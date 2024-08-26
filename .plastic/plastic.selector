@@ -1,0 +1,4 @@
+repository "Z_Plugin@Mr_hlly@cloud"
+  path "/"
+    br "/main"
+    co "/main"

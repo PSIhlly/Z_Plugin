@@ -1,0 +1,4 @@
+﻿  ServeCore.cpp
+D:\Works\VS's\C++\Z_Server\ServeCore.cpp(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+D:\Works\VS's\C++\Z_Server\ServeCore.cpp(120,23): warning C4018: “<”: 有符号/无符号不匹配
+  Z_Server.vcxproj -> D:\Works\VS's\C++\Z_Server\Debug\Z_Server.exe

@@ -1,0 +1,16 @@
+{
+    "name": "Z_Client",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e57ccd5b37b83b8418c733e6b6fde474"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

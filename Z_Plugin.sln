@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{349D3CED-3B01-A894-1286-2212C7ED26F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z_Os", "Z_Os.csproj", "{DB10A55B-251C-8671-66E0-89DD923A1B1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z_Client", "Z_Client.csproj", "{6C5ADBF1-FFC4-2355-3184-322A58F036EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z_Serialize", "Z_Serialize.csproj", "{275D4130-2AB6-D84B-BED8-14FB20F21C19}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB10A55B-251C-8671-66E0-89DD923A1B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB10A55B-251C-8671-66E0-89DD923A1B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB10A55B-251C-8671-66E0-89DD923A1B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB10A55B-251C-8671-66E0-89DD923A1B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C5ADBF1-FFC4-2355-3184-322A58F036EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5ADBF1-FFC4-2355-3184-322A58F036EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C5ADBF1-FFC4-2355-3184-322A58F036EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C5ADBF1-FFC4-2355-3184-322A58F036EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{275D4130-2AB6-D84B-BED8-14FB20F21C19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{275D4130-2AB6-D84B-BED8-14FB20F21C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{275D4130-2AB6-D84B-BED8-14FB20F21C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{275D4130-2AB6-D84B-BED8-14FB20F21C19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,22 +1,20 @@
 #include <iostream>
 #include <WS2tcpip.h>  // Winsock2 库
 #include "..\Base\serverCore.h"
-#include <thread>
 #include <chrono>
 #include <vector>
 #include "..\Util\byteSerialize.h"
 using namespace std;
-TcpListenerServer::TcpListenerServer(int _localPort) : ListenerServer(_localPort)
+TcpListenerServer::TcpListenerServer(int _localPort, function<void(Msg)> _onReceiveCallBack, function<void(CLIENTTUPLE)> _onCloseCallBack) : ListenerServer(_localPort, _onReceiveCallBack)
 {
-
-
+	onCloseCallBack = _onCloseCallBack;
 }
 void TcpListenerServer::listenerThreadDo()
 {
 	// 创建一个 TCP 套接字
 	SOCKET tcpSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (tcpSocket == INVALID_SOCKET) {
-		cerr << "Can't create UDP socket! Quitting" << endl;
+		cerr << "Can't create TCP socket! Quitting" << endl;
 		return;
 	}
 
@@ -26,12 +24,11 @@ void TcpListenerServer::listenerThreadDo()
 	hint.sin_port = htons(localPort);  // 本地端口，注意 htons 将主机字节序转换为网络字节序
 	hint.sin_addr.S_un.S_addr = INADDR_ANY;  // 接收所有 IP 地址
 
-	bind(tcpSocket, (sockaddr*)&hint, sizeof(hint));
-	cout << "StartWait" << endl;
+	::bind(tcpSocket, (sockaddr*)&hint, sizeof(hint));
+	cout << localPort<<"StartWait" << endl;
 
 	int socketClient;
 	listen(tcpSocket, 5);
-	std::vector<std::thread> threads;
 	while (true)
 	{
 		sockaddr_in clientAddr;
@@ -39,17 +36,18 @@ void TcpListenerServer::listenerThreadDo()
 		
 
 		socketClient = accept(tcpSocket, (struct sockaddr*)&clientAddr, (socklen_t*)&clientAddrSize);
-
 		if (socketClient == INVALID_SOCKET)
 		{
-			cerr << "连接失败";
+			cerr << "Connect fail";
 			continue;
 		}
-
 		//1.登记
 		CLIENTTUPLE address = make_tuple(clientAddr.sin_addr.S_un.S_addr, clientAddr.sin_port);
+
 		//2.记录该用户
-		TcpClientServer* client = new TcpClientServer(socketClient, clientAddr);
+		auto bindCloseClient = std::bind(&TcpListenerServer::closeClient, this, std::placeholders::_1);
+		TcpClientServer* client = new TcpClientServer(socketClient, clientAddr, onReceiveCallBack, bindCloseClient);
+
 		id2Client[address] = client;
 		idList.push_back(address);
 		cout << "new!" << endl;
@@ -61,6 +59,28 @@ void TcpListenerServer::listenerThreadDo()
 	}
 }
 
+void TcpListenerServer::closeClient(CLIENTTUPLE address)
+{
+	if (id2Client[address]!=NULL)
+	{
+		if (onCloseCallBack)
+		{
+			onCloseCallBack(address);
+		}
+		cout << "Over " << endl << id2Client[address]->socket << endl;
+		// 关闭套接字和清理 Winsock
+		closesocket(id2Client[address]->socket);
+		delete id2Client[address];
+	}
+	id2Client[address] = NULL;
+
+	auto it = std::find(idList.begin(), idList.end(), address);
+	if (it != idList.end()) {
+		idList.erase(it);
+	}
+
+
+}
 
 void TcpListenerServer::subListenerThreadDo(CLIENTTUPLE address, SOCKET socketClient)
 {
@@ -73,6 +93,8 @@ void TcpListenerServer::subListenerThreadDo(CLIENTTUPLE address, SOCKET socketCl
 		int received = 0;
 		while (true)
 		{
+			if (id2Client[address] == NULL)
+				break;
 			cout << "qianlai!"  << endl;
 			int bytesReceived = recv(socketClient, rawMsg, BUFFER_LENGTH, 0);
 			cout << bytesReceived << endl;
@@ -111,10 +133,10 @@ void TcpListenerServer::subListenerThreadDo(CLIENTTUPLE address, SOCKET socketCl
 						for (int i = 0; i < realMsg.size(); i++)
 						{
 							msg[i] = realMsg[i];
-						}
+						}	cout << static_cast<void*>(msg) << std::endl;
 						//初始信息手动叫
 						manageRealMsg(address, msg, length);
-
+						cout << static_cast<void*>(msg) << std::endl;
 						delete[] msg;
 
 						realMsg.clear();
@@ -150,13 +172,10 @@ void TcpListenerServer::subListenerThreadDo(CLIENTTUPLE address, SOCKET socketCl
 			}
 
 		}
-		cout << "Over "<<endl<< socketClient<<endl;
-	// 关闭套接字和清理 Winsock
-	closesocket(socketClient);
+		closeClient(address);
 }
 
 void TcpListenerServer::manageRealMsg(CLIENTTUPLE address, char*& realMsg, int& length)
 {
-	debug(realMsg, length);
 	(*id2Client[address]).onReceiveMsg(realMsg, length);
 }

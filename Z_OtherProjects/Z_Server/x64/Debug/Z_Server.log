@@ -1,5 +1,3 @@
-﻿  tcpListenerServer.cpp
-D:\Works\Unity's\Personal\Tools\Z_Plugin\Z_OtherProjects\Z_Server\Tcp\tcpListenerServer.cpp(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-D:\Works\Unity's\Personal\Tools\Z_Plugin\Z_OtherProjects\Z_Server\Base\serverCore.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-D:\Works\Unity's\Personal\Tools\Z_Plugin\Z_OtherProjects\Z_Server\Tcp\tcpListenerServer.cpp(41,24): warning C4244: “=”: 从“SOCKET”转换到“int”，可能丢失数据
-  Z_Server.vcxproj -> D:\Works\Unity's\Personal\Tools\Z_Plugin\Z_OtherProjects\Z_Server\x64\Debug\Z_Server.exe
+﻿  pvpServerStart.cpp
+D:\Works\Unity's\Personal\wwepq\WorldWarEraPreQin_assets\Z_Server\Base\serverCore.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  Z_Server.vcxproj -> D:\Works\Unity's\Personal\wwepq\WorldWarEraPreQin_assets\Z_Server\x64\Debug\Z_Server.exe

@@ -10,26 +10,51 @@ public class Z_ClientSample : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ClientCore.Instance.Init(new Param[] { new Param( ProtoType.Tcp,1234, "127.0.0.1", 5678), new Param(ProtoType.Tcp, 2468, "127.0.0.1", 5678) });
+        ClientCore.Instance.Init(new Param[] { new Param( ProtoType.Tcp,1234, "127.0.0.1", 55555), new Param(ProtoType.Tcp, 5678, "127.0.0.1", 55555) });
     }
 
     public void Update()
     {
-        if(Input.GetKeyDown(KeyCode.W))
+        if(Input.GetKeyDown(KeyCode.Q))
         {
-            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("wwww"));
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("1$weq"));
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("10$"));
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("11$1"));
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("12$"));
+        }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("31$wwwwww"));
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            ClientCore.Instance.Send(5678, Encoding.ASCII.GetBytes("1$sweq"));
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
-            ClientCore.Instance.Send(2468, Encoding.ASCII.GetBytes("ssss"));
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("aaaa"));
+            ClientCore.Instance.Send(5678, Encoding.ASCII.GetBytes("10$"));
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
-            ClientCore.Instance.Send(2468, Encoding.ASCII.GetBytes("dddd"));
+            ClientCore.Instance.Send(5678, Encoding.ASCII.GetBytes("11$1"));
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ClientCore.Instance.Send(5678, Encoding.ASCII.GetBytes("12$"));
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("31$aaaaaaa"));
         }
     }
 }

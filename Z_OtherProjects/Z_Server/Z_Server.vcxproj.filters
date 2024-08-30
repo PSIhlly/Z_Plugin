@@ -21,6 +21,9 @@
     <ClInclude Include="Base\serverCore.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Util\byteSerialize.cpp">
@@ -48,6 +51,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Base\serverCore.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="modDownloadServerStart.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pvpServerStart.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

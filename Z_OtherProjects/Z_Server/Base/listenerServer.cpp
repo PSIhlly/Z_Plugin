@@ -11,9 +11,10 @@ void ListenerServer::listenerThreadDo()
 {
 
 }
-ListenerServer::ListenerServer(int _localPort)
+ListenerServer::ListenerServer(int _localPort, std::function<void(Msg)> _onReceiveCallBack)
 {
 	localPort = _localPort;
+	onReceiveCallBack = _onReceiveCallBack;
 }
 void ListenerServer::manageRealMsg(CLIENTTUPLE address, char*& realMsg, int& length)
 {

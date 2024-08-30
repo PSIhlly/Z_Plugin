@@ -6,7 +6,7 @@
 #include <vector>
 #include "..\Util\byteSerialize.h"
 using namespace std;
-UdpClientServer::UdpClientServer(SOCKET _socket, sockaddr_in _clientAddr) :ClientServer(_socket, _clientAddr)
+UdpClientServer::UdpClientServer(SOCKET _socket, sockaddr_in _clientAddr, function<void(Msg)> _onReceiveCallBack) :ClientServer(_socket, _clientAddr, _onReceiveCallBack)
 {
 	uniqueId = 0;
 }
@@ -36,17 +36,25 @@ void UdpClientServer::sendMsg(char*& msg, int length)
 
 
 }
+void UdpClientServer::sendMsg(string msg)
+{
+	char* now = new char[msg.size() + 1];
+	for (int i = 0; i < msg.size() + 1; i++)
+		now[i] = msg[i];
 
+	sendMsg(now, msg.size() + 1);
+	delete now;
+}
 void UdpClientServer::onReceiveMsg(char* data, int length)
 {
 	// 打印接收到的数据
 	debug(data, length);
-	//内存隔离
-	char* sendData = new char[length];
-	for (int i = 0; i < length; i++)
-	{
-		sendData[i]=data[i];
+	Msg msg;
+	msg.mes = data;
+	msg.mesLength = length;
+	msg.client = this;
+	if (onReceiveCallBack) {
+		onReceiveCallBack(msg);  // 调用回调函数
 	}
-	sendMsg(sendData, length);//发回去
-	delete[] sendData;
+
 }

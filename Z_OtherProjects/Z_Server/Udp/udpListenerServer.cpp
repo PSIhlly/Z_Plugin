@@ -7,7 +7,7 @@
 #include "..\Util\byteSerialize.h"
 using namespace std;
 
-UdpListenerServer::UdpListenerServer(int _localPort) : ListenerServer(_localPort)
+UdpListenerServer::UdpListenerServer(int _localPort, function<void(Msg)> _onReceiveCallBack) : ListenerServer(_localPort, _onReceiveCallBack)
 {
 
 }
@@ -27,7 +27,7 @@ void UdpListenerServer::listenerThreadDo()
 	hint.sin_port = htons(localPort);  // 本地端口，注意 htons 将主机字节序转换为网络字节序
 	hint.sin_addr.S_un.S_addr = INADDR_ANY;  // 接收所有 IP 地址
 
-	bind(udpSocket, (sockaddr*)&hint, sizeof(hint));
+	::bind(udpSocket, (sockaddr*)&hint, sizeof(hint));
 	cout << "StartWait" << endl;
 
 	int length = 0;
@@ -78,7 +78,7 @@ void UdpListenerServer::listenerThreadDo()
 					//2.记录该用户
 					if (id2Client[address] == NULL)
 					{
-						UdpClientServer* client = new UdpClientServer(udpSocket, clientAddr);
+						UdpClientServer* client = new UdpClientServer(udpSocket, clientAddr, onReceiveCallBack);
 						(*client).clientAddr = clientAddr;
 
 						id2Client[address] = client;

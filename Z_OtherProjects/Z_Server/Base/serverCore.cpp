@@ -11,37 +11,31 @@
 #pragma comment(lib, "ws2_32.lib")  // 链接 ws2_32.lib 库文件
 using namespace std;
 
-int start(int type)//0udp 1tcp
-{
+void createServer(int type, int port, function<void(Msg)>  onReceiveCallBack,function<void(CLIENTTUPLE)>  onCloseCallBack);
 
-	// 初始化 Winsock
-	WSADATA wsData;
-	WORD ver = MAKEWORD(2, 2);
-	int wsOK = WSAStartup(ver, &wsData);
-	if (wsOK != 0) {
-		cerr << "Can't initialize Winsock! Quitting" << endl;
-		return -1;
-	}
+thread start(int type,int port, function<void(Msg)>  onReceiveCallBack, function<void(CLIENTTUPLE)>  onCloseCallBack)//0udp 1tcp
+{
+	thread mainThread(createServer,type,port, onReceiveCallBack, onCloseCallBack);
+	return mainThread;
+}
+void createServer(int type, int port, function<void(Msg)>  onReceiveCallBack, function<void(CLIENTTUPLE)>  onCloseCallBack)
+{
 	switch (type)
 	{
 	case 0:
 	{
-		UdpListenerServer udpServer = UdpListenerServer(5678);
+		UdpListenerServer udpServer = UdpListenerServer(port, onReceiveCallBack);
 		udpServer.start();
 		break;
 	}
 	case 1:
 	{
-		TcpListenerServer tcpServer = TcpListenerServer(5678);
+		TcpListenerServer tcpServer = TcpListenerServer(port, onReceiveCallBack, onCloseCallBack);
 		tcpServer.start();
 		break;
 	}
 
 	}
-
-
-	WSACleanup();
-	return 0;
 }
 
 void debugSockaddrIn(sockaddr_in addr) {

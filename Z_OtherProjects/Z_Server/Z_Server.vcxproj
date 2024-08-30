@@ -20,18 +20,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\serverCore.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="Util\byteSerialize.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Base\clientServer.cpp" />
     <ClCompile Include="Base\listenerServer.cpp" />
     <ClCompile Include="Base\serverCore.cpp" />
+    <ClCompile Include="pvpServerStart.cpp" />
     <ClCompile Include="serverStart.cpp" />
     <ClCompile Include="Tcp\tcpClientServer.cpp" />
     <ClCompile Include="Tcp\tcpListenerServer.cpp" />
     <ClCompile Include="Udp\udpClientServer.cpp" />
     <ClCompile Include="Udp\udpListenerServer.cpp" />
     <ClCompile Include="Util\byteSerialize.cpp" />
+    <ClCompile Include="modDownloadServerStart.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -33,7 +33,11 @@ public class Z_ClientSample : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.T))
         {
-            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("31$wwwwww"));
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("3$weq"));
+        }
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            ClientCore.Instance.Send(1234, Encoding.ASCII.GetBytes("13$0$1$1"));
         }
 
         if (Input.GetKeyDown(KeyCode.A))

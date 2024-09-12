@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{349D3CED-3B01-A894-1286-2212C7ED26F9}</ProjectGuid>
+    <ProjectGuid>{4FE1F9A1-9FE4-F98A-B5FA-EAB736018378}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Z_Ui</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -27,7 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169;USG0001</NoWarn>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169;USG0001</NoWarn>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -60,138 +60,19 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.39f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\06_CLRBinding\CLRBindingDemo.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Sample\Z_Ui_Sample.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\03_Delegate\DelegateDemo.cs" />
-    <Compile Include="Assets\Scenes\Test.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\02_Invocation\Invocation.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\ValueTypeBindingDemo.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourDemo.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonException.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\Lexer.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\IJsonWrapper.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector3Binder.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonReader.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonWriter.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\09_Reflection\ReflectionDemo.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonData.cs" />
-    <Compile Include="Assets\Z_Level2\Z_TileMap\Sample\Z_TileMap_Demo.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\InheritanceAdapter.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourAdapter.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\QuaternionBinder.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector2Binder.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineAdapter.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\Inheritance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\05_CLRRedirection\CLRRedirectionDemo.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\10_LitJson\LitJsonDemo.cs" />
-    <Compile Include="Assets\Z_Level0\Z_Texture\Sample\Z_Texture_Sample.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMockWrapper.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineDemo.cs" />
-    <Compile Include="Assets\Z_Level0\Z_Os\Sample\Z_Os_Sample.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\12_Performance\Performance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMapper.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\01_HelloWorld\HelloWorld.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\ParserToken.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\BaseFunc\SwitchFunc.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\SkipFuncController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\MainPictureController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\DialogUiBaseManager.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\HistoryFuncController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\ProfilePictureController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\TitleController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\AutoPlayFuncController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\HideFuncController.cs" />
+    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\MainTextController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\StreamingAssets\System.Drawing.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Claims.dll" />
-    <None Include="Assets\StreamingAssets\System.Resources.Writer.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.UnmanagedMemoryStream.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.FileSystem.Watcher.dll" />
-    <None Include="Assets\StreamingAssets\System.Text.Encoding.Extensions.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Principal.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Cryptography.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Collections.dll" />
-    <None Include="Assets\StreamingAssets\System.Globalization.Extensions.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.WebSockets.Client.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.Compression.ZipFile.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.NetworkInformation.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.NameResolution.dll" />
-    <None Include="Assets\StreamingAssets\System.Reflection.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.Http.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Numerics.dll" />
-    <None Include="Assets\Z_Level0\Newtonsoft.Json.dll" />
-    <None Include="Assets\StreamingAssets\System.AppContext.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.Sockets.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.Pipes.dll" />
-    <None Include="Assets\StreamingAssets\System.Xml.XmlDocument.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Serialization.Json.dll" />
-    <None Include="Assets\StreamingAssets\System.Linq.dll" />
-    <None Include="Assets\StreamingAssets\System.Xml.XPath.dll" />
-    <None Include="Assets\StreamingAssets\System.Xml.XDocument.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Serialization.Xml.dll" />
-    <None Include="Assets\StreamingAssets\System.Xml.XPath.XDocument.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.FileSystem.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.Timer.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.MemoryMappedFiles.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.CompilerServices.VisualC.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Cryptography.X509Certificates.dll" />
-    <None Include="Assets\StreamingAssets\System.Xml.XmlSerializer.dll" />
-    <None Include="Assets\StreamingAssets\System.Globalization.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.Contracts.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Serialization.Formatters.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.Tasks.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.Compression.dll" />
-    <None Include="Assets\StreamingAssets\System.Data.Common.dll" />
-    <None Include="Assets\StreamingAssets\System.Globalization.Calendars.dll" />
-    <None Include="Assets\StreamingAssets\System.Console.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.Tasks.Parallel.dll" />
-    <None Include="Assets\StreamingAssets\System.ObjectModel.dll" />
-    <None Include="Assets\StreamingAssets\System.Reflection.dll" />
-    <None Include="Assets\StreamingAssets\System.Text.RegularExpressions.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.Debug.dll" />
-    <None Include="Assets\StreamingAssets\System.ComponentModel.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.FileVersionInfo.dll" />
-    <None Include="Assets\StreamingAssets\System.ComponentModel.TypeConverter.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.InteropServices.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.Ping.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.FileSystem.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Cryptography.Csp.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.TextWriterTraceListener.dll" />
-    <None Include="Assets\StreamingAssets\System.ValueTuple.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Serialization.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.WebHeaderCollection.dll" />
-    <None Include="Assets\StreamingAssets\System.Xml.ReaderWriter.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.IsolatedStorage.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Cryptography.Algorithms.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.dll" />
-    <None Include="Assets\StreamingAssets\System.Resources.Reader.dll" />
-    <None Include="Assets\StreamingAssets\System.Dynamic.Runtime.dll" />
-    <None Include="Assets\StreamingAssets\netstandard.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.Tracing.dll" />
-    <None Include="Assets\StreamingAssets\System.Linq.Queryable.dll" />
-    <None Include="Assets\StreamingAssets\System.ComponentModel.EventBasedAsync.dll" />
-    <None Include="Assets\StreamingAssets\System.Text.Encoding.dll" />
-    <None Include="Assets\StreamingAssets\System.Collections.Specialized.dll" />
-    <None Include="Assets\StreamingAssets\System.Linq.Parallel.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.ThreadPool.dll" />
-    <None Include="Assets\StreamingAssets\System.ComponentModel.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Collections.NonGeneric.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.TraceSource.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Extensions.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.Cryptography.Encoding.dll" />
-    <None Include="Assets\StreamingAssets\HotFix_Project.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.Requests.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.Process.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.Tools.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.Security.dll" />
-    <None Include="Assets\StreamingAssets\Microsoft.Win32.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.InteropServices.RuntimeInformation.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.dll" />
-    <None Include="Assets\StreamingAssets\System.Collections.Concurrent.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.Overlapped.dll" />
-    <None Include="Assets\StreamingAssets\System.Threading.Thread.dll" />
-    <None Include="Assets\StreamingAssets\System.Reflection.Extensions.dll" />
-    <None Include="Assets\StreamingAssets\System.Diagnostics.StackTrace.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.WebSockets.dll" />
-    <None Include="Assets\StreamingAssets\System.Resources.ResourceManager.dll" />
-    <None Include="Assets\StreamingAssets\System.Net.Primitives.dll" />
-    <None Include="Assets\StreamingAssets\System.Runtime.Handles.dll" />
-    <None Include="Assets\StreamingAssets\System.Security.SecureString.dll" />
-    <None Include="Assets\StreamingAssets\System.IO.FileSystem.DriveInfo.dll" />
-    <None Include="Assets\StreamingAssets\System.Linq.Expressions.dll" />
+    <None Include="Assets\Z_Level2\Z_UI\Core\Z_Ui.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -514,8 +395,32 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.39f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEditor.Graphs">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.39f1\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.39f1\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.39f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.YamlDotNet">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.4\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.2.5\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="unityplastic">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@2.4.4\Lib\Editor\PlasticSCM\unityplastic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Plastic.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@2.4.4\Lib\Editor\PlasticSCM\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ILRuntime.Mono.Cecil">
@@ -526,12 +431,28 @@
       <HintPath>Assets\Z_Level0\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Plastic.Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@2.4.4\Lib\Editor\PlasticSCM\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="log4netPlastic">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@2.4.4\Lib\Editor\PlasticSCM\log4netPlastic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.IonicZip">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.4\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.4\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ILRuntime.Mono.Cecil.Pdb">
       <HintPath>Library\PackageCache\com.ourpalm.ilruntime@2.0.2\Plugins\ILRuntime.Mono.Cecil.Pdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.TextureAssets">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.4\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ILRuntime.Mono.Cecil.Mdb">
@@ -1050,143 +971,19 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.39f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.EditorCoroutines.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.PlasticSCM.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ILRuntime">
-      <HintPath>Library\ScriptAssemblies\ILRuntime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Timeline.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Shared.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualStudio.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Core">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Core.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Rider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Timeline">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VSCode.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Z_ObjectAnimator.csproj">
-      <Project>{9DCCECFA-008F-FE02-15EC-09C3D3165C2C}</Project>
-      <Name>Z_ObjectAnimator</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Role.csproj">
-      <Project>{F525D38E-C301-4E94-E553-328D12994AC7}</Project>
-      <Name>Z_Role</Name>
-    </ProjectReference>
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
       <Name>Z_DesignStyle</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_TileMap.csproj">
-      <Project>{239AD4E9-50D2-EF56-B467-EE9EF8ACF31A}</Project>
-      <Name>Z_TileMap</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Os.csproj">
-      <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
-      <Name>Z_Os</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_IlRuntime.csproj">
-      <Project>{84808AE8-8C94-824C-B9DA-B280A421A9C3}</Project>
-      <Name>Z_IlRuntime</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Serialize.csproj">
-      <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
-      <Name>Z_Serialize</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Texture.csproj">
-      <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
-      <Name>Z_Texture</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Client.csproj">
-      <Project>{6C5ADBF1-FFC4-2355-3184-322A58F036EF}</Project>
-      <Name>Z_Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Ui.csproj">
-      <Project>{4FE1F9A1-9FE4-F98A-B5FA-EAB736018378}</Project>
-      <Name>Z_Ui</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

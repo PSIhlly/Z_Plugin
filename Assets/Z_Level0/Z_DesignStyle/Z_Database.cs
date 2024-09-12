@@ -5,27 +5,29 @@ using UnityEngine;
 
 namespace Z_DesignStyle
 {
-    
+
     public class RawData
-        {
-            public IDatabase database;
-            public int id;
-        }
+    {
+        public IDatabase database;
+        public int id;
+        public Z_Database[] subDatabase;
+    }
     public interface IDatabase
     {
-       
+
         public bool Load(bool loadSubDatabase);
         public void Save(bool saveSubDatabase);
         public void Init();
         public void Register(RawData upData, string address, string fileName);
     }
-    public abstract class  Z_Database: IDatabase
+    public abstract class Z_Database : IDatabase
     {
         // Start is called before the first frame update
         public string address;
         public string fileName;
         public RawData upData;
-        
+
+        public Dictionary<int, RawData> dataDic = new Dictionary<int, RawData>();
         public virtual RawData GetRawData(int id)
         {
             return new RawData();
@@ -33,7 +35,7 @@ namespace Z_DesignStyle
 
         public virtual bool Load(bool loadSubDatabase)
         {
-            if(File.Exists(address+fileName))
+            if (File.Exists(address + fileName))
             {
                 return true;
             }
@@ -49,18 +51,18 @@ namespace Z_DesignStyle
         {
             throw new System.NotImplementedException();
         }
-        public virtual void Register(RawData upData,string address,string fileName)
+        public virtual void Register(RawData upData, string address, string fileName)
         {
-            this.upData = (RawData)upData;
+            this.upData = upData;
             this.address = address;
             this.fileName = fileName;
-            if(!Directory.Exists(address))
+            if (!Directory.Exists(address))
             {
                 Directory.CreateDirectory(address);
             }
-            if (!File.Exists(address+ fileName))
+            if (!File.Exists(address + fileName))
             {
-                File.Create(address+ fileName).Close();
+                File.Create(address + fileName).Close();
             }
         }
     }

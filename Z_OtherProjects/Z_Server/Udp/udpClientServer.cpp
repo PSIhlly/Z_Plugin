@@ -38,17 +38,15 @@ void UdpClientServer::sendMsg(char*& msg, int length)
 }
 void UdpClientServer::sendMsg(string msg)
 {
-	char* now = new char[msg.size() + 1];
-	for (int i = 0; i < msg.size() + 1; i++)
+	char* now = new char[msg.size()];
+	for (int i = 0; i < msg.size(); i++)
 		now[i] = msg[i];
 
-	sendMsg(now, msg.size() + 1);
+	sendMsg(now, msg.size());
 	delete now;
 }
 void UdpClientServer::onReceiveMsg(char* data, int length)
 {
-	// 打印接收到的数据
-	debug(data, length);
 	Msg msg;
 	msg.mes = data;
 	msg.mesLength = length;

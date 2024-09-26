@@ -134,7 +134,7 @@ void TcpListenerServer::subListenerThreadDo(CLIENTTUPLE address, SOCKET socketCl
 						{
 							msg[i] = realMsg[i];
 						}	cout << static_cast<void*>(msg) << std::endl;
-						//初始信息手动叫
+
 						manageRealMsg(address, msg, length);
 						cout << static_cast<void*>(msg) << std::endl;
 						delete[] msg;

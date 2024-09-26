@@ -15,8 +15,8 @@ TcpClientServer::TcpClientServer(SOCKET _socket, sockaddr_in _clientAddr,functio
 }
 void TcpClientServer::sendMsg(char*& msg, int length)
 {
-	char* now = new char[length+1]; 
-	std::copy(msg, msg + length + 1, now);
+	char* now = new char[length]; 
+	std::copy(msg, msg + length, now);
 
 	setInHeadBytes(length, now, length);
 
@@ -38,15 +38,15 @@ void TcpClientServer::sendMsg(string msg)
 		now[i] = msg[i];
 	}
 
-	sendMsg(now, msg.size() + 1);
+	sendMsg(now, msg.size());
 	delete[] now;
 }
 void TcpClientServer::onReceiveMsg(char* data, int length)
 {
 	// 打印接收到的数据
 	debug(data, length);
-	char* now = new char[length + 1];
-	std::copy(data, data + length + 1, now);
+	char* now = new char[length];
+	std::copy(data, data + length, now);
 	Msg msg;
 	msg.mes = now;
 	msg.id = make_tuple(clientAddr.sin_addr.S_un.S_addr,clientAddr.sin_port);

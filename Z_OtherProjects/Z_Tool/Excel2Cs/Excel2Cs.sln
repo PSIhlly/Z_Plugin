@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34931.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Excel2Cs", "Excel2Cs.pyproj", "{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E03E1B28-E326-485B-A4A6-4609CD2D7308}
+	EndGlobalSection
+EndGlobal

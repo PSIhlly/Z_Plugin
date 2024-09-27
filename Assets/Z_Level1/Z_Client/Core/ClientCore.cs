@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -5,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using Z_DesignStyle;
 namespace Z_Client
 {
     public enum ProtoType
@@ -19,49 +20,44 @@ namespace Z_Client
         public int targetPort;
         public int localPort;
         public ProtoType protoType;
-        public Param(ProtoType protoType,int localPort, string targetIp, int targetPort)
+        public Action<int,byte[]> onReceive;
+        public Param(ProtoType protoType,int localPort, string targetIp, int targetPort, Action<int, byte[]> onReceive)
         {
             this.targetIp = targetIp;
             this.targetPort = targetPort;
             this.localPort = localPort;
             this.protoType = protoType;
+            this.onReceive = onReceive;
         }
     }
+    public class ReceiveMsg
+    {
+        public int localPort;
+        public byte[] msg;
+        public Action<int, byte[]> onReceive;
+    }
 
-    public class ClientCore : MonoBehaviour//todo:monoSingleton
+    public sealed class ClientCore : Z_MonoSingleton<ClientCore>
     {
 
         public const int BUFFER_LENGTH = 10240;
 
         public const float DIFCHECKTIME = 60;
 
-        private static ClientCore _instance;
-
         private Dictionary<int, (ClientListener, ClientSender)> netPairDic;
 
         internal static float timeNow;
 
-        public static ClientCore Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    var listener = new GameObject("ClientCore");
-                    _instance = listener.AddComponent<ClientCore>();
-                }
-                return _instance;
-            }
-            private set
-            {
-                _instance = value;
-            }
-        }
-
+        private List<ReceiveMsg> receiveList = new List<ReceiveMsg>();
         
         public void Update()
         {
             timeNow = Time.time;
+            foreach(var rec in receiveList)
+            {
+                rec.onReceive.Invoke(rec.localPort, rec.msg);
+            }
+            receiveList.Clear();
         }
 
 
@@ -79,7 +75,11 @@ namespace Z_Client
 
                         netPairDic[initParam.localPort] = (new UdpClientListener(udpClient, (msg) =>
                         {
-                            OnReceive(initParam.localPort, msg);
+                            OnReceive(new ReceiveMsg(){
+                                localPort=initParam.localPort, 
+                                msg=msg,
+                                onReceive=initParam.onReceive 
+                            });
                         }), new UdpClientSender(udpClient, initParam.targetIp, initParam.targetPort));
                         break;
                     case ProtoType.Tcp:
@@ -92,7 +92,12 @@ namespace Z_Client
 
                         netPairDic[initParam.localPort] = (new TcpClientListener(tcpClient, (msg) =>
                         {
-                            OnReceive(initParam.localPort, msg);
+                            OnReceive(new ReceiveMsg()
+                            {
+                                localPort = initParam.localPort,
+                                msg = msg,
+                                onReceive = initParam.onReceive
+                            });
                         }), new TcpClientSender(tcpClient, initParam.targetIp, initParam.targetPort));
 
                         break;
@@ -103,13 +108,13 @@ namespace Z_Client
             }
         }
 
-        public virtual void OnReceive(int localPort, byte[] msg)
+        public void OnReceive(ReceiveMsg msg)
         {
-            string content = Encoding.UTF8.GetString(msg);
-            Debug.Log("收到了" + content);
+            Debug.Log(msg.localPort);
+            receiveList.Add(msg);
         }
 
-        public virtual void Send(int localPort, byte[] msg)
+        public void Send(int localPort, byte[] msg)
         {
             
             netPairDic[localPort].Item2.Send(msg);

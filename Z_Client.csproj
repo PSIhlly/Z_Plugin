@@ -983,6 +983,10 @@
       <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
       <Name>Z_Serialize</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_DesignStyle.csproj">
+      <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
+      <Name>Z_DesignStyle</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

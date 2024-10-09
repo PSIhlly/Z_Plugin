@@ -1,2 +1,2 @@
-cmd /c "pip install pandas openpyxl pyinstaller"
+cmd /c "pip install pandas openpyxl pyinstaller zmail"
 pause

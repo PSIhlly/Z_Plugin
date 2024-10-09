@@ -1,9 +1,12 @@
 Library/
-/Z_OtherProjects/Z_Server/.vs
-/Z_OtherProjects/Z_Server/x64
 /.vs
 /Temp
 /Logs
-/.vs
 /obj/Debug
 /obj
+/.plastic
+/Z_OtherProjects/Z_Server/CppPart/.vs
+/Z_OtherProjects/Z_Server/CppPart/x64
+/Z_OtherProjects/Z_Server/PyPart/.vs
+/Z_OtherProjects/Z_Server/PyPart/__pycache__
+/Z_OtherProjects/Z_Server/CppPart/Debug

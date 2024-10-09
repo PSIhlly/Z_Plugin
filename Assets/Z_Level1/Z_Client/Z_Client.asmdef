@@ -2,7 +2,8 @@
     "name": "Z_Client",
     "rootNamespace": "",
     "references": [
-        "GUID:e57ccd5b37b83b8418c733e6b6fde474"
+        "GUID:e57ccd5b37b83b8418c733e6b6fde474",
+        "GUID:f1afb23856bbf394e828758842085432"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

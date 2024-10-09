@@ -22,7 +22,6 @@ namespace Z_Client
             {
 
                 NetworkStream stream = tcpClient.GetStream();
-                
                 byte[] rawMsg = new byte[ClientCore.BUFFER_LENGTH];
                 byte[] realMsg=new byte[0];
                 List<byte> lengthBytes = new List<byte>(4);
@@ -59,7 +58,7 @@ namespace Z_Client
                         }
 
                         int realDataRemain = bytesRead - p;
-
+                        Debug.Log(realDataRemain);
                         if (realDataRemain == 0)
                             break;
                         //length

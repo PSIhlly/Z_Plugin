@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Z_ByteSerialize
 {
-public class BytesSerialize : MonoBehaviour
-{
-    // Start is called before the first frame update
+    public class BytesSerialize : MonoBehaviour
+    {
+
     public static byte[] SetInHeadBytes(object src,ref byte[] tar)
     {
         byte[] tarBytes;
@@ -32,11 +32,9 @@ public class BytesSerialize : MonoBehaviour
                 byte[] newSrc = new byte[src.Length - 4];
                 Buffer.BlockCopy(src, 4, newSrc, 0, src.Length - 4);
                 src = newSrc;
-                tar = BitConverter.ToInt32(srcBytes);
+                tar = BitConverter.ToInt32(srcBytes,0);
             }
             return tar;
         }
     }
-
-
 }

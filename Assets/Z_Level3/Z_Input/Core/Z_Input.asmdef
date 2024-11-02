@@ -1,0 +1,16 @@
+{
+    "name": "Z_Input",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f1afb23856bbf394e828758842085432"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

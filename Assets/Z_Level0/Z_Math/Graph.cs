@@ -1,0 +1,111 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+namespace Z_Math
+{
+    public class Graph
+    {
+       public enum CubeEightPoint
+        {
+            LeftDownBack,
+            RightDownBack,
+            LeftUpBack,
+            RightUpBack,
+            LeftDownForward,
+            RightDownForward,
+            LeftUpForward,
+            RightUpForward,
+        }
+
+        public static Vector3[] RotatePointAroundOrigin(Vector3[] points, Vector3 eular)
+        {
+            Vector3[] newPos = new Vector3[points.Length];
+            Quaternion rotation = Quaternion.Euler(eular);
+            for (int i=0,icnt=points.Length;i<icnt;i++)
+            {
+                // 将欧拉角转换为四元数
+                // 使用四元数旋转点
+                newPos[i]= rotation * points[i];
+            }
+            return newPos;
+        }
+        public static Vector3[] GetCubeEightPoint(Vector3 center,Vector3 size,Vector3 eular,Vector3 scale,Vector3 offset)
+        {
+            Debug.Log(offset + " " + center + " " + size + " " + scale + " " + eular);
+            Vector3[] ans = new Vector3[8];
+            Quaternion rotation = Quaternion.Euler(eular);
+            //ref CubeEightPoint
+            Vector3[] choose = new[] { new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f),
+                                        new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f)};
+            for(int i=0;i<8;i++)
+            {
+                ans[i] = offset+rotation * ElementwiseMultiply(center + ElementwiseMultiply(choose[i],size), scale);
+            }
+            return ans;
+        }
+        public static List<Vector3Int> GetRoughOverlapIntPos(Vector3[] cubeEightPoint)
+        {
+            int minX = int.MaxValue;
+            int minY= int.MaxValue;
+            int minZ = int.MaxValue;
+            int maxX = int.MinValue;
+            int maxY = int.MinValue;
+            int maxZ = int.MinValue;
+            for (int i = 0; i < 8; i++)
+            {
+                minX = Mathf.Min((int)cubeEightPoint[i].x,minX);
+                minY = Mathf.Min((int)cubeEightPoint[i].y, minY);
+                minZ = Mathf.Min((int)cubeEightPoint[i].z, minZ);
+                maxX = Mathf.Max((int)(cubeEightPoint[i].x+1), maxX);
+                maxY = Mathf.Max((int)(cubeEightPoint[i].y+1), maxY);
+                maxZ = Mathf.Max((int)(cubeEightPoint[i].z+1), maxZ);
+            }
+            List<Vector3Int> res = new List<Vector3Int>((maxX-minX+1)*( maxY - minY + 1)*(maxZ - minZ + 1));
+            Debug.Log("oko"+minX + " " + maxX + " " + minY + " " + maxY + " " + minZ + " " + maxZ);
+            for (int i = minX; i <= maxX; i++)
+                for (int j = minY; j <= maxY; j++)
+                    for (int k = minZ; k <= maxZ; k++)
+                    {
+                        res.Add(new Vector3Int(i,j,k));
+                    }
+            return res;
+        }
+        public static bool IsPointInQuad(Vector2[] quadFourPoint, Vector2 point)
+        {
+
+            bool isPositive = false;
+            bool isNegative = false;
+
+            for (int i = 0; i < quadFourPoint.Length; i++)
+            {
+                Vector2 p1 = quadFourPoint[i];
+                Vector2 p2 = quadFourPoint[(i + 1) % quadFourPoint.Length];
+                
+                float crossProduct = Cross(p1, p2, point);
+
+                if (crossProduct > 0)
+                    isPositive = true;
+                else if (crossProduct < 0)
+                    isNegative = true;
+
+                if (isPositive && isNegative)
+                    return false;
+            }
+
+            return true;
+        }
+        public static float Cross(Vector2 from, Vector2 to, Vector2 o)
+        {
+            return (to.x - from.x) * (o.y - from.y) - (to.y - from.y) * (o.x - from.x);
+        }
+        public float GetLineYByX(Vector2 p1,Vector2 p2,float x)
+        {
+            float k = (p2.y - p1.y) / (p2.x - p1.x);
+            return k * x + (p1.y - k * p1.x);
+        }
+        public static Vector3 ElementwiseMultiply(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+        }
+    }
+}

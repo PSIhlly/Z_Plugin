@@ -6,7 +6,7 @@ using Z_DesignStyle;
 
 namespace Z_Ui.Dialog
 {
-    public class ProfilePictureController : Z_MonoController<ProfilePictureController>
+    public class ProfilePictureController : Z_MonoController<DialogUiBaseManager>
     {
         public Image profilePictureImg;
 

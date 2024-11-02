@@ -12,6 +12,7 @@
     <Name>Excel2Cs</Name>
     <RootNamespace>Excel2Cs</RootNamespace>
     <InterpreterId>Global|PythonCore|3.10</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

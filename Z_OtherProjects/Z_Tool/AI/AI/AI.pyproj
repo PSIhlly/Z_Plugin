@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0631c4ec-a727-4a19-94f6-604d7b04c450</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>AI.py</StartupFile>
+    <StartupFile>Ai.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,22 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AI.py" />
+    <Compile Include="Ai.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="jpg2npy.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="mnist.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="txt2npy.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ushort2jpg.py" />
+    <Compile Include="z_string.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

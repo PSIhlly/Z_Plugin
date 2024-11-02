@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Z_DesignStyle;
 namespace Z_Ui.Dialog
 {
-    public class MainPictureController : Z_MonoController<MainPictureController>
+    public class MainPictureController : Z_MonoController<DialogUiBaseManager>
     {
         public Image mainPictureImg;
 

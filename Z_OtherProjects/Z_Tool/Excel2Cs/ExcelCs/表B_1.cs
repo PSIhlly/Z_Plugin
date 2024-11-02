@@ -1,5 +1,0 @@
-
-        public class ±ÌB_1.cs{
-
-        }
-        

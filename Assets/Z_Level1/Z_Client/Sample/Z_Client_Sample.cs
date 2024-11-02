@@ -9,8 +9,6 @@ using Z_Client;
 public class Z_Client_Sample : MonoBehaviour
 {
     
-    
-
     // Start is called before the first frame update
     public InputField iF;
     public InputField iFCoin;
@@ -24,7 +22,6 @@ public class Z_Client_Sample : MonoBehaviour
     public void OnReceive(int port,byte[] data)
     {
         string content = Encoding.UTF8.GetString(data);
-        Debug.Log(content + "<__");
         showCoins.text = content;
     }
     public void Render()

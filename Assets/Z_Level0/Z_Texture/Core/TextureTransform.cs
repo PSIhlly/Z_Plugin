@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 namespace Z_Texture
 {
     public class TextureTransform
     {
-       
+        
+
         public static Texture2D GetTargetSize(Texture2D tex, int width, int height)
         {
             var texNew = new Texture2D(width, height);

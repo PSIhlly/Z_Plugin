@@ -6,7 +6,7 @@ using Z_DesignStyle;
 
 namespace Z_Ui.Dialog
 {
-    public class TitleController : Z_MonoController<TitleController>
+    public class TitleController : Z_MonoController<DialogUiBaseManager>
     {
         public Text titleText; 
 

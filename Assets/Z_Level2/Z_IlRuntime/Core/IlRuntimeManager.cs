@@ -42,7 +42,6 @@ namespace Z_IlRuntime.Core
 
         IEnumerator LoadHotFixAssembly()
         {
-
             var dllTask = File.ReadAllBytesAsync(Application.streamingAssetsPath + "/HotFix_Project.dll");
             var pdbTask = File.ReadAllBytesAsync(Application.streamingAssetsPath + "/HotFix_Project.pdb");
             while (!dllTask.IsCompleted || !pdbTask.IsCompleted)

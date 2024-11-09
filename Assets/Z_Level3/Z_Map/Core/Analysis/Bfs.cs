@@ -1,0 +1,197 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Z_DesignStyle;
+
+namespace Z_Map.Analysis
+{
+    public class Bfs
+    {
+        NavigationController nc;
+        Dictionary<NavUnit, int> steps = new Dictionary<NavUnit, int>();
+        Queue<NavUnit> queue = new Queue<NavUnit>();
+        Dictionary<NavUnit, NavUnit> pre = new Dictionary<NavUnit, NavUnit>();
+        List<NavUnit> path = new List<NavUnit>();
+        public Bfs(NavigationController nc)
+        {
+            this.nc = nc;
+        }
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep)
+        {
+            pre.Clear();
+            steps.Clear();
+            queue.Clear();
+            path.Clear();
+            Vector3Int curPos = nc.RealPos2MapPos(cur);
+            if (!nc.InArea(curPos))
+                curPos = nc.GetClosestInArea(curPos);
+            Vector3Int tarPos = nc.RealPos2MapPos(tar);
+            if (!nc.InArea(tarPos))
+                tarPos = nc.GetClosestInArea(tarPos);
+
+
+
+            if (curPos == tarPos)
+            {
+                nc.GetNormalWithoutY(tar - cur);
+            }
+            var first = nc.navUnits[curPos.x, curPos.y, curPos.z];
+            //落地
+            while (first.isNull)
+            {
+                first = nc.navUnits[first.pos.x, first.pos.y - 1, first.pos.z];
+            }
+
+            var end = nc.navUnits[tarPos.x, tarPos.y, tarPos.z];
+
+            float minDis2 = (cur - tar).sqrMagnitude;
+            NavUnit minUnit = first;
+
+            queue.Enqueue(first);
+            steps[first] = 0;
+
+            //Vector3Int[] dirs = new[] { Vector3Int.right, Vector3Int.left, Vector3Int.up, Vector3Int.down, Vector3Int.forward, Vector3Int.back };
+            while (queue.Count > 0)
+            {
+                var now = queue.Dequeue();
+                int step = steps[now];
+                if (step >= maxStep)
+                    break;
+                if (minDis2 > (now.realPos - tar).sqrMagnitude)
+                {
+                    minDis2 = (now.realPos - tar).sqrMagnitude;
+                    minUnit = now;
+                }
+                foreach (var nxt in now.links)
+                {
+                    if (CanPass(now, nxt))
+                    {
+                        steps[nxt] = step + 1;
+                        queue.Enqueue(nxt);
+                        pre[nxt] = now;
+
+                        if (nxt == end)
+                        {
+                            queue.Clear();
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!pre.ContainsKey(end))
+            {
+                //太远，说明没希望
+                if (minDis2 > 2*2)
+                    return Vector3.zero;
+                end = minUnit;
+            }
+
+            {
+                NavUnit now = end;
+                path.Add(now);
+
+                while (now != first)
+                {
+                    now = pre[now];
+                    path.Add(now);
+                }
+
+                DebugPath(path);
+                int i = 0;
+
+                var nxt = path[path.Count - 1].pos;
+                float y = path[path.Count - 1].realPos.y;
+                int forward = nxt.z;
+                int back = nxt.z;
+                int right = nxt.x;
+                int left = nxt.x;
+
+                //不算自己,不算终点
+                for (i = path.Count - 2; i >= 0; i--)
+                {
+                    Vector3Int tryPos = path[i].pos;
+
+                    int checkLeft = left;
+                    int checkRight = right;
+                    int checkForward = forward;
+                    int checkBack = back;
+
+                    if (tryPos.x > right)
+                    {
+                        right = tryPos.x;
+                        checkLeft = checkRight = right;
+                    }
+                    if (tryPos.x < left)
+                    {
+                        left = tryPos.x;
+                        checkLeft = checkRight = left;
+                    }
+                    if (tryPos.z > forward)
+                    {
+                        forward = tryPos.z;
+                        checkForward = checkBack = forward;
+                    }
+                    if (tryPos.z < back)
+                    {
+                        back = tryPos.z;
+                        checkForward = checkBack = back;
+                    }
+
+                    //换层先断
+                    if (!Check(checkLeft, checkRight, nxt.y, y, checkBack, checkForward))
+                    {
+                        //那就只走第一步
+                        if (i == path.Count - 2)
+                        {
+                            return nc.GetNormalWithoutY(path[i].realPos - cur);
+                        }
+                        return nc.GetNormalWithoutY(path[i + 1].realPos - cur);
+                    }
+                }
+
+                if (i < 0)
+                {
+                    return nc.GetNormalWithoutY(tar - cur);
+                }
+            }
+            return nc.GetNormalWithoutY(tar - cur);
+        }
+
+        public bool CanPass(NavUnit tar)
+        {
+            return !steps.ContainsKey(tar) && tar.cantPassParts.Count == 0;
+        }
+        public bool CanPass(NavUnit from, NavUnit tar)
+        {
+            return !steps.ContainsKey(tar)
+                && tar.cantPassParts.Count == 0;//Contains(nc.GetDir(tar, from))
+                                                //&& !nc.navUnits[from.x, from.y, from.z].cantPassDirs.Contains(nc.GetDir(from, tar ));
+        }
+
+        public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ)
+        {
+            for (int i = startX; i <= endX; i++)
+                for (int k = startZ; k <= endZ; k++)
+                {
+                    if (nc.navUnits[i, mapY, k].cantPassParts.Count > 0 || Mathf.Abs(nc.navUnits[i, mapY, k].realPos.y - realY) > nc.step)
+                    {
+                        return false;
+                    }
+                }
+
+            return true;
+
+        }
+        public void DebugPath(List<NavUnit> lst)
+        {
+            var list = new Vector3[lst.Count];
+
+            for (int i = 1; i < lst.Count; i++)
+            {
+                list[i] = lst[i].realPos + Vector3.up;
+                Debug.DrawLine(list[i - 1], list[i]);
+            }
+
+        }
+    }
+}

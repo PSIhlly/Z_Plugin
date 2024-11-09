@@ -12,7 +12,7 @@ namespace Z_DesignStyle
             {
                 if (_instance == null)
                 {
-                    var listener = new GameObject("ClientCore");
+                    var listener = new GameObject(typeof(T).Name);
                     _instance = (T)listener.AddComponent(typeof(T));
                 }
                 return _instance;

@@ -63,7 +63,7 @@
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\QuaternionBinder.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\FirstPersonController.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourDemo.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Input\Sample\Z_Input_Sample.cs" />
+    <Compile Include="Assets\Z_Level1\Z_Input\Sample\Z_Input_Sample.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\AutoLoadPipelineAsset.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\02_Invocation\Invocation.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\Inheritance.cs" />
@@ -72,34 +72,34 @@
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineDemo.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\Lexer.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector2Binder.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Sample\Z_Fight_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\06_CLRBinding\CLRBindingDemo.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Sample\Excels\ExcelCs\Npc.cs" />
-    <Compile Include="Assets\Z_Level2\Z_IlRuntime\Sample\Z_IlRuntime_Sample.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Npc.cs" />
+    <Compile Include="Assets\Z_Level3\Z_IlRuntime\Sample\Z_IlRuntime_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMockWrapper.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\ParserToken.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\LensFlares\Scripts\ScreenSpacePlacement.cs" />
-    <Compile Include="Assets\Z_Level0\Z_Os\Sample\Z_Os_Sample.cs" />
+    <Compile Include="Assets\Z_Level1\Z_Os\Sample\Z_Os_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\InheritanceAdapter.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourAdapter.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\01_HelloWorld\HelloWorld.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\RendererFeatures\KeepFrame\KeepFrameFeature.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Sample\Z_Client_Sample.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Sample\Z_Client_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineAdapter.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\03_Delegate\DelegateDemo.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonException.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\05_CLRRedirection\CLRRedirectionDemo.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Sample\Z_Ui_Sample.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Sample\Excels\ExcelCs\Dialog.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Z_Ui_Sample.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Dialog.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector3Binder.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\10_LitJson\LitJsonDemo.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonWriter.cs" />
-    <Compile Include="Assets\Z_Level2\Z_Map\Sample\Z_Map_Sample.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Sample\Z_Map_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\ValueTypeBindingDemo.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Sample\Excels\ExcelCs\Img.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Img.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\IJsonWrapper.cs" />
     <Compile Include="Assets\Z_Level0\Z_Texture\Sample\Z_Texture_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonReader.cs" />
-    <Compile Include="Assets\Z_Level2\Z_Fight\Sample\Z_Fight_Sample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\StreamingAssets\System.Drawing.Primitives.dll" />
@@ -1026,6 +1026,10 @@
       <Project>{8087FDDB-2C25-2E20-9312-10CA4405EB8B}</Project>
       <Name>Z_Input</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Math.csproj">
+      <Project>{4E7B6A79-C4BD-8DCD-9BAA-506ACBA3D18A}</Project>
+      <Name>Z_Math</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_Client.csproj">
       <Project>{6C5ADBF1-FFC4-2355-3184-322A58F036EF}</Project>
       <Name>Z_Client</Name>
@@ -1042,9 +1046,17 @@
       <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
       <Name>Z_Os</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Fight.csproj">
+      <Project>{6257FE85-8383-BC7B-C5EA-D1951C93C293}</Project>
+      <Name>Z_Fight</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
       <Name>Z_DesignStyle</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Debug.csproj">
+      <Project>{97CD91AE-467A-FDB7-BE45-20BBE954AA3A}</Project>
+      <Name>Z_Debug</Name>
     </ProjectReference>
     <ProjectReference Include="Z_Serialize.csproj">
       <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
@@ -1065,14 +1077,6 @@
     <ProjectReference Include="Z_Texture.csproj">
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
       <Name>Z_Texture</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Fight.csproj">
-      <Project>{6257FE85-8383-BC7B-C5EA-D1951C93C293}</Project>
-      <Name>Z_Fight</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Math.csproj">
-      <Project>{4E7B6A79-C4BD-8DCD-9BAA-506ACBA3D18A}</Project>
-      <Name>Z_Math</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

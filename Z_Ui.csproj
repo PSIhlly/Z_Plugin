@@ -56,18 +56,18 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\AutoPlayFuncController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\MainTextController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\TitleController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\DialogUiBaseManager.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\ProfilePictureController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\MainPictureController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\HistoryFuncController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\SkipFuncController.cs" />
-    <Compile Include="Assets\Z_Level2\Z_UI\Core\Dialog\SubController\Func\HideFuncController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\AutoPlayFuncController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\MainTextController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\TitleController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\DialogUiBaseManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\ProfilePictureController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\MainPictureController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\HistoryFuncController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\SkipFuncController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\HideFuncController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Z_Level2\Z_UI\Core\Z_Ui.asmdef" />
+    <None Include="Assets\Z_Level3\Z_UI\Core\Z_Ui.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

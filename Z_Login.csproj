@@ -56,10 +56,10 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level2\Z_Login\Core\Core.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Login\Core\Core.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Z_Level2\Z_Login\Core\Z_Login.asmdef" />
+    <None Include="Assets\Z_Level3\Z_Login\Core\Z_Login.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

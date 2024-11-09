@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,7 +32,7 @@ namespace Z_Math
         }
         public static Vector3[] GetCubeEightPoint(Vector3 center,Vector3 size,Vector3 eular,Vector3 scale,Vector3 offset)
         {
-            Debug.Log(offset + " " + center + " " + size + " " + scale + " " + eular);
+            
             Vector3[] ans = new Vector3[8];
             Quaternion rotation = Quaternion.Euler(eular);
             //ref CubeEightPoint
@@ -61,7 +62,6 @@ namespace Z_Math
                 maxZ = Mathf.Max((int)(cubeEightPoint[i].z+1), maxZ);
             }
             List<Vector3Int> res = new List<Vector3Int>((maxX-minX+1)*( maxY - minY + 1)*(maxZ - minZ + 1));
-            Debug.Log("oko"+minX + " " + maxX + " " + minY + " " + maxY + " " + minZ + " " + maxZ);
             for (int i = minX; i <= maxX; i++)
                 for (int j = minY; j <= maxY; j++)
                     for (int k = minZ; k <= maxZ; k++)
@@ -106,6 +106,18 @@ namespace Z_Math
         public static Vector3 ElementwiseMultiply(Vector3 a, Vector3 b)
         {
             return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+        }
+        public static Vector3 ElementwisePlus(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
+        public static Vector3 ElementwiseDivide(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+        }
+        public static Vector3Int GetVector3Int(Vector3 a)
+        {
+            return new Vector3Int((int)Math.Round(a.x), (int)Math.Round(a.y), (int)Math.Round(a.z));
         }
     }
 }

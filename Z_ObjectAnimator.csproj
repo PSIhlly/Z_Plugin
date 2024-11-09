@@ -56,16 +56,16 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Event\Transform\PositionSetEvent.cs" />
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Core.cs" />
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Event\Process\WaitSecondsEvent.cs" />
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Event\Process\WaitFramesEvent.cs" />
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Event\Event.cs" />
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Event\Transform\LocalPositionSetEvent.cs" />
-    <Compile Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Action\Action.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Event\Transform\PositionSetEvent.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Core.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Event\Process\WaitSecondsEvent.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Event\Process\WaitFramesEvent.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Event\Event.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Event\Transform\LocalPositionSetEvent.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Action\Action.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Z_Level1\Z_ObjectAnimator\Core\Z_ObjectAnimator.asmdef" />
+    <None Include="Assets\Z_Level2\Z_ObjectAnimator\Core\Z_ObjectAnimator.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

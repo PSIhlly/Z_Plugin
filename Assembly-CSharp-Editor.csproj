@@ -931,6 +931,10 @@
       <Project>{8087FDDB-2C25-2E20-9312-10CA4405EB8B}</Project>
       <Name>Z_Input</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Math.csproj">
+      <Project>{4E7B6A79-C4BD-8DCD-9BAA-506ACBA3D18A}</Project>
+      <Name>Z_Math</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_Client.csproj">
       <Project>{6C5ADBF1-FFC4-2355-3184-322A58F036EF}</Project>
       <Name>Z_Client</Name>
@@ -947,9 +951,17 @@
       <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
       <Name>Z_Os</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Fight.csproj">
+      <Project>{6257FE85-8383-BC7B-C5EA-D1951C93C293}</Project>
+      <Name>Z_Fight</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
       <Name>Z_DesignStyle</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Debug.csproj">
+      <Project>{97CD91AE-467A-FDB7-BE45-20BBE954AA3A}</Project>
+      <Name>Z_Debug</Name>
     </ProjectReference>
     <ProjectReference Include="Z_Serialize.csproj">
       <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
@@ -970,14 +982,6 @@
     <ProjectReference Include="Z_Texture.csproj">
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
       <Name>Z_Texture</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Fight.csproj">
-      <Project>{6257FE85-8383-BC7B-C5EA-D1951C93C293}</Project>
-      <Name>Z_Fight</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Math.csproj">
-      <Project>{4E7B6A79-C4BD-8DCD-9BAA-506ACBA3D18A}</Project>
-      <Name>Z_Math</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

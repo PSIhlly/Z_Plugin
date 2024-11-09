@@ -56,16 +56,16 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\Listener\ClientListener.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\Listener\TcpClientListener.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\ClientCore.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\Listener\UdpClientListener.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\Sender\ClientSender.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\Sender\TcpClientSender.cs" />
-    <Compile Include="Assets\Z_Level1\Z_Client\Core\Sender\UdpClientSender.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\Listener\ClientListener.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\Listener\TcpClientListener.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\ClientCore.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\Listener\UdpClientListener.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\Sender\ClientSender.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\Sender\TcpClientSender.cs" />
+    <Compile Include="Assets\Z_Level2\Z_Client\Core\Sender\UdpClientSender.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Z_Level1\Z_Client\Core\Z_Client.asmdef" />
+    <None Include="Assets\Z_Level2\Z_Client\Core\Z_Client.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -119,5 +119,31 @@ namespace Z_Math
         {
             return new Vector3Int((int)Math.Round(a.x), (int)Math.Round(a.y), (int)Math.Round(a.z));
         }
+        /// <summary>
+        /// 获取向量法平面上随机向量
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static Vector3 GetRandomVectorOnPlane(Vector3 v, float length)
+        {
+            // 计算两个与v垂直的基向量
+            Vector3 right = Vector3.Cross(v, Vector3.up);  // 与v垂直的向量
+            if (right.magnitude < 0.001f)  // 如果v与Vector3.up平行，尝试与其他向量交叉
+            {
+                right = Vector3.Cross(v, Vector3.forward);
+            }
+
+            Vector3 forward = Vector3.Cross(v, right);  // 获取另一个与v垂直的向量
+
+            // 随机生成平面内的两个方向
+            float randomX = UnityEngine.Random.Range(-1f, 1f);
+            float randomY = UnityEngine.Random.Range(-1f, 1f);
+
+            // 通过线性组合获得随机的向量
+            Vector3 randomVector = (right * randomX + forward * randomY).normalized * length;
+
+            return randomVector;
+        }
     }
 }

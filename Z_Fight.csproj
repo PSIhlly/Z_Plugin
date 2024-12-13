@@ -56,7 +56,14 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Bullet\BulletInstance.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightData.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponInstance.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Bullet\BulletUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Fight\FightUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Fight\FightInstance.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Z_Level3\Z_Fight\Core\Z_Fight.asmdef" />
@@ -766,6 +773,18 @@
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
       <Name>Z_DesignStyle</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_UnitSystem.csproj">
+      <Project>{0008358A-06D8-039E-A808-15EA0E646B96}</Project>
+      <Name>Z_UnitSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Math.csproj">
+      <Project>{4E7B6A79-C4BD-8DCD-9BAA-506ACBA3D18A}</Project>
+      <Name>Z_Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Serialize.csproj">
+      <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
+      <Name>Z_Serialize</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

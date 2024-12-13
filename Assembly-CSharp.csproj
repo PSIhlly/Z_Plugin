@@ -57,58 +57,99 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\09_Reflection\ReflectionDemo.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiHolder.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\CameraStacking\3D Skybox\Scripts\SkyboxCamera.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapData.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\12_Performance\Performance.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMapper.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\QuaternionBinder.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\UiManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Analysis\NavigationController.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\FirstPersonController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\ScrView.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourDemo.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiScrViewContainer.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Bullet\BulletInstance.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Analysis\Bfs.cs" />
     <Compile Include="Assets\Z_Level1\Z_Input\Sample\Z_Input_Sample.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\AutoLoadPipelineAsset.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\02_Invocation\Invocation.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\ImgForm.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightData.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\Inheritance.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponInstance.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonData.cs" />
     <Compile Include="Assets\Scenes\Test.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineDemo.cs" />
+    <Compile Include="Assets\GameSample\Scripts\GameManager.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\Lexer.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector2Binder.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Sample\Z_Fight_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\06_CLRBinding\CLRBindingDemo.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Npc.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Character\CharacterUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_IlRuntime\Sample\Z_IlRuntime_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMockWrapper.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightManager.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\ParserToken.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\LensFlares\Scripts\ScreenSpacePlacement.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiView.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiModel.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiCtrl.cs" />
     <Compile Include="Assets\Z_Level1\Z_Os\Sample\Z_Os_Sample.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\NpcForm.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Img.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\InheritanceAdapter.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Character\CharacterInstance.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourAdapter.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\01_HelloWorld\HelloWorld.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\RendererFeatures\KeepFrame\KeepFrameFeature.cs" />
     <Compile Include="Assets\Z_Level2\Z_Client\Sample\Z_Client_Sample.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\DialogForm.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Btn.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineAdapter.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\03_Delegate\DelegateDemo.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Bullet\BulletUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Login\Core\Core.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemInstance.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapUtilController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_IlRuntime\Core\IlRuntimeManager.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonException.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\05_CLRRedirection\CLRRedirectionDemo.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\DialogManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit\MapUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Txt.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Fight\FightUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Sample\Z_Ui_Sample.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Dialog.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Fight\FightInstance.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector3Binder.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\10_LitJson\LitJsonDemo.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit\MapInstance.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonWriter.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Sample\Z_Map_Sample.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiContainer.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\ValueTypeBindingDemo.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Img.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Ui\UiBase\UiAPanelBase.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\IJsonWrapper.cs" />
     <Compile Include="Assets\Z_Level0\Z_Texture\Sample\Z_Texture_Sample.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonReader.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemUnit.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Ui\UiBase\UiDialogBase.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Sample\Ui\Dialog\UiDialogCtrl.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Sta.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\StreamingAssets\System.Drawing.Primitives.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\StreamingAssets\System.Security.Claims.dll" />
     <None Include="Assets\StreamingAssets\System.Resources.Writer.dll" />
     <None Include="Assets\StreamingAssets\System.IO.UnmanagedMemoryStream.dll" />
     <None Include="Assets\StreamingAssets\System.IO.FileSystem.Watcher.dll" />
     <None Include="Assets\StreamingAssets\System.Text.Encoding.Extensions.dll" />
     <None Include="Assets\StreamingAssets\System.Runtime.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\StreamingAssets\System.Security.Principal.dll" />
     <None Include="Assets\StreamingAssets\System.Security.Cryptography.Primitives.dll" />
     <None Include="Assets\StreamingAssets\System.Collections.dll" />
@@ -116,10 +157,12 @@
     <None Include="Assets\StreamingAssets\System.Net.WebSockets.Client.dll" />
     <None Include="Assets\StreamingAssets\System.IO.Compression.ZipFile.dll" />
     <None Include="Assets\StreamingAssets\System.Net.NetworkInformation.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\StreamingAssets\System.Net.NameResolution.dll" />
     <None Include="Assets\StreamingAssets\System.Reflection.Primitives.dll" />
     <None Include="Assets\StreamingAssets\System.Net.Http.dll" />
     <None Include="Assets\StreamingAssets\System.Runtime.Numerics.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\Z_Level0\Newtonsoft.Json.dll" />
     <None Include="Assets\StreamingAssets\System.AppContext.dll" />
     <None Include="Assets\StreamingAssets\System.Net.Sockets.dll" />
@@ -130,6 +173,7 @@
     <None Include="Assets\StreamingAssets\System.Xml.XPath.dll" />
     <None Include="Assets\StreamingAssets\System.Xml.XDocument.dll" />
     <None Include="Assets\StreamingAssets\System.Runtime.Serialization.Xml.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\StreamingAssets\System.Xml.XPath.XDocument.dll" />
     <None Include="Assets\StreamingAssets\System.IO.FileSystem.dll" />
     <None Include="Assets\StreamingAssets\System.Threading.Timer.dll" />
@@ -148,15 +192,23 @@
     <None Include="Assets\StreamingAssets\System.Threading.Tasks.Parallel.dll" />
     <None Include="Assets\StreamingAssets\System.ObjectModel.dll" />
     <None Include="Assets\StreamingAssets\System.Reflection.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\StreamingAssets\System.Text.RegularExpressions.dll" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\StreamingAssets\System.Diagnostics.Debug.dll" />
     <None Include="Assets\StreamingAssets\System.ComponentModel.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Assets\StreamingAssets\System.Diagnostics.FileVersionInfo.dll" />
     <None Include="Assets\StreamingAssets\System.ComponentModel.TypeConverter.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\StreamingAssets\System.Runtime.InteropServices.dll" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\StreamingAssets\System.Net.Ping.dll" />
     <None Include="Assets\StreamingAssets\System.IO.FileSystem.Primitives.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\StreamingAssets\System.Security.Cryptography.Csp.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\StreamingAssets\System.Diagnostics.TextWriterTraceListener.dll" />
     <None Include="Assets\StreamingAssets\System.ValueTuple.dll" />
     <None Include="Assets\StreamingAssets\System.Runtime.Serialization.Primitives.dll" />
@@ -169,6 +221,7 @@
     <None Include="Assets\StreamingAssets\System.Resources.Reader.dll" />
     <None Include="Assets\StreamingAssets\System.Dynamic.Runtime.dll" />
     <None Include="Assets\StreamingAssets\netstandard.dll" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\StreamingAssets\System.Diagnostics.Tracing.dll" />
     <None Include="Assets\StreamingAssets\System.Linq.Queryable.dll" />
     <None Include="Assets\StreamingAssets\System.ComponentModel.EventBasedAsync.dll" />
@@ -178,6 +231,7 @@
     <None Include="Assets\StreamingAssets\System.Threading.ThreadPool.dll" />
     <None Include="Assets\StreamingAssets\System.ComponentModel.Primitives.dll" />
     <None Include="Assets\StreamingAssets\System.Collections.NonGeneric.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\StreamingAssets\System.Diagnostics.TraceSource.dll" />
     <None Include="Assets\StreamingAssets\System.Runtime.Extensions.dll" />
     <None Include="Assets\StreamingAssets\System.Security.Cryptography.Encoding.dll" />
@@ -187,20 +241,25 @@
     <None Include="Assets\StreamingAssets\System.Diagnostics.Tools.dll" />
     <None Include="Assets\StreamingAssets\System.Net.Security.dll" />
     <None Include="Assets\StreamingAssets\Microsoft.Win32.Primitives.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\StreamingAssets\System.Runtime.InteropServices.RuntimeInformation.dll" />
     <None Include="Assets\StreamingAssets\System.Threading.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\StreamingAssets\System.Collections.Concurrent.dll" />
     <None Include="Assets\StreamingAssets\System.Threading.Overlapped.dll" />
     <None Include="Assets\StreamingAssets\System.Threading.Thread.dll" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\StreamingAssets\System.Reflection.Extensions.dll" />
     <None Include="Assets\StreamingAssets\System.Diagnostics.StackTrace.dll" />
     <None Include="Assets\StreamingAssets\System.Net.WebSockets.dll" />
     <None Include="Assets\StreamingAssets\System.Resources.ResourceManager.dll" />
     <None Include="Assets\StreamingAssets\System.Net.Primitives.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\StreamingAssets\System.Runtime.Handles.dll" />
     <None Include="Assets\StreamingAssets\System.Security.SecureString.dll" />
     <None Include="Assets\StreamingAssets\System.IO.FileSystem.DriveInfo.dll" />
     <None Include="Assets\StreamingAssets\System.Linq.Expressions.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1018,10 +1077,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Z_Login.csproj">
-      <Project>{7A4497EF-B9DB-4A29-43A3-B6C2E0A2DF13}</Project>
-      <Name>Z_Login</Name>
-    </ProjectReference>
     <ProjectReference Include="Z_Input.csproj">
       <Project>{8087FDDB-2C25-2E20-9312-10CA4405EB8B}</Project>
       <Name>Z_Input</Name>
@@ -1038,17 +1093,9 @@
       <Project>{E05891DC-A1BF-C7BC-8243-88166AC07D0C}</Project>
       <Name>Z_Trick</Name>
     </ProjectReference>
-    <ProjectReference Include="Z_TileMap.csproj">
-      <Project>{239AD4E9-50D2-EF56-B467-EE9EF8ACF31A}</Project>
-      <Name>Z_TileMap</Name>
-    </ProjectReference>
     <ProjectReference Include="Z_Os.csproj">
       <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
       <Name>Z_Os</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Fight.csproj">
-      <Project>{6257FE85-8383-BC7B-C5EA-D1951C93C293}</Project>
-      <Name>Z_Fight</Name>
     </ProjectReference>
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
@@ -1066,17 +1113,17 @@
       <Project>{9DCCECFA-008F-FE02-15EC-09C3D3165C2C}</Project>
       <Name>Z_ObjectAnimator</Name>
     </ProjectReference>
-    <ProjectReference Include="Z_Ui.csproj">
-      <Project>{4FE1F9A1-9FE4-F98A-B5FA-EAB736018378}</Project>
-      <Name>Z_Ui</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_IlRuntime.csproj">
-      <Project>{84808AE8-8C94-824C-B9DA-B280A421A9C3}</Project>
-      <Name>Z_IlRuntime</Name>
+    <ProjectReference Include="Z_UnitSystem.csproj">
+      <Project>{0008358A-06D8-039E-A808-15EA0E646B96}</Project>
+      <Name>Z_UnitSystem</Name>
     </ProjectReference>
     <ProjectReference Include="Z_Texture.csproj">
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
       <Name>Z_Texture</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Time.csproj">
+      <Project>{29E96E60-9A29-59F5-2C38-EE3F21525971}</Project>
+      <Name>Z_Time</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

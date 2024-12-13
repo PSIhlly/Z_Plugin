@@ -13,6 +13,11 @@ namespace Z_Input
         public Action onButonDownA;
         public Action onButonDownD;
 
+        public Action onButonW;
+        public Action onButonS;
+        public Action onButonA;
+        public Action onButonD;
+
         public Action onButonUpW;
         public Action onButonUpS;
         public Action onButonUpA;
@@ -28,6 +33,10 @@ namespace Z_Input
         public override void Init()
         {
         }
+        public void Register(InputConfig config)
+        {
+            cur = config;
+        }
 
         public void Update()
         {
@@ -38,36 +47,54 @@ namespace Z_Input
 #else
             if (Input.GetKeyDown(KeyCode.W))
             {
-                cur?.onButonDownW();
+                cur?.onButonDownW?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                cur?.onButonDownS();
+                cur?.onButonDownS?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                cur?.onButonDownA();
+                cur?.onButonDownA?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                cur?.onButonDownD();
+                cur?.onButonDownD?.Invoke();
             }
+
+            if (Input.GetKey(KeyCode.W))
+            {
+                cur?.onButonW?.Invoke();
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                cur?.onButonS?.Invoke();
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                cur?.onButonA?.Invoke();
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                cur?.onButonD?.Invoke();
+            }
+
 
             if (Input.GetKeyUp(KeyCode.W))
             {
-                cur?.onButonUpW();
+                cur?.onButonUpW?.Invoke();
             }
             if (Input.GetKeyUp(KeyCode.S))
             {
-                cur?.onButonUpS();
+                cur?.onButonUpS?.Invoke();
             }
             if (Input.GetKeyUp(KeyCode.A))
             {
-                cur?.onButonUpA();
+                cur?.onButonUpA?.Invoke();
             }
             if (Input.GetKeyUp(KeyCode.D))
             {
-                cur?.onButonUpD();
+                cur?.onButonUpD?.Invoke();
             }
 #endif
 

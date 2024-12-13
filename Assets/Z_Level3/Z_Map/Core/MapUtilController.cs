@@ -28,37 +28,7 @@ namespace Z_Map
         {
             return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mapUnitSize);
         }
-        public GameObject GetPrefab(string name)
-        {
-            foreach (var pool in _super.pools)
-                if (name == pool.prefab.name)
-                {
-                    return pool.prefab;
-                }
-            return null;
-        }
-        public GameObject CreateInstance(GameObject tar)
-        {
-            foreach(var pool in _super.pools)
-            if(tar==pool.prefab)
-            {
-                return pool.Get();
-            }
-            var go = GameObject.Instantiate(tar);
-            go.transform.SetParent(_super.mainGo.transform);
-            return go;
-        }
-        public void DeleteInstance(GameObject tar,GameObject proto)
-        {
-            foreach (var pool in _super.pools)
-                if (proto == pool.prefab)
-                {
-                    pool.Push(tar);
-                    return;
-                }
 
-            tar.SetActive(false);
-        }
 
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {

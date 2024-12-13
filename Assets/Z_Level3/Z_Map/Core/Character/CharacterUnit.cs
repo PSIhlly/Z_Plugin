@@ -1,8 +1,10 @@
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_UnitSystem;
 
 namespace Z_Map
 {
@@ -27,7 +29,6 @@ namespace Z_Map
             get { return (CharacterInstance)base.ins; }
         }
 
-        public MapUnit map;
 
         public bool navEnabled=true;
 
@@ -36,27 +37,17 @@ namespace Z_Map
         public int alertDis;
         public int pathDis;
         public bool isMine;
-       
-        public void UpdateActive()
+
+        public override Type GetInsType()
         {
-            if (map==null)
-                return;
-            if (!map.isShowing)
-            {
-                if (isShowing)
-                    Hide();
-            }
-            else if (!isShowing)
-            {
-                Show<CharacterInstance>();
-            }
+            return typeof(CharacterInstance);
         }
 
-        public void UpdateInfo()
+        public override void UpdateInfo()
         {
             
 
-            if (ins != null && (updateType== UpdateType.Always||isShowing))
+            if (updateType== UpdateType.Always||isShowing)
             {
                 //nav
                 if (navEnabled)
@@ -74,9 +65,9 @@ namespace Z_Map
                 {
                     
                     var newMap = MapManager.instance.data.maps[newMapPos.x, newMapPos.y, newMapPos.z];
-                    if(map!=newMap)
+                    if(superUnit!=newMap)
                     {
-                        map.Unbind(this);
+                        superUnit.Unbind(this);
                         newMap.Bind(this);
                         UpdateActive();
                     }
@@ -103,7 +94,7 @@ namespace Z_Map
                 ins.transform.position = newPos;
                 
                 pos = ins.transform.position;
-                eular = ins.transform.eulerAngles;
+                euler = ins.transform.eulerAngles;
 
             }
         }

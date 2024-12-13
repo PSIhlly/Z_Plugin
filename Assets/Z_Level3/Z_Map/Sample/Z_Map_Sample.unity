@@ -181,7 +181,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 2147483647
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -252,6 +252,7 @@ GameObject:
   - component: {fileID: 227423650}
   - component: {fileID: 227423649}
   - component: {fileID: 227423651}
+  - component: {fileID: 227423652}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -310,6 +311,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainGo: {fileID: 1753461143}
+--- !u!114 &227423652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227423646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5e4944157ffdd4590f7988acc08f39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabs:
+  - {fileID: 1209352508}
+  - {fileID: 298770350}
+  - {fileID: 1643562241}
+  - {fileID: 480881089}
+  - {fileID: 1195621359}
+  - {fileID: 630048630}
+  materials:
+  - {fileID: 2100000, guid: 9a05b41dfa64a614b8d8ce34d617726b, type: 2}
+  - {fileID: 2100000, guid: 657c32b3cf762d04d83a2f7fa74b2bd4, type: 2}
+  - {fileID: 2100000, guid: 759133448a0466946b06f4b96770e44f, type: 2}
+  defaultRoot: {fileID: 1753461144}
 --- !u!1 &298770350
 GameObject:
   m_ObjectHideFlags: 0

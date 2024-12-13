@@ -56,15 +56,19 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\AutoPlayFuncController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\MainTextController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\TitleController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\DialogUiBaseManager.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\ProfilePictureController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\MainPictureController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\HistoryFuncController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\SkipFuncController.cs" />
-    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\SubController\Func\HideFuncController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiHolder.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\UiManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\ScrView.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiScrViewContainer.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiView.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiModel.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiCtrl.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Img.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Btn.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Dialog\DialogManager.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Txt.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\UiContainer.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Sta.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Z_Level3\Z_UI\Core\Z_Ui.asmdef" />
@@ -763,6 +767,9 @@
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>C:\Program Files\Unity 2022.1.24f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
     </Reference>
@@ -778,6 +785,10 @@
     <ProjectReference Include="Z_Trick.csproj">
       <Project>{E05891DC-A1BF-C7BC-8243-88166AC07D0C}</Project>
       <Name>Z_Trick</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Time.csproj">
+      <Project>{29E96E60-9A29-59F5-2C38-EE3F21525971}</Project>
+      <Name>Z_Time</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

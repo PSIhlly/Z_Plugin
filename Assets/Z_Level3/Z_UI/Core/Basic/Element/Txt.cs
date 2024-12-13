@@ -1,0 +1,13 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+namespace Z_Ui.Base
+{
+    public class Txt : TextMeshProUGUI
+    {
+
+    }
+}

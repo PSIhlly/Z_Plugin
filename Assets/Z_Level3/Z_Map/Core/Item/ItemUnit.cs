@@ -1,8 +1,10 @@
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_UnitSystem;
 
 namespace Z_Map
 {
@@ -22,39 +24,27 @@ namespace Z_Map
             get { return (ItemInstance)base.ins; }
         }
 
-        public MapUnit map;
         public bool isObstacle;
 
-        public void UpdateActive()
+        public override Type GetInsType()
         {
-            if (map == null)
-                return;
-            if (!map.isShowing)
-            {
-                if (isShowing)
-                    Hide();
-            }
-            else if (!isShowing)
-            {
-                Show<ItemInstance>();
-            }
+            return typeof(ItemInstance);
         }
 
-
-        public void UpdateInfo()
+        public override void UpdateInfo()
         {
-            if (ins != null && ins.gameObject.activeSelf)
+            if (isShowing)
             {
                 pos = ins.transform.position;
-                eular = ins.transform.eulerAngles;
+                euler = ins.transform.eulerAngles;
 
                 var newMapPos = MapManager.instance.mapUtilController.RealPos2MapPos(pos);
                 if (MapManager.instance.mapUtilController.InArea(newMapPos))
                 {
                     var newMap = MapManager.instance.data.maps[newMapPos.x, newMapPos.y, newMapPos.z];
-                    if (map != newMap)
+                    if (superUnit != newMap)
                     {
-                        map.Unbind(this);
+                        superUnit.Unbind(this);
                         newMap.Bind(this);
                         UpdateActive();
                     }

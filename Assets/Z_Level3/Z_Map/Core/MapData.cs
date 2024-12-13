@@ -146,11 +146,26 @@ namespace Z_Map
             var characters = new List<CharacterUnit>(characterPoss.Length);
             for (int i = 0; i < characterPoss.Length; i++)
             {
-                characters.Add(new CharacterUnit(i, i + 3, characterPoss[i], characterEulars[i], Vector3.one, (i == characterPoss.Length - 1), 5, 10));
+                characters.Add(new CharacterUnit(i+2, i + 3, characterPoss[i], characterEulars[i], Vector3.one, (i == characterPoss.Length - 1), 5, 10));
             }
             
             return new MapData(new Vector3(1, 3, 1), new Vector3Int(5, 2, 5), new Vector3Int(10, 3, 10), maps, items, characters, prefabs,materials);
             //new Vector3(1, 3, 1),new Vector3Int(5, 2, 5),maps,items,characters
+        }
+        public void Unload()
+        {
+            foreach(var map in  maps)
+            {
+                map.Hide();
+            }
+            foreach (var item in items)
+            {
+                item.Hide();
+            }
+            foreach (var character in characters)
+            {
+                character.Hide();
+            }
         }
     }
 

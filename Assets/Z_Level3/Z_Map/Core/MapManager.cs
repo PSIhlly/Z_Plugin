@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map.Analysis;
+using Z_UnitSystem;
 
 namespace Z_Map
 {
@@ -13,10 +14,8 @@ namespace Z_Map
         public MapData data;
         public GameObject mainGo;
 
-        public Dictionary<int, ItemUnit> itemDic=new Dictionary<int, ItemUnit>();
-        public Dictionary<int,CharacterUnit> characterDic = new Dictionary<int, CharacterUnit>();
-
-        public InstancePool[] pools;
+        public Dictionary<int, Unit> unitDic=new Dictionary<int, Unit>();
+        
 
         public NavigationController navigationController;
         public MapUtilController mapUtilController;
@@ -46,11 +45,7 @@ namespace Z_Map
             Init();
             mainGo.SetActive(true);
             this.data = data;
-            pools = new InstancePool[data.prefabs.Count];
-            for (int i = 0; i < data.prefabs.Count; i++)
-            {
-                pools[i] = new InstancePool(data.prefabs[i], mainGo.transform);
-            }
+            
 
             viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
 
@@ -60,39 +55,39 @@ namespace Z_Map
             }
             for (int i = 0; i < data.characters.Count; i++)
             {
-                
                 CheckAndLoad(data.characters[i]);
             }
             navigationController.Build();
             mainGo.SetActive(true);
         }
-        public void AddItemUnit(ItemUnit item)
+        public void AddUnit(Unit unit)
         {
-            data.items.Add(item);
-            CheckAndLoad(item);
-            item.UpdateActive();
+            if(unit is ItemUnit item)
+            {
+                data.items.Add(item);
+            }else if(unit is CharacterUnit character)
+            {
+                data.characters.Add(character);
+            }
+
+            CheckAndLoad(unit);
+            unit.UpdateActive();
         }
-        public void AddCharacterUnit(CharacterUnit character)
+        public void RemoveUnit(int uid)
         {
-            data.characters.Add(character);
-            CheckAndLoad(character);
-            character.UpdateActive();
-        }
-        public void RemoveItemUnit(int uid)
-        {
-            itemDic[uid].map.Unbind(itemDic[uid]);
-            itemDic[uid].VisOff();
-            itemDic[uid].Hide();
-            data.items.Remove(itemDic[uid]);
-            itemDic.Remove(uid);
-        }
-        public void RemoveCharacterUnit(int uid)
-        {
-            characterDic[uid].map.Unbind(characterDic[uid]);
-            characterDic[uid].VisOff();
-            characterDic[uid].Hide();
-            data.characters.Remove(characterDic[uid]);
-            characterDic.Remove(uid);
+            var unit = unitDic[uid];
+            if (unit is ItemUnit item)
+            {
+                data.items.Remove(item);
+            }
+            else if (unit is CharacterUnit character)
+            {
+                data.characters.Remove(character);
+            }
+            unit.superUnit.Unbind(unit);
+            unit.VisOff();
+            unit.Hide();
+            unitDic.Remove(uid);
         }
         private bool CheckAndLoad(Unit unit)
         {
@@ -114,16 +109,13 @@ namespace Z_Map
         public void End()
         {
             
-            if (pools!=null)
-            foreach(var pool in pools)
-                pool.Destroy();
             if (curMapLst != null)
                 curMapLst.Clear();
             mainGo.SetActive(false);
-
-            foreach (Transform child in mainGo.transform)
+            if(data!=null)
             {
-                Destroy(child.gameObject);
+                data.Unload();
+                data = null;
             }
         }
 
@@ -132,33 +124,16 @@ namespace Z_Map
 
         private void Register(Unit tar)
         {
-            if (tar is ItemUnit item)
-            {
-                itemDic[item.uid]=item;
-            }
-            else if (tar is CharacterUnit character)
-            {
-                characterDic[character.uid]=character;
-            }
-            else
-            {
-                Debug.LogError("Register cant find " + tar.GetType());
-            }
+            unitDic[tar.uid]= tar;
         }
         private void Unregister(Unit tar)
         {
-            if (tar is ItemUnit item)
+            
+            if (unitDic.ContainsKey(tar.uid))
             {
-                itemDic.Remove(item.uid);
+                unitDic.Remove(tar.uid);
             }
-            else if (tar is CharacterUnit character)
-            {
-                characterDic.Remove(character.uid);
-            }
-            else
-            {
-                Debug.LogError("unregister cant find " + tar.GetType());
-            }
+           
         }
 
       
@@ -234,7 +209,7 @@ namespace Z_Map
         }
         private void ShowMap(MapUnit map)
         {
-            map.Show<MapInstance>();
+            map.Show();
         }
 
         public Vector3 GetNavDir(Vector3 cur,Vector3 tar, int maxStep=99999)
@@ -242,7 +217,7 @@ namespace Z_Map
             return navigationController.GetNextDir(cur,tar, maxStep);
         }
 
-        public void LateUpdate()
+        public void UpdateInfo()
         {
             UpdateMap();
             if((curCenterPos - viewCenter).sqrMagnitude>0.2f)

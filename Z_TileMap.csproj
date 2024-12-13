@@ -56,7 +56,7 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level3\Z_Map\Core\Instance.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapData.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Analysis\NavigationController.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Analysis\Bfs.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Character\CharacterUnit.cs" />
@@ -65,12 +65,8 @@
     <Compile Include="Assets\Z_Level3\Z_Map\Core\MapUtilController.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit\MapUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\MapManager.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Map\Core\InstancePool.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit\MapInstance.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemUnit.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Map\Core\File\SaveAndLoad.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Z_Level3\Z_Map\Core\Z_TileMap.asmdef" />
@@ -792,6 +788,10 @@
     <ProjectReference Include="Z_Serialize.csproj">
       <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
       <Name>Z_Serialize</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_UnitSystem.csproj">
+      <Project>{0008358A-06D8-039E-A808-15EA0E646B96}</Project>
+      <Name>Z_UnitSystem</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

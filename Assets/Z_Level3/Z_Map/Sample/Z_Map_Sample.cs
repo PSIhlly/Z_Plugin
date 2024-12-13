@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_Map;
+using Z_UnitSystem;
 
 public class Z_Map_Sample : MonoBehaviour
 {
@@ -12,20 +13,19 @@ public class Z_Map_Sample : MonoBehaviour
     public void Start()
     {
         MapManager.instance.Begin(MapData.GetDefault(prefabs, materials));
-        
     }
     public void Update()
     {
-        
+        MapManager.instance.UpdateInfo();
         {
-            MapManager.instance.SetPos(MapManager.instance.characterDic[2].pos);
+            MapManager.instance.SetPos(MapManager.instance.unitDic[4].pos);
         }
-        if (MapManager.instance.characterDic[2].ins == null)
+        if (MapManager.instance.unitDic[4].ins == null)
             return;
-        var main = MapManager.instance.characterDic[2].ins.transform;
-        if(MapManager.instance.characterDic.ContainsKey(0))
-            MapManager.instance.characterDic[0].destination = main.position;
-        MapManager.instance.characterDic[1].destination = main.position;
+        var main = MapManager.instance.unitDic[4].ins.transform;
+        if(MapManager.instance.unitDic.ContainsKey(0))
+            ((CharacterUnit)(MapManager.instance.unitDic[2])).destination = main.position;
+        ((CharacterUnit)(MapManager.instance.unitDic[3])).destination = main.position;
         if (Input.GetKey(KeyCode.W))
             main.position += Time.deltaTime * Vector3.forward*2;
         if (Input.GetKey(KeyCode.S))
@@ -43,10 +43,10 @@ public class Z_Map_Sample : MonoBehaviour
             MapManager.instance.Begin(new MapData(jo, prefabs, materials));
         }
         if (Input.GetKeyDown(KeyCode.Q))
-            MapManager.instance.RemoveCharacterUnit(0);
+            MapManager.instance.RemoveUnit(0);
 
         if (Input.GetKeyDown(KeyCode.E))
-            MapManager.instance.AddCharacterUnit(new CharacterUnit(8, 4, main.position + Vector3.forward, Vector3.zero, Vector3.one));
+            MapManager.instance.AddUnit(new CharacterUnit(8, 4, main.position + Vector3.forward, Vector3.zero, Vector3.one));
             //MapManager.instance.AddItemUnit(new ItemUnit(8, 1, main.position + Vector3.forward, Vector3.zero, Vector3.one,true));
     }
 }

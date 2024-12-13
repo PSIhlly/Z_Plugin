@@ -42,7 +42,7 @@ namespace Z_ByteSerialize
                 float y = subJo.Value<float>("y");
                 float z = subJo.Value<float>("z");
                 return (T)(object)new Vector3(x, y, z);
-            }else
+            } else
             if (tp == typeof(Vector3Int))
             {
                 JObject subJo = jo.Get<JObject>(key);
@@ -53,7 +53,7 @@ namespace Z_ByteSerialize
             }
             else
             {
-                return jo.Value<T>(key);
+                return (T)(object)jo[key].ToObject<T>();
             }
         }
     }

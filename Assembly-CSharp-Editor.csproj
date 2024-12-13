@@ -56,8 +56,10 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Editor\ScrViewEditor.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\Editor\MonoBehaviourAdapterEditor.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Editor\ILRuntimeCrossBinding.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\Editor\UiHolderEditor.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Editor\ILRuntimeCLRBinding.cs" />
     <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Editor\ILRuntimeMenu.cs" />
   </ItemGroup>
@@ -923,10 +925,6 @@
       <Project>{349D3CED-3B01-A894-1286-2212C7ED26F9}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
-    <ProjectReference Include="Z_Login.csproj">
-      <Project>{7A4497EF-B9DB-4A29-43A3-B6C2E0A2DF13}</Project>
-      <Name>Z_Login</Name>
-    </ProjectReference>
     <ProjectReference Include="Z_Input.csproj">
       <Project>{8087FDDB-2C25-2E20-9312-10CA4405EB8B}</Project>
       <Name>Z_Input</Name>
@@ -943,17 +941,9 @@
       <Project>{E05891DC-A1BF-C7BC-8243-88166AC07D0C}</Project>
       <Name>Z_Trick</Name>
     </ProjectReference>
-    <ProjectReference Include="Z_TileMap.csproj">
-      <Project>{239AD4E9-50D2-EF56-B467-EE9EF8ACF31A}</Project>
-      <Name>Z_TileMap</Name>
-    </ProjectReference>
     <ProjectReference Include="Z_Os.csproj">
       <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
       <Name>Z_Os</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Fight.csproj">
-      <Project>{6257FE85-8383-BC7B-C5EA-D1951C93C293}</Project>
-      <Name>Z_Fight</Name>
     </ProjectReference>
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
@@ -971,17 +961,17 @@
       <Project>{9DCCECFA-008F-FE02-15EC-09C3D3165C2C}</Project>
       <Name>Z_ObjectAnimator</Name>
     </ProjectReference>
-    <ProjectReference Include="Z_Ui.csproj">
-      <Project>{4FE1F9A1-9FE4-F98A-B5FA-EAB736018378}</Project>
-      <Name>Z_Ui</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_IlRuntime.csproj">
-      <Project>{84808AE8-8C94-824C-B9DA-B280A421A9C3}</Project>
-      <Name>Z_IlRuntime</Name>
+    <ProjectReference Include="Z_UnitSystem.csproj">
+      <Project>{0008358A-06D8-039E-A808-15EA0E646B96}</Project>
+      <Name>Z_UnitSystem</Name>
     </ProjectReference>
     <ProjectReference Include="Z_Texture.csproj">
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
       <Name>Z_Texture</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Time.csproj">
+      <Project>{29E96E60-9A29-59F5-2C38-EE3F21525971}</Project>
+      <Name>Z_Time</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

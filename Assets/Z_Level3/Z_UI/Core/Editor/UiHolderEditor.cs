@@ -19,17 +19,19 @@ namespace Z_Ui_Editor
 
             //绘制输入框
             uiHolder.uiName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
-            if (uiHolder.uiType == UIType.Panel)
+
+            if (uiHolder.uiType == UiType.Panel)
             {
                 uiHolder.path = EditorGUILayout.TextField("Path: ", uiHolder.path);
                 // 绘制按钮
                 if (GUILayout.Button("Generate"))
                 {
                     GenerateFile();
-                    
                 }
+                
             }
             
+
 
             // 如果需要，绘制默认的 Inspector
             DrawDefaultInspector();
@@ -68,10 +70,10 @@ namespace Z_Ui_Editor
                     var subEditor = (UiHolderEditor)CreateEditor(subHolder);
                     switch (subHolder.uiType)
                     {
-                        case UIType.Panel:
+                        case UiType.Panel:
                             bindContent += $@"
             view.page_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
-            view.page_{subHolder.uiName}.BindHolder(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
+            view.page_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
             public Ui{subHolder.uiName}Ctrl page_{subHolder.uiName};";
@@ -80,10 +82,10 @@ namespace Z_Ui_Editor
 
                             subEditor.GenerateFile();
                             break;
-                        case UIType.Model:
+                        case UiType.Model:
                             bindContent += $@"
             view.model_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
-            view.model_{subHolder.uiName}.BindHolder(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
+            view.model_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
             public Ui{subHolder.uiName}Ctrl model_{subHolder.uiName};";
@@ -91,10 +93,10 @@ namespace Z_Ui_Editor
             model_{subHolder.uiName} = (Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
                             break;
 
-                        case UIType.Sub:
+                        case UiType.Sub:
                             bindContent += $@"
             view.sub_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
-            view.sub_{subHolder.uiName}.BindHolder(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
+            view.sub_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
             public Ui{subHolder.uiName}Ctrl sub_{subHolder.uiName};";
@@ -201,8 +203,8 @@ namespace Z_Ui_Editor
             RefreshPanelElementContent();
             switch (uiHolder.uiType)
             {
-                case UIType.Panel:
-                case UIType.Model:
+                case UiType.Panel:
+                case UiType.Model:
                     return $@"
 using System.Collections;
 using System.Collections.Generic;
@@ -215,7 +217,7 @@ namespace Ui.{uiHolder.uiName}
 {GetCoreCode(parentClass)}
 }}
 ";
-                case UIType.Sub:
+                case UiType.Sub:
                     return GetCoreCode(parentClass);
             }
             return null;
@@ -225,9 +227,7 @@ namespace Ui.{uiHolder.uiName}
         string GetCoreCode(string parent)
         {
             return $@"
-
 {subContent}
-
     public partial class Ui{uiHolder.uiName}Param:UiParam
     {{
     }}
@@ -253,14 +253,15 @@ namespace Ui.{uiHolder.uiName}
             this.param = (Ui{uiHolder.uiName}Param)param;
         }}
 
-        public override void BindHolder(UiHolder uiHolder)
+        public override void BindHolderRecursively(UiHolder uiHolder)
         {{
-{bindContent}
 
-            base.BindHolder(uiHolder);
+            base.BindHolderRecursively(uiHolder);
 
             view = new Ui{uiHolder.uiName}View(uiHolder);
             model=new Ui{uiHolder.uiName}Model();
+
+{bindContent}
         }}
 
     }}

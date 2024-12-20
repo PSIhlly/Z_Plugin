@@ -1,6 +1,6 @@
-using Z_Ui.Form.DialogForm;
-using Z_Ui.Form.NpcForm;
-using Z_Ui.Form.ImgForm;
+using Z_Ui.Form.Sample_DialogForm;
+using Z_Ui.Form.Sample_NpcForm;
+using Z_Ui.Form.Sample_ImgForm;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,15 +10,13 @@ using Z_Ui.Dialog;
 using UnityEngine.UI;
 using Z_Ui;
 using Z_Ui.Base;
-using Ui.APanel;
+using Z_Ui.Notify;
+using System;
+using Z_Time;
 
 public class Z_Ui_Sample : MonoBehaviour
 {
     public Text t;
-    private void Start()
-    {
-        
-    }
     public void StartDialog()
     {
         var contentLst = new List<string>();
@@ -26,14 +24,14 @@ public class Z_Ui_Sample : MonoBehaviour
         var bgLst = new List<Sprite>();
         var avatarLst = new List<Sprite>();
 
-        foreach (var v in DialogForm.Datas.Values)
+        foreach (var v in Sample_DialogForm.Datas.Values)
         {
             if (v.groupId == 1)
             {
                 contentLst.Add(v.text);
-                nameLst.Add(NpcForm.Datas[v.speaker_npcId].name);
-                bgLst.Add(TextureHelper.GetSpriteByPath(ImgForm.Datas[v.background_imgId].path));
-                avatarLst.Add(TextureHelper.GetSpriteByPath(ImgForm.Datas[NpcForm.Datas[v.speaker_npcId].avatar_imgId].path));
+                nameLst.Add(Sample_NpcForm.Datas[v.speaker_npcId].name);
+                bgLst.Add(TextureHelper.GetSpriteByPath(Application.dataPath+Sample_ImgForm.Datas[v.background_imgId].path));
+                avatarLst.Add(TextureHelper.GetSpriteByPath(Application.dataPath + Sample_ImgForm.Datas[Sample_NpcForm.Datas[v.speaker_npcId].avatar_imgId].path));
             }
         }
         DialogManager.instance.Begin(nameLst, contentLst, bgLst, avatarLst, OnComplete);
@@ -44,58 +42,20 @@ public class Z_Ui_Sample : MonoBehaviour
     }
     private void Update()
     {
-      
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            NotifyManager.instance.AddTip("tips");
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            NotifyManager.instance.AddPopup("tips",false,new List<string>() { "ok", "cancel" }, new List<Func<bool>>() { ()=> { Debug.Log("ok"); return false; }, () => { Debug.Log("close"); return true; } });
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            StartDialog();
+        }
     }
 
 
 }
 
-namespace Ui.APanel
-{
-    
-    public partial class UiAPanelCtrl
-    {
-        UiScrViewContainer<UiJBCtrl> con;
-        public override void OnCreate()
-        {
-            con = new UiScrViewContainer<UiJBCtrl>(view.go_JB,view.scr_tt);
-        }
-
-        public override void OnShow()
-        {
-            Refresh();
-        }
-        public void Refresh()
-        {
-            con.Clear();
-            for (int i = 0; i < 30; i++)
-                con.Add(new UiJBParam()
-                {
-                    id = i
-                });
-            con.Refresh();
-        }
-
-    }
-    
-    public partial class UiJBParam
-    {
-        public int id;
-    }
-
-    public partial class UiJBCtrl
-    {
-        public override void OnCreate()
-        {
-            view.btn_lj.onClick.AddListener(()=>
-            {
-                parent.Refresh();
-            });
-        }
-        public override void OnShow()
-        {
-            view.txt_.text = param.id.ToString();
-        }
-    }
-
-    }

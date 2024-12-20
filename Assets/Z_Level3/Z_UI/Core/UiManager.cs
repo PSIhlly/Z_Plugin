@@ -9,7 +9,7 @@ namespace Z_Ui
     public class UiManager : Z_MonoManager<UiManager>
     {
         public List<GameObject> preloadUis;
-        public List<GameObject> canvasLst;
+        public List<GameObject> layerRootLst;
 
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
@@ -24,7 +24,7 @@ namespace Z_Ui
                 ui.SetActive(false);
             }
         }
-        public UiCtrl GetUi<T>() where T : UiCtrl, new()
+        public T GetUi<T>() where T : UiCtrl, new()
         {
             var tp = typeof(T);
             if (uiCtrlName2Uis[tp.Name].Count == 0)
@@ -32,7 +32,7 @@ namespace Z_Ui
                 return null;
             }
             var uiHolder =uiCtrlName2Uis[tp.Name][0];
-            return uiHolder.ctrl;
+            return (T)uiHolder.ctrl;
         }
         public UiHolder ShowUi<T>(UiParam param=null) where T : UiCtrl, new()
         {
@@ -44,6 +44,7 @@ namespace Z_Ui
             var uiHolder = uiCtrlName2Uis[tp.Name][0];
             uiHolder.ctrl.SetParam(param);
             uiHolder.gameObject.SetActive(true);
+            uiHolder.transform.SetAsLastSibling();
             return uiHolder;
         }
         public void CloseUi<T>() where T : UiCtrl, new()
@@ -54,22 +55,18 @@ namespace Z_Ui
                 return;
             }
             var uiHolder = uiCtrlName2Uis[tp.Name][0];
-            uiHolder.gameObject.SetActive(false);
+            uiHolder.ctrl.Close();
         }
        
         public UiHolder CreateUi<T>() where T : UiCtrl, new()
         {
             var tp = typeof(T);
             var oriHolder = uiCtrlName2OriUi[tp.Name];
-            var uiHolder = Instantiate(oriHolder.gameObject, canvasLst[0].transform).GetComponent<UiHolder>();
-            BindMainUi<T>(uiHolder);
+            var uiHolder = Instantiate(oriHolder.gameObject, layerRootLst[(int)oriHolder.layer].transform).GetComponent<UiHolder>();
+            uiHolder.InstanceInit<T>();
             return uiHolder;
         }
-        public void BindMainUi<T>(UiHolder uiHolder) where T : UiCtrl, new()
-        {
-            var tp = typeof(T);
-            uiHolder.MainUiBind(new T());
-        }
+        
 
         public void DestroyUi<T>(T uiCtrl) where T : UiCtrl, new()
         {

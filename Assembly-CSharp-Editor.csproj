@@ -961,6 +961,10 @@
       <Project>{9DCCECFA-008F-FE02-15EC-09C3D3165C2C}</Project>
       <Name>Z_ObjectAnimator</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Time.csproj">
+      <Project>{29E96E60-9A29-59F5-2C38-EE3F21525971}</Project>
+      <Name>Z_Time</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_UnitSystem.csproj">
       <Project>{0008358A-06D8-039E-A808-15EA0E646B96}</Project>
       <Name>Z_UnitSystem</Name>
@@ -968,10 +972,6 @@
     <ProjectReference Include="Z_Texture.csproj">
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
       <Name>Z_Texture</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Time.csproj">
-      <Project>{29E96E60-9A29-59F5-2C38-EE3F21525971}</Project>
-      <Name>Z_Time</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

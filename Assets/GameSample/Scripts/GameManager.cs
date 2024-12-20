@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     public void Update()
     {
         
-           }
+    }
     public void RegisterInput()
     {
         var ins = InputManager.instance;
@@ -47,19 +47,5 @@ public class GameManager : MonoBehaviour
         };
 
         ins.Register(config);
-
-       /* if (Input.GetKey(KeyCode.O))
-            SaveAndLoad.Save("data1", JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
-        if (Input.GetKey(KeyCode.P))
-        {
-            JObject jo = JObject.Parse(SaveAndLoad.Load("data1"));
-            MapManager.instance.Begin(new MapData(jo, prefabs, materials));
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-            MapManager.instance.RemoveCharacterUnit(0);
-
-        if (Input.GetKeyDown(KeyCode.E))
-            MapManager.instance.AddCharacterUnit(new CharacterUnit(8, 4, main.position + Vector3.forward, Vector3.zero, Vector3.one));
-*/
     }
 }

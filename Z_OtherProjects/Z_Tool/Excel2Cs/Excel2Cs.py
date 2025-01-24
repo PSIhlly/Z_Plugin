@@ -1,12 +1,14 @@
 import pandas as pd
 import sys
 import os
-from collections import defaultdict
 file_namespace = "Form"
 file_using=""
 class FormInfo:
+    path_output=""
+    
     df = None
     base_info = None
+
     def get_namespace_str(self,namespace):
        return f"""using UnityEngine;
 using System.Collections;
@@ -16,26 +18,26 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
-using Z_Form;
 {file_using}
 namespace {file_namespace}
 {{
 """
+    declare_sub_str = f""""""
     declare_str = f""""""
     dic_str = f""""""
 
     serialize_str = f""""""
     deserialize_str = f""""""
-
+    
     add_str = f""""""
+    default_content_str = f""""""
     remove_str = f""""""
+    clear_str = f""""""
 
     content_str = f""""""
 
-    extend_data_str = ':Form.Data'
-    extend_str=':Form'
-
-
+    extend_data_str = ''
+        
     id_str = 'id'
 
     def __init__(self):
@@ -46,121 +48,152 @@ namespace {file_namespace}
         self.data_list = []
         self.name = 'default'
 
-
     def get_result(self):
         namespace_str = self.get_namespace_str(self.name)
 
+        init_op_base_str=f'''
+            InitInternal();'''
+        init_internal_base_str=""
+
+        init_children_action_str=""
         add_op_base_str = ""
         remove_op_base_str = ""
-        add_remove_op_str = ""
-        children_str=""
-        for data in form_info_list:
-            if data.extend_str == self.name:
-                children_str+=data.name+"Form,"
+        if self.base_info!=None:
+            init_op_base_str=f"""
+            {self.base_info}Form.Init();
+"""
+            add_op_base_str=self.base_info+"Form.AddData(data);"
+            remove_op_base_str=self.base_info+f"""Form.RemoveData({self.id_str});"""
+            init_children_action_str+=f'''
+                {self.base_info}Form.childInitAction+=InitInternal;
+'''
+            init_internal_base_str+=f'''
+            foreach(var data in DataBy{self.id_str.capitalize()}.Values)
+            {{
+                {self.base_info}Form.AddData(data,false);
+            }}
+'''
 
+
+        add_remove_clear_op_str = ""
         if 'write' in self.var_config_dic[self.id_str]:
-            visit
-            if  children_str == "":
-                add_remove_op_str = f'''
-        public int AddData(Data data)
+            add_remove_clear_op_str = f'''
+        public static int AddData(Data data,bool autoId=false)
         {{
-            {add_op_base_str}
-            if(free{self.id_str.capitalize()}Queue.Count==0)
-            return -1;
-            int {self.id_str}=free{self.id_str.capitalize()}Queue.Dequeue();
-            data.{self.id_str}={self.id_str};  
+            Init();
+            if(autoId)
+            {{ 
+                if(free{self.id_str.capitalize()}Queue.Count==0)
+                return -1;
+                int {self.id_str}=free{self.id_str.capitalize()}Queue.Dequeue();
+                data.{self.id_str}={self.id_str};  
+            }}
+{self.add_str}
             
-            return {self.id_str};
+{add_op_base_str}
+            return data.{self.id_str};
         }}
-        public void RemoveData(int {self.id_str})
-        {{
-            {remove_op_base_str}
+        public static void RemoveData(int {self.id_str})
+        {{            
+            Init();
             if(!_DataBy{self.id_str.capitalize()}.ContainsKey({self.id_str}))
                 return;
-            var data = _DataBy{self.id_str.capitalize()}[{self.id_str}];
+                
+            var data=_DataBy{self.id_str.capitalize()}[{self.id_str}];
+{self.remove_str}
+{remove_op_base_str}
+        }}
+        public static void Clear()
+        {{
+            Init();
+{self.clear_str}
         }}
 '''
 
-        
-
         return f"""{namespace_str}
-    public partial class {self.name}Form{extend_str}
+    public static partial class {self.name}Form
     {{
-        private {self.name}Form[] childrenForm = new {self.name}Form[]{{{children_str}}};
-        private static _ins;
-        public static ins
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Register()
         {{
-            get{{
-            if(_ins!=null)
-             return ins;
-            _ins=new {self.name}Form();
-            _ins.Init();
-            }}
+{init_children_action_str}
         }}
-        private bool inited;
-        private Queue<int> free{self.id_str.capitalize()}Queue;
+
+        private static bool inited;
+        private static Queue<int> free{self.id_str.capitalize()}Queue;
+        public static Action childInitAction;
 
         public partial class Data{self.extend_data_str}
         {{
 {self.declare_str}
         }}
+{self.default_content_str}
 {self.dic_str}
 
-        public void Init()
+        static public void Init()
+        {{
+{init_op_base_str}
+        }}
+        public static void InitInternal()
         {{
             if(inited)
                 return;
-             for(int i=0;i<childrenForm.Length;i++)
-             {{
-                childrenForm[i].Init();
-             }}
-
-            free{self.id_str.capitalize()}Queue=new  Queue<int> (Enumerable.Range(0, 100));
+            inited=true;  
+            free{self.id_str.capitalize()}Queue=new Queue<int> (Enumerable.Range(0, 100));
 {self.content_str}
+
+            childInitAction?.Invoke();
             
-            foreach(var k in _DataBy{self.id_str.capitalize()}.Keys)
+{init_internal_base_str}
+
+             foreach(var k in _DataBy{self.id_str.capitalize()}.Keys)
             {{
                 free{self.id_str.capitalize()}Queue.Enqueue(k);
             }}
-            
-            inited=true;
-            base.Init();
         }}
 
-        public List<Data> GetDatasByJa(JArray ja)
+
+        public static List<Data> GetDatasByJa(JArray ja)
         {{
+            Init();
             List<Data> lst=new List<Data>();
             foreach(JObject jo in ja)
             {{
+                if(jo.Get<int>("{self.id_str}")==0)
+                    continue;
                 lst.Add(GetDataByJo(jo));
             }}
             return lst;
         }}
 
-        public JArray GetJaByDatas()
+        public static JArray GetJaByDatas()
         {{
+            Init();
             JArray ja=new JArray();
             foreach(Data data in _DataBy{self.id_str.capitalize()}.Values)
             {{
-
+                if(data.{self.id_str}==0)
+                    continue;
                 ja.Add(GetJoByData(data));
             }}
             return ja;
         }}
 
-        public Data GetDataByJo(JObject jo)
+        public static Data GetDataByJo(JObject jo)
         {{
+            Init();
 {self.deserialize_str}
             return data;
         }}
 
-        public JObject GetJoByData(Data data)
+        public static JObject GetJoByData(Data data)
         {{
+            Init();
 {self.serialize_str}
             return jo;
         }}
 
-{add_remove_op_str}
+{add_remove_clear_op_str}
     }}
 }}
         """
@@ -289,7 +322,7 @@ for i, arg in enumerate(sys.argv):
     if i == 3:
         file_namespace = arg + "." + file_namespace
     if i == 4:
-        file_using = "using "+arg+";";
+        file_using = "using "+arg+";"
         
 print(f'''start\n''')
 for root, dirs, files in os.walk(files_root_excels):
@@ -302,8 +335,8 @@ for root, dirs, files in os.walk(files_root_excels):
             formInfo.name = temp_names[0]
             if len(temp_names) > 1:
                 formInfo.base_info = temp_names[1]
-                formInfo.extend_str = " : " + temp_names[1] +'Form'
-                formInfo.extend_data_str = " : " + temp_names[1] + "Data"
+                formInfo.extend_data_str = " : " + temp_names[1] + "Form.Data"
+
             formInfo.df = pd.read_excel(root + "/" + file)
 
             #第一行，获取名称和配置
@@ -330,36 +363,63 @@ for root, dirs, files in os.walk(files_root_excels):
             
             form_info_list.append(formInfo)
 
+
 for formInfo in form_info_list:
-            #构造声明
+     #构造声明
+            #外挂式变量并移除
+            for name in formInfo.var_list[::-1]:
+                
+                if 'sub' in formInfo.var_config_dic[name]:
+                    if 'override' not in formInfo.var_config_dic[name]:
+                        formInfo.declare_str+=f'''
+                    protected {formInfo.var_type_dic[name]} _{name};
+'''
+                    formInfo.declare_str+=f'''
+                /// <summary>
+                ///{formInfo.var_annotation_dic[name]}
+                ///</summary>
+                public {formInfo.var_type_dic[name]} {name}
+                {{
+                    get
+                    {{
+                        return ({formInfo.var_type_dic[name]}) _{name};
+                    }}
+                }}
+'''  
+                    formInfo.declare_sub_str+=f'''
+                    _{name}=new {formInfo.var_type_dic[name]}(this);
+'''
+                    formInfo.var_list.remove(name)
+                    formInfo.var_type_dic.pop(name, 'Not Found')
+            #常规声明
             for name in formInfo.var_list:
-                if 'override' not in formInfo.var_config_dic[name]:
-                    declare = ''
-                    if name in formInfo.var_annotation_dic:
-                        declare+=f'''
+                    if 'override' not in formInfo.var_config_dic[name]:
+                        declare = ''
+                        if name in formInfo.var_annotation_dic:
+                            declare+=f'''
                 /// <summary>
                 ///{formInfo.var_annotation_dic[name]}
                 ///</summary>
                 '''
-                    else:
-                        declare+=f'''
+                        else:
+                            declare+=f'''
                 '''
-                    declare+='public '
-                    if 'write' not in formInfo.var_config_dic[name]:
-                        declare+='readonly '
-                    #类型描述
-                    if 'custom' in formInfo.var_config_dic[name]:
-                        declare+=formInfo.var_type_dic[name] + ' '#暂时一样
-                    else:
-                        declare+=formInfo.var_type_dic[name] + ' '
-                    declare+=name
-                    formInfo.declare_str+=declare + ';\n'
-
+                        declare+='public '
+                        if 'write' not in formInfo.var_config_dic[name]:
+                            declare+='readonly '
+                        #类型描述
+                        if 'custom' in formInfo.var_config_dic[name]:
+                            declare+=formInfo.var_type_dic[name] + ' '#暂时一样
+                        else:
+                            declare+=formInfo.var_type_dic[name] + ' '
+                        declare+=name
+                        formInfo.declare_str+=declare + ';\n'
+            
             #添加索引
             
             formInfo.dic_str+=f"""
-        Dictionary<int, Data> _DataBy{formInfo.id_str.capitalize()} = null;
-        public Dictionary<int, Data> DataBy{formInfo.id_str.capitalize()}
+        static Dictionary<int, Data> _DataBy{formInfo.id_str.capitalize()} = null;
+        public static Dictionary<int, Data> DataBy{formInfo.id_str.capitalize()}
         {{
             get
             {{
@@ -371,8 +431,8 @@ for formInfo in form_info_list:
             for name in formInfo.var_list:
                 if 'uniqueIndex' in formInfo.var_config_dic[name]:
                     formInfo.dic_str+=f"""
-        Dictionary<{formInfo.var_type_dic[name]}, Data> _DataBy{name.capitalize()} = null;
-        public Dictionary<{formInfo.var_type_dic[name]}, Data> DataBy{name.capitalize()}
+        static Dictionary<{formInfo.var_type_dic[name]}, Data> _DataBy{name.capitalize()} = null;
+        public static Dictionary<{formInfo.var_type_dic[name]}, Data> DataBy{name.capitalize()}
         {{
             get
             {{
@@ -399,7 +459,6 @@ for formInfo in form_info_list:
             con_arg_str = ''
             con_set_str = ''
             for key in formInfo.var_type_dic:
-                print(key+' '+(str)(formInfo.var_config_dic[key]))
                 if 'override' in formInfo.var_config_dic[key]:
                     con_extend_str+=key+','
                 con_arg_str+=formInfo.var_type_dic[key] + ' ' + key + ','
@@ -413,6 +472,7 @@ for formInfo in form_info_list:
             public Data({con_arg_str[0:-1]}){con_extend_str}
             {{
 {con_set_str}
+{formInfo.declare_sub_str}
             }}
             '''
             
@@ -423,15 +483,17 @@ for formInfo in form_info_list:
                 dic = {}
                 cur_row = formInfo.df.iloc[i]
                 for title in cur_row.index:
+                    if 'sub' in formInfo.var_config_dic[title]:
+                        continue
                     #处理auto
                     if ('auto' in formInfo.var_config_dic[title]) and pd.isna(cur_row[title]) and last_row is not None:
                         cur_row[title] = last_row[title]
                     content = cur_row[title]
+                    
                     dic[title] = get_value(formInfo.var_type_dic[title],str(content))
-
+                    
                 formInfo.data_list.append(dic)
                 last_row = cur_row
-
             #处理初始化
             #id
             formInfo.content_str+=f'''
@@ -443,11 +505,19 @@ for formInfo in form_info_list:
             formInfo.remove_str+=f'''
                 _DataBy{formInfo.id_str.capitalize()}.Remove(data.{formInfo.id_str});
 '''
+            formInfo.clear_str+=f'''
+                _DataBy{formInfo.id_str.capitalize()}.Clear();
+'''
             for data in formInfo.data_list:
                 args = ''
                 for key in data:
                     args+=data[key] + ','
-                formInfo.content_str+=f'''
+                if data[formInfo.id_str]=='0':
+                    formInfo.default_content_str=f'''
+                   public static Data defaultData=new Data({args[0:-1]});
+'''
+                else:
+                    formInfo.content_str+=f'''
                 {{{data[formInfo.id_str]},new Data({args[0:-1]})}},
 '''
             formInfo.content_str+=f'''
@@ -456,6 +526,7 @@ for formInfo in form_info_list:
 
             #index
             for name in formInfo.var_list:
+
                 if 'uniqueIndex' in formInfo.var_config_dic[name]:
                     formInfo.content_str+=f'''
                 _DataBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, Data>() {{
@@ -465,10 +536,15 @@ for formInfo in form_info_list:
 '''         
                     formInfo.remove_str+=f'''
                 _DataBy{name.capitalize()}.Remove(data.{name});
+'''                   
+                    formInfo.clear_str+=f'''
+                _DataBy{name.capitalize()}.Clear();
 '''
                     for data in formInfo.data_list:
+                        if data[formInfo.id_str]=='0':
+                            continue
                         formInfo.content_str+=f'''
-                    {{{data[name]},_DataBy{formInfo.id_str.capitalize()}[{data['id']}]}},
+                    {{{data[name]},_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]}},
 '''
                     formInfo.content_str+=f'''
                 }};
@@ -478,16 +554,19 @@ for formInfo in form_info_list:
                 _DatasBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, List<Data>>() {{
 '''
                     formInfo.add_str+=f'''
-                _DataBy{name.capitalize()}[data.{name}].Add(data);
+                _DatasBy{name.capitalize()}[data.{name}].Add(data);
 '''         
                     formInfo.remove_str+=f'''
-                _DataBy{name.capitalize()}[data.{name}].Remove(data);
+                _DatasBy{name.capitalize()}[data.{name}].Remove(data);
+'''
+                    formInfo.clear_str+=f'''
+                _DatasBy{name.capitalize()}.Clear();
 '''
 
                     #登记list
                     exist_list = []
                     for data in formInfo.data_list:
-                        if data[name] in exist_list:
+                        if data[name] in exist_list or data[formInfo.id_str]=='0':
                             continue
                         exist_list.append(data[name])
                         formInfo.content_str+=f'''
@@ -498,31 +577,35 @@ for formInfo in form_info_list:
 '''
                     #注册
                     for data in formInfo.data_list:
+                        if data[formInfo.id_str]=='0':
+                            continue
                         formInfo.content_str+=f'''
                     _DatasBy{name.capitalize()}[{data[name]}].Add(_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]);
 '''
             #构造序列化
             formInfo.serialize_str = f'''
-                    JObject jo=new JObject();
+            JObject jo=new JObject();
 '''               
             for name in formInfo.var_list:
+
                 if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name]:
                     formInfo.serialize_str+=f'''
-                    jo.Set<{formInfo.var_type_dic[name]}>("{name}",data.{name});
+            jo.Set<{formInfo.var_type_dic[name]}>("{name}",data.{name});
 '''               
 
 
             formInfo.deserialize_str = f'''
-                    Data data=new Data(
+            Data data=new Data(
 '''               
             for name in formInfo.var_list: 
+
                 if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name]:
                     formInfo.deserialize_str+=f'''
-                        jo.Get<{formInfo.var_type_dic[name]}>("{name}"),
+                jo.Get<{formInfo.var_type_dic[name]}>("{name}"),
 '''             
-                else:#不可用的取0
+                else:#不可用的取default
                     formInfo.deserialize_str+=f'''
-                    _DataBy{formInfo.id_str.capitalize()}[0].{name},
+                    defaultData.{name},
 '''               
 
             #去结尾,
@@ -534,7 +617,7 @@ for formInfo in form_info_list:
 # 打印找到的 Excel 文件
 for file in form_info_list:
     print('处理中：' + file.name)
-    with open(files_root_cs + file.name + '.cs', 'w') as f:
+    with open(files_root_cs + file.name + 'Form.cs', 'w') as f:
         f.write(file.get_result())
 
 

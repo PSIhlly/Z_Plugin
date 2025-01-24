@@ -6,7 +6,7 @@ using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Dialog;
 
-namespace Ui.Dialog
+namespace Ui
 {
 
     #region func

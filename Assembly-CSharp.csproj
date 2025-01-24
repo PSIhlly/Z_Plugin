@@ -56,44 +56,43 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\09_Reflection\ReflectionDemo.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiHolder.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\CameraStacking\3D Skybox\Scripts\SkyboxCamera.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapData.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\12_Performance\Performance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMapper.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\QuaternionBinder.cs" />
+    <Compile Include="Assets\GameSample\Forms\ExcelCs\SceneForm.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Form\ExcelCs\FightUnitForm.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Form\ExcelCs\FightMainForm.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Item\ItemManager.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\UiManager.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Cmd\Cmd.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Analysis\NavigationController.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\FirstPersonController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Form\ExcelCs\WeaponUnitForm.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiEnterMainBase.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\ScrView.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourDemo.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiScrViewContainer.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Form\ExcelCs\WeaponBulletForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Bullet\BulletInstance.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Analysis\Bfs.cs" />
     <Compile Include="Assets\Z_Level1\Z_Input\Sample\Z_Input_Sample.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\AutoLoadPipelineAsset.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\02_Invocation\Invocation.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Sample_ImgForm.cs" />
-    <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightData.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\Inheritance.cs" />
+    <Compile Include="Assets\GameSample\Forms\ExcelCs\SceneFormForm.cs" />
+    <Compile Include="Assets\Z_Level2\Z_ObjectAnimator\Sample\Z_ObjectAnimator_Sample.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponInstance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonData.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Form\ExcelCs\ItemUnitForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\UiBase\UiNotifyBase.cs" />
     <Compile Include="Assets\Scenes\Test.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineDemo.cs" />
-    <Compile Include="Assets\GameSample\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\Lexer.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector2Binder.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Form\ExcelCs\CharacterUnitForm.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Form\ExcelCs\MapUnitForm.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\GameManager.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Sample\Z_Fight_Sample.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\06_CLRBinding\CLRBindingDemo.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Character\CharacterUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_IlRuntime\Sample\Z_IlRuntime_Sample.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonMockWrapper.cs" />
+    <Compile Include="Assets\GameSample\Forms\ExcelCs\ItemFormForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightManager.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\ParserToken.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\UiBase\UiDialogBase.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\LensFlares\Scripts\ScreenSpacePlacement.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiWarRoomCtrl.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiView.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiModel.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiCtrl.cs" />
@@ -101,46 +100,50 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Sample_NpcForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Addition\TouchPass.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Img.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\04_Inheritance\InheritanceAdapter.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Character\CharacterInstance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\08_MonoBehaviour\MonoBehaviourAdapter.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\01_HelloWorld\HelloWorld.cs" />
+    <Compile Include="Assets\GameSample\Forms\ExcelCs\StoryFormForm.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\RendererFeatures\KeepFrame\KeepFrameFeature.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\Form\ExcelCs\MapMainForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\Tips\UiTNotifyCtrl.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiEnterMainCtrl.cs" />
     <Compile Include="Assets\Z_Level2\Z_Client\Sample\Z_Client_Sample.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Sample\Excels\ExcelCs\Sample_DialogForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Btn.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\07_Coroutine\CoroutineAdapter.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\03_Delegate\DelegateDemo.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiWarRoomBase.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Bullet\BulletUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_Login\Core\Core.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\Form\ExcelCs\BulletUnitForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemInstance.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\MapUtilController.cs" />
     <Compile Include="Assets\Z_Level3\Z_IlRuntime\Core\IlRuntimeManager.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonException.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Sta.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\05_CLRRedirection\CLRRedirectionDemo.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Module\Dialog\DialogManager.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit\MapUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Txt.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Fight\Core\FightDataController.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\MapManager.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Fight\FightUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Sample\Z_Ui_Sample.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Module\Tips\NotifyManager.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Fight\FightInstance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\Vector3Binder.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\10_LitJson\LitJsonDemo.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Item\ItemDefines.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Unit\MapInstance.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonWriter.cs" />
+    <Compile Include="Assets\GameSample\Forms\ExcelCs\ItemForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Sample\Z_Map_Sample.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiContainer.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\Scripts\Examples\11_ValueTypeBinding\ValueTypeBindingDemo.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\IJsonWrapper.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\Dialog\UiDialogCtrl.cs" />
     <Compile Include="Assets\Z_Level0\Z_Texture\Sample\Z_Texture_Sample.cs" />
-    <Compile Include="Assets\Samples\ILRuntime\2.0.2\Demo\LitJson\JsonReader.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapDataController.cs" />
+    <Compile Include="Assets\GameSample\Forms\ExcelCs\StoryForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemUnit.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiStartBase.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiStartCtrl.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main2Scene\Main2SceneManager.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiModBase.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiModCtrl.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiModSceneCtrl.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiModStoryBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
@@ -166,7 +169,6 @@
     <None Include="Assets\StreamingAssets\System.Net.Http.dll" />
     <None Include="Assets\StreamingAssets\System.Runtime.Numerics.dll" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
-    <None Include="Assets\Z_Level0\Newtonsoft.Json.dll" />
     <None Include="Assets\StreamingAssets\System.AppContext.dll" />
     <None Include="Assets\StreamingAssets\System.Net.Sockets.dll" />
     <None Include="Assets\StreamingAssets\System.IO.Pipes.dll" />
@@ -231,6 +233,7 @@
     <None Include="Assets\StreamingAssets\System.Text.Encoding.dll" />
     <None Include="Assets\StreamingAssets\System.Collections.Specialized.dll" />
     <None Include="Assets\StreamingAssets\System.Linq.Parallel.dll" />
+    <None Include="Assets\Z_Level0\Newtonsoft.Json.dll" />
     <None Include="Assets\StreamingAssets\System.Threading.ThreadPool.dll" />
     <None Include="Assets\StreamingAssets\System.ComponentModel.Primitives.dll" />
     <None Include="Assets\StreamingAssets\System.Collections.NonGeneric.dll" />
@@ -521,29 +524,17 @@
     <Reference Include="Unity.Burst.Cecil.Mdb">
       <HintPath>Library\PackageCache\com.unity.burst@1.7.4\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
     </Reference>
-    <Reference Include="ILRuntime.Mono.Cecil.Mdb">
-      <HintPath>Library\PackageCache\com.ourpalm.ilruntime@2.0.2\Plugins\ILRuntime.Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Burst.Cecil.Pdb">
       <HintPath>Library\PackageCache\com.unity.burst@1.7.4\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="ILRuntime.Mono.Cecil">
-      <HintPath>Library\PackageCache\com.ourpalm.ilruntime@2.0.2\Plugins\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil">
       <HintPath>Library\PackageCache\com.unity.burst@1.7.4\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="ILRuntime.Mono.Cecil.Pdb">
-      <HintPath>Library\PackageCache\com.ourpalm.ilruntime@2.0.2\Plugins\ILRuntime.Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.4\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Burst.Cecil.Rocks">
       <HintPath>Library\PackageCache\com.unity.burst@1.7.4\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
     </Reference>
-    <Reference Include="ReportGeneratorMerged">
-      <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.7.8\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Z_Level0\Newtonsoft.Json.dll</HintPath>
@@ -929,8 +920,8 @@
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>C:\Program Files\Unity 2022.1.24f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.InternalAPIEngineBridge.001">
-      <HintPath>Library\ScriptAssemblies\Unity.InternalAPIEngineBridge.001.dll</HintPath>
+    <Reference Include="Unity.VisualScripting.Flow.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
@@ -938,65 +929,14 @@
     <Reference Include="Unity.RenderPipelines.Universal.Shaders">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor.CacheServer">
-      <HintPath>Library\ScriptAssemblies\UnityEditor.CacheServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Searcher.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Rider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.EditorCoroutines.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ShaderGraph.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Mathematics.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Common.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="PPv2URPConverters">
       <HintPath>Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
@@ -1010,32 +950,44 @@
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.VisualScripting.State.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="ILRuntime">
-      <HintPath>Library\ScriptAssemblies\ILRuntime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InternalAPIEditorBridge.001">
-      <HintPath>Library\ScriptAssemblies\Unity.InternalAPIEditorBridge.001.dll</HintPath>
+    <Reference Include="Unity.Searcher.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualScripting.Flow">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.PlasticSCM.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
+    <Reference Include="UnityEditor.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Rider.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Core">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ShaderGraph.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
@@ -1046,41 +998,30 @@
     <Reference Include="Unity.VisualScripting.Shared.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.2D.Common.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ScriptableBuildPipeline">
-      <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.SpriteShape.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.SpriteShape.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ScriptableBuildPipeline.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Common.Path.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Path.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
+    <Reference Include="Unity.Mathematics.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.SpriteShape.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.SpriteShape.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.State">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Z_Client.csproj">
+      <Project>{6C5ADBF1-FFC4-2355-3184-322A58F036EF}</Project>
+      <Name>Z_Client</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_Input.csproj">
       <Project>{8087FDDB-2C25-2E20-9312-10CA4405EB8B}</Project>
       <Name>Z_Input</Name>
@@ -1089,29 +1030,13 @@
       <Project>{4E7B6A79-C4BD-8DCD-9BAA-506ACBA3D18A}</Project>
       <Name>Z_Math</Name>
     </ProjectReference>
-    <ProjectReference Include="Z_Client.csproj">
-      <Project>{6C5ADBF1-FFC4-2355-3184-322A58F036EF}</Project>
-      <Name>Z_Client</Name>
+    <ProjectReference Include="Z_Serialize.csproj">
+      <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
+      <Name>Z_Serialize</Name>
     </ProjectReference>
     <ProjectReference Include="Z_Trick.csproj">
       <Project>{E05891DC-A1BF-C7BC-8243-88166AC07D0C}</Project>
       <Name>Z_Trick</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Os.csproj">
-      <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
-      <Name>Z_Os</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_DesignStyle.csproj">
-      <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
-      <Name>Z_DesignStyle</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Debug.csproj">
-      <Project>{97CD91AE-467A-FDB7-BE45-20BBE954AA3A}</Project>
-      <Name>Z_Debug</Name>
-    </ProjectReference>
-    <ProjectReference Include="Z_Serialize.csproj">
-      <Project>{275D4130-2AB6-D84B-BED8-14FB20F21C19}</Project>
-      <Name>Z_Serialize</Name>
     </ProjectReference>
     <ProjectReference Include="Z_ObjectAnimator.csproj">
       <Project>{9DCCECFA-008F-FE02-15EC-09C3D3165C2C}</Project>
@@ -1121,9 +1046,25 @@
       <Project>{29E96E60-9A29-59F5-2C38-EE3F21525971}</Project>
       <Name>Z_Time</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Os.csproj">
+      <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
+      <Name>Z_Os</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_UnitSystem.csproj">
       <Project>{0008358A-06D8-039E-A808-15EA0E646B96}</Project>
       <Name>Z_UnitSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="Google.Protobuf.csproj">
+      <Project>{C355699A-E5E2-5E0A-B9B0-DE3AC3299A46}</Project>
+      <Name>Google.Protobuf</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_DesignStyle.csproj">
+      <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
+      <Name>Z_DesignStyle</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Debug.csproj">
+      <Project>{97CD91AE-467A-FDB7-BE45-20BBE954AA3A}</Project>
+      <Name>Z_Debug</Name>
     </ProjectReference>
     <ProjectReference Include="Z_Texture.csproj">
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>

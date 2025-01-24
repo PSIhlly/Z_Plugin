@@ -1,3 +1,16 @@
 {
-	"name": "Z_Serialize"
+    "name": "Z_Serialize",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5e3ae0133fa908c409910131ff505d06"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

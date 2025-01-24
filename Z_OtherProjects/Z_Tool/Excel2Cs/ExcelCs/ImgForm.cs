@@ -2,20 +2,28 @@ using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
-namespace Form.ImgForm
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Z_ByteSerialize;
+
+namespace Form
 {
 
-    public static partial class ImgForm
+    public static partial class ImgFormForm
     {
-        public class Data
+        private static bool inited;
+        private static Queue<int> freeIdQueue;
+
+        public partial class Data
         {
 
-            public readonly int id;
+                public readonly int id;
 
-            /// <summary>
-            ///头像目录
-            ///</summary>
-            public readonly string path;
+                /// <summary>
+                ///头像目录
+                ///</summary>
+                public readonly string path;
 
             public Data(int id,string path)
             {
@@ -25,19 +33,29 @@ namespace Form.ImgForm
             }
             
         }
-        static IReadOnlyDictionary<int, Data> _Datas = null;
-        public static IReadOnlyDictionary<int, Data> Datas
+
+        static Dictionary<int, Data> _DataById = null;
+        public static Dictionary<int, Data> DataById
         {
             get
             {
                 Init();
-                return _Datas;
+                return _DataById;
             }
         }
 
-        static void Init()
+
+        static public void Init()
         {
-            _Datas = new Dictionary<int, Data>() {
+            InitInternal();
+        }
+        public static void InitInternal()
+        {
+             if(inited)
+                return;
+        freeIdQueue=new Queue<int> (Enumerable.Range(0, 100));
+
+                _DataById = new Dictionary<int, Data>() {
 
                 {0,new Data(0,"")},
 
@@ -53,8 +71,67 @@ namespace Form.ImgForm
 
                 {200002,new Data(200002,"\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg2")},
 
-            };
+                };
+
+
+            foreach(var k in _DataById.Keys)
+            {
+                freeIdQueue.Enqueue(k);
+            }
+
+            inited=true;  
         }
+
+
+        public static List<Data> GetDatasByJa(JArray ja)
+        {
+            Init();
+            List<Data> lst=new List<Data>();
+            foreach(JObject jo in ja)
+            {
+                lst.Add(GetDataByJo(jo));
+            }
+            return lst;
+        }
+
+        public static JArray GetJaByDatas()
+        {
+            Init();
+            JArray ja=new JArray();
+            foreach(Data data in _DataById.Values)
+            {
+
+                ja.Add(GetJoByData(data));
+            }
+            return ja;
+        }
+
+        public static Data GetDataByJo(JObject jo)
+        {
+            Init();
+
+                    Data data=new Data(
+
+                        jo.Get<int>("id"),
+
+                    _DataById[0].path
+                    );
+
+            return data;
+        }
+
+        public static JObject GetJoByData(Data data)
+        {
+            Init();
+
+                    JObject jo=new JObject();
+
+                    jo.Set<int>("id",data.id);
+
+            return jo;
+        }
+
+
     }
 }
         

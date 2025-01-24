@@ -96,7 +96,10 @@ namespace Z_Map.Analysis
                     path.Add(now);
                 }
 
-                DebugPath(path);
+                if (GlobalSettings.NAV_DEBUG)
+                {
+                    DebugPath(path);
+                }
                 int i = 0;
 
                 var nxt = path[path.Count - 1].pos;

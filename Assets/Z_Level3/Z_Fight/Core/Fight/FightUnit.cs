@@ -4,47 +4,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Fight.Form;
 using Z_UnitSystem;
-
+using Z_Debug;
 namespace Z_Fight
 {
     public class FightUnit : Unit
     {
-        public FightUnit(JObject jo) : base(jo)
+        public FightUnit(FightUnitForm.Data data) : base(data)
         {
-            LoadJsonData(jo);
         }
+        public FightUnitForm.Data data => (FightUnitForm.Data)_data;
 
-        public FightUnit(int uid, int prefabId_Data, Vector3 pos, Vector3 eular, Vector3 scale, int targetFightUid, bool isMine, float alertDistance, Dictionary<int, int> itemCountDic, List<int> curUsingWeaponsId_subUnits, List<int> curReloadWeaponsId_subUnits, float hp, float hpMax, float defence,float reloadTime ,UpdateType updateType = UpdateType.ShowOnly) : base(uid, prefabId_Data, pos, eular, scale, updateType)
-        {
-            this.isMine = isMine;
-            this.itemCountDic = itemCountDic;
-            this.curUsingWeaponsId_subUnits = curUsingWeaponsId_subUnits;
-            this.curReloadWeaponsId_subUnits = curReloadWeaponsId_subUnits;
-            this.alertDistance = alertDistance;
-            this.hp = hp;
-            this.hpMax = hpMax;
-            this.defence = defence;
-            this.targetFightUid = targetFightUid;
-            this.reloadTime = reloadTime;
-        }
-        public float hp;
-        public float hpMax;
-        public float defence;
-        public float alertDistance;
 
-        public bool isMine;
-        public float reloadTime;
-        public int targetFightUid;
-        public FightUnit target => targetFightUid>0&&FightManager.instance.unitDic.ContainsKey(targetFightUid)?
-            (FightUnit) FightManager.instance.unitDic[targetFightUid]:null; 
+        public FightUnit target => data.targetFightUid >0&&FightUnitForm.DataByUid.ContainsKey(data.targetFightUid)?
+            (FightUnit) FightUnitForm.DataByUid[data.targetFightUid].unit:null; 
        
-
-
-
-        public Dictionary<int, int> itemCountDic = new Dictionary<int, int>();
-        public List<int> curUsingWeaponsId_subUnits = new List<int>();
-        public List<int> curReloadWeaponsId_subUnits = new List<int>();
         public override Type GetInsType()
         {
             return typeof(FightInstance);
@@ -54,47 +29,46 @@ namespace Z_Fight
         public void SetHp(float cur)
         {
             
-            if(hp>0 && cur <= 0)
+            if(data.hp >0 && cur <= 0)
             {
                 FightManager.instance.Dead(this);
             }
-            if (cur > hpMax) cur = hpMax;
+            if (cur > data.hpMax) cur = data.hpMax;
             if (cur < 0) cur = 0;
-            hp = cur;
+            data.hp = cur;
         }
         public int TryGetItem(int itemId)
         {
-            if (itemCountDic.ContainsKey(itemId))
+            if (data.itemIdCountDic.ContainsKey(itemId))
             {
-                return itemCountDic[itemId];
+                return data.itemIdCountDic[itemId];
             }
             return 0;
         }
 
         public int TryGetItem(int itemId, int require)
         {
-            if (itemCountDic.ContainsKey(itemId))
+            if (data.itemIdCountDic.ContainsKey(itemId))
             {
-                if (itemCountDic[itemId] < require)
+                if (data.itemIdCountDic[itemId] < require)
                 {
-                    require = itemCountDic[itemId];
+                    require = data.itemIdCountDic[itemId];
 
                 }
-                itemCountDic[itemId] -= require;
+                data.itemIdCountDic[itemId] -= require;
                 return require;
             }
             return 0;
         }
         public void TryAddItem(int itemId, int require)
         {
-            Debug.Log(itemId + " " + require + " " + itemCountDic[itemId]);
-            if (!itemCountDic.ContainsKey(itemId))
-                itemCountDic[itemId] = 0;
-            itemCountDic[itemId] += require;
+            if (!data.itemIdCountDic.ContainsKey(itemId))
+                data.itemIdCountDic[itemId] = 0;
+            data.itemIdCountDic[itemId] += require;
         }
         public void SetTarget(int tar)
         {
-            targetFightUid = tar;
+            data.targetFightUid = tar;
         }
 
         #endregion
@@ -103,26 +77,45 @@ namespace Z_Fight
             
             List<int> weapons = new List<int>();
             if (target != null)
-                foreach (var id in curUsingWeaponsId_subUnits)
+                foreach (var id in data.curUsingWeaponsSid)
             {
-                var unit = subUnits[id];
+                    var unit = subUnits[id];
                 if (unit is WeaponUnit weapon)
                 {
-                    var dir = (target.pos - weapon.pos);
-                    if (dir.sqrMagnitude < alertDistance * alertDistance)
-                    {
-                            //Debug.Log(weapon.weaponBullet(weapon.curBulletId_Data).range);
-                            //扫默认层
-                        if (Physics.Raycast(pos, target.pos - pos, out var hit, weapon.weaponBullet(weapon.curBulletId_Data).range,1))
+
+                        var dir = (target.data.pos - weapon.data.pos);
+
+                        if (GlobalSettings.FIGHT_FIND_DEBUG)
                         {
+                            Z_Log.Log(data.uid + " cur weaponAid: " + id+"  length:"+ dir.sqrMagnitude+" alert:"+ data.alertDistance+" range:"+ weapon.weaponBullet(weapon.data.curWeaponBulletAid).range);
+                        }
+                        if (dir.sqrMagnitude < data.alertDistance * data.alertDistance)
+                    {
+                            if (GlobalSettings.FIGHT_FIND_DEBUG)
+                            {
+                                Z_Log.Log(data.pos+" -> "+target.data.pos);
+                                Debug.DrawLine(data.pos, data.pos + (target.data.pos - data.pos).normalized* weapon.weaponBullet(weapon.data.curWeaponBulletAid).range);
+                            }
+                            //扫默认层
+                            if (Physics.Raycast(data.pos, target.data.pos - data.pos, out var hit, weapon.weaponBullet(weapon.data.curWeaponBulletAid).range,1))
+                        {
+                                if (GlobalSettings.FIGHT_FIND_DEBUG)
+                                {
+                                    Z_Log.Log(data.uid + " hit " + hit.transform.name);
+                                }
                                 if (hit.rigidbody == target.ins.rigidbody)
                             {
-                                weapons.Add(id);
+                                if (GlobalSettings.FIGHT_FIND_DEBUG)
+                                {
+                                   Z_Log.Log(data.uid+" found "+ target.data.uid+" weaponAid:"+id);
+                                }
+                                 weapons.Add(id);
                             }
                         }
                     }
                 }
             }
+            
             return weapons;
         }
         //1.有能打的先打
@@ -135,9 +128,9 @@ namespace Z_Fight
             //调整姿态
             if (attackWeaponIds_subUnits.Count > 0)
             {
-                var dir = (target.pos - subUnits[attackWeaponIds_subUnits[0]].pos);
+                var dir = (target.data.pos - subUnits[attackWeaponIds_subUnits[0]].data.pos);
                 Quaternion rotation = Quaternion.LookRotation(dir);
-                euler = rotation.eulerAngles;
+                data.euler = rotation.eulerAngles;
             }
 
 
@@ -148,25 +141,33 @@ namespace Z_Fight
             for (int i = 0; i < attackWeaponIds_subUnits.Count; i++)
             {
                 var weapon = subUnits[attackWeaponIds_subUnits[i]] as WeaponUnit;
-                
-                if (weapon.magazineRemain > 0)
-                    reloading = false;
+
+                if (weapon.data.magazineRemain > 0)
+                {
+                    
+                    reloading = false; 
+                }
             }
+            
             //全打不了
             if (reloading)
             {
-                //1.有在装的
-                if (curReloadWeaponsId_subUnits.Count > 0)
+                if (GlobalSettings.FIGHT_SHOOT_DEBUG)
                 {
-                    for (int i = 0; i < curReloadWeaponsId_subUnits.Count; i++)
+                    Z_Log.Log(data.uid + " no magazine ");
+                }
+                //1.有在装的
+                if (data.curReloadWeaponsSid.Count > 0)
+                {
+                    for (int i = 0; i < data.curReloadWeaponsSid.Count; i++)
                     {
-                        var unit = subUnits[curReloadWeaponsId_subUnits[i]];
+                        var unit = subUnits[data.curReloadWeaponsSid[i]];
                         if (unit is WeaponUnit weapon)
                         {
 
-                            if (weapon.TryReload(reloadTime))
+                            if (weapon.TryReload(data.reloadTime))
                             {
-                                curReloadWeaponsId_subUnits.RemoveAt(i);
+                                data.curReloadWeaponsSid.RemoveAt(i);
                                 i--;
                             }
                         }
@@ -180,7 +181,7 @@ namespace Z_Fight
                         var weapon = subUnits[attackWeaponIds_subUnits[i]] as WeaponUnit;
                         if (weapon.CanReload())
                         {
-                            curReloadWeaponsId_subUnits.Add(attackWeaponIds_subUnits[i]);
+                            data.curReloadWeaponsSid.Add(attackWeaponIds_subUnits[i]);
                             break;
                         }
                     }
@@ -189,75 +190,53 @@ namespace Z_Fight
                 //3.没有能打的，全装了
                 else
                 {
-                    foreach (var id in curUsingWeaponsId_subUnits)
+                    foreach (var id in data.curUsingWeaponsSid)
                     {
                         var weapon = subUnits[id] as WeaponUnit;
                         if (weapon.CanReload())
                         {
-                            curReloadWeaponsId_subUnits.Add(id);
+                            data.curReloadWeaponsSid.Add(id);
                             break;
                         }
                     }
                 }
 
                 //没有能装的，靠近目标
-                if (curReloadWeaponsId_subUnits.Count==0)
+                if (data.curReloadWeaponsSid.Count==0)
                 {
-                    reloadTime = 0;
+                    data.reloadTime = 0;
                     //
                 }
                 else
                 //装填中
                 {
-                    reloadTime += Time.deltaTime;
+                    data.reloadTime += Time.deltaTime;
                 }
             }
             else
             {
-                reloadTime = 0;
-                curReloadWeaponsId_subUnits.Clear();
+                data.reloadTime = 0;
+                data.curReloadWeaponsSid.Clear();
                 for (int i = 0; i < attackWeaponIds_subUnits.Count; i++)
                 {
                     var weapon=subUnits[attackWeaponIds_subUnits[i]] as WeaponUnit;
+                    if (GlobalSettings.FIGHT_SHOOT_DEBUG)
+                    {
+                        Z_Log.Log(data.uid + " try shoot ");
+                    }
                     weapon.TryShoot();
                 }
             }
             if (isShowing)
             {
-                pos = ins.transform.position;
-                euler = ins.transform.eulerAngles;
+                data.pos = ins.transform.position;
+                data.euler = ins.transform.eulerAngles;
             }
 
         }
-        private void LoadJsonData(JObject jo)
-        {
-            isMine = jo.Get<bool>("isMine");
-            itemCountDic = jo.Get<Dictionary<int,int>>("itemCountDic");
-            curUsingWeaponsId_subUnits = jo.Get <List<int>>("curUsingWeaponsId_subUnits");
-            curReloadWeaponsId_subUnits = jo.Get<List<int>>("curReloadWeaponsId_subUnits");
-            alertDistance = jo.Get<float>("alertDistance");
-            hp = jo.Get<float>("hp");
-            hpMax = jo.Get<float>("hpMax");
-            defence = jo.Get<float>("defence");
-            targetFightUid = jo.Get<int>("targetFightUid");
-            reloadTime = jo.Get<int>("reloadTime");
-        }
-        public override JObject GetJsonData()
-        {
-            JObject jo = base.GetJsonData();
-            jo.Set("isMine", isMine);
-            jo.Set("itemCountDic", itemCountDic);
-            jo.Set("curUsingWeaponsId_subUnits", curUsingWeaponsId_subUnits);
-            jo.Set("curReloadWeaponsId_subUnits", curReloadWeaponsId_subUnits);
-            jo.Set("alertDistance", alertDistance);
-            jo.Set("hp", hp);
-            jo.Set("hpMax", hpMax);
-            jo.Set("defence", defence);
-            jo.Set("targetFightUid", targetFightUid); 
-            jo.Set("reloadTime", reloadTime); 
-
-            return jo;
-        }
+    
+ 
+      
     }
 }
 

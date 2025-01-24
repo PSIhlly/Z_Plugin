@@ -8,7 +8,7 @@ namespace Z_IlRuntime.Core
 {
     public class IlRuntimeManager : MonoBehaviour
     {
-        public dynamic appdomain;
+ /*       public dynamic appdomain;
 
         public static void Init()
         {
@@ -85,7 +85,7 @@ namespace Z_IlRuntime.Core
         void Update()
         {
 
-        }
+        }*/
     }
 
 

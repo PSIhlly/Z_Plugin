@@ -212,7 +212,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 {namespaceContent}
-namespace Ui.{uiHolder.uiName}
+namespace Ui
 {{
 {GetCoreCode(parentClass)}
 }}

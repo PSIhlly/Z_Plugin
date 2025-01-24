@@ -9,8 +9,11 @@ namespace Z_UnitSystem
     {
         public List<InstancePool> pools;
 
-        public List<GameObject> prefabs;
-        public List<Material> materials;
+        [SerializeField]
+        private List<GameObject> prefabs;
+
+        [SerializeField]
+        private List<Material> materials;
 
         public Transform defaultRoot;
 

@@ -1,23 +1,22 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Map.Form;
 using Z_UnitSystem;
 
 namespace Z_Map
 {
     public class ItemUnit:Unit
     {
-        public ItemUnit(JObject jo) : base(jo)
+        public ItemUnit(ItemUnitForm.Data data) : base(data)
         {
-            LoadJsonData(jo);
         }
-        public ItemUnit(int uid, int prefabId_Data, Vector3 pos, Vector3 eular, Vector3 scale, bool isObstacle,UpdateType updateType = UpdateType.ShowOnly): base(uid, prefabId_Data, pos, eular, scale, updateType)
-        {
-            this.isObstacle = isObstacle;
-        }
+        public ItemUnitForm.Data data => (ItemUnitForm.Data)_data;
+
         public ItemInstance ins
         {
             set { base.ins = value; }
@@ -35,33 +34,22 @@ namespace Z_Map
         {
             if (isShowing)
             {
-                pos = ins.transform.position;
-                euler = ins.transform.eulerAngles;
+                data.pos = ins.transform.position;
+                data.euler = ins.transform.eulerAngles;
 
-                var newMapPos = MapManager.instance.mapUtilController.RealPos2MapPos(pos);
-                if (MapManager.instance.mapUtilController.InArea(newMapPos))
+                var newMapPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(data.pos);
+                if (MapManager.instance.mapUtilCtrl.InArea(newMapPos))
                 {
-                    var newMap = MapManager.instance.data.maps[newMapPos.x, newMapPos.y, newMapPos.z];
-                    if (superUnit != newMap)
+                    var newMap = MapManager.instance.dataCtrl.maps[newMapPos.x, newMapPos.y, newMapPos.z];
+                    if (superUnit != newMap.unit)
                     {
                         superUnit.Unbind(this);
-                        newMap.Bind(this);
-                        UpdateActive();
+                        newMap.unit.Bind(this);
+                        SubUpdateActive();
                     }
                 }
             }
-            
-            
     }
-        private void LoadJsonData(JObject jo)
-        {
-            isObstacle = jo.Get<bool>("isObstacle");
-        }
-        public override JObject GetJsonData()
-        {
-            JObject jo = base.GetJsonData();
-            jo.Set("isObstacle", isObstacle);
-            return jo;
-        }
+
     }
 }

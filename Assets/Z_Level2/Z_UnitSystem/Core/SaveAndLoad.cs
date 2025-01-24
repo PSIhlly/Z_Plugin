@@ -12,6 +12,10 @@ public static class SaveAndLoad
         {
             File.WriteAllText(path + "/" + key, content);
         }
+        public static bool Exist(string key)
+        {
+            return File.Exists(path + "/" + key);
+        }
         public static string Load(string key)
         {
            return File.ReadAllText(path + "/" + key);

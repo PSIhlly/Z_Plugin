@@ -30,6 +30,10 @@ public static class Z_EventHelper
     public static void Invoke<T>(T evt)
     {
         var type = evt.GetType();
+        if(!type2Listener.ContainsKey(type))
+        {
+            return;
+        }
         foreach (var listener in type2Listener[type])
         {
             if(listener!=null)

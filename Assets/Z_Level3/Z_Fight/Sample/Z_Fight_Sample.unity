@@ -546,12 +546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f76860970f2e9bb4ab6b0d2784f94096, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabs:
-  - {fileID: 596759776}
-  - {fileID: 1640419972}
-  - {fileID: 1863923953}
-  materials: []
-  main: {fileID: 0}
+  main: {fileID: 1160203972}
 --- !u!4 &868310014
 Transform:
   m_ObjectHideFlags: 0
@@ -583,7 +578,8 @@ MonoBehaviour:
   - {fileID: 596759776}
   - {fileID: 1640419972}
   - {fileID: 1863923953}
-  materials: []
+  materials:
+  - {fileID: 2100000, guid: 0322899e4b83d6a4c83caf4d9be7935c, type: 2}
   defaultRoot: {fileID: 1160203972}
 --- !u!114 &868310016
 MonoBehaviour:
@@ -597,7 +593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58f2291323862724981a1f37c211f759, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainGo: {fileID: 1160203971}
+  mainGo: {fileID: 1747810817}
 --- !u!1 &1143464010
 GameObject:
   m_ObjectHideFlags: 0

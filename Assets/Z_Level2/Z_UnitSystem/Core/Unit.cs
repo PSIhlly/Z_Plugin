@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_UnitSystem.Form;
+
 namespace Z_UnitSystem
 {
     public enum UpdateType
@@ -12,32 +14,22 @@ namespace Z_UnitSystem
         Always,
     }
 
-    public abstract class Unit
+    public class Unit
     {
-        public Unit(JObject jo)
+        public Unit(UnitForm.Data data)
         {
-            LoadJsonData(jo);
+            _data = data;
         }
-        public Unit(int uid, int prefabId_Data, Vector3 pos, Vector3 euler, Vector3 scale, UpdateType updateType)
-        {
-            this.uid = uid;
-            this.prefabId_Data = prefabId_Data;
-            this.pos = pos;
-            this.euler = euler;
-            this.scale = scale;
-            this.updateType = updateType;
-        }
-        public int uid;
-        public int prefabId_Data;
-        public GameObject prefab => InstancePoolManager.instance.prefabs[prefabId_Data];
+        protected readonly UnitForm.Data _data;
+        public UnitForm.Data data => (UnitForm.Data)_data;
+
+        public GameObject prefab => InstancePoolManager.instance.GetPrefab(_data.prefabName);
+
         public Instance ins;
-        public Vector3 pos;
-        public Vector3 euler;
-        public Vector3 scale;
-        public UpdateType updateType = UpdateType.ShowOnly;
 
         public List<Unit> subUnits=new List<Unit>();
         public Unit superUnit;
+
         private int lastUpdateFrame;
         public bool isShowing => ins != null && ins.gameObject != null && ins.gameObject.activeSelf;
 
@@ -57,7 +49,7 @@ namespace Z_UnitSystem
                 ins = (Instance)go.GetComponent(GetInsType());
             }
 
-            if (scale == Vector3.zero)
+            if (_data.scale==Vector3.zero)
             {
                 foreach (var bc in ins.boxColliders)
                 {
@@ -74,9 +66,9 @@ namespace Z_UnitSystem
  
             ins.unit = this;
             ins.gameObject.SetActive(true);
-            ins.transform.position = pos;
-            ins.transform.eulerAngles = euler;
-            ins.transform.localScale = scale;
+            ins.transform.position = _data.pos;
+            ins.transform.eulerAngles = _data.euler;
+            ins.transform.localScale = _data.scale;
 
             VisOn();
             foreach (var unit in subUnits)
@@ -138,7 +130,7 @@ namespace Z_UnitSystem
             }
 
         }
-        public void UpdateActive()
+        public void SubUpdateActive()
         {
            
             if (superUnit == null || !superUnit.isShowing)
@@ -167,27 +159,6 @@ namespace Z_UnitSystem
             {
                 unit.UpdateInfo();
             }
-        }
-        public virtual JObject GetJsonData()
-        {
-            JObject jo = new JObject();
-            jo.Set("uid", uid);
-            jo.Set("pos", pos);
-            jo.Set("eular", euler);
-            jo.Set("scale", scale);
-            jo.Set("updateType", (int)updateType);
-            jo.Set("prefabId_Data", prefabId_Data);
-
-            return jo;
-        }
-        private void LoadJsonData(JObject jo)
-        {
-            uid = jo.Get<int>("uid");
-            pos = jo.Get<Vector3>("pos");
-            euler = jo.Get<Vector3>("eular");
-            scale = jo.Get<Vector3>("scale");
-            updateType = (UpdateType)jo.Get<int>("updateType");
-            prefabId_Data = jo.Get<int>("prefabId_Data");
         }
     }
 }

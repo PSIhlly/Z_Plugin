@@ -21,7 +21,7 @@ namespace Z_Ui.Base
     public partial class UiHolder : MonoBehaviour
     {
 
-        public static string defaultPath = "\\Z_Level3\\Z_UI\\Ui\\UiBase";
+        public static string defaultPath = "\\GameSample\\UiBase";
 
         [HideInInspector]
         public string uiName;

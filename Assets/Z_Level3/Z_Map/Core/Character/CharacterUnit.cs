@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Map.Form;
 using Z_UnitSystem;
 
 namespace Z_Map
@@ -11,32 +12,18 @@ namespace Z_Map
 
     public class CharacterUnit : Unit
     {
-        public CharacterUnit(JObject jo):base(jo)
+        public CharacterUnit(CharacterUnitForm.Data data) : base(data)
         {
-            LoadJsonData(jo);
-            if (isMine) navEnabled = false;
         }
-        public CharacterUnit(int uid, int prefabId_Data, Vector3 pos, Vector3 eular, Vector3 scale, bool isMine =false, int alertDis = 9999, int pathDis = 9999, UpdateType updateType = UpdateType.Always) : base(uid, prefabId_Data, pos, eular, scale, updateType)
-        {
-            this.isMine = isMine;
-            if (isMine) navEnabled = false;
-            this.alertDis = alertDis;
-            this.pathDis = pathDis;
-        }
+        public CharacterUnitForm.Data data => (CharacterUnitForm.Data)_data;
+
         public CharacterInstance ins
         {
             set { base.ins = value; }
             get { return (CharacterInstance)base.ins; }
         }
 
-
-        public bool navEnabled=true;
-
-        public Vector3 destination;
-        public float speed = 1;
-        public int alertDis;
-        public int pathDis;
-        public bool isMine;
+        public float pathDis;
 
         public override Type GetInsType()
         {
@@ -45,35 +32,36 @@ namespace Z_Map
 
         public override void UpdateInfo()
         {
-            
+           
 
-            if (updateType== UpdateType.Always||isShowing)
+                if (data.updateType== (int)UpdateType.Always||isShowing)
             {
                 //nav
-                if (navEnabled)
+                if (data.navEnabled)
                 {
-                    if((destination-pos).sqrMagnitude< alertDis* alertDis)
+                    if((data.destination- data.pos).sqrMagnitude< data.alertDis * data.alertDis)
                     {
-                        Vector3 dir = MapManager.instance.GetNavDir(pos, destination, pathDis);
-                        ins.transform.position = ins.transform.position + dir * Time.deltaTime * speed;
+                        Vector3 dir = MapManager.instance.GetNavDir(data.pos, data.destination, (int)data.pathDis);
+
+                        ins.transform.position = ins.transform.position + dir * Time.deltaTime * data.speed;
                     }
                     
                 }
                 
-                var newMapPos = MapManager.instance.mapUtilController.RealPos2MapPos(pos);
-                if (MapManager.instance.mapUtilController.InArea(newMapPos))
+                var newMapPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(data.pos);
+                if (MapManager.instance.mapUtilCtrl.InArea(newMapPos))
                 {
                     
-                    var newMap = MapManager.instance.data.maps[newMapPos.x, newMapPos.y, newMapPos.z];
-                    if(superUnit!=newMap)
+                    var newMap = MapManager.instance.dataCtrl.maps[newMapPos.x, newMapPos.y, newMapPos.z];
+                    if(superUnit!=newMap.unit)
                     {
                         superUnit.Unbind(this);
-                        newMap.Bind(this);
-                        UpdateActive();
+                        newMap.unit.Bind(this);
+                        SubUpdateActive();
                     }
                     
                 }
-
+                Debug.Log(data.uid + " tar:" + data.destination + " speed:" + data.speed);
                 var newPos = ins.transform.position;
 
                 /*                //模拟重力
@@ -90,28 +78,15 @@ namespace Z_Map
                                     newPos.y -= Time.deltaTime;*/
 
                 //fix
-                newPos = MapManager.instance.mapUtilController.GetClosestInArea(newPos);
+                newPos = MapManager.instance.mapUtilCtrl.GetClosestInArea(newPos);
                 ins.transform.position = newPos;
                 
-                pos = ins.transform.position;
-                euler = ins.transform.eulerAngles;
+                data.pos = ins.transform.position;
+                data.euler = ins.transform.eulerAngles;
 
             }
         }
-        private void LoadJsonData(JObject jo)
-        {
-            isMine= jo.Get<bool>("isMine");
-            alertDis=jo.Get<int>("alertDis");
-            pathDis=jo.Get<int>("pathDis");
-        }
-        public override JObject GetJsonData()
-        {
-            JObject jo = base.GetJsonData();
-            jo.Set("isMine",isMine);
-            jo.Set("alertDis",alertDis);
-            jo.Set("pathDis", pathDis);
-            return jo;
-        }
+
     }
 }
 

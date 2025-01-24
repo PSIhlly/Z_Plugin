@@ -5,7 +5,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 
-namespace Ui.Dialog
+namespace Ui
 {
 
 
@@ -68,16 +68,16 @@ namespace Ui.Dialog
     {
 
             public GameObject go_history;
-            public ScrView scr_tt;
             public Btn btn_back;
+            public ScrView scr_tt;
             public GameObject go_historyItem;
             public UiHistoryItemCtrl sub_HistoryItem;
         public UiHistoryView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_history = uiHolder.elementTrsLst[0].gameObject;
-            scr_tt = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            btn_back = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_back = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            scr_tt = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             go_historyItem = uiHolder.elementTrsLst[3].gameObject;
             sub_HistoryItem = (UiHistoryItemCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
         }

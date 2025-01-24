@@ -13,3 +13,6 @@ Library/
 /Z_OtherProjects/Z_Tool/AI/AI/.vs
 /Z_OtherProjects/Z_Tool/AI/AI/dataset/mnist
 *.cache
+/Z_OtherProjects/Z_Tool/Excel2Cs/build
+*.cache
+/Z_OtherProjects/Z_Tool/Excel2Cs/dist

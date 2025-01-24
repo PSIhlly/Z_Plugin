@@ -6,16 +6,21 @@ using UnityEngine;
 using Z_DesignStyle;
 namespace Z_Debug.Z_Cmd
 {
-    public class Z_Cmd : Z_Manager<Z_Cmd>
+    public class Z_Cmd
     {
+        public Type cmdType;
+        public Z_Cmd(Type cmdType)
+        {
+            this.cmdType = cmdType;
+        }
         public void Excute(string cmd)
         {
             if (string.IsNullOrEmpty(cmd))
                 return;
             var cmds = cmd.Split(" ");
-            Type type = this.GetType();
+            
             // 查找对应的方法
-            MethodInfo method = type.GetMethod(cmds[0]);
+            MethodInfo method = cmdType.GetMethod(cmds[0]);
 
             if (method != null)
             {
@@ -29,10 +34,10 @@ namespace Z_Debug.Z_Cmd
                     
                     // 根据参数类型构造正确的参数
                     args = new object[parameterInfos.Length];
-                    for (int i = 1; i < parameterInfos.Length; i++)
+                    for (int i = 0; i < parameterInfos.Length; i++)
                     {
                         // 将参数值转换为正确的类型
-                        args[i] = Convert.ChangeType(cmds[i], parameterInfos[i].ParameterType);
+                        args[i] = Convert.ChangeType(cmds[i+1], parameterInfos[i].ParameterType);
                     }
                 }
                 // 调用方法
@@ -45,9 +50,7 @@ namespace Z_Debug.Z_Cmd
             }
         }
 
-        public override void Init()
-        {
-        }
+        
     }
 }
 

@@ -2,35 +2,43 @@ using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
-namespace Form.DialogForm
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Z_ByteSerialize;
+
+namespace Form
 {
 
-    public static partial class DialogForm
+    public static partial class DialogFormForm
     {
-        public class Data
+        private static bool inited;
+        private static Queue<int> freeIdQueue;
+
+        public partial class Data
         {
 
-            public readonly int id;
+                public readonly int id;
 
-            /// <summary>
-            ///组号
-            ///</summary>
-            public readonly int groupId;
+                /// <summary>
+                ///组号
+                ///</summary>
+                public readonly int groupId;
 
-            /// <summary>
-            ///说话者Id
-            ///</summary>
-            public readonly int speaker_npcId;
+                /// <summary>
+                ///说话者Id
+                ///</summary>
+                public readonly int speaker_npcId;
 
-            /// <summary>
-            ///对话背景图片Id
-            ///</summary>
-            public readonly int background_imgId;
+                /// <summary>
+                ///对话背景图片Id
+                ///</summary>
+                public readonly int background_imgId;
 
-            /// <summary>
-            ///对话文本
-            ///</summary>
-            public readonly string text;
+                /// <summary>
+                ///对话文本
+                ///</summary>
+                public readonly string text;
 
             public Data(int id,int groupId,int speaker_npcId,int background_imgId,string text)
             {
@@ -43,19 +51,29 @@ namespace Form.DialogForm
             }
             
         }
-        static IReadOnlyDictionary<int, Data> _Datas = null;
-        public static IReadOnlyDictionary<int, Data> Datas
+
+        static Dictionary<int, Data> _DataById = null;
+        public static Dictionary<int, Data> DataById
         {
             get
             {
                 Init();
-                return _Datas;
+                return _DataById;
             }
         }
 
-        static void Init()
+
+        static public void Init()
         {
-            _Datas = new Dictionary<int, Data>() {
+            InitInternal();
+        }
+        public static void InitInternal()
+        {
+             if(inited)
+                return;
+        freeIdQueue=new Queue<int> (Enumerable.Range(0, 100));
+
+                _DataById = new Dictionary<int, Data>() {
 
                 {0,new Data(0,0,0,0,"")},
 
@@ -69,8 +87,73 @@ namespace Form.DialogForm
 
                 {5,new Data(5,2,1,200001,"fine")},
 
-            };
+                };
+
+
+            foreach(var k in _DataById.Keys)
+            {
+                freeIdQueue.Enqueue(k);
+            }
+
+            inited=true;  
         }
+
+
+        public static List<Data> GetDatasByJa(JArray ja)
+        {
+            Init();
+            List<Data> lst=new List<Data>();
+            foreach(JObject jo in ja)
+            {
+                lst.Add(GetDataByJo(jo));
+            }
+            return lst;
+        }
+
+        public static JArray GetJaByDatas()
+        {
+            Init();
+            JArray ja=new JArray();
+            foreach(Data data in _DataById.Values)
+            {
+
+                ja.Add(GetJoByData(data));
+            }
+            return ja;
+        }
+
+        public static Data GetDataByJo(JObject jo)
+        {
+            Init();
+
+                    Data data=new Data(
+
+                        jo.Get<int>("id"),
+
+                    _DataById[0].groupId,
+
+                    _DataById[0].speaker_npcId,
+
+                    _DataById[0].background_imgId,
+
+                    _DataById[0].text
+                    );
+
+            return data;
+        }
+
+        public static JObject GetJoByData(Data data)
+        {
+            Init();
+
+                    JObject jo=new JObject();
+
+                    jo.Set<int>("id",data.id);
+
+            return jo;
+        }
+
+
     }
 }
         

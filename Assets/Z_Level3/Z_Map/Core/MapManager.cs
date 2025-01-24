@@ -3,107 +3,115 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map.Analysis;
+using Z_Map.Form;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Map
 {
-   
+    public static class GlobalSettings
+    {
+        public const bool NAV_DEBUG = true;
+    }
 
     public class MapManager : Z_MonoManager<MapManager>
     {
-        public MapData data;
+        public MapDataController dataCtrl;
         public GameObject mainGo;
-
-        public Dictionary<int, Unit> unitDic=new Dictionary<int, Unit>();
         
 
-        public NavigationController navigationController;
-        public MapUtilController mapUtilController;
+        public NavigationController navigationCtrl;
+        public MapUtilController mapUtilCtrl;
 
         private Vector3Int curCenterPos;
         private Vector3Int viewCenter;
 
-        private List<MapUnit> curMapLst = new List<MapUnit>();
+        private List<MapUnitForm.Data> curMapLst = new List<MapUnitForm.Data>();
 
         public override void Init()
         {
             base.Init();
 
-            navigationController = new NavigationController();
-            navigationController.Init(this);
+            navigationCtrl = new NavigationController();
+            navigationCtrl.Init(this);
 
-            mapUtilController = new MapUtilController();
-            mapUtilController.Init(this);
+            mapUtilCtrl = new MapUtilController();
+            mapUtilCtrl.Init(this);
             
         }
 
         #region external
 
-        public void Begin(MapData data)
+        public void Begin(MapDataController dataCtrl)
         {
             End();
             Init();
             mainGo.SetActive(true);
-            this.data = data;
+            this.dataCtrl = dataCtrl;
             
 
             viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
 
-            for (int i = 0; i < data.items.Count; i++)
+            foreach (var itemData in ItemUnitForm.DataByUid.Values)
             {
-                CheckAndLoad(data.items[i]);
+                var mapPos = mapUtilCtrl.RealPos2MapPos(itemData.pos);
+                if (mapUtilCtrl.InArea(mapPos))
+                {
+                    MapUnitForm.DataByUid[dataCtrl.maps[mapPos.x, mapPos.y, mapPos.z].uid].unit.Bind(itemData.unit);
+                }
             }
-            for (int i = 0; i < data.characters.Count; i++)
+            foreach (var characterData in CharacterUnitForm.DataByUid.Values)
             {
-                CheckAndLoad(data.characters[i]);
+                var mapPos = mapUtilCtrl.RealPos2MapPos(characterData.pos);
+                if (mapUtilCtrl.InArea(mapPos))
+                {
+                    MapUnitForm.DataByUid[dataCtrl.maps[mapPos.x, mapPos.y, mapPos.z].uid].unit.Bind(characterData.unit);
+                }
             }
-            navigationController.Build();
+            navigationCtrl.Build();
             mainGo.SetActive(true);
         }
         public void AddUnit(Unit unit)
         {
             if(unit is ItemUnit item)
             {
-                data.items.Add(item);
+                ItemUnitForm.AddData(item.data);
             }else if(unit is CharacterUnit character)
             {
-                data.characters.Add(character);
+                CharacterUnitForm.AddData(character.data);
+            }
+            else if (unit is MapUnit map)
+            {
+                MapUnitForm.AddData(map.data);
             }
 
-            CheckAndLoad(unit);
-            unit.UpdateActive();
+            unit.SubUpdateActive();
         }
         public void RemoveUnit(int uid)
         {
-            var unit = unitDic[uid];
-            if (unit is ItemUnit item)
+            var data = UnitForm.DataByUid[uid];
+            var unit = data.unit;
+            if (data is MapUnitForm.Data)
             {
-                data.items.Remove(item);
+                MapUnitForm.RemoveData(uid);
             }
-            else if (unit is CharacterUnit character)
+            if (data is ItemUnitForm.Data)
             {
-                data.characters.Remove(character);
+                ItemUnitForm.RemoveData(uid);
             }
-            unit.superUnit.Unbind(unit);
+            if (data is CharacterUnitForm.Data)
+            {
+                CharacterUnitForm.RemoveData(uid);
+            }
+
+            if (unit.superUnit != null)
+                unit.superUnit.Unbind(data.unit);
             unit.VisOff();
             unit.Hide();
-            unitDic.Remove(uid);
-        }
-        private bool CheckAndLoad(Unit unit)
-        {
-            var mapPos = mapUtilController.RealPos2MapPos(unit.pos);
-            if (mapUtilController.InArea(mapPos))
-            {
-                var map = data.maps[mapPos.x, mapPos.y, mapPos.z];
-                map.Bind(unit);
-                Register(unit);
-                return true;
-            }
-            return false;
         }
         public void SetPos(Vector3 curCenterPos)
         {
-            this.curCenterPos = mapUtilController.RealPos2MapPos(curCenterPos );
+            this.curCenterPos = mapUtilCtrl.RealPos2MapPos(curCenterPos );
         }
 
         public void End()
@@ -112,29 +120,17 @@ namespace Z_Map
             if (curMapLst != null)
                 curMapLst.Clear();
             mainGo.SetActive(false);
-            if(data!=null)
+            if(dataCtrl!=null)
             {
-                data.Unload();
-                data = null;
+                dataCtrl.Unload();
+                dataCtrl = null;
             }
         }
 
 
         #endregion
 
-        private void Register(Unit tar)
-        {
-            unitDic[tar.uid]= tar;
-        }
-        private void Unregister(Unit tar)
-        {
-            
-            if (unitDic.ContainsKey(tar.uid))
-            {
-                unitDic.Remove(tar.uid);
-            }
-           
-        }
+        
 
       
 
@@ -143,26 +139,28 @@ namespace Z_Map
             //get need
             HashSet<Vector3Int> need=new HashSet<Vector3Int>();
             HashSet<Vector3Int> now=new HashSet<Vector3Int>();
-            for (int i = viewCenter.x - data.viewSize.x; i < viewCenter.x + data.viewSize.x; i++)
-            {    for (int j = viewCenter.y - data.viewSize.y ; j <= viewCenter.y+ data.viewSize.y; j++)
+            var viewSize = dataCtrl.mainData.viewSize;
+            for (int i = viewCenter.x - viewSize.x; i < viewCenter.x + viewSize.x; i++)
+            {    for (int j = viewCenter.y - viewSize.y ; j <= viewCenter.y+ viewSize.y; j++)
                 {
-                    for (int k = viewCenter.z - data.viewSize.z; k < viewCenter.z + data.viewSize.z; k++)
+                    for (int k = viewCenter.z - viewSize.z; k < viewCenter.z + viewSize.z; k++)
                     {
                         var pos = new Vector3Int(i, j, k);
-                        if (!mapUtilController.InArea(pos))
+                        if (!mapUtilCtrl.InArea(pos))
                             continue;
                         
                         need.Add(pos);
                     }
                 }
             }
-            var newMapLst = new List<MapUnit>();
+            var newMapLst = new List<MapUnitForm.Data>();
             foreach(var map in curMapLst)
             {
                 if(!need.Contains(map.mapPos))
                 {
-                    HideMap(map);
-                }else
+                    map.unit.Hide();
+                }
+                else
                 {
                     now.Add(map.mapPos);
 
@@ -174,9 +172,9 @@ namespace Z_Map
             {
                 if (!now.Contains(pos))
                 {
-                    var map = data.maps[pos.x, pos.y, pos.z];
-                    ShowMap(map);
- 
+                    var map = dataCtrl.maps[pos.x, pos.y, pos.z];
+                    map.unit.Show();
+
                     newMapLst.Add(map);
                 }
             }
@@ -188,33 +186,26 @@ namespace Z_Map
             //update
             foreach (var map in curMapLst)
             {
-                map.UpdateInfo();
+                map.unit.UpdateInfo();
             }
             //Manage vison
             foreach (var curMap in curMapLst)
             {
                 if (curMap.mapPos.y <= viewCenter.y)
                 {
-                    curMap.VisOn();
+                    curMap.unit.VisOn();
                 }
                 else
                 {
-                    curMap.VisOff();
+                    curMap.unit.VisOff();
                 }
             }
         }
-        private void HideMap(MapUnit map)
-        {
-            map.Hide();
-        }
-        private void ShowMap(MapUnit map)
-        {
-            map.Show();
-        }
+        
 
         public Vector3 GetNavDir(Vector3 cur,Vector3 tar, int maxStep=99999)
         {
-            return navigationController.GetNextDir(cur,tar, maxStep);
+            return navigationCtrl.GetNextDir(cur,tar, maxStep);
         }
 
         public void UpdateInfo()
@@ -223,7 +214,7 @@ namespace Z_Map
             if((curCenterPos - viewCenter).sqrMagnitude>0.2f)
             {
                 
-                viewCenter = mapUtilController.GetClosestInArea(curCenterPos);
+                viewCenter = mapUtilCtrl.GetClosestInArea(curCenterPos);
 
                 FreshMap();
             }

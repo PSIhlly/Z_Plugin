@@ -4,30 +4,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Fight.Form;
 using Z_UnitSystem;
 
 namespace Z_Fight
 {
     public class BulletUnit : Unit
     {
-        public BulletUnit(JObject jo) : base(jo)
+        public BulletUnit(BulletUnitForm.Data data) : base(data)
         {
-            LoadJsonData(jo);
         }
-        public BulletUnit(int uid, int prefabId_Data, Vector3 pos, Vector3 euler, Vector3 scale, int weaponBulletId_Data, float rangeLast,int attackerUid,bool selfHurt,UpdateType updateType= UpdateType.ShowOnly) : base(uid, prefabId_Data, pos, euler, scale, updateType)
-        {
-            this.weaponBulletId_Data = weaponBulletId_Data;
-            this.rangeLast = rangeLast;
-            this.attackerUid = attackerUid;
-            this.selfHurt = selfHurt;
-        }
-        public int weaponBulletId_Data;
-        public WeaponBullet weaponBullet=>FightManager.instance.data.weaponBullets[weaponBulletId_Data];
-        public Vector3 dir => Quaternion.Euler(euler) * Vector3.forward;
+        public BulletUnitForm.Data data => (BulletUnitForm.Data)_data;
 
-        public float rangeLast;
-        public int attackerUid;
-        public bool selfHurt;
+        public WeaponBulletForm.Data weaponBullet=> WeaponBulletForm.DataById[data.weaponBulletId];
+        public Vector3 dir => Quaternion.Euler(data.euler) * Vector3.forward;
+
 
         public override Type GetInsType()
         {
@@ -37,7 +28,7 @@ namespace Z_Fight
         public override void UpdateInfo()
         {
             float dis = weaponBullet.speed * Time.deltaTime;
-            if (Physics.Raycast(pos, dir, out var hit))
+            if (Physics.Raycast(data.pos, dir, out var hit))
             {
                 if (hit.distance < dis * 1.5f)
                 {
@@ -45,13 +36,13 @@ namespace Z_Fight
                     return;
                 }
             }
-            pos = (pos + dis * dir);
-            rangeLast -= dis;
-            if (updateType == UpdateType.Always || isShowing)
+            data.pos = (data.pos + dis * dir);
+            data.rangeLast -= dis;
+            if (data.updateType == (int)UpdateType.Always || isShowing)
             {
-                ins.transform.position = pos;
+                ins.transform.position = data.pos;
             }
-            if (rangeLast <= 0)
+            if (data.rangeLast <= 0)
             {
                 TryBurst(null);
                 return;
@@ -60,8 +51,8 @@ namespace Z_Fight
 
             if (isShowing)
             {
-                pos = ins.transform.position;
-                euler = ins.transform.eulerAngles;
+                data.pos = ins.transform.position;
+                data.euler = ins.transform.eulerAngles;
             }
         }
         public bool TryBurst(Transform tar)
@@ -72,7 +63,7 @@ namespace Z_Fight
                 foreach(var ins in inss)
                 {
                     //子弹不碰子弹
-                    if (ins != null && !(ins is BulletInstance) && (attackerUid != ins.unit.uid))
+                    if (ins != null && !(ins is BulletInstance) && (data.attackerUid != ins.unit.data.uid))
                     {
                         Hurt(this, ins.unit);
                         Des();
@@ -90,25 +81,8 @@ namespace Z_Fight
         }
         public void Des()
         {
-            FightManager.instance.RemoveUnit(uid);
+            FightManager.instance.RemoveUnit(data.uid);
         }
-        private void LoadJsonData(JObject jo)
-        {
-  
-            weaponBulletId_Data = jo.Get<int>("weaponBulletId_Data");
-            rangeLast = jo.Get<int>("rangeLast");
-            attackerUid = jo.Get<int>("attackerUid");
-            selfHurt = jo.Get<bool>("selfHurt");
-
-        }
-        public override JObject GetJsonData()
-        {
-            JObject jo = base.GetJsonData();
-            jo.Set("weaponBulletId_Data", weaponBulletId_Data);
-            jo.Set("rangeLast", rangeLast);
-            jo.Set("attackerUid", attackerUid);
-            jo.Set("selfHurt", selfHurt);
-            return jo;
-        }
+        
     }
 }

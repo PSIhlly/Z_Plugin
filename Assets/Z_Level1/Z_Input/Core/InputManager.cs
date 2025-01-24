@@ -13,6 +13,8 @@ namespace Z_Input
         public Action onButonDownA;
         public Action onButonDownD;
 
+        public Action onButonDownE;
+
         public Action onButonW;
         public Action onButonS;
         public Action onButonA;
@@ -61,7 +63,11 @@ namespace Z_Input
             {
                 cur?.onButonDownD?.Invoke();
             }
-
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                cur?.onButonDownE?.Invoke();
+            }
+            
             if (Input.GetKey(KeyCode.W))
             {
                 cur?.onButonW?.Invoke();

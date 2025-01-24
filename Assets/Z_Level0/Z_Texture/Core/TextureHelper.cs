@@ -24,8 +24,13 @@ namespace Z_Texture
             textureCache[path] = res;
             return res;
         }
-        public static Sprite GetSpriteByPath(string path)
+        public static Sprite GetSpriteByPath(string path,string basePath="")
         {
+            if(string.IsNullOrEmpty(basePath))
+            {
+                basePath = Application.dataPath;
+            }
+            path = basePath + path;
             Texture tex;
             if (textureCache.ContainsKey(path))
             {

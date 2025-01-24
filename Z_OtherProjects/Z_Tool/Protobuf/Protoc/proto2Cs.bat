@@ -1,0 +1,6 @@
+@echo off
+for %%i in (*.proto) do (
+   echo gen %%~nxi...
+   tool\protoc.exe --csharp_out="Cs" %%~nxi)
+echo finish... 
+pause

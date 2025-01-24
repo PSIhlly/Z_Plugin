@@ -1,0 +1,6 @@
+// 指定版本
+syntax = "proto3";
+
+message LoginPack{
+    string username = 1;
+}

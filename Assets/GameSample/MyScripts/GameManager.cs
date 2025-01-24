@@ -6,16 +6,17 @@ using System.Collections;
 using System.Collections.Generic;
 using Ui;
 using UnityEngine;
+using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
 using Z_Ui;
 using Z_UnitSystem;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Z_MonoManager<GameManager>
 {
     public void Start()
     {
-        RegisterInput();
+        RegisterInputDefault();
         UiManager.instance.ShowUi<UiEnterMainCtrl>();
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))
@@ -32,7 +33,7 @@ public class GameManager : MonoBehaviour
     {
         
     }
-    public void RegisterInput()
+    public void RegisterInputDefault()
     {
         var ins = InputManager.instance;
         var config = new InputConfig();
@@ -63,6 +64,32 @@ public class GameManager : MonoBehaviour
         {
             Cmd.instance.Excute("AddItem 1 5");
         };
+        ins.Register(config);
+    }
+    public void RegisterInputByUgc()
+    {
+        var ins = InputManager.instance;
+        var config = new InputConfig();
+
+        config.onButonW = () =>
+        {
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 2;
+        };
+        config.onButonS = () =>
+        {
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 2;
+        };
+
+        config.onButonA = () =>
+        {
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 2;
+        };
+        config.onButonD = () =>
+        {
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 2;
+        };
+
+
         ins.Register(config);
     }
 }

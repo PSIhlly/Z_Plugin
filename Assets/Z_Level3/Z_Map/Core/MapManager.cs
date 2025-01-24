@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_Debug;
 using Z_DesignStyle;
 using Z_Map.Analysis;
 using Z_Map.Form;
@@ -12,6 +13,7 @@ namespace Z_Map
     public static class GlobalSettings
     {
         public const bool NAV_DEBUG = true;
+        public const bool MAP_SHOW_DEBUG = false;
     }
 
     public class MapManager : Z_MonoManager<MapManager>
@@ -181,13 +183,17 @@ namespace Z_Map
             curMapLst = newMapLst;
 
         }
-        private void UpdateMap()
+        private void UpdateMapInfo()
         {
             //update
             foreach (var map in curMapLst)
             {
                 map.unit.UpdateInfo();
             }
+            
+        }
+        private void UpdateVision()
+        {
             //Manage vison
             foreach (var curMap in curMapLst)
             {
@@ -210,14 +216,18 @@ namespace Z_Map
 
         public void UpdateInfo()
         {
-            UpdateMap();
+            UpdateMapInfo();
             if((curCenterPos - viewCenter).sqrMagnitude>0.2f)
             {
                 
                 viewCenter = mapUtilCtrl.GetClosestInArea(curCenterPos);
-
+                if (GlobalSettings.MAP_SHOW_DEBUG)
+                {
+                    Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:"+viewCenter);
+                }
                 FreshMap();
             }
+            UpdateVision();
         }
     }
 }

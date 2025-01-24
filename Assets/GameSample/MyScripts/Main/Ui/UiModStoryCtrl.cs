@@ -32,7 +32,7 @@ namespace Ui
             con.Clear();
             for (int i = 0; i < 1; i++)
             {
-                con.Add(new UiStoryItemParam()
+                con.Add(new UiSceneItemParam()
                 {
                     name="scene1"
                 });
@@ -53,8 +53,8 @@ namespace Ui
         {
             view.btn_scene.onClick.AddListener(() =>
             {
-                Main2SceneManager.instance.StartLoadScene("scene1");
-                Close();
+                Main2SceneManager.instance.StartLoadSceneUgc("scene1");
+                parent.Close();
             });
         }
         public override void OnShow()

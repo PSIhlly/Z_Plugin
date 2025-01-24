@@ -53,7 +53,8 @@ namespace Ui
         {
             view.btn_mod.onClick.AddListener(() =>
             {
-
+                UiManager.instance.ShowUi<UiModStoryCtrl>();
+                parent.Close();
             });
         }
         public override void OnShow()

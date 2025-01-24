@@ -142,8 +142,12 @@
     <Compile Include="Assets\GameSample\MyScripts\Main2Scene\Main2SceneManager.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiModBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiModCtrl.cs" />
-    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiModSceneCtrl.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiModStoryBase.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiLoadingCtrl.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiLoadingBase.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiModStoryCtrl.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Mod\ModSceneManager.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\CameraInstance.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

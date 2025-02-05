@@ -7,6 +7,14 @@ public class CameraInstance : Z_MonoSingleton<CameraInstance>
 {
     Transform _camTrs;
     Transform _tarTrs;
+    private Vector3 limitMax;
+    private Vector3 limitMin;
+    public void Register(Vector3 limitMin, Vector3 limitMax)
+    {
+        this.limitMax = limitMax;
+        this.limitMin = limitMin;   
+    }
+
 
     public Transform camTrs
     {
@@ -29,5 +37,13 @@ public class CameraInstance : Z_MonoSingleton<CameraInstance>
             }
             return _tarTrs;
         }
+    }
+    public void LateUpdate()
+    {
+        tarTrs.position = new Vector3(
+            Mathf.Max(Mathf.Min(tarTrs.position.x, limitMax.x), limitMin.x),
+            Mathf.Max(Mathf.Min(tarTrs.position.y, limitMax.y), limitMin.y),
+            Mathf.Max(Mathf.Min(tarTrs.position.z, limitMax.z), limitMin.z)
+            );
     }
 }

@@ -60,7 +60,7 @@ public class GameManager : Z_MonoManager<GameManager>
             main.position += Time.deltaTime * Vector3.right * 2;
         };*/
 
-        config.onButonDownE = () =>
+        config.onButtonDownE = () =>
         {
             Cmd.instance.Excute("AddItem 1 5");
         };
@@ -71,24 +71,31 @@ public class GameManager : Z_MonoManager<GameManager>
         var ins = InputManager.instance;
         var config = new InputConfig();
 
-        config.onButonW = () =>
+        config.onButtonW = () =>
         {
             CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 2;
         };
-        config.onButonS = () =>
+        config.onButtonS = () =>
         {
             CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 2;
         };
 
-        config.onButonA = () =>
+        config.onButtonA = () =>
         {
             CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 2;
         };
-        config.onButonD = () =>
+        config.onButtonD = () =>
         {
             CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 2;
         };
-
+        config.onMouse = (id, pos, dir) =>
+        {
+            if(id==0)
+            {
+                Vector2 moveDir = -Time.deltaTime * dir * 2;
+                CameraInstance.instance.tarTrs.position +=new Vector3(moveDir.x,0,moveDir.y);
+            }
+        };
 
         ins.Register(config);
     }

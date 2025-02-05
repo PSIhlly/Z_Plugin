@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using Z_DesignStyle;
 namespace Z_Input
@@ -8,99 +9,245 @@ namespace Z_Input
 
     public class InputConfig
     {
-        public Action onButonDownW;
-        public Action onButonDownS;
-        public Action onButonDownA;
-        public Action onButonDownD;
+        public Action onButtonDownW;
+        public Action onButtonDownS;
+        public Action onButtonDownA;
+        public Action onButtonDownD;
 
-        public Action onButonDownE;
+        public Action onButtonDownE;
 
-        public Action onButonW;
-        public Action onButonS;
-        public Action onButonA;
-        public Action onButonD;
+        public Action onButtonW;
+        public Action onButtonS;
+        public Action onButtonA;
+        public Action onButtonD;
 
-        public Action onButonUpW;
-        public Action onButonUpS;
-        public Action onButonUpA;
-        public Action onButonUpD;
+        public Action onButtonUpW;
+        public Action onButtonUpS;
+        public Action onButtonUpA;
+        public Action onButtonUpD;
 
+        public Action<int, Vector3> onPointDown;
+        public Action<int, Vector3, Vector3> onPoint;
+        public Action<int, Vector3> onPointUp;
+
+        public Action<int, Vector3> onMouseDown;
+        public Action<int, Vector3, Vector3> onMouse;
+        public Action<int, Vector3> onMouseUp;
 
     }
-
+    [DefaultExecutionOrder(-100)]
     public class InputManager : Z_MonoManager<InputManager>
     {
         public bool enabled = true;
         public InputConfig cur;
+        public Vector2 screenSize;
+
+
+        public Dictionary<int, Vector2> mousePos = new Dictionary<int, Vector2>();
+        public Dictionary<int, Vector2> mouseOldPos = new Dictionary<int, Vector2>();
+
+        public Dictionary<int, Vector2> id2Pos = new Dictionary<int, Vector2>();
+        public Dictionary<int, Vector2> id2OldPos = new Dictionary<int, Vector2>();
+
+        private Dictionary<int, int> touchId2id = new Dictionary<int, int>();
+        private List<int> tmpList = new List<int>();
+        private HashSet<int> tmpHash = new HashSet<int>();
+        private int pointCnt;
         public override void Init()
         {
+            screenSize = new Vector2(Screen.width, Screen.height);
         }
         public void Register(InputConfig config)
         {
             cur = config;
         }
 
+
+        private void ManageTouch()
+        {
+            id2OldPos.Clear();
+            foreach (var point in id2Pos)
+            {
+                id2OldPos[point.Key] = point.Value;
+            }
+
+
+            touchId2id.Clear();
+            tmpHash.Clear();
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                var closetId = -1;
+                var min = float.MaxValue;
+                //find Closet
+                foreach (var point in id2Pos)
+                {
+                    if (tmpHash.Contains(point.Key))
+                        continue;
+
+                    var length2 = (Input.touches[i].position - point.Value).sqrMagnitude;
+                    if (length2 < min)
+                    {
+                        closetId = point.Key;
+                        min = length2;
+                    }
+
+                }
+                touchId2id[i] = closetId;
+                tmpHash.Add(closetId);
+            }
+
+
+            tmpList.Clear();
+            //less
+            foreach (var point in id2Pos)
+            {
+                if (!touchId2id.ContainsValue(point.Key))
+                {
+                    tmpList.Add(point.Key);
+                }
+            }
+            foreach (var k in tmpList)
+            {
+                cur?.onPointUp?.Invoke(k, id2Pos[k]);
+
+                id2Pos.Remove(k);
+            }
+
+            
+
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                //more
+                int id = touchId2id[i];
+                if (id == -1)
+                {
+                    pointCnt = (pointCnt + 1) % 100;
+                    id2Pos[pointCnt] = Input.touches[i].position;
+                    cur?.onPointDown?.Invoke(pointCnt, Input.touches[i].position);
+                }
+            }
+
+
+            //keep
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                int id = touchId2id[i];
+                if (id != -1)
+                {
+                    id2Pos[id] = Input.touches[i].position;
+                    cur?.onPoint?.Invoke(id, id2Pos[id], id2Pos[id] - id2OldPos[id]);
+                }
+            }
+
+        }
+        private void ManageMouse()
+        {
+            mouseOldPos.Clear();
+            tmpHash.Clear();
+            foreach (var mouse in mousePos)
+            {
+                mouseOldPos[mouse.Key] = mouse.Value;
+            }
+
+            for (int i = 0; i <= 1; i++)
+            {
+                if (Input.GetMouseButtonUp(i))
+                {
+                    cur?.onMouseUp?.Invoke(i, Input.mousePosition);
+                    tmpHash.Add(i);
+                }
+            }
+
+            for (int i = 0; i <= 1; i++)
+            {
+                if (Input.GetMouseButtonDown(i))
+                {
+                    mousePos[i] = Input.mousePosition;
+                    cur?.onMouseDown?.Invoke(i, Input.mousePosition);
+                    tmpHash.Add(i);
+
+                }
+            }
+
+            for (int i = 0; i <= 1; i++)
+            {
+                if (Input.GetMouseButton(i)&&!tmpHash.Contains(i))//ignore first frame
+                {
+                    mousePos[i] = Input.mousePosition;
+                    cur?.onMouse?.Invoke(i, mousePos[i], mousePos[i] - mouseOldPos[i]);
+
+                }
+            }
+
+
+
+
+        }
         public void Update()
         {
             if (!enabled)
                 return;
+
 #if UNITY_ANDROID && !UNITY_EDITOR
 
+            ManagePoint();
 #else
+
+            ManageMouse();
             if (Input.GetKeyDown(KeyCode.W))
             {
-                cur?.onButonDownW?.Invoke();
+                cur?.onButtonDownW?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                cur?.onButonDownS?.Invoke();
+                cur?.onButtonDownS?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                cur?.onButonDownA?.Invoke();
+                cur?.onButtonDownA?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                cur?.onButonDownD?.Invoke();
+                cur?.onButtonDownD?.Invoke();
             }
             if (Input.GetKeyDown(KeyCode.E))
             {
-                cur?.onButonDownE?.Invoke();
+                cur?.onButtonDownE?.Invoke();
             }
-            
+
             if (Input.GetKey(KeyCode.W))
             {
-                cur?.onButonW?.Invoke();
+                cur?.onButtonW?.Invoke();
             }
             if (Input.GetKey(KeyCode.S))
             {
-                cur?.onButonS?.Invoke();
+                cur?.onButtonS?.Invoke();
             }
             if (Input.GetKey(KeyCode.A))
             {
-                cur?.onButonA?.Invoke();
+                cur?.onButtonA?.Invoke();
             }
             if (Input.GetKey(KeyCode.D))
             {
-                cur?.onButonD?.Invoke();
+                cur?.onButtonD?.Invoke();
             }
 
 
             if (Input.GetKeyUp(KeyCode.W))
             {
-                cur?.onButonUpW?.Invoke();
+                cur?.onButtonUpW?.Invoke();
             }
             if (Input.GetKeyUp(KeyCode.S))
             {
-                cur?.onButonUpS?.Invoke();
+                cur?.onButtonUpS?.Invoke();
             }
             if (Input.GetKeyUp(KeyCode.A))
             {
-                cur?.onButonUpA?.Invoke();
+                cur?.onButtonUpA?.Invoke();
             }
             if (Input.GetKeyUp(KeyCode.D))
             {
-                cur?.onButonUpD?.Invoke();
+                cur?.onButtonUpD?.Invoke();
             }
 #endif
 

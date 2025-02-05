@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,10 +48,10 @@ namespace Z_Map
         }
         public JObject GetJsonData()
         {
-            mainData.mapJa = MapUnitForm.GetJaByDatas().ToString();
-            mainData.ItemJa = ItemUnitForm.GetJaByDatas().ToString();
+            mainData.mapJa = JsonConvert.SerializeObject(MapUnitForm.GetJaByDatas());
+            mainData.ItemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
 
-            mainData.CharacterJa = CharacterUnitForm.GetJaByDatas().ToString();
+            mainData.CharacterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
             return MapMainForm.GetJoByData(mainData);
         }
         public MapDataController()
@@ -61,30 +62,39 @@ namespace Z_Map
             CharacterUnitForm.Clear();
             int uidCnt = 0;
 
-            maps = new MapUnitForm.Data[10, 3, 10];
-            
+            maps = new MapUnitForm.Data[300, 1, 300];
 
-            for (int i = 0; i < 10; i++)
+            Vector3 realPos = Vector3.one; 
+            Vector3Int mapPos= Vector3Int.one;
+            string mapName = "map";
+            for (int i = 0; i < 300; i++)
             {
-                for (int j = 0; j < 3; j++)
+                realPos.x = i*1;
+                mapPos.x = i;
+                for (int j = 0; j < 1; j++)
                 {
-                    for (int k = 0; k < 10; k++)
+                    realPos.y = j * 3;
+                    mapPos.y= j;
+
+                    for (int k = 0; k < 300; k++)
                     {
-                        MapUnitForm.AddData(new MapUnitForm.Data(++uidCnt, "_", 0, new Vector3Int(i, j, k), "map", Z_Math.Graph.ElementwiseMultiply(new Vector3(i, j, k), new Vector3(1, 3, 1)), new Vector3(0, 0, 0), Vector3.one, 0));
+                        realPos.z = k * 1;
+                        mapPos.z = k;
+
+                        MapUnitForm.AddData(new MapUnitForm.Data(++uidCnt, "", 0, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0));
                         maps[i, j, k] = MapUnitForm.DataByUid[uidCnt];
                     }
                 }
             }
-
             mainData = new MapMainForm.Data(
                 1, 
                 uidCnt,
-                new Vector3(1, 3, 1),
-                new Vector3Int(10, 3, 10),
-                new Vector3Int(5, 1, 5),
-               MapUnitForm.GetJaByDatas().ToString(),
-               ItemUnitForm.GetJaByDatas().ToString(),
-               CharacterUnitForm.GetJaByDatas().ToString()
+                new Vector3(1, 1, 1),
+                new Vector3Int(300, 1, 300),
+                new Vector3Int(30, 1, 20),
+               "",
+               "",
+               ""
            );
         }
         public void Unload()

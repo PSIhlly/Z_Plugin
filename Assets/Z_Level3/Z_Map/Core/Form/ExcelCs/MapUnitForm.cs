@@ -66,7 +66,7 @@ namespace Z_Map.Form
                 this.scale = scale;
                 this.updateType = updateType;
 
-                    _unit=new MapUnit(this);
+                _unit =new MapUnit(this);
 
             }
             
@@ -227,12 +227,12 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+            _DataByUid[data.uid] = data;
 
-                _DataByMappos[data.mapPos]=data;
+            _DataByMappos[data.mapPos] = data;
 
-            
-UnitForm.AddData(data);
+
+            UnitForm.AddData(data);
             return data.uid;
         }
         public static void RemoveData(int uid)

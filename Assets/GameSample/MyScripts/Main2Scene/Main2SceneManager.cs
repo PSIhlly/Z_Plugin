@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Ui;
 using UnityEngine;
 using Z_DesignStyle;
@@ -19,25 +20,34 @@ public class LoadingEvent : Z_Event
 }
 public class Main2SceneManager : Z_MonoManager<Main2SceneManager>
 {
-    
-    public void StartLoadSceneUgc(string fileName)
+
+    public async void StartLoadSceneUgc(string fileName)
     {
         UiManager.instance.ShowUi<UiLoadingCtrl>();
-
-        if(SaveAndLoad.Exist(fileName))
+        MapDataController data;
+        if (SaveAndLoad.Exist(fileName))
         {
-            var data = SaveAndLoad.Load(fileName);
-            ModSceneManager.instance.Begin(new MapDataController(data));
+            data = await Task.Run(() =>
+                {
+                    return new MapDataController(SaveAndLoad.Load(fileName));
+                });
         }
         else
         {
-            ModSceneManager.instance.Begin(new MapDataController());
+            data = await Task.Run(() =>
+            {
+                return new MapDataController();
+            });
         }
+
+        ModSceneManager.instance.Begin(data, fileName);
 
         Z_EventHelper.Invoke(new LoadingEvent()
         {
-            state=  LoadingState.Done
+            state = LoadingState.Done
         });
+        UiManager.instance.CloseUi<UiLoadingCtrl>();
+        UiManager.instance.ShowUi<UiModSceneMainCtrl>();
     }
 
 

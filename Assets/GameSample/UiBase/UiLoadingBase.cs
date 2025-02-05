@@ -17,12 +17,10 @@ namespace Ui
     {
 
             public Txt txt_title;
-            public Btn btn_back;
         public UiLoadingView(UiHolder uiHolder):base(uiHolder)
         {
 
             txt_title = uiHolder.elementTrsLst[0].GetComponent<Txt>();
-            btn_back = uiHolder.elementTrsLst[1].GetComponent<Btn>();
         }
 
     }

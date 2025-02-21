@@ -18,6 +18,10 @@ namespace Z_Debug
             }
             Log(res);
         }
+        public static void Log(int str)
+        {
+            Log(str.ToString());
+        }
         public static void Log(string str)
         {
             if(str.Length> maxLength)

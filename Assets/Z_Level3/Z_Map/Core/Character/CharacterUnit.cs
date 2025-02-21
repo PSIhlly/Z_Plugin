@@ -52,7 +52,7 @@ namespace Z_Map
                 if (MapManager.instance.mapUtilCtrl.InArea(newMapPos))
                 {
                     
-                    var newMap = MapManager.instance.dataCtrl.maps[newMapPos.x, newMapPos.y, newMapPos.z];
+                    var newMap = MapManager.instance.dataCtrl.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
                     if(superUnit!=newMap.unit)
                     {
                         superUnit.Unbind(this);
@@ -61,7 +61,6 @@ namespace Z_Map
                     }
                     
                 }
-                Debug.Log(data.uid + " tar:" + data.destination + " speed:" + data.speed);
                 var newPos = ins.transform.position;
 
                 /*                //模拟重力
@@ -85,6 +84,11 @@ namespace Z_Map
                 data.euler = ins.transform.eulerAngles;
 
             }
+        }
+        public override void Remove()
+        {
+            CharacterUnitForm.RemoveData(data.uid);
+            base.Remove();
         }
 
     }

@@ -6,11 +6,6 @@ using TMPro;
 
 namespace Z_Ui.Base
 {
-    public enum Language
-    {
-        Chinese,
-        English
-    }
     public class Txt : TextMeshProUGUI
     {
         protected override void Awake()

@@ -47,10 +47,11 @@ namespace Z_Ui.Notify
                 }) ;
             }
        }
-        public void AddPopup(string content, bool canClose,List<string>words,List<Func<bool>> funcs)
+        public void AddPopup(string title,string content, bool canClose,List<string>words,List<Func<bool>> funcs)
         {
             var info = new PopupInfo()
             {
+                title=title,
                 content = content,
                 canClose=canClose,
                 selectionWords = words,

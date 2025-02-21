@@ -35,9 +35,14 @@ namespace Z_UnitSystem
         {
             pools.Remove(pool);
         }
-        public Material GetMaterial(int id)
+        public Material GetMaterial(string name)
         {
-            return materials[id];
+            foreach (var mat in materials)
+                if (name == mat.name)
+                {
+                    return mat;
+                }
+            return materials[0];
         }
         public GameObject GetPrefab(string name)
         {
@@ -51,22 +56,24 @@ namespace Z_UnitSystem
         public GameObject CreateInstance(GameObject tar)
         {
             foreach (var pool in pools)
-                if (tar == pool.prefab)
+                if (tar.name == pool.prefab.name)
                 {
-                    return pool.Get();
+                    var poolGo = pool.Get();
+                    poolGo.name = tar.name;
+                    return poolGo;
                 }
             var go = GameObject.Instantiate(tar);
+            go.name = tar.name;
             return go;
         }
         public void DeleteInstance(GameObject tar, GameObject proto)
         {
             foreach (var pool in pools)
-                if (proto == pool.prefab)
+                if (proto.name == pool.prefab.name)
                 {
                     pool.Push(tar);
-                    return;
+                    break;
                 }
-
             tar.SetActive(false);
         }
     }

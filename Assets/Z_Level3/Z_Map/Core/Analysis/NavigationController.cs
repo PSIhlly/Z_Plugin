@@ -24,82 +24,81 @@ namespace Z_Map.Analysis
     public class NavigationController : Z_Controller<MapManager>
     {
         Bfs bfs;
-        public NavUnit[,,] navUnits;
+        public Dictionary<(int, int, int), NavUnit> navUnits;
         public float step;
         public void Build()
         {
-            step = _super.dataCtrl.mainData.mapUnitSize.y*1/10;
-            InitMap(); 
+            step = _super.dataCtrl.mainData.mapUnitSize.y * 1 / 10;
+            InitMap();
             bfs = new Bfs(this);
         }
-        
+
         public void InitMap()
         {
-            Vector3Int[] tryDir = new Vector3Int[] {Vector3Int.right,Vector3Int.left,Vector3Int.forward,Vector3Int.back };
+            Vector3Int[] tryDir = new Vector3Int[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
             Vector2[] offset = new Vector2[] { Vector2.right * 0.25f, Vector2.left * 0.25f, Vector2.up * 0.25f, Vector2.down * 0.25f };
-                
-                Vector3Int size = _super.dataCtrl.mainData.size;
-                navUnits = new NavUnit[size.x,size.y,size.z];
-            for (int i = 0; i < size.x; i++)
-                for (int j = 0; j < size.y; j++)
-                    for (int k = 0; k < size.z; k++)
-                    {
-                        var navUnit = new NavUnit();
-                        navUnits[i, j, k] = navUnit;
-                        navUnit.cantPassParts = new HashSet<Dir>();
-                        navUnit.links = new List<NavUnit>();
-                        navUnit.realPos = _super.dataCtrl.maps[i, j, k].pos;
-                        navUnit.pos = new Vector3Int(i,j,k);
-                        navUnit.isNull = _super.dataCtrl.maps[i, j, k].scale == Vector3.zero;
-                    }
 
-            for (int i = 0; i < size.x; i++)
-                for (int j = 0; j < size.y; j++)
-                    for (int k = 0; k < size.z; k++)
-                    {
-                        var navUnit = navUnits[i, j, k];
-                        var map = _super.dataCtrl.maps[i, j, k];
+            navUnits = new Dictionary<(int, int, int), NavUnit>(_super.dataCtrl.maps.Count);
 
-                        for(int m=-1;m<=1;m++)
-                        for (int l=0;l<4;l++)
+            //build single unit
+            foreach (var map in _super.dataCtrl.maps.Values)
+            {
+                var navUnit = new NavUnit();
+                (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
+                navUnits[pos] = navUnit;
+                navUnit.cantPassParts = new HashSet<Dir>();
+                navUnit.links = new List<NavUnit>();
+                navUnit.realPos = _super.dataCtrl.maps[pos].pos;
+                navUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
+                navUnit.isNull = _super.dataCtrl.maps[pos].scale == Vector3.zero;
+            }
+
+            //4 dir link
+            foreach (var map in _super.dataCtrl.maps.Values)
+            {
+                (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
+                var navUnit = navUnits[pos];
+
+                for (int m = -1; m <= 1; m++)
+                    for (int l = 0; l < 4; l++)
+                    {
+                        Vector3Int linkPos = Z_Math.Graph.GetVector3Int(Z_Math.Graph.ElementwisePlus(new Vector3Int(pos.Item1, m + pos.Item2, pos.Item3), tryDir[l]));
+                        if (!InArea(linkPos))
+                            continue;
+                        var link = _super.dataCtrl.maps[(linkPos.x, linkPos.y, linkPos.z)];
+
+                        Vector2 p = new Vector2(tryDir[l].x * 0.5f, tryDir[l].z * 0.5f);
+
+                        //can move
+                        if (Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
                         {
-                            Vector3Int linkPos = Z_Math.Graph.GetVector3Int( Z_Math.Graph.ElementwisePlus( new Vector3Int(i, m+j, k) , tryDir[l]));
-                                if (!InArea(linkPos))
-                                    continue;
-                                var link = _super.dataCtrl.maps[linkPos.x, linkPos.y, linkPos.z];
 
-                            Vector2 p = new Vector2(tryDir[l].x*0.5f, tryDir[l].z * 0.5f);
-                                
-                               
-                                if (Math.Abs(link.unit.GetYByPoint(-p)- map.unit.GetYByPoint(p)) <=step)
-                            {
-                                    
-                                    navUnit.links.Add(navUnits[linkPos.x, linkPos.y, linkPos.z]);
-                            }
+                            navUnit.links.Add(navUnits[(linkPos.x, linkPos.y, linkPos.z)]);
                         }
                     }
+            }
 
             foreach (var obs in ItemUnitForm.DataByUid.Values)
             {
                 if (obs != null && obs.isObstacle)
                 {
-                    
+
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
-                        Vector3[] points= Z_Math.Graph.GetCubeEightPoint(bc.center,bc.size, obs.euler, bc.transform.lossyScale, obs.pos);
-                        var overlapMaps=Z_Math.Graph.GetRoughOverlapIntPos(points);
+                        Vector3[] points = Z_Math.Graph.GetCubeEightPoint(bc.center, bc.size, obs.euler, bc.transform.lossyScale, obs.pos);
+                        var overlapMaps = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.RightDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.RightDownForward].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.RightDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.RightDownBack].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].z) };
-                       foreach (var map in overlapMaps)
+                        foreach (var map in overlapMaps)
                         {
-                            for(int i=0,icnt=offset.Length;i<icnt;i++)
+                            for (int i = 0, icnt = offset.Length; i < icnt; i++)
                             {
-                                if (InArea(map) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(map.x, map.z)+offset[i]))
+                                if (InArea(map) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(map.x, map.z) + offset[i]))
                                 {
-                                    navUnits[map.x, map.y, map.z].cantPassParts.Add((Dir)i);
+                                    navUnits[(map.x, map.y, map.z)].cantPassParts.Add((Dir)i);
                                 }
                             }
                         }
@@ -112,9 +111,9 @@ namespace Z_Map.Analysis
             tar.y = 0;
             return tar.normalized;
         }
-        public Vector3 GetNextDir(Vector3 cur,Vector3 tar,int maxStep)
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep)
         {
-            var res=bfs.GetNextDir(cur, tar, maxStep);
+            var res = bfs.GetNextDir(cur, tar, maxStep);
             res.y = 0;
             return res;
         }
@@ -134,16 +133,16 @@ namespace Z_Map.Analysis
         {
             return _super.mapUtilCtrl.MapPos2RealPos(pos);
         }
-        public Dir GetDir(Vector3 self,Vector3 tar)
+        public Dir GetDir(Vector3 self, Vector3 tar)
         {
-            if (self.x < tar.x-0.01f)
+            if (self.x < tar.x - 0.01f)
                 return Dir.Right;
-            if (self.x > tar.x+0.01f)
+            if (self.x > tar.x + 0.01f)
                 return Dir.Left;
-            if (self.z < tar.z-0.01f)
+            if (self.z < tar.z - 0.01f)
                 return Dir.Forward;
             return Dir.Back;
         }
     }
-    
+
 }

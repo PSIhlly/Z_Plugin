@@ -81,8 +81,9 @@ namespace Z_UnitSystem
             if (ins == null || ins.gameObject == null)
                 return false;
             VisOff();
+            
             ins.unit = null;
-            InstancePoolManager.instance.DeleteInstance(ins.gameObject, prefab);
+            InstancePoolManager.instance.DeleteInstance(ins.gameObject, ins.gameObject);
             ins = null;
             foreach (var unit in subUnits)
             {
@@ -143,6 +144,19 @@ namespace Z_UnitSystem
                 Show();
             }
         }
+        public List<Unit> GetAllSubUnits(bool recursion=false)
+        {
+            List<Unit> units = new List<Unit>();
+            foreach(var sub in subUnits)
+            {
+                units.Add(sub);
+                if(recursion)
+                {
+                    units.AddRange(sub.GetAllSubUnits());
+                }
+            }
+            return units;
+        }
 
         public virtual void UpdateInfo()
         {
@@ -159,6 +173,20 @@ namespace Z_UnitSystem
             {
                 unit.UpdateInfo();
             }
+        }
+        public virtual void Remove()
+        {
+            var lst = data.unit.GetAllSubUnits();
+            foreach (var unit in lst)
+            {
+                unit.Remove();
+            }
+
+            if (superUnit != null)
+                superUnit.Unbind(this);
+            VisOff();
+            Hide();
+            UnitForm.RemoveData(data.uid);
         }
     }
 }

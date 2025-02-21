@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace Z_ObjectAnimator.Base
 {
+    public enum GroupState
+    {
+        Playing,
+        Pausing,
+        End
+    }
     public enum StopType
     {
         BackToStart,
@@ -24,22 +30,33 @@ namespace Z_ObjectAnimator.Base
             this.stopType = stopType;
             this.cycle = cycle;
         }
+        public ActionGroup(Action act, StopType stopType = StopType.BackToStart, bool cycle = true)
+        {
+            this.acts = new List<Action>() { act };
+            this.stopType = stopType;
+            this.cycle = cycle;
+        }
 
-        public void PlayAll()
+
+        public void PlayAll(System.Action onComplete)
         {
             int cnt = 0;
             foreach (var act in acts)
             {
                 act.Excute((o)=>
                 {
-                    if(cycle)
+                    cnt++;
+                    if (cnt == acts.Count)
                     {
-                        cnt++;
-                        if(cnt == acts.Count)
+                        onComplete?.Invoke();
+                        if (cycle)
                         {
-                            PlayAll();
+                            PlayAll(onComplete);
                         }
                     }
+                    
+                        
+                       
                 });
             }
         }
@@ -65,6 +82,21 @@ namespace Z_ObjectAnimator.Base
                         break;
                 }
             }
+        }
+        public GroupState GetState()
+        {
+            foreach (var act in acts)
+            {
+                switch (act.state)
+                {
+                    case State.Playing:
+                        return GroupState.Playing;
+                    case State.Pausing:
+                        return GroupState.Pausing;
+                        break;
+                }
+            }
+            return GroupState.End;
         }
     }
 }

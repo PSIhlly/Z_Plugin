@@ -40,6 +40,7 @@ namespace Z_Fight
 
                     var bulletData = new BulletUnitForm.Data(
                         uid: ++FightManager.instance.dataCtrl.mainData.uidCnt,
+                        name:"",
                         weaponBulletId: cur.id,
                         rangeLast: cur.range,
                         attackerUid: superUnit.data.uid,

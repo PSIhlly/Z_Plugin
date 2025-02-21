@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 using Z_UnitSystem.Form;
 namespace Z_Map.Form
 {
@@ -21,7 +22,7 @@ namespace Z_Map.Form
         }
 
         private static bool inited;
-        private static Queue<int> freeUidQueue;
+        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
 
         public partial class Data : UnitForm.Data
@@ -39,26 +40,21 @@ namespace Z_Map.Form
                 }
 
                 /// <summary>
-                ///名称
+                ///材质名字（索引）
                 ///</summary>
-                public string areaName;
-
-                /// <summary>
-                ///材质id
-                ///</summary>
-                public int matId;
+                public string matName;
 
                 /// <summary>
                 ///离散位置
                 ///</summary>
                 public Vector3Int mapPos;
 
-            public Data(int uid,string areaName,int matId,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,string matName,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
                 this.uid = uid;
-                this.areaName = areaName;
-                this.matId = matId;
+                this.name = name;
+                this.matName = matName;
                 this.mapPos = mapPos;
                 this.prefabName = prefabName;
                 this.pos = pos;
@@ -66,13 +62,13 @@ namespace Z_Map.Form
                 this.scale = scale;
                 this.updateType = updateType;
 
-                _unit =new MapUnit(this);
+                    _unit=new MapUnit(this);
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"","",Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -107,7 +103,8 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            freeUidQueue=new Queue<int> (Enumerable.Range(0, 100));
+            
+            
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -123,14 +120,12 @@ namespace Z_Map.Form
 
             foreach(var data in DataByUid.Values)
             {
-                UnitForm.AddData(data,false);
+                UnitForm.AddData(data);
             }
 
 
-             foreach(var k in _DataByUid.Keys)
-            {
-                freeUidQueue.Enqueue(k);
-            }
+            
+             
         }
 
 
@@ -168,9 +163,9 @@ namespace Z_Map.Form
 
                 jo.Get<int>("uid"),
 
-                jo.Get<string>("areaName"),
+                jo.Get<string>("name"),
 
-                jo.Get<int>("matId"),
+                jo.Get<string>("matName"),
 
                 jo.Get<Vector3Int>("mapPos"),
 
@@ -196,9 +191,9 @@ namespace Z_Map.Form
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("areaName",data.areaName);
+            jo.Set<string>("name",data.name);
 
-            jo.Set<int>("matId",data.matId);
+            jo.Set<string>("matName",data.matName);
 
             jo.Set<Vector3Int>("mapPos",data.mapPos);
 
@@ -216,23 +211,23 @@ namespace Z_Map.Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.uid==-1)
             { 
-                if(freeUidQueue.Count==0)
-                return -1;
-                int uid=freeUidQueue.Dequeue();
+                int uid=uidChain.GetId();
+                if(uid==-1)
+                    return -1;
                 data.uid=uid;  
             }
 
-            _DataByUid[data.uid] = data;
+                _DataByUid[data.uid]=data;
 
-            _DataByMappos[data.mapPos] = data;
+                _DataByMappos[data.mapPos]=data;
 
-
-            UnitForm.AddData(data);
+            
+UnitForm.AddData(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
@@ -257,6 +252,7 @@ UnitForm.RemoveData(uid);
 
                 _DataByMappos.Clear();
 
+            uidChain.Clear();
         }
 
     }

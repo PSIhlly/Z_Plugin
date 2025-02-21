@@ -18,6 +18,7 @@ namespace Z_Map
 
     public class MapManager : Z_MonoManager<MapManager>
     {
+        public Vector3 sizeLimit=new Vector3(1000,1000,1000);
         public MapDataController dataCtrl;
         public GameObject mainGo;
         
@@ -59,7 +60,7 @@ namespace Z_Map
                 var mapPos = mapUtilCtrl.RealPos2MapPos(itemData.pos);
                 if (mapUtilCtrl.InArea(mapPos))
                 {
-                    MapUnitForm.DataByUid[dataCtrl.maps[mapPos.x, mapPos.y, mapPos.z].uid].unit.Bind(itemData.unit);
+                    MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(itemData.unit);
                 }
             }
             foreach (var characterData in CharacterUnitForm.DataByUid.Values)
@@ -67,50 +68,29 @@ namespace Z_Map
                 var mapPos = mapUtilCtrl.RealPos2MapPos(characterData.pos);
                 if (mapUtilCtrl.InArea(mapPos))
                 {
-                    MapUnitForm.DataByUid[dataCtrl.maps[mapPos.x, mapPos.y, mapPos.z].uid].unit.Bind(characterData.unit);
+                    MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(characterData.unit);
                 }
             }
             navigationCtrl.Build();
             mainGo.SetActive(true);
         }
-        public void AddUnit(Unit unit)
+        public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            if(unit is ItemUnit item)
-            {
-                ItemUnitForm.AddData(item.data);
-            }else if(unit is CharacterUnit character)
-            {
-                CharacterUnitForm.AddData(character.data);
-            }
-            else if (unit is MapUnit map)
-            {
-                MapUnitForm.AddData(map.data);
-            }
-
-            unit.SubUpdateActive();
+            return dataCtrl.AddMap(mapPos);
         }
-        public void RemoveUnit(int uid)
+        public ItemUnitForm.Data AddItem(Vector3 realPos)
         {
-            var data = UnitForm.DataByUid[uid];
-            var unit = data.unit;
-            if (data is MapUnitForm.Data)
+            var mapPos = mapUtilCtrl.RealPos2MapPos(realPos);
+            if(!dataCtrl.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
             {
-                MapUnitForm.RemoveData(uid);
+                return null;
             }
-            if (data is ItemUnitForm.Data)
-            {
-                ItemUnitForm.RemoveData(uid);
-            }
-            if (data is CharacterUnitForm.Data)
-            {
-                CharacterUnitForm.RemoveData(uid);
-            }
-
-            if (unit.superUnit != null)
-                unit.superUnit.Unbind(data.unit);
-            unit.VisOff();
-            unit.Hide();
+            var data= dataCtrl.AddItem();
+            data.pos = realPos;
+            dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
+            return data;
         }
+
         public void SetPos(Vector3 curCenterPos)
         {
             this.curCenterPos = mapUtilCtrl.RealPos2MapPos(curCenterPos );
@@ -118,7 +98,7 @@ namespace Z_Map
 
         public void End()
         {
-            
+            Debug.Log(UnitForm.DataByUid.Values.Count+"??");
             if (curMapLst != null)
                 curMapLst.Clear();
             mainGo.SetActive(false);
@@ -174,7 +154,7 @@ namespace Z_Map
             {
                 if (!now.Contains(pos))
                 {
-                    var map = dataCtrl.maps[pos.x, pos.y, pos.z];
+                    var map = dataCtrl.maps[(pos.x, pos.y, pos.z)];
                     map.unit.Show();
 
                     newMapLst.Add(map);
@@ -213,14 +193,26 @@ namespace Z_Map
         {
             return navigationCtrl.GetNextDir(cur,tar, maxStep);
         }
-
-        public void UpdateInfo()
+        public void ResetInfo(MapUnit unit=null)
+        {
+            foreach (var map in curMapLst)
+            {
+                map.unit.Hide();
+            }
+            foreach (var map in curMapLst)
+            {
+                map.unit.Show();
+            }
+            UpdateInfo(true);
+        }
+        public void UpdateInfo(bool forceFresh=false)
         {
             UpdateMapInfo();
-            if((curCenterPos - viewCenter).sqrMagnitude>0.2f)
+
+            if (forceFresh||(curCenterPos - viewCenter).sqrMagnitude>0.2f)
             {
                 
-                viewCenter = mapUtilCtrl.GetClosestInArea(curCenterPos);
+                viewCenter = curCenterPos;
                 if (GlobalSettings.MAP_SHOW_DEBUG)
                 {
                     Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:"+viewCenter);
@@ -228,6 +220,16 @@ namespace Z_Map
                 FreshMap();
             }
             UpdateVision();
+
+            
+        }
+        public void DebugShow()
+        {
+            foreach (var map in curMapLst)
+            {
+                if ((map.unit.ins.transform.GetChild(0).position - map.pos).sqrMagnitude > 0.2)
+                    Debug.Log((map.unit.ins.transform.position - map.pos).sqrMagnitude + "    ->  " + map.pos + " " + map.unit.ins.transform.position);
+            }
         }
     }
 }

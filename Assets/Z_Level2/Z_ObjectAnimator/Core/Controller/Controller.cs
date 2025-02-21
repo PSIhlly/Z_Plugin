@@ -9,14 +9,19 @@ namespace Z_ObjectAnimator.Core
    
     public class Controller : MonoBehaviour
     {
+        int curPlayId;
         public List<ActionGroup> groups;
         public Controller(List<ActionGroup> groups)
         {
             this.groups = groups;
         }
-        public void Play(int id)
+        public Controller(ActionGroup group)
         {
-            groups[id].PlayAll();
+            this.groups = new List<ActionGroup>() { group };
+        }
+        public void Play(int id, System.Action onComplete=null)
+        {
+            groups[id].PlayAll(onComplete);
         }
         public void Pause(int id)
         {
@@ -25,6 +30,10 @@ namespace Z_ObjectAnimator.Core
         public void Stop(int id)
         {
             groups[id].StopAll();
+        }
+        public GroupState GetState(int id)
+        {
+            return groups[id].GetState();
         }
     }
 }

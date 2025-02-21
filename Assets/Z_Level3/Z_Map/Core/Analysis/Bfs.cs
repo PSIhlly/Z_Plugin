@@ -35,14 +35,14 @@ namespace Z_Map.Analysis
             {
                 nc.GetNormalWithoutY(tar - cur);
             }
-            var first = nc.navUnits[curPos.x, curPos.y, curPos.z];
+            var first = nc.navUnits[(curPos.x, curPos.y, curPos.z)];
             //落地
             while (first.isNull)
             {
-                first = nc.navUnits[first.pos.x, first.pos.y - 1, first.pos.z];
+                first = nc.navUnits[(first.pos.x, first.pos.y - 1, first.pos.z)];
             }
 
-            var end = nc.navUnits[tarPos.x, tarPos.y, tarPos.z];
+            var end = nc.navUnits[(tarPos.x, tarPos.y, tarPos.z)];
 
             float minDis2 = (cur - tar).sqrMagnitude;
             NavUnit minUnit = first;
@@ -176,7 +176,7 @@ namespace Z_Map.Analysis
             for (int i = startX; i <= endX; i++)
                 for (int k = startZ; k <= endZ; k++)
                 {
-                    if (nc.navUnits[i, mapY, k].cantPassParts.Count > 0 || Mathf.Abs(nc.navUnits[i, mapY, k].realPos.y - realY) > nc.step)
+                    if (nc.navUnits[(i, mapY, k)].cantPassParts.Count > 0 || Mathf.Abs(nc.navUnits[(i, mapY, k)].realPos.y - realY) > nc.step)
                     {
                         return false;
                     }

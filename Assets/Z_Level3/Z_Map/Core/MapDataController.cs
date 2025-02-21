@@ -14,7 +14,8 @@ namespace Z_Map
     public class MapDataController : Z_Controller<MapManager>
     {
         public MapMainForm.Data mainData;
-        public MapUnitForm.Data[,,] maps;
+        public Dictionary<(int,int,int), MapUnitForm.Data>maps;
+        public Dictionary<(int,int),List<int>>mapXZ2Y;
 
         public MapDataController(string formData)
         {
@@ -23,13 +24,13 @@ namespace Z_Map
             ItemUnitForm.Clear();
             CharacterUnitForm.Clear();
             mainData = MapMainForm.GetDataByJo(JObject.Parse(formData));
-            maps = new MapUnitForm.Data[mainData.size.x, mainData.size.y, mainData.size.z];
-
+            maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
+            mapXZ2Y = new Dictionary<(int, int), List<int>>();
             var mapDatas = MapUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
             for (int i = 0; i < mapDatas.Count; i++)
             {
                 MapUnitForm.AddData(mapDatas[i]);
-                maps[mapDatas[i].mapPos.x, mapDatas[i].mapPos.y, mapDatas[i].mapPos.z]= mapDatas[i];
+                RegisterMap(mapDatas[i]);
             }
 
             var itemDatas = ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.ItemJa));
@@ -60,38 +61,35 @@ namespace Z_Map
             MapUnitForm.Clear();
             ItemUnitForm.Clear();
             CharacterUnitForm.Clear();
-            int uidCnt = 0;
-
-            maps = new MapUnitForm.Data[300, 1, 300];
+            maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
+            mapXZ2Y = new Dictionary<(int, int), List<int>>();
 
             Vector3 realPos = Vector3.one; 
             Vector3Int mapPos= Vector3Int.one;
             string mapName = "map";
-            for (int i = 0; i < 300; i++)
+            for (int i = 495; i < 505; i++)
             {
                 realPos.x = i*1;
                 mapPos.x = i;
-                for (int j = 0; j < 1; j++)
+                for (int j = 500; j < 501; j++)
                 {
                     realPos.y = j * 3;
                     mapPos.y= j;
 
-                    for (int k = 0; k < 300; k++)
+                    for (int k = 495; k < 505; k++)
                     {
                         realPos.z = k * 1;
                         mapPos.z = k;
-
-                        MapUnitForm.AddData(new MapUnitForm.Data(++uidCnt, "", 0, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0));
-                        maps[i, j, k] = MapUnitForm.DataByUid[uidCnt];
+                        var data = new MapUnitForm.Data(-1, "", "", mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
+                        MapUnitForm.AddData(data);
+                        RegisterMap(data);
                     }
                 }
             }
             mainData = new MapMainForm.Data(
                 1, 
-                uidCnt,
-                new Vector3(1, 1, 1),
-                new Vector3Int(300, 1, 300),
-                new Vector3Int(30, 1, 20),
+                new Vector3(1, 3, 1),
+                new Vector3Int(30, 5, 20),
                "",
                "",
                ""
@@ -103,6 +101,36 @@ namespace Z_Map
             {
                 data.unit.Hide();
             }
+        }
+        public void RegisterMap(MapUnitForm.Data data)
+        {
+            maps[(data.mapPos.x, data.mapPos.y, data.mapPos.z)] = data;
+
+            if (!mapXZ2Y.ContainsKey((data.mapPos.x, data.mapPos.z)))
+                mapXZ2Y[(data.mapPos.x, data.mapPos.z)] = new List<int>();
+            mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Add(data.mapPos.y);
+        }
+        public void UnRegisterMap(MapUnitForm.Data data)
+        {
+            if (maps.ContainsKey((data.mapPos.x, data.mapPos.y, data.mapPos.z)))
+                maps.Remove((data.mapPos.x, data.mapPos.y, data.mapPos.z));
+
+            if (mapXZ2Y.ContainsKey((data.mapPos.x, data.mapPos.z)))
+                mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Remove(data.mapPos.y);
+        }
+
+        public MapUnitForm.Data AddMap(Vector3Int mapPos)
+        {
+            var data = new MapUnitForm.Data(-1,"","", mapPos,"map", mapPos,Vector3.zero,Vector3.one,0);
+            MapUnitForm.AddData(data);
+            RegisterMap(data);
+            return data;
+        }
+        public ItemUnitForm.Data AddItem()
+        {
+            var data = new ItemUnitForm.Data(-1,false,"","", Vector3.zero, Vector3.zero,Vector3.one,0);
+            ItemUnitForm.AddData(data);
+            return data;
         }
     }
 

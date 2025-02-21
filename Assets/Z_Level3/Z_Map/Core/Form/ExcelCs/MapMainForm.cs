@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 using Z_UnitSystem.Form;
 namespace Z_Map.Form
 {
@@ -19,7 +20,7 @@ namespace Z_Map.Form
         }
 
         private static bool inited;
-        private static Queue<int> freeUidQueue;
+        public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
 
         public partial class Data
@@ -28,19 +29,9 @@ namespace Z_Map.Form
                 public int uid;
 
                 /// <summary>
-                ///uid总数
-                ///</summary>
-                public int uidCnt;
-
-                /// <summary>
                 ///单位图块大小
                 ///</summary>
                 public Vector3 mapUnitSize;
-
-                /// <summary>
-                ///总尺寸
-                ///</summary>
-                public Vector3Int size;
 
                 /// <summary>
                 ///视口大小
@@ -62,13 +53,11 @@ namespace Z_Map.Form
                 ///</summary>
                 public string CharacterJa;
 
-            public Data(int uid,int uidCnt,Vector3 mapUnitSize,Vector3Int size,Vector3Int viewSize,string mapJa,string ItemJa,string CharacterJa)
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string ItemJa,string CharacterJa)
             {
 
                 this.uid = uid;
-                this.uidCnt = uidCnt;
                 this.mapUnitSize = mapUnitSize;
-                this.size = size;
                 this.viewSize = viewSize;
                 this.mapJa = mapJa;
                 this.ItemJa = ItemJa;
@@ -78,7 +67,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","");
+                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","");
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -102,7 +91,8 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            freeUidQueue=new Queue<int> (Enumerable.Range(0, 100));
+            uidChain=new Z_Chain.Chain (1000000);
+            
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -113,10 +103,8 @@ namespace Z_Map.Form
             
 
 
-             foreach(var k in _DataByUid.Keys)
-            {
-                freeUidQueue.Enqueue(k);
-            }
+            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+             
         }
 
 
@@ -154,11 +142,7 @@ namespace Z_Map.Form
 
                 jo.Get<int>("uid"),
 
-                jo.Get<int>("uidCnt"),
-
                 jo.Get<Vector3>("mapUnitSize"),
-
-                jo.Get<Vector3Int>("size"),
 
                 jo.Get<Vector3Int>("viewSize"),
 
@@ -180,11 +164,7 @@ namespace Z_Map.Form
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<int>("uidCnt",data.uidCnt);
-
             jo.Set<Vector3>("mapUnitSize",data.mapUnitSize);
-
-            jo.Set<Vector3Int>("size",data.size);
 
             jo.Set<Vector3Int>("viewSize",data.viewSize);
 
@@ -198,14 +178,14 @@ namespace Z_Map.Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.uid==-1)
             { 
-                if(freeUidQueue.Count==0)
-                return -1;
-                int uid=freeUidQueue.Dequeue();
+                int uid=uidChain.GetId();
+                if(uid==-1)
+                    return -1;
                 data.uid=uid;  
             }
 
@@ -233,6 +213,7 @@ namespace Z_Map.Form
 
                 _DataByUid.Clear();
 
+            uidChain.Clear();
         }
 
     }

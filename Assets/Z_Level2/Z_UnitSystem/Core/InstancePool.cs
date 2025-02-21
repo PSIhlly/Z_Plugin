@@ -37,6 +37,7 @@ namespace Z_UnitSystem
         public override GameObject New()
         {
             var go = GameObject.Instantiate(prefab);
+
             go.transform.SetParent(root);
             return go;
         }

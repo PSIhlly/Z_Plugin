@@ -6,7 +6,12 @@ namespace Z_Trick.BaseFunc
 {
     public class State : MonoBehaviour
     {
-        public int state;
+        [SerializeField]
+        public int state
+        {
+            get;
+            private set;
+        }
         [SerializeField]
         private GameObject[] stateGo;
         public void ChangeState(int tar)

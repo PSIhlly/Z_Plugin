@@ -20,10 +20,13 @@ namespace Ui
             public Txt txt_title;
             public Btn btn_save;
             public Btn btn_back;
+            public Btn btn_exit;
             public Img img_save;
             public Txt txt_save;
             public Img img_back;
             public Txt txt_back;
+            public Img img_exit;
+            public Txt txt_exit;
         public UiModSceneMenuView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -31,10 +34,13 @@ namespace Ui
             txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             btn_save = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_back = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            img_save = uiHolder.elementTrsLst[4].GetComponent<Img>();
-            txt_save = uiHolder.elementTrsLst[5].GetComponent<Txt>();
-            img_back = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            txt_back = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            btn_exit = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            img_save = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            txt_save = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            img_back = uiHolder.elementTrsLst[7].GetComponent<Img>();
+            txt_back = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            img_exit = uiHolder.elementTrsLst[9].GetComponent<Img>();
+            txt_exit = uiHolder.elementTrsLst[10].GetComponent<Txt>();
         }
 
     }

@@ -11,17 +11,26 @@ namespace Z_ObjectAnimator.Base
         private Vector3 _pos;
         private Transform _transform;
         private Vector3 _posOri;
+        private bool _sqr;
 
-        public PositionSetEvent(Transform transform, Vector3 posOri, Vector3 pos, float duration=0):base(duration)
+        public PositionSetEvent(Transform transform, Vector3 posOri, Vector3 pos, float duration=0,bool sqr=true):base(duration)
         {
             _pos = pos;
             _transform = transform;
             _posOri = posOri;
+            _sqr = sqr;
         }
 
         public override ReturnValue Excute()
         {
-            _transform.position = Vector3.Lerp(_posOri, _pos, 1f * (_times + 1) / _maxTimes);
+            if(_sqr)
+            {
+                _transform.position = Vector3.Lerp(_posOri, _pos, 1f * ((_times + 1)* (_times + 1)) / _maxTimes/ _maxTimes);
+            }
+            else
+            {
+                _transform.position = Vector3.Lerp(_posOri, _pos, 1f * (_times + 1) / _maxTimes);
+            }
             return base.Excute();
         }
         public override void ToEnd()

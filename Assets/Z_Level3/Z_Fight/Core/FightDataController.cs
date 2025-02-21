@@ -92,6 +92,7 @@ namespace Z_Fight
             {
                 FightUnitForm.AddData(new FightUnitForm.Data(
                      uid:++uidCnt,
+                     name:"",
                      itemIdCountDic:new Dictionary<int, int> { { 1, 100 } },
                      curUsingWeaponsSid: new List<int>() { 0},
                      curReloadWeaponsSid:new List<int>(),
@@ -115,6 +116,7 @@ namespace Z_Fight
             {
                 var data = new WeaponUnitForm.Data(
                      uid: ++uidCnt,
+                     name:"",
                      fightUid: i + 1,
                      weaponBulletsId: new List<int>() { 1 },
                      curWeaponBulletAid: 0,

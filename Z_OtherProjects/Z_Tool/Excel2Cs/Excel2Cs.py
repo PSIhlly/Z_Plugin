@@ -18,6 +18,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 {file_using}
 namespace {file_namespace}
 {{
@@ -47,6 +48,7 @@ namespace {file_namespace}
         self.var_type_dic = {}
         self.data_list = []
         self.name = 'default'
+        self.id_cnt= 100
 
     def get_result(self):
         namespace_str = self.get_namespace_str(self.name)
@@ -70,7 +72,7 @@ namespace {file_namespace}
             init_internal_base_str+=f'''
             foreach(var data in DataBy{self.id_str.capitalize()}.Values)
             {{
-                {self.base_info}Form.AddData(data,false);
+                {self.base_info}Form.AddData(data);
             }}
 '''
 
@@ -78,14 +80,14 @@ namespace {file_namespace}
         add_remove_clear_op_str = ""
         if 'write' in self.var_config_dic[self.id_str]:
             add_remove_clear_op_str = f'''
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {{
             Init();
-            if(autoId)
+            if(data.{self.id_str}==-1)
             {{ 
-                if(free{self.id_str.capitalize()}Queue.Count==0)
-                return -1;
-                int {self.id_str}=free{self.id_str.capitalize()}Queue.Dequeue();
+                int {self.id_str}={self.id_str}Chain.GetId();
+                if({self.id_str}==-1)
+                    return -1;
                 data.{self.id_str}={self.id_str};  
             }}
 {self.add_str}
@@ -107,9 +109,9 @@ namespace {file_namespace}
         {{
             Init();
 {self.clear_str}
+            {self.id_str}Chain.Clear();
         }}
 '''
-
         return f"""{namespace_str}
     public static partial class {self.name}Form
     {{
@@ -120,10 +122,10 @@ namespace {file_namespace}
         }}
 
         private static bool inited;
-        private static Queue<int> free{self.id_str.capitalize()}Queue;
+        public static Z_Chain.Chain {self.id_str}Chain{'' if self.extend_data_str == '' else f'=>{self.extend_data_str}Form.{self.id_str}Chain'};
         public static Action childInitAction;
 
-        public partial class Data{self.extend_data_str}
+        public partial class Data{'' if self.extend_data_str=='' else  f" : {self.extend_data_str}Form.Data"}
         {{
 {self.declare_str}
         }}
@@ -139,17 +141,16 @@ namespace {file_namespace}
             if(inited)
                 return;
             inited=true;  
-            free{self.id_str.capitalize()}Queue=new Queue<int> (Enumerable.Range(0, 100));
+            {'' if self.extend_data_str != '' else f"{self.id_str}Chain=new Z_Chain.Chain ({self.id_cnt});"}
+            
 {self.content_str}
 
             childInitAction?.Invoke();
             
 {init_internal_base_str}
 
-             foreach(var k in _DataBy{self.id_str.capitalize()}.Keys)
-            {{
-                free{self.id_str.capitalize()}Queue.Enqueue(k);
-            }}
+            {'' if self.extend_data_str != '' else f'foreach(var k in _DataBy{self.id_str.capitalize()}.Keys){{ {self.id_str}Chain.PopId(k); }}'}
+             
         }}
 
 
@@ -319,10 +320,12 @@ for i, arg in enumerate(sys.argv):
         files_root_excels = arg + files_root_excels
     if i == 2:
         files_root_cs = arg + files_root_cs
-    if i == 3:
-        file_namespace = arg + "." + file_namespace
-    if i == 4:
-        file_using = "using "+arg+";"
+    if i >= 3:
+        content = arg.split(':')
+        if content[0] == 'namespace':
+            file_namespace = content[1] + "." + file_namespace
+        if content[0] == 'using':
+            file_using = file_using+"using "+content[1]+";\n"
         
 print(f'''start\n''')
 for root, dirs, files in os.walk(files_root_excels):
@@ -335,7 +338,7 @@ for root, dirs, files in os.walk(files_root_excels):
             formInfo.name = temp_names[0]
             if len(temp_names) > 1:
                 formInfo.base_info = temp_names[1]
-                formInfo.extend_data_str = " : " + temp_names[1] + "Form.Data"
+                formInfo.extend_data_str =temp_names[1]
 
             formInfo.df = pd.read_excel(root + "/" + file)
 
@@ -360,8 +363,15 @@ for root, dirs, files in os.walk(files_root_excels):
             cur_row = formInfo.df.iloc[2]
             for title,content in cur_row.items():
                 formInfo.var_type_dic[title] = content
+
+            #id特殊处理
+            if 'mass' in formInfo.var_config_dic[formInfo.id_str]:
+                formInfo.id_cnt = 1000000
             
             form_info_list.append(formInfo)
+
+
+
 
 
 for formInfo in form_info_list:

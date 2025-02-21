@@ -7,6 +7,12 @@ namespace Z_Ui.Base
 {
     public class ScrView : ScrollRect
     {
+        public enum FillType
+        {
+            None,
+            Average,
+            Fill
+        }
         public RectTransform viewPort;
 
         public Func<int, GameObject> ContainerAdd;
@@ -15,17 +21,20 @@ namespace Z_Ui.Base
         private int cnt;
         private bool inited;
 
-        public Vector2 cellSize;
-        float width => viewPort.rect.width;
-        float height => viewPort.rect.height;
-        int rowCnt => (int)((height) / cellSize.y);
-        int columnCnt => (int)((width) / cellSize.x);
+        public RectTransform cell;
+       
+        public FillType fiilType;
+        float width => viewPort.rect.width ;
+        float height => viewPort.rect.height ;
+        int rowCnt => (int)((height) / cell.rect.height);
+        int columnCnt => (int)((width) / cell.rect.width);
 
         Dictionary<int, GameObject> id2Go = new Dictionary<int, GameObject>();
 
 
         HashSet<int> needs = new HashSet<int>();
         List<int> lastShows = new List<int>();
+
 
         protected override void Start()
         {
@@ -43,17 +52,25 @@ namespace Z_Ui.Base
 
             Clear();
             this.cnt = cnt;
-
+            Vector2 cellSize = new Vector2(cell.rect.width, cell.rect.height);
             if (vertical)
             {
                 int totRow = (cnt / columnCnt) + (cnt % columnCnt != 0 ? 1 : 0);
-                content.sizeDelta = new Vector2(width, Mathf.Max(totRow, rowCnt) * cellSize.y);
+                content.sizeDelta = new Vector2(content.rect.width-width,  Mathf.Max(totRow, rowCnt) * cell.rect.height - content.rect.height);
             }
             else
             {
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
-                content.sizeDelta = new Vector2(Mathf.Max(totColumn, columnCnt) * cellSize.x, height);
+                content.sizeDelta = new Vector2( Mathf.Max(totColumn, columnCnt) * cell.rect.width-content.rect.width , content.rect.height - height);
             }
+
+            if (fiilType == FillType.Fill)
+            {
+                content.sizeDelta = new Vector2(content.rect.width - width / columnCnt, content.rect.height - height / rowCnt);
+            }
+            //stretch back
+            cell.sizeDelta += cellSize - new Vector2(cell.rect.width,cell.rect.height);
+
             UpdateInfo(normalizedPosition);
         }
 
@@ -67,11 +84,15 @@ namespace Z_Ui.Base
 
             Vector3[] contentCorners = new Vector3[4];
             content.GetWorldCorners(contentCorners);
+
+            var relaPos = new Vector3(0,0, 0);
+
+
             if (vertical)
             {
-                int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / cellSize.y);
+                int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / cell.rect.height / content.lossyScale.y);
                 needs.Clear();
-                while (contentCorners[1].y - curRowId * cellSize.y > viewPortCorners[0].y)
+                while (contentCorners[1].y - curRowId * cell.rect.height * content.lossyScale.y > viewPortCorners[0].y)
                 {
                     for (int i = 0; i < columnCnt; i++)
                     {
@@ -87,14 +108,25 @@ namespace Z_Ui.Base
                 {
                     int row = id / columnCnt;
                     int column = id % columnCnt;
-                    Add(id, contentCorners[1] + new Vector3((column + 0.5f) * cellSize.x, -(row + 0.5f) * cellSize.y, 0));
+
+                    if (fiilType == FillType.Average)
+                    {
+                        relaPos = new Vector3((column + 0.5f) * width / columnCnt * content.lossyScale.x, -(row + 0.5f) * height / rowCnt * content.lossyScale.y, 0);
+
+                    }
+                    else
+                    {
+                        relaPos = new Vector3((column + 0.5f) * cell.rect.width * content.lossyScale.x, -(row + 0.5f) * cell.rect.height * content.lossyScale.y, 0);
+
+                    }
+                    Add(id, contentCorners[1] + relaPos);
                 }
             }
             else
             {
-                int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / cellSize.x);
+                int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / cell.rect.width / content.lossyScale.x);
                 needs.Clear();
-                while (contentCorners[1].x + curColumnId * cellSize.x < viewPortCorners[2].x)
+                while (contentCorners[1].x + curColumnId * cell.rect.width * content.lossyScale.x < viewPortCorners[2].x)
                 {
                     for (int i = 0; i < rowCnt; i++)
                     {
@@ -110,7 +142,17 @@ namespace Z_Ui.Base
                 {
                     int column = id / columnCnt;
                     int row = id % rowCnt;
-                    Add(id, contentCorners[1] + new Vector3((column + 0.5f) * cellSize.x, -(row + 0.5f) * cellSize.y, 0));
+                    if (fiilType == FillType.Average)
+                    {
+                        relaPos = new Vector3((column + 0.5f) * width / columnCnt * content.lossyScale.x, -(row + 0.5f) * height / rowCnt * content.lossyScale.y, 0);
+
+                    }
+                    else
+                    {
+                        relaPos = new Vector3((column + 0.5f) * cell.rect.width, -(row + 0.5f) * cell.rect.height, 0);
+
+                    }
+                    Add(id, contentCorners[1] + relaPos);
                 }
             }
         }
@@ -138,9 +180,14 @@ namespace Z_Ui.Base
             if (id2Go.ContainsKey(id))
                 return;
             var obj = ContainerAdd(id);
-            obj.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize.x, cellSize.y);
             obj.name = id.ToString();
             obj.transform.position = pos;
+
+            Vector3[] viewPortCorners = new Vector3[4];
+            viewPort.GetWorldCorners(viewPortCorners);
+
+            Vector3[] contentCorners = new Vector3[4];
+            content.GetWorldCorners(contentCorners);
             id2Go[id] = obj;
         }
         private void Clear()

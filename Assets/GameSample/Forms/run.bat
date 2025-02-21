@@ -22,5 +22,5 @@ pause
 :end
 cls
 
-python %current_dir%Z_OtherProjects\Z_Tool\Excel2Cs\Excel2Cs.py %root_dir%  %root_dir% 
+python %current_dir%Z_OtherProjects\Z_Tool\Excel2Cs\Excel2Cs.py %root_dir%  %root_dir%  using:Z_UnitSystem.Form using:Z_Text.Form using:Z_DataSystem.Form
 pause

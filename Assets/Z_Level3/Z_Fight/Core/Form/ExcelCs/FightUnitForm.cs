@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 using Z_UnitSystem.Form;
 namespace Z_Fight.Form
 {
@@ -21,7 +22,7 @@ namespace Z_Fight.Form
         }
 
         private static bool inited;
-        private static Queue<int> freeUidQueue;
+        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
 
         public partial class Data : UnitForm.Data
@@ -88,10 +89,11 @@ namespace Z_Fight.Form
                 ///</summary>
                 public bool isMine;
 
-            public Data(int uid,Dictionary<int,int> itemIdCountDic,List<int> curUsingWeaponsSid,List<int> curReloadWeaponsSid,float alertDistance,float hp,float hpMax,float defence,int targetFightUid,float reloadTime,bool isMine,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,Dictionary<int,int> itemIdCountDic,List<int> curUsingWeaponsSid,List<int> curReloadWeaponsSid,float alertDistance,float hp,float hpMax,float defence,int targetFightUid,float reloadTime,bool isMine,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
                 this.uid = uid;
+                this.name = name;
                 this.itemIdCountDic = itemIdCountDic;
                 this.curUsingWeaponsSid = curUsingWeaponsSid;
                 this.curReloadWeaponsSid = curReloadWeaponsSid;
@@ -114,7 +116,7 @@ namespace Z_Fight.Form
             
         }
 
-                   public static Data defaultData=new Data(0,new Dictionary<int,int>(){},null,null,0f,0f,0f,0f,0,0f,false,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"",new Dictionary<int,int>(){},null,null,0f,0f,0f,0f,0,0f,false,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -139,7 +141,8 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            freeUidQueue=new Queue<int> (Enumerable.Range(0, 100));
+            
+            
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -151,14 +154,12 @@ namespace Z_Fight.Form
 
             foreach(var data in DataByUid.Values)
             {
-                UnitForm.AddData(data,false);
+                UnitForm.AddData(data);
             }
 
 
-             foreach(var k in _DataByUid.Keys)
-            {
-                freeUidQueue.Enqueue(k);
-            }
+            
+             
         }
 
 
@@ -195,6 +196,8 @@ namespace Z_Fight.Form
             Data data=new Data(
 
                 jo.Get<int>("uid"),
+
+                jo.Get<string>("name"),
 
                 jo.Get<Dictionary<int,int>>("itemIdCountDic"),
 
@@ -238,6 +241,8 @@ namespace Z_Fight.Form
 
             jo.Set<int>("uid",data.uid);
 
+            jo.Set<string>("name",data.name);
+
             jo.Set<Dictionary<int,int>>("itemIdCountDic",data.itemIdCountDic);
 
             jo.Set<List<int>>("curUsingWeaponsSid",data.curUsingWeaponsSid);
@@ -272,14 +277,14 @@ namespace Z_Fight.Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.uid==-1)
             { 
-                if(freeUidQueue.Count==0)
-                return -1;
-                int uid=freeUidQueue.Dequeue();
+                int uid=uidChain.GetId();
+                if(uid==-1)
+                    return -1;
                 data.uid=uid;  
             }
 
@@ -307,6 +312,7 @@ UnitForm.RemoveData(uid);
 
                 _DataByUid.Clear();
 
+            uidChain.Clear();
         }
 
     }

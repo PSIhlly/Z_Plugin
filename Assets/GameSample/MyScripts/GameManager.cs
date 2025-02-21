@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Ui;
 using UnityEngine;
+using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
@@ -14,6 +15,8 @@ using Z_UnitSystem;
 
 public class GameManager : Z_MonoManager<GameManager>
 {
+    public Vector2 downPos;
+    public float dragDis2 => InputManager.instance.screenSize.x/25;
     public void Start()
     {
         RegisterInputDefault();
@@ -31,7 +34,6 @@ public class GameManager : Z_MonoManager<GameManager>
     }
     public void Update()
     {
-        
     }
     public void RegisterInputDefault()
     {
@@ -73,28 +75,54 @@ public class GameManager : Z_MonoManager<GameManager>
 
         config.onButtonW = () =>
         {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 2;
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 4;
         };
         config.onButtonS = () =>
         {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 2;
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 4;
         };
 
         config.onButtonA = () =>
         {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 2;
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 4;
         };
         config.onButtonD = () =>
         {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 2;
+            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 4;
         };
-        config.onMouse = (id, pos, dir) =>
+        config.onMouse = (id, pos, dir,ui) =>
         {
-            if(id==0)
+            
+            if (id==0&&ui==null&& downPos != Vector2.zero )//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
             {
-                Vector2 moveDir = -Time.deltaTime * dir * 2;
-                CameraInstance.instance.tarTrs.position +=new Vector3(moveDir.x,0,moveDir.y);
+                ModSceneManager.instance.OnMouse(false, pos, dir);
             }
+        };
+
+        config.onMouseDown = (id, pos, ui) =>
+        {
+            
+            if (ui==null)
+            {
+                downPos = pos;
+            }
+            else
+            {
+                downPos = Vector2.zero;
+            }
+        };
+        config.onMouseUp = (id, pos, ui) =>
+        {
+            if (id == 0 && ui == null && downPos != Vector2.zero && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < dragDis2)
+            {
+                ModSceneManager.instance.OnMouse(true, pos, Vector3.zero);
+            }
+            downPos = Vector2.zero;
+        };
+
+        config.onMouseScroll = (v) =>
+        {
+            CameraInstance.instance.cam.orthographicSize += v*-2f;
         };
 
         ins.Register(config);

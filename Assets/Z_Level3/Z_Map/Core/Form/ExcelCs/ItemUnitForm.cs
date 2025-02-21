@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 using Z_UnitSystem.Form;
 namespace Z_Map.Form
 {
@@ -21,7 +22,7 @@ namespace Z_Map.Form
         }
 
         private static bool inited;
-        private static Queue<int> freeUidQueue;
+        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
 
         public partial class Data : UnitForm.Data
@@ -43,11 +44,12 @@ namespace Z_Map.Form
                 ///</summary>
                 public bool isObstacle;
 
-            public Data(int uid,bool isObstacle,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
                 this.uid = uid;
                 this.isObstacle = isObstacle;
+                this.name = name;
                 this.prefabName = prefabName;
                 this.pos = pos;
                 this.euler = euler;
@@ -60,7 +62,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,false,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -85,7 +87,8 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            freeUidQueue=new Queue<int> (Enumerable.Range(0, 100));
+            
+            
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -97,14 +100,12 @@ namespace Z_Map.Form
 
             foreach(var data in DataByUid.Values)
             {
-                UnitForm.AddData(data,false);
+                UnitForm.AddData(data);
             }
 
 
-             foreach(var k in _DataByUid.Keys)
-            {
-                freeUidQueue.Enqueue(k);
-            }
+            
+             
         }
 
 
@@ -144,6 +145,8 @@ namespace Z_Map.Form
 
                 jo.Get<bool>("isObstacle"),
 
+                jo.Get<string>("name"),
+
                 jo.Get<string>("prefabName"),
 
                 jo.Get<Vector3>("pos"),
@@ -168,6 +171,8 @@ namespace Z_Map.Form
 
             jo.Set<bool>("isObstacle",data.isObstacle);
 
+            jo.Set<string>("name",data.name);
+
             jo.Set<string>("prefabName",data.prefabName);
 
             jo.Set<Vector3>("pos",data.pos);
@@ -182,14 +187,14 @@ namespace Z_Map.Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.uid==-1)
             { 
-                if(freeUidQueue.Count==0)
-                return -1;
-                int uid=freeUidQueue.Dequeue();
+                int uid=uidChain.GetId();
+                if(uid==-1)
+                    return -1;
                 data.uid=uid;  
             }
 
@@ -217,6 +222,7 @@ UnitForm.RemoveData(uid);
 
                 _DataByUid.Clear();
 
+            uidChain.Clear();
         }
 
     }

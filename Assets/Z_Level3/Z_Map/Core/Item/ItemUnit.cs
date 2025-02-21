@@ -23,7 +23,6 @@ namespace Z_Map
             get { return (ItemInstance)base.ins; }
         }
 
-        public bool isObstacle;
 
         public override Type GetInsType()
         {
@@ -40,16 +39,25 @@ namespace Z_Map
                 var newMapPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(data.pos);
                 if (MapManager.instance.mapUtilCtrl.InArea(newMapPos))
                 {
-                    var newMap = MapManager.instance.dataCtrl.maps[newMapPos.x, newMapPos.y, newMapPos.z];
+                    var newMap = MapManager.instance.dataCtrl.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
                     if (superUnit != newMap.unit)
                     {
                         superUnit.Unbind(this);
                         newMap.unit.Bind(this);
                         SubUpdateActive();
                     }
+                }else
+                {
+                    data.pos = MapManager.instance.mapUtilCtrl.GetClosestInArea(data.pos);
+                    ins.transform.position = data.pos;
                 }
             }
-    }
+        }
+        public override void Remove()
+        {
+            ItemUnitForm.RemoveData(data.uid);
+            base.Remove();
+        }
 
-    }
+        }
 }

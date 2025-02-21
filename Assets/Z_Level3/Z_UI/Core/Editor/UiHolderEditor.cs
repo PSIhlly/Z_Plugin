@@ -150,7 +150,13 @@ namespace Z_Ui_Editor
                             initContent += $@"
             txt_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Txt>();";
                             break;
-
+                        case "ipt":
+                            declareContent += $@"
+            public Ipt ipt_{realName};";
+                            initContent += $@"
+            ipt_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Ipt>();";
+                            break;
+                            
                         case "go":
                             declareContent += $@"
             public GameObject go_{realName};";

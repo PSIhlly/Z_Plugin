@@ -17,10 +17,7 @@ namespace Z_Map
         }
         public MapUnitForm.Data data => (MapUnitForm.Data)_data;
 
-        public string areaName;
-        public int matId_Data;
-        public Vector3Int mapPos;
-        public Material mat=> InstancePoolManager.instance.GetMaterial(matId_Data);
+        public Material mat=> InstancePoolManager.instance.GetMaterial(data.matName);
 
 
         public override Type GetInsType()
@@ -54,7 +51,12 @@ namespace Z_Map
             }
             return data.pos.y + length;
         }
-        
-        
+        public override void Remove()
+        {
+            MapManager.instance.dataCtrl.UnRegisterMap(data);
+            MapUnitForm.RemoveData(data.uid);
+            base.Remove();
+        }
+
     }
 }

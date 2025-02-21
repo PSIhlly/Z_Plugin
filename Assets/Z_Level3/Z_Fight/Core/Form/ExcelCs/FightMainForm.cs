@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 using Z_UnitSystem.Form;
 namespace Z_Fight.Form
 {
@@ -19,7 +20,7 @@ namespace Z_Fight.Form
         }
 
         private static bool inited;
-        private static Queue<int> freeUidQueue;
+        public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
 
         public partial class Data
@@ -90,7 +91,8 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            freeUidQueue=new Queue<int> (Enumerable.Range(0, 100));
+            uidChain=new Z_Chain.Chain (100);
+            
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -101,10 +103,8 @@ namespace Z_Fight.Form
             
 
 
-             foreach(var k in _DataByUid.Keys)
-            {
-                freeUidQueue.Enqueue(k);
-            }
+            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+             
         }
 
 
@@ -178,14 +178,14 @@ namespace Z_Fight.Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.uid==-1)
             { 
-                if(freeUidQueue.Count==0)
-                return -1;
-                int uid=freeUidQueue.Dequeue();
+                int uid=uidChain.GetId();
+                if(uid==-1)
+                    return -1;
                 data.uid=uid;  
             }
 
@@ -213,6 +213,7 @@ namespace Z_Fight.Form
 
                 _DataByUid.Clear();
 
+            uidChain.Clear();
         }
 
     }

@@ -6,6 +6,10 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
+using Z_UnitSystem.Form;
+using Z_Text.Form;
+using Z_DataSystem.Form;
 
 namespace Form
 {
@@ -19,7 +23,7 @@ namespace Form
         }
 
         private static bool inited;
-        private static Queue<int> freeIdQueue;
+        public static Z_Chain.Chain idChain;
         public static Action childInitAction;
 
         public partial class Data
@@ -78,7 +82,8 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            freeIdQueue=new Queue<int> (Enumerable.Range(0, 100));
+            idChain=new Z_Chain.Chain (100);
+            
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -89,10 +94,8 @@ namespace Form
             
 
 
-             foreach(var k in _DataById.Keys)
-            {
-                freeIdQueue.Enqueue(k);
-            }
+            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+             
         }
 
 
@@ -158,14 +161,14 @@ namespace Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.id==-1)
             { 
-                if(freeIdQueue.Count==0)
-                return -1;
-                int id=freeIdQueue.Dequeue();
+                int id=idChain.GetId();
+                if(id==-1)
+                    return -1;
                 data.id=id;  
             }
 
@@ -193,6 +196,7 @@ namespace Form
 
                 _DataById.Clear();
 
+            idChain.Clear();
         }
 
     }

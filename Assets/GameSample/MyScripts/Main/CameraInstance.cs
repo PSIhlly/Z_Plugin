@@ -5,16 +5,31 @@ using Z_DesignStyle;
 
 public class CameraInstance : Z_MonoSingleton<CameraInstance>
 {
+    Camera _cam;
     Transform _camTrs;
     Transform _tarTrs;
     private Vector3 limitMax;
     private Vector3 limitMin;
-    public void Register(Vector3 limitMin, Vector3 limitMax)
+    private float orthographicSizeMax=7;
+    private float orthographicSizeMin=7;
+    public void Register(Vector3 limitMin, Vector3 limitMax, float orthographicSizeMin, float orthographicSizeMax)
     {
         this.limitMax = limitMax;
-        this.limitMin = limitMin;   
+        this.limitMin = limitMin;
+        this.orthographicSizeMax = orthographicSizeMax;
+        this.orthographicSizeMin = orthographicSizeMin;
     }
-
+    public Camera cam
+    {
+        get
+        {
+            if (_cam == null)
+            {
+                _cam = gameObject.GetComponentInChildren<Camera>();
+            }
+            return _cam;
+        }
+    }
 
     public Transform camTrs
     {
@@ -45,5 +60,6 @@ public class CameraInstance : Z_MonoSingleton<CameraInstance>
             Mathf.Max(Mathf.Min(tarTrs.position.y, limitMax.y), limitMin.y),
             Mathf.Max(Mathf.Min(tarTrs.position.z, limitMax.z), limitMin.z)
             );
+        cam.orthographicSize = Mathf.Max(Mathf.Min(cam.orthographicSize, orthographicSizeMax), orthographicSizeMin); 
     }
 }

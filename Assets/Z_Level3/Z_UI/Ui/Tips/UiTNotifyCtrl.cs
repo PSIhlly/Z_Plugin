@@ -219,7 +219,7 @@ namespace Ui
                 parent.RemoveTip(model.id);
                 return true;
             },uiHolder);
-
+            LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
             LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
         }
 

@@ -24,6 +24,20 @@ namespace Z_ObjectAnimator.Base
         {
             this.playObj = playObj;
         }
+        public Action(MonoBehaviour playObj, Event @event)
+        {
+            this.playObj = playObj;
+            Add(@event);
+        }
+
+        public Action(MonoBehaviour playObj, List<Event> @events)
+        {
+            this.playObj = playObj;
+            foreach (var e in @events)
+            { 
+                Add(e); 
+            }
+        }
         private List<Event> _eventList = new List<Event>();
 
         private Action<bool> onSucces;

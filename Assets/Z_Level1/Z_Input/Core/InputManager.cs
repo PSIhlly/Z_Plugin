@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Z_DesignStyle;
 namespace Z_Input
 {
@@ -26,13 +27,15 @@ namespace Z_Input
         public Action onButtonUpA;
         public Action onButtonUpD;
 
-        public Action<int, Vector3> onPointDown;
-        public Action<int, Vector3, Vector3> onPoint;
-        public Action<int, Vector3> onPointUp;
+        public Action<int, Vector3, GameObject> onPointDown;
+        public Action<int, Vector3, Vector3, GameObject> onPoint;
+        public Action<int, Vector3, GameObject> onPointUp;
 
-        public Action<int, Vector3> onMouseDown;
-        public Action<int, Vector3, Vector3> onMouse;
-        public Action<int, Vector3> onMouseUp;
+        public Action<int, Vector3,GameObject> onMouseDown;
+        public Action<int, Vector3, Vector3, GameObject> onMouse;
+        public Action<int, Vector3, GameObject> onMouseUp;
+
+        public Action<float> onMouseScroll;
 
     }
     [DefaultExecutionOrder(-100)]
@@ -108,7 +111,7 @@ namespace Z_Input
             }
             foreach (var k in tmpList)
             {
-                cur?.onPointUp?.Invoke(k, id2Pos[k]);
+                cur?.onPointUp?.Invoke(k, id2Pos[k], UICheck(id2Pos[k]));
 
                 id2Pos.Remove(k);
             }
@@ -123,7 +126,7 @@ namespace Z_Input
                 {
                     pointCnt = (pointCnt + 1) % 100;
                     id2Pos[pointCnt] = Input.touches[i].position;
-                    cur?.onPointDown?.Invoke(pointCnt, Input.touches[i].position);
+                    cur?.onPointDown?.Invoke(pointCnt, Input.touches[i].position, UICheck(Input.touches[i].position));
                 }
             }
 
@@ -135,7 +138,7 @@ namespace Z_Input
                 if (id != -1)
                 {
                     id2Pos[id] = Input.touches[i].position;
-                    cur?.onPoint?.Invoke(id, id2Pos[id], id2Pos[id] - id2OldPos[id]);
+                    cur?.onPoint?.Invoke(id, id2Pos[id], id2Pos[id] - id2OldPos[id], UICheck(id2Pos[id]));
                 }
             }
 
@@ -153,7 +156,7 @@ namespace Z_Input
             {
                 if (Input.GetMouseButtonUp(i))
                 {
-                    cur?.onMouseUp?.Invoke(i, Input.mousePosition);
+                    cur?.onMouseUp?.Invoke(i, Input.mousePosition, UICheck(Input.mousePosition));
                     tmpHash.Add(i);
                 }
             }
@@ -163,7 +166,7 @@ namespace Z_Input
                 if (Input.GetMouseButtonDown(i))
                 {
                     mousePos[i] = Input.mousePosition;
-                    cur?.onMouseDown?.Invoke(i, Input.mousePosition);
+                    cur?.onMouseDown?.Invoke(i, Input.mousePosition,UICheck(mousePos[i]));
                     tmpHash.Add(i);
 
                 }
@@ -174,15 +177,48 @@ namespace Z_Input
                 if (Input.GetMouseButton(i)&&!tmpHash.Contains(i))//ignore first frame
                 {
                     mousePos[i] = Input.mousePosition;
-                    cur?.onMouse?.Invoke(i, mousePos[i], mousePos[i] - mouseOldPos[i]);
+                    cur?.onMouse?.Invoke(i, mousePos[i], mousePos[i] - mouseOldPos[i], UICheck(mousePos[i]));
 
                 }
             }
-
-
+            //scroll
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (scroll!=0)
+            {
+                cur?.onMouseScroll?.Invoke(scroll);
+            }
+           
 
 
         }
+
+        /// <summary>
+        /// if ui hover
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        private GameObject UICheck(Vector2 point)
+        {
+            PointerEventData pointerData = new PointerEventData(EventSystem.current)
+            {
+                position = point
+            };
+
+            var results = new System.Collections.Generic.List<RaycastResult>();
+
+            EventSystem.current.RaycastAll(pointerData, results);
+
+            foreach(var result in results)
+            {
+                if(result.gameObject.layer == 5)
+                {
+                    return result.gameObject;
+                }
+            }
+
+            return null;
+        }
+
         public void Update()
         {
             if (!enabled)
@@ -249,6 +285,8 @@ namespace Z_Input
             {
                 cur?.onButtonUpD?.Invoke();
             }
+
+            
 #endif
 
         }

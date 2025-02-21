@@ -6,7 +6,15 @@ namespace Z_Math
 {
     public class Graph
     {
-       public enum CubeEightPoint
+        public enum FourDir
+        {
+            Up,
+            Right,
+            Down,
+            Left,
+        }
+
+        public enum CubeEightPoint
         {
             LeftDownBack,
             RightDownBack,
@@ -18,10 +26,10 @@ namespace Z_Math
             RightUpForward,
         }
 
-        public static Vector3[] RotatePointAroundOrigin(Vector3[] points, Vector3 eular)
+        public static Vector3[] RotatePointAroundOrigin(Vector3[] points, Vector3 euler)
         {
             Vector3[] newPos = new Vector3[points.Length];
-            Quaternion rotation = Quaternion.Euler(eular);
+            Quaternion rotation = Quaternion.Euler(euler);
             for (int i=0,icnt=points.Length;i<icnt;i++)
             {
                 // 将欧拉角转换为四元数
@@ -30,11 +38,11 @@ namespace Z_Math
             }
             return newPos;
         }
-        public static Vector3[] GetCubeEightPoint(Vector3 center,Vector3 size,Vector3 eular,Vector3 scale,Vector3 offset)
+        public static Vector3[] GetCubeEightPoint(Vector3 center,Vector3 size,Vector3 euler,Vector3 scale,Vector3 offset)
         {
             
             Vector3[] ans = new Vector3[8];
-            Quaternion rotation = Quaternion.Euler(eular);
+            Quaternion rotation = Quaternion.Euler(euler);
             //ref CubeEightPoint
             Vector3[] choose = new[] { new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f),
                                         new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f)};
@@ -144,6 +152,28 @@ namespace Z_Math
             Vector3 randomVector = (right * randomX + forward * randomY).normalized * length;
 
             return randomVector;
+        }
+        public static FourDir GetFourDirByEuler(float eular)
+        {
+            eular = (eular % 360 + 360) % 360;
+            if (eular <= 45 || eular >= 315)
+            {
+                return FourDir.Up;
+            }
+            else if(eular >= 45 && eular <= 135)
+            {
+                return  FourDir.Right;
+            }
+            else  if (eular >= 135 && eular <= 225)
+            {
+                return  FourDir.Down;
+
+            }
+            else if (eular >= 225 && eular <= 315)
+            {
+                return FourDir.Left;
+            }
+            return FourDir.Up;
         }
     }
 }

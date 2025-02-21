@@ -10,6 +10,7 @@ namespace Z_Ui
     {
         public List<GameObject> preloadUis;
         public List<GameObject> layerRootLst;
+        public Dictionary<UiLayer, int> layer2Id=new Dictionary<UiLayer, int>() { { UiLayer.Bottom,0 }, { UiLayer.Mid, 1 }, { UiLayer.Top, 2 } };
 
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
@@ -77,6 +78,24 @@ namespace Z_Ui
             }
             Destroy(uiCtrl.uiHolder.gameObject);
             uiCtrlName2Uis[tp.Name].Remove(uiCtrl.uiHolder);
+        }
+        public void CloseAll(UiLayer layer)
+        {
+            for(int i=0;i< layerRootLst[(int)layer].transform.childCount;i++)
+            {
+               var holder= layerRootLst[(int)layer].transform.GetChild(i).GetComponent<UiHolder>();
+                if(holder.ctrl.isActive)
+                {
+                    holder.ctrl.Close();
+                }
+            }
+        }
+        public void CloseAll()
+        {
+            foreach(var layer in layer2Id)
+            {
+                CloseAll(layer.Key);
+            }
         }
 
     }

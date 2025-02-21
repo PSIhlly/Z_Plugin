@@ -48,7 +48,7 @@ public class Z_Ui_Sample : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.W))
         {
-            NotifyManager.instance.AddPopup("tips",false,new List<string>() { "ok", "cancel" }, new List<Func<bool>>() { ()=> { Debug.Log("ok"); return false; }, () => { Debug.Log("close"); return true; } });
+            NotifyManager.instance.AddPopup("tips","tips",false,new List<string>() { "ok", "cancel" }, new List<Func<bool>>() { ()=> { Debug.Log("ok"); return false; }, () => { Debug.Log("close"); return true; } });
         }
         if (Input.GetKeyDown(KeyCode.E))
         {

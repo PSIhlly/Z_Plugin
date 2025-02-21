@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 
 namespace Z_UnitSystem.Form
 {
@@ -19,7 +20,7 @@ namespace Z_UnitSystem.Form
         }
 
         private static bool inited;
-        private static Queue<int> freeUidQueue;
+        public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
 
         public partial class Data
@@ -39,6 +40,11 @@ namespace Z_UnitSystem.Form
                 }
 
                 public int uid;
+
+                /// <summary>
+                ///名称
+                ///</summary>
+                public string name;
 
                 /// <summary>
                 ///预制名字（索引）
@@ -65,10 +71,11 @@ namespace Z_UnitSystem.Form
                 ///</summary>
                 public int updateType;
 
-            public Data(int uid,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType)
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType)
             {
 
                 this.uid = uid;
+                this.name = name;
                 this.prefabName = prefabName;
                 this.pos = pos;
                 this.euler = euler;
@@ -81,7 +88,7 @@ namespace Z_UnitSystem.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -105,7 +112,8 @@ namespace Z_UnitSystem.Form
             if(inited)
                 return;
             inited=true;  
-            freeUidQueue=new Queue<int> (Enumerable.Range(0, 100));
+            uidChain=new Z_Chain.Chain (1000000);
+            
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -116,10 +124,8 @@ namespace Z_UnitSystem.Form
             
 
 
-             foreach(var k in _DataByUid.Keys)
-            {
-                freeUidQueue.Enqueue(k);
-            }
+            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+             
         }
 
 
@@ -157,6 +163,8 @@ namespace Z_UnitSystem.Form
 
                 jo.Get<int>("uid"),
 
+                jo.Get<string>("name"),
+
                 jo.Get<string>("prefabName"),
 
                 jo.Get<Vector3>("pos"),
@@ -179,6 +187,8 @@ namespace Z_UnitSystem.Form
 
             jo.Set<int>("uid",data.uid);
 
+            jo.Set<string>("name",data.name);
+
             jo.Set<string>("prefabName",data.prefabName);
 
             jo.Set<Vector3>("pos",data.pos);
@@ -193,14 +203,14 @@ namespace Z_UnitSystem.Form
         }
 
 
-        public static int AddData(Data data,bool autoId=false)
+        public static int AddData(Data data)
         {
             Init();
-            if(autoId)
+            if(data.uid==-1)
             { 
-                if(freeUidQueue.Count==0)
-                return -1;
-                int uid=freeUidQueue.Dequeue();
+                int uid=uidChain.GetId();
+                if(uid==-1)
+                    return -1;
                 data.uid=uid;  
             }
 
@@ -228,6 +238,7 @@ namespace Z_UnitSystem.Form
 
                 _DataByUid.Clear();
 
+            uidChain.Clear();
         }
 
     }

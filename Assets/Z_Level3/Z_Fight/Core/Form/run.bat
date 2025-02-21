@@ -22,5 +22,5 @@ pause
 :end
 cls
 
-python %current_dir%Z_OtherProjects\Z_Tool\Excel2Cs\Excel2Cs.py %root_dir%  %root_dir% Z_Fight Z_UnitSystem.Form
+python %current_dir%Z_OtherProjects\Z_Tool\Excel2Cs\Excel2Cs.py %root_dir%  %root_dir% namespace:Z_Fight using:Z_UnitSystem.Form
 pause

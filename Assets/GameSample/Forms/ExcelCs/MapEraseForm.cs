@@ -51,7 +51,12 @@ namespace Form
                 ///</summary>
                 public readonly bool character;
 
-            public Data(int id,string name,string icon,bool terrain,bool obstacle,bool item,bool character):base(id,name,icon)
+                /// <summary>
+                ///«Â¿ÌÃ˘Õº
+                ///</summary>
+                public readonly bool texture;
+
+            public Data(int id,string name,string icon,bool terrain,bool obstacle,bool item,bool character,bool texture):base(id,name,icon)
             {
 
                 this.id = id;
@@ -61,12 +66,13 @@ namespace Form
                 this.obstacle = obstacle;
                 this.item = item;
                 this.character = character;
+                this.texture = texture;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,false,false,false);
+                   public static Data defaultData=new Data(0,"","",false,false,false,false,false);
 
 
         static Dictionary<int, Data> _DataById = null;
@@ -96,9 +102,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {10000001,new Data(10000001,"all erase","",true,true,true,true)},
+                {10000001,new Data(10000001,"all erase","",true,true,true,true,false)},
 
-                {10000002,new Data(10000002,"remain terrain","",false,true,true,true)},
+                {10000002,new Data(10000002,"texture only","",false,false,false,false,true)},
+
+                {10000003,new Data(10000003,"remain terrain","",false,true,true,true,false)},
 
                 };
 
@@ -161,7 +169,9 @@ namespace Form
 
                     defaultData.item,
 
-                    defaultData.character
+                    defaultData.character,
+
+                    defaultData.texture
                     );
 
             return data;

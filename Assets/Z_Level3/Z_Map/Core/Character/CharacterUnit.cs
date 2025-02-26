@@ -48,8 +48,8 @@ namespace Z_Map
                     
                 }
                 
-                var newMapPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(data.pos);
-                if (MapManager.instance.mapUtilCtrl.InArea(newMapPos))
+                var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
+                if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
                     
                     var newMap = MapManager.instance.dataCtrl.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
@@ -77,7 +77,7 @@ namespace Z_Map
                                     newPos.y -= Time.deltaTime;*/
 
                 //fix
-                newPos = MapManager.instance.mapUtilCtrl.GetClosestInArea(newPos);
+                newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
                 ins.transform.position = newPos;
                 
                 data.pos = ins.transform.position;

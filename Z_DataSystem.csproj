@@ -58,10 +58,12 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\DataDefines.cs" />
-    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\ParamForm.cs" />
     <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\PruductForm.cs" />
+    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\DataDefines.cs" />
     <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\ProtoForm.cs" />
+    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\TexAssetForm.cs" />
+    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\AssetManager.cs" />
+    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\ParamForm.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Z_Level2\Z_DataSystem\Core\Z_DataSystem.asmdef" />
@@ -976,6 +978,10 @@
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
       <Name>Z_DesignStyle</Name>
+    </ProjectReference>
+    <ProjectReference Include="Z_Texture.csproj">
+      <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
+      <Name>Z_Texture</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

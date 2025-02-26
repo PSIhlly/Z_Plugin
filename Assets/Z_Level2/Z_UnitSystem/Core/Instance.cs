@@ -17,14 +17,14 @@ namespace Z_UnitSystem
                 return _boxColliders;
             }
         }
-        private Renderer _renderer;
-        public Renderer renderer
+        private Renderer[] _renderers;
+        public Renderer[] renderers
         {
             get
             {
-                if (_renderer == null)
-                    _renderer = GetComponentInChildren<Renderer>();
-                return _renderer;
+                if (_renderers == null)
+                    _renderers = GetComponentsInChildren<Renderer>();
+                return _renderers;
             }
         }
         private Rigidbody _rigidbody;

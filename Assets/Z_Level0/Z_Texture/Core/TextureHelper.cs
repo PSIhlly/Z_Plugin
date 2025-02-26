@@ -59,6 +59,14 @@ namespace Z_Texture
             spriteCache[tex] = s;
             return s;
         }
+
+        public static void SaveTexture(Texture2D tex,string fileName)
+        {
+            byte[] pngData = tex.EncodeToPNG();
+            string filePath = Path.Combine(Application.dataPath, fileName);
+            File.WriteAllBytes(filePath, pngData);
+        }
+
         #region util
         private static Texture InternalGetTextureByPath(string path)
         {
@@ -89,6 +97,9 @@ namespace Z_Texture
             Debug.LogError("文件未找到：" + path);
             return Texture2D.whiteTexture;
         }
+
+        
+
         #endregion
     }
 

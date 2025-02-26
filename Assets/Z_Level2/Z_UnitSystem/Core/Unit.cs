@@ -33,7 +33,7 @@ namespace Z_UnitSystem
         private int lastUpdateFrame;
         public bool isShowing => ins != null && ins.gameObject != null && ins.gameObject.activeSelf;
 
-        public bool isVising => isShowing&&ins.renderer.enabled;
+        public bool isVising => isShowing&&ins.GetComponent<Renderer>().enabled;
 
         public virtual Type GetInsType()
         {
@@ -81,7 +81,10 @@ namespace Z_UnitSystem
             if (ins == null || ins.gameObject == null)
                 return false;
             VisOff();
-            
+            foreach (var renderer in ins.renderers)
+            {
+                renderer.SetPropertyBlock(null);
+            }
             ins.unit = null;
             InstancePoolManager.instance.DeleteInstance(ins.gameObject, ins.gameObject);
             ins = null;
@@ -95,7 +98,10 @@ namespace Z_UnitSystem
         {
             if (ins == null || ins.gameObject == null)
                 return false;
-            ins.renderer.enabled = false;
+            foreach (var render in ins.renderers)
+            {
+                render.enabled = false;
+            }
             foreach (var unit in subUnits)
             {
                 unit.VisOff();
@@ -106,7 +112,10 @@ namespace Z_UnitSystem
         {
             if (ins == null || ins.gameObject == null)
                 return false;
-            ins.renderer.enabled = true;
+            foreach (var render in ins.renderers)
+            {
+                render.enabled = true;
+            }
 
             foreach (var unit in subUnits)
             {

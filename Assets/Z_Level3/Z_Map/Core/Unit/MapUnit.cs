@@ -17,7 +17,6 @@ namespace Z_Map
         }
         public MapUnitForm.Data data => (MapUnitForm.Data)_data;
 
-        public Material mat=> InstancePoolManager.instance.GetMaterial(data.matName);
 
 
         public override Type GetInsType()
@@ -29,8 +28,7 @@ namespace Z_Map
         {
             base.Show();
 
-            if (ins.renderer)
-                ins.renderer.material = mat;
+            MapManager.instance.unitUtilCtrl.ShowFinalMat((MapInstance)ins);
             
         }
        
@@ -51,12 +49,16 @@ namespace Z_Map
             }
             return data.pos.y + length;
         }
+
+
         public override void Remove()
         {
             MapManager.instance.dataCtrl.UnRegisterMap(data);
             MapUnitForm.RemoveData(data.uid);
             base.Remove();
         }
+       
+        
 
     }
 }

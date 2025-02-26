@@ -27,6 +27,8 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
 
     public int offset = 500;
 
+
+    public int layer = 0;
     public int cntX=1;
     public int cntY=1;
     public int angle=0;
@@ -79,7 +81,7 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
         Vector3 worldPosition = CameraInstance.instance.cam.ScreenToWorldPoint(pos);
         worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
-        var hitPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(worldPosition);
+        var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
         //manage
         if (curData!=null)
         {
@@ -92,7 +94,7 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                         if(!MapManager.instance.dataCtrl.maps.ContainsKey((x, hitPos.y, z)))
                         {
                             var newMapPos = new Vector3Int(x, hitPos.y, z);
-                            if (MapManager.instance.mapUtilCtrl.InLimit(newMapPos))
+                            if (MapManager.instance.utilCtrl.InLimit(newMapPos))
                             {
                                 MapManager.instance.AddMap(newMapPos);
                             }
@@ -163,8 +165,22 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                 for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                     for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
                     {
+                        if (!MapManager.instance.dataCtrl.maps.ContainsKey((x, hitPos.y, z)))
+                            continue;
                         var mapData = MapManager.instance.dataCtrl.maps[(x, hitPos.y, z)];
-                        mapData.matName = textureData.matName;
+                        mapData.texNameDic[layer] = textureData.texName;
+                    }
+            }
+            else if (curData is MapTransitionMaskForm.Data maskData)
+            {
+                for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
+                    for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+                    {
+                        if (!MapManager.instance.dataCtrl.maps.ContainsKey((x, hitPos.y, z)))
+                            continue;
+
+                        var mapData = MapManager.instance.dataCtrl.maps[(x, hitPos.y, z)];
+                        mapData.alphaTexNameDic[layer] = maskData.texName;
                     }
             }
             else if(curData is MapObstacleForm.Data obstacleData)
@@ -176,7 +192,7 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                         var finalZ = posZ + z;
                         var finalY = posY + worldPosition.y;
                         var finalPos = new Vector3(finalX, finalY, finalZ);
-                        var mapPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(finalPos);
+                        var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(finalPos);
                         if (MapManager.instance.dataCtrl.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
                         {
                             var mapData = MapManager.instance.dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)];

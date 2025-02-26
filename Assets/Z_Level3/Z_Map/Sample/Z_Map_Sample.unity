@@ -201,7 +201,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1313500}
   m_LocalRotation: {x: 0.699006, y: -0, z: -0, w: 0.7151158}
-  m_LocalPosition: {x: 1.245, y: 12.13, z: 2.745}
+  m_LocalPosition: {x: 500, y: 1500, z: 500}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -299,6 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfd58523f92d674ba3e9d8bc9fca2df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sizeLimit: {x: 1000, y: 1000, z: 1000}
   mainGo: {fileID: 1753461143}
 --- !u!114 &227423652
 MonoBehaviour:
@@ -319,10 +320,6 @@ MonoBehaviour:
   - {fileID: 480881089}
   - {fileID: 1195621359}
   - {fileID: 630048630}
-  materials:
-  - {fileID: 2100000, guid: 9a05b41dfa64a614b8d8ce34d617726b, type: 2}
-  - {fileID: 2100000, guid: 657c32b3cf762d04d83a2f7fa74b2bd4, type: 2}
-  - {fileID: 2100000, guid: 759133448a0466946b06f4b96770e44f, type: 2}
   defaultRoot: {fileID: 1753461144}
 --- !u!1 &298770350
 GameObject:
@@ -1323,6 +1320,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 1209352510}
     m_Modifications:
+    - target: {fileID: 2581719477263935513, guid: 470e7609d6e1d82438d2e6d2afc8a16d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 761ba149eda7f92468fd0894419876bd, type: 2}
     - target: {fileID: 2581719477263935515, guid: 470e7609d6e1d82438d2e6d2afc8a16d, type: 3}
       propertyPath: m_RootOrder
       value: -1

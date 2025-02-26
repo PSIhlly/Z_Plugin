@@ -32,7 +32,7 @@ namespace Ui
                 float.TryParse(value, out float v); 
                 var x = (v + ModSceneManager.instance.offset)* MapManager.instance.dataCtrl.mainData.mapUnitSize.x;
                 var newPos = new Vector3(x, data.pos.y, data.pos.z);
-                if (MapManager.instance.mapUtilCtrl.InArea(newPos))
+                if (MapManager.instance.utilCtrl.InArea(newPos))
                 { 
                     data.pos = newPos;
                     ModSceneManager.instance.ForceUpdate();
@@ -65,7 +65,7 @@ namespace Ui
                 }
                 var newPos = new Vector3(data.pos.x, (v + ModSceneManager.instance.offset) * MapManager.instance.dataCtrl.mainData.mapUnitSize.y, data.pos.z);
 
-                if (MapManager.instance.mapUtilCtrl.InArea(newPos))
+                if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
                     data.pos = newPos;
                     ModSceneManager.instance.ForceUpdate();
@@ -84,7 +84,7 @@ namespace Ui
                 var z = (v + ModSceneManager.instance.offset) * MapManager.instance.dataCtrl.mainData.mapUnitSize.z;
 
                 var newPos = new Vector3(data.pos.x, data.pos.y, z);
-                if (MapManager.instance.mapUtilCtrl.InArea(newPos))
+                if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
                     data.pos = newPos;
                     ModSceneManager.instance.ForceUpdate();

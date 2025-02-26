@@ -119,19 +119,19 @@ namespace Z_Map.Analysis
         }
         public Vector3Int RealPos2MapPos(Vector3 pos)
         {
-            return _super.mapUtilCtrl.RealPos2MapPos(pos);
+            return _super.utilCtrl.RealPos2MapPos(pos);
         }
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {
-            return _super.mapUtilCtrl.GetClosestInArea(pos);
+            return _super.utilCtrl.GetClosestInArea(pos);
         }
         public bool InArea(Vector3Int pos)
         {
-            return _super.mapUtilCtrl.InArea(pos);
+            return _super.utilCtrl.InArea(pos);
         }
         public Vector3 MapPos2RealPos(Vector3Int pos)
         {
-            return _super.mapUtilCtrl.MapPos2RealPos(pos);
+            return _super.utilCtrl.MapPos2RealPos(pos);
         }
         public Dir GetDir(Vector3 self, Vector3 tar)
         {

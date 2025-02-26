@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
+
 namespace Z_Map.Form
 {
 
@@ -40,21 +41,27 @@ namespace Z_Map.Form
                 }
 
                 /// <summary>
-                ///材质名字（索引）
+                ///纹理名字（索引）
                 ///</summary>
-                public string matName;
+                public Dictionary<int,string> texNameDic;
+
+                /// <summary>
+                ///透明度纹理名字（索引）
+                ///</summary>
+                public Dictionary<int,string> alphaTexNameDic;
 
                 /// <summary>
                 ///离散位置
                 ///</summary>
                 public Vector3Int mapPos;
 
-            public Data(int uid,string name,string matName,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,Dictionary<int,string> texNameDic,Dictionary<int,string> alphaTexNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
                 this.uid = uid;
                 this.name = name;
-                this.matName = matName;
+                this.texNameDic = texNameDic;
+                this.alphaTexNameDic = alphaTexNameDic;
                 this.mapPos = mapPos;
                 this.prefabName = prefabName;
                 this.pos = pos;
@@ -68,7 +75,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"","",Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -165,7 +172,9 @@ namespace Z_Map.Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("matName"),
+                jo.Get<Dictionary<int,string>>("texNameDic"),
+
+                jo.Get<Dictionary<int,string>>("alphaTexNameDic"),
 
                 jo.Get<Vector3Int>("mapPos"),
 
@@ -193,7 +202,9 @@ namespace Z_Map.Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("matName",data.matName);
+            jo.Set<Dictionary<int,string>>("texNameDic",data.texNameDic);
+
+            jo.Set<Dictionary<int,string>>("alphaTexNameDic",data.alphaTexNameDic);
 
             jo.Set<Vector3Int>("mapPos",data.mapPos);
 

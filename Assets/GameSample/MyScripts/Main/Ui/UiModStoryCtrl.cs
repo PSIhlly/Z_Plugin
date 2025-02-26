@@ -9,64 +9,48 @@ using Z_Ui;
 
 namespace Ui
 {
+    public partial class UiModStoryModel
+    {
+        public UiCtrl curUi;
+    }
     public partial class UiModStoryCtrl
     {
-        UiScrViewContainer<UiSceneItemCtrl> con;
+        
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiSceneItemCtrl>(view.go_sceneItem, view.scr_tt);
             view.btn_back.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModCtrl>();
                 Close();
+            });
+
+            view.btn_material.onClick.AddListener(() =>
+            {
+                model.curUi = view.sub_ModStoryMaterialPanel;
+                Refresh();
+            });
+            view.btn_scene.onClick.AddListener(() =>
+            {
+                model.curUi = view.sub_ModStoryScenePanel;
+                Refresh();
             });
         }
 
         
         public override void OnShow()
         {
+            model.curUi = view.sub_ModStoryScenePanel;
             Refresh();
         }
         public void Refresh()
         {
-            con.Clear();
-            for (int i = 0; i < 1; i++)
-            {
-                con.Add(new UiSceneItemParam()
-                {
-                    name="scene1"
-                });
-            }
-            con.Refresh();
+            view.sta_scene.ChangeState(model.curUi == view.sub_ModStoryScenePanel ? 1 : 0);
+            view.sub_ModStoryScenePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryScenePanel);
+            
+            view.sta_material.ChangeState(model.curUi == view.sub_ModStoryMaterialPanel ? 1 : 0);
+            view.sub_ModStoryMaterialPanel.gameObject.SetActive(model.curUi == view.sub_ModStoryMaterialPanel);
         }
-
-       
 
     }
-    public partial class UiSceneItemParam
-    {
-        public string name;
-    }
-    public partial class UiSceneItemCtrl
-    {
-       public override void OnCreate()
-        {
-            view.btn_scene.onClick.AddListener(() =>
-            {
-                Main2SceneManager.instance.StartLoadSceneUgc("scene1");
-                parent.Close();
-            });
-        }
-        public override void OnShow()
-        {
-            view.txt_sceneName.text = param.name;
-            Refresh();
-        }
-        public void Refresh()
-        {
-        }
-
-
-
-    }
+   
 }

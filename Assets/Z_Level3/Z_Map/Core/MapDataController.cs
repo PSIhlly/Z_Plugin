@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_DataSystem;
+using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Map.Form;
@@ -33,13 +35,13 @@ namespace Z_Map
                 RegisterMap(mapDatas[i]);
             }
 
-            var itemDatas = ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.ItemJa));
+            var itemDatas = ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.itemJa));
             for (int i = 0; i < itemDatas.Count; i++)
             {
                 ItemUnitForm.AddData(itemDatas[i]);
             }
 
-            var charactersDatas = CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.CharacterJa));
+            var charactersDatas = CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
             for (int i = 0; i < charactersDatas.Count; i++)
             {
                 CharacterUnitForm.AddData(charactersDatas[i]);
@@ -50,9 +52,9 @@ namespace Z_Map
         public JObject GetJsonData()
         {
             mainData.mapJa = JsonConvert.SerializeObject(MapUnitForm.GetJaByDatas());
-            mainData.ItemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
+            mainData.itemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
 
-            mainData.CharacterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
+            mainData.characterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
             return MapMainForm.GetJoByData(mainData);
         }
         public MapDataController()
@@ -80,19 +82,26 @@ namespace Z_Map
                     {
                         realPos.z = k * 1;
                         mapPos.z = k;
-                        var data = new MapUnitForm.Data(-1, "", "", mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
+                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0,"tile1" } }, new Dictionary<int, string>(), mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
                         MapUnitForm.AddData(data);
                         RegisterMap(data);
                     }
                 }
             }
+
+
+           
+
+
             mainData = new MapMainForm.Data(
                 1, 
                 new Vector3(1, 3, 1),
                 new Vector3Int(30, 5, 20),
                "",
                "",
-               ""
+               "",
+               new List<string>() { "tile1", "tile2", "tile3", "tile4" },
+               new List<string>() {"alpha" }
            );
         }
         public void Unload()
@@ -121,7 +130,7 @@ namespace Z_Map
 
         public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            var data = new MapUnitForm.Data(-1,"","", mapPos,"map", mapPos,Vector3.zero,Vector3.one,0);
+            var data = new MapUnitForm.Data(-1,"", new Dictionary<int, string>() { {0,"tile1" } }, new Dictionary<int, string>(), mapPos,"map", mapPos,Vector3.zero,Vector3.one,0);
             MapUnitForm.AddData(data);
             RegisterMap(data);
             return data;

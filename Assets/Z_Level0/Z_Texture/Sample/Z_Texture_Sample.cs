@@ -12,11 +12,12 @@ public class Z_Texture_Sample :MonoBehaviour
     void Start()
     {
         List<Texture2D> texList = new List<Texture2D>();
-        foreach(var member in members)
+        foreach (var member in members)
         {
-            texList.Add(TextureTransform.GetTargetSize(member.texture, 500, 500));
+            texList.Add(member.texture);
         }
-        var newTex = TextureCombine.CombineTexture2DsToTexture2D(texList.ToArray(), 2, 2, 10);
+        TextureTransform.GetTargetSize(texList.ToArray(), 500, 500);
+        var newTex = TextureCombine.FillTexture2DsToTexture2D(texList.ToArray(), 2, 2, 10);
         target.texture = newTex;
     }
 }

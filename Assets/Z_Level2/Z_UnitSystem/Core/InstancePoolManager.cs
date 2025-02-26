@@ -12,9 +12,6 @@ namespace Z_UnitSystem
         [SerializeField]
         private List<GameObject> prefabs;
 
-        [SerializeField]
-        private List<Material> materials;
-
         public Transform defaultRoot;
 
         public override void Init()
@@ -26,7 +23,10 @@ namespace Z_UnitSystem
                 pools.Add(new InstancePool(prefabs[i], defaultRoot));
             }
         }
-
+        public void AddPool(GameObject go)
+        {
+            pools.Add(new InstancePool(go, defaultRoot));
+        }
         public void Register(InstancePool pool)
         {
             pools.Add(pool);
@@ -34,15 +34,6 @@ namespace Z_UnitSystem
         public void Unregister(InstancePool pool)
         {
             pools.Remove(pool);
-        }
-        public Material GetMaterial(string name)
-        {
-            foreach (var mat in materials)
-                if (name == mat.name)
-                {
-                    return mat;
-                }
-            return materials[0];
         }
         public GameObject GetPrefab(string name)
         {

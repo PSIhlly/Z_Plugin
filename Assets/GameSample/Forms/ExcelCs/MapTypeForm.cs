@@ -41,18 +41,24 @@ namespace Form
                 ///</summary>
                 public readonly string icon;
 
-            public Data(int id,string NameKey,string icon)
+                /// <summary>
+                ///是否需要层级设置
+                ///</summary>
+                public readonly bool needLayer;
+
+            public Data(int id,string NameKey,string icon,bool needLayer)
             {
 
                 this.id = id;
                 this.NameKey = NameKey;
                 this.icon = icon;
+                this.needLayer = needLayer;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","");
+                   public static Data defaultData=new Data(0,"","",false);
 
 
         static Dictionary<int, Data> _DataById = null;
@@ -81,13 +87,15 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"terrain","")},
+                {1,new Data(1,"terrain","",false)},
 
-                {2,new Data(2,"texture","")},
+                {2,new Data(2,"texture","",true)},
 
-                {3,new Data(3,"obstacle","")},
+                {3,new Data(3,"transition mask","",true)},
 
-                {100,new Data(100,"erase","")},
+                {4,new Data(4,"obstacle","",false)},
+
+                {100,new Data(100,"erase","",false)},
 
                 };
 
@@ -137,7 +145,9 @@ namespace Form
 
                     defaultData.NameKey,
 
-                    defaultData.icon
+                    defaultData.icon,
+
+                    defaultData.needLayer
                     );
 
             return data;

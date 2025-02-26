@@ -32,17 +32,17 @@ namespace Form
         {
 
                 /// <summary>
-                ///²ÄÖÊÃû³Æ
+                ///ÌùÍ¼Ãû³Æ
                 ///</summary>
-                public string matName;
+                public string texName;
 
-            public Data(int id,string name,string icon,string matName):base(id,name,icon)
+            public Data(int id,string name,string icon,string texName):base(id,name,icon)
             {
 
                 this.id = id;
                 this.name = name;
                 this.icon = icon;
-                this.matName = matName;
+                this.texName = texName;
 
             }
             
@@ -78,11 +78,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","","floor1")},
+                {200001,new Data(200001,"floor","","tile1")},
 
-                {200002,new Data(200002,"grass","","grass1")},
+                {200002,new Data(200002,"grass","","tile2")},
 
-                {200003,new Data(200003,"road","","road1")},
+                {200003,new Data(200003,"road","","tile3")},
 
                 };
 
@@ -139,7 +139,7 @@ namespace Form
 
                 jo.Get<string>("icon"),
 
-                jo.Get<string>("matName")
+                jo.Get<string>("texName")
                     );
 
             return data;
@@ -157,7 +157,7 @@ namespace Form
 
             jo.Set<string>("icon",data.icon);
 
-            jo.Set<string>("matName",data.matName);
+            jo.Set<string>("texName",data.texName);
 
             return jo;
         }

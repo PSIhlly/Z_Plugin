@@ -87,13 +87,17 @@ namespace Form
 
                 {1000002,new Data(1000002,"texture","Texture","贴图")},
 
-                {1000003,new Data(1000003,"obstacle","Obstacle","障碍物")},
+                {1000003,new Data(1000003,"transition mask","Transition mask","过渡遮罩")},
+
+                {1000004,new Data(1000004,"obstacle","Obstacle","障碍物")},
 
                 {1000100,new Data(1000100,"erase","Erase","清除")},
 
                 {1000101,new Data(1000101,"all erase","All erase","全部清除")},
 
                 {1000102,new Data(1000102,"remain terrain","Remain terrain","保留地面")},
+
+                {1000103,new Data(1000103,"texture only","Terrain texture only","仅地面贴图")},
 
                 {1001000,new Data(1001000,"maxYTip","The height must be less than the ceiling of this level.","高度必须小于该层天花板")},
 
@@ -107,13 +111,17 @@ namespace Form
 
                     {"texture",_DataById[1000002]},
 
-                    {"obstacle",_DataById[1000003]},
+                    {"transition mask",_DataById[1000003]},
+
+                    {"obstacle",_DataById[1000004]},
 
                     {"erase",_DataById[1000100]},
 
                     {"all erase",_DataById[1000101]},
 
                     {"remain terrain",_DataById[1000102]},
+
+                    {"texture only",_DataById[1000103]},
 
                     {"maxYTip",_DataById[1001000]},
 

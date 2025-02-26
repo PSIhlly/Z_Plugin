@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Map.Analysis;
@@ -24,7 +25,8 @@ namespace Z_Map
         
 
         public NavigationController navigationCtrl;
-        public MapUtilController mapUtilCtrl;
+        public MapUtilController utilCtrl;
+        public MapUnitUtilController unitUtilCtrl;
 
         private Vector3Int curCenterPos;
         private Vector3Int viewCenter;
@@ -38,9 +40,11 @@ namespace Z_Map
             navigationCtrl = new NavigationController();
             navigationCtrl.Init(this);
 
-            mapUtilCtrl = new MapUtilController();
-            mapUtilCtrl.Init(this);
-            
+            utilCtrl = new MapUtilController();
+            utilCtrl.Init(this);
+
+            unitUtilCtrl = new MapUnitUtilController();
+            unitUtilCtrl.Init(this);
         }
 
         #region external
@@ -57,20 +61,36 @@ namespace Z_Map
 
             foreach (var itemData in ItemUnitForm.DataByUid.Values)
             {
-                var mapPos = mapUtilCtrl.RealPos2MapPos(itemData.pos);
-                if (mapUtilCtrl.InArea(mapPos))
+                var mapPos = utilCtrl.RealPos2MapPos(itemData.pos);
+                if (utilCtrl.InArea(mapPos))
                 {
                     MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(itemData.unit);
                 }
             }
             foreach (var characterData in CharacterUnitForm.DataByUid.Values)
             {
-                var mapPos = mapUtilCtrl.RealPos2MapPos(characterData.pos);
-                if (mapUtilCtrl.InArea(mapPos))
+                var mapPos = utilCtrl.RealPos2MapPos(characterData.pos);
+                if (utilCtrl.InArea(mapPos))
                 {
                     MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(characterData.unit);
                 }
             }
+
+
+
+            foreach(var alphaTexName in dataCtrl.mainData.alphaTexName)
+            {
+                var raws = new Texture2D[] {
+                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$0"]?.tex ,
+                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$1"]?.tex,
+                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$2"]?.tex,
+                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$3"]?.tex,
+                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$4"]?.tex,
+                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$5"]?.tex
+                };
+                unitUtilCtrl.CreateVariantsMatsByBasic5(alphaTexName, raws);
+            }
+
             navigationCtrl.Build();
             mainGo.SetActive(true);
         }
@@ -80,7 +100,7 @@ namespace Z_Map
         }
         public ItemUnitForm.Data AddItem(Vector3 realPos)
         {
-            var mapPos = mapUtilCtrl.RealPos2MapPos(realPos);
+            var mapPos = utilCtrl.RealPos2MapPos(realPos);
             if(!dataCtrl.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
             {
                 return null;
@@ -93,12 +113,11 @@ namespace Z_Map
 
         public void SetPos(Vector3 curCenterPos)
         {
-            this.curCenterPos = mapUtilCtrl.RealPos2MapPos(curCenterPos );
+            this.curCenterPos = utilCtrl.RealPos2MapPos(curCenterPos );
         }
 
         public void End()
         {
-            Debug.Log(UnitForm.DataByUid.Values.Count+"??");
             if (curMapLst != null)
                 curMapLst.Clear();
             mainGo.SetActive(false);
@@ -122,15 +141,16 @@ namespace Z_Map
             HashSet<Vector3Int> need=new HashSet<Vector3Int>();
             HashSet<Vector3Int> now=new HashSet<Vector3Int>();
             var viewSize = dataCtrl.mainData.viewSize;
+
+
             for (int i = viewCenter.x - viewSize.x; i < viewCenter.x + viewSize.x; i++)
             {    for (int j = viewCenter.y - viewSize.y ; j <= viewCenter.y+ viewSize.y; j++)
                 {
                     for (int k = viewCenter.z - viewSize.z; k < viewCenter.z + viewSize.z; k++)
                     {
                         var pos = new Vector3Int(i, j, k);
-                        if (!mapUtilCtrl.InArea(pos))
+                        if (!utilCtrl.InArea(pos))
                             continue;
-                        
                         need.Add(pos);
                     }
                 }

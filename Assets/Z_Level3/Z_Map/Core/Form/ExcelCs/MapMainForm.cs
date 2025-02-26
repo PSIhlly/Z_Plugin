@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
+
 namespace Z_Map.Form
 {
 
@@ -46,28 +47,40 @@ namespace Z_Map.Form
                 /// <summary>
                 ///物体数据
                 ///</summary>
-                public string ItemJa;
+                public string itemJa;
 
                 /// <summary>
                 ///单位数据
                 ///</summary>
-                public string CharacterJa;
+                public string characterJa;
 
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string ItemJa,string CharacterJa)
+                /// <summary>
+                ///全部纹理名称
+                ///</summary>
+                public List<string> texName;
+
+                /// <summary>
+                ///全部透明纹理名称
+                ///</summary>
+                public List<string> alphaTexName;
+
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa,List<string> texName,List<string> alphaTexName)
             {
 
                 this.uid = uid;
                 this.mapUnitSize = mapUnitSize;
                 this.viewSize = viewSize;
                 this.mapJa = mapJa;
-                this.ItemJa = ItemJa;
-                this.CharacterJa = CharacterJa;
+                this.itemJa = itemJa;
+                this.characterJa = characterJa;
+                this.texName = texName;
+                this.alphaTexName = alphaTexName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","");
+                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","",null,null);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -148,9 +161,13 @@ namespace Z_Map.Form
 
                 jo.Get<string>("mapJa"),
 
-                jo.Get<string>("ItemJa"),
+                jo.Get<string>("itemJa"),
 
-                jo.Get<string>("CharacterJa")
+                jo.Get<string>("characterJa"),
+
+                jo.Get<List<string>>("texName"),
+
+                jo.Get<List<string>>("alphaTexName")
                     );
 
             return data;
@@ -170,9 +187,13 @@ namespace Z_Map.Form
 
             jo.Set<string>("mapJa",data.mapJa);
 
-            jo.Set<string>("ItemJa",data.ItemJa);
+            jo.Set<string>("itemJa",data.itemJa);
 
-            jo.Set<string>("CharacterJa",data.CharacterJa);
+            jo.Set<string>("characterJa",data.characterJa);
+
+            jo.Set<List<string>>("texName",data.texName);
+
+            jo.Set<List<string>>("alphaTexName",data.alphaTexName);
 
             return jo;
         }

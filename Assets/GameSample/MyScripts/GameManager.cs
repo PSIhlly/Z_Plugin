@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using Ui;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_DataSystem;
+using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
@@ -19,6 +21,14 @@ public class GameManager : Z_MonoManager<GameManager>
     public float dragDis2 => InputManager.instance.screenSize.x/25;
     public void Start()
     {
+        //default Assets
+        var res = AssetManager.instance.GetAssetsByFolder(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs");
+        foreach (var tex in res.texs)
+        {
+            TexAssetForm.AddData(new TexAssetForm.Data(-1, tex.Item1, tex.Item2));
+        }
+
+
         RegisterInputDefault();
         UiManager.instance.ShowUi<UiEnterMainCtrl>();
 

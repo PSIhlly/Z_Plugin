@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ui;
 using UnityEngine;
+using Z_DataSystem;
+using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Ui;
@@ -25,6 +27,9 @@ public class Main2SceneManager : Z_MonoManager<Main2SceneManager>
     {
         UiManager.instance.ShowUi<UiLoadingCtrl>();
         MapDataController data;
+        
+
+
         if (SaveAndLoad.Exist(fileName))
         {
             data = await Task.Run(() =>
@@ -34,10 +39,14 @@ public class Main2SceneManager : Z_MonoManager<Main2SceneManager>
         }
         else
         {
+            //new
+            
+
             data = await Task.Run(() =>
             {
                 return new MapDataController();
             });
+            
         }
 
         ModSceneManager.instance.Begin(data, fileName);

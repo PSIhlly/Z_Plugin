@@ -58,11 +58,11 @@ namespace Ui
             set
             {
                 float.TryParse(value, out float v);
-                ModSceneManager.instance.posX = v*MapManager.instance.dataCtrl.mainData.mapUnitSize.x;
+                ModSceneManager.instance.posX = v * MapManager.instance.dataCtrl.mainData.mapUnitSize.x;
             }
             get
             {
-                return (ModSceneManager.instance.posX/MapManager.instance.dataCtrl.mainData.mapUnitSize.x).ToString("0.##");
+                return (ModSceneManager.instance.posX / MapManager.instance.dataCtrl.mainData.mapUnitSize.x).ToString("0.##");
             }
         }
         public string posY
@@ -83,11 +83,11 @@ namespace Ui
                     v = maxV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("maxYTip"));
                 }
-                ModSceneManager.instance.posY = v* MapManager.instance.dataCtrl.mainData.mapUnitSize.y;
+                ModSceneManager.instance.posY = v * MapManager.instance.dataCtrl.mainData.mapUnitSize.y;
             }
             get
             {
-                return (ModSceneManager.instance.posY/ MapManager.instance.dataCtrl.mainData.mapUnitSize.y).ToString("0.##");
+                return (ModSceneManager.instance.posY / MapManager.instance.dataCtrl.mainData.mapUnitSize.y).ToString("0.##");
             }
         }
         public string posZ
@@ -95,7 +95,7 @@ namespace Ui
             set
             {
                 float.TryParse(value, out float v);
-                ModSceneManager.instance.posZ = v* MapManager.instance.dataCtrl.mainData.mapUnitSize.z;
+                ModSceneManager.instance.posZ = v * MapManager.instance.dataCtrl.mainData.mapUnitSize.z;
             }
             get
             {
@@ -119,7 +119,7 @@ namespace Ui
         {
             set
             {
-                
+
                 ModSceneManager.instance.posing = value;
             }
             get
@@ -127,13 +127,24 @@ namespace Ui
                 return ModSceneManager.instance.posing;
             }
         }
+        public int layer
+        {
+            set
+            {
+                ModSceneManager.instance.layer = value;
+            }
+            get
+            {
+                return ModSceneManager.instance.layer;
+            }
+        }
     }
 
     public partial class UiModToolCtrl
     {
         private Controller aniCon;
-        UiScrViewContainer<UiToolItemCtrl> conData; 
-        UiScrViewContainer<UiToolTypeItemCtrl> conType; 
+        UiScrViewContainer<UiToolItemCtrl> conData;
+        UiScrViewContainer<UiToolTypeItemCtrl> conType;
 
 
         public override void OnCreate()
@@ -152,7 +163,7 @@ namespace Ui
 
             view.btn_showTool.onClick.AddListener(() =>
             {
-                if(model.show)
+                if (model.show)
                 {
                     aniCon.Stop(0);
                     if (aniCon.GetState(1) != GroupState.Playing)
@@ -163,7 +174,8 @@ namespace Ui
                             SetCurData(null);
                         });
                     }
-                }else
+                }
+                else
                 {
                     aniCon.Stop(1);
                     if (aniCon.GetState(0) != GroupState.Playing)
@@ -193,7 +205,7 @@ namespace Ui
             });
             view.btn_rotate.onClick.AddListener(() =>
             {
-                model.angle = ((int.Parse(model.angle)+90)).ToString();
+                model.angle = ((int.Parse(model.angle) + 90)).ToString();
                 Refresh();
             });
 
@@ -227,9 +239,25 @@ namespace Ui
                 model.posZ = v;
                 Refresh();
             });
-            view.ipt_rotateSet.onInput=((v) =>
+            view.ipt_rotateSet.onInput = ((v) =>
+              {
+                  model.angle = v;
+                  Refresh();
+              });
+
+            view.btn_layer0.onClick.AddListener(() =>
             {
-                model.angle = v;
+                model.layer = 0;
+                Refresh();
+            });
+            view.btn_layer1.onClick.AddListener(() =>
+            {
+                model.layer = 1;
+                Refresh();
+            });
+            view.btn_layer2.onClick.AddListener(() =>
+            {
+                model.layer = 2;
                 Refresh();
             });
         }
@@ -237,7 +265,7 @@ namespace Ui
         {
             model.curType = MapTypeForm.DataById[1];
             Refresh();
-            
+
         }
         public void Refresh()
         {
@@ -254,7 +282,7 @@ namespace Ui
 
 
             conData.Clear();
-            switch(model.curType.id)
+            switch (model.curType.id)
             {
                 case 2:
                     {
@@ -268,6 +296,17 @@ namespace Ui
                     }
                     break;
                 case 3:
+                    {
+                        foreach (var data in MapTransitionMaskForm.DataById.Values)
+                        {
+                            conData.Add(new UiToolItemParam()
+                            {
+                                data = data
+                            });
+                        }
+                    }
+                    break;
+                case 4:
                     {
                         foreach (var data in MapObstacleForm.DataById.Values)
                         {
@@ -302,15 +341,20 @@ namespace Ui
                     }
                     break;
             }
-            
+
             conData.Refresh();
-            view.sta_pos.ChangeState(model.posing?1:0);
+            view.sta_pos.ChangeState(model.posing ? 1 : 0);
             view.ipt_cntSetX.Set(model.cntX);
             view.ipt_cntSetY.Set(model.cntY);
             view.ipt_posSetX.Set(model.posX);
             view.ipt_posSetY.Set(model.posY);
             view.ipt_posSetZ.Set(model.posZ);
             view.ipt_rotateSet.Set(model.angle);
+
+            view.txt_textureLayerSet.gameObject.SetActive(model.curType.needLayer);
+            view.sta_layer0.ChangeState(model.layer == 0 ? 1 : 0);
+            view.sta_layer1.ChangeState(model.layer == 1 ? 1 : 0);
+            view.sta_layer2.ChangeState(model.layer == 2 ? 1 : 0);
 
         }
         public void SetCurType(MapTypeForm.Data type)
@@ -338,7 +382,7 @@ namespace Ui
         {
             view.btn_tool.onClick.AddListener(() =>
             {
-                if(parent.model.curData==model.data)
+                if (parent.model.curData == model.data)
                 {
                     parent.SetCurData(null);
 
@@ -355,12 +399,13 @@ namespace Ui
             model.data = param.data;
 
             view.txt_name.text = model.data.name;
-            view.img_.sprite= TextureHelper.GetSpriteByPath(model.data.icon);
-
-            if (parent.model.curData==model.data)
+            view.img_.sprite = TextureHelper.GetSpriteByPath(model.data.icon);
+            
+            if (parent.model.curData == model.data)
             {
                 view.sta_tool.ChangeState(1);
-            }else
+            }
+            else
             {
                 view.sta_tool.ChangeState(0);
             }

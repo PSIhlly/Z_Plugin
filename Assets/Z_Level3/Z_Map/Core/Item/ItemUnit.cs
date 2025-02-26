@@ -36,8 +36,8 @@ namespace Z_Map
                 data.pos = ins.transform.position;
                 data.euler = ins.transform.eulerAngles;
 
-                var newMapPos = MapManager.instance.mapUtilCtrl.RealPos2MapPos(data.pos);
-                if (MapManager.instance.mapUtilCtrl.InArea(newMapPos))
+                var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
+                if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
                     var newMap = MapManager.instance.dataCtrl.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
                     if (superUnit != newMap.unit)
@@ -48,7 +48,7 @@ namespace Z_Map
                     }
                 }else
                 {
-                    data.pos = MapManager.instance.mapUtilCtrl.GetClosestInArea(data.pos);
+                    data.pos = MapManager.instance.utilCtrl.GetClosestInArea(data.pos);
                     ins.transform.position = data.pos;
                 }
             }

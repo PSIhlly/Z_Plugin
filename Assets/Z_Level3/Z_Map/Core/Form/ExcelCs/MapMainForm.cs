@@ -14,15 +14,19 @@ namespace Z_Map.Form
 
     public static partial class MapMainForm
     {
+        public static readonly int autoUidCnt=1000000;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-        }
 
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data
         {
@@ -54,17 +58,7 @@ namespace Z_Map.Form
                 ///</summary>
                 public string characterJa;
 
-                /// <summary>
-                ///全部纹理名称
-                ///</summary>
-                public List<string> texName;
-
-                /// <summary>
-                ///全部透明纹理名称
-                ///</summary>
-                public List<string> alphaTexName;
-
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa,List<string> texName,List<string> alphaTexName)
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa)
             {
 
                 this.uid = uid;
@@ -73,14 +67,12 @@ namespace Z_Map.Form
                 this.mapJa = mapJa;
                 this.itemJa = itemJa;
                 this.characterJa = characterJa;
-                this.texName = texName;
-                this.alphaTexName = alphaTexName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","",null,null);
+                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","");
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -104,7 +96,7 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (1000000);
+            uidChain=new Z_Chain.Chain (autoUidCnt);
             
 
                 _DataByUid = new Dictionary<int, Data>() {
@@ -163,11 +155,7 @@ namespace Z_Map.Form
 
                 jo.Get<string>("itemJa"),
 
-                jo.Get<string>("characterJa"),
-
-                jo.Get<List<string>>("texName"),
-
-                jo.Get<List<string>>("alphaTexName")
+                jo.Get<string>("characterJa")
                     );
 
             return data;
@@ -190,10 +178,6 @@ namespace Z_Map.Form
             jo.Set<string>("itemJa",data.itemJa);
 
             jo.Set<string>("characterJa",data.characterJa);
-
-            jo.Set<List<string>>("texName",data.texName);
-
-            jo.Set<List<string>>("alphaTexName",data.alphaTexName);
 
             return jo;
         }
@@ -227,6 +211,7 @@ namespace Z_Map.Form
                 _DataByUid.Remove(data.uid);
 
 
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -236,6 +221,14 @@ namespace Z_Map.Form
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

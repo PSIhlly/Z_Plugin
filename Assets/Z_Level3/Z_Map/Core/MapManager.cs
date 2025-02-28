@@ -1,3 +1,4 @@
+using Form;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace Z_Map
 {
     public static class GlobalSettings
     {
+        public const int ANIM_MAX = 10;
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
     }
@@ -76,20 +78,35 @@ namespace Z_Map
                 }
             }
 
+            foreach(var data in MapTextureForm.DataById.Values)
+            {
+                List<Texture2D> lst = new List<Texture2D>();
+                for(int i=0;i< GlobalSettings.ANIM_MAX; i++)
+                {
+                    var curKey = ModAssetManager.instance.GetTexRealName(data.name, i);
+                    if (TexAssetForm.DataByName.ContainsKey(curKey))
+                        lst.Add((Texture2D)TexAssetForm.DataByName[curKey].tex);
+                    else
+                        break;
+                }
+                Debug.Log(data.name + "???");
+                unitUtilCtrl.CreateTexAnimVariants(data.name, lst.ToArray());
+            }
 
-
-            foreach(var alphaTexName in dataCtrl.mainData.alphaTexName)
+            foreach(var data in MapTransitionMaskForm.DataById.Values)
             {
                 var raws = new Texture2D[] {
-                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$0"]?.tex ,
-                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$1"]?.tex,
-                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$2"]?.tex,
-                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$3"]?.tex,
-                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$4"]?.tex,
-                (Texture2D)TexAssetForm.DataByName["a$"+alphaTexName + "$5"]?.tex
+                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,0)]?.tex ,
+                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,1)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,2)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,3)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,4)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,5)]?.tex
                 };
-                unitUtilCtrl.CreateVariantsMatsByBasic5(alphaTexName, raws);
+                unitUtilCtrl.CreateAlphaVariantsByBasic5(data.name, raws);
             }
+
+
 
             navigationCtrl.Build();
             mainGo.SetActive(true);

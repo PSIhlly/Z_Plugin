@@ -10,6 +10,7 @@ namespace Z_Texture
         private static Dictionary<Texture, Sprite> spriteCache = new Dictionary<Texture, Sprite>();
         public static Texture GetTextureByPath(string path)
         {
+            path = Path.GetFullPath(path);
             if (textureCache.ContainsKey(path))
                 return textureCache[path];
             Texture res;
@@ -23,6 +24,12 @@ namespace Z_Texture
             }
             textureCache[path] = res;
             return res;
+        }
+        public static Texture GetTextureByByte(byte[] data)
+        {
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            return texture;
         }
         public static Sprite GetSpriteByPath(string path,string basePath="")
         {
@@ -59,12 +66,32 @@ namespace Z_Texture
             spriteCache[tex] = s;
             return s;
         }
-
-        public static void SaveTexture(Texture2D tex,string fileName)
+        public static void SaveTexture(Texture2D tex, string folder, string fileName)
         {
-            byte[] pngData = tex.EncodeToPNG();
-            string filePath = Path.Combine(Application.dataPath, fileName);
-            File.WriteAllBytes(filePath, pngData);
+            SaveTexture(tex.EncodeToPNG(), folder, fileName);
+        }
+        public static void SaveTexture(byte[] data,string folder,string fileName)
+        {
+            if(!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            File.WriteAllBytes(folder+fileName, data);
+        }
+
+        public static void DeleteTexture(string path)
+        {
+            path = Path.GetFullPath(path);
+            if (textureCache.ContainsKey(path))
+            {
+                var tex = textureCache[path];
+                File.Delete(path);
+                if (spriteCache.ContainsKey(tex))
+                {
+                    spriteCache.Remove(tex);
+                }
+                textureCache.Remove(path);
+            }
         }
 
         #region util
@@ -73,9 +100,7 @@ namespace Z_Texture
             // 尝试获取文件的字节数组
             if (File.Exists(path))
             {
-                Texture2D texture = new Texture2D(2, 2); // 创建一个新的纹理
-                texture.LoadImage(File.ReadAllBytes(path));
-                return texture;
+                return GetTextureByByte(File.ReadAllBytes(path));
             }
             Debug.LogError("文件未找到：" + path);
             return Texture2D.whiteTexture;

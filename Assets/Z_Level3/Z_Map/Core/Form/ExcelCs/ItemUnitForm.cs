@@ -14,17 +14,23 @@ namespace Z_Map.Form
 
     public static partial class ItemUnitForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 UnitForm.childInitAction+=InitInternal;
 
-        }
 
+                UnitForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -216,6 +222,7 @@ UnitForm.AddData(data);
                 _DataByUid.Remove(data.uid);
 
 UnitForm.RemoveData(uid);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -225,6 +232,14 @@ UnitForm.RemoveData(uid);
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(UnitForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

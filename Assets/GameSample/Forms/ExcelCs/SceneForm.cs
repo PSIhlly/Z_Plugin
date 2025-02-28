@@ -16,15 +16,19 @@ namespace Form
 
     public static partial class SceneForm
     {
+        public static readonly int autoIdCnt=100;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-        }
 
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data
         {
@@ -82,7 +86,7 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (100);
+            idChain=new Z_Chain.Chain (autoIdCnt);
             
 
                 _DataById = new Dictionary<int, Data>() {
@@ -189,6 +193,7 @@ namespace Form
                 _DataById.Remove(data.id);
 
 
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -198,6 +203,14 @@ namespace Form
 
             idChain.Clear();
         }
+
+         private static void RemoveChildren(Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.id);      
+        }
+
 
     }
 }

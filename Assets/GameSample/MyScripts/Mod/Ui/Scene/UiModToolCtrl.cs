@@ -351,7 +351,9 @@ namespace Ui
             view.ipt_posSetZ.Set(model.posZ);
             view.ipt_rotateSet.Set(model.angle);
 
-            view.txt_textureLayerSet.gameObject.SetActive(model.curType.needLayer);
+            view.txt_textureLayerSet.gameObject.SetActive(model.curType.needLayer
+                ||(model.curData!=null&& model.curData is MapEraseForm.Data erase&&erase.texture));
+
             view.sta_layer0.ChangeState(model.layer == 0 ? 1 : 0);
             view.sta_layer1.ChangeState(model.layer == 1 ? 1 : 0);
             view.sta_layer2.ChangeState(model.layer == 2 ? 1 : 0);

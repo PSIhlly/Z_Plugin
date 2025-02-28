@@ -16,17 +16,23 @@ namespace Form
 
     public static partial class MapObstacleForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 MapBaseForm.childInitAction+=InitInternal;
 
-        }
 
+                MapBaseForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : MapBaseForm.Data
         {
@@ -187,6 +193,7 @@ MapBaseForm.AddData(data);
                 _DataById.Remove(data.id);
 
 MapBaseForm.RemoveData(id);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -196,6 +203,14 @@ MapBaseForm.RemoveData(id);
 
             idChain.Clear();
         }
+
+         private static void RemoveChildren(MapBaseForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.id);      
+        }
+
 
     }
 }

@@ -56,12 +56,12 @@ namespace Z_Ui.Base
             if (vertical)
             {
                 int totRow = (cnt / columnCnt) + (cnt % columnCnt != 0 ? 1 : 0);
-                content.sizeDelta = new Vector2(content.rect.width-width,  Mathf.Max(totRow, rowCnt) * cell.rect.height - content.rect.height);
+                content.sizeDelta += new Vector2(width-content.rect.width,  Mathf.Max(totRow, rowCnt) * cell.rect.height - (content.rect.height));
             }
             else
             {
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
-                content.sizeDelta = new Vector2( Mathf.Max(totColumn, columnCnt) * cell.rect.width-content.rect.width , content.rect.height - height);
+                content.sizeDelta += new Vector2( Mathf.Max(totColumn, columnCnt) * cell.rect.width-content.rect.width , content.rect.height - height);
             }
 
             if (fiilType == FillType.Fill)

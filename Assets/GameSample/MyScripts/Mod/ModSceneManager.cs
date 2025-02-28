@@ -168,7 +168,7 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                         if (!MapManager.instance.dataCtrl.maps.ContainsKey((x, hitPos.y, z)))
                             continue;
                         var mapData = MapManager.instance.dataCtrl.maps[(x, hitPos.y, z)];
-                        mapData.texNameDic[layer] = textureData.texName;
+                        mapData.texNameDic[layer] = textureData.name;
                     }
             }
             else if (curData is MapTransitionMaskForm.Data maskData)
@@ -180,7 +180,7 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                             continue;
 
                         var mapData = MapManager.instance.dataCtrl.maps[(x, hitPos.y, z)];
-                        mapData.alphaTexNameDic[layer] = maskData.texName;
+                        mapData.alphaTexNameDic[layer] = maskData.name;
                     }
             }
             else if(curData is MapObstacleForm.Data obstacleData)
@@ -240,6 +240,14 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                                     sub.Remove();
                                 }
                             }
+                        }
+
+                        if(eraseData.texture)
+                        {
+                            if (mapData.texNameDic.ContainsKey(layer))
+                                mapData.texNameDic.Remove(layer);
+                            if (mapData.alphaTexNameDic.ContainsKey(layer))
+                                mapData.alphaTexNameDic.Remove(layer);
                         }
                     }
             }

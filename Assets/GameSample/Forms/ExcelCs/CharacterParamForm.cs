@@ -16,17 +16,23 @@ namespace Form
 
     public static partial class CharacterParamForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 ParamForm.childInitAction+=InitInternal;
 
-        }
 
+                ParamForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain=>ParamForm.uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : ParamForm.Data
         {
@@ -191,6 +197,7 @@ ParamForm.AddData(data);
                 _DataByName.Remove(data.name);
 
 ParamForm.RemoveData(uid);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -202,6 +209,14 @@ ParamForm.RemoveData(uid);
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(ParamForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

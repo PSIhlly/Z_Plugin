@@ -21,8 +21,20 @@ namespace Z_Map
     public class MapUnitUtilController : Z_Controller<MapManager>
     {
         public Dictionary<(string, int), Texture2D> alphaTextureDic=new Dictionary<(string, int), Texture2D>();
+        public Dictionary<string, List<Texture2D>> animTextureDic=new Dictionary<string, List<Texture2D>>();
 
-        public void CreateVariantsMatsByBasic5(string name, Texture2D[] rawAlphaTex)
+        public void CreateTexAnimVariants(string name, Texture2D[] rawAnimTex)
+        {
+            if (rawAnimTex == null || rawAnimTex.Length == 0 || rawAnimTex[0] == null)
+                return;
+            animTextureDic[name] = new List<Texture2D>();
+            for (int i=0;i< rawAnimTex.Length;i++)
+            {
+                animTextureDic[name].Add(rawAnimTex[i]);
+            }
+        }
+
+        public void CreateAlphaVariantsByBasic5(string name, Texture2D[] rawAlphaTex)
         {
             if (rawAlphaTex == null || rawAlphaTex.Length == 0 || rawAlphaTex[0] == null)
                 return;
@@ -653,7 +665,7 @@ namespace Z_Map
                     MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                     ins.renderers[i].GetPropertyBlock(propBlock);
 
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName["b$" + data.texNameDic[i]].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[ModAssetManager.instance.GetTexRealName(data.texNameDic[i],0)].tex);
 
                     if (data.alphaTexNameDic.ContainsKey(i))
                     {
@@ -682,6 +694,26 @@ namespace Z_Map
                     ins.renderers[i].SetPropertyBlock(propBlock);
                 }
             }
+        }
+        public void UpdateAnim(MapInstance ins)
+        {
+            
+            var data = ins.unit.data;
+            for (int i = 0; i < ins.renderers.Length; i++)
+            {
+                if (data.texNameDic.ContainsKey(i)&&data.animInterval[i]>0)
+                {
+                    int all = data.animInterval[i] * animTextureDic[data.texNameDic[i]].Count;
+                    int cur=(Time.frameCount % all)/ data.animInterval[i];
+                    if (ins.animCur.ContainsKey(i) && ins.animCur[i] == cur)
+                        continue;
+
+                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                    ins.renderers[i].GetPropertyBlock(propBlock);
+                    propBlock.SetTexture("_Tex", animTextureDic[data.texNameDic[i]][cur]);
+                    ins.renderers[i].SetPropertyBlock(propBlock);
+                }
+            }  
         }
 
 

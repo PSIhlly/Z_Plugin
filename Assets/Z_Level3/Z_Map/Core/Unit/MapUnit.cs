@@ -57,8 +57,16 @@ namespace Z_Map
             MapUnitForm.RemoveData(data.uid);
             base.Remove();
         }
-       
-        
+
+        public override void UpdateInfo()
+        {
+            base.UpdateInfo();
+
+            if(ins!=null)
+                MapManager.instance.unitUtilCtrl.UpdateAnim((MapInstance)ins);
+        }
+
+
 
     }
 }

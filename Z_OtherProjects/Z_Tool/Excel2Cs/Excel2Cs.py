@@ -58,6 +58,7 @@ namespace {file_namespace}
         init_internal_base_str=""
 
         init_children_action_str=""
+        remove_children_action_str=""
         add_op_base_str = ""
         remove_op_base_str = ""
         if self.base_info!=None:
@@ -79,6 +80,10 @@ namespace {file_namespace}
 
         add_remove_clear_op_str = ""
         if 'write' in self.var_config_dic[self.id_str]:
+            if self.extend_data_str != '':
+                remove_children_action_str=f'''
+                {self.extend_data_str}Form.childRemoveAction+=RemoveChildren;
+            '''
             add_remove_clear_op_str = f'''
         public static int AddData(Data data)
         {{
@@ -104,6 +109,7 @@ namespace {file_namespace}
             var data=_DataBy{self.id_str.capitalize()}[{self.id_str}];
 {self.remove_str}
 {remove_op_base_str}
+            childRemoveAction?.Invoke(data);
         }}
         public static void Clear()
         {{
@@ -111,19 +117,31 @@ namespace {file_namespace}
 {self.clear_str}
             {self.id_str}Chain.Clear();
         }}
+
+         private static void RemoveChildren({'' if self.extend_data_str == '' else f'{self.extend_data_str}Form.'}Data data)
+        {{
+            Init();
+            if(data is Data)
+               RemoveData(data.{self.id_str});      
+        }}
+
 '''
         return f"""{namespace_str}
     public static partial class {self.name}Form
     {{
+        {'' if self.extend_data_str != '' else f'public static readonly int auto{self.id_str.capitalize()}Cnt={self.id_cnt};'}
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {{
 {init_children_action_str}
+{remove_children_action_str}
         }}
-
+        
         private static bool inited;
         public static Z_Chain.Chain {self.id_str}Chain{'' if self.extend_data_str == '' else f'=>{self.extend_data_str}Form.{self.id_str}Chain'};
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data{'' if self.extend_data_str=='' else  f" : {self.extend_data_str}Form.Data"}
         {{
@@ -141,7 +159,7 @@ namespace {file_namespace}
             if(inited)
                 return;
             inited=true;  
-            {'' if self.extend_data_str != '' else f"{self.id_str}Chain=new Z_Chain.Chain ({self.id_cnt});"}
+            {'' if self.extend_data_str != '' else f"{self.id_str}Chain=new Z_Chain.Chain (auto{self.id_str.capitalize()}Cnt);"}
             
 {self.content_str}
 
@@ -367,6 +385,8 @@ for root, dirs, files in os.walk(files_root_excels):
             #id特殊处理
             if 'mass' in formInfo.var_config_dic[formInfo.id_str]:
                 formInfo.id_cnt = 1000000
+            if 'medium' in formInfo.var_config_dic[formInfo.id_str]:
+                formInfo.id_cnt = 10000
             
             form_info_list.append(formInfo)
 

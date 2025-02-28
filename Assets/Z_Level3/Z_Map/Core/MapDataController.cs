@@ -82,7 +82,7 @@ namespace Z_Map
                     {
                         realPos.z = k * 1;
                         mapPos.z = k;
-                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0,"tile1" } }, new Dictionary<int, string>(), mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
+                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0,"grass" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 60 } }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
                         MapUnitForm.AddData(data);
                         RegisterMap(data);
                     }
@@ -99,9 +99,7 @@ namespace Z_Map
                 new Vector3Int(30, 5, 20),
                "",
                "",
-               "",
-               new List<string>() { "tile1", "tile2", "tile3", "tile4" },
-               new List<string>() {"alpha" }
+               ""
            );
         }
         public void Unload()
@@ -130,7 +128,7 @@ namespace Z_Map
 
         public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            var data = new MapUnitForm.Data(-1,"", new Dictionary<int, string>() { {0,"tile1" } }, new Dictionary<int, string>(), mapPos,"map", mapPos,Vector3.zero,Vector3.one,0);
+            var data = new MapUnitForm.Data(-1,"", new Dictionary<int, string>() { {0,"tile1" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { {0, 60 } }, mapPos, "map", mapPos,Vector3.zero,Vector3.one,0);
             MapUnitForm.AddData(data);
             RegisterMap(data);
             return data;

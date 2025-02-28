@@ -13,15 +13,19 @@ namespace Z_UnitSystem.Form
 
     public static partial class UnitForm
     {
+        public static readonly int autoUidCnt=1000000;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-        }
 
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data
         {
@@ -112,7 +116,7 @@ namespace Z_UnitSystem.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (1000000);
+            uidChain=new Z_Chain.Chain (autoUidCnt);
             
 
                 _DataByUid = new Dictionary<int, Data>() {
@@ -231,6 +235,7 @@ namespace Z_UnitSystem.Form
                 _DataByUid.Remove(data.uid);
 
 
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -240,6 +245,14 @@ namespace Z_UnitSystem.Form
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

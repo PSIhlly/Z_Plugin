@@ -983,6 +983,10 @@
       <Project>{E9CABA05-0A23-9ECF-CA09-06371EB85EA1}</Project>
       <Name>Z_Texture</Name>
     </ProjectReference>
+    <ProjectReference Include="Z_Os.csproj">
+      <Project>{DB10A55B-251C-8671-66E0-89DD923A1B1C}</Project>
+      <Name>Z_Os</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

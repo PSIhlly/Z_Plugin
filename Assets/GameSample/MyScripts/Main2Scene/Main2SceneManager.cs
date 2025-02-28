@@ -1,3 +1,4 @@
+using Form;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,12 +42,10 @@ public class Main2SceneManager : Z_MonoManager<Main2SceneManager>
         {
             //new
             
-
             data = await Task.Run(() =>
             {
                 return new MapDataController();
             });
-            
         }
 
         ModSceneManager.instance.Begin(data, fileName);
@@ -58,6 +57,20 @@ public class Main2SceneManager : Z_MonoManager<Main2SceneManager>
         UiManager.instance.CloseUi<UiLoadingCtrl>();
         UiManager.instance.ShowUi<UiModSceneMainCtrl>();
     }
-
-
+    public void UnloadSceneUgc()
+    {
+        UnloadScene();
+    }
+    public void UnloadScene()
+    {
+        //clean auto content
+        var idLst = new List<int>(MapBaseForm.DataById.Keys);
+        foreach(var id in idLst)
+        {
+            if(id<= MapBaseForm.autoIdCnt)
+            {
+                MapBaseForm.RemoveData(id);
+            }
+        }
+    }
 }

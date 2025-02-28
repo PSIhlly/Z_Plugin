@@ -8,20 +8,25 @@ using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
+
 namespace Z_Fight.Form
 {
 
     public static partial class WeaponBulletForm
     {
+        public static readonly int autoIdCnt=100;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-        }
 
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data
         {
@@ -139,7 +144,7 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (100);
+            idChain=new Z_Chain.Chain (autoIdCnt);
             
 
                 _DataById = new Dictionary<int, Data>() {
@@ -286,6 +291,7 @@ namespace Z_Fight.Form
                 _DataById.Remove(data.id);
 
 
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -295,6 +301,14 @@ namespace Z_Fight.Form
 
             idChain.Clear();
         }
+
+         private static void RemoveChildren(Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.id);      
+        }
+
 
     }
 }

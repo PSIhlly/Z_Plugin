@@ -16,39 +16,45 @@ namespace Form
 
     public static partial class MapTextureForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 MapBaseForm.childInitAction+=InitInternal;
 
-        }
 
+                MapBaseForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : MapBaseForm.Data
         {
 
                 /// <summary>
-                ///ÌùÍ¼Ãû³Æ
+                ///æ’­æ”¾é€Ÿåº¦
                 ///</summary>
-                public string texName;
+                public float animSpeed;
 
-            public Data(int id,string name,string icon,string texName):base(id,name,icon)
+            public Data(int id,string name,string icon,float animSpeed):base(id,name,icon)
             {
 
                 this.id = id;
                 this.name = name;
                 this.icon = icon;
-                this.texName = texName;
+                this.animSpeed = animSpeed;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","","");
+                   public static Data defaultData=new Data(0,"","",0f);
 
 
         static Dictionary<int, Data> _DataById = null;
@@ -78,11 +84,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","","tile1")},
+                {200001,new Data(200001,"floor","",999f)},
 
-                {200002,new Data(200002,"grass","","tile2")},
+                {200002,new Data(200002,"grass","",999f)},
 
-                {200003,new Data(200003,"road","","tile3")},
+                {200003,new Data(200003,"road","",999f)},
 
                 };
 
@@ -139,7 +145,7 @@ namespace Form
 
                 jo.Get<string>("icon"),
 
-                jo.Get<string>("texName")
+                jo.Get<float>("animSpeed")
                     );
 
             return data;
@@ -157,7 +163,7 @@ namespace Form
 
             jo.Set<string>("icon",data.icon);
 
-            jo.Set<string>("texName",data.texName);
+            jo.Set<float>("animSpeed",data.animSpeed);
 
             return jo;
         }
@@ -191,6 +197,7 @@ MapBaseForm.AddData(data);
                 _DataById.Remove(data.id);
 
 MapBaseForm.RemoveData(id);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -200,6 +207,14 @@ MapBaseForm.RemoveData(id);
 
             idChain.Clear();
         }
+
+         private static void RemoveChildren(MapBaseForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.id);      
+        }
+
 
     }
 }

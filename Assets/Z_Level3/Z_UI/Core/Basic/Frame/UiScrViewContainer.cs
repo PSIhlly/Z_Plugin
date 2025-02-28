@@ -16,7 +16,6 @@ namespace Z_Ui.Base
             sv.ContainerDel = DelReal;
         }
 
-
         public override void Clear()
         {
             base.Clear();

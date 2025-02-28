@@ -6,6 +6,7 @@ using Item;
 using Z_Texture;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_DataSystem;
 
 namespace Ui
 {
@@ -37,6 +38,7 @@ namespace Ui
         }
 
         
+
         public override void OnShow()
         {
             model.curUi = view.sub_ModStoryScenePanel;
@@ -50,7 +52,7 @@ namespace Ui
             view.sta_material.ChangeState(model.curUi == view.sub_ModStoryMaterialPanel ? 1 : 0);
             view.sub_ModStoryMaterialPanel.gameObject.SetActive(model.curUi == view.sub_ModStoryMaterialPanel);
         }
-
+       
     }
    
 }

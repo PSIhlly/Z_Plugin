@@ -16,39 +16,39 @@ namespace Form
 
     public static partial class MapTransitionMaskForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 MapBaseForm.childInitAction+=InitInternal;
 
-        }
 
+                MapBaseForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : MapBaseForm.Data
         {
 
-                /// <summary>
-                ///ÌùÍ¼Ãû³Æ
-                ///</summary>
-                public string texName;
-
-            public Data(int id,string name,string icon,string texName):base(id,name,icon)
+            public Data(int id,string name,string icon):base(id,name,icon)
             {
 
                 this.id = id;
                 this.name = name;
                 this.icon = icon;
-                this.texName = texName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","","");
+                   public static Data defaultData=new Data(0,"","");
 
 
         static Dictionary<int, Data> _DataById = null;
@@ -78,7 +78,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {300001,new Data(300001,"alpha","","alpha")},
+                {300001,new Data(300001,"alpha","")},
 
                 };
 
@@ -133,9 +133,7 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("icon"),
-
-                jo.Get<string>("texName")
+                jo.Get<string>("icon")
                     );
 
             return data;
@@ -152,8 +150,6 @@ namespace Form
             jo.Set<string>("name",data.name);
 
             jo.Set<string>("icon",data.icon);
-
-            jo.Set<string>("texName",data.texName);
 
             return jo;
         }
@@ -187,6 +183,7 @@ MapBaseForm.AddData(data);
                 _DataById.Remove(data.id);
 
 MapBaseForm.RemoveData(id);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -196,6 +193,14 @@ MapBaseForm.RemoveData(id);
 
             idChain.Clear();
         }
+
+         private static void RemoveChildren(MapBaseForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.id);      
+        }
+
 
     }
 }

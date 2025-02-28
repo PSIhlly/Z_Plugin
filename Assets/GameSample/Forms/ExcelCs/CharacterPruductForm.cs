@@ -16,17 +16,23 @@ namespace Form
 
     public static partial class CharacterPruductForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 PruductForm.childInitAction+=InitInternal;
 
-        }
 
+                PruductForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain=>PruductForm.uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : PruductForm.Data
         {
@@ -193,6 +199,7 @@ PruductForm.AddData(data);
                 _DataByName.Remove(data.name);
 
 PruductForm.RemoveData(uid);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -204,6 +211,14 @@ PruductForm.RemoveData(uid);
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(PruductForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

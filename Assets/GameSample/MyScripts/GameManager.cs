@@ -22,12 +22,8 @@ public class GameManager : Z_MonoManager<GameManager>
     public void Start()
     {
         //default Assets
-        var res = AssetManager.instance.GetAssetsByFolder(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs");
-        foreach (var tex in res.texs)
-        {
-            TexAssetForm.AddData(new TexAssetForm.Data(-1, tex.Item1, tex.Item2));
-        }
-
+        AssetManager.instance.LoadAssetsByFolderAutoAdd(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs");
+        
 
         RegisterInputDefault();
         UiManager.instance.ShowUi<UiEnterMainCtrl>();

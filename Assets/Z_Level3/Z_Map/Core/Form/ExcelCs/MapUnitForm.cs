@@ -14,17 +14,23 @@ namespace Z_Map.Form
 
     public static partial class MapUnitForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 UnitForm.childInitAction+=InitInternal;
 
-        }
 
+                UnitForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -51,17 +57,23 @@ namespace Z_Map.Form
                 public Dictionary<int,string> alphaTexNameDic;
 
                 /// <summary>
+                ///∂Øª≠º‰∏Ù
+                ///</summary>
+                public Dictionary<int,int> animInterval;
+
+                /// <summary>
                 ///¿Î…¢Œª÷√
                 ///</summary>
                 public Vector3Int mapPos;
 
-            public Data(int uid,string name,Dictionary<int,string> texNameDic,Dictionary<int,string> alphaTexNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,Dictionary<int,string> texNameDic,Dictionary<int,string> alphaTexNameDic,Dictionary<int,int> animInterval,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
                 this.uid = uid;
                 this.name = name;
                 this.texNameDic = texNameDic;
                 this.alphaTexNameDic = alphaTexNameDic;
+                this.animInterval = animInterval;
                 this.mapPos = mapPos;
                 this.prefabName = prefabName;
                 this.pos = pos;
@@ -75,7 +87,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},new Dictionary<int,string>(){},new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
         static Dictionary<int, Data> _DataByUid = null;
@@ -176,6 +188,8 @@ namespace Z_Map.Form
 
                 jo.Get<Dictionary<int,string>>("alphaTexNameDic"),
 
+                jo.Get<Dictionary<int,int>>("animInterval"),
+
                 jo.Get<Vector3Int>("mapPos"),
 
                 jo.Get<string>("prefabName"),
@@ -205,6 +219,8 @@ namespace Z_Map.Form
             jo.Set<Dictionary<int,string>>("texNameDic",data.texNameDic);
 
             jo.Set<Dictionary<int,string>>("alphaTexNameDic",data.alphaTexNameDic);
+
+            jo.Set<Dictionary<int,int>>("animInterval",data.animInterval);
 
             jo.Set<Vector3Int>("mapPos",data.mapPos);
 
@@ -254,6 +270,7 @@ UnitForm.AddData(data);
                 _DataByMappos.Remove(data.mapPos);
 
 UnitForm.RemoveData(uid);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -265,6 +282,14 @@ UnitForm.RemoveData(uid);
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(UnitForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

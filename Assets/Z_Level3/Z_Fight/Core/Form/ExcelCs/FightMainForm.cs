@@ -8,20 +8,25 @@ using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
+
 namespace Z_Fight.Form
 {
 
     public static partial class FightMainForm
     {
+        public static readonly int autoUidCnt=100;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-        }
 
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data
         {
@@ -91,7 +96,7 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (100);
+            uidChain=new Z_Chain.Chain (autoUidCnt);
             
 
                 _DataByUid = new Dictionary<int, Data>() {
@@ -206,6 +211,7 @@ namespace Z_Fight.Form
                 _DataByUid.Remove(data.uid);
 
 
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -215,6 +221,14 @@ namespace Z_Fight.Form
 
             uidChain.Clear();
         }
+
+         private static void RemoveChildren(Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+
 
     }
 }

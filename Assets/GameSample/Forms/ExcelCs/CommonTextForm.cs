@@ -16,17 +16,23 @@ namespace Form
 
     public static partial class CommonTextForm
     {
+        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
                 TextBaseForm.childInitAction+=InitInternal;
 
-        }
 
+                TextBaseForm.childRemoveAction+=RemoveChildren;
+            
+        }
+        
         private static bool inited;
         public static Z_Chain.Chain idChain=>TextBaseForm.idChain;
         public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
 
         public partial class Data : TextBaseForm.Data
         {
@@ -210,6 +216,7 @@ TextBaseForm.AddData(data);
                 _DataByKey.Remove(data.key);
 
 TextBaseForm.RemoveData(id);
+            childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
@@ -221,6 +228,14 @@ TextBaseForm.RemoveData(id);
 
             idChain.Clear();
         }
+
+         private static void RemoveChildren(TextBaseForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.id);      
+        }
+
 
     }
 }

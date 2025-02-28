@@ -26,6 +26,7 @@ namespace Form
 
 
                 PruductForm.childRemoveAction+=RemoveChildren;
+                PruductForm.childAddAction+=AddChildren;
             
         }
         
@@ -33,6 +34,7 @@ namespace Form
         public static Z_Chain.Chain uidChain=>PruductForm.uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : PruductForm.Data
         {
@@ -51,7 +53,7 @@ namespace Form
                    public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){});
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -61,7 +63,7 @@ namespace Form
             }
         }
 
-        static Dictionary<string, Data> _DataByName = null;
+        static Dictionary<string, Data> _DataByName;
         public static Dictionary<string, Data> DataByName
         {
             get
@@ -170,6 +172,8 @@ namespace Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -178,25 +182,26 @@ namespace Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
-                _DataByName[data.name]=data;
+                DataByName[data.name]=data;
 
             
 PruductForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
-                _DataByName.Remove(data.name);
+                DataByName.Remove(data.name);
 
 PruductForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
@@ -205,9 +210,9 @@ PruductForm.RemoveData(uid);
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
-                _DataByName.Clear();
+                DataByName.Clear();
 
             uidChain.Clear();
         }
@@ -218,6 +223,13 @@ PruductForm.RemoveData(uid);
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(PruductForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

@@ -54,7 +54,7 @@ namespace Z_DataSystem
         }
         public void LoadTexBytesAutoAdd(Texture2D tex, string path, string fileName)
         {
-            TextureHelper.SaveTexture(tex.EncodeToPNG(), path, fileName);
+            LoadTexBytesAutoAdd(tex.EncodeToPNG(), path, fileName);
         }
         public void LoadTexBytesAutoAdd(byte[] data,string path,string fileName)
         {

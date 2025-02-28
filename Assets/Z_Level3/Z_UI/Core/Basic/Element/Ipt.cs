@@ -9,7 +9,10 @@ namespace Z_Ui.Base
     public class Ipt : TMP_InputField
     {
         public Action<string> onInput;
-        private bool invokeAction;
+        public Action<string> onFinishInput;
+        private bool invokeAction=true;
+
+        private string oldStr;
         public Ipt()
         {
             onValueChanged.AddListener((v) =>
@@ -19,6 +22,25 @@ namespace Z_Ui.Base
                     onInput?.Invoke(v);
                 }
             });
+            onSelect.AddListener((v)=>
+            {
+                oldStr = v;
+            });
+            onDeselect.AddListener((v) =>
+            {
+                
+                if (invokeAction&& oldStr != text)
+                {
+                    onFinishInput?.Invoke(v);
+                }
+            });
+            onSubmit.AddListener((v) =>
+            {
+                if (invokeAction && oldStr != text)
+                {
+                    onFinishInput?.Invoke(v);
+                }
+            });
         }
         public void Set(string content, bool onlyNotFocus = true,bool invokeAction = false)
         {
@@ -26,6 +48,7 @@ namespace Z_Ui.Base
                 return;
             this.invokeAction = invokeAction;
             text = content;
+            oldStr = text;
             this.invokeAction = true;
         }
         

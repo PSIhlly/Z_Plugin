@@ -61,7 +61,7 @@ namespace Z_Ui.Base
             else
             {
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
-                content.sizeDelta += new Vector2( Mathf.Max(totColumn, columnCnt) * cell.rect.width-content.rect.width , content.rect.height - height);
+                content.sizeDelta += new Vector2( Mathf.Max(totColumn, columnCnt) * cell.rect.width-content.rect.width, height-content.rect.height);
             }
 
             if (fiilType == FillType.Fill)
@@ -140,8 +140,14 @@ namespace Z_Ui.Base
                 UpdateDic();
                 foreach (var id in needs)
                 {
-                    int column = id / columnCnt;
-                    int row = id % rowCnt;
+
+                    int column = id % columnCnt;
+                    int row = id / columnCnt;
+                    if (horizontal)
+                    {
+                        column = id / rowCnt;
+                        row = id % rowCnt;
+                    }
                     if (fiilType == FillType.Average)
                     {
                         relaPos = new Vector3((column + 0.5f) * width / columnCnt * content.lossyScale.x, -(row + 0.5f) * height / rowCnt * content.lossyScale.y, 0);

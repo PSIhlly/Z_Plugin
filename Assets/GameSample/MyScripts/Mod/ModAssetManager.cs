@@ -41,16 +41,20 @@ public class ModAssetManager : Z_MonoManager<ModAssetManager>
         {
             var oldKey = GetTexRealName(oldName, i);
             var newKey = GetTexRealName(newName, i);
-            if (TexAssetForm.DataByName.ContainsKey(oldKey))
+            if (oldKey != newKey&&TexAssetForm.DataByName.ContainsKey(oldKey))
             {
                 var data = TexAssetForm.DataByName[oldKey];
                 //copy
                 AssetManager.instance.LoadTexBytesAutoAdd((Texture2D)TexAssetForm.DataByName[oldKey].tex,GetModPath(), newKey);
-                data.name = newName;
+
                 //del
                 AssetManager.instance.DeleteTargetAssetAutoDel(GetModPath(), oldKey);
+                
             }
-        }
-       
+        } 
+        
+        //change
+        MapTextureForm.DataByName[oldName].name = newName;
+
     }
 }

@@ -26,21 +26,46 @@ namespace Z_DataSystem.Form
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int uid;
+                private int _uid;
+
+                public int uid{
+                            get{return _uid;}
+                             set{
+                            
+                            _uid = value;
+                            }
+                        }
+
+                private string _name;
 
                 /// <summary>
                 ///名称
                 ///</summary>
-                public string name;
+                public string name{
+                            get{return _name;}
+                             set{
+                            
+                            _name = value;
+                            }
+                        }
+
+                private int _valueType;
 
                 /// <summary>
                 ///数据类型
                 ///</summary>
-                public int valueType;
+                public int valueType{
+                            get{return _valueType;}
+                             set{
+                            
+                            _valueType = value;
+                            }
+                        }
 
             public Data(int uid,string name,int valueType)
             {
@@ -56,7 +81,7 @@ namespace Z_DataSystem.Form
                    public static Data defaultData=new Data(0,"",0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -155,6 +180,8 @@ namespace Z_DataSystem.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -163,21 +190,22 @@ namespace Z_DataSystem.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 
             childRemoveAction?.Invoke(data);
@@ -186,7 +214,7 @@ namespace Z_DataSystem.Form
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -197,6 +225,13 @@ namespace Z_DataSystem.Form
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

@@ -27,36 +27,85 @@ namespace Z_Fight.Form
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int uid;
+                private int _uid;
+
+                public int uid{
+                            get{return _uid;}
+                             set{
+                            
+                            _uid = value;
+                            }
+                        }
+
+                private int _uidCnt;
 
                 /// <summary>
                 ///uid总数
                 ///</summary>
-                public int uidCnt;
+                public int uidCnt{
+                            get{return _uidCnt;}
+                             set{
+                            
+                            _uidCnt = value;
+                            }
+                        }
+
+                private string _fightJa;
 
                 /// <summary>
                 ///战斗数据
                 ///</summary>
-                public string fightJa;
+                public string fightJa{
+                            get{return _fightJa;}
+                             set{
+                            
+                            _fightJa = value;
+                            }
+                        }
+
+                private string _weaponJa;
 
                 /// <summary>
                 ///武器数据
                 ///</summary>
-                public string weaponJa;
+                public string weaponJa{
+                            get{return _weaponJa;}
+                             set{
+                            
+                            _weaponJa = value;
+                            }
+                        }
+
+                private string _bulletJa;
 
                 /// <summary>
                 ///子弹数据
                 ///</summary>
-                public string bulletJa;
+                public string bulletJa{
+                            get{return _bulletJa;}
+                             set{
+                            
+                            _bulletJa = value;
+                            }
+                        }
+
+                private string _weaponBulletJa;
 
                 /// <summary>
                 ///武器子弹数据
                 ///</summary>
-                public string weaponBulletJa;
+                public string weaponBulletJa{
+                            get{return _weaponBulletJa;}
+                             set{
+                            
+                            _weaponBulletJa = value;
+                            }
+                        }
 
             public Data(int uid,int uidCnt,string fightJa,string weaponJa,string bulletJa,string weaponBulletJa)
             {
@@ -75,7 +124,7 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,0,"","","","");
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -186,6 +235,8 @@ namespace Z_Fight.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -194,21 +245,22 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 
             childRemoveAction?.Invoke(data);
@@ -217,7 +269,7 @@ namespace Z_Fight.Form
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -228,6 +280,13 @@ namespace Z_Fight.Form
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

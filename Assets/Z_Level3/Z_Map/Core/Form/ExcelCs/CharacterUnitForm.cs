@@ -24,6 +24,7 @@ namespace Z_Map.Form
 
 
                 UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
             
         }
         
@@ -31,6 +32,7 @@ namespace Z_Map.Form
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -46,35 +48,83 @@ namespace Z_Map.Form
                     }
                 }
 
+                private bool _navEnabled;
+
                 /// <summary>
                 ///启用
                 ///</summary>
-                public bool navEnabled;
+                public bool navEnabled{
+                            get{return _navEnabled;}
+                             set{
+                            
+                            _navEnabled = value;
+                            }
+                        }
+
+                private Vector3 _destination;
 
                 /// <summary>
                 ///目的地
                 ///</summary>
-                public Vector3 destination;
+                public Vector3 destination{
+                            get{return _destination;}
+                             set{
+                            
+                            _destination = value;
+                            }
+                        }
+
+                private float _speed;
 
                 /// <summary>
                 ///速度
                 ///</summary>
-                public float speed;
+                public float speed{
+                            get{return _speed;}
+                             set{
+                            
+                            _speed = value;
+                            }
+                        }
+
+                private float _alertDis;
 
                 /// <summary>
                 ///启动距离
                 ///</summary>
-                public float alertDis;
+                public float alertDis{
+                            get{return _alertDis;}
+                             set{
+                            
+                            _alertDis = value;
+                            }
+                        }
+
+                private float _pathDis;
 
                 /// <summary>
                 ///寻路距离上限
                 ///</summary>
-                public float pathDis;
+                public float pathDis{
+                            get{return _pathDis;}
+                             set{
+                            
+                            _pathDis = value;
+                            }
+                        }
+
+                private bool _isMine;
 
                 /// <summary>
                 ///是我自己
                 ///</summary>
-                public bool isMine;
+                public bool isMine{
+                            get{return _isMine;}
+                             set{
+                            
+                            _isMine = value;
+                            }
+                        }
 
             public Data(int uid,bool navEnabled,Vector3 destination,float speed,float alertDis,float pathDis,bool isMine,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
@@ -102,7 +152,7 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,false,Vector3.zero,0f,0f,0f,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -247,6 +297,8 @@ namespace Z_Map.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -255,21 +307,22 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 UnitForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
@@ -278,7 +331,7 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -289,6 +342,13 @@ UnitForm.RemoveData(uid);
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(UnitForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

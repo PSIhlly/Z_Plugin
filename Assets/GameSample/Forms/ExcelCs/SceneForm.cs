@@ -29,26 +29,59 @@ namespace Form
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int id;
+                private int _id;
+
+                public int id{
+                            get{return _id;}
+                             set{
+                            
+                            _id = value;
+                            }
+                        }
+
+                private string _name;
 
                 /// <summary>
                 ///Ãû×Ö
                 ///</summary>
-                public string name;
+                public string name{
+                            get{return _name;}
+                             set{
+                            
+                            _name = value;
+                            }
+                        }
+
+                private string _icon;
 
                 /// <summary>
                 ///·âÃæ
                 ///</summary>
-                public string icon;
+                public string icon{
+                            get{return _icon;}
+                             set{
+                            
+                            _icon = value;
+                            }
+                        }
+
+                private string _content;
 
                 /// <summary>
                 ///ÄÚÈÝ
                 ///</summary>
-                public string content;
+                public string content{
+                            get{return _content;}
+                             set{
+                            
+                            _content = value;
+                            }
+                        }
 
             public Data(int id,string name,string icon,string content)
             {
@@ -65,7 +98,7 @@ namespace Form
                    public static Data defaultData=new Data(0,"","","");
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -168,6 +201,8 @@ namespace Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataById.ContainsKey(data.id))
+                return data.id;
             if(data.id==-1)
             { 
                 int id=idChain.GetId();
@@ -176,21 +211,22 @@ namespace Form
                 data.id=id;  
             }
 
-                _DataById[data.id]=data;
+                DataById[data.id]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
         {            
             Init();
-            if(!_DataById.ContainsKey(id))
+            if(!DataById.ContainsKey(id))
                 return;
                 
-            var data=_DataById[id];
+            var data=DataById[id];
 
-                _DataById.Remove(data.id);
+                DataById.Remove(data.id);
 
 
             childRemoveAction?.Invoke(data);
@@ -199,7 +235,7 @@ namespace Form
         {
             Init();
 
-                _DataById.Clear();
+                DataById.Clear();
 
             idChain.Clear();
         }
@@ -210,6 +246,13 @@ namespace Form
             if(data is Data)
                RemoveData(data.id);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

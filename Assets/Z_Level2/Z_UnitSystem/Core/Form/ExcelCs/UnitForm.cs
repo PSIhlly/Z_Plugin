@@ -26,6 +26,7 @@ namespace Z_UnitSystem.Form
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
@@ -43,37 +44,93 @@ namespace Z_UnitSystem.Form
                     }
                 }
 
-                public int uid;
+                private int _uid;
+
+                public int uid{
+                            get{return _uid;}
+                             set{
+                            
+                            _uid = value;
+                            }
+                        }
+
+                private string _name;
 
                 /// <summary>
                 ///名称
                 ///</summary>
-                public string name;
+                public string name{
+                            get{return _name;}
+                             set{
+                            
+                            _name = value;
+                            }
+                        }
+
+                private string _prefabName;
 
                 /// <summary>
                 ///预制名字（索引）
                 ///</summary>
-                public string prefabName;
+                public string prefabName{
+                            get{return _prefabName;}
+                             set{
+                            
+                            _prefabName = value;
+                            }
+                        }
+
+                private Vector3 _pos;
 
                 /// <summary>
                 ///位置
                 ///</summary>
-                public Vector3 pos;
+                public Vector3 pos{
+                            get{return _pos;}
+                             set{
+                            
+                            _pos = value;
+                            }
+                        }
+
+                private Vector3 _euler;
 
                 /// <summary>
                 ///欧拉旋转
                 ///</summary>
-                public Vector3 euler;
+                public Vector3 euler{
+                            get{return _euler;}
+                             set{
+                            
+                            _euler = value;
+                            }
+                        }
+
+                private Vector3 _scale;
 
                 /// <summary>
                 ///缩放
                 ///</summary>
-                public Vector3 scale;
+                public Vector3 scale{
+                            get{return _scale;}
+                             set{
+                            
+                            _scale = value;
+                            }
+                        }
+
+                private int _updateType;
 
                 /// <summary>
                 ///更新方式
                 ///</summary>
-                public int updateType;
+                public int updateType{
+                            get{return _updateType;}
+                             set{
+                            
+                            _updateType = value;
+                            }
+                        }
 
             public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType)
             {
@@ -95,7 +152,7 @@ namespace Z_UnitSystem.Form
                    public static Data defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -210,6 +267,8 @@ namespace Z_UnitSystem.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -218,21 +277,22 @@ namespace Z_UnitSystem.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 
             childRemoveAction?.Invoke(data);
@@ -241,7 +301,7 @@ namespace Z_UnitSystem.Form
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -252,6 +312,13 @@ namespace Z_UnitSystem.Form
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

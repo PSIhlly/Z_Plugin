@@ -27,36 +27,85 @@ namespace Z_Map.Form
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int uid;
+                private int _uid;
+
+                public int uid{
+                            get{return _uid;}
+                             set{
+                            
+                            _uid = value;
+                            }
+                        }
+
+                private Vector3 _mapUnitSize;
 
                 /// <summary>
                 ///单位图块大小
                 ///</summary>
-                public Vector3 mapUnitSize;
+                public Vector3 mapUnitSize{
+                            get{return _mapUnitSize;}
+                             set{
+                            
+                            _mapUnitSize = value;
+                            }
+                        }
+
+                private Vector3Int _viewSize;
 
                 /// <summary>
                 ///视口大小
                 ///</summary>
-                public Vector3Int viewSize;
+                public Vector3Int viewSize{
+                            get{return _viewSize;}
+                             set{
+                            
+                            _viewSize = value;
+                            }
+                        }
+
+                private string _mapJa;
 
                 /// <summary>
                 ///地图数据
                 ///</summary>
-                public string mapJa;
+                public string mapJa{
+                            get{return _mapJa;}
+                             set{
+                            
+                            _mapJa = value;
+                            }
+                        }
+
+                private string _itemJa;
 
                 /// <summary>
                 ///物体数据
                 ///</summary>
-                public string itemJa;
+                public string itemJa{
+                            get{return _itemJa;}
+                             set{
+                            
+                            _itemJa = value;
+                            }
+                        }
+
+                private string _characterJa;
 
                 /// <summary>
                 ///单位数据
                 ///</summary>
-                public string characterJa;
+                public string characterJa{
+                            get{return _characterJa;}
+                             set{
+                            
+                            _characterJa = value;
+                            }
+                        }
 
             public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa)
             {
@@ -75,7 +124,7 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","");
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -186,6 +235,8 @@ namespace Z_Map.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -194,21 +245,22 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 
             childRemoveAction?.Invoke(data);
@@ -217,7 +269,7 @@ namespace Z_Map.Form
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -228,6 +280,13 @@ namespace Z_Map.Form
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

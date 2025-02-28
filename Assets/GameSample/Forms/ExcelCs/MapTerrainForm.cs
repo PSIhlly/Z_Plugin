@@ -26,6 +26,7 @@ namespace Form
 
 
                 MapBaseForm.childRemoveAction+=RemoveChildren;
+                MapBaseForm.childAddAction+=AddChildren;
             
         }
         
@@ -33,19 +34,36 @@ namespace Form
         public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : MapBaseForm.Data
         {
 
+                private string _prefabName;
+
                 /// <summary>
                 ///Ô¤ÖÆÃû³Æ
                 ///</summary>
-                public string prefabName;
+                public string prefabName{
+                            get{return _prefabName;}
+                             set{
+                            
+                            _prefabName = value;
+                            }
+                        }
+
+                private float _step;
 
                 /// <summary>
                 ///½×Êý
                 ///</summary>
-                public readonly float step;
+                public float step{
+                            get{return _step;}
+                            private set{
+                            
+                            _step = value;
+                            }
+                        }
 
             public Data(int id,string name,string prefabName,string icon,float step):base(id,name,icon)
             {
@@ -63,13 +81,23 @@ namespace Form
                    public static Data defaultData=new Data(0,"","","",0f);
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
             {
                 Init();
                 return _DataById;
+            }
+        }
+
+        static Dictionary<string, Data> _DataByName;
+        public static Dictionary<string, Data> DataByName
+        {
+            get
+            {
+                Init();
+                return _DataByName;
             }
         }
 
@@ -97,6 +125,18 @@ namespace Form
                 {100003,new Data(100003,"4slope","map4Slope","",4f)},
 
                 {100004,new Data(100004,"5slope","map5Slope","",5f)},
+
+                };
+
+                _DataByName = new Dictionary<string, Data>() {
+
+                    {"plain",_DataById[100001]},
+
+                    {"3slope",_DataById[100002]},
+
+                    {"4slope",_DataById[100003]},
+
+                    {"5slope",_DataById[100004]},
 
                 };
 
@@ -182,6 +222,8 @@ namespace Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataById.ContainsKey(data.id))
+                return data.id;
             if(data.id==-1)
             { 
                 int id=idChain.GetId();
@@ -190,21 +232,26 @@ namespace Form
                 data.id=id;  
             }
 
-                _DataById[data.id]=data;
+                DataById[data.id]=data;
+
+                DataByName[data.name]=data;
 
             
 MapBaseForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
         {            
             Init();
-            if(!_DataById.ContainsKey(id))
+            if(!DataById.ContainsKey(id))
                 return;
                 
-            var data=_DataById[id];
+            var data=DataById[id];
 
-                _DataById.Remove(data.id);
+                DataById.Remove(data.id);
+
+                DataByName.Remove(data.name);
 
 MapBaseForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
@@ -213,7 +260,9 @@ MapBaseForm.RemoveData(id);
         {
             Init();
 
-                _DataById.Clear();
+                DataById.Clear();
+
+                DataByName.Clear();
 
             idChain.Clear();
         }
@@ -224,6 +273,13 @@ MapBaseForm.RemoveData(id);
             if(data is Data)
                RemoveData(data.id);      
         }
+         private static void AddChildren(MapBaseForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

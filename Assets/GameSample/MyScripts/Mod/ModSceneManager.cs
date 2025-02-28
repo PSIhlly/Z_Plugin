@@ -213,7 +213,7 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                             {
                                 var itemData = MapManager.instance.AddItem(finalPos);
                                 itemData.isObstacle = true;
-                                itemData.euler.y = angle;
+                                itemData.euler = new Vector3(itemData.euler.x, angle, itemData.euler.z);
                                 itemData.prefabName = obstacleData.prefabName;
                                 itemData.name = obstacleData.name;
                             }

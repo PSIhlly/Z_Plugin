@@ -27,76 +27,189 @@ namespace Z_Fight.Form
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int id;
+                private int _id;
+
+                public int id{
+                            get{return _id;}
+                             set{
+                            
+                            _id = value;
+                            }
+                        }
+
+                private int _itemId;
 
                 /// <summary>
                 ///武器道具id
                 ///</summary>
-                public int itemId;
+                public int itemId{
+                            get{return _itemId;}
+                             set{
+                            
+                            _itemId = value;
+                            }
+                        }
+
+                private int _damage;
 
                 /// <summary>
                 ///伤害
                 ///</summary>
-                public int damage;
+                public int damage{
+                            get{return _damage;}
+                             set{
+                            
+                            _damage = value;
+                            }
+                        }
+
+                private string _prefabName;
 
                 /// <summary>
                 ///预制名字（索引）
                 ///</summary>
-                public string prefabName;
+                public string prefabName{
+                            get{return _prefabName;}
+                             set{
+                            
+                            _prefabName = value;
+                            }
+                        }
+
+                private int _magazineCapacity;
 
                 /// <summary>
                 ///弹夹总量
                 ///</summary>
-                public int magazineCapacity;
+                public int magazineCapacity{
+                            get{return _magazineCapacity;}
+                             set{
+                            
+                            _magazineCapacity = value;
+                            }
+                        }
+
+                private float _cdTime;
 
                 /// <summary>
                 ///射速冷却时长
                 ///</summary>
-                public float cdTime;
+                public float cdTime{
+                            get{return _cdTime;}
+                             set{
+                            
+                            _cdTime = value;
+                            }
+                        }
+
+                private float _reloadTime;
 
                 /// <summary>
                 ///装填时长
                 ///</summary>
-                public float reloadTime;
+                public float reloadTime{
+                            get{return _reloadTime;}
+                             set{
+                            
+                            _reloadTime = value;
+                            }
+                        }
+
+                private float _speed;
 
                 /// <summary>
                 ///弹速
                 ///</summary>
-                public float speed;
+                public float speed{
+                            get{return _speed;}
+                             set{
+                            
+                            _speed = value;
+                            }
+                        }
+
+                private float _range;
 
                 /// <summary>
                 ///射程
                 ///</summary>
-                public float range;
+                public float range{
+                            get{return _range;}
+                             set{
+                            
+                            _range = value;
+                            }
+                        }
+
+                private Vector3 _attackPos;
 
                 /// <summary>
                 ///枪口
                 ///</summary>
-                public Vector3 attackPos;
+                public Vector3 attackPos{
+                            get{return _attackPos;}
+                             set{
+                            
+                            _attackPos = value;
+                            }
+                        }
+
+                private Vector3 _attackDir;
 
                 /// <summary>
                 ///方向
                 ///</summary>
-                public Vector3 attackDir;
+                public Vector3 attackDir{
+                            get{return _attackDir;}
+                             set{
+                            
+                            _attackDir = value;
+                            }
+                        }
+
+                private bool _selfHurt;
 
                 /// <summary>
                 ///自己伤害
                 ///</summary>
-                public bool selfHurt;
+                public bool selfHurt{
+                            get{return _selfHurt;}
+                             set{
+                            
+                            _selfHurt = value;
+                            }
+                        }
+
+                private float _accuracy;
 
                 /// <summary>
                 ///精度
                 ///</summary>
-                public float accuracy;
+                public float accuracy{
+                            get{return _accuracy;}
+                             set{
+                            
+                            _accuracy = value;
+                            }
+                        }
+
+                private int _bulletsPer;
 
                 /// <summary>
                 ///单次开火弹数
                 ///</summary>
-                public int bulletsPer;
+                public int bulletsPer{
+                            get{return _bulletsPer;}
+                             set{
+                            
+                            _bulletsPer = value;
+                            }
+                        }
 
             public Data(int id,int itemId,int damage,string prefabName,int magazineCapacity,float cdTime,float reloadTime,float speed,float range,Vector3 attackPos,Vector3 attackDir,bool selfHurt,float accuracy,int bulletsPer)
             {
@@ -123,7 +236,7 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,0,0,"",0,0f,0f,0f,0f,Vector3.zero,Vector3.zero,false,0f,0);
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -266,6 +379,8 @@ namespace Z_Fight.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataById.ContainsKey(data.id))
+                return data.id;
             if(data.id==-1)
             { 
                 int id=idChain.GetId();
@@ -274,21 +389,22 @@ namespace Z_Fight.Form
                 data.id=id;  
             }
 
-                _DataById[data.id]=data;
+                DataById[data.id]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
         {            
             Init();
-            if(!_DataById.ContainsKey(id))
+            if(!DataById.ContainsKey(id))
                 return;
                 
-            var data=_DataById[id];
+            var data=DataById[id];
 
-                _DataById.Remove(data.id);
+                DataById.Remove(data.id);
 
 
             childRemoveAction?.Invoke(data);
@@ -297,7 +413,7 @@ namespace Z_Fight.Form
         {
             Init();
 
-                _DataById.Clear();
+                DataById.Clear();
 
             idChain.Clear();
         }
@@ -308,6 +424,13 @@ namespace Z_Fight.Form
             if(data is Data)
                RemoveData(data.id);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

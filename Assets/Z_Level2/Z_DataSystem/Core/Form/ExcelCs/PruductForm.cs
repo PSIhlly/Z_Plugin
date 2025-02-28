@@ -26,21 +26,46 @@ namespace Z_DataSystem.Form
         public static Z_Chain.Chain uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int uid;
+                private int _uid;
+
+                public int uid{
+                            get{return _uid;}
+                             set{
+                            
+                            _uid = value;
+                            }
+                        }
+
+                private string _name;
 
                 /// <summary>
                 ///Ãû³Æ
                 ///</summary>
-                public string name;
+                public string name{
+                            get{return _name;}
+                             set{
+                            if(_DataByUid!=null&&_DataByUid.ContainsValue(this)){RemoveData(uid); _name = value;AddData(this);}else
+                            _name = value;
+                            }
+                        }
+
+                private Dictionary<string,object> _paramDic;
 
                 /// <summary>
                 ///Êý¾Ý
                 ///</summary>
-                public Dictionary<string,object> paramDic;
+                public Dictionary<string,object> paramDic{
+                            get{return _paramDic;}
+                             set{
+                            
+                            _paramDic = value;
+                            }
+                        }
 
             public Data(int uid,string name,Dictionary<string,object> paramDic)
             {
@@ -56,7 +81,7 @@ namespace Z_DataSystem.Form
                    public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){});
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -66,7 +91,7 @@ namespace Z_DataSystem.Form
             }
         }
 
-        static Dictionary<string, Data> _DataByName = null;
+        static Dictionary<string, Data> _DataByName;
         public static Dictionary<string, Data> DataByName
         {
             get
@@ -169,6 +194,8 @@ namespace Z_DataSystem.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -177,25 +204,26 @@ namespace Z_DataSystem.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
-                _DataByName[data.name]=data;
+                DataByName[data.name]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
-                _DataByName.Remove(data.name);
+                DataByName.Remove(data.name);
 
 
             childRemoveAction?.Invoke(data);
@@ -204,9 +232,9 @@ namespace Z_DataSystem.Form
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
-                _DataByName.Clear();
+                DataByName.Clear();
 
             uidChain.Clear();
         }
@@ -217,6 +245,13 @@ namespace Z_DataSystem.Form
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

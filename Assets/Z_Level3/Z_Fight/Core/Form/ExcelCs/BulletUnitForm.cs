@@ -24,6 +24,7 @@ namespace Z_Fight.Form
 
 
                 UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
             
         }
         
@@ -31,6 +32,7 @@ namespace Z_Fight.Form
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -46,20 +48,44 @@ namespace Z_Fight.Form
                     }
                 }
 
+                private int _weaponBulletId;
+
                 /// <summary>
                 ///ÎäÆ÷×Óµ¯Êý¾Ýid
                 ///</summary>
-                public int weaponBulletId;
+                public int weaponBulletId{
+                            get{return _weaponBulletId;}
+                             set{
+                            
+                            _weaponBulletId = value;
+                            }
+                        }
+
+                private float _rangeLast;
 
                 /// <summary>
                 ///ÓàÊ£Éä³Ì
                 ///</summary>
-                public float rangeLast;
+                public float rangeLast{
+                            get{return _rangeLast;}
+                             set{
+                            
+                            _rangeLast = value;
+                            }
+                        }
+
+                private int _attackerUid;
 
                 /// <summary>
                 ///¹¥»÷Õß
                 ///</summary>
-                public int attackerUid;
+                public int attackerUid{
+                            get{return _attackerUid;}
+                             set{
+                            
+                            _attackerUid = value;
+                            }
+                        }
 
             public Data(int uid,string name,int weaponBulletId,float rangeLast,int attackerUid,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
@@ -84,7 +110,7 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,"",0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -217,6 +243,8 @@ namespace Z_Fight.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -225,21 +253,22 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 UnitForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
@@ -248,7 +277,7 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -259,6 +288,13 @@ UnitForm.RemoveData(uid);
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(UnitForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

@@ -29,26 +29,59 @@ namespace Form
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public readonly int id;
+                private int _id;
+
+                public int id{
+                            get{return _id;}
+                            private set{
+                            
+                            _id = value;
+                            }
+                        }
+
+                private string _NameKey;
 
                 /// <summary>
                 ///名称索引
                 ///</summary>
-                public readonly string NameKey;
+                public string NameKey{
+                            get{return _NameKey;}
+                            private set{
+                            
+                            _NameKey = value;
+                            }
+                        }
+
+                private string _icon;
 
                 /// <summary>
                 ///图标
                 ///</summary>
-                public readonly string icon;
+                public string icon{
+                            get{return _icon;}
+                            private set{
+                            
+                            _icon = value;
+                            }
+                        }
+
+                private bool _needLayer;
 
                 /// <summary>
                 ///是否需要层级设置
                 ///</summary>
-                public readonly bool needLayer;
+                public bool needLayer{
+                            get{return _needLayer;}
+                            private set{
+                            
+                            _needLayer = value;
+                            }
+                        }
 
             public Data(int id,string NameKey,string icon,bool needLayer)
             {
@@ -65,7 +98,7 @@ namespace Form
                    public static Data defaultData=new Data(0,"","",false);
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get

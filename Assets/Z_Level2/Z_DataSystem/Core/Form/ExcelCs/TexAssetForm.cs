@@ -26,18 +26,43 @@ namespace Z_DataSystem.Form
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int id;
+                private int _id;
+
+                public int id{
+                            get{return _id;}
+                             set{
+                            
+                            _id = value;
+                            }
+                        }
+
+                private string _name;
 
                 /// <summary>
                 ///Ãû³Æ£¨Ë÷Òý£©
                 ///</summary>
-                public string name;
+                public string name{
+                            get{return _name;}
+                             set{
+                            if(_DataById!=null&&_DataById.ContainsValue(this)){RemoveData(id); _name = value;AddData(this);}else
+                            _name = value;
+                            }
+                        }
 
-                public Texture tex;
+                private Texture _tex;
+
+                public Texture tex{
+                            get{return _tex;}
+                             set{
+                            
+                            _tex = value;
+                            }
+                        }
 
             public Data(int id,string name,Texture tex)
             {
@@ -53,7 +78,7 @@ namespace Z_DataSystem.Form
                    public static Data defaultData=new Data(0,"",Texture2D.blackTexture);
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -63,7 +88,7 @@ namespace Z_DataSystem.Form
             }
         }
 
-        static Dictionary<string, Data> _DataByName = null;
+        static Dictionary<string, Data> _DataByName;
         public static Dictionary<string, Data> DataByName
         {
             get
@@ -166,6 +191,8 @@ namespace Z_DataSystem.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataById.ContainsKey(data.id))
+                return data.id;
             if(data.id==-1)
             { 
                 int id=idChain.GetId();
@@ -174,25 +201,26 @@ namespace Z_DataSystem.Form
                 data.id=id;  
             }
 
-                _DataById[data.id]=data;
+                DataById[data.id]=data;
 
-                _DataByName[data.name]=data;
+                DataByName[data.name]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
         {            
             Init();
-            if(!_DataById.ContainsKey(id))
+            if(!DataById.ContainsKey(id))
                 return;
                 
-            var data=_DataById[id];
+            var data=DataById[id];
 
-                _DataById.Remove(data.id);
+                DataById.Remove(data.id);
 
-                _DataByName.Remove(data.name);
+                DataByName.Remove(data.name);
 
 
             childRemoveAction?.Invoke(data);
@@ -201,9 +229,9 @@ namespace Z_DataSystem.Form
         {
             Init();
 
-                _DataById.Clear();
+                DataById.Clear();
 
-                _DataByName.Clear();
+                DataByName.Clear();
 
             idChain.Clear();
         }
@@ -214,6 +242,13 @@ namespace Z_DataSystem.Form
             if(data is Data)
                RemoveData(data.id);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

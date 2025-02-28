@@ -24,6 +24,7 @@ namespace Z_Map.Form
 
 
                 UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
             
         }
         
@@ -31,6 +32,7 @@ namespace Z_Map.Form
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -46,25 +48,57 @@ namespace Z_Map.Form
                     }
                 }
 
+                private Dictionary<int,string> _texNameDic;
+
                 /// <summary>
                 ///纹理名字（索引）
                 ///</summary>
-                public Dictionary<int,string> texNameDic;
+                public Dictionary<int,string> texNameDic{
+                            get{return _texNameDic;}
+                             set{
+                            
+                            _texNameDic = value;
+                            }
+                        }
+
+                private Dictionary<int,string> _alphaTexNameDic;
 
                 /// <summary>
                 ///透明度纹理名字（索引）
                 ///</summary>
-                public Dictionary<int,string> alphaTexNameDic;
+                public Dictionary<int,string> alphaTexNameDic{
+                            get{return _alphaTexNameDic;}
+                             set{
+                            
+                            _alphaTexNameDic = value;
+                            }
+                        }
+
+                private Dictionary<int,int> _animInterval;
 
                 /// <summary>
                 ///动画间隔
                 ///</summary>
-                public Dictionary<int,int> animInterval;
+                public Dictionary<int,int> animInterval{
+                            get{return _animInterval;}
+                             set{
+                            
+                            _animInterval = value;
+                            }
+                        }
+
+                private Vector3Int _mapPos;
 
                 /// <summary>
                 ///离散位置
                 ///</summary>
-                public Vector3Int mapPos;
+                public Vector3Int mapPos{
+                            get{return _mapPos;}
+                             set{
+                            if(_DataByUid!=null&&_DataByUid.ContainsValue(this)){RemoveData(uid); _mapPos = value;AddData(this);}else
+                            _mapPos = value;
+                            }
+                        }
 
             public Data(int uid,string name,Dictionary<int,string> texNameDic,Dictionary<int,string> alphaTexNameDic,Dictionary<int,int> animInterval,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
@@ -90,7 +124,7 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},new Dictionary<int,string>(){},new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -100,7 +134,7 @@ namespace Z_Map.Form
             }
         }
 
-        static Dictionary<Vector3Int, Data> _DataByMappos = null;
+        static Dictionary<Vector3Int, Data> _DataByMappos;
         public static Dictionary<Vector3Int, Data> DataByMappos
         {
             get
@@ -241,6 +275,8 @@ namespace Z_Map.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -249,25 +285,26 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
-                _DataByMappos[data.mapPos]=data;
+                DataByMappos[data.mapPos]=data;
 
             
 UnitForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
-                _DataByMappos.Remove(data.mapPos);
+                DataByMappos.Remove(data.mapPos);
 
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
@@ -276,9 +313,9 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
-                _DataByMappos.Clear();
+                DataByMappos.Clear();
 
             uidChain.Clear();
         }
@@ -289,6 +326,13 @@ UnitForm.RemoveData(uid);
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(UnitForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

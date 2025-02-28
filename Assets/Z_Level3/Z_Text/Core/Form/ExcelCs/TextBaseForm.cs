@@ -26,26 +26,59 @@ namespace Z_Text.Form
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public int id;
+                private int _id;
+
+                public int id{
+                            get{return _id;}
+                             set{
+                            
+                            _id = value;
+                            }
+                        }
+
+                private string _key;
 
                 /// <summary>
                 ///索引
                 ///</summary>
-                public string key;
+                public string key{
+                            get{return _key;}
+                             set{
+                            if(_DataById!=null&&_DataById.ContainsValue(this)){RemoveData(id); _key = value;AddData(this);}else
+                            _key = value;
+                            }
+                        }
+
+                private string _contentEn;
 
                 /// <summary>
                 ///英文
                 ///</summary>
-                public string contentEn;
+                public string contentEn{
+                            get{return _contentEn;}
+                             set{
+                            
+                            _contentEn = value;
+                            }
+                        }
+
+                private string _contentCn;
 
                 /// <summary>
                 ///中文
                 ///</summary>
-                public string contentCn;
+                public string contentCn{
+                            get{return _contentCn;}
+                             set{
+                            
+                            _contentCn = value;
+                            }
+                        }
 
             public Data(int id,string key,string contentEn,string contentCn)
             {
@@ -62,7 +95,7 @@ namespace Z_Text.Form
                    public static Data defaultData=new Data(0,"","","");
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -72,7 +105,7 @@ namespace Z_Text.Form
             }
         }
 
-        static Dictionary<string, Data> _DataByKey = null;
+        static Dictionary<string, Data> _DataByKey;
         public static Dictionary<string, Data> DataByKey
         {
             get
@@ -179,6 +212,8 @@ namespace Z_Text.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataById.ContainsKey(data.id))
+                return data.id;
             if(data.id==-1)
             { 
                 int id=idChain.GetId();
@@ -187,25 +222,26 @@ namespace Z_Text.Form
                 data.id=id;  
             }
 
-                _DataById[data.id]=data;
+                DataById[data.id]=data;
 
-                _DataByKey[data.key]=data;
+                DataByKey[data.key]=data;
 
             
 
+            childAddAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
         {            
             Init();
-            if(!_DataById.ContainsKey(id))
+            if(!DataById.ContainsKey(id))
                 return;
                 
-            var data=_DataById[id];
+            var data=DataById[id];
 
-                _DataById.Remove(data.id);
+                DataById.Remove(data.id);
 
-                _DataByKey.Remove(data.key);
+                DataByKey.Remove(data.key);
 
 
             childRemoveAction?.Invoke(data);
@@ -214,9 +250,9 @@ namespace Z_Text.Form
         {
             Init();
 
-                _DataById.Clear();
+                DataById.Clear();
 
-                _DataByKey.Clear();
+                DataByKey.Clear();
 
             idChain.Clear();
         }
@@ -227,6 +263,13 @@ namespace Z_Text.Form
             if(data is Data)
                RemoveData(data.id);      
         }
+         private static void AddChildren(Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

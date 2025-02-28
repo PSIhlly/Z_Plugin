@@ -29,26 +29,59 @@ namespace Form
         public static Z_Chain.Chain idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data
         {
 
-                public readonly int id;
+                private int _id;
+
+                public int id{
+                            get{return _id;}
+                            private set{
+                            
+                            _id = value;
+                            }
+                        }
+
+                private string _name;
 
                 /// <summary>
                 ///名字
                 ///</summary>
-                public readonly string name;
+                public string name{
+                            get{return _name;}
+                            private set{
+                            
+                            _name = value;
+                            }
+                        }
+
+                private string _icon;
 
                 /// <summary>
                 ///图标
                 ///</summary>
-                public readonly string icon;
+                public string icon{
+                            get{return _icon;}
+                            private set{
+                            
+                            _icon = value;
+                            }
+                        }
+
+                private int _count;
 
                 /// <summary>
                 ///拥有数
                 ///</summary>
-                public int count;
+                public int count{
+                            get{return _count;}
+                             set{
+                            
+                            _count = value;
+                            }
+                        }
 
             public Data(int id,string name,string icon,int count)
             {
@@ -65,7 +98,7 @@ namespace Form
                    public static Data defaultData=new Data(0,"","",0);
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get

@@ -34,9 +34,10 @@ namespace Ui
                 ModAssetManager.instance.ImportAnimTex(ModAssetManager.instance.GetTexRealName(model.curData.name, model.curAnim), null);
             });
 
-            view.ipt_name.onInput += (v) =>
+            view.ipt_name.onFinishInput += (v) =>
             {
                 ModAssetManager.instance.RenameAnimTex(model.curData.name,v);
+                Refresh();
             };
         }
 
@@ -49,11 +50,12 @@ namespace Ui
         public void Refresh()
         {
             con.Clear();
-            foreach(var data in MapTextureForm.DataById.Values)
+
+
+            foreach (var data in MapTextureForm.DataById.Values)
             {
                 if (data.id > MapBaseForm.autoIdCnt)
                     continue;
-
                 con.Add(new UiTextureItemParam
                 {
                     id = data.id
@@ -83,13 +85,18 @@ namespace Ui
                         break;
                 }
 
+                animCon.Add(new UiAnimTypeItemParam
+                {
+                    id = -1
+                });
+                animCon.Refresh();
             }
-
+            
             animCon.Refresh();
             if (model.curData != null)
             {
                 view.img_tex.sprite = AssetManager.instance.GetSprite(ModAssetManager.instance.GetTexRealName(model.curData.name ,model.curAnim));
-                view.ipt_name.text = model.curData.name;
+                view.ipt_name.Set(model.curData.name);
             }
 
         }
@@ -147,12 +154,11 @@ namespace Ui
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(parent.model.curData.id == model.id ? 1 : 0);
             if(model.id!=-1)
             {
                 view.txt_name.text = parent.model.curData.name + model.id;
                 view.img_.sprite = AssetManager.instance.GetSprite(ModAssetManager.instance.GetTexRealName(MapTextureForm.DataById[parent.model.curData.id].name,model.id));
-                view.sta_item.ChangeState(parent.model.curData?.id == model.id ? 1 : 0);
+                view.sta_item.ChangeState(parent.model.curAnim == model.id ? 1 : 0);
             }
         }
 
@@ -208,7 +214,7 @@ namespace Ui
         }
         public void Refresh()
         {
-            if(model.id!=-1)
+            if (model.id!=-1)
             {
                 view.img_.sprite = AssetManager.instance.GetSprite(ModAssetManager.instance.GetTexRealName(MapTextureForm.DataById[model.id].name,0));
                 view.txt_name.text = MapTextureForm.DataById[model.id].name;

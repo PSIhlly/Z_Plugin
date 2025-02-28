@@ -24,6 +24,7 @@ namespace Z_Fight.Form
 
 
                 UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
             
         }
         
@@ -31,6 +32,7 @@ namespace Z_Fight.Form
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -46,30 +48,70 @@ namespace Z_Fight.Form
                     }
                 }
 
+                private int _fightUid;
+
                 /// <summary>
                 ///持有者
                 ///</summary>
-                public int fightUid;
+                public int fightUid{
+                            get{return _fightUid;}
+                             set{
+                            
+                            _fightUid = value;
+                            }
+                        }
+
+                private List<int> _weaponBulletsId;
 
                 /// <summary>
                 ///子弹类型列表
                 ///</summary>
-                public List<int> weaponBulletsId;
+                public List<int> weaponBulletsId{
+                            get{return _weaponBulletsId;}
+                             set{
+                            
+                            _weaponBulletsId = value;
+                            }
+                        }
+
+                private int _curWeaponBulletAid;
 
                 /// <summary>
                 ///当前使用子弹id
                 ///</summary>
-                public int curWeaponBulletAid;
+                public int curWeaponBulletAid{
+                            get{return _curWeaponBulletAid;}
+                             set{
+                            
+                            _curWeaponBulletAid = value;
+                            }
+                        }
+
+                private float _cdRemain;
 
                 /// <summary>
                 ///射速冷却时长余剩
                 ///</summary>
-                public float cdRemain;
+                public float cdRemain{
+                            get{return _cdRemain;}
+                             set{
+                            
+                            _cdRemain = value;
+                            }
+                        }
+
+                private int _magazineRemain;
 
                 /// <summary>
                 ///弹夹余剩
                 ///</summary>
-                public int magazineRemain;
+                public int magazineRemain{
+                            get{return _magazineRemain;}
+                             set{
+                            
+                            _magazineRemain = value;
+                            }
+                        }
 
             public Data(int uid,string name,int fightUid,List<int> weaponBulletsId,int curWeaponBulletAid,float cdRemain,int magazineRemain,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
@@ -96,7 +138,7 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,"",0,null,0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -237,6 +279,8 @@ namespace Z_Fight.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -245,21 +289,22 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 UnitForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
@@ -268,7 +313,7 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -279,6 +324,13 @@ UnitForm.RemoveData(uid);
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(UnitForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

@@ -26,6 +26,7 @@ namespace Form
 
 
                 TextBaseForm.childRemoveAction+=RemoveChildren;
+                TextBaseForm.childAddAction+=AddChildren;
             
         }
         
@@ -33,6 +34,7 @@ namespace Form
         public static Z_Chain.Chain idChain=>TextBaseForm.idChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : TextBaseForm.Data
         {
@@ -52,7 +54,7 @@ namespace Form
                    public static Data defaultData=new Data(0,"","","");
 
 
-        static Dictionary<int, Data> _DataById = null;
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -62,7 +64,7 @@ namespace Form
             }
         }
 
-        static Dictionary<string, Data> _DataByKey = null;
+        static Dictionary<string, Data> _DataByKey;
         public static Dictionary<string, Data> DataByKey
         {
             get
@@ -215,6 +217,8 @@ namespace Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataById.ContainsKey(data.id))
+                return data.id;
             if(data.id==-1)
             { 
                 int id=idChain.GetId();
@@ -223,25 +227,26 @@ namespace Form
                 data.id=id;  
             }
 
-                _DataById[data.id]=data;
+                DataById[data.id]=data;
 
-                _DataByKey[data.key]=data;
+                DataByKey[data.key]=data;
 
             
 TextBaseForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
         {            
             Init();
-            if(!_DataById.ContainsKey(id))
+            if(!DataById.ContainsKey(id))
                 return;
                 
-            var data=_DataById[id];
+            var data=DataById[id];
 
-                _DataById.Remove(data.id);
+                DataById.Remove(data.id);
 
-                _DataByKey.Remove(data.key);
+                DataByKey.Remove(data.key);
 
 TextBaseForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
@@ -250,9 +255,9 @@ TextBaseForm.RemoveData(id);
         {
             Init();
 
-                _DataById.Clear();
+                DataById.Clear();
 
-                _DataByKey.Clear();
+                DataByKey.Clear();
 
             idChain.Clear();
         }
@@ -263,6 +268,13 @@ TextBaseForm.RemoveData(id);
             if(data is Data)
                RemoveData(data.id);      
         }
+         private static void AddChildren(TextBaseForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

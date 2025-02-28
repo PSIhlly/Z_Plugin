@@ -58,7 +58,7 @@ namespace {file_namespace}
         init_internal_base_str=""
 
         init_children_action_str=""
-        remove_children_action_str=""
+        remove_add_children_action_str=""
         add_op_base_str = ""
         remove_op_base_str = ""
         if self.base_info!=None:
@@ -81,13 +81,16 @@ namespace {file_namespace}
         add_remove_clear_op_str = ""
         if 'write' in self.var_config_dic[self.id_str]:
             if self.extend_data_str != '':
-                remove_children_action_str=f'''
+                remove_add_children_action_str=f'''
                 {self.extend_data_str}Form.childRemoveAction+=RemoveChildren;
+                {self.extend_data_str}Form.childAddAction+=AddChildren;
             '''
             add_remove_clear_op_str = f'''
         public static int AddData(Data data)
         {{
             Init();
+            if(DataBy{self.id_str.capitalize()}.ContainsKey(data.{self.id_str}))
+                return data.{self.id_str};
             if(data.{self.id_str}==-1)
             {{ 
                 int {self.id_str}={self.id_str}Chain.GetId();
@@ -98,15 +101,16 @@ namespace {file_namespace}
 {self.add_str}
             
 {add_op_base_str}
+            childAddAction?.Invoke(data);
             return data.{self.id_str};
         }}
         public static void RemoveData(int {self.id_str})
         {{            
             Init();
-            if(!_DataBy{self.id_str.capitalize()}.ContainsKey({self.id_str}))
+            if(!DataBy{self.id_str.capitalize()}.ContainsKey({self.id_str}))
                 return;
                 
-            var data=_DataBy{self.id_str.capitalize()}[{self.id_str}];
+            var data=DataBy{self.id_str.capitalize()}[{self.id_str}];
 {self.remove_str}
 {remove_op_base_str}
             childRemoveAction?.Invoke(data);
@@ -124,6 +128,13 @@ namespace {file_namespace}
             if(data is Data)
                RemoveData(data.{self.id_str});      
         }}
+         private static void AddChildren({'' if self.extend_data_str == '' else f'{self.extend_data_str}Form.'}Data superData)
+        {{
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }}
+        
 
 '''
         return f"""{namespace_str}
@@ -135,13 +146,14 @@ namespace {file_namespace}
         static void Register()
         {{
 {init_children_action_str}
-{remove_children_action_str}
+{remove_add_children_action_str}
         }}
         
         private static bool inited;
         public static Z_Chain.Chain {self.id_str}Chain{'' if self.extend_data_str == '' else f'=>{self.extend_data_str}Form.{self.id_str}Chain'};
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data{'' if self.extend_data_str=='' else  f" : {self.extend_data_str}Form.Data"}
         {{
@@ -425,30 +437,40 @@ for formInfo in form_info_list:
             for name in formInfo.var_list:
                     if 'override' not in formInfo.var_config_dic[name]:
                         declare = ''
+                        annotation=''
+                        visit=''
                         if name in formInfo.var_annotation_dic:
-                            declare+=f'''
+                            annotation=f'''
                 /// <summary>
                 ///{formInfo.var_annotation_dic[name]}
                 ///</summary>
                 '''
                         else:
-                            declare+=f'''
+                            annotation+=f'''
                 '''
-                        declare+='public '
-                        if 'write' not in formInfo.var_config_dic[name]:
-                            declare+='readonly '
+                        visit=f'''
+                private '''
+                        
                         #类型描述
                         if 'custom' in formInfo.var_config_dic[name]:
                             declare+=formInfo.var_type_dic[name] + ' '#暂时一样
                         else:
                             declare+=formInfo.var_type_dic[name] + ' '
-                        declare+=name
-                        formInfo.declare_str+=declare + ';\n'
+                        formInfo.declare_str+=visit+declare +"_"+name+ ';\n'
+                        visit='public '
+                        formInfo.declare_str+=annotation+visit+declare+name+f'''{{
+                            get{{return _{name};}}
+                            {f"" if 'write' in formInfo.var_config_dic[name] else f"private"} set{{
+                            {f"if(_DataBy{formInfo.id_str.capitalize()}!=null&&_DataBy{formInfo.id_str.capitalize()}.ContainsValue(this)){{RemoveData({formInfo.id_str}); _{name} = value;AddData(this);}}else" if 'write' in formInfo.var_config_dic[name] and ('index' in formInfo.var_config_dic[name] or 'uniqueIndex' in formInfo.var_config_dic[name]) else  f""}
+                            _{name} = value;
+                            }}
+                        }}\n'''
+
             
             #添加索引
             
             formInfo.dic_str+=f"""
-        static Dictionary<int, Data> _DataBy{formInfo.id_str.capitalize()} = null;
+        static Dictionary<int, Data> _DataBy{formInfo.id_str.capitalize()};
         public static Dictionary<int, Data> DataBy{formInfo.id_str.capitalize()}
         {{
             get
@@ -461,7 +483,7 @@ for formInfo in form_info_list:
             for name in formInfo.var_list:
                 if 'uniqueIndex' in formInfo.var_config_dic[name]:
                     formInfo.dic_str+=f"""
-        static Dictionary<{formInfo.var_type_dic[name]}, Data> _DataBy{name.capitalize()} = null;
+        static Dictionary<{formInfo.var_type_dic[name]}, Data> _DataBy{name.capitalize()};
         public static Dictionary<{formInfo.var_type_dic[name]}, Data> DataBy{name.capitalize()}
         {{
             get
@@ -473,7 +495,7 @@ for formInfo in form_info_list:
 """
                 if 'index' in formInfo.var_config_dic[name]:
                     formInfo.dic_str+=f"""
-        static Dictionary<{formInfo.var_type_dic[name]}, List<Data>> _DatasBy{name.capitalize()} = null;
+        static Dictionary<{formInfo.var_type_dic[name]}, List<Data>> _DatasBy{name.capitalize()};
         public static Dictionary<{formInfo.var_type_dic[name]}, List<Data>> DatasBy{name.capitalize()}
         {{
             get
@@ -530,13 +552,13 @@ for formInfo in form_info_list:
                 _DataBy{formInfo.id_str.capitalize()} = new Dictionary<int, Data>() {{
 '''
             formInfo.add_str+=f'''
-                _DataBy{formInfo.id_str.capitalize()}[data.{formInfo.id_str}]=data;
+                DataBy{formInfo.id_str.capitalize()}[data.{formInfo.id_str}]=data;
 '''         
             formInfo.remove_str+=f'''
-                _DataBy{formInfo.id_str.capitalize()}.Remove(data.{formInfo.id_str});
+                DataBy{formInfo.id_str.capitalize()}.Remove(data.{formInfo.id_str});
 '''
             formInfo.clear_str+=f'''
-                _DataBy{formInfo.id_str.capitalize()}.Clear();
+                DataBy{formInfo.id_str.capitalize()}.Clear();
 '''
             for data in formInfo.data_list:
                 args = ''
@@ -562,13 +584,13 @@ for formInfo in form_info_list:
                 _DataBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, Data>() {{
 '''
                     formInfo.add_str+=f'''
-                _DataBy{name.capitalize()}[data.{name}]=data;
+                DataBy{name.capitalize()}[data.{name}]=data;
 '''         
                     formInfo.remove_str+=f'''
-                _DataBy{name.capitalize()}.Remove(data.{name});
+                DataBy{name.capitalize()}.Remove(data.{name});
 '''                   
                     formInfo.clear_str+=f'''
-                _DataBy{name.capitalize()}.Clear();
+                DataBy{name.capitalize()}.Clear();
 '''
                     for data in formInfo.data_list:
                         if data[formInfo.id_str]=='0':
@@ -584,13 +606,13 @@ for formInfo in form_info_list:
                 _DatasBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, List<Data>>() {{
 '''
                     formInfo.add_str+=f'''
-                _DatasBy{name.capitalize()}[data.{name}].Add(data);
+                DatasBy{name.capitalize()}[data.{name}].Add(data);
 '''         
                     formInfo.remove_str+=f'''
-                _DatasBy{name.capitalize()}[data.{name}].Remove(data);
+                DatasBy{name.capitalize()}[data.{name}].Remove(data);
 '''
                     formInfo.clear_str+=f'''
-                _DatasBy{name.capitalize()}.Clear();
+                DatasBy{name.capitalize()}.Clear();
 '''
 
                     #登记list

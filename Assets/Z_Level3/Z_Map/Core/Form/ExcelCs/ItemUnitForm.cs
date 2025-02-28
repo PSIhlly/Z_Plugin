@@ -24,6 +24,7 @@ namespace Z_Map.Form
 
 
                 UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
             
         }
         
@@ -31,6 +32,7 @@ namespace Z_Map.Form
         public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
 
         public partial class Data : UnitForm.Data
         {
@@ -46,10 +48,18 @@ namespace Z_Map.Form
                     }
                 }
 
+                private bool _isObstacle;
+
                 /// <summary>
                 /// «’œ∞≠ŒÔ
                 ///</summary>
-                public bool isObstacle;
+                public bool isObstacle{
+                            get{return _isObstacle;}
+                             set{
+                            
+                            _isObstacle = value;
+                            }
+                        }
 
             public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
@@ -72,7 +82,7 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid = null;
+        static Dictionary<int, Data> _DataByUid;
         public static Dictionary<int, Data> DataByUid
         {
             get
@@ -197,6 +207,8 @@ namespace Z_Map.Form
         public static int AddData(Data data)
         {
             Init();
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
@@ -205,21 +217,22 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                _DataByUid[data.uid]=data;
+                DataByUid[data.uid]=data;
 
             
 UnitForm.AddData(data);
+            childAddAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
         {            
             Init();
-            if(!_DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                 
-            var data=_DataByUid[uid];
+            var data=DataByUid[uid];
 
-                _DataByUid.Remove(data.uid);
+                DataByUid.Remove(data.uid);
 
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
@@ -228,7 +241,7 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                _DataByUid.Clear();
+                DataByUid.Clear();
 
             uidChain.Clear();
         }
@@ -239,6 +252,13 @@ UnitForm.RemoveData(uid);
             if(data is Data)
                RemoveData(data.uid);      
         }
+         private static void AddChildren(UnitForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
 
 
     }

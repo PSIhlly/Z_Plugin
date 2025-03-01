@@ -6,39 +6,79 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 
 namespace Form
 {
 
     public static partial class ItemFormForm
     {
-        private static bool inited;
-        private static Queue<int> freeIdQueue;
-        public static Action childInitAction;
+        public static readonly int autoIdCnt=100;
 
-        static ItemFormForm()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Register()
         {
 
+
         }
+        
+        private static bool inited;
+        public static Z_Chain.Chain idChain;
+        public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+
         public partial class Data
         {
 
-                    public readonly int id;
+                private int _id;
 
-                    /// <summary>
-                    ///名字
-                    ///</summary>
-                    public readonly string name;
+                public int id{
+                            get{return _id;}
+                            private set{
+                            
+                            _id = value;
+                            }
+                        }
 
-                    /// <summary>
-                    ///图标
-                    ///</summary>
-                    public readonly string icon;
+                private string _name;
 
-                    /// <summary>
-                    ///拥有数
-                    ///</summary>
-                    public int count;
+                /// <summary>
+                ///名字
+                ///</summary>
+                public string name{
+                            get{return _name;}
+                            private set{
+                            
+                            _name = value;
+                            }
+                        }
+
+                private string _icon;
+
+                /// <summary>
+                ///图标
+                ///</summary>
+                public string icon{
+                            get{return _icon;}
+                            private set{
+                            
+                            _icon = value;
+                            }
+                        }
+
+                private int _count;
+
+                /// <summary>
+                ///拥有数
+                ///</summary>
+                public int count{
+                            get{return _count;}
+                             set{
+                            
+                            _count = value;
+                            }
+                        }
 
             public Data(int id,string name,string icon,int count)
             {
@@ -47,11 +87,15 @@ namespace Form
                 this.name = name;
                 this.icon = icon;
                 this.count = count;
+
             }
             
         }
 
-        static Dictionary<int, Data> _DataById = null;
+                   public static Data defaultData=new Data(0,"","",0);
+
+
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -64,17 +108,18 @@ namespace Form
 
         static public void Init()
         {
+
             InitInternal();
         }
         public static void InitInternal()
         {
-             if(inited)
+            if(inited)
                 return;
-        freeIdQueue=new Queue<int> (Enumerable.Range(0, 100));
+            inited=true;  
+            idChain=new Z_Chain.Chain (autoIdCnt);
+            
 
                 _DataById = new Dictionary<int, Data>() {
-
-                {0,new Data(0,"","",0)},
 
                 {1,new Data(1,"Space-Time Fragment","\\GameSample\\Imgs\\Item\\ST fragment.png",500)},
 
@@ -87,12 +132,8 @@ namespace Form
             
 
 
-             foreach(var k in _DataById.Keys)
-            {
-                freeIdQueue.Enqueue(k);
-            }
-
-            inited=true;  
+            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+             
         }
 
 
@@ -102,6 +143,8 @@ namespace Form
             List<Data> lst=new List<Data>();
             foreach(JObject jo in ja)
             {
+                if(jo.Get<int>("id")==0)
+                    continue;
                 lst.Add(GetDataByJo(jo));
             }
             return lst;
@@ -113,7 +156,8 @@ namespace Form
             JArray ja=new JArray();
             foreach(Data data in _DataById.Values)
             {
-
+                if(data.id==0)
+                    continue;
                 ja.Add(GetJoByData(data));
             }
             return ja;
@@ -123,15 +167,15 @@ namespace Form
         {
             Init();
 
-                    Data data=new Data(
+            Data data=new Data(
 
-                        jo.Get<int>("id"),
+                jo.Get<int>("id"),
 
-                    _DataById[0].name,
+                    defaultData.name,
 
-                    _DataById[0].icon,
+                    defaultData.icon,
 
-                        jo.Get<int>("count")
+                jo.Get<int>("count")
                     );
 
             return data;
@@ -141,11 +185,11 @@ namespace Form
         {
             Init();
 
-                    JObject jo=new JObject();
+            JObject jo=new JObject();
 
-                    jo.Set<int>("id",data.id);
+            jo.Set<int>("id",data.id);
 
-                    jo.Set<int>("count",data.count);
+            jo.Set<int>("count",data.count);
 
             return jo;
         }

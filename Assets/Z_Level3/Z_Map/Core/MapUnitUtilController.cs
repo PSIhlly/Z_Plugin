@@ -704,10 +704,11 @@ namespace Z_Map
                 if (data.texNameDic.ContainsKey(i)&&data.animInterval[i]>0)
                 {
                     int all = data.animInterval[i] * animTextureDic[data.texNameDic[i]].Count;
-                    int cur=(Time.frameCount % all)/ data.animInterval[i];
-                    if (ins.animCur.ContainsKey(i) && ins.animCur[i] == cur)
-                        continue;
 
+                    int cur=(Time.frameCount % all)/ data.animInterval[i];
+                    if (all==0||(ins.animCur.ContainsKey(i) && ins.animCur[i] == cur))
+                        continue;
+                    ins.animCur[i] = cur;
                     MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                     ins.renderers[i].GetPropertyBlock(propBlock);
                     propBlock.SetTexture("_Tex", animTextureDic[data.texNameDic[i]][cur]);

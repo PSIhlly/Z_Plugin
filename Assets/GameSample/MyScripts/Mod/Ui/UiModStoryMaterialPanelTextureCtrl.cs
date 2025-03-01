@@ -39,6 +39,14 @@ namespace Ui
                 ModAssetManager.instance.RenameAnimTex(model.curData.name,v);
                 Refresh();
             };
+            view.ipt_intervalSet.onFinishInput += (v) =>
+            {
+                if(float.TryParse(v,out var itv))
+                {
+                    model.curData.animTimeInterval =itv;
+                }
+                Refresh();
+            };
         }
 
 
@@ -97,6 +105,7 @@ namespace Ui
             {
                 view.img_tex.sprite = AssetManager.instance.GetSprite(ModAssetManager.instance.GetTexRealName(model.curData.name ,model.curAnim));
                 view.ipt_name.Set(model.curData.name);
+                view.ipt_intervalSet.Set(model.curData.animTimeInterval.ToString("0.##"));
             }
 
         }

@@ -128,7 +128,7 @@ namespace Z_Map
 
         public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            var data = new MapUnitForm.Data(-1,"", new Dictionary<int, string>() { {0,"tile1" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { {0, 60 } }, mapPos, "map", mapPos,Vector3.zero,Vector3.one,0);
+            var data = new MapUnitForm.Data(-1,"", new Dictionary<int, string>() { {0, "grass" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { {0, 60 } }, mapPos, "map", mapPos,Vector3.zero,Vector3.one,0);
             MapUnitForm.AddData(data);
             RegisterMap(data);
             return data;

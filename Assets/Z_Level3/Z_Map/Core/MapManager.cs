@@ -89,7 +89,6 @@ namespace Z_Map
                     else
                         break;
                 }
-                Debug.Log(data.name + "???");
                 unitUtilCtrl.CreateTexAnimVariants(data.name, lst.ToArray());
             }
 

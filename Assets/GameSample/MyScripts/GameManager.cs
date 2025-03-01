@@ -21,6 +21,7 @@ public class GameManager : Z_MonoManager<GameManager>
     public float dragDis2 => InputManager.instance.screenSize.x/25;
     public void Start()
     {
+        Application.targetFrameRate = 100;//ÏÈËø100Ö¡
         //default Assets
         AssetManager.instance.LoadAssetsByFolderAutoAdd(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs");
         

@@ -39,26 +39,26 @@ namespace Form
         public partial class Data : MapBaseForm.Data
         {
 
-                private float _animSpeed;
+                private float _animTimeInterval;
 
                 /// <summary>
-                ///播放速度
+                ///播放间隔时间
                 ///</summary>
-                public float animSpeed{
-                            get{return _animSpeed;}
+                public float animTimeInterval{
+                            get{return _animTimeInterval;}
                              set{
                             
-                            _animSpeed = value;
+                            _animTimeInterval = value;
                             }
                         }
 
-            public Data(int id,string name,string icon,float animSpeed):base(id,name,icon)
+            public Data(int id,string name,string icon,float animTimeInterval):base(id,name,icon)
             {
 
                 this.id = id;
                 this.name = name;
                 this.icon = icon;
-                this.animSpeed = animSpeed;
+                this.animTimeInterval = animTimeInterval;
 
             }
             
@@ -104,11 +104,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","",999f)},
+                {200001,new Data(200001,"floor","",0f)},
 
-                {200002,new Data(200002,"grass","",999f)},
+                {200002,new Data(200002,"grass","",0f)},
 
-                {200003,new Data(200003,"road","",999f)},
+                {200003,new Data(200003,"road","",0f)},
 
                 };
 
@@ -175,7 +175,7 @@ namespace Form
 
                 jo.Get<string>("icon"),
 
-                jo.Get<float>("animSpeed")
+                jo.Get<float>("animTimeInterval")
                     );
 
             return data;
@@ -193,7 +193,7 @@ namespace Form
 
             jo.Set<string>("icon",data.icon);
 
-            jo.Set<float>("animSpeed",data.animSpeed);
+            jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
             return jo;
         }

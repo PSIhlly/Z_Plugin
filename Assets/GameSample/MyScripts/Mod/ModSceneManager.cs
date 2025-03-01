@@ -169,6 +169,8 @@ public class ModSceneManager : Z_MonoManager<ModSceneManager>
                             continue;
                         var mapData = MapManager.instance.dataCtrl.maps[(x, hitPos.y, z)];
                         mapData.texNameDic[layer] = textureData.name;
+                        mapData.animInterval[layer] = textureData.animTimeInterval==0?0:Mathf.Max((int)(textureData.animTimeInterval*Application.targetFrameRate),1);
+                        
                     }
             }
             else if (curData is MapTransitionMaskForm.Data maskData)

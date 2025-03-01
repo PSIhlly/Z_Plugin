@@ -6,44 +6,92 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 
 namespace Form
 {
 
     public static partial class DialogFormForm
     {
-        private static bool inited;
-        private static Queue<int> freeIdQueue;
-        public static Action childInitAction;
+        public static readonly int autoIdCnt=100;
 
-        static DialogFormForm()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Register()
         {
 
+
         }
+        
+        private static bool inited;
+        public static Z_Chain.Chain idChain;
+        public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+
         public partial class Data
         {
 
-                    public readonly int id;
+                private int _id;
 
-                    /// <summary>
-                    ///组号
-                    ///</summary>
-                    public readonly int groupId;
+                public int id{
+                            get{return _id;}
+                            private set{
+                            
+                            _id = value;
+                            }
+                        }
 
-                    /// <summary>
-                    ///说话者Id
-                    ///</summary>
-                    public readonly int speaker_npcId;
+                private int _groupId;
 
-                    /// <summary>
-                    ///对话背景图片Id
-                    ///</summary>
-                    public readonly int background_imgId;
+                /// <summary>
+                ///组号
+                ///</summary>
+                public int groupId{
+                            get{return _groupId;}
+                            private set{
+                            
+                            _groupId = value;
+                            }
+                        }
 
-                    /// <summary>
-                    ///对话文本
-                    ///</summary>
-                    public readonly string text;
+                private int _speaker_npcId;
+
+                /// <summary>
+                ///说话者Id
+                ///</summary>
+                public int speaker_npcId{
+                            get{return _speaker_npcId;}
+                            private set{
+                            
+                            _speaker_npcId = value;
+                            }
+                        }
+
+                private int _background_imgId;
+
+                /// <summary>
+                ///对话背景图片Id
+                ///</summary>
+                public int background_imgId{
+                            get{return _background_imgId;}
+                            private set{
+                            
+                            _background_imgId = value;
+                            }
+                        }
+
+                private string _text;
+
+                /// <summary>
+                ///对话文本
+                ///</summary>
+                public string text{
+                            get{return _text;}
+                            private set{
+                            
+                            _text = value;
+                            }
+                        }
 
             public Data(int id,int groupId,int speaker_npcId,int background_imgId,string text)
             {
@@ -53,11 +101,15 @@ namespace Form
                 this.speaker_npcId = speaker_npcId;
                 this.background_imgId = background_imgId;
                 this.text = text;
+
             }
             
         }
 
-        static Dictionary<int, Data> _DataById = null;
+                   public static Data defaultData=new Data(0,0,0,0,"");
+
+
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -70,17 +122,18 @@ namespace Form
 
         static public void Init()
         {
+
             InitInternal();
         }
         public static void InitInternal()
         {
-             if(inited)
+            if(inited)
                 return;
-        freeIdQueue=new Queue<int> (Enumerable.Range(0, 100));
+            inited=true;  
+            idChain=new Z_Chain.Chain (autoIdCnt);
+            
 
                 _DataById = new Dictionary<int, Data>() {
-
-                {0,new Data(0,0,0,0,"")},
 
                 {1,new Data(1,1,1,200001,"hello")},
 
@@ -99,12 +152,8 @@ namespace Form
             
 
 
-             foreach(var k in _DataById.Keys)
-            {
-                freeIdQueue.Enqueue(k);
-            }
-
-            inited=true;  
+            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+             
         }
 
 
@@ -114,6 +163,8 @@ namespace Form
             List<Data> lst=new List<Data>();
             foreach(JObject jo in ja)
             {
+                if(jo.Get<int>("id")==0)
+                    continue;
                 lst.Add(GetDataByJo(jo));
             }
             return lst;
@@ -125,7 +176,8 @@ namespace Form
             JArray ja=new JArray();
             foreach(Data data in _DataById.Values)
             {
-
+                if(data.id==0)
+                    continue;
                 ja.Add(GetJoByData(data));
             }
             return ja;
@@ -135,17 +187,17 @@ namespace Form
         {
             Init();
 
-                    Data data=new Data(
+            Data data=new Data(
 
-                        jo.Get<int>("id"),
+                jo.Get<int>("id"),
 
-                    _DataById[0].groupId,
+                    defaultData.groupId,
 
-                    _DataById[0].speaker_npcId,
+                    defaultData.speaker_npcId,
 
-                    _DataById[0].background_imgId,
+                    defaultData.background_imgId,
 
-                    _DataById[0].text
+                    defaultData.text
                     );
 
             return data;
@@ -155,9 +207,9 @@ namespace Form
         {
             Init();
 
-                    JObject jo=new JObject();
+            JObject jo=new JObject();
 
-                    jo.Set<int>("id",data.id);
+            jo.Set<int>("id",data.id);
 
             return jo;
         }

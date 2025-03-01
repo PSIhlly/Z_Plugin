@@ -6,34 +6,66 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
+using Z_DesignStyle;
 
 namespace Form
 {
 
     public static partial class NpcFormForm
     {
-        private static bool inited;
-        private static Queue<int> freeIdQueue;
-        public static Action childInitAction;
+        public static readonly int autoIdCnt=100;
 
-        static NpcFormForm()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Register()
         {
 
+
         }
+        
+        private static bool inited;
+        public static Z_Chain.Chain idChain;
+        public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+
         public partial class Data
         {
 
-                    public readonly int id;
+                private int _id;
 
-                    /// <summary>
-                    ///Ãû³Æ
-                    ///</summary>
-                    public readonly string name;
+                public int id{
+                            get{return _id;}
+                            private set{
+                            
+                            _id = value;
+                            }
+                        }
 
-                    /// <summary>
-                    ///Í·ÏñÍ¼Æ¬Id
-                    ///</summary>
-                    public readonly int avatar_imgId;
+                private string _name;
+
+                /// <summary>
+                ///Ãû³Æ
+                ///</summary>
+                public string name{
+                            get{return _name;}
+                            private set{
+                            
+                            _name = value;
+                            }
+                        }
+
+                private int _avatar_imgId;
+
+                /// <summary>
+                ///Í·ÏñÍ¼Æ¬Id
+                ///</summary>
+                public int avatar_imgId{
+                            get{return _avatar_imgId;}
+                            private set{
+                            
+                            _avatar_imgId = value;
+                            }
+                        }
 
             public Data(int id,string name,int avatar_imgId)
             {
@@ -41,11 +73,15 @@ namespace Form
                 this.id = id;
                 this.name = name;
                 this.avatar_imgId = avatar_imgId;
+
             }
             
         }
 
-        static Dictionary<int, Data> _DataById = null;
+                   public static Data defaultData=new Data(0,"",0);
+
+
+        static Dictionary<int, Data> _DataById;
         public static Dictionary<int, Data> DataById
         {
             get
@@ -55,7 +91,7 @@ namespace Form
             }
         }
 
-        static Dictionary<string, List<Data>> _DatasByName = null;
+        static Dictionary<string, List<Data>> _DatasByName;
         public static Dictionary<string, List<Data>> DatasByName
         {
             get
@@ -65,7 +101,7 @@ namespace Form
             }
         }
 
-        static Dictionary<int, Data> _DataByAvatar_imgid = null;
+        static Dictionary<int, Data> _DataByAvatar_imgid;
         public static Dictionary<int, Data> DataByAvatar_imgid
         {
             get
@@ -78,17 +114,18 @@ namespace Form
 
         static public void Init()
         {
+
             InitInternal();
         }
         public static void InitInternal()
         {
-             if(inited)
+            if(inited)
                 return;
-        freeIdQueue=new Queue<int> (Enumerable.Range(0, 100));
+            inited=true;  
+            idChain=new Z_Chain.Chain (autoIdCnt);
+            
 
                 _DataById = new Dictionary<int, Data>() {
-
-                {0,new Data(0,"",0)},
 
                 {1,new Data(1,"human",100001)},
 
@@ -102,8 +139,6 @@ namespace Form
 
                 _DatasByName = new Dictionary<string, List<Data>>() {
 
-                    {"",new List<Data>()},
-
                     {"human",new List<Data>()},
 
                     {"pig",new List<Data>()},
@@ -114,8 +149,6 @@ namespace Form
 
                 };
 
-                    _DatasByName[""].Add(_DataById[0]);
-
                     _DatasByName["human"].Add(_DataById[1]);
 
                     _DatasByName["pig"].Add(_DataById[2]);
@@ -125,8 +158,6 @@ namespace Form
                     _DatasByName["chicken"].Add(_DataById[4]);
 
                 _DataByAvatar_imgid = new Dictionary<int, Data>() {
-
-                    {0,_DataById[0]},
 
                     {100001,_DataById[1]},
 
@@ -143,12 +174,8 @@ namespace Form
             
 
 
-             foreach(var k in _DataById.Keys)
-            {
-                freeIdQueue.Enqueue(k);
-            }
-
-            inited=true;  
+            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+             
         }
 
 
@@ -158,6 +185,8 @@ namespace Form
             List<Data> lst=new List<Data>();
             foreach(JObject jo in ja)
             {
+                if(jo.Get<int>("id")==0)
+                    continue;
                 lst.Add(GetDataByJo(jo));
             }
             return lst;
@@ -169,7 +198,8 @@ namespace Form
             JArray ja=new JArray();
             foreach(Data data in _DataById.Values)
             {
-
+                if(data.id==0)
+                    continue;
                 ja.Add(GetJoByData(data));
             }
             return ja;
@@ -179,13 +209,13 @@ namespace Form
         {
             Init();
 
-                    Data data=new Data(
+            Data data=new Data(
 
-                        jo.Get<int>("id"),
+                jo.Get<int>("id"),
 
-                    _DataById[0].name,
+                    defaultData.name,
 
-                    _DataById[0].avatar_imgId
+                    defaultData.avatar_imgId
                     );
 
             return data;
@@ -195,9 +225,9 @@ namespace Form
         {
             Init();
 
-                    JObject jo=new JObject();
+            JObject jo=new JObject();
 
-                    jo.Set<int>("id",data.id);
+            jo.Set<int>("id",data.id);
 
             return jo;
         }

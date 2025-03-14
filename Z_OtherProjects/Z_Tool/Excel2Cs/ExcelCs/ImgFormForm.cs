@@ -13,52 +13,60 @@ namespace Form
 
     public static partial class ImgFormForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;;
+
         public static Action childInitAction;
-        public static Action<Data> childRemoveAction;
-        public static Action<Data> childAddAction;
+        public static Action<Data,string> childRemoveAction;
+        public static Action<Data,string> childAddAction;
+
+
 
         public partial class Data
         {
 
-                private int _id;
-
-                public int id{
-                            get{return _id;}
-                            private set{
-                            
-                            _id = value;
-                            }
-                        }
-
-                private string _path;
-
-                /// <summary>
-                ///头像目录
-                ///</summary>
-                public string path{
-                            get{return _path;}
-                            private set{
-                            
-                            _path = value;
-                            }
-                        }
-
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+private set{
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _path;
+                    /// <summary>
+                    ///头像目录
+                    ///</summary>
+                    public string  path{
+                                get{return _path;}
+private set{
+        
+                _path = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string path)
             {
 
-                this.id = id;
-                this.path = path;
+             this.id = id;
+             this.path = path;
 
             }
             
@@ -67,16 +75,16 @@ namespace Form
                    public static Data defaultData=new Data(0,"");
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -88,8 +96,7 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -105,14 +112,24 @@ namespace Form
 
                 {200002,new Data(200002,"\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg2")},
 
-                };
+                }
+                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc1"].Add(_DataById[100001]);
+
+                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc2"].Add(_DataById[100002]);
+
+                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc3"].Add(_DataById[100003]);
+
+                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc4"].Add(_DataById[100004]);
+
+                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg1"].Add(_DataById[200001]);
+
+                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg2"].Add(_DataById[200002]);
 
 
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -167,6 +184,8 @@ namespace Form
 
             return jo;
         }
+
+
 
 
     }

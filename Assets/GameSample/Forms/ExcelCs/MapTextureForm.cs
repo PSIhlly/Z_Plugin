@@ -16,6 +16,7 @@ namespace Form
 
     public static partial class MapTextureForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -28,37 +29,61 @@ namespace Form
                 MapBaseForm.childRemoveAction+=RemoveChildren;
                 MapBaseForm.childAddAction+=AddChildren;
             
+
+            MapBaseForm.changeIdAction+=ChangeId;
+
+            MapBaseForm.changeNameAction+=ChangeName;
+
+            MapBaseForm.changeIconAction+=ChangeIcon;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
+
+        public static Z_Chain.Chain idChain =>MapBaseForm.idChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changeIconAction;
+                
+        public static Action<Data,float,float> changeAnimtimeintervalAction;
+                
+
+
         public partial class Data : MapBaseForm.Data
         {
 
-                private float _animTimeInterval;
+                    private float  _animTimeInterval;
+                    /// <summary>
+                    ///播放间隔时间
+                    ///</summary>
+                    public float  animTimeInterval{
+                                get{return _animTimeInterval;}
+ set{
 
-                /// <summary>
-                ///播放间隔时间
-                ///</summary>
-                public float animTimeInterval{
-                            get{return _animTimeInterval;}
-                             set{
-                            
-                            _animTimeInterval = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeAnimtimeinterval(this,_animTimeInterval,value); 
+                    }
+        
+                _animTimeInterval = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,string icon,float animTimeInterval):base(id,name,icon)
             {
 
-                this.id = id;
-                this.name = name;
-                this.icon = icon;
-                this.animTimeInterval = animTimeInterval;
+             this.id = id;
+             this.name = name;
+             this.icon = icon;
+             this.animTimeInterval = animTimeInterval;
 
             }
             
@@ -67,26 +92,26 @@ namespace Form
                    public static Data defaultData=new Data(0,"","",0f);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -99,8 +124,8 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -111,17 +136,16 @@ namespace Form
                 {200003,new Data(200003,"road","",0f)},
 
                 };
-
-                _DataByName = new Dictionary<string, Data>() {
-
-                    {"floor",_DataById[200001]},
-
-                    {"grass",_DataById[200002]},
-
-                    {"road",_DataById[200003]},
-
-                };
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"floor",_DataById[200001]},
+    
+                        {"grass",_DataById[200002]},
+    
+                        {"road",_DataById[200003]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -132,7 +156,7 @@ namespace Form
             }
 
 
-            
+        
              
         }
 
@@ -212,11 +236,10 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByName[data.name]=data;
-
-            
+        DataById[data.id]=data;
+    
+                    DataByName[data.name]=data;
+    
 MapBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -226,13 +249,13 @@ MapBaseForm.AddData(data);
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByName.Remove(data.name);
-
+                    DataById.Remove(data.id);
+    
+                    DataByName.Remove(data.name);
+    
 MapBaseForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
         }
@@ -240,10 +263,10 @@ MapBaseForm.RemoveData(id);
         {
             Init();
 
-                DataById.Clear();
-
-                DataByName.Clear();
-
+                    DataById.Clear();
+    
+                    DataByName.Clear();
+    
             idChain.Clear();
         }
 
@@ -262,6 +285,51 @@ MapBaseForm.RemoveData(id);
         
 
 
+
+
+            public static void ChangeId(MapBaseForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAnimtimeinterval(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

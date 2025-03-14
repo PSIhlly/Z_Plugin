@@ -13,63 +13,69 @@ namespace Z_DataSystem.Form
 
     public static partial class TexAssetForm
     {
-        public static readonly int autoIdCnt=100;
+
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
+                AssetForm.childInitAction+=InitInternal;
+
+
+                AssetForm.childRemoveAction+=RemoveChildren;
+                AssetForm.childAddAction+=AddChildren;
+            
+
+            AssetForm.changeIdAction+=ChangeId;
+
+            AssetForm.changeNameAction+=ChangeName;
 
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain =>AssetForm.idChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
-        public partial class Data
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,Texture,Texture> changeTexAction;
+                
+
+
+        public partial class Data : AssetForm.Data
         {
 
-                private int _id;
+                    private Texture  _tex;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public Texture  tex{
+                                get{return _tex;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                             set{
-                            
-                            _id = value;
-                            }
-                        }
-
-                private string _name;
-
-                /// <summary>
-                ///Ãû³Æ£¨Ë÷Òý£©
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                             set{
-                            if(_DataById!=null&&_DataById.ContainsValue(this)){RemoveData(id); _name = value;AddData(this);}else
-                            _name = value;
-                            }
-                        }
-
-                private Texture _tex;
-
-                public Texture tex{
-                            get{return _tex;}
-                             set{
-                            
-                            _tex = value;
-                            }
-                        }
-
-            public Data(int id,string name,Texture tex)
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeTex(this,_tex,value); 
+                    }
+        
+                _tex = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,Texture tex):base(id,name)
             {
 
-                this.id = id;
-                this.name = name;
-                this.tex = tex;
+             this.id = id;
+             this.name = name;
+             this.tex = tex;
 
             }
             
@@ -78,54 +84,59 @@ namespace Z_DataSystem.Form
                    public static Data defaultData=new Data(0,"",Texture2D.blackTexture);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
 
-            InitInternal();
+            AssetForm.Init();
+
         }
         public static void InitInternal()
         {
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+
+        
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
-
-                _DataByName = new Dictionary<string, Data>() {
-
-                };
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
 
+            foreach(var data in DataById.Values)
+            {
+                AssetForm.AddData(data);
+            }
 
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+
+        
              
         }
 
@@ -201,12 +212,11 @@ namespace Z_DataSystem.Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByName[data.name]=data;
-
-            
-
+        DataById[data.id]=data;
+    
+                    DataByName[data.name]=data;
+    
+AssetForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
         }
@@ -215,34 +225,34 @@ namespace Z_DataSystem.Form
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByName.Remove(data.name);
-
-
+                    DataById.Remove(data.id);
+    
+                    DataByName.Remove(data.name);
+    
+AssetForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
 
-                DataById.Clear();
-
-                DataByName.Clear();
-
+                    DataById.Clear();
+    
+                    DataByName.Clear();
+    
             idChain.Clear();
         }
 
-         private static void RemoveChildren(Data data)
+         private static void RemoveChildren(AssetForm.Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.id);      
         }
-         private static void AddChildren(Data superData)
+         private static void AddChildren(AssetForm.Data superData)
         {
             Init();
             if(superData is Data data)
@@ -251,6 +261,41 @@ namespace Z_DataSystem.Form
         
 
 
+
+
+            public static void ChangeId(AssetForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(AssetForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTex(Data superData,Texture oldV,Texture newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTexAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

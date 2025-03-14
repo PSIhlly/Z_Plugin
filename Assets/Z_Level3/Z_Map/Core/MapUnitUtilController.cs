@@ -20,6 +20,8 @@ namespace Z_Map
     }
     public class MapUnitUtilController : Z_Controller<MapManager>
     {
+        public MapUnitUtilController(MapManager super) : base(super) { }
+
         public Dictionary<(string, int), Texture2D> alphaTextureDic=new Dictionary<(string, int), Texture2D>();
         public Dictionary<string, List<Texture2D>> animTextureDic=new Dictionary<string, List<Texture2D>>();
 
@@ -659,14 +661,13 @@ namespace Z_Map
             var data = ins.unit.data;
             for (int i = 0; i < ins.renderers.Length; i++)
             {
-
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                ins.renderers[i].GetPropertyBlock(propBlock);
                 if (data.texNameDic.ContainsKey(i))
                 {
-                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                    ins.renderers[i].GetPropertyBlock(propBlock);
 
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[ModAssetManager.instance.GetTexRealName(data.texNameDic[i],0)].tex);
 
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[GlobalHelper.GetTexRealName(data.texNameDic[i], 0)].tex);
                     if (data.alphaTexNameDic.ContainsKey(i))
                     {
                         int linkDesc = 0;
@@ -677,43 +678,50 @@ namespace Z_Map
                                 if (x == 0 && z == 0)
                                     continue;
                                 var pos = (x + data.mapPos.x, data.mapPos.y, z + data.mapPos.z);
-                                if (_super.dataCtrl.maps.ContainsKey(pos)
-                                    && _super.dataCtrl.maps[pos].texNameDic.ContainsKey(i)
-                                    && _super.dataCtrl.maps[pos].texNameDic[i] == data.texNameDic[i])
+                                if (_super.data.maps.ContainsKey(pos)
+                                    && _super.data.maps[pos].texNameDic.ContainsKey(i)
+                                    && _super.data.maps[pos].texNameDic[i] == data.texNameDic[i])
                                 {
                                     linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
                                 }
                             }
                         }
                         propBlock.SetTexture("_AlphaTex", alphaTextureDic[(data.alphaTexNameDic[i], linkDesc)]);
-                    }else
-                    {
-                        propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
                     }
-
-                    ins.renderers[i].SetPropertyBlock(propBlock);
+                    else
+                    {
+                        propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
+                    }
                 }
+                else
+                {
+                    propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
+                }
+                ins.renderers[i].SetPropertyBlock(propBlock);
             }
         }
         public void UpdateAnim(MapInstance ins)
         {
-            
+
             var data = ins.unit.data;
             for (int i = 0; i < ins.renderers.Length; i++)
             {
-                if (data.texNameDic.ContainsKey(i)&&data.animInterval[i]>0)
+
+                if (data.animInterval[i] > 0)
                 {
                     int all = data.animInterval[i] * animTextureDic[data.texNameDic[i]].Count;
 
-                    int cur=(Time.frameCount % all)/ data.animInterval[i];
-                    if (all==0||(ins.animCur.ContainsKey(i) && ins.animCur[i] == cur))
-                        continue;
-                    ins.animCur[i] = cur;
-                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                    ins.renderers[i].GetPropertyBlock(propBlock);
-                    propBlock.SetTexture("_Tex", animTextureDic[data.texNameDic[i]][cur]);
-                    ins.renderers[i].SetPropertyBlock(propBlock);
+                    int cur = (Time.frameCount % all) / data.animInterval[i];
+                    if (all > 0 && (!ins.animCur.ContainsKey(i) || ins.animCur[i] != cur))
+                    {
+                        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                        ins.renderers[i].GetPropertyBlock(propBlock);
+                        ins.animCur[i] = cur;
+                        propBlock.SetTexture("_Tex", animTextureDic[data.texNameDic[i]][cur]);
+                        ins.renderers[i].SetPropertyBlock(propBlock);
+                    }
                 }
+                //propBlock.SetFloat("_UseCloseHide", data.pos.y > CameraInstance.instance.tarTrs.position.y ? 1f : 0f);
             }  
         }
 

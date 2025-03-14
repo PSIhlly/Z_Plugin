@@ -26,7 +26,7 @@ namespace Z_Fight
     public class FightManager : Z_MonoManager<FightManager>
     {
 
-        public FightDataController dataCtrl;
+        public FightData dataCtrl;
         public GameObject mainGo;
 
         public Action<BulletUnit, FightUnit> onHurt;
@@ -40,7 +40,7 @@ namespace Z_Fight
 
         #region external
 
-        public void Begin(FightDataController dataCtrl)
+        public void Begin(FightData dataCtrl)
         {
             End();
             Init();

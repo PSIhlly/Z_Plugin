@@ -5,7 +5,9 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using Ui;
+using Ui.EnterMain;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Z_ByteSerialize;
 using Z_DataSystem;
 using Z_DataSystem.Form;
@@ -17,27 +19,40 @@ using Z_UnitSystem;
 
 public class GameManager : Z_MonoManager<GameManager>
 {
+    public GameUtilController utilCtrl;
     public Vector2 downPos;
+    public Material mat;
+    public Mesh mesh;
     public float dragDis2 => InputManager.instance.screenSize.x/25;
-    public void Start()
-    {
-        Application.targetFrameRate = 100;//œ»À¯100÷°
-        //default Assets
-        AssetManager.instance.LoadAssetsByFolderAutoAdd(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs");
-        
 
-        RegisterInputDefault();
-        UiManager.instance.ShowUi<UiEnterMainCtrl>();
+    public override void Init()
+    {
+        base.Init();
+
+
+        utilCtrl = new GameUtilController(this);
+
+        Application.targetFrameRate = 100;//ÂÖàÈîÅ100Â∏ß
+        //default Assets
+        AssetManager.instance.LoadAssetsByFolderAutoAdd("Z_Map/", true, true);
+
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))
         {
-            var lst=ItemForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load(ItemDefines.SAVE_NAME)));
-            for(int i=0;i<lst.Count;i++)
+            var lst = ItemForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load(ItemDefines.SAVE_NAME)));
+            for (int i = 0; i < lst.Count; i++)
             {
                 ItemForm.DataById[lst[i].id].count = lst[i].count;
             }
         }
 
+
+        RegisterInputDefault();
+    }
+
+    public void Start()
+    {
+        UiManager.instance.ShowUi<UiEnterMainCtrl>();
     }
     public void Update()
     {
@@ -102,7 +117,7 @@ public class GameManager : Z_MonoManager<GameManager>
             
             if (id==0&&ui==null&& downPos != Vector2.zero )//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
             {
-                ModSceneManager.instance.OnMouse(false, pos, dir);
+                ModManager.instance.OnMouse(false, pos, dir);
             }
         };
 
@@ -122,7 +137,7 @@ public class GameManager : Z_MonoManager<GameManager>
         {
             if (id == 0 && ui == null && downPos != Vector2.zero && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < dragDis2)
             {
-                ModSceneManager.instance.OnMouse(true, pos, Vector3.zero);
+                ModManager.instance.OnMouse(true, pos, Vector3.zero);
             }
             downPos = Vector2.zero;
         };

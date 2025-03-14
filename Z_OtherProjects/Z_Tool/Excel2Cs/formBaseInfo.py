@@ -1,0 +1,306 @@
+
+
+
+class FormInfo:
+    path_output=""
+    
+    df = None
+
+    def __init__(self,file_using,file_namespace):
+        self.var_list = []
+        self.var_config_dic = {}
+        self.var_annotation_dic = {}
+        self.var_type_dic = {}
+        self.data_list = []
+        self.name = 'default'
+        self.id_cnt= 100
+        
+        self.file_namespace=file_namespace
+        self.file_using=file_using
+
+        self.declare_sub_str = f""""""
+        self.declare_str = f""""""
+        self.declare_change_action = ''
+        self.dic_str = f""""""
+        self.serialize_str = f""""""
+        self.deserialize_str = f""""""
+        self.add_str = f""""""
+        self.default_content_str = f""""""
+        self.remove_str = f""""""
+        self.clear_str = f""""""
+        self.content_str = f""""""
+        self.extend_data_str = ''
+        self.change_op_str=''
+
+        self.id_str = 'id'
+
+    def refresh_namespace_str(self):
+       self.namespace_str= f"""using UnityEngine;
+using System.Collections;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Z_ByteSerialize;
+using Z_DesignStyle;
+{self.file_using}
+namespace {self.file_namespace}
+{{
+"""
+    def refresh_init(self):
+        self.init_op_base_str=f'''
+            InitInternal();'''
+        self.init_internal_base_str=""
+        self.init_children_action_str=""
+        self.init_change_action_str=""
+
+        if self.extend_data_str!='':
+            self.init_op_base_str=f"""
+            {self.extend_data_str}Form.Init();
+"""
+            self.init_children_action_str+=f'''
+                {self.extend_data_str}Form.childInitAction+=InitInternal;
+'''
+            self.init_internal_base_str+=f'''
+            foreach(var data in DataBy{self.id_str.capitalize()}.Values)
+            {{
+                {self.extend_data_str}Form.AddData(data);
+            }}
+'''
+            for name in self.var_list:
+                if 'write' in self.var_config_dic[name] and 'override' in self.var_config_dic[name]:
+                    self.init_change_action_str+=f'''
+            {self.extend_data_str}Form.change{name.capitalize()}Action+=Change{name.capitalize()};
+'''
+
+    def refresh_add_remove(self):
+        self.remove_add_children_action_str=""
+        self.add_remove_clear_op_str = ""
+
+        add_op_base_str = ""
+        remove_op_base_str = ""
+
+
+
+        if 'write' in self.var_config_dic[self.id_str]:
+            if self.extend_data_str != '':
+                add_op_base_str=self.extend_data_str+"Form.AddData(data);"
+                remove_op_base_str=self.extend_data_str+f"""Form.RemoveData({self.id_str});"""
+                self.remove_add_children_action_str=f'''
+                {self.extend_data_str}Form.childRemoveAction+=RemoveChildren;
+                {self.extend_data_str}Form.childAddAction+=AddChildren;
+            '''
+            self.add_remove_clear_op_str = f'''
+        public static int AddData(Data data)
+        {{
+            Init();
+            if(DataBy{self.id_str.capitalize()}.ContainsKey(data.{self.id_str}))
+                return data.{self.id_str};
+            if(data.{self.id_str}==-1)
+            {{ 
+                int {self.id_str}={self.id_str}Chain.GetId();
+                if({self.id_str}==-1)
+                    return -1;
+                data.{self.id_str}={self.id_str};  
+            }}
+{self.add_str}
+{add_op_base_str}
+            childAddAction?.Invoke(data);
+            return data.{self.id_str};
+        }}
+        public static void RemoveData(int {self.id_str})
+        {{            
+            Init();
+            if(!DataBy{self.id_str.capitalize()}.ContainsKey({self.id_str}))
+                return;
+               
+            var data=DataBy{self.id_str.capitalize()}[{self.id_str}];
+{self.remove_str}
+{remove_op_base_str}
+            childRemoveAction?.Invoke(data);
+        }}
+        public static void Clear()
+        {{
+            Init();
+{self.clear_str}
+            {self.id_str}Chain.Clear();
+        }}
+
+         private static void RemoveChildren({'' if self.extend_data_str == '' else f'{self.extend_data_str}Form.'}Data data)
+        {{
+            Init();
+            if(data is Data)
+               RemoveData(data.{self.id_str});      
+        }}
+         private static void AddChildren({'' if self.extend_data_str == '' else f'{self.extend_data_str}Form.'}Data superData)
+        {{
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }}
+        
+
+'''
+    def refresh_change(self):
+        self.declare_change_action=''
+        for name in self.var_list:
+            if 'write' in self.var_config_dic[name]:
+                self.declare_change_action+=f'''
+        public static Action<Data,{self.var_type_dic[name]},{self.var_type_dic[name]}> change{name.capitalize()}Action;
+                '''
+                change_dic=''
+                if 'index' in self.var_config_dic[name]:
+                    change_dic=f'''
+                    DatasBy{name.capitalize()}[oldV].Remove(data);
+                    DatasBy{name.capitalize()}[newV].Add(data);
+ '''
+                if 'uniqueIndex' in self.var_config_dic[name]:
+                    change_dic=f'''
+                    DataBy{name.capitalize()}.Remove(oldV);
+                    DataBy{name.capitalize()}[newV]=data;
+ '''
+                super_type=''
+                if 'override' in self.var_config_dic[name]:
+                    super_type= f'{self.extend_data_str}Form.'
+                self.change_op_str+=f'''
+            public static void Change{name.capitalize()}({super_type}Data superData,{self.var_type_dic[name]} oldV,{self.var_type_dic[name]} newV)
+            {{
+                if(superData is Data data)
+                {{
+{change_dic}
+                change{name.capitalize()}Action?.Invoke(data,oldV,newV);
+                }}
+                    
+            }}
+            ''' 
+
+    def refresh_extend(self):
+        self.data_declare=f'''
+        public partial class Data'''
+        if self.extend_data_str=='':
+            self.data_declare+= ''
+        else  :
+           self.data_declare+= f" : {self.extend_data_str}Form.Data"
+    def refresh_id_chain(self):
+    
+        self.id_chain_declare=f'''
+        '''
+        self.id_chain_get=f'''
+        public static Z_Chain.Chain {self.id_str}Chain '''
+        self.id_chain_init=f'''
+        '''
+        self.id_chain_fill=f'''
+        '''
+
+        if self.extend_data_str != '':
+           self.id_chain_get+=f'=>{self.extend_data_str}Form.{self.id_str}Chain'
+        else :
+            self.id_chain_declare=f'public static readonly int auto{self.id_str.capitalize()}Cnt={self.id_cnt};'
+            self.id_chain_init=f"{self.id_str}Chain=new Z_Chain.Chain (auto{self.id_str.capitalize()}Cnt);"
+            self.id_chain_fill=f'foreach(var k in _DataBy{self.id_str.capitalize()}.Keys){{ {self.id_str}Chain.PopId(k); }}'
+
+        self.id_chain_get+=";"
+
+    def get_result(self):
+        self.refresh_namespace_str()
+        self.refresh_extend();
+        self.refresh_add_remove()
+        self.refresh_change()
+        self.refresh_init()
+        self.refresh_id_chain()
+
+        return f"""{self.namespace_str}
+    public static partial class {self.name}Form
+    {{
+{self.id_chain_declare}
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Register()
+        {{
+{self.init_children_action_str}
+{self.remove_add_children_action_str}
+{self.init_change_action_str}
+        }}
+        
+        private static bool inited;
+{self.id_chain_get}
+
+        public static Action childInitAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+{self.declare_change_action}
+
+{self.data_declare}
+        {{
+{self.declare_str}
+        }}
+{self.default_content_str}
+{self.dic_str}
+
+        static public void Init()
+        {{
+{self.init_op_base_str}
+        }}
+        public static void InitInternal()
+        {{
+            if(inited)
+                return;
+            inited=true;  
+{self.id_chain_init}
+{self.content_str}
+
+            childInitAction?.Invoke();
+            
+{self.init_internal_base_str}
+{self.id_chain_fill}
+             
+        }}
+
+
+        public static List<Data> GetDatasByJa(JArray ja)
+        {{
+            Init();
+            List<Data> lst=new List<Data>();
+            foreach(JObject jo in ja)
+            {{
+                if(jo.Get<int>("{self.id_str}")==0)
+                    continue;
+                lst.Add(GetDataByJo(jo));
+            }}
+            return lst;
+        }}
+
+        public static JArray GetJaByDatas()
+        {{
+            Init();
+            JArray ja=new JArray();
+            foreach(Data data in _DataBy{self.id_str.capitalize()}.Values)
+            {{
+                if(data.{self.id_str}==0)
+                    continue;
+                ja.Add(GetJoByData(data));
+            }}
+            return ja;
+        }}
+
+        public static Data GetDataByJo(JObject jo)
+        {{
+            Init();
+{self.deserialize_str}
+            return data;
+        }}
+
+        public static JObject GetJoByData(Data data)
+        {{
+            Init();
+{self.serialize_str}
+            return jo;
+        }}
+
+{self.add_remove_clear_op_str}
+
+{self.change_op_str}
+    }}
+}}
+        """

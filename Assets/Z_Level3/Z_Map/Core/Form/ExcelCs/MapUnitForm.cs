@@ -14,6 +14,7 @@ namespace Z_Map.Form
 
     public static partial class MapUnitForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -26,13 +27,54 @@ namespace Z_Map.Form
                 UnitForm.childRemoveAction+=RemoveChildren;
                 UnitForm.childAddAction+=AddChildren;
             
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,Dictionary<int,string>,Dictionary<int,string>> changeTexnamedicAction;
+                
+        public static Action<Data,Dictionary<int,string>,Dictionary<int,string>> changeAlphatexnamedicAction;
+                
+        public static Action<Data,Dictionary<int,int>,Dictionary<int,int>> changeAnimintervalAction;
+                
+        public static Action<Data,Vector3Int,Vector3Int> changeMapposAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
 
         public partial class Data : UnitForm.Data
         {
@@ -48,72 +90,92 @@ namespace Z_Map.Form
                     }
                 }
 
-                private Dictionary<int,string> _texNameDic;
+                    private Dictionary<int,string>  _texNameDic;
+                    /// <summary>
+                    ///纹理名字（索引）
+                    ///</summary>
+                    public Dictionary<int,string>  texNameDic{
+                                get{return _texNameDic;}
+ set{
 
-                /// <summary>
-                ///纹理名字（索引）
-                ///</summary>
-                public Dictionary<int,string> texNameDic{
-                            get{return _texNameDic;}
-                             set{
-                            
-                            _texNameDic = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTexnamedic(this,_texNameDic,value); 
+                    }
+        
+                _texNameDic = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<int,string>  _alphaTexNameDic;
+                    /// <summary>
+                    ///透明度纹理名字（索引）
+                    ///</summary>
+                    public Dictionary<int,string>  alphaTexNameDic{
+                                get{return _alphaTexNameDic;}
+ set{
 
-                private Dictionary<int,string> _alphaTexNameDic;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAlphatexnamedic(this,_alphaTexNameDic,value); 
+                    }
+        
+                _alphaTexNameDic = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<int,int>  _animInterval;
+                    /// <summary>
+                    ///动画间隔
+                    ///</summary>
+                    public Dictionary<int,int>  animInterval{
+                                get{return _animInterval;}
+ set{
 
-                /// <summary>
-                ///透明度纹理名字（索引）
-                ///</summary>
-                public Dictionary<int,string> alphaTexNameDic{
-                            get{return _alphaTexNameDic;}
-                             set{
-                            
-                            _alphaTexNameDic = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAniminterval(this,_animInterval,value); 
+                    }
+        
+                _animInterval = value;
+                }
+                 
+                     }
+                    
+                    private Vector3Int  _mapPos;
+                    /// <summary>
+                    ///离散位置
+                    ///</summary>
+                    public Vector3Int  mapPos{
+                                get{return _mapPos;}
+ set{
 
-                private Dictionary<int,int> _animInterval;
-
-                /// <summary>
-                ///动画间隔
-                ///</summary>
-                public Dictionary<int,int> animInterval{
-                            get{return _animInterval;}
-                             set{
-                            
-                            _animInterval = value;
-                            }
-                        }
-
-                private Vector3Int _mapPos;
-
-                /// <summary>
-                ///离散位置
-                ///</summary>
-                public Vector3Int mapPos{
-                            get{return _mapPos;}
-                             set{
-                            if(_DataByUid!=null&&_DataByUid.ContainsValue(this)){RemoveData(uid); _mapPos = value;AddData(this);}else
-                            _mapPos = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMappos(this,_mapPos,value); 
+                    }
+        
+                _mapPos = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,string name,Dictionary<int,string> texNameDic,Dictionary<int,string> alphaTexNameDic,Dictionary<int,int> animInterval,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.texNameDic = texNameDic;
-                this.alphaTexNameDic = alphaTexNameDic;
-                this.animInterval = animInterval;
-                this.mapPos = mapPos;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.name = name;
+             this.texNameDic = texNameDic;
+             this.alphaTexNameDic = alphaTexNameDic;
+             this.animInterval = animInterval;
+             this.mapPos = mapPos;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new MapUnit(this);
 
@@ -124,26 +186,26 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},new Dictionary<int,string>(){},new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
-        static Dictionary<Vector3Int, Data> _DataByMappos;
-        public static Dictionary<Vector3Int, Data> DataByMappos
-        {
-            get
+    
+            static Dictionary<Vector3Int, Data> _DataByMappos;
+            public static Dictionary<Vector3Int, Data> DataByMappos
             {
-                Init();
-                return _DataByMappos;
+                get
+                {
+                    Init();
+                    return _DataByMappos;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -156,17 +218,16 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
-                _DataByMappos = new Dictionary<Vector3Int, Data>() {
-
-                };
-
+                    _DataByMappos = new Dictionary<Vector3Int, Data>() {
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -177,7 +238,7 @@ namespace Z_Map.Form
             }
 
 
-            
+        
              
         }
 
@@ -285,11 +346,10 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-                DataByMappos[data.mapPos]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
+                    DataByMappos[data.mapPos]=data;
+    
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -299,13 +359,13 @@ UnitForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
-                DataByMappos.Remove(data.mapPos);
-
+                    DataByUid.Remove(data.uid);
+    
+                    DataByMappos.Remove(data.mapPos);
+    
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -313,10 +373,10 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
-                DataByMappos.Clear();
-
+                    DataByUid.Clear();
+    
+                    DataByMappos.Clear();
+    
             uidChain.Clear();
         }
 
@@ -335,6 +395,121 @@ UnitForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTexnamedic(Data superData,Dictionary<int,string> oldV,Dictionary<int,string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTexnamedicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAlphatexnamedic(Data superData,Dictionary<int,string> oldV,Dictionary<int,string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAlphatexnamedicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAniminterval(Data superData,Dictionary<int,int> oldV,Dictionary<int,int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimintervalAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMappos(Data superData,Vector3Int oldV,Vector3Int newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByMappos.Remove(oldV);
+                    DataByMappos[newV]=data;
+ 
+                changeMapposAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

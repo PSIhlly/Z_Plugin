@@ -5,7 +5,7 @@ using Form;
 using Item;
 using Z_Texture;
 
-namespace Ui
+namespace Ui.WarRoom
 {
     public partial class UiWarRoomCtrl: IZ_Listener<ItemEvent>
     {

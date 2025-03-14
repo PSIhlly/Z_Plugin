@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Z_Math
 {
-    public class Graph
+    public static class Graph
     {
         public enum FourDir
         {
@@ -25,7 +25,18 @@ namespace Z_Math
             LeftUpForward,
             RightUpForward,
         }
-
+        public static Vector3 SetX(this Vector3 v3, float x)
+        {
+            return new Vector3(x, v3.y, v3.z);
+        }
+        public static Vector3 SetY(this Vector3 v3, float y)
+        {
+            return new Vector3(v3.x, y, v3.z);
+        }
+        public static Vector3 SetZ(this Vector3 v3,float z)
+        {
+            return new Vector3(v3.x, v3.y, z);
+        }
         public static Vector3[] RotatePointAroundOrigin(Vector3[] points, Vector3 euler)
         {
             Vector3[] newPos = new Vector3[points.Length];
@@ -106,7 +117,7 @@ namespace Z_Math
         {
             return (to.x - from.x) * (o.y - from.y) - (to.y - from.y) * (o.x - from.x);
         }
-        public float GetLineYByX(Vector2 p1,Vector2 p2,float x)
+        public static float GetLineYByX(Vector2 p1,Vector2 p2,float x)
         {
             float k = (p2.y - p1.y) / (p2.x - p1.x);
             return k * x + (p1.y - k * p1.x);

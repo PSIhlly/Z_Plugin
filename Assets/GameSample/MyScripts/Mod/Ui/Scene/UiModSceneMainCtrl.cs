@@ -1,6 +1,7 @@
 using Form;
 using System.Collections;
 using System.Collections.Generic;
+using Ui.ModSceneMenu;
 using UnityEngine;
 using Z_Map;
 using Z_ObjectAnimator.Base;
@@ -9,7 +10,7 @@ using Z_Texture;
 using Z_Ui;
 using Z_Ui.Base;
 
-namespace Ui
+namespace Ui.ModSceneMain
 {
     public partial class UiModSceneMainModel
     {
@@ -18,12 +19,12 @@ namespace Ui
             set
             {
                 int.TryParse(value, out int v);
-                var x = Mathf.Max(Mathf.Min(v + ModSceneManager.instance.offset, (int)MapManager.instance.sizeLimit.x), 0)*MapManager.instance.dataCtrl.mainData.mapUnitSize.x;
-                ModSceneManager.instance.SetCamera( x, (int)CameraInstance.instance.tarTrs.position.y, (int)CameraInstance.instance.tarTrs.position.z);
+                var x = Mathf.Max(Mathf.Min(v + ModManager.instance.sceneCtrl.offset, (int)MapManager.instance.sizeLimit.x), 0)*MapManager.instance.data.mainData.mapUnitSize.x;
+                ModManager.instance.sceneCtrl.SetCamera( x, (int)CameraInstance.instance.tarTrs.position.y, (int)CameraInstance.instance.tarTrs.position.z);
             }
             get
             {
-                return ((int)(CameraInstance.instance.tarTrs.position.x/ MapManager.instance.dataCtrl.mainData.mapUnitSize.x) - ModSceneManager.instance.offset).ToString();
+                return ((int)(CameraInstance.instance.tarTrs.position.x/ MapManager.instance.data.mainData.mapUnitSize.x) - ModManager.instance.sceneCtrl.offset).ToString();
             }
         }
         public string viewY
@@ -31,12 +32,12 @@ namespace Ui
             set
             {
                 int.TryParse(value, out int v);
-                var y = Mathf.Max(Mathf.Min(v+ ModSceneManager.instance.offset, (int) MapManager.instance.sizeLimit.y), 0) * MapManager.instance.dataCtrl.mainData.mapUnitSize.y;
-                ModSceneManager.instance.SetCamera((int)CameraInstance.instance.tarTrs.position.x, y, (int)CameraInstance.instance.tarTrs.position.z);
+                var y = Mathf.Max(Mathf.Min(v+ ModManager.instance.sceneCtrl.offset, (int) MapManager.instance.sizeLimit.y), 0) * MapManager.instance.data.mainData.mapUnitSize.y;
+                ModManager.instance.sceneCtrl.SetCamera((int)CameraInstance.instance.tarTrs.position.x, y, (int)CameraInstance.instance.tarTrs.position.z);
             }
             get
             {
-                return ((int)(CameraInstance.instance.tarTrs.position.y/ MapManager.instance.dataCtrl.mainData.mapUnitSize.y) - ModSceneManager.instance.offset).ToString();
+                return ((int)(CameraInstance.instance.tarTrs.position.y/ MapManager.instance.data.mainData.mapUnitSize.y) - ModManager.instance.sceneCtrl.offset).ToString();
             }
         }
         public string viewZ
@@ -44,13 +45,13 @@ namespace Ui
             set
             {
                 int.TryParse(value, out int v);
-                var z = Mathf.Max(Mathf.Min(v+ ModSceneManager.instance.offset, (int)MapManager.instance.sizeLimit.z),0) * MapManager.instance.dataCtrl.mainData.mapUnitSize.z;
-                ModSceneManager.instance.SetCamera((int)CameraInstance.instance.tarTrs.position.x, (int)CameraInstance.instance.tarTrs.position.y, z);
+                var z = Mathf.Max(Mathf.Min(v+ ModManager.instance.sceneCtrl.offset, (int)MapManager.instance.sizeLimit.z),0) * MapManager.instance.data.mainData.mapUnitSize.z;
+                ModManager.instance.sceneCtrl.SetCamera((int)CameraInstance.instance.tarTrs.position.x, (int)CameraInstance.instance.tarTrs.position.y, z);
 
             }
             get
             {
-                return ((int)(CameraInstance.instance.tarTrs.position.z/ MapManager.instance.dataCtrl.mainData.mapUnitSize.z) - ModSceneManager.instance.offset).ToString();
+                return ((int)(CameraInstance.instance.tarTrs.position.z/ MapManager.instance.data.mainData.mapUnitSize.z) - ModManager.instance.sceneCtrl.offset).ToString();
             }
         }
     }
@@ -65,7 +66,7 @@ namespace Ui
             });
             view.btn_view.onClick.AddListener(() =>
             {
-                ModSceneManager.instance.SetCamera(ModSceneManager.instance.offset * MapManager.instance.dataCtrl.mainData.mapUnitSize.x, ModSceneManager.instance.offset * MapManager.instance.dataCtrl.mainData.mapUnitSize.y, ModSceneManager.instance.offset * MapManager.instance.dataCtrl.mainData.mapUnitSize.z);
+                ModManager.instance.sceneCtrl.SetCamera(ModManager.instance.sceneCtrl.offset * MapManager.instance.data.mainData.mapUnitSize.x, ModManager.instance.sceneCtrl.offset * MapManager.instance.data.mainData.mapUnitSize.y, ModManager.instance.sceneCtrl.offset * MapManager.instance.data.mainData.mapUnitSize.z);
                 Refresh();
             });
             view.ipt_viewPosSetX.onInput = (v) =>

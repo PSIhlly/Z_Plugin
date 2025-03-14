@@ -16,6 +16,7 @@ namespace Form
 
     public static partial class CharacterParamForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -28,13 +29,26 @@ namespace Form
                 ParamForm.childRemoveAction+=RemoveChildren;
                 ParamForm.childAddAction+=AddChildren;
             
+
+            ParamForm.changeUidAction+=ChangeUid;
+
+            ParamForm.changeNameAction+=ChangeName;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>ParamForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>ParamForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+
 
         public partial class Data : ParamForm.Data
         {
@@ -42,9 +56,9 @@ namespace Form
             public Data(int uid,string name,int valueType):base(uid,name,valueType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.valueType = valueType;
+             this.uid = uid;
+             this.name = name;
+             this.valueType = valueType;
 
             }
             
@@ -53,26 +67,26 @@ namespace Form
                    public static Data defaultData=new Data(0,"",0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -85,17 +99,16 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
-                _DataByName = new Dictionary<string, Data>() {
-
-                };
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -106,7 +119,7 @@ namespace Form
             }
 
 
-            
+        
              
         }
 
@@ -180,11 +193,10 @@ namespace Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-                DataByName[data.name]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
+                    DataByName[data.name]=data;
+    
 ParamForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -194,13 +206,13 @@ ParamForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
-                DataByName.Remove(data.name);
-
+                    DataByUid.Remove(data.uid);
+    
+                    DataByName.Remove(data.name);
+    
 ParamForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -208,10 +220,10 @@ ParamForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
-                DataByName.Clear();
-
+                    DataByUid.Clear();
+    
+                    DataByName.Clear();
+    
             uidChain.Clear();
         }
 
@@ -230,6 +242,31 @@ ParamForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(ParamForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(ParamForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

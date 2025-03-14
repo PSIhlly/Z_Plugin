@@ -8,36 +8,43 @@ namespace Z_Map
 {
     public class MapUtilController : Z_Controller<MapManager>
     {
+        public MapUtilController(MapManager super) : base(super)
+        {
+        }
 
+        public bool InArea((int,int,int) pos)
+        {
+            return _super.data.maps.ContainsKey((pos.Item1, pos.Item2, pos.Item3));
+        }
         public bool InArea(Vector3Int pos)
         {
-            return _super.dataCtrl.maps.ContainsKey((pos.x, pos.y, pos.z));
+            return _super.data.maps.ContainsKey((pos.x, pos.y, pos.z));
         }
         public bool InArea(Vector3 pos)
         {
-            int x = (int)Math.Round(pos.x / _super.dataCtrl.mainData.mapUnitSize.x);
-            int y = (int)(pos.y /_super.dataCtrl.mainData.mapUnitSize.y);
-            int z = (int)Math.Round(pos.z / _super.dataCtrl.mainData.mapUnitSize.z);
+            int x = (int)Math.Round(pos.x / _super.data.mainData.mapUnitSize.x);
+            int y = (int)(pos.y /_super.data.mainData.mapUnitSize.y);
+            int z = (int)Math.Round(pos.z / _super.data.mainData.mapUnitSize.z);
 
-            return _super.dataCtrl.maps.ContainsKey((x, y, z));
+            return _super.data.maps.ContainsKey((x, y, z));
         }
         public Vector3Int RealPos2MapPos(Vector3 pos)
         {
-            pos = Z_Math.Graph.ElementwiseDivide(pos, _super.dataCtrl.mainData.mapUnitSize);
+            pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
             return new Vector3Int((int)Math.Round(pos.x), (int)(pos.y), (int)Math.Round(pos.z));
         }
         public Vector3 MapPos2RealPos(Vector3Int pos)
         {
-            return Z_Math.Graph.ElementwiseMultiply(pos, _super.dataCtrl.mainData.mapUnitSize);
+            return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
         }
 
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {
             //groundFirst
             int floor = -1;
-            if(_super.dataCtrl.mapXZ2Y.ContainsKey((pos.x, pos.z)))
+            if(_super.data.mapXZ2Y.ContainsKey((pos.x, pos.z)))
             {
-                foreach (var u in _super.dataCtrl.mapXZ2Y[(pos.x, pos.z)])
+                foreach (var u in _super.data.mapXZ2Y[(pos.x, pos.z)])
                 {
                     if (u <= pos.y && u > floor)
                     {
@@ -69,9 +76,9 @@ namespace Z_Map
         }
         public Vector3 GetClosestInArea(Vector3 pos)
         {
-            int x = (int)(pos.x + _super.dataCtrl.mainData.mapUnitSize.x / 2);
-            int y = (int)(pos.y + _super.dataCtrl.mainData.mapUnitSize.y / 2);
-            int z = (int)(pos.z + _super.dataCtrl.mainData.mapUnitSize.z / 2);
+            int x = (int)(pos.x + _super.data.mainData.mapUnitSize.x / 2);
+            int y = (int)(pos.y + _super.data.mainData.mapUnitSize.y / 2);
+            int z = (int)(pos.z + _super.data.mainData.mapUnitSize.z / 2);
 
             return GetClosestInArea(new Vector3Int(x,y,z));
         }

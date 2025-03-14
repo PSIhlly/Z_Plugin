@@ -70,6 +70,11 @@ namespace Z_Texture
         {
             SaveTexture(tex.EncodeToPNG(), folder, fileName);
         }
+        public static void SaveTexture(Texture2D tex, string folder, string fileName,Vector2Int forceSize)
+        {
+            SaveTexture(tex.EncodeToPNG(), folder, fileName);
+        }
+        
         public static void SaveTexture(byte[] data,string folder,string fileName)
         {
             if(!Directory.Exists(folder))
@@ -91,6 +96,19 @@ namespace Z_Texture
                     spriteCache.Remove(tex);
                 }
                 textureCache.Remove(path);
+            }
+        }
+
+        public static void RenameTexture(string path,string oldFileName,string newFileName)
+        {
+            path = Path.GetFullPath(path+"/"+ oldFileName);
+            var newPath = Path.GetFullPath(path+"/"+ newFileName);
+            if (textureCache.ContainsKey(path))
+            {
+                var tex = textureCache[path];
+                textureCache.Remove(path);
+                textureCache[newPath] = tex;
+                File.Move(path, newPath);
             }
         }
 

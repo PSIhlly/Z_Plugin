@@ -67,5 +67,13 @@ namespace Z_UnitSystem
                 }
             tar.SetActive(false);
         }
+        public void Clear()
+        {
+            foreach(var pool in pools)
+            {
+                pool.Destroy();
+            }
+            pools.Clear();
+        }    
     }
 }

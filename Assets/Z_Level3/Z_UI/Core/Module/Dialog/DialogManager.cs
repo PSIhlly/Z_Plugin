@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Ui;
+using Ui.Dialog;
 using UnityEngine;
 using Z_DesignStyle;
 namespace Z_Ui.Dialog

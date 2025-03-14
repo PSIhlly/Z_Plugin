@@ -13,66 +13,74 @@ namespace Form
 
     public static partial class NpcFormForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;;
+
         public static Action childInitAction;
-        public static Action<Data> childRemoveAction;
-        public static Action<Data> childAddAction;
+        public static Action<Data,string> childRemoveAction;
+        public static Action<Data,string> childAddAction;
+
+
 
         public partial class Data
         {
 
-                private int _id;
-
-                public int id{
-                            get{return _id;}
-                            private set{
-                            
-                            _id = value;
-                            }
-                        }
-
-                private string _name;
-
-                /// <summary>
-                ///Ãû³Æ
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                            private set{
-                            
-                            _name = value;
-                            }
-                        }
-
-                private int _avatar_imgId;
-
-                /// <summary>
-                ///Í·ÏñÍ¼Æ¬Id
-                ///</summary>
-                public int avatar_imgId{
-                            get{return _avatar_imgId;}
-                            private set{
-                            
-                            _avatar_imgId = value;
-                            }
-                        }
-
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+private set{
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///Ãû³Æ
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+private set{
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private int  _avatar_imgId;
+                    /// <summary>
+                    ///Í·ÏñÍ¼Æ¬Id
+                    ///</summary>
+                    public int  avatar_imgId{
+                                get{return _avatar_imgId;}
+private set{
+        
+                _avatar_imgId = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,int avatar_imgId)
             {
 
-                this.id = id;
-                this.name = name;
-                this.avatar_imgId = avatar_imgId;
+             this.id = id;
+             this.name = name;
+             this.avatar_imgId = avatar_imgId;
 
             }
             
@@ -81,36 +89,36 @@ namespace Form
                    public static Data defaultData=new Data(0,"",0);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, List<Data>> _DatasByName;
-        public static Dictionary<string, List<Data>> DatasByName
-        {
-            get
+    
+            static Dictionary<string, List<Data>> _DatasByName;
+            public static Dictionary<string, List<Data>> DatasByName
             {
-                Init();
-                return _DatasByName;
+                get
+                {
+                    Init();
+                    return _DatasByName;
+                }
             }
-        }
-
-        static Dictionary<int, Data> _DataByAvatar_imgid;
-        public static Dictionary<int, Data> DataByAvatar_imgid
-        {
-            get
+    
+            static Dictionary<int, Data> _DataByAvatar_imgid;
+            public static Dictionary<int, Data> DataByAvatar_imgid
             {
-                Init();
-                return _DataByAvatar_imgid;
+                get
+                {
+                    Init();
+                    return _DataByAvatar_imgid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -122,8 +130,7 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -135,46 +142,44 @@ namespace Form
 
                 {4,new Data(4,"chicken",100004)},
 
+                }
+                    _DatasByName = new Dictionary<string, List<Data>>() {
+    
+                            {"human",new List<Data>()},
+        
+                            {"pig",new List<Data>()},
+        
+                            {"dog",new List<Data>()},
+        
+                            {"chicken",new List<Data>()},
+        
                 };
 
-                _DatasByName = new Dictionary<string, List<Data>>() {
+                    _DataByAvatar_imgid = new Dictionary<int, Data>() {
+    
+                        {100001,_DataById[1]},
+    
+                        {100002,_DataById[2]},
+    
+                        {100003,_DataById[3]},
+    
+                        {100004,_DataById[4]},
+    
+                    };
+    
+                    _DatasByAvatar_imgid[100001].Add(_DataById[1]);
 
-                    {"human",new List<Data>()},
+                    _DatasByAvatar_imgid[100002].Add(_DataById[2]);
 
-                    {"pig",new List<Data>()},
+                    _DatasByAvatar_imgid[100003].Add(_DataById[3]);
 
-                    {"dog",new List<Data>()},
-
-                    {"chicken",new List<Data>()},
-
-                };
-
-                    _DatasByName["human"].Add(_DataById[1]);
-
-                    _DatasByName["pig"].Add(_DataById[2]);
-
-                    _DatasByName["dog"].Add(_DataById[3]);
-
-                    _DatasByName["chicken"].Add(_DataById[4]);
-
-                _DataByAvatar_imgid = new Dictionary<int, Data>() {
-
-                    {100001,_DataById[1]},
-
-                    {100002,_DataById[2]},
-
-                    {100003,_DataById[3]},
-
-                    {100004,_DataById[4]},
-
-                };
+                    _DatasByAvatar_imgid[100004].Add(_DataById[4]);
 
 
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -231,6 +236,8 @@ namespace Form
 
             return jo;
         }
+
+
 
 
     }

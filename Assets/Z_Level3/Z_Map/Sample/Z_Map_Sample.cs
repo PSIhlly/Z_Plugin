@@ -14,12 +14,12 @@ public class Z_Map_Sample : MonoBehaviour
     public void Start()
     {
 
-        var res = AssetManager.instance.LoadAssetsByFolder(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs");
+        var res = AssetManager.instance.LoadAssetsByFolder(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs",false);
         foreach (var tex in res.texs)
         {
             TexAssetForm.AddData(new TexAssetForm.Data(-1, tex.Item1, tex.Item2));
         }
-        MapManager.instance.Begin(new MapDataController());
+        MapManager.instance.Begin(new MapData());
     }
     public void Update()
     {

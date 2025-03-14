@@ -13,80 +13,116 @@ namespace Z_Text.Form
 
     public static partial class TextBaseForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeKeyAction;
+                
+        public static Action<Data,string,string> changeContentenAction;
+                
+        public static Action<Data,string,string> changeContentcnAction;
+                
+
+
         public partial class Data
         {
 
-                private int _id;
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                             set{
-                            
-                            _id = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeId(this,_id,value); 
+                    }
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _key;
+                    /// <summary>
+                    ///索引
+                    ///</summary>
+                    public string  key{
+                                get{return _key;}
+ set{
 
-                private string _key;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeKey(this,_key,value); 
+                    }
+        
+                _key = value;
+                }
+                 
+                     }
+                    
+                    private string  _contentEn;
+                    /// <summary>
+                    ///英文
+                    ///</summary>
+                    public string  contentEn{
+                                get{return _contentEn;}
+ set{
 
-                /// <summary>
-                ///索引
-                ///</summary>
-                public string key{
-                            get{return _key;}
-                             set{
-                            if(_DataById!=null&&_DataById.ContainsValue(this)){RemoveData(id); _key = value;AddData(this);}else
-                            _key = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeContenten(this,_contentEn,value); 
+                    }
+        
+                _contentEn = value;
+                }
+                 
+                     }
+                    
+                    private string  _contentCn;
+                    /// <summary>
+                    ///中文
+                    ///</summary>
+                    public string  contentCn{
+                                get{return _contentCn;}
+ set{
 
-                private string _contentEn;
-
-                /// <summary>
-                ///英文
-                ///</summary>
-                public string contentEn{
-                            get{return _contentEn;}
-                             set{
-                            
-                            _contentEn = value;
-                            }
-                        }
-
-                private string _contentCn;
-
-                /// <summary>
-                ///中文
-                ///</summary>
-                public string contentCn{
-                            get{return _contentCn;}
-                             set{
-                            
-                            _contentCn = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeContentcn(this,_contentCn,value); 
+                    }
+        
+                _contentCn = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string key,string contentEn,string contentCn)
             {
 
-                this.id = id;
-                this.key = key;
-                this.contentEn = contentEn;
-                this.contentCn = contentCn;
+             this.id = id;
+             this.key = key;
+             this.contentEn = contentEn;
+             this.contentCn = contentCn;
 
             }
             
@@ -95,26 +131,26 @@ namespace Z_Text.Form
                    public static Data defaultData=new Data(0,"","","");
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByKey;
-        public static Dictionary<string, Data> DataByKey
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByKey;
+            public static Dictionary<string, Data> DataByKey
             {
-                Init();
-                return _DataByKey;
+                get
+                {
+                    Init();
+                    return _DataByKey;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -126,23 +162,20 @@ namespace Z_Text.Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
-
-                _DataByKey = new Dictionary<string, Data>() {
-
-                };
-
+                    _DataByKey = new Dictionary<string, Data>() {
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -222,11 +255,10 @@ namespace Z_Text.Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByKey[data.key]=data;
-
-            
+        DataById[data.id]=data;
+    
+                    DataByKey[data.key]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.id;
@@ -236,13 +268,13 @@ namespace Z_Text.Form
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByKey.Remove(data.key);
-
+                    DataById.Remove(data.id);
+    
+                    DataByKey.Remove(data.key);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -250,10 +282,10 @@ namespace Z_Text.Form
         {
             Init();
 
-                DataById.Clear();
-
-                DataByKey.Clear();
-
+                    DataById.Clear();
+    
+                    DataByKey.Clear();
+    
             idChain.Clear();
         }
 
@@ -272,6 +304,51 @@ namespace Z_Text.Form
         
 
 
+
+
+            public static void ChangeId(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeKey(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByKey.Remove(oldV);
+                    DataByKey[newV]=data;
+ 
+                changeKeyAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeContenten(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeContentenAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeContentcn(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeContentcnAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

@@ -14,6 +14,7 @@ namespace Z_Map.Form
 
     public static partial class CharacterUnitForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -26,13 +27,58 @@ namespace Z_Map.Form
                 UnitForm.childRemoveAction+=RemoveChildren;
                 UnitForm.childAddAction+=AddChildren;
             
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,bool,bool> changeNavenabledAction;
+                
+        public static Action<Data,Vector3,Vector3> changeDestinationAction;
+                
+        public static Action<Data,float,float> changeSpeedAction;
+                
+        public static Action<Data,float,float> changeAlertdisAction;
+                
+        public static Action<Data,float,float> changePathdisAction;
+                
+        public static Action<Data,bool,bool> changeIsmineAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
 
         public partial class Data : UnitForm.Data
         {
@@ -48,100 +94,130 @@ namespace Z_Map.Form
                     }
                 }
 
-                private bool _navEnabled;
+                    private bool  _navEnabled;
+                    /// <summary>
+                    ///启用
+                    ///</summary>
+                    public bool  navEnabled{
+                                get{return _navEnabled;}
+ set{
 
-                /// <summary>
-                ///启用
-                ///</summary>
-                public bool navEnabled{
-                            get{return _navEnabled;}
-                             set{
-                            
-                            _navEnabled = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeNavenabled(this,_navEnabled,value); 
+                    }
+        
+                _navEnabled = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _destination;
+                    /// <summary>
+                    ///目的地
+                    ///</summary>
+                    public Vector3  destination{
+                                get{return _destination;}
+ set{
 
-                private Vector3 _destination;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDestination(this,_destination,value); 
+                    }
+        
+                _destination = value;
+                }
+                 
+                     }
+                    
+                    private float  _speed;
+                    /// <summary>
+                    ///速度
+                    ///</summary>
+                    public float  speed{
+                                get{return _speed;}
+ set{
 
-                /// <summary>
-                ///目的地
-                ///</summary>
-                public Vector3 destination{
-                            get{return _destination;}
-                             set{
-                            
-                            _destination = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeSpeed(this,_speed,value); 
+                    }
+        
+                _speed = value;
+                }
+                 
+                     }
+                    
+                    private float  _alertDis;
+                    /// <summary>
+                    ///启动距离
+                    ///</summary>
+                    public float  alertDis{
+                                get{return _alertDis;}
+ set{
 
-                private float _speed;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAlertdis(this,_alertDis,value); 
+                    }
+        
+                _alertDis = value;
+                }
+                 
+                     }
+                    
+                    private float  _pathDis;
+                    /// <summary>
+                    ///寻路距离上限
+                    ///</summary>
+                    public float  pathDis{
+                                get{return _pathDis;}
+ set{
 
-                /// <summary>
-                ///速度
-                ///</summary>
-                public float speed{
-                            get{return _speed;}
-                             set{
-                            
-                            _speed = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePathdis(this,_pathDis,value); 
+                    }
+        
+                _pathDis = value;
+                }
+                 
+                     }
+                    
+                    private bool  _isMine;
+                    /// <summary>
+                    ///是我自己
+                    ///</summary>
+                    public bool  isMine{
+                                get{return _isMine;}
+ set{
 
-                private float _alertDis;
-
-                /// <summary>
-                ///启动距离
-                ///</summary>
-                public float alertDis{
-                            get{return _alertDis;}
-                             set{
-                            
-                            _alertDis = value;
-                            }
-                        }
-
-                private float _pathDis;
-
-                /// <summary>
-                ///寻路距离上限
-                ///</summary>
-                public float pathDis{
-                            get{return _pathDis;}
-                             set{
-                            
-                            _pathDis = value;
-                            }
-                        }
-
-                private bool _isMine;
-
-                /// <summary>
-                ///是我自己
-                ///</summary>
-                public bool isMine{
-                            get{return _isMine;}
-                             set{
-                            
-                            _isMine = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeIsmine(this,_isMine,value); 
+                    }
+        
+                _isMine = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,bool navEnabled,Vector3 destination,float speed,float alertDis,float pathDis,bool isMine,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
-                this.uid = uid;
-                this.navEnabled = navEnabled;
-                this.destination = destination;
-                this.speed = speed;
-                this.alertDis = alertDis;
-                this.pathDis = pathDis;
-                this.isMine = isMine;
-                this.name = name;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.navEnabled = navEnabled;
+             this.destination = destination;
+             this.speed = speed;
+             this.alertDis = alertDis;
+             this.pathDis = pathDis;
+             this.isMine = isMine;
+             this.name = name;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new CharacterUnit(this);
 
@@ -152,16 +228,16 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,false,Vector3.zero,0f,0f,0f,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -174,13 +250,12 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
 
             childInitAction?.Invoke();
             
@@ -191,7 +266,7 @@ namespace Z_Map.Form
             }
 
 
-            
+        
              
         }
 
@@ -307,9 +382,8 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -319,11 +393,11 @@ UnitForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -331,8 +405,8 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -351,6 +425,138 @@ UnitForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeNavenabled(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNavenabledAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDestination(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDestinationAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSpeed(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSpeedAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAlertdis(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAlertdisAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePathdis(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePathdisAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsmine(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsmineAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

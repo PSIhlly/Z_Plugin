@@ -8,6 +8,7 @@ namespace Z_UnitSystem
     {
         public Unit unit;
         private BoxCollider[] _boxColliders;
+        protected bool vising;
         public BoxCollider[] boxColliders
         {
             get
@@ -35,6 +36,26 @@ namespace Z_UnitSystem
                 if (_rigidbody == null)
                     _rigidbody = GetComponentInChildren<Rigidbody>();
                 return _rigidbody;
+            }
+        }
+        public virtual void VisOff()
+        {
+            if (!vising)
+                return;
+            vising = false;
+            foreach (var render in renderers)
+            {
+                render.enabled = false;
+            }
+        }
+        public virtual void VisOn()
+        {
+            if (vising)
+                return;
+            vising = true;
+            foreach (var render in renderers)
+            {
+                render.enabled = true;
             }
         }
     }

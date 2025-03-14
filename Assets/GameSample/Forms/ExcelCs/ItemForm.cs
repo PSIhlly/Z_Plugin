@@ -16,80 +16,95 @@ namespace Form
 
     public static partial class ItemForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeCountAction;
+                
+
+
         public partial class Data
         {
 
-                private int _id;
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+private set{
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///名字
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+private set{
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private string  _icon;
+                    /// <summary>
+                    ///图标
+                    ///</summary>
+                    public string  icon{
+                                get{return _icon;}
+private set{
+        
+                _icon = value;
+                }
+                 
+                     }
+                    
+                    private int  _count;
+                    /// <summary>
+                    ///拥有数
+                    ///</summary>
+                    public int  count{
+                                get{return _count;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                            private set{
-                            
-                            _id = value;
-                            }
-                        }
-
-                private string _name;
-
-                /// <summary>
-                ///名字
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                            private set{
-                            
-                            _name = value;
-                            }
-                        }
-
-                private string _icon;
-
-                /// <summary>
-                ///图标
-                ///</summary>
-                public string icon{
-                            get{return _icon;}
-                            private set{
-                            
-                            _icon = value;
-                            }
-                        }
-
-                private int _count;
-
-                /// <summary>
-                ///拥有数
-                ///</summary>
-                public int count{
-                            get{return _count;}
-                             set{
-                            
-                            _count = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeCount(this,_count,value); 
+                    }
+        
+                _count = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,string icon,int count)
             {
 
-                this.id = id;
-                this.name = name;
-                this.icon = icon;
-                this.count = count;
+             this.id = id;
+             this.name = name;
+             this.icon = icon;
+             this.count = count;
 
             }
             
@@ -98,16 +113,16 @@ namespace Form
                    public static Data defaultData=new Data(0,"","",0);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -119,8 +134,7 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -130,12 +144,10 @@ namespace Form
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -198,6 +210,18 @@ namespace Form
         }
 
 
+
+
+            public static void ChangeCount(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCountAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

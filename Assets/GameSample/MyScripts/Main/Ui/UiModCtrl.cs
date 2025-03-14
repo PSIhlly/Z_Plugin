@@ -6,8 +6,10 @@ using Item;
 using Z_Texture;
 using Z_Ui.Base;
 using Z_Ui;
+using Ui.Start;
+using Ui.ModStory;
 
-namespace Ui
+namespace Ui.Mod
 {
     public partial class UiModCtrl
     {
@@ -53,6 +55,7 @@ namespace Ui
         {
             view.btn_mod.onClick.AddListener(() =>
             {
+                Main2StoryManager.instance.StartLoadStoryUgc("story1");
                 UiManager.instance.ShowUi<UiModStoryCtrl>();
                 parent.Close();
             });

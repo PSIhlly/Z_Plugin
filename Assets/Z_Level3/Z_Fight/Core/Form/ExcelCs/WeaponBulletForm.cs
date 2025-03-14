@@ -14,220 +14,326 @@ namespace Z_Fight.Form
 
     public static partial class WeaponBulletForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,int,int> changeItemidAction;
+                
+        public static Action<Data,int,int> changeDamageAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,int,int> changeMagazinecapacityAction;
+                
+        public static Action<Data,float,float> changeCdtimeAction;
+                
+        public static Action<Data,float,float> changeReloadtimeAction;
+                
+        public static Action<Data,float,float> changeSpeedAction;
+                
+        public static Action<Data,float,float> changeRangeAction;
+                
+        public static Action<Data,Vector3,Vector3> changeAttackposAction;
+                
+        public static Action<Data,Vector3,Vector3> changeAttackdirAction;
+                
+        public static Action<Data,bool,bool> changeSelfhurtAction;
+                
+        public static Action<Data,float,float> changeAccuracyAction;
+                
+        public static Action<Data,int,int> changeBulletsperAction;
+                
+
+
         public partial class Data
         {
 
-                private int _id;
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                             set{
-                            
-                            _id = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeId(this,_id,value); 
+                    }
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private int  _itemId;
+                    /// <summary>
+                    ///武器道具id
+                    ///</summary>
+                    public int  itemId{
+                                get{return _itemId;}
+ set{
 
-                private int _itemId;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeItemid(this,_itemId,value); 
+                    }
+        
+                _itemId = value;
+                }
+                 
+                     }
+                    
+                    private int  _damage;
+                    /// <summary>
+                    ///伤害
+                    ///</summary>
+                    public int  damage{
+                                get{return _damage;}
+ set{
 
-                /// <summary>
-                ///武器道具id
-                ///</summary>
-                public int itemId{
-                            get{return _itemId;}
-                             set{
-                            
-                            _itemId = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeDamage(this,_damage,value); 
+                    }
+        
+                _damage = value;
+                }
+                 
+                     }
+                    
+                    private string  _prefabName;
+                    /// <summary>
+                    ///预制名字（索引）
+                    ///</summary>
+                    public string  prefabName{
+                                get{return _prefabName;}
+ set{
 
-                private int _damage;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangePrefabname(this,_prefabName,value); 
+                    }
+        
+                _prefabName = value;
+                }
+                 
+                     }
+                    
+                    private int  _magazineCapacity;
+                    /// <summary>
+                    ///弹夹总量
+                    ///</summary>
+                    public int  magazineCapacity{
+                                get{return _magazineCapacity;}
+ set{
 
-                /// <summary>
-                ///伤害
-                ///</summary>
-                public int damage{
-                            get{return _damage;}
-                             set{
-                            
-                            _damage = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeMagazinecapacity(this,_magazineCapacity,value); 
+                    }
+        
+                _magazineCapacity = value;
+                }
+                 
+                     }
+                    
+                    private float  _cdTime;
+                    /// <summary>
+                    ///射速冷却时长
+                    ///</summary>
+                    public float  cdTime{
+                                get{return _cdTime;}
+ set{
 
-                private string _prefabName;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeCdtime(this,_cdTime,value); 
+                    }
+        
+                _cdTime = value;
+                }
+                 
+                     }
+                    
+                    private float  _reloadTime;
+                    /// <summary>
+                    ///装填时长
+                    ///</summary>
+                    public float  reloadTime{
+                                get{return _reloadTime;}
+ set{
 
-                /// <summary>
-                ///预制名字（索引）
-                ///</summary>
-                public string prefabName{
-                            get{return _prefabName;}
-                             set{
-                            
-                            _prefabName = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeReloadtime(this,_reloadTime,value); 
+                    }
+        
+                _reloadTime = value;
+                }
+                 
+                     }
+                    
+                    private float  _speed;
+                    /// <summary>
+                    ///弹速
+                    ///</summary>
+                    public float  speed{
+                                get{return _speed;}
+ set{
 
-                private int _magazineCapacity;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeSpeed(this,_speed,value); 
+                    }
+        
+                _speed = value;
+                }
+                 
+                     }
+                    
+                    private float  _range;
+                    /// <summary>
+                    ///射程
+                    ///</summary>
+                    public float  range{
+                                get{return _range;}
+ set{
 
-                /// <summary>
-                ///弹夹总量
-                ///</summary>
-                public int magazineCapacity{
-                            get{return _magazineCapacity;}
-                             set{
-                            
-                            _magazineCapacity = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeRange(this,_range,value); 
+                    }
+        
+                _range = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _attackPos;
+                    /// <summary>
+                    ///枪口
+                    ///</summary>
+                    public Vector3  attackPos{
+                                get{return _attackPos;}
+ set{
 
-                private float _cdTime;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeAttackpos(this,_attackPos,value); 
+                    }
+        
+                _attackPos = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _attackDir;
+                    /// <summary>
+                    ///方向
+                    ///</summary>
+                    public Vector3  attackDir{
+                                get{return _attackDir;}
+ set{
 
-                /// <summary>
-                ///射速冷却时长
-                ///</summary>
-                public float cdTime{
-                            get{return _cdTime;}
-                             set{
-                            
-                            _cdTime = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeAttackdir(this,_attackDir,value); 
+                    }
+        
+                _attackDir = value;
+                }
+                 
+                     }
+                    
+                    private bool  _selfHurt;
+                    /// <summary>
+                    ///自己伤害
+                    ///</summary>
+                    public bool  selfHurt{
+                                get{return _selfHurt;}
+ set{
 
-                private float _reloadTime;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeSelfhurt(this,_selfHurt,value); 
+                    }
+        
+                _selfHurt = value;
+                }
+                 
+                     }
+                    
+                    private float  _accuracy;
+                    /// <summary>
+                    ///精度
+                    ///</summary>
+                    public float  accuracy{
+                                get{return _accuracy;}
+ set{
 
-                /// <summary>
-                ///装填时长
-                ///</summary>
-                public float reloadTime{
-                            get{return _reloadTime;}
-                             set{
-                            
-                            _reloadTime = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeAccuracy(this,_accuracy,value); 
+                    }
+        
+                _accuracy = value;
+                }
+                 
+                     }
+                    
+                    private int  _bulletsPer;
+                    /// <summary>
+                    ///单次开火弹数
+                    ///</summary>
+                    public int  bulletsPer{
+                                get{return _bulletsPer;}
+ set{
 
-                private float _speed;
-
-                /// <summary>
-                ///弹速
-                ///</summary>
-                public float speed{
-                            get{return _speed;}
-                             set{
-                            
-                            _speed = value;
-                            }
-                        }
-
-                private float _range;
-
-                /// <summary>
-                ///射程
-                ///</summary>
-                public float range{
-                            get{return _range;}
-                             set{
-                            
-                            _range = value;
-                            }
-                        }
-
-                private Vector3 _attackPos;
-
-                /// <summary>
-                ///枪口
-                ///</summary>
-                public Vector3 attackPos{
-                            get{return _attackPos;}
-                             set{
-                            
-                            _attackPos = value;
-                            }
-                        }
-
-                private Vector3 _attackDir;
-
-                /// <summary>
-                ///方向
-                ///</summary>
-                public Vector3 attackDir{
-                            get{return _attackDir;}
-                             set{
-                            
-                            _attackDir = value;
-                            }
-                        }
-
-                private bool _selfHurt;
-
-                /// <summary>
-                ///自己伤害
-                ///</summary>
-                public bool selfHurt{
-                            get{return _selfHurt;}
-                             set{
-                            
-                            _selfHurt = value;
-                            }
-                        }
-
-                private float _accuracy;
-
-                /// <summary>
-                ///精度
-                ///</summary>
-                public float accuracy{
-                            get{return _accuracy;}
-                             set{
-                            
-                            _accuracy = value;
-                            }
-                        }
-
-                private int _bulletsPer;
-
-                /// <summary>
-                ///单次开火弹数
-                ///</summary>
-                public int bulletsPer{
-                            get{return _bulletsPer;}
-                             set{
-                            
-                            _bulletsPer = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeBulletsper(this,_bulletsPer,value); 
+                    }
+        
+                _bulletsPer = value;
+                }
+                 
+                     }
+                    
             public Data(int id,int itemId,int damage,string prefabName,int magazineCapacity,float cdTime,float reloadTime,float speed,float range,Vector3 attackPos,Vector3 attackDir,bool selfHurt,float accuracy,int bulletsPer)
             {
 
-                this.id = id;
-                this.itemId = itemId;
-                this.damage = damage;
-                this.prefabName = prefabName;
-                this.magazineCapacity = magazineCapacity;
-                this.cdTime = cdTime;
-                this.reloadTime = reloadTime;
-                this.speed = speed;
-                this.range = range;
-                this.attackPos = attackPos;
-                this.attackDir = attackDir;
-                this.selfHurt = selfHurt;
-                this.accuracy = accuracy;
-                this.bulletsPer = bulletsPer;
+             this.id = id;
+             this.itemId = itemId;
+             this.damage = damage;
+             this.prefabName = prefabName;
+             this.magazineCapacity = magazineCapacity;
+             this.cdTime = cdTime;
+             this.reloadTime = reloadTime;
+             this.speed = speed;
+             this.range = range;
+             this.attackPos = attackPos;
+             this.attackDir = attackDir;
+             this.selfHurt = selfHurt;
+             this.accuracy = accuracy;
+             this.bulletsPer = bulletsPer;
 
             }
             
@@ -236,16 +342,16 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,0,0,"",0,0f,0f,0f,0f,Vector3.zero,Vector3.zero,false,0f,0);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -257,19 +363,16 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -389,9 +492,8 @@ namespace Z_Fight.Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-            
+        DataById[data.id]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.id;
@@ -401,11 +503,11 @@ namespace Z_Fight.Form
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
+                    DataById.Remove(data.id);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -413,8 +515,8 @@ namespace Z_Fight.Form
         {
             Init();
 
-                DataById.Clear();
-
+                    DataById.Clear();
+    
             idChain.Clear();
         }
 
@@ -433,6 +535,148 @@ namespace Z_Fight.Form
         
 
 
+
+
+            public static void ChangeId(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeItemid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeItemidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDamage(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDamageAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMagazinecapacity(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMagazinecapacityAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCdtime(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCdtimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeReloadtime(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeReloadtimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSpeed(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSpeedAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRange(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRangeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAttackpos(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAttackposAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAttackdir(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAttackdirAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSelfhurt(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSelfhurtAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAccuracy(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAccuracyAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBulletsper(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBulletsperAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

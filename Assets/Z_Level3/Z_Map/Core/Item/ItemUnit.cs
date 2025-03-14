@@ -39,7 +39,7 @@ namespace Z_Map
                 var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
                 if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
-                    var newMap = MapManager.instance.dataCtrl.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
+                    var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
                     if (superUnit != newMap.unit)
                     {
                         superUnit.Unbind(this);

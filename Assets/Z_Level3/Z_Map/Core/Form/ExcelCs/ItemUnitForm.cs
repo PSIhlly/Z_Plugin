@@ -14,6 +14,7 @@ namespace Z_Map.Form
 
     public static partial class ItemUnitForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -26,13 +27,48 @@ namespace Z_Map.Form
                 UnitForm.childRemoveAction+=RemoveChildren;
                 UnitForm.childAddAction+=AddChildren;
             
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,bool,bool> changeIsobstacleAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
 
         public partial class Data : UnitForm.Data
         {
@@ -48,30 +84,35 @@ namespace Z_Map.Form
                     }
                 }
 
-                private bool _isObstacle;
+                    private bool  _isObstacle;
+                    /// <summary>
+                    ///是障碍物
+                    ///</summary>
+                    public bool  isObstacle{
+                                get{return _isObstacle;}
+ set{
 
-                /// <summary>
-                ///是障碍物
-                ///</summary>
-                public bool isObstacle{
-                            get{return _isObstacle;}
-                             set{
-                            
-                            _isObstacle = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeIsobstacle(this,_isObstacle,value); 
+                    }
+        
+                _isObstacle = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
-                this.uid = uid;
-                this.isObstacle = isObstacle;
-                this.name = name;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.isObstacle = isObstacle;
+             this.name = name;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new ItemUnit(this);
 
@@ -82,16 +123,16 @@ namespace Z_Map.Form
                    public static Data defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -104,13 +145,12 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
 
             childInitAction?.Invoke();
             
@@ -121,7 +161,7 @@ namespace Z_Map.Form
             }
 
 
-            
+        
              
         }
 
@@ -217,9 +257,8 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -229,11 +268,11 @@ UnitForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -241,8 +280,8 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -261,6 +300,88 @@ UnitForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsobstacle(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsobstacleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

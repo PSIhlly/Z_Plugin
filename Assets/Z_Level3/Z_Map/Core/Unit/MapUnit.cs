@@ -53,7 +53,7 @@ namespace Z_Map
 
         public override void Remove()
         {
-            MapManager.instance.dataCtrl.UnRegisterMap(data);
+            MapManager.instance.data.UnRegisterMap(data);
             MapUnitForm.RemoveData(data.uid);
             base.Remove();
         }
@@ -62,11 +62,10 @@ namespace Z_Map
         {
             base.UpdateInfo();
 
-            if(ins!=null)
+            if (ins != null)
                 MapManager.instance.unitUtilCtrl.UpdateAnim((MapInstance)ins);
         }
-
-
+        
 
     }
 }

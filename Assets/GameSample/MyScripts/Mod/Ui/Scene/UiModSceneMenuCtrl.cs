@@ -10,7 +10,7 @@ using Z_Text;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
-namespace Ui
+namespace Ui.ModSceneMenu
 {
     public partial class UiModSceneMenuModel
     {
@@ -61,13 +61,12 @@ namespace Ui
         public void Save()
         {
             model.lastSaveTime = Time.time;
-            SaveAndLoad.Save(ModSceneManager.instance.fileName, JsonConvert.SerializeObject(MapManager.instance.dataCtrl.GetJsonData()));//先只存地图的
+            SaveAndLoad.Save(ModManager.instance.GetSceneFileName(), JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));//先只存地图的
 
         }
         public void Exit()
         {
-            ModSceneManager.instance.End();
-
+            Main2StoryManager.instance.UnloadSceneUgc();
         }
     }
 }

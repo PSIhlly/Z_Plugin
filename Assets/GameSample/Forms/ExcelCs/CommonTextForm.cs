@@ -16,6 +16,7 @@ namespace Form
 
     public static partial class CommonTextForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -28,13 +29,34 @@ namespace Form
                 TextBaseForm.childRemoveAction+=RemoveChildren;
                 TextBaseForm.childAddAction+=AddChildren;
             
+
+            TextBaseForm.changeIdAction+=ChangeId;
+
+            TextBaseForm.changeKeyAction+=ChangeKey;
+
+            TextBaseForm.changeContentenAction+=ChangeContenten;
+
+            TextBaseForm.changeContentcnAction+=ChangeContentcn;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain=>TextBaseForm.idChain;
+
+        public static Z_Chain.Chain idChain =>TextBaseForm.idChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeKeyAction;
+                
+        public static Action<Data,string,string> changeContentenAction;
+                
+        public static Action<Data,string,string> changeContentcnAction;
+                
+
 
         public partial class Data : TextBaseForm.Data
         {
@@ -42,10 +64,10 @@ namespace Form
             public Data(int id,string key,string contentEn,string contentCn):base(id,key,contentEn,contentCn)
             {
 
-                this.id = id;
-                this.key = key;
-                this.contentEn = contentEn;
-                this.contentCn = contentCn;
+             this.id = id;
+             this.key = key;
+             this.contentEn = contentEn;
+             this.contentCn = contentCn;
 
             }
             
@@ -54,26 +76,26 @@ namespace Form
                    public static Data defaultData=new Data(0,"","","");
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByKey;
-        public static Dictionary<string, Data> DataByKey
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByKey;
+            public static Dictionary<string, Data> DataByKey
             {
-                Init();
-                return _DataByKey;
+                get
+                {
+                    Init();
+                    return _DataByKey;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -86,8 +108,8 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -95,20 +117,31 @@ namespace Form
 
                 {2,new Data(2,"no","No","否")},
 
+                {3,new Data(3,"new","New","新")},
+
+                {4,new Data(4,"play_1","Play","播放")},
+
+                {5,new Data(5,"stop","Stop","停止")},
+
                 {10001,new Data(10001,"savePopupTitle","Do you need Save?","需要保存吗?")},
 
                 };
-
-                _DataByKey = new Dictionary<string, Data>() {
-
-                    {"yes",_DataById[1]},
-
-                    {"no",_DataById[2]},
-
-                    {"savePopupTitle",_DataById[10001]},
-
-                };
-
+                    _DataByKey = new Dictionary<string, Data>() {
+    
+                        {"yes",_DataById[1]},
+    
+                        {"no",_DataById[2]},
+    
+                        {"new",_DataById[3]},
+    
+                        {"play_1",_DataById[4]},
+    
+                        {"stop",_DataById[5]},
+    
+                        {"savePopupTitle",_DataById[10001]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -119,7 +152,7 @@ namespace Form
             }
 
 
-            
+        
              
         }
 
@@ -199,11 +232,10 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByKey[data.key]=data;
-
-            
+        DataById[data.id]=data;
+    
+                    DataByKey[data.key]=data;
+    
 TextBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -213,13 +245,13 @@ TextBaseForm.AddData(data);
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByKey.Remove(data.key);
-
+                    DataById.Remove(data.id);
+    
+                    DataByKey.Remove(data.key);
+    
 TextBaseForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
         }
@@ -227,10 +259,10 @@ TextBaseForm.RemoveData(id);
         {
             Init();
 
-                DataById.Clear();
-
-                DataByKey.Clear();
-
+                    DataById.Clear();
+    
+                    DataByKey.Clear();
+    
             idChain.Clear();
         }
 
@@ -249,6 +281,51 @@ TextBaseForm.RemoveData(id);
         
 
 
+
+
+            public static void ChangeId(TextBaseForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeKey(TextBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByKey.Remove(oldV);
+                    DataByKey[newV]=data;
+ 
+                changeKeyAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeContenten(TextBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeContentenAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeContentcn(TextBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeContentcnAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

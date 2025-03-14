@@ -14,126 +14,197 @@ namespace Z_Map.Form
 
     public static partial class MapMainForm
     {
-        public static readonly int autoUidCnt=1000000;
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain;
+
+        public static Z_Chain.Chain uidChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,Vector3,Vector3> changeMapunitsizeAction;
+                
+        public static Action<Data,Vector3Int,Vector3Int> changeLogicsizeAction;
+                
+        public static Action<Data,Vector3Int,Vector3Int> changeViewsizeAction;
+                
+        public static Action<Data,string,string> changeMapjaAction;
+                
+        public static Action<Data,string,string> changeItemjaAction;
+                
+        public static Action<Data,string,string> changeCharacterjaAction;
+                
+
+
         public partial class Data
         {
 
-                private int _uid;
+                    private int  _uid;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  uid{
+                                get{return _uid;}
+ set{
 
-                public int uid{
-                            get{return _uid;}
-                             set{
-                            
-                            _uid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUid(this,_uid,value); 
+                    }
+        
+                _uid = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _mapUnitSize;
+                    /// <summary>
+                    ///单位图块大小
+                    ///</summary>
+                    public Vector3  mapUnitSize{
+                                get{return _mapUnitSize;}
+ set{
 
-                private Vector3 _mapUnitSize;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMapunitsize(this,_mapUnitSize,value); 
+                    }
+        
+                _mapUnitSize = value;
+                }
+                 
+                     }
+                    
+                    private Vector3Int  _logicSize;
+                    /// <summary>
+                    ///逻辑大小
+                    ///</summary>
+                    public Vector3Int  logicSize{
+                                get{return _logicSize;}
+ set{
 
-                /// <summary>
-                ///单位图块大小
-                ///</summary>
-                public Vector3 mapUnitSize{
-                            get{return _mapUnitSize;}
-                             set{
-                            
-                            _mapUnitSize = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeLogicsize(this,_logicSize,value); 
+                    }
+        
+                _logicSize = value;
+                }
+                 
+                     }
+                    
+                    private Vector3Int  _viewSize;
+                    /// <summary>
+                    ///视口大小
+                    ///</summary>
+                    public Vector3Int  viewSize{
+                                get{return _viewSize;}
+ set{
 
-                private Vector3Int _viewSize;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeViewsize(this,_viewSize,value); 
+                    }
+        
+                _viewSize = value;
+                }
+                 
+                     }
+                    
+                    private string  _mapJa;
+                    /// <summary>
+                    ///地图数据
+                    ///</summary>
+                    public string  mapJa{
+                                get{return _mapJa;}
+ set{
 
-                /// <summary>
-                ///视口大小
-                ///</summary>
-                public Vector3Int viewSize{
-                            get{return _viewSize;}
-                             set{
-                            
-                            _viewSize = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMapja(this,_mapJa,value); 
+                    }
+        
+                _mapJa = value;
+                }
+                 
+                     }
+                    
+                    private string  _itemJa;
+                    /// <summary>
+                    ///物体数据
+                    ///</summary>
+                    public string  itemJa{
+                                get{return _itemJa;}
+ set{
 
-                private string _mapJa;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeItemja(this,_itemJa,value); 
+                    }
+        
+                _itemJa = value;
+                }
+                 
+                     }
+                    
+                    private string  _characterJa;
+                    /// <summary>
+                    ///单位数据
+                    ///</summary>
+                    public string  characterJa{
+                                get{return _characterJa;}
+ set{
 
-                /// <summary>
-                ///地图数据
-                ///</summary>
-                public string mapJa{
-                            get{return _mapJa;}
-                             set{
-                            
-                            _mapJa = value;
-                            }
-                        }
-
-                private string _itemJa;
-
-                /// <summary>
-                ///物体数据
-                ///</summary>
-                public string itemJa{
-                            get{return _itemJa;}
-                             set{
-                            
-                            _itemJa = value;
-                            }
-                        }
-
-                private string _characterJa;
-
-                /// <summary>
-                ///单位数据
-                ///</summary>
-                public string characterJa{
-                            get{return _characterJa;}
-                             set{
-                            
-                            _characterJa = value;
-                            }
-                        }
-
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa)
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCharacterja(this,_characterJa,value); 
+                    }
+        
+                _characterJa = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa)
             {
 
-                this.uid = uid;
-                this.mapUnitSize = mapUnitSize;
-                this.viewSize = viewSize;
-                this.mapJa = mapJa;
-                this.itemJa = itemJa;
-                this.characterJa = characterJa;
+             this.uid = uid;
+             this.mapUnitSize = mapUnitSize;
+             this.logicSize = logicSize;
+             this.viewSize = viewSize;
+             this.mapJa = mapJa;
+             this.itemJa = itemJa;
+             this.characterJa = characterJa;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,"","","");
+                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","");
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -145,19 +216,16 @@ namespace Z_Map.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (autoUidCnt);
-            
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -198,6 +266,8 @@ namespace Z_Map.Form
 
                 jo.Get<Vector3>("mapUnitSize"),
 
+                jo.Get<Vector3Int>("logicSize"),
+
                 jo.Get<Vector3Int>("viewSize"),
 
                 jo.Get<string>("mapJa"),
@@ -219,6 +289,8 @@ namespace Z_Map.Form
             jo.Set<int>("uid",data.uid);
 
             jo.Set<Vector3>("mapUnitSize",data.mapUnitSize);
+
+            jo.Set<Vector3Int>("logicSize",data.logicSize);
 
             jo.Set<Vector3Int>("viewSize",data.viewSize);
 
@@ -245,9 +317,8 @@ namespace Z_Map.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -257,11 +328,11 @@ namespace Z_Map.Form
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -269,8 +340,8 @@ namespace Z_Map.Form
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -289,6 +360,78 @@ namespace Z_Map.Form
         
 
 
+
+
+            public static void ChangeUid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMapunitsize(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMapunitsizeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLogicsize(Data superData,Vector3Int oldV,Vector3Int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLogicsizeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeViewsize(Data superData,Vector3Int oldV,Vector3Int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeViewsizeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMapja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMapjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeItemja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeItemjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCharacterja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCharacterjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

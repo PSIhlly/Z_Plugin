@@ -5,8 +5,10 @@ using Form;
 using Item;
 using Z_Texture;
 using Z_Ui;
+using Ui.Mod;
+using Ui.EnterMain;
 
-namespace Ui
+namespace Ui.Start
 {
     public partial class UiStartCtrl
     {

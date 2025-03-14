@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -6,8 +7,18 @@ namespace Z_Texture
 {
     public class TextureTransform
     {
-        
 
+        public static Texture2D GetTargetSize(Texture2D tex, int width, int height)
+        {
+                var texNew = new Texture2D(width, height);
+                for (int y = 0; y < height; y++)
+                    for (int x = 0; x < width; x++)
+                    {
+                        texNew.SetPixel(x, y, CalculatePixel(tex, x, y, width, height));
+                    }
+                texNew.Apply();
+                return texNew;
+        }
         public static void GetTargetSize(Texture2D[] texs, int width, int height)
         {
             if (texs == null || texs.Length == 0 || texs[0] == null)
@@ -15,16 +26,8 @@ namespace Z_Texture
 
             for(int i=0;i<texs.Length;i++)
             {
-                var texNew = new Texture2D(width, height);
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
-                    {
-                        texNew.SetPixel(x, y, CalculatePixel(texs[i], x, y, width, height));
-                    }
-                texNew.Apply();
-                texs[i] = texNew;
+                texs[i]=GetTargetSize(texs[i], width, height);
             }
-           
         }
         public static Texture2D Copy(Texture2D tex)
         {
@@ -49,6 +52,7 @@ namespace Z_Texture
             Color32[] originalPixels = original.GetPixels32();
             Color32[] rotatedPixels = new Color32[originalPixels.Length];
 
+            
             // 旋转像素数据
             for (int x = 0; x < width; x++)
             {
@@ -68,11 +72,12 @@ namespace Z_Texture
                             rotatedIndex = (width - 1 - x) + (height -1- y)* width;
                             break;
                         case 3:
-                            rotatedIndex = x * height + (width - 1 - y);
+                            rotatedIndex = x * height + (height - 1 - y);
                             break;
 
                     }
                     rotatedPixels[rotatedIndex] = originalPixels[originalIndex];
+                    
                 }
             }
 

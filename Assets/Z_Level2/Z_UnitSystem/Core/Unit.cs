@@ -98,10 +98,7 @@ namespace Z_UnitSystem
         {
             if (ins == null || ins.gameObject == null)
                 return false;
-            foreach (var render in ins.renderers)
-            {
-                render.enabled = false;
-            }
+            ins.VisOff();
             foreach (var unit in subUnits)
             {
                 unit.VisOff();
@@ -112,10 +109,7 @@ namespace Z_UnitSystem
         {
             if (ins == null || ins.gameObject == null)
                 return false;
-            foreach (var render in ins.renderers)
-            {
-                render.enabled = true;
-            }
+            ins.VisOn();
 
             foreach (var unit in subUnits)
             {
@@ -172,15 +166,9 @@ namespace Z_UnitSystem
             if (lastUpdateFrame == Time.frameCount)
                 return;
             lastUpdateFrame = Time.frameCount;
-
-            var unitCache = new List<Unit>();
-            foreach (var unit in subUnits)
+            for(int i= subUnits.Count-1; i>=0;i--)
             {
-                unitCache.Add(unit);
-            }
-            foreach (var unit in unitCache)
-            {
-                unit.UpdateInfo();
+                subUnits[i].UpdateInfo();
             }
         }
         public virtual void Remove()

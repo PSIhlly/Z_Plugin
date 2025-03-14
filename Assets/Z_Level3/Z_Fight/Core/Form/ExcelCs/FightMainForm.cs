@@ -14,108 +14,158 @@ namespace Z_Fight.Form
 
     public static partial class FightMainForm
     {
-        public static readonly int autoUidCnt=100;
+public static readonly int autoUidCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain;
+
+        public static Z_Chain.Chain uidChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,int,int> changeUidcntAction;
+                
+        public static Action<Data,string,string> changeFightjaAction;
+                
+        public static Action<Data,string,string> changeWeaponjaAction;
+                
+        public static Action<Data,string,string> changeBulletjaAction;
+                
+        public static Action<Data,string,string> changeWeaponbulletjaAction;
+                
+
+
         public partial class Data
         {
 
-                private int _uid;
+                    private int  _uid;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  uid{
+                                get{return _uid;}
+ set{
 
-                public int uid{
-                            get{return _uid;}
-                             set{
-                            
-                            _uid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUid(this,_uid,value); 
+                    }
+        
+                _uid = value;
+                }
+                 
+                     }
+                    
+                    private int  _uidCnt;
+                    /// <summary>
+                    ///uid总数
+                    ///</summary>
+                    public int  uidCnt{
+                                get{return _uidCnt;}
+ set{
 
-                private int _uidCnt;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUidcnt(this,_uidCnt,value); 
+                    }
+        
+                _uidCnt = value;
+                }
+                 
+                     }
+                    
+                    private string  _fightJa;
+                    /// <summary>
+                    ///战斗数据
+                    ///</summary>
+                    public string  fightJa{
+                                get{return _fightJa;}
+ set{
 
-                /// <summary>
-                ///uid总数
-                ///</summary>
-                public int uidCnt{
-                            get{return _uidCnt;}
-                             set{
-                            
-                            _uidCnt = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeFightja(this,_fightJa,value); 
+                    }
+        
+                _fightJa = value;
+                }
+                 
+                     }
+                    
+                    private string  _weaponJa;
+                    /// <summary>
+                    ///武器数据
+                    ///</summary>
+                    public string  weaponJa{
+                                get{return _weaponJa;}
+ set{
 
-                private string _fightJa;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeWeaponja(this,_weaponJa,value); 
+                    }
+        
+                _weaponJa = value;
+                }
+                 
+                     }
+                    
+                    private string  _bulletJa;
+                    /// <summary>
+                    ///子弹数据
+                    ///</summary>
+                    public string  bulletJa{
+                                get{return _bulletJa;}
+ set{
 
-                /// <summary>
-                ///战斗数据
-                ///</summary>
-                public string fightJa{
-                            get{return _fightJa;}
-                             set{
-                            
-                            _fightJa = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeBulletja(this,_bulletJa,value); 
+                    }
+        
+                _bulletJa = value;
+                }
+                 
+                     }
+                    
+                    private string  _weaponBulletJa;
+                    /// <summary>
+                    ///武器子弹数据
+                    ///</summary>
+                    public string  weaponBulletJa{
+                                get{return _weaponBulletJa;}
+ set{
 
-                private string _weaponJa;
-
-                /// <summary>
-                ///武器数据
-                ///</summary>
-                public string weaponJa{
-                            get{return _weaponJa;}
-                             set{
-                            
-                            _weaponJa = value;
-                            }
-                        }
-
-                private string _bulletJa;
-
-                /// <summary>
-                ///子弹数据
-                ///</summary>
-                public string bulletJa{
-                            get{return _bulletJa;}
-                             set{
-                            
-                            _bulletJa = value;
-                            }
-                        }
-
-                private string _weaponBulletJa;
-
-                /// <summary>
-                ///武器子弹数据
-                ///</summary>
-                public string weaponBulletJa{
-                            get{return _weaponBulletJa;}
-                             set{
-                            
-                            _weaponBulletJa = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeWeaponbulletja(this,_weaponBulletJa,value); 
+                    }
+        
+                _weaponBulletJa = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,int uidCnt,string fightJa,string weaponJa,string bulletJa,string weaponBulletJa)
             {
 
-                this.uid = uid;
-                this.uidCnt = uidCnt;
-                this.fightJa = fightJa;
-                this.weaponJa = weaponJa;
-                this.bulletJa = bulletJa;
-                this.weaponBulletJa = weaponBulletJa;
+             this.uid = uid;
+             this.uidCnt = uidCnt;
+             this.fightJa = fightJa;
+             this.weaponJa = weaponJa;
+             this.bulletJa = bulletJa;
+             this.weaponBulletJa = weaponBulletJa;
 
             }
             
@@ -124,16 +174,16 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,0,"","","","");
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -145,19 +195,16 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (autoUidCnt);
-            
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -245,9 +292,8 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -257,11 +303,11 @@ namespace Z_Fight.Form
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -269,8 +315,8 @@ namespace Z_Fight.Form
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -289,6 +335,68 @@ namespace Z_Fight.Form
         
 
 
+
+
+            public static void ChangeUid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUidcnt(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidcntAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeFightja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeFightjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeWeaponja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeWeaponjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBulletja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBulletjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeWeaponbulletja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeWeaponbulletjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

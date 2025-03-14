@@ -14,17 +14,48 @@ namespace Z_Map
 {
     public static class GlobalSettings
     {
-        public const int ANIM_MAX = 10;
+        public const int TEX_ANIM_MAX = 10;
+        public const int ITEM_UNIT_MAX = 10;
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
+        public const bool OVERLAY_HIDE = true;
     }
+
+    public static class GlobalHelper
+    {
+        public static string GetTexRealName(string nickName, int animId)
+        {
+            return "b$" + nickName + "$" + animId;
+        }
+        public static string GetTexNickName(string realName)
+        {
+            string[] splt = realName.Split("$");
+            if (splt.Length < 3)
+                return "";
+            return splt[1];
+        }
+        public static string GetMaskRealName(string nickName, int maskId)
+        {
+            return "a$" + nickName + "$" + maskId;
+        }
+
+        public static string GetInternalPrefabName(string name)
+        {
+            return "$" + name;
+        }
+        public static string GetItemTexRealName(string nickName, int prefabId)
+        {
+            return "c$" + nickName + "$" + prefabId;
+        }
+    }
+
 
     public class MapManager : Z_MonoManager<MapManager>
     {
-        public Vector3 sizeLimit=new Vector3(1000,1000,1000);
-        public MapDataController dataCtrl;
+        public Vector3 sizeLimit = new Vector3(1000, 1000, 1000);
+        public MapData data;
         public GameObject mainGo;
-        
+
 
         public NavigationController navigationCtrl;
         public MapUtilController utilCtrl;
@@ -39,25 +70,22 @@ namespace Z_Map
         {
             base.Init();
 
-            navigationCtrl = new NavigationController();
-            navigationCtrl.Init(this);
+            navigationCtrl = new NavigationController(this);
 
-            utilCtrl = new MapUtilController();
-            utilCtrl.Init(this);
+            utilCtrl = new MapUtilController(this);
 
-            unitUtilCtrl = new MapUnitUtilController();
-            unitUtilCtrl.Init(this);
+            unitUtilCtrl = new MapUnitUtilController(this);
         }
 
         #region external
 
-        public void Begin(MapDataController dataCtrl)
+        public void Begin(MapData dataCtrl)
         {
             End();
             Init();
             mainGo.SetActive(true);
-            this.dataCtrl = dataCtrl;
-            
+            this.data = dataCtrl;
+
 
             viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
 
@@ -78,12 +106,12 @@ namespace Z_Map
                 }
             }
 
-            foreach(var data in MapTextureForm.DataById.Values)
+            foreach (var data in MapTextureForm.DataById.Values)
             {
                 List<Texture2D> lst = new List<Texture2D>();
-                for(int i=0;i< GlobalSettings.ANIM_MAX; i++)
+                for (int i = 0; i < GlobalSettings.TEX_ANIM_MAX; i++)
                 {
-                    var curKey = ModAssetManager.instance.GetTexRealName(data.name, i);
+                    var curKey = GlobalHelper.GetTexRealName(data.name, i);
                     if (TexAssetForm.DataByName.ContainsKey(curKey))
                         lst.Add((Texture2D)TexAssetForm.DataByName[curKey].tex);
                     else
@@ -92,15 +120,15 @@ namespace Z_Map
                 unitUtilCtrl.CreateTexAnimVariants(data.name, lst.ToArray());
             }
 
-            foreach(var data in MapTransitionMaskForm.DataById.Values)
+            foreach (var data in MapTransitionMaskForm.DataById.Values)
             {
                 var raws = new Texture2D[] {
-                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,0)]?.tex ,
-                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,1)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,2)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,3)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,4)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[ModAssetManager.instance.GetMaskTexRealName(data.name,5)]?.tex
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,0)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,1)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,2)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,3)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,4)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,5)]?.tex
                 };
                 unitUtilCtrl.CreateAlphaVariantsByBasic5(data.name, raws);
             }
@@ -112,24 +140,24 @@ namespace Z_Map
         }
         public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            return dataCtrl.AddMap(mapPos);
+            return data.AddMap(mapPos);
         }
         public ItemUnitForm.Data AddItem(Vector3 realPos)
         {
             var mapPos = utilCtrl.RealPos2MapPos(realPos);
-            if(!dataCtrl.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+            if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
             {
                 return null;
             }
-            var data= dataCtrl.AddItem();
+            var data = this.data.AddItem();
             data.pos = realPos;
-            dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
+            this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
             return data;
         }
 
         public void SetPos(Vector3 curCenterPos)
         {
-            this.curCenterPos = utilCtrl.RealPos2MapPos(curCenterPos );
+            this.curCenterPos = utilCtrl.RealPos2MapPos(curCenterPos);
         }
 
         public void End()
@@ -137,68 +165,102 @@ namespace Z_Map
             if (curMapLst != null)
                 curMapLst.Clear();
             mainGo.SetActive(false);
-            if(dataCtrl!=null)
+            if (data != null)
             {
-                dataCtrl.Unload();
-                dataCtrl = null;
+                data.Unload();
+                data = null;
             }
+            lastView = (0, 0, 0, 0, 0, 0);
         }
 
 
         #endregion
 
-        
 
-      
+        (int, int, int, int, int, int) lastView;
 
         private void FreshMap()
         {
-            //get need
-            HashSet<Vector3Int> need=new HashSet<Vector3Int>();
-            HashSet<Vector3Int> now=new HashSet<Vector3Int>();
-            var viewSize = dataCtrl.mainData.viewSize;
 
+            List<MapUnitForm.Data> nowTmp = new List<MapUnitForm.Data>();
+            var viewSize = data.mainData.viewSize;
+            var curView = (viewCenter.x - viewSize.x, viewCenter.x + viewSize.x, viewCenter.y - viewSize.y, viewCenter.y + viewSize.y, viewCenter.z - viewSize.z, viewCenter.z + viewSize.z);
+            (int, int, int, int, int, int) commonView = (Mathf.Max(curView.Item1, lastView.Item1), Mathf.Min(curView.Item2, lastView.Item2),
+                Mathf.Max(curView.Item3, lastView.Item3), Mathf.Min(curView.Item4, lastView.Item4),
+                Mathf.Max(curView.Item5, lastView.Item5), Mathf.Min(curView.Item6, lastView.Item6));
 
-            for (int i = viewCenter.x - viewSize.x; i < viewCenter.x + viewSize.x; i++)
-            {    for (int j = viewCenter.y - viewSize.y ; j <= viewCenter.y+ viewSize.y; j++)
-                {
-                    for (int k = viewCenter.z - viewSize.z; k < viewCenter.z + viewSize.z; k++)
-                    {
-                        var pos = new Vector3Int(i, j, k);
-                        if (!utilCtrl.InArea(pos))
-                            continue;
-                        need.Add(pos);
-                    }
-                }
-            }
-            var newMapLst = new List<MapUnitForm.Data>();
-            foreach(var map in curMapLst)
+            //old:
+            foreach (var map in curMapLst)
             {
-                if(!need.Contains(map.mapPos))
+                if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
+                    || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
+                     || map.mapPos.z >= curView.Item6 || map.mapPos.z < curView.Item5)
                 {
                     map.unit.Hide();
                 }
                 else
                 {
-                    now.Add(map.mapPos);
-
-                    newMapLst.Add(map);
+                    nowTmp.Add(map);
                 }
             }
             //fill
-            foreach (var pos in need)
+            if (curView.Item1 < lastView.Item1)
             {
-                if (!now.Contains(pos))
-                {
-                    var map = dataCtrl.maps[(pos.x, pos.y, pos.z)];
-                    map.unit.Show();
+                ShowAndAddLst(nowTmp, curView.Item1, Mathf.Min(lastView.Item1, curView.Item2), curView.Item3, curView.Item4, curView.Item5, curView.Item6);
+            }
+            else if (curView.Item2 > lastView.Item2)
+            {
+                ShowAndAddLst(nowTmp,Mathf.Max(lastView.Item2, curView.Item1),curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
+            }
 
-                    newMapLst.Add(map);
+            if (curView.Item3 < lastView.Item3)
+            {
+                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, curView.Item3, Mathf.Min(lastView.Item3, curView.Item4), curView.Item5, curView.Item6);
+            }
+            else if (curView.Item4 > lastView.Item4)
+            {
+                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, Mathf.Max(lastView.Item4, curView.Item3), curView.Item4, curView.Item5, curView.Item6);
+            }
+
+            if (curView.Item5 < lastView.Item5)
+            {
+                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, curView.Item5, Mathf.Min(lastView.Item5, curView.Item6));
+            }
+            else if (curView.Item6 > lastView.Item6)
+            {
+                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, Mathf.Max(lastView.Item6, curView.Item5), curView.Item6);
+            }
+
+           
+            curMapLst = nowTmp;
+            lastView = curView;
+        }
+        private void ShowAndAddLst(List<MapUnitForm.Data> lst, int minX,int maxX,int minY,int maxY,int minZ,int maxZ)
+        {
+            for (int i = minX; i < maxX; i++)
+            {
+
+                for (int k = minZ; k < maxZ; k++)
+                {
+                    if (!data.mapXZ2Y.ContainsKey((i, k)))
+                        continue;
+                    int yMax = Mathf.Min(data.mapXZ2Y[(i, k)].Max+1, maxY);
+                    int yMin = Mathf.Max(data.mapXZ2Y[(i, k)].Min, minY);
+                    for (int j = yMin; j < yMax; j++)
+                    {
+                        if (!utilCtrl.InArea((i, j, k)))
+                            continue;
+                        var map = data.maps[(i, j, k)];
+                        map.unit.Show();
+                        lst.Add(map);
+                    }
                 }
             }
-            curMapLst = newMapLst;
-
+            
+            
         }
+
+
         private void UpdateMapInfo()
         {
             //update
@@ -206,58 +268,105 @@ namespace Z_Map
             {
                 map.unit.UpdateInfo();
             }
-            
+
         }
+        /// <summary>
+        /// Manage vison
+        /// </summary>
         private void UpdateVision()
         {
-            //Manage vison
-            foreach (var curMap in curMapLst)
+            if (GlobalSettings.OVERLAY_HIDE)
             {
-                if (curMap.mapPos.y <= viewCenter.y)
+                var viewSize = data.mainData.viewSize;
+
+                foreach (var curMap in curMapLst)
                 {
                     curMap.unit.VisOn();
                 }
-                else
+                HashSet<(int, int)> visited = new HashSet<(int, int)>();
+                Queue<(int, int)> queue = new Queue<(int, int)>();
+                for (int i = viewCenter.y + 1; i < viewCenter.y + viewSize.y; i++)
                 {
-                    curMap.unit.VisOff();
+                    visited.Clear();
+                    queue.Clear();
+                    if (data.maps.ContainsKey((viewCenter.x, i, viewCenter.z)))
+                    {
+                        visited.Add((viewCenter.x, viewCenter.z));
+                        queue.Enqueue((viewCenter.x, viewCenter.z));
+                        while (queue.Count > 0)
+                        {
+                            var cur = queue.Dequeue();
+                            data.maps[(cur.Item1, i, cur.Item2)].unit.VisOff();
+                            for (int x = cur.Item1 - 1; x <= cur.Item1 + 1 && x < viewCenter.x + viewSize.x && x >= viewCenter.x - viewSize.x; x += 2)
+                            {
+                                if (!visited.Contains((x, cur.Item2)) && data.maps.ContainsKey((x, i, cur.Item2)))
+                                {
+                                    visited.Add((x, cur.Item2));
+                                    queue.Enqueue((x, cur.Item2));
+                                }
+                            }
+                            for (int z = cur.Item2 - 1; z <= cur.Item2 + 1 && z < viewCenter.z + viewSize.z && z >= viewCenter.z - viewSize.z; z += 2)
+                            {
+                                if (!visited.Contains((cur.Item1, z)) && data.maps.ContainsKey((cur.Item1, i, z)))
+                                {
+                                    visited.Add((cur.Item1, z));
+                                    queue.Enqueue((cur.Item1, z));
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                foreach (var curMap in curMapLst)
+                {
+                    if (curMap.mapPos.y <= viewCenter.y)
+                    {
+                        curMap.unit.VisOn();
+                    }
+                    else
+                    {
+                        curMap.unit.VisOff();
+                    }
                 }
             }
-        }
-        
 
-        public Vector3 GetNavDir(Vector3 cur,Vector3 tar, int maxStep=99999)
-        {
-            return navigationCtrl.GetNextDir(cur,tar, maxStep);
         }
-        public void ResetInfo(MapUnit unit=null)
+
+
+        public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999)
         {
+            return navigationCtrl.GetNextDir(cur, tar, maxStep);
+        }
+        public void ResetInfo(MapUnit unit = null)
+        {
+            lastView = (0, 0, 0, 0, 0, 0);
             foreach (var map in curMapLst)
             {
                 map.unit.Hide();
             }
-            foreach (var map in curMapLst)
-            {
-                map.unit.Show();
-            }
+            curMapLst.Clear();
             UpdateInfo(true);
         }
-        public void UpdateInfo(bool forceFresh=false)
+        public void UpdateInfo(bool forceFresh = false)
         {
             UpdateMapInfo();
 
-            if (forceFresh||(curCenterPos - viewCenter).sqrMagnitude>0.2f)
+            if (forceFresh || (curCenterPos - viewCenter).sqrMagnitude > 0.2f)
             {
-                
+
                 viewCenter = curCenterPos;
                 if (GlobalSettings.MAP_SHOW_DEBUG)
                 {
-                    Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:"+viewCenter);
+                    Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:" + viewCenter);
                 }
                 FreshMap();
             }
             UpdateVision();
 
-            
         }
         public void DebugShow()
         {

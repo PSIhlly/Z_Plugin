@@ -14,6 +14,7 @@ namespace Z_Fight.Form
 
     public static partial class FightUnitForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -26,13 +27,66 @@ namespace Z_Fight.Form
                 UnitForm.childRemoveAction+=RemoveChildren;
                 UnitForm.childAddAction+=AddChildren;
             
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,Dictionary<int,int>,Dictionary<int,int>> changeItemidcountdicAction;
+                
+        public static Action<Data,List<int>,List<int>> changeCurusingweaponssidAction;
+                
+        public static Action<Data,List<int>,List<int>> changeCurreloadweaponssidAction;
+                
+        public static Action<Data,float,float> changeAlertdistanceAction;
+                
+        public static Action<Data,float,float> changeHpAction;
+                
+        public static Action<Data,float,float> changeHpmaxAction;
+                
+        public static Action<Data,float,float> changeDefenceAction;
+                
+        public static Action<Data,int,int> changeTargetfightuidAction;
+                
+        public static Action<Data,float,float> changeReloadtimeAction;
+                
+        public static Action<Data,bool,bool> changeIsmineAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
 
         public partial class Data : UnitForm.Data
         {
@@ -48,156 +102,206 @@ namespace Z_Fight.Form
                     }
                 }
 
-                private Dictionary<int,int> _itemIdCountDic;
+                    private Dictionary<int,int>  _itemIdCountDic;
+                    /// <summary>
+                    ///道具持有数字典
+                    ///</summary>
+                    public Dictionary<int,int>  itemIdCountDic{
+                                get{return _itemIdCountDic;}
+ set{
 
-                /// <summary>
-                ///道具持有数字典
-                ///</summary>
-                public Dictionary<int,int> itemIdCountDic{
-                            get{return _itemIdCountDic;}
-                             set{
-                            
-                            _itemIdCountDic = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeItemidcountdic(this,_itemIdCountDic,value); 
+                    }
+        
+                _itemIdCountDic = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _curUsingWeaponsSid;
+                    /// <summary>
+                    ///使用中subId
+                    ///</summary>
+                    public List<int>  curUsingWeaponsSid{
+                                get{return _curUsingWeaponsSid;}
+ set{
 
-                private List<int> _curUsingWeaponsSid;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCurusingweaponssid(this,_curUsingWeaponsSid,value); 
+                    }
+        
+                _curUsingWeaponsSid = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _curReloadWeaponsSid;
+                    /// <summary>
+                    ///装填中subId
+                    ///</summary>
+                    public List<int>  curReloadWeaponsSid{
+                                get{return _curReloadWeaponsSid;}
+ set{
 
-                /// <summary>
-                ///使用中subId
-                ///</summary>
-                public List<int> curUsingWeaponsSid{
-                            get{return _curUsingWeaponsSid;}
-                             set{
-                            
-                            _curUsingWeaponsSid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCurreloadweaponssid(this,_curReloadWeaponsSid,value); 
+                    }
+        
+                _curReloadWeaponsSid = value;
+                }
+                 
+                     }
+                    
+                    private float  _alertDistance;
+                    /// <summary>
+                    ///战斗触发距离
+                    ///</summary>
+                    public float  alertDistance{
+                                get{return _alertDistance;}
+ set{
 
-                private List<int> _curReloadWeaponsSid;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAlertdistance(this,_alertDistance,value); 
+                    }
+        
+                _alertDistance = value;
+                }
+                 
+                     }
+                    
+                    private float  _hp;
+                    /// <summary>
+                    ///血量
+                    ///</summary>
+                    public float  hp{
+                                get{return _hp;}
+ set{
 
-                /// <summary>
-                ///装填中subId
-                ///</summary>
-                public List<int> curReloadWeaponsSid{
-                            get{return _curReloadWeaponsSid;}
-                             set{
-                            
-                            _curReloadWeaponsSid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeHp(this,_hp,value); 
+                    }
+        
+                _hp = value;
+                }
+                 
+                     }
+                    
+                    private float  _hpMax;
+                    /// <summary>
+                    ///血量上限
+                    ///</summary>
+                    public float  hpMax{
+                                get{return _hpMax;}
+ set{
 
-                private float _alertDistance;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeHpmax(this,_hpMax,value); 
+                    }
+        
+                _hpMax = value;
+                }
+                 
+                     }
+                    
+                    private float  _defence;
+                    /// <summary>
+                    ///护甲
+                    ///</summary>
+                    public float  defence{
+                                get{return _defence;}
+ set{
 
-                /// <summary>
-                ///战斗触发距离
-                ///</summary>
-                public float alertDistance{
-                            get{return _alertDistance;}
-                             set{
-                            
-                            _alertDistance = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDefence(this,_defence,value); 
+                    }
+        
+                _defence = value;
+                }
+                 
+                     }
+                    
+                    private int  _targetFightUid;
+                    /// <summary>
+                    ///目标uid
+                    ///</summary>
+                    public int  targetFightUid{
+                                get{return _targetFightUid;}
+ set{
 
-                private float _hp;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTargetfightuid(this,_targetFightUid,value); 
+                    }
+        
+                _targetFightUid = value;
+                }
+                 
+                     }
+                    
+                    private float  _reloadTime;
+                    /// <summary>
+                    ///装填持续时间
+                    ///</summary>
+                    public float  reloadTime{
+                                get{return _reloadTime;}
+ set{
 
-                /// <summary>
-                ///血量
-                ///</summary>
-                public float hp{
-                            get{return _hp;}
-                             set{
-                            
-                            _hp = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeReloadtime(this,_reloadTime,value); 
+                    }
+        
+                _reloadTime = value;
+                }
+                 
+                     }
+                    
+                    private bool  _isMine;
+                    /// <summary>
+                    ///是我自己
+                    ///</summary>
+                    public bool  isMine{
+                                get{return _isMine;}
+ set{
 
-                private float _hpMax;
-
-                /// <summary>
-                ///血量上限
-                ///</summary>
-                public float hpMax{
-                            get{return _hpMax;}
-                             set{
-                            
-                            _hpMax = value;
-                            }
-                        }
-
-                private float _defence;
-
-                /// <summary>
-                ///护甲
-                ///</summary>
-                public float defence{
-                            get{return _defence;}
-                             set{
-                            
-                            _defence = value;
-                            }
-                        }
-
-                private int _targetFightUid;
-
-                /// <summary>
-                ///目标uid
-                ///</summary>
-                public int targetFightUid{
-                            get{return _targetFightUid;}
-                             set{
-                            
-                            _targetFightUid = value;
-                            }
-                        }
-
-                private float _reloadTime;
-
-                /// <summary>
-                ///装填持续时间
-                ///</summary>
-                public float reloadTime{
-                            get{return _reloadTime;}
-                             set{
-                            
-                            _reloadTime = value;
-                            }
-                        }
-
-                private bool _isMine;
-
-                /// <summary>
-                ///是我自己
-                ///</summary>
-                public bool isMine{
-                            get{return _isMine;}
-                             set{
-                            
-                            _isMine = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeIsmine(this,_isMine,value); 
+                    }
+        
+                _isMine = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,string name,Dictionary<int,int> itemIdCountDic,List<int> curUsingWeaponsSid,List<int> curReloadWeaponsSid,float alertDistance,float hp,float hpMax,float defence,int targetFightUid,float reloadTime,bool isMine,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.itemIdCountDic = itemIdCountDic;
-                this.curUsingWeaponsSid = curUsingWeaponsSid;
-                this.curReloadWeaponsSid = curReloadWeaponsSid;
-                this.alertDistance = alertDistance;
-                this.hp = hp;
-                this.hpMax = hpMax;
-                this.defence = defence;
-                this.targetFightUid = targetFightUid;
-                this.reloadTime = reloadTime;
-                this.isMine = isMine;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.name = name;
+             this.itemIdCountDic = itemIdCountDic;
+             this.curUsingWeaponsSid = curUsingWeaponsSid;
+             this.curReloadWeaponsSid = curReloadWeaponsSid;
+             this.alertDistance = alertDistance;
+             this.hp = hp;
+             this.hpMax = hpMax;
+             this.defence = defence;
+             this.targetFightUid = targetFightUid;
+             this.reloadTime = reloadTime;
+             this.isMine = isMine;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new FightUnit(this);
 
@@ -208,16 +312,16 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,"",new Dictionary<int,int>(){},null,null,0f,0f,0f,0f,0,0f,false,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -230,13 +334,12 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
 
             childInitAction?.Invoke();
             
@@ -247,7 +350,7 @@ namespace Z_Fight.Form
             }
 
 
-            
+        
              
         }
 
@@ -379,9 +482,8 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -391,11 +493,11 @@ UnitForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -403,8 +505,8 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -423,6 +525,178 @@ UnitForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeItemidcountdic(Data superData,Dictionary<int,int> oldV,Dictionary<int,int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeItemidcountdicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCurusingweaponssid(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCurusingweaponssidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCurreloadweaponssid(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCurreloadweaponssidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAlertdistance(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAlertdistanceAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHp(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHpAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHpmax(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHpmaxAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDefence(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDefenceAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTargetfightuid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTargetfightuidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeReloadtime(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeReloadtimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsmine(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsmineAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

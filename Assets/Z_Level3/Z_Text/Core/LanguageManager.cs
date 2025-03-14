@@ -28,7 +28,7 @@ namespace Z_Language
             if(!TextBaseForm.DataByKey.ContainsKey(key))
             {
                 Debug.LogError("Language text key: "+ key + " not exist!");
-                return "";
+                return key;
             }
             switch (language)
             {

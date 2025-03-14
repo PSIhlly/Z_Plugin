@@ -7,7 +7,7 @@ using Z_Time;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
-namespace Ui
+namespace Ui.Notify
 {
     public partial class UiNotifyParam
     {

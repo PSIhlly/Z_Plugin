@@ -16,6 +16,7 @@ namespace Form
 
     public static partial class CharacterPruductForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -28,13 +29,30 @@ namespace Form
                 PruductForm.childRemoveAction+=RemoveChildren;
                 PruductForm.childAddAction+=AddChildren;
             
+
+            PruductForm.changeUidAction+=ChangeUid;
+
+            PruductForm.changeNameAction+=ChangeName;
+
+            PruductForm.changeParamdicAction+=ChangeParamdic;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>PruductForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>PruductForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,Dictionary<string,object>,Dictionary<string,object>> changeParamdicAction;
+                
+
 
         public partial class Data : PruductForm.Data
         {
@@ -42,9 +60,9 @@ namespace Form
             public Data(int uid,string name,Dictionary<string,object> paramDic):base(uid,name,paramDic)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.paramDic = paramDic;
+             this.uid = uid;
+             this.name = name;
+             this.paramDic = paramDic;
 
             }
             
@@ -53,26 +71,26 @@ namespace Form
                    public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){});
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -85,17 +103,16 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
-                _DataByName = new Dictionary<string, Data>() {
-
-                };
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -106,7 +123,7 @@ namespace Form
             }
 
 
-            
+        
              
         }
 
@@ -182,11 +199,10 @@ namespace Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-                DataByName[data.name]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
+                    DataByName[data.name]=data;
+    
 PruductForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -196,13 +212,13 @@ PruductForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
-                DataByName.Remove(data.name);
-
+                    DataByUid.Remove(data.uid);
+    
+                    DataByName.Remove(data.name);
+    
 PruductForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -210,10 +226,10 @@ PruductForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
-                DataByName.Clear();
-
+                    DataByUid.Clear();
+    
+                    DataByName.Clear();
+    
             uidChain.Clear();
         }
 
@@ -232,6 +248,41 @@ PruductForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(PruductForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(PruductForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeParamdic(PruductForm.Data superData,Dictionary<string,object> oldV,Dictionary<string,object> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeParamdicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

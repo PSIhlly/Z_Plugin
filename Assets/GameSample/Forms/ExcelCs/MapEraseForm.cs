@@ -16,6 +16,7 @@ namespace Form
 
     public static partial class MapEraseForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -28,121 +29,124 @@ namespace Form
                 MapBaseForm.childRemoveAction+=RemoveChildren;
                 MapBaseForm.childAddAction+=AddChildren;
             
+
+            MapBaseForm.changeIdAction+=ChangeId;
+
+            MapBaseForm.changeNameAction+=ChangeName;
+
+            MapBaseForm.changeIconAction+=ChangeIcon;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
+
+        public static Z_Chain.Chain idChain =>MapBaseForm.idChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changeIconAction;
+                
+
+
         public partial class Data : MapBaseForm.Data
         {
 
-                private bool _terrain;
-
-                /// <summary>
-                ///清理地板
-                ///</summary>
-                public bool terrain{
-                            get{return _terrain;}
-                            private set{
-                            
-                            _terrain = value;
-                            }
-                        }
-
-                private bool _obstacle;
-
-                /// <summary>
-                ///清理障碍
-                ///</summary>
-                public bool obstacle{
-                            get{return _obstacle;}
-                            private set{
-                            
-                            _obstacle = value;
-                            }
-                        }
-
-                private bool _item;
-
-                /// <summary>
-                ///清理物品
-                ///</summary>
-                public bool item{
-                            get{return _item;}
-                            private set{
-                            
-                            _item = value;
-                            }
-                        }
-
-                private bool _character;
-
-                /// <summary>
-                ///清理角色
-                ///</summary>
-                public bool character{
-                            get{return _character;}
-                            private set{
-                            
-                            _character = value;
-                            }
-                        }
-
-                private bool _texture;
-
-                /// <summary>
-                ///清理贴图
-                ///</summary>
-                public bool texture{
-                            get{return _texture;}
-                            private set{
-                            
-                            _texture = value;
-                            }
-                        }
-
-            public Data(int id,string name,string icon,bool terrain,bool obstacle,bool item,bool character,bool texture):base(id,name,icon)
+                    private bool  _terrain;
+                    /// <summary>
+                    ///清理地板
+                    ///</summary>
+                    public bool  terrain{
+                                get{return _terrain;}
+private set{
+        
+                _terrain = value;
+                }
+                 
+                     }
+                    
+                    private bool  _item;
+                    /// <summary>
+                    ///清理物品
+                    ///</summary>
+                    public bool  item{
+                                get{return _item;}
+private set{
+        
+                _item = value;
+                }
+                 
+                     }
+                    
+                    private bool  _character;
+                    /// <summary>
+                    ///清理角色
+                    ///</summary>
+                    public bool  character{
+                                get{return _character;}
+private set{
+        
+                _character = value;
+                }
+                 
+                     }
+                    
+                    private bool  _texture;
+                    /// <summary>
+                    ///清理贴图
+                    ///</summary>
+                    public bool  texture{
+                                get{return _texture;}
+private set{
+        
+                _texture = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string icon,bool terrain,bool item,bool character,bool texture):base(id,name,icon)
             {
 
-                this.id = id;
-                this.name = name;
-                this.icon = icon;
-                this.terrain = terrain;
-                this.obstacle = obstacle;
-                this.item = item;
-                this.character = character;
-                this.texture = texture;
+             this.id = id;
+             this.name = name;
+             this.icon = icon;
+             this.terrain = terrain;
+             this.item = item;
+             this.character = character;
+             this.texture = texture;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,false,false,false,false);
+                   public static Data defaultData=new Data(0,"","",false,false,false,false);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -155,29 +159,28 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {10000001,new Data(10000001,"all erase","",true,true,true,true,false)},
+                {10000001,new Data(10000001,"all erase","",true,true,true,false)},
 
-                {10000002,new Data(10000002,"texture only","",false,false,false,false,true)},
+                {10000002,new Data(10000002,"texture only","",false,false,false,true)},
 
-                {10000003,new Data(10000003,"remain terrain","",false,true,true,true,false)},
-
-                };
-
-                _DataByName = new Dictionary<string, Data>() {
-
-                    {"all erase",_DataById[10000001]},
-
-                    {"texture only",_DataById[10000002]},
-
-                    {"remain terrain",_DataById[10000003]},
+                {10000003,new Data(10000003,"remain terrain","",false,true,true,false)},
 
                 };
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"all erase",_DataById[10000001]},
+    
+                        {"texture only",_DataById[10000002]},
+    
+                        {"remain terrain",_DataById[10000003]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -188,7 +191,7 @@ namespace Form
             }
 
 
-            
+        
              
         }
 
@@ -233,8 +236,6 @@ namespace Form
 
                     defaultData.terrain,
 
-                    defaultData.obstacle,
-
                     defaultData.item,
 
                     defaultData.character,
@@ -274,11 +275,10 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByName[data.name]=data;
-
-            
+        DataById[data.id]=data;
+    
+                    DataByName[data.name]=data;
+    
 MapBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -288,13 +288,13 @@ MapBaseForm.AddData(data);
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByName.Remove(data.name);
-
+                    DataById.Remove(data.id);
+    
+                    DataByName.Remove(data.name);
+    
 MapBaseForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
         }
@@ -302,10 +302,10 @@ MapBaseForm.RemoveData(id);
         {
             Init();
 
-                DataById.Clear();
-
-                DataByName.Clear();
-
+                    DataById.Clear();
+    
+                    DataByName.Clear();
+    
             idChain.Clear();
         }
 
@@ -324,6 +324,41 @@ MapBaseForm.RemoveData(id);
         
 
 
+
+
+            public static void ChangeId(MapBaseForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

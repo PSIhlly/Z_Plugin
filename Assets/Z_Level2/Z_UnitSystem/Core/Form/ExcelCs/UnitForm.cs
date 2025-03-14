@@ -13,25 +13,44 @@ namespace Z_UnitSystem.Form
 
     public static partial class UnitForm
     {
-        public static readonly int autoUidCnt=1000000;
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain;
+
+        public static Z_Chain.Chain uidChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
+
         public partial class Data
         {
 
-                    protected Unit _unit;
+                protected Unit _unit;
 
                 /// <summary>
                 ///单位逻辑
@@ -44,104 +63,142 @@ namespace Z_UnitSystem.Form
                     }
                 }
 
-                private int _uid;
+                    private int  _uid;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  uid{
+                                get{return _uid;}
+ set{
 
-                public int uid{
-                            get{return _uid;}
-                             set{
-                            
-                            _uid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUid(this,_uid,value); 
+                    }
+        
+                _uid = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///名称
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
 
-                private string _name;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private string  _prefabName;
+                    /// <summary>
+                    ///预制名字（索引）
+                    ///</summary>
+                    public string  prefabName{
+                                get{return _prefabName;}
+ set{
 
-                /// <summary>
-                ///名称
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                             set{
-                            
-                            _name = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePrefabname(this,_prefabName,value); 
+                    }
+        
+                _prefabName = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _pos;
+                    /// <summary>
+                    ///位置
+                    ///</summary>
+                    public Vector3  pos{
+                                get{return _pos;}
+ set{
 
-                private string _prefabName;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePos(this,_pos,value); 
+                    }
+        
+                _pos = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _euler;
+                    /// <summary>
+                    ///欧拉旋转
+                    ///</summary>
+                    public Vector3  euler{
+                                get{return _euler;}
+ set{
 
-                /// <summary>
-                ///预制名字（索引）
-                ///</summary>
-                public string prefabName{
-                            get{return _prefabName;}
-                             set{
-                            
-                            _prefabName = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEuler(this,_euler,value); 
+                    }
+        
+                _euler = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _scale;
+                    /// <summary>
+                    ///缩放
+                    ///</summary>
+                    public Vector3  scale{
+                                get{return _scale;}
+ set{
 
-                private Vector3 _pos;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeScale(this,_scale,value); 
+                    }
+        
+                _scale = value;
+                }
+                 
+                     }
+                    
+                    private int  _updateType;
+                    /// <summary>
+                    ///更新方式
+                    ///</summary>
+                    public int  updateType{
+                                get{return _updateType;}
+ set{
 
-                /// <summary>
-                ///位置
-                ///</summary>
-                public Vector3 pos{
-                            get{return _pos;}
-                             set{
-                            
-                            _pos = value;
-                            }
-                        }
-
-                private Vector3 _euler;
-
-                /// <summary>
-                ///欧拉旋转
-                ///</summary>
-                public Vector3 euler{
-                            get{return _euler;}
-                             set{
-                            
-                            _euler = value;
-                            }
-                        }
-
-                private Vector3 _scale;
-
-                /// <summary>
-                ///缩放
-                ///</summary>
-                public Vector3 scale{
-                            get{return _scale;}
-                             set{
-                            
-                            _scale = value;
-                            }
-                        }
-
-                private int _updateType;
-
-                /// <summary>
-                ///更新方式
-                ///</summary>
-                public int updateType{
-                            get{return _updateType;}
-                             set{
-                            
-                            _updateType = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUpdatetype(this,_updateType,value); 
+                    }
+        
+                _updateType = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.name = name;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new Unit(this);
 
@@ -152,16 +209,16 @@ namespace Z_UnitSystem.Form
                    public static Data defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -173,19 +230,16 @@ namespace Z_UnitSystem.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (autoUidCnt);
-            
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -277,9 +331,8 @@ namespace Z_UnitSystem.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -289,11 +342,11 @@ namespace Z_UnitSystem.Form
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -301,8 +354,8 @@ namespace Z_UnitSystem.Form
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -321,6 +374,78 @@ namespace Z_UnitSystem.Form
         
 
 
+
+
+            public static void ChangeUid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

@@ -16,80 +16,116 @@ namespace Form
 
     public static partial class SceneForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changeIconAction;
+                
+        public static Action<Data,string,string> changeContentAction;
+                
+
+
         public partial class Data
         {
 
-                private int _id;
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                             set{
-                            
-                            _id = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeId(this,_id,value); 
+                    }
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///名字
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
 
-                private string _name;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private string  _icon;
+                    /// <summary>
+                    ///封面
+                    ///</summary>
+                    public string  icon{
+                                get{return _icon;}
+ set{
 
-                /// <summary>
-                ///名字
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                             set{
-                            
-                            _name = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeIcon(this,_icon,value); 
+                    }
+        
+                _icon = value;
+                }
+                 
+                     }
+                    
+                    private string  _content;
+                    /// <summary>
+                    ///内容
+                    ///</summary>
+                    public string  content{
+                                get{return _content;}
+ set{
 
-                private string _icon;
-
-                /// <summary>
-                ///封面
-                ///</summary>
-                public string icon{
-                            get{return _icon;}
-                             set{
-                            
-                            _icon = value;
-                            }
-                        }
-
-                private string _content;
-
-                /// <summary>
-                ///内容
-                ///</summary>
-                public string content{
-                            get{return _content;}
-                             set{
-                            
-                            _content = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeContent(this,_content,value); 
+                    }
+        
+                _content = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,string icon,string content)
             {
 
-                this.id = id;
-                this.name = name;
-                this.icon = icon;
-                this.content = content;
+             this.id = id;
+             this.name = name;
+             this.icon = icon;
+             this.content = content;
 
             }
             
@@ -98,16 +134,16 @@ namespace Form
                    public static Data defaultData=new Data(0,"","","");
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -119,19 +155,16 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -211,9 +244,8 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-            
+        DataById[data.id]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.id;
@@ -223,11 +255,11 @@ namespace Form
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
+                    DataById.Remove(data.id);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -235,8 +267,8 @@ namespace Form
         {
             Init();
 
-                DataById.Clear();
-
+                    DataById.Clear();
+    
             idChain.Clear();
         }
 
@@ -255,6 +287,48 @@ namespace Form
         
 
 
+
+
+            public static void ChangeId(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIcon(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeContent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeContentAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

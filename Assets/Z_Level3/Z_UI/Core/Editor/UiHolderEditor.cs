@@ -218,7 +218,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 {namespaceContent}
-namespace Ui
+namespace Ui.{uiHolder.uiName}
 {{
 {GetCoreCode(parentClass)}
 }}

@@ -12,7 +12,7 @@ using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
-namespace Ui
+namespace Ui.ModSceneMain
 {
     public partial class UiModToolModel
     {
@@ -22,11 +22,11 @@ namespace Ui
         {
             set
             {
-                ModSceneManager.instance.curData = value;
+                ModManager.instance.sceneCtrl.curData = value;
             }
             get
             {
-                return ModSceneManager.instance.curData;
+                return ModManager.instance.sceneCtrl.curData;
             }
         }
         public string cntX
@@ -34,11 +34,11 @@ namespace Ui
             set
             {
                 int.TryParse(value, out int v);
-                ModSceneManager.instance.cntX = v;
+                ModManager.instance.sceneCtrl.cntX = v;
             }
             get
             {
-                return ModSceneManager.instance.cntX.ToString();
+                return ModManager.instance.sceneCtrl.cntX.ToString();
             }
         }
         public string cntY
@@ -46,11 +46,11 @@ namespace Ui
             set
             {
                 int.TryParse(value, out int v);
-                ModSceneManager.instance.cntY = v;
+                ModManager.instance.sceneCtrl.cntY = v;
             }
             get
             {
-                return ModSceneManager.instance.cntY.ToString();
+                return ModManager.instance.sceneCtrl.cntY.ToString();
             }
         }
         public string posX
@@ -58,11 +58,11 @@ namespace Ui
             set
             {
                 float.TryParse(value, out float v);
-                ModSceneManager.instance.posX = v * MapManager.instance.dataCtrl.mainData.mapUnitSize.x;
+                ModManager.instance.sceneCtrl.posX = v * MapManager.instance.data.mainData.mapUnitSize.x;
             }
             get
             {
-                return (ModSceneManager.instance.posX / MapManager.instance.dataCtrl.mainData.mapUnitSize.x).ToString("0.##");
+                return (ModManager.instance.sceneCtrl.posX / MapManager.instance.data.mainData.mapUnitSize.x).ToString("0.##");
             }
         }
         public string posY
@@ -83,11 +83,11 @@ namespace Ui
                     v = maxV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("maxYTip"));
                 }
-                ModSceneManager.instance.posY = v * MapManager.instance.dataCtrl.mainData.mapUnitSize.y;
+                ModManager.instance.sceneCtrl.posY = v * MapManager.instance.data.mainData.mapUnitSize.y;
             }
             get
             {
-                return (ModSceneManager.instance.posY / MapManager.instance.dataCtrl.mainData.mapUnitSize.y).ToString("0.##");
+                return (ModManager.instance.sceneCtrl.posY / MapManager.instance.data.mainData.mapUnitSize.y).ToString("0.##");
             }
         }
         public string posZ
@@ -95,11 +95,11 @@ namespace Ui
             set
             {
                 float.TryParse(value, out float v);
-                ModSceneManager.instance.posZ = v * MapManager.instance.dataCtrl.mainData.mapUnitSize.z;
+                ModManager.instance.sceneCtrl.posZ = v * MapManager.instance.data.mainData.mapUnitSize.z;
             }
             get
             {
-                return (ModSceneManager.instance.posZ / MapManager.instance.dataCtrl.mainData.mapUnitSize.z).ToString("0.##");
+                return (ModManager.instance.sceneCtrl.posZ / MapManager.instance.data.mainData.mapUnitSize.z).ToString("0.##");
             }
         }
         public string angle
@@ -108,11 +108,11 @@ namespace Ui
             {
                 int.TryParse(value, out int v);
                 v = (v % 360 + 360) % 360;
-                ModSceneManager.instance.angle = v;
+                ModManager.instance.sceneCtrl.angle = v;
             }
             get
             {
-                return ModSceneManager.instance.angle.ToString();
+                return ModManager.instance.sceneCtrl.angle.ToString();
             }
         }
         public bool posing
@@ -120,22 +120,22 @@ namespace Ui
             set
             {
 
-                ModSceneManager.instance.posing = value;
+                ModManager.instance.sceneCtrl.posing = value;
             }
             get
             {
-                return ModSceneManager.instance.posing;
+                return ModManager.instance.sceneCtrl.posing;
             }
         }
         public int layer
         {
             set
             {
-                ModSceneManager.instance.layer = value;
+                ModManager.instance.sceneCtrl.layer = value;
             }
             get
             {
-                return ModSceneManager.instance.layer;
+                return ModManager.instance.sceneCtrl.layer;
             }
         }
     }
@@ -308,7 +308,7 @@ namespace Ui
                     break;
                 case 4:
                     {
-                        foreach (var data in MapObstacleForm.DataById.Values)
+                        foreach (var data in MapItemForm.DataById.Values)
                         {
                             conData.Add(new UiToolItemParam()
                             {

@@ -7,7 +7,7 @@ using Z_Texture;
 using Z_Ui.Base;
 using Z_Ui;
 
-namespace Ui
+namespace Ui.ModStory
 {
     public partial class UiModStoryScenePanelCtrl
     {
@@ -50,7 +50,7 @@ namespace Ui
         {
             view.btn_scene.onClick.AddListener(() =>
             {
-                Main2SceneManager.instance.StartLoadSceneUgc("scene1");
+                Main2StoryManager.instance.StartLoadSceneUgc("scene1");
                 UiManager.instance.CloseUi<UiModStoryCtrl>();
             });
         }

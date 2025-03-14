@@ -7,7 +7,7 @@ using Z_Texture;
 using Z_Ui.Base;
 using Z_Ui;
 
-namespace Ui
+namespace Ui.Loading
 {
     public partial class UiLoadingCtrl :
         IZ_Listener<LoadingEvent>

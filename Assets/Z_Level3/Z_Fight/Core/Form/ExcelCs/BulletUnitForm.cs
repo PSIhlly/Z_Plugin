@@ -14,6 +14,7 @@ namespace Z_Fight.Form
 
     public static partial class BulletUnitForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -26,13 +27,52 @@ namespace Z_Fight.Form
                 UnitForm.childRemoveAction+=RemoveChildren;
                 UnitForm.childAddAction+=AddChildren;
             
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,int,int> changeWeaponbulletidAction;
+                
+        public static Action<Data,float,float> changeRangelastAction;
+                
+        public static Action<Data,int,int> changeAttackeruidAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
 
         public partial class Data : UnitForm.Data
         {
@@ -48,58 +88,73 @@ namespace Z_Fight.Form
                     }
                 }
 
-                private int _weaponBulletId;
+                    private int  _weaponBulletId;
+                    /// <summary>
+                    ///ÎäÆ÷×Óµ¯Êý¾Ýid
+                    ///</summary>
+                    public int  weaponBulletId{
+                                get{return _weaponBulletId;}
+ set{
 
-                /// <summary>
-                ///ÎäÆ÷×Óµ¯Êý¾Ýid
-                ///</summary>
-                public int weaponBulletId{
-                            get{return _weaponBulletId;}
-                             set{
-                            
-                            _weaponBulletId = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeWeaponbulletid(this,_weaponBulletId,value); 
+                    }
+        
+                _weaponBulletId = value;
+                }
+                 
+                     }
+                    
+                    private float  _rangeLast;
+                    /// <summary>
+                    ///ÓàÊ£Éä³Ì
+                    ///</summary>
+                    public float  rangeLast{
+                                get{return _rangeLast;}
+ set{
 
-                private float _rangeLast;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeRangelast(this,_rangeLast,value); 
+                    }
+        
+                _rangeLast = value;
+                }
+                 
+                     }
+                    
+                    private int  _attackerUid;
+                    /// <summary>
+                    ///¹¥»÷Õß
+                    ///</summary>
+                    public int  attackerUid{
+                                get{return _attackerUid;}
+ set{
 
-                /// <summary>
-                ///ÓàÊ£Éä³Ì
-                ///</summary>
-                public float rangeLast{
-                            get{return _rangeLast;}
-                             set{
-                            
-                            _rangeLast = value;
-                            }
-                        }
-
-                private int _attackerUid;
-
-                /// <summary>
-                ///¹¥»÷Õß
-                ///</summary>
-                public int attackerUid{
-                            get{return _attackerUid;}
-                             set{
-                            
-                            _attackerUid = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAttackeruid(this,_attackerUid,value); 
+                    }
+        
+                _attackerUid = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,string name,int weaponBulletId,float rangeLast,int attackerUid,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.weaponBulletId = weaponBulletId;
-                this.rangeLast = rangeLast;
-                this.attackerUid = attackerUid;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.name = name;
+             this.weaponBulletId = weaponBulletId;
+             this.rangeLast = rangeLast;
+             this.attackerUid = attackerUid;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new BulletUnit(this);
 
@@ -110,16 +165,16 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,"",0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -132,13 +187,12 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
 
             childInitAction?.Invoke();
             
@@ -149,7 +203,7 @@ namespace Z_Fight.Form
             }
 
 
-            
+        
              
         }
 
@@ -253,9 +307,8 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -265,11 +318,11 @@ UnitForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -277,8 +330,8 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -297,6 +350,108 @@ UnitForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeWeaponbulletid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeWeaponbulletidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRangelast(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRangelastAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAttackeruid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAttackeruidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

@@ -7,6 +7,6 @@ namespace Z_Ui.Base
 {
     public class Sta : State
     {
-
+       
     }
 }

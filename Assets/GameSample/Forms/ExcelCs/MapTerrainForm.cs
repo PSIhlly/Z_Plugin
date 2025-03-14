@@ -16,6 +16,7 @@ namespace Form
 
     public static partial class MapTerrainForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -28,51 +29,75 @@ namespace Form
                 MapBaseForm.childRemoveAction+=RemoveChildren;
                 MapBaseForm.childAddAction+=AddChildren;
             
+
+            MapBaseForm.changeIdAction+=ChangeId;
+
+            MapBaseForm.changeNameAction+=ChangeName;
+
+            MapBaseForm.changeIconAction+=ChangeIcon;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain=>MapBaseForm.idChain;
+
+        public static Z_Chain.Chain idChain =>MapBaseForm.idChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,string,string> changeIconAction;
+                
+
+
         public partial class Data : MapBaseForm.Data
         {
 
-                private string _prefabName;
+                    private string  _prefabName;
+                    /// <summary>
+                    ///预制名称
+                    ///</summary>
+                    public string  prefabName{
+                                get{return _prefabName;}
+ set{
 
-                /// <summary>
-                ///预制名称
-                ///</summary>
-                public string prefabName{
-                            get{return _prefabName;}
-                             set{
-                            
-                            _prefabName = value;
-                            }
-                        }
-
-                private float _step;
-
-                /// <summary>
-                ///阶数
-                ///</summary>
-                public float step{
-                            get{return _step;}
-                            private set{
-                            
-                            _step = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangePrefabname(this,_prefabName,value); 
+                    }
+        
+                _prefabName = value;
+                }
+                 
+                     }
+                    
+                    private float  _step;
+                    /// <summary>
+                    ///阶数
+                    ///</summary>
+                    public float  step{
+                                get{return _step;}
+private set{
+        
+                _step = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,string prefabName,string icon,float step):base(id,name,icon)
             {
 
-                this.id = id;
-                this.name = name;
-                this.prefabName = prefabName;
-                this.icon = icon;
-                this.step = step;
+             this.id = id;
+             this.name = name;
+             this.prefabName = prefabName;
+             this.icon = icon;
+             this.step = step;
 
             }
             
@@ -81,26 +106,26 @@ namespace Form
                    public static Data defaultData=new Data(0,"","","",0f);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -113,8 +138,8 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -127,19 +152,18 @@ namespace Form
                 {100004,new Data(100004,"5slope","map5Slope","",5f)},
 
                 };
-
-                _DataByName = new Dictionary<string, Data>() {
-
-                    {"plain",_DataById[100001]},
-
-                    {"3slope",_DataById[100002]},
-
-                    {"4slope",_DataById[100003]},
-
-                    {"5slope",_DataById[100004]},
-
-                };
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"plain",_DataById[100001]},
+    
+                        {"3slope",_DataById[100002]},
+    
+                        {"4slope",_DataById[100003]},
+    
+                        {"5slope",_DataById[100004]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -150,7 +174,7 @@ namespace Form
             }
 
 
-            
+        
              
         }
 
@@ -232,11 +256,10 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByName[data.name]=data;
-
-            
+        DataById[data.id]=data;
+    
+                    DataByName[data.name]=data;
+    
 MapBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -246,13 +269,13 @@ MapBaseForm.AddData(data);
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByName.Remove(data.name);
-
+                    DataById.Remove(data.id);
+    
+                    DataByName.Remove(data.name);
+    
 MapBaseForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
         }
@@ -260,10 +283,10 @@ MapBaseForm.RemoveData(id);
         {
             Init();
 
-                DataById.Clear();
-
-                DataByName.Clear();
-
+                    DataById.Clear();
+    
+                    DataByName.Clear();
+    
             idChain.Clear();
         }
 
@@ -282,6 +305,51 @@ MapBaseForm.RemoveData(id);
         
 
 
+
+
+            public static void ChangeId(MapBaseForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

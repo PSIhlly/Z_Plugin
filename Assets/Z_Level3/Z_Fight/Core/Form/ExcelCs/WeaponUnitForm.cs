@@ -14,6 +14,7 @@ namespace Z_Fight.Form
 
     public static partial class WeaponUnitForm
     {
+
         
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -26,13 +27,56 @@ namespace Z_Fight.Form
                 UnitForm.childRemoveAction+=RemoveChildren;
                 UnitForm.childAddAction+=AddChildren;
             
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain=>UnitForm.uidChain;
+
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,int,int> changeFightuidAction;
+                
+        public static Action<Data,List<int>,List<int>> changeWeaponbulletsidAction;
+                
+        public static Action<Data,int,int> changeCurweaponbulletaidAction;
+                
+        public static Action<Data,float,float> changeCdremainAction;
+                
+        public static Action<Data,int,int> changeMagazineremainAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,int,int> changeUpdatetypeAction;
+                
+
 
         public partial class Data : UnitForm.Data
         {
@@ -48,86 +92,111 @@ namespace Z_Fight.Form
                     }
                 }
 
-                private int _fightUid;
+                    private int  _fightUid;
+                    /// <summary>
+                    ///持有者
+                    ///</summary>
+                    public int  fightUid{
+                                get{return _fightUid;}
+ set{
 
-                /// <summary>
-                ///持有者
-                ///</summary>
-                public int fightUid{
-                            get{return _fightUid;}
-                             set{
-                            
-                            _fightUid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeFightuid(this,_fightUid,value); 
+                    }
+        
+                _fightUid = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _weaponBulletsId;
+                    /// <summary>
+                    ///子弹类型列表
+                    ///</summary>
+                    public List<int>  weaponBulletsId{
+                                get{return _weaponBulletsId;}
+ set{
 
-                private List<int> _weaponBulletsId;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeWeaponbulletsid(this,_weaponBulletsId,value); 
+                    }
+        
+                _weaponBulletsId = value;
+                }
+                 
+                     }
+                    
+                    private int  _curWeaponBulletAid;
+                    /// <summary>
+                    ///当前使用子弹id
+                    ///</summary>
+                    public int  curWeaponBulletAid{
+                                get{return _curWeaponBulletAid;}
+ set{
 
-                /// <summary>
-                ///子弹类型列表
-                ///</summary>
-                public List<int> weaponBulletsId{
-                            get{return _weaponBulletsId;}
-                             set{
-                            
-                            _weaponBulletsId = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCurweaponbulletaid(this,_curWeaponBulletAid,value); 
+                    }
+        
+                _curWeaponBulletAid = value;
+                }
+                 
+                     }
+                    
+                    private float  _cdRemain;
+                    /// <summary>
+                    ///射速冷却时长余剩
+                    ///</summary>
+                    public float  cdRemain{
+                                get{return _cdRemain;}
+ set{
 
-                private int _curWeaponBulletAid;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCdremain(this,_cdRemain,value); 
+                    }
+        
+                _cdRemain = value;
+                }
+                 
+                     }
+                    
+                    private int  _magazineRemain;
+                    /// <summary>
+                    ///弹夹余剩
+                    ///</summary>
+                    public int  magazineRemain{
+                                get{return _magazineRemain;}
+ set{
 
-                /// <summary>
-                ///当前使用子弹id
-                ///</summary>
-                public int curWeaponBulletAid{
-                            get{return _curWeaponBulletAid;}
-                             set{
-                            
-                            _curWeaponBulletAid = value;
-                            }
-                        }
-
-                private float _cdRemain;
-
-                /// <summary>
-                ///射速冷却时长余剩
-                ///</summary>
-                public float cdRemain{
-                            get{return _cdRemain;}
-                             set{
-                            
-                            _cdRemain = value;
-                            }
-                        }
-
-                private int _magazineRemain;
-
-                /// <summary>
-                ///弹夹余剩
-                ///</summary>
-                public int magazineRemain{
-                            get{return _magazineRemain;}
-                             set{
-                            
-                            _magazineRemain = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMagazineremain(this,_magazineRemain,value); 
+                    }
+        
+                _magazineRemain = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,string name,int fightUid,List<int> weaponBulletsId,int curWeaponBulletAid,float cdRemain,int magazineRemain,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.fightUid = fightUid;
-                this.weaponBulletsId = weaponBulletsId;
-                this.curWeaponBulletAid = curWeaponBulletAid;
-                this.cdRemain = cdRemain;
-                this.magazineRemain = magazineRemain;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
+             this.uid = uid;
+             this.name = name;
+             this.fightUid = fightUid;
+             this.weaponBulletsId = weaponBulletsId;
+             this.curWeaponBulletAid = curWeaponBulletAid;
+             this.cdRemain = cdRemain;
+             this.magazineRemain = magazineRemain;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
 
                     _unit=new WeaponUnit(this);
 
@@ -138,16 +207,16 @@ namespace Z_Fight.Form
                    public static Data defaultData=new Data(0,"",0,null,0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -160,13 +229,12 @@ namespace Z_Fight.Form
             if(inited)
                 return;
             inited=true;  
-            
-            
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-
 
             childInitAction?.Invoke();
             
@@ -177,7 +245,7 @@ namespace Z_Fight.Form
             }
 
 
-            
+        
              
         }
 
@@ -289,9 +357,8 @@ namespace Z_Fight.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -301,11 +368,11 @@ UnitForm.AddData(data);
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 UnitForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -313,8 +380,8 @@ UnitForm.RemoveData(uid);
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -333,6 +400,128 @@ UnitForm.RemoveData(uid);
         
 
 
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeFightuid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeFightuidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeWeaponbulletsid(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeWeaponbulletsidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCurweaponbulletaid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCurweaponbulletaidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCdremain(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCdremainAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMagazineremain(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMagazineremainAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

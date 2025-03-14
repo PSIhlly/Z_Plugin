@@ -13,7 +13,7 @@ public class Z_Fight_Sample : MonoBehaviour
     public Transform main;
     void Start()
     {
-        FightManager.instance.Begin(new FightDataController());
+        FightManager.instance.Begin(new FightData());
 
 
         FightManager.instance.onDead += (u) =>

@@ -13,66 +13,95 @@ namespace Z_DataSystem.Form
 
     public static partial class ParamForm
     {
-        public static readonly int autoUidCnt=1000000;
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain uidChain;
+
+        public static Z_Chain.Chain uidChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,int,int> changeValuetypeAction;
+                
+
+
         public partial class Data
         {
 
-                private int _uid;
+                    private int  _uid;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  uid{
+                                get{return _uid;}
+ set{
 
-                public int uid{
-                            get{return _uid;}
-                             set{
-                            
-                            _uid = value;
-                            }
-                        }
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUid(this,_uid,value); 
+                    }
+        
+                _uid = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///名称
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
 
-                private string _name;
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private int  _valueType;
+                    /// <summary>
+                    ///数据类型
+                    ///</summary>
+                    public int  valueType{
+                                get{return _valueType;}
+ set{
 
-                /// <summary>
-                ///名称
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                             set{
-                            
-                            _name = value;
-                            }
-                        }
-
-                private int _valueType;
-
-                /// <summary>
-                ///数据类型
-                ///</summary>
-                public int valueType{
-                            get{return _valueType;}
-                             set{
-                            
-                            _valueType = value;
-                            }
-                        }
-
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeValuetype(this,_valueType,value); 
+                    }
+        
+                _valueType = value;
+                }
+                 
+                     }
+                    
             public Data(int uid,string name,int valueType)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.valueType = valueType;
+             this.uid = uid;
+             this.name = name;
+             this.valueType = valueType;
 
             }
             
@@ -81,16 +110,16 @@ namespace Z_DataSystem.Form
                    public static Data defaultData=new Data(0,"",0);
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -102,19 +131,16 @@ namespace Z_DataSystem.Form
             if(inited)
                 return;
             inited=true;  
-            uidChain=new Z_Chain.Chain (autoUidCnt);
-            
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -190,9 +216,8 @@ namespace Z_DataSystem.Form
                 data.uid=uid;  
             }
 
-                DataByUid[data.uid]=data;
-
-            
+        DataByUid[data.uid]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -202,11 +227,11 @@ namespace Z_DataSystem.Form
             Init();
             if(!DataByUid.ContainsKey(uid))
                 return;
-                
+               
             var data=DataByUid[uid];
 
-                DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -214,8 +239,8 @@ namespace Z_DataSystem.Form
         {
             Init();
 
-                DataByUid.Clear();
-
+                    DataByUid.Clear();
+    
             uidChain.Clear();
         }
 
@@ -234,6 +259,38 @@ namespace Z_DataSystem.Form
         
 
 
+
+
+            public static void ChangeUid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeValuetype(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeValuetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

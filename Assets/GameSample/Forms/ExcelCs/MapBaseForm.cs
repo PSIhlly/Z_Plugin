@@ -16,66 +16,95 @@ namespace Form
 
     public static partial class MapBaseForm
     {
-        public static readonly int autoIdCnt=10000;
+public static readonly int autoIdCnt=10000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changeIconAction;
+                
+
+
         public partial class Data
         {
 
-                private int _id;
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                             set{
-                            
-                            _id = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeId(this,_id,value); 
+                    }
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///名字
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
 
-                private string _name;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private string  _icon;
+                    /// <summary>
+                    ///图标
+                    ///</summary>
+                    public string  icon{
+                                get{return _icon;}
+ set{
 
-                /// <summary>
-                ///名字
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                             set{
-                            if(_DataById!=null&&_DataById.ContainsValue(this)){RemoveData(id); _name = value;AddData(this);}else
-                            _name = value;
-                            }
-                        }
-
-                private string _icon;
-
-                /// <summary>
-                ///图标
-                ///</summary>
-                public string icon{
-                            get{return _icon;}
-                             set{
-                            
-                            _icon = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeIcon(this,_icon,value); 
+                    }
+        
+                _icon = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,string icon)
             {
 
-                this.id = id;
-                this.name = name;
-                this.icon = icon;
+             this.id = id;
+             this.name = name;
+             this.icon = icon;
 
             }
             
@@ -84,26 +113,16 @@ namespace Form
                    public static Data defaultData=new Data(0,"","");
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
-            {
-                Init();
-                return _DataByName;
-            }
-        }
-
+    
 
         static public void Init()
         {
@@ -115,23 +134,16 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
 
-                _DataByName = new Dictionary<string, Data>() {
-
-                };
-
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -207,11 +219,8 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-                DataByName[data.name]=data;
-
-            
+        DataById[data.id]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.id;
@@ -221,13 +230,11 @@ namespace Form
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
-                DataByName.Remove(data.name);
-
+                    DataById.Remove(data.id);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -235,10 +242,8 @@ namespace Form
         {
             Init();
 
-                DataById.Clear();
-
-                DataByName.Clear();
-
+                    DataById.Clear();
+    
             idChain.Clear();
         }
 
@@ -257,6 +262,38 @@ namespace Form
         
 
 
+
+
+            public static void ChangeId(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIcon(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

@@ -23,12 +23,14 @@ namespace Z_Map.Analysis
     }
     public class NavigationController : Z_Controller<MapManager>
     {
+        public NavigationController(MapManager super):base(super)
+        { }
         Bfs bfs;
         public Dictionary<(int, int, int), NavUnit> navUnits;
         public float step;
         public void Build()
         {
-            step = _super.dataCtrl.mainData.mapUnitSize.y * 1 / 10;
+            step = _super.data.mainData.mapUnitSize.y * 1 / 10;
             InitMap();
             bfs = new Bfs(this);
         }
@@ -38,23 +40,23 @@ namespace Z_Map.Analysis
             Vector3Int[] tryDir = new Vector3Int[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
             Vector2[] offset = new Vector2[] { Vector2.right * 0.25f, Vector2.left * 0.25f, Vector2.up * 0.25f, Vector2.down * 0.25f };
 
-            navUnits = new Dictionary<(int, int, int), NavUnit>(_super.dataCtrl.maps.Count);
+            navUnits = new Dictionary<(int, int, int), NavUnit>(_super.data.maps.Count);
 
             //build single unit
-            foreach (var map in _super.dataCtrl.maps.Values)
+            foreach (var map in _super.data.maps.Values)
             {
                 var navUnit = new NavUnit();
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
                 navUnits[pos] = navUnit;
                 navUnit.cantPassParts = new HashSet<Dir>();
                 navUnit.links = new List<NavUnit>();
-                navUnit.realPos = _super.dataCtrl.maps[pos].pos;
+                navUnit.realPos = _super.data.maps[pos].pos;
                 navUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
-                navUnit.isNull = _super.dataCtrl.maps[pos].scale == Vector3.zero;
+                navUnit.isNull = _super.data.maps[pos].scale == Vector3.zero;
             }
 
             //4 dir link
-            foreach (var map in _super.dataCtrl.maps.Values)
+            foreach (var map in _super.data.maps.Values)
             {
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
                 var navUnit = navUnits[pos];
@@ -65,7 +67,7 @@ namespace Z_Map.Analysis
                         Vector3Int linkPos = Z_Math.Graph.GetVector3Int(Z_Math.Graph.ElementwisePlus(new Vector3Int(pos.Item1, m + pos.Item2, pos.Item3), tryDir[l]));
                         if (!InArea(linkPos))
                             continue;
-                        var link = _super.dataCtrl.maps[(linkPos.x, linkPos.y, linkPos.z)];
+                        var link = _super.data.maps[(linkPos.x, linkPos.y, linkPos.z)];
 
                         Vector2 p = new Vector2(tryDir[l].x * 0.5f, tryDir[l].z * 0.5f);
 

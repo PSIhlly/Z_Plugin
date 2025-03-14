@@ -5,7 +5,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 
-namespace Ui
+namespace Ui.Mod
 {
 
 

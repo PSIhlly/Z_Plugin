@@ -37,7 +37,13 @@
     <InterpreterReference Include="Global|PythonCore|3.10" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dataAnalysis.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Excel2Cs.py" />
+    <Compile Include="formBaseInfo.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

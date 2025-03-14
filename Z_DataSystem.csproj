@@ -64,6 +64,8 @@
     <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\TexAssetForm.cs" />
     <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\AssetManager.cs" />
     <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\ParamForm.cs" />
+    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\AssetForm.cs" />
+    <Compile Include="Assets\Z_Level2\Z_DataSystem\Core\Form\ExcelCs\GameObjectAssetForm.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Z_Level2\Z_DataSystem\Core\Z_DataSystem.asmdef" />

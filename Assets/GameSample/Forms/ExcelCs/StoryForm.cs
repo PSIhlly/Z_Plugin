@@ -16,66 +16,95 @@ namespace Form
 
     public static partial class StoryForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+        public static Action<Data,int,int> changeIdAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,List<int>,List<int>> changeSceneidsAction;
+                
+
+
         public partial class Data
         {
 
-                private int _id;
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+ set{
 
-                public int id{
-                            get{return _id;}
-                             set{
-                            
-                            _id = value;
-                            }
-                        }
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeId(this,_id,value); 
+                    }
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///名字
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
 
-                private string _name;
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _sceneIds;
+                    /// <summary>
+                    ///包含场景id
+                    ///</summary>
+                    public List<int>  sceneIds{
+                                get{return _sceneIds;}
+ set{
 
-                /// <summary>
-                ///名字
-                ///</summary>
-                public string name{
-                            get{return _name;}
-                             set{
-                            
-                            _name = value;
-                            }
-                        }
-
-                private List<int> _sceneIds;
-
-                /// <summary>
-                ///包含场景id
-                ///</summary>
-                public List<int> sceneIds{
-                            get{return _sceneIds;}
-                             set{
-                            
-                            _sceneIds = value;
-                            }
-                        }
-
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeSceneids(this,_sceneIds,value); 
+                    }
+        
+                _sceneIds = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string name,List<int> sceneIds)
             {
 
-                this.id = id;
-                this.name = name;
-                this.sceneIds = sceneIds;
+             this.id = id;
+             this.name = name;
+             this.sceneIds = sceneIds;
 
             }
             
@@ -84,16 +113,16 @@ namespace Form
                    public static Data defaultData=new Data(0,"",null);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -105,19 +134,16 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -193,9 +219,8 @@ namespace Form
                 data.id=id;  
             }
 
-                DataById[data.id]=data;
-
-            
+        DataById[data.id]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.id;
@@ -205,11 +230,11 @@ namespace Form
             Init();
             if(!DataById.ContainsKey(id))
                 return;
-                
+               
             var data=DataById[id];
 
-                DataById.Remove(data.id);
-
+                    DataById.Remove(data.id);
+    
 
             childRemoveAction?.Invoke(data);
         }
@@ -217,8 +242,8 @@ namespace Form
         {
             Init();
 
-                DataById.Clear();
-
+                    DataById.Clear();
+    
             idChain.Clear();
         }
 
@@ -237,6 +262,38 @@ namespace Form
         
 
 
+
+
+            public static void ChangeId(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeName(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSceneids(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSceneidsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
     }
 }
         

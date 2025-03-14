@@ -7,8 +7,9 @@ using Z_Texture;
 using Z_Ui.Base;
 using Z_Ui;
 using Z_DataSystem;
+using Ui.Mod;
 
-namespace Ui
+namespace Ui.ModStory
 {
     public partial class UiModStoryModel
     {
@@ -21,13 +22,14 @@ namespace Ui
         {
             view.btn_back.onClick.AddListener(() =>
             {
+                Main2StoryManager.instance.UnloadStoryUgc();
                 UiManager.instance.ShowUi<UiModCtrl>();
                 Close();
             });
 
-            view.btn_material.onClick.AddListener(() =>
+            view.btn_module.onClick.AddListener(() =>
             {
-                model.curUi = view.sub_ModStoryMaterialPanel;
+                model.curUi = view.sub_ModStoryModulePanel;
                 Refresh();
             });
             view.btn_scene.onClick.AddListener(() =>
@@ -49,8 +51,8 @@ namespace Ui
             view.sta_scene.ChangeState(model.curUi == view.sub_ModStoryScenePanel ? 1 : 0);
             view.sub_ModStoryScenePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryScenePanel);
             
-            view.sta_material.ChangeState(model.curUi == view.sub_ModStoryMaterialPanel ? 1 : 0);
-            view.sub_ModStoryMaterialPanel.gameObject.SetActive(model.curUi == view.sub_ModStoryMaterialPanel);
+            view.sta_module.ChangeState(model.curUi == view.sub_ModStoryModulePanel ? 1 : 0);
+            view.sub_ModStoryModulePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryModulePanel);
         }
        
     }

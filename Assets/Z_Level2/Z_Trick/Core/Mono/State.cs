@@ -14,6 +14,14 @@ namespace Z_Trick.BaseFunc
         }
         [SerializeField]
         private GameObject[] stateGo;
+        public void Awake()
+        {
+            for(int i=0;i< stateGo.Length;i++)
+            {
+                stateGo[i].SetActive(false);
+            }
+            ChangeState(state);
+        }
         public void ChangeState(int tar)
         {
             stateGo[state].SetActive(false);

@@ -16,80 +16,88 @@ namespace Form
 
     public static partial class MapTypeForm
     {
-        public static readonly int autoIdCnt=100;
+public static readonly int autoIdCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
 
+
         }
         
         private static bool inited;
-        public static Z_Chain.Chain idChain;
+
+        public static Z_Chain.Chain idChain ;
+
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
+
+
         public partial class Data
         {
 
-                private int _id;
-
-                public int id{
-                            get{return _id;}
-                            private set{
-                            
-                            _id = value;
-                            }
-                        }
-
-                private string _NameKey;
-
-                /// <summary>
-                ///名称索引
-                ///</summary>
-                public string NameKey{
-                            get{return _NameKey;}
-                            private set{
-                            
-                            _NameKey = value;
-                            }
-                        }
-
-                private string _icon;
-
-                /// <summary>
-                ///图标
-                ///</summary>
-                public string icon{
-                            get{return _icon;}
-                            private set{
-                            
-                            _icon = value;
-                            }
-                        }
-
-                private bool _needLayer;
-
-                /// <summary>
-                ///是否需要层级设置
-                ///</summary>
-                public bool needLayer{
-                            get{return _needLayer;}
-                            private set{
-                            
-                            _needLayer = value;
-                            }
-                        }
-
+                    private int  _id;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  id{
+                                get{return _id;}
+private set{
+        
+                _id = value;
+                }
+                 
+                     }
+                    
+                    private string  _NameKey;
+                    /// <summary>
+                    ///名称索引
+                    ///</summary>
+                    public string  NameKey{
+                                get{return _NameKey;}
+private set{
+        
+                _NameKey = value;
+                }
+                 
+                     }
+                    
+                    private string  _icon;
+                    /// <summary>
+                    ///图标
+                    ///</summary>
+                    public string  icon{
+                                get{return _icon;}
+private set{
+        
+                _icon = value;
+                }
+                 
+                     }
+                    
+                    private bool  _needLayer;
+                    /// <summary>
+                    ///是否需要层级设置
+                    ///</summary>
+                    public bool  needLayer{
+                                get{return _needLayer;}
+private set{
+        
+                _needLayer = value;
+                }
+                 
+                     }
+                    
             public Data(int id,string NameKey,string icon,bool needLayer)
             {
 
-                this.id = id;
-                this.NameKey = NameKey;
-                this.icon = icon;
-                this.needLayer = needLayer;
+             this.id = id;
+             this.NameKey = NameKey;
+             this.icon = icon;
+             this.needLayer = needLayer;
 
             }
             
@@ -98,16 +106,16 @@ namespace Form
                    public static Data defaultData=new Data(0,"","",false);
 
 
-        static Dictionary<int, Data> _DataById;
-        public static Dictionary<int, Data> DataById
-        {
-            get
+            static Dictionary<int, Data> _DataById;
+            public static Dictionary<int, Data> DataById
             {
-                Init();
-                return _DataById;
+                get
+                {
+                    Init();
+                    return _DataById;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -119,8 +127,7 @@ namespace Form
             if(inited)
                 return;
             inited=true;  
-            idChain=new Z_Chain.Chain (autoIdCnt);
-            
+idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
@@ -136,12 +143,10 @@ namespace Form
 
                 };
 
-
             childInitAction?.Invoke();
             
 
-
-            foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataById.Keys){ idChain.PopId(k); }
              
         }
 
@@ -200,6 +205,8 @@ namespace Form
 
             return jo;
         }
+
+
 
 
     }

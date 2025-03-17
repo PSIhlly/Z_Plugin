@@ -64,7 +64,20 @@ public class ModManager : Z_MonoManager<ModManager>
             //new
             data = await Task.Run(() =>
             {
-                return new MapData();
+                var data=new MapData();
+                data.mainData.texsName.Clear();
+                data.mainData.masksName.Clear();
+                //special init
+                foreach (var o in MapTextureForm.DataById.Values)
+                {
+                    data.mainData.texsName.Add(o.name);
+                }
+                foreach (var o in MapTransitionMaskForm.DataById.Values)
+                {
+                    data.mainData.masksName.Add(o.name);
+                }
+
+                return data;
             });
         }
 

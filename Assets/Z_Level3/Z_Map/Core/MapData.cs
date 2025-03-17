@@ -95,7 +95,9 @@ namespace Z_Map
                 new Vector3Int(30, 5, 15),
                "",
                "",
-               ""
+               "",
+                new List<string>() { "grass", "ground","floor","road" },
+                new List<string>() { "alpha"}
            );
         }
         public void Unload()

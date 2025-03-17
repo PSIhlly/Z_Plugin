@@ -106,31 +106,31 @@ namespace Z_Map
                 }
             }
 
-            foreach (var data in MapTextureForm.DataById.Values)
+            foreach (var name in dataCtrl.mainData.texsName)
             {
                 List<Texture2D> lst = new List<Texture2D>();
                 for (int i = 0; i < GlobalSettings.TEX_ANIM_MAX; i++)
                 {
-                    var curKey = GlobalHelper.GetTexRealName(data.name, i);
+                    var curKey = GlobalHelper.GetTexRealName(name, i);
                     if (TexAssetForm.DataByName.ContainsKey(curKey))
                         lst.Add((Texture2D)TexAssetForm.DataByName[curKey].tex);
                     else
                         break;
                 }
-                unitUtilCtrl.CreateTexAnimVariants(data.name, lst.ToArray());
+                unitUtilCtrl.CreateTexAnimVariants(name, lst.ToArray());
             }
 
-            foreach (var data in MapTransitionMaskForm.DataById.Values)
+            foreach (var name in dataCtrl.mainData.masksName)
             {
                 var raws = new Texture2D[] {
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,0)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,1)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,2)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,3)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,4)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(data.name,5)]?.tex
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,0)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,1)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,2)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,3)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,4)]?.tex,
+                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,5)]?.tex
                 };
-                unitUtilCtrl.CreateAlphaVariantsByBasic5(data.name, raws);
+                unitUtilCtrl.CreateAlphaVariantsByBasic5(name, raws);
             }
 
 

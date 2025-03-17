@@ -46,6 +46,10 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeCharacterjaAction;
                 
+        public static Action<Data,List<string>,List<string>> changeTexsnameAction;
+                
+        public static Action<Data,List<string>,List<string>> changeMasksnameAction;
+                
 
 
         public partial class Data
@@ -177,7 +181,43 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa)
+                    private List<string>  _texsName;
+                    /// <summary>
+                    ///ÌùÍ¼Ãû³Æ
+                    ///</summary>
+                    public List<string>  texsName{
+                                get{return _texsName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTexsname(this,_texsName,value); 
+                    }
+        
+                _texsName = value;
+                }
+                 
+                     }
+                    
+                    private List<string>  _masksName;
+                    /// <summary>
+                    ///ÕÚÕÖÃû³Æ
+                    ///</summary>
+                    public List<string>  masksName{
+                                get{return _masksName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMasksname(this,_masksName,value); 
+                    }
+        
+                _masksName = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa,List<string> texsName,List<string> masksName)
             {
 
              this.uid = uid;
@@ -187,12 +227,14 @@ public static readonly int autoUidCnt=1000000;
              this.mapJa = mapJa;
              this.itemJa = itemJa;
              this.characterJa = characterJa;
+             this.texsName = texsName;
+             this.masksName = masksName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","");
+                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","",null,null);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -274,7 +316,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("itemJa"),
 
-                jo.Get<string>("characterJa")
+                jo.Get<string>("characterJa"),
+
+                jo.Get<List<string>>("texsName"),
+
+                jo.Get<List<string>>("masksName")
                     );
 
             return data;
@@ -299,6 +345,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("itemJa",data.itemJa);
 
             jo.Set<string>("characterJa",data.characterJa);
+
+            jo.Set<List<string>>("texsName",data.texsName);
+
+            jo.Set<List<string>>("masksName",data.masksName);
 
             return jo;
         }
@@ -428,6 +478,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeCharacterjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTexsname(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTexsnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMasksname(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMasksnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

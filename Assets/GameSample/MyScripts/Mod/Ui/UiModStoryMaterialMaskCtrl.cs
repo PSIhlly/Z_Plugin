@@ -1,0 +1,287 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Form;
+using Item;
+using Z_Texture;
+using Z_Ui.Base;
+using Z_Ui;
+using Z_Map;
+using Z_DataSystem.Form;
+using Z_DataSystem;
+using Z_Language;
+using Z_Time;
+using Z_Text;
+using System;
+
+namespace Ui.ModStoryMaterial
+{
+    public partial class UiModStoryMaterialMaskModel
+    {
+        public MapTransitionMaskForm.Data curData;
+        public int curMask;
+        
+    }
+
+    public partial class UiModStoryMaterialMaskCtrl : IZ_Listener<AssetEvent>
+    {
+        UiScrViewContainer<UiMaskItemCtrl> con;
+        UiScrViewContainer<UiMaskTypeItemCtrl> maskCon;
+
+        public override void OnCreate()
+        {
+            this.Register<AssetEvent>();
+            con = new UiScrViewContainer<UiMaskItemCtrl>(view.go_maskItem, view.scr_items);
+            maskCon = new UiScrViewContainer<UiMaskTypeItemCtrl>(view.go_maskTypeItem, view.scr_masks);
+
+            view.btn_replace.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportMaskTex(GlobalHelper.GetMaskRealName(model.curData.name, model.curMask), null);
+            });
+
+            view.btn_delete.onClick.AddListener(() =>
+            {
+            ModManager.instance.assetCtrl.DeleteMaskTex(model.curData.name);
+                SetCur(null, 0);
+
+                Refresh();
+            });
+            view.ipt_name.onFinishInput += (v) =>
+            {
+                ModManager.instance.assetCtrl.RenameMaskTex(model.curData.name, v);
+                Refresh();
+            };
+            
+        }
+
+        public override void OnShow()
+        {
+            SetCur(null, 0);
+            Refresh();
+        }
+        public void Refresh()
+        {
+            con.Clear();
+
+
+            foreach (var data in MapTransitionMaskForm.DataById.Values)
+            {
+                if (data.id > MapBaseForm.autoIdCnt)
+                    continue;
+                con.Add(new UiMaskItemParam
+                {
+                    id = data.id
+                });
+            }
+            con.Add(new UiMaskItemParam
+            {
+                id = -1
+            });
+            con.Refresh();
+
+            view.sta_exist.ChangeState(model.curData == null ? 0 : 1);
+
+            if (model.curData != null)
+            {
+                maskCon.Clear();
+                for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
+                {
+                    var curKey = GlobalHelper.GetTexRealName(model.curData.name, i);
+                    maskCon.Add(new UiMaskTypeItemParam
+                    {
+                        id = i
+                    });
+                }
+
+            maskCon.Refresh();
+            if (model.curData != null)
+            {
+                view.img_tex.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetMaskRealName(model.curData.name,  model.curMask));
+                view.ipt_name.Set(model.curData.name);
+            }
+            switch((AlphaTexBasic5)model.curMask)
+            {
+                    case AlphaTexBasic5.OOOOXOOOO:
+                        SetShow(new HashSet<int>() { });
+                        break;
+                    case AlphaTexBasic5.OOOXXOOOO:
+                        SetShow(new HashSet<int>() {4 });
+                        break;
+                    case AlphaTexBasic5.OXOXXOOOO:
+                        SetShow(new HashSet<int>() {1,2,3,4,6,8,9 });
+                        break;
+                    case AlphaTexBasic5.OOXOOXXXX:
+                        SetShow(new HashSet<int>() {4,7,8 });
+                        break;
+                    case AlphaTexBasic5.XXXOOOOOO:
+                        SetShow(new HashSet<int>() {4,6 });
+                        break;
+                    case AlphaTexBasic5.XXXXOXXXX:
+                        SetShow(new HashSet<int>() {1,2,3,4,6,7,8,9 });
+                        break;
+                }
+
+            }
+
+        }
+        private void SetShow(HashSet<int> show)
+        {
+            view.img_1.color = show.Contains(1) ? Color.green : Color.white;
+            view.img_2.color = show.Contains(2) ? Color.green : Color.white;
+            view.img_3.color = show.Contains(3) ? Color.green : Color.white;
+            view.img_4.color = show.Contains(4) ? Color.green : Color.white;
+            view.img_5.color = Color.yellow;
+            view.img_6.color = show.Contains(6) ? Color.green : Color.white;
+            view.img_7.color = show.Contains(7) ? Color.green : Color.white;
+            view.img_8.color = show.Contains(8) ? Color.green : Color.white;
+            view.img_9.color = show.Contains(9) ? Color.green : Color.white;
+        }
+        public void SetCur(MapTransitionMaskForm.Data data,int maskId)
+        {
+                model.curData = data;
+            if (maskId != -1)
+                model.curMask = maskId;
+        }
+
+        public void OnEvent(AssetEvent evt)
+        {
+            if (!string.IsNullOrEmpty(evt.importAssetName)&&isActive)
+            {
+                string key = GlobalHelper.GetTexNickName(evt.importAssetName);
+                if (MapTransitionMaskForm.DataByName.ContainsKey(key))
+                {
+                    SetCur(MapTransitionMaskForm.DataByName[key], -1);
+                }
+            }
+            Refresh();
+        }
+
+    }
+
+    public partial class UiMaskTypeItemModel
+    {
+        public int id;
+    }
+    public partial class UiMaskTypeItemParam
+    {
+        public int id;
+    }
+    public partial class UiMaskTypeItemCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_item.onClick.AddListener(() =>
+            {
+                if (model.id == -1)
+                {
+                    string res = null;
+                    for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
+                    {
+                        var curKey = GlobalHelper.GetMaskRealName(parent.model.curData.name, i);
+                        if (!TexAssetForm.DataByName.ContainsKey(curKey))
+                        {
+                            res = curKey;
+                            break;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(res))
+                    {
+                        ModManager.instance.assetCtrl.ImportMaskTex(res, null);
+                    }
+                }
+                else
+                {
+                    parent.SetCur(parent.model.curData, model.id);
+                    parent.Refresh();
+                }
+            });
+        }
+        public override void OnShow()
+        {
+            model.id = param.id;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            if (model.id != -1)
+            {
+                view.txt_name.text = parent.model.curData.name + "_" + model.id;
+                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetTexRealName(MapTransitionMaskForm.DataById[parent.model.curData.id].name, model.id));
+                view.sta_item.ChangeState(parent.model.curMask == model.id ? 1 : 0);
+            }
+            else
+            {
+                view.txt_name.text = TextManager.instance.GetTxt("new");
+                /*view.img_.sprite = Texture2D.whiteTexture;*/
+                view.sta_item.ChangeState(0);
+            }
+        }
+
+
+    }
+
+
+
+    public partial class UiMaskItemModel
+    {
+        public int id;
+    }
+    public partial class UiMaskItemParam
+    {
+        public int id;
+    }
+    public partial class UiMaskItemCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_item.onClick.AddListener(() =>
+            {
+                if (model.id == -1)
+                {
+                    int max = 1;
+                    foreach (var o in MapTransitionMaskForm.DataById.Values)
+                    {
+                        var splt = o.name.Split("newMask");
+                        if (splt.Length > 1)
+                        {
+                            if (int.TryParse(splt[1], out int v))
+                            {
+                                max = Mathf.Max(max, v + 1);
+                            }
+                        }
+                    }
+                    var key = GlobalHelper.GetMaskRealName("newMask" + max, 0);
+                    ModManager.instance.assetCtrl.ImportMaskTex(key, "newMask" + max);
+                }
+                else
+                {
+                    parent.SetCur(MapTransitionMaskForm.DataById[model.id], 0);
+                    parent.Refresh();
+                }
+            });
+        }
+        public override void OnShow()
+        {
+            model.id = param.id;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            if (model.id != -1)
+            {
+                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetMaskRealName(MapTransitionMaskForm.DataById[model.id].name, 0));
+                view.txt_name.text = MapTransitionMaskForm.DataById[model.id].name;
+            }
+            else
+            {
+                view.txt_name.text = TextManager.instance.GetTxt("new");
+                //view.img_.sprite = AssetManager.instance.GetSprite(ModAssetManager.instance.GetTexRealName(MapTextureForm.DataById[model.id].name, 0));
+            }
+            view.sta_item.ChangeState(parent.model.curData?.id == model.id ? 1 : 0);
+        }
+
+
+    }
+}
+

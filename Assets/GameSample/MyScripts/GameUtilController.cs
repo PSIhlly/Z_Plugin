@@ -9,6 +9,7 @@ using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
+using Z_Texture;
 using Z_UnitSystem;
 
 public class GameUtilController: Z_Controller<GameManager>
@@ -44,8 +45,8 @@ public class GameUtilController: Z_Controller<GameManager>
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             var render = go.GetComponent<Renderer>();
             render.GetPropertyBlock(propBlock);
-            
-            propBlock.SetTexture("_Tex", AssetManager.instance.GetSprite(GlobalHelper.GetItemTexRealName(name,i))?.texture);
+            var tex = AssetManager.instance.GetSprite(GlobalHelper.GetItemTexRealName(name, i))?.texture;
+            propBlock.SetTexture("_Tex", tex);
             render.SetPropertyBlock(propBlock);
         }
         if (forGame)

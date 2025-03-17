@@ -86,14 +86,14 @@ public class ModManager : Z_MonoManager<ModManager>
     #endregion
     public string GetSceneFileName()
     {
-        return _folderName + "/" + _sceneCtrl.folderName+"/scene";
+        return Application.persistentDataPath + "/" + _folderName + "/" + _sceneCtrl.folderName+"/scene";
     }
     public string GetSceneFolder()
     {
-        return _folderName + "/" + _sceneCtrl.folderName;
+        return Application.persistentDataPath + "/" + _folderName + "/" + _sceneCtrl.folderName + "/";
     }
     public string GetStoryFolder()
     {
-        return _folderName;
+        return Application.persistentDataPath+"/"+_folderName+"/";
     }
 }

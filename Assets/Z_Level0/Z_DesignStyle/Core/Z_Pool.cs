@@ -7,6 +7,7 @@ namespace Z_DesignStyle
     public abstract class Z_Pool<Obj>
     {
         protected Queue<Obj> pool=new Queue<Obj>();
+        protected HashSet<Obj> activeObjs=new HashSet<Obj>();
 
         public abstract void Clear(Obj obj);
         public abstract void Destroy();
@@ -17,12 +18,14 @@ namespace Z_DesignStyle
             if (pool.Count == 0)
                 pool.Enqueue(New());
             var obj=pool.Dequeue();
+            activeObjs.Add(obj);
             Fresh(obj);
             return obj;
         }
         public void Push(Obj obj)
         {
             pool.Enqueue(obj);
+            activeObjs.Remove(obj);
             Clear(obj);
         }
 

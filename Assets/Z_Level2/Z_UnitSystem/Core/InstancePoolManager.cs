@@ -55,6 +55,7 @@ namespace Z_UnitSystem
                 }
             var go = GameObject.Instantiate(tar);
             go.name = tar.name;
+            
             return go;
         }
         public void DeleteInstance(GameObject tar, GameObject proto)

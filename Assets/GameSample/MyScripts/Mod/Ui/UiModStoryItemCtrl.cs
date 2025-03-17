@@ -154,6 +154,12 @@ namespace Ui.ModStoryItem
                 ModManager.instance.assetCtrl.CreateItemUnit(parent.model.curData);
                 parent.Refresh();
             });
+            view.btn_prefab.onClick.AddListener(() =>
+            {
+                var pre=MapPrefabForm.DataByName[parent.model.curData.subPrefabUnitName[model.id]];
+                parent.model.curData.subPrefabUnitName[model.id] = MapPrefabForm.DataById[((pre.id) % MapPrefabForm.DataById.Count) + 1].name;
+                parent.Refresh();
+            });
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteItemUnit(parent.model.curData.name,model.id);

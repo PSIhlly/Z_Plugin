@@ -7,22 +7,22 @@ namespace Z_UnitSystem
 {
 public static class SaveAndLoad
     {
-        static string path;
+        static string perPath;
         static SaveAndLoad()
         {
-            path= Application.persistentDataPath; ;
+            perPath= Application.persistentDataPath;
         }
         public static void Save(string key,string content)
         {
-            File.WriteAllText(path + "/" + key, content);
+            File.WriteAllText((key.Contains(":")?"":(perPath + "/")) + key, content);
         }
         public static bool Exist(string key)
         {
-            return File.Exists(path + "/" + key);
+            return File.Exists((key.Contains(":") ? "" : (perPath + "/")) + "/" + key);
         }
         public static string Load(string key)
         {
-           return File.ReadAllText(path + "/" + key);
+           return File.ReadAllText((key.Contains(":") ? "" : (perPath + "/")) + "/" + key);
         }
     }
 

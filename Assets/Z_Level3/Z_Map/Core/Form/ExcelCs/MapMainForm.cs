@@ -42,7 +42,7 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeMapjaAction;
                 
-        public static Action<Data,string,string> changeItemjaAction;
+        public static Action<Data,string,string> changeObjectjaAction;
                 
         public static Action<Data,string,string> changeCharacterjaAction;
                 
@@ -145,20 +145,20 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private string  _itemJa;
+                    private string  _objectJa;
                     /// <summary>
                     ///物体数据
                     ///</summary>
-                    public string  itemJa{
-                                get{return _itemJa;}
+                    public string  objectJa{
+                                get{return _objectJa;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeItemja(this,_itemJa,value); 
+                       ChangeObjectja(this,_objectJa,value); 
                     }
         
-                _itemJa = value;
+                _objectJa = value;
                 }
                  
                      }
@@ -217,7 +217,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa,List<string> texsName,List<string> masksName)
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string objectJa,string characterJa,List<string> texsName,List<string> masksName)
             {
 
              this.uid = uid;
@@ -225,7 +225,7 @@ public static readonly int autoUidCnt=1000000;
              this.logicSize = logicSize;
              this.viewSize = viewSize;
              this.mapJa = mapJa;
-             this.itemJa = itemJa;
+             this.objectJa = objectJa;
              this.characterJa = characterJa;
              this.texsName = texsName;
              this.masksName = masksName;
@@ -314,7 +314,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("mapJa"),
 
-                jo.Get<string>("itemJa"),
+                jo.Get<string>("objectJa"),
 
                 jo.Get<string>("characterJa"),
 
@@ -342,7 +342,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("mapJa",data.mapJa);
 
-            jo.Set<string>("itemJa",data.itemJa);
+            jo.Set<string>("objectJa",data.objectJa);
 
             jo.Set<string>("characterJa",data.characterJa);
 
@@ -462,12 +462,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeItemja(Data superData,string oldV,string newV)
+            public static void ChangeObjectja(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeItemjaAction?.Invoke(data,oldV,newV);
+                changeObjectjaAction?.Invoke(data,oldV,newV);
                 }
                     
             }

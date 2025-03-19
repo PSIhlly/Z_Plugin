@@ -14,7 +14,7 @@ using Z_DataSystem.Form;
 namespace Form
 {
 
-    public static partial class MapTransitionMaskForm
+    public static partial class MapMaskForm
     {
 
         

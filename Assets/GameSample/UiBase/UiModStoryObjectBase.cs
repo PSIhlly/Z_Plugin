@@ -5,7 +5,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 
-namespace Ui.ModStoryItem
+namespace Ui.ModStoryObject
 {
 
 
@@ -38,7 +38,7 @@ namespace Ui.ModStoryItem
         public UiItemView view;
         public UiItemModel model;
         public UiItemParam param;
-        public UiModStoryItemCtrl parent=>(UiModStoryItemCtrl)uiHolder.parent.ctrl;
+        public UiModStoryObjectCtrl parent=>(UiModStoryObjectCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -114,7 +114,7 @@ namespace Ui.ModStoryItem
         public UiUnitView view;
         public UiUnitModel model;
         public UiUnitParam param;
-        public UiModStoryItemCtrl parent=>(UiModStoryItemCtrl)uiHolder.parent.ctrl;
+        public UiModStoryObjectCtrl parent=>(UiModStoryObjectCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -137,11 +137,11 @@ namespace Ui.ModStoryItem
     {
         
     }
-    public partial class UiModStoryItemParam:UiParam
+    public partial class UiModStoryObjectParam:UiParam
     {
     }
 
-    public partial class UiModStoryItemView:UiView
+    public partial class UiModStoryObjectView:UiView
     {
 
             public Btn btn_back;
@@ -163,7 +163,7 @@ namespace Ui.ModStoryItem
             public GameObject go_unit;
             public Sta sta_unit;
             public UiUnitCtrl sub_Unit;
-        public UiModStoryItemView(UiHolder uiHolder):base(uiHolder)
+        public UiModStoryObjectView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
@@ -188,16 +188,16 @@ namespace Ui.ModStoryItem
         }
 
     }
-    public partial class UiModStoryItemCtrl:UiCtrl
+    public partial class UiModStoryObjectCtrl:UiCtrl
     {
-        public UiModStoryItemView view;
-        public UiModStoryItemModel model;
-        public UiModStoryItemParam param;
+        public UiModStoryObjectView view;
+        public UiModStoryObjectModel model;
+        public UiModStoryObjectParam param;
         
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiModStoryItemParam)param;
+            this.param = (UiModStoryObjectParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -205,8 +205,8 @@ namespace Ui.ModStoryItem
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiModStoryItemView(uiHolder);
-            model=new UiModStoryItemModel();
+            view = new UiModStoryObjectView(uiHolder);
+            model=new UiModStoryObjectModel();
 
 
             view.sub_Item = new UiItemCtrl();
@@ -216,7 +216,7 @@ namespace Ui.ModStoryItem
         }
 
     }
-    public partial class UiModStoryItemModel:UiModel
+    public partial class UiModStoryObjectModel:UiModel
     {
         
     }

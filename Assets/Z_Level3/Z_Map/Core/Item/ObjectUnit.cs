@@ -10,12 +10,12 @@ using Z_UnitSystem;
 
 namespace Z_Map
 {
-    public class ItemUnit:Unit
+    public class ObjectUnit:Unit
     {
-        public ItemUnit(ItemUnitForm.Data data) : base(data)
+        public ObjectUnit(ObjectUnitForm.Data data) : base(data)
         {
         }
-        public ItemUnitForm.Data data => (ItemUnitForm.Data)_data;
+        public ObjectUnitForm.Data data => (ObjectUnitForm.Data)_data;
 
         public ItemInstance ins
         {
@@ -55,7 +55,7 @@ namespace Z_Map
         }
         public override void Remove()
         {
-            ItemUnitForm.RemoveData(data.uid);
+            ObjectUnitForm.RemoveData(data.uid);
             base.Remove();
         }
 

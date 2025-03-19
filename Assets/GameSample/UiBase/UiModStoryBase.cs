@@ -119,8 +119,11 @@ namespace Ui.ModStory
             public Sta sta_material;
             public Btn btn_item;
             public Sta sta_item;
+            public Btn btn_Character;
+            public Sta sta_Character;
             public Txt txt_material;
             public Txt txt_item;
+            public Txt txt_character;
         public UiModStoryModulePanelView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -128,8 +131,11 @@ namespace Ui.ModStory
             sta_material = uiHolder.elementTrsLst[1].GetComponent<Sta>();
             btn_item = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             sta_item = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_material = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            txt_item = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            btn_Character = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_Character = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            txt_material = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_item = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            txt_character = uiHolder.elementTrsLst[8].GetComponent<Txt>();
         }
 
     }

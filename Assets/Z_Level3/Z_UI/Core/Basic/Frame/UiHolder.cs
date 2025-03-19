@@ -46,7 +46,7 @@ namespace Z_Ui.Base
             if (oriInited)
                 return; 
             var uiCtrlName = "Ui" + uiName + "Ctrl";
-            if (UiManager.instance.uiCtrlName2OriUi.ContainsKey(uiCtrlName) && UiManager.instance.uiCtrlName2OriUi[uiCtrlName] != this)
+            if (uiType != UiType.Sub && UiManager.instance.uiCtrlName2OriUi.ContainsKey(uiCtrlName) && UiManager.instance.uiCtrlName2OriUi[uiCtrlName] != this)
                 Debug.LogError(uiName + " has exist!");
 
             UiManager.instance.uiCtrlName2OriUi[uiCtrlName] = this;
@@ -54,6 +54,8 @@ namespace Z_Ui.Base
             //init sub
             foreach (var subUiHolder in subUiHolderLst)
             {
+                if(subUiHolder==null)
+                    Debug.LogError(uiName + " has empty sub");
                 subUiHolder.OriInit();
             }
 

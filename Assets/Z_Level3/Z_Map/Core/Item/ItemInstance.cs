@@ -7,10 +7,10 @@ namespace Z_Map
 {
     public class ItemInstance : Instance
     {
-        public ItemUnit unit
+        public ObjectUnit unit
         {
             set { base.unit = value; }
-            get { return (ItemUnit)base.unit; }
+            get { return (ObjectUnit)base.unit; }
         }
     }
 }

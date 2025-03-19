@@ -224,7 +224,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         
                     }
             }
-            else if (curData is MapTransitionMaskForm.Data maskData)
+            else if (curData is MapMaskForm.Data maskData)
             {
                 for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                     for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
@@ -236,7 +236,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         mapData.alphaTexNameDic[layer] = maskData.name;
                     }
             }
-            else if(curData is MapItemForm.Data itemData)
+            else if(curData is MapObjectForm.Data itemData)
             {
                 for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                     for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
@@ -253,7 +253,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             //放置去重
                             foreach (var subUnit in mapData.unit.subUnits)
                             {
-                                if (subUnit.data is ItemUnitForm.Data otherItemData)
+                                if (subUnit.data is ObjectUnitForm.Data otherItemData)
                                 {
                                     if (otherItemData.prefabName == itemData.name&& (otherItemData.pos- finalPos).sqrMagnitude<0.001f&&Mathf.Abs(otherItemData.euler.y - angle)<1f)
                                     {
@@ -288,7 +288,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         {
                             foreach(var sub in mapData.unit.GetAllSubUnits())
                             {
-                                if(sub is ItemUnit item)
+                                if(sub is ObjectUnit item)
                                 {
                                     sub.Remove();
                                 }

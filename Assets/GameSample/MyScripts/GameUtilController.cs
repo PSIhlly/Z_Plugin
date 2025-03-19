@@ -27,7 +27,7 @@ public class GameUtilController: Z_Controller<GameManager>
                 InstancePoolManager.instance.AddPool(form.go);
             }
         }
-        foreach (var form in MapItemForm.DataById.Values)
+        foreach (var form in MapObjectForm.DataById.Values)
         {
             InstancePoolManager.instance.AddPool(CombineNewItemByPrefabs(form.name,form.subPrefabUnitName,form.subPrefabUnitPos,form.subPrefabUnitScale,true));
         }

@@ -11,7 +11,7 @@ using Z_DesignStyle;
 namespace Z_DataSystem.Form
 {
 
-    public static partial class PruductForm
+    public static partial class ProductForm
     {
 public static readonly int autoUidCnt=100;
 
@@ -36,6 +36,8 @@ public static readonly int autoUidCnt=100;
         public static Action<Data,string,string> changeNameAction;
                 
         public static Action<Data,Dictionary<string,object>,Dictionary<string,object>> changeParamdicAction;
+                
+        public static Action<Data,bool,bool> changeIsprotoAction;
                 
 
 
@@ -96,18 +98,37 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<string,object> paramDic)
+                    private bool  _isProto;
+                    /// <summary>
+                    ///ÊÇÔ­ÐÍ
+                    ///</summary>
+                    public bool  isProto{
+                                get{return _isProto;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeIsproto(this,_isProto,value); 
+                    }
+        
+                _isProto = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,Dictionary<string,object> paramDic,bool isProto)
             {
 
              this.uid = uid;
              this.name = name;
              this.paramDic = paramDic;
+             this.isProto = isProto;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){});
+                   public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){},false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -117,16 +138,6 @@ public static readonly int autoUidCnt=100;
                 {
                     Init();
                     return _DataByUid;
-                }
-            }
-    
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
                 }
             }
     
@@ -146,10 +157,6 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByName = new Dictionary<string, Data>() {
-    
-                    };
-    
 
             childInitAction?.Invoke();
             
@@ -195,7 +202,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<Dictionary<string,object>>("paramDic")
+                jo.Get<Dictionary<string,object>>("paramDic"),
+
+                jo.Get<bool>("isProto")
                     );
 
             return data;
@@ -212,6 +221,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("name",data.name);
 
             jo.Set<Dictionary<string,object>>("paramDic",data.paramDic);
+
+            jo.Set<bool>("isProto",data.isProto);
 
             return jo;
         }
@@ -232,8 +243,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
-                    DataByName[data.name]=data;
-    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -248,8 +257,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                     DataByUid.Remove(data.uid);
     
-                    DataByName.Remove(data.name);
-    
 
             childRemoveAction?.Invoke(data);
         }
@@ -258,8 +265,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             Init();
 
                     DataByUid.Clear();
-    
-                    DataByName.Clear();
     
             uidChain.Clear();
         }
@@ -296,9 +301,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
- 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
@@ -310,6 +312,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeParamdicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsproto(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsprotoAction?.Invoke(data,oldV,newV);
                 }
                     
             }

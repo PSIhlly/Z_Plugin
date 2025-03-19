@@ -14,7 +14,7 @@ using Z_DataSystem.Form;
 namespace Form
 {
 
-    public static partial class MapItemForm
+    public static partial class MapObjectForm
     {
 
         

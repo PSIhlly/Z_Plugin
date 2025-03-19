@@ -15,15 +15,15 @@ using Z_Text;
 using Z_Math;
 using System;
 
-namespace Ui.ModStoryItem
+namespace Ui.ModStoryObject
 {
-    public partial class UiModStoryItemModel
+    public partial class UiModStoryObjectModel
     {
-        public MapItemForm.Data curData;
+        public MapObjectForm.Data curData;
 
     }
 
-    public partial class UiModStoryItemCtrl : IZ_Listener<AssetEvent>
+    public partial class UiModStoryObjectCtrl : IZ_Listener<AssetEvent>
     {
         UiScrViewContainer<UiItemCtrl> con;
         UiScrViewContainer<UiUnitCtrl> unitCon;
@@ -37,14 +37,14 @@ namespace Ui.ModStoryItem
 
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteItem(model.curData.name);
+                ModManager.instance.assetCtrl.DeleteObject(model.curData.name);
                 SetCur(null);
 
                 Refresh();
             });
             view.ipt_name.onFinishInput += (v) =>
             {
-                ModManager.instance.assetCtrl.RenameItem(model.curData.name, v);
+                ModManager.instance.assetCtrl.RenameObject(model.curData.name, v);
                 Refresh();
             };
             view.btn_back.onClick.AddListener(() =>
@@ -69,7 +69,7 @@ namespace Ui.ModStoryItem
             con.Clear();
 
 
-            foreach (var data in MapItemForm.DataById.Values)
+            foreach (var data in MapObjectForm.DataById.Values)
             {
                 if (data.id > MapBaseForm.autoIdCnt)
                     continue;
@@ -117,7 +117,7 @@ namespace Ui.ModStoryItem
 
         }
 
-        public void SetCur(MapItemForm.Data data)
+        public void SetCur(MapObjectForm.Data data)
         {
             model.curData = data;
         }
@@ -127,9 +127,9 @@ namespace Ui.ModStoryItem
             if (!string.IsNullOrEmpty(evt.importAssetName) && isActive)
             {
                 string key = GlobalHelper.GetTexNickName(evt.importAssetName);
-                if (MapItemForm.DataByName.ContainsKey(key))
+                if (MapObjectForm.DataByName.ContainsKey(key))
                 {
-                    SetCur(MapItemForm.DataByName[key]);
+                    SetCur(MapObjectForm.DataByName[key]);
                 }
             }
             Refresh();
@@ -151,7 +151,7 @@ namespace Ui.ModStoryItem
         {
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateItemUnit(parent.model.curData);
+                ModManager.instance.assetCtrl.CreateObjectUnit(parent.model.curData);
                 parent.Refresh();
             });
             view.btn_prefab.onClick.AddListener(() =>
@@ -162,7 +162,7 @@ namespace Ui.ModStoryItem
             });
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteItemUnit(parent.model.curData.name,model.id);
+                ModManager.instance.assetCtrl.DeleteObjectUnit(parent.model.curData.name,model.id);
                 parent.Refresh();
             });
             view.ipt_posX.onFinishInput += s =>
@@ -223,7 +223,7 @@ namespace Ui.ModStoryItem
 
             view.btn_tex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportItemTex(GlobalHelper.GetItemTexRealName(parent.model.curData.name,model.id));
+                ModManager.instance.assetCtrl.ImportObjectTex(GlobalHelper.GetItemTexRealName(parent.model.curData.name,model.id));
             });
         }
         public override void OnShow()
@@ -277,7 +277,7 @@ namespace Ui.ModStoryItem
                 if (model.id == -1)
                 {
                     int max = 1;
-                    foreach (var o in MapItemForm.DataById.Values)
+                    foreach (var o in MapObjectForm.DataById.Values)
                     {
                         var splt = o.name.Split("newItem");
                         if (splt.Length > 1)
@@ -288,12 +288,12 @@ namespace Ui.ModStoryItem
                             }
                         }
                     }
-                    ModManager.instance.assetCtrl.CreateItem("newItem" + max);
+                    ModManager.instance.assetCtrl.CreateObject("newItem" + max);
                     parent.Refresh();
                 }
                 else
                 {
-                    parent.SetCur(MapItemForm.DataById[model.id]);
+                    parent.SetCur(MapObjectForm.DataById[model.id]);
                     parent.Refresh();
                 }
             });
@@ -309,8 +309,8 @@ namespace Ui.ModStoryItem
         {
             if (model.id != -1)
             {
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetItemTexRealName(MapItemForm.DataById[model.id].name, 0));
-                view.txt_name.text = MapItemForm.DataById[model.id].name;
+                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetItemTexRealName(MapObjectForm.DataById[model.id].name, 0));
+                view.txt_name.text = MapObjectForm.DataById[model.id].name;
             }
             else
             {

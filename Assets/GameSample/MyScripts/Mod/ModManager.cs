@@ -72,7 +72,7 @@ public class ModManager : Z_MonoManager<ModManager>
                 {
                     data.mainData.texsName.Add(o.name);
                 }
-                foreach (var o in MapTransitionMaskForm.DataById.Values)
+                foreach (var o in MapMaskForm.DataById.Values)
                 {
                     data.mainData.masksName.Add(o.name);
                 }

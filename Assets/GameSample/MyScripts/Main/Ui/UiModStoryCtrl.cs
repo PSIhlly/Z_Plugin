@@ -17,7 +17,7 @@ namespace Ui.ModStory
     }
     public partial class UiModStoryCtrl
     {
-        
+
         public override void OnCreate()
         {
             view.btn_back.onClick.AddListener(() =>
@@ -39,7 +39,7 @@ namespace Ui.ModStory
             });
         }
 
-        
+
 
         public override void OnShow()
         {
@@ -50,11 +50,11 @@ namespace Ui.ModStory
         {
             view.sta_scene.ChangeState(model.curUi == view.sub_ModStoryScenePanel ? 1 : 0);
             view.sub_ModStoryScenePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryScenePanel);
-            
+
             view.sta_module.ChangeState(model.curUi == view.sub_ModStoryModulePanel ? 1 : 0);
             view.sub_ModStoryModulePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryModulePanel);
         }
-       
+
     }
-   
+
 }

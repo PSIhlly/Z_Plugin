@@ -7,7 +7,8 @@ using Z_Texture;
 using Z_Ui.Base;
 using Z_Ui;
 using Ui.ModStoryMaterial;
-using Ui.ModStoryItem;
+using Ui.ModStoryObject;
+using Ui.ModStoryCharacter;
 
 namespace Ui.ModStory
 {
@@ -23,7 +24,12 @@ namespace Ui.ModStory
             });
             view.btn_item.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiModStoryItemCtrl>();
+                UiManager.instance.ShowUi<UiModStoryObjectCtrl>();
+
+            });
+            view.btn_Character.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModStoryCharacterCtrl>();
 
             });
         }

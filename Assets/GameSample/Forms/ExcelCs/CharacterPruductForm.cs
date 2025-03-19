@@ -23,24 +23,26 @@ namespace Form
         static void Register()
         {
 
-                PruductForm.childInitAction+=InitInternal;
+                ProductForm.childInitAction+=InitInternal;
 
 
-                PruductForm.childRemoveAction+=RemoveChildren;
-                PruductForm.childAddAction+=AddChildren;
+                ProductForm.childRemoveAction+=RemoveChildren;
+                ProductForm.childAddAction+=AddChildren;
             
 
-            PruductForm.changeUidAction+=ChangeUid;
+            ProductForm.changeUidAction+=ChangeUid;
 
-            PruductForm.changeNameAction+=ChangeName;
+            ProductForm.changeNameAction+=ChangeName;
 
-            PruductForm.changeParamdicAction+=ChangeParamdic;
+            ProductForm.changeParamdicAction+=ChangeParamdic;
+
+            ProductForm.changeIsprotoAction+=ChangeIsproto;
 
         }
         
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain =>PruductForm.uidChain;
+        public static Z_Chain.Chain uidChain =>ProductForm.uidChain;
 
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
@@ -52,23 +54,26 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,object>,Dictionary<string,object>> changeParamdicAction;
                 
+        public static Action<Data,bool,bool> changeIsprotoAction;
+                
 
 
-        public partial class Data : PruductForm.Data
+        public partial class Data : ProductForm.Data
         {
 
-            public Data(int uid,string name,Dictionary<string,object> paramDic):base(uid,name,paramDic)
+            public Data(int uid,string name,Dictionary<string,object> paramDic,bool isProto):base(uid,name,paramDic,isProto)
             {
 
              this.uid = uid;
              this.name = name;
              this.paramDic = paramDic;
+             this.isProto = isProto;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){});
+                   public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){},false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -95,7 +100,7 @@ namespace Form
         static public void Init()
         {
 
-            PruductForm.Init();
+            ProductForm.Init();
 
         }
         public static void InitInternal()
@@ -119,7 +124,7 @@ namespace Form
 
             foreach(var data in DataByUid.Values)
             {
-                PruductForm.AddData(data);
+                ProductForm.AddData(data);
             }
 
 
@@ -164,7 +169,9 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<Dictionary<string,object>>("paramDic")
+                jo.Get<Dictionary<string,object>>("paramDic"),
+
+                jo.Get<bool>("isProto")
                     );
 
             return data;
@@ -181,6 +188,8 @@ namespace Form
             jo.Set<string>("name",data.name);
 
             jo.Set<Dictionary<string,object>>("paramDic",data.paramDic);
+
+            jo.Set<bool>("isProto",data.isProto);
 
             return jo;
         }
@@ -203,7 +212,7 @@ namespace Form
     
                     DataByName[data.name]=data;
     
-PruductForm.AddData(data);
+ProductForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
         }
@@ -219,7 +228,7 @@ PruductForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
-PruductForm.RemoveData(uid);
+ProductForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -233,13 +242,13 @@ PruductForm.RemoveData(uid);
             uidChain.Clear();
         }
 
-         private static void RemoveChildren(PruductForm.Data data)
+         private static void RemoveChildren(ProductForm.Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.uid);      
         }
-         private static void AddChildren(PruductForm.Data superData)
+         private static void AddChildren(ProductForm.Data superData)
         {
             Init();
             if(superData is Data data)
@@ -250,7 +259,7 @@ PruductForm.RemoveData(uid);
 
 
 
-            public static void ChangeUid(PruductForm.Data superData,int oldV,int newV)
+            public static void ChangeUid(ProductForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -260,7 +269,7 @@ PruductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeName(PruductForm.Data superData,string oldV,string newV)
+            public static void ChangeName(ProductForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -273,12 +282,22 @@ PruductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeParamdic(PruductForm.Data superData,Dictionary<string,object> oldV,Dictionary<string,object> newV)
+            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,object> oldV,Dictionary<string,object> newV)
             {
                 if(superData is Data data)
                 {
 
                 changeParamdicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsproto(ProductForm.Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsprotoAction?.Invoke(data,oldV,newV);
                 }
                     
             }

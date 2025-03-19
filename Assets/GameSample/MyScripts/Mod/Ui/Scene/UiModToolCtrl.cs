@@ -297,7 +297,7 @@ namespace Ui.ModSceneMain
                     break;
                 case 3:
                     {
-                        foreach (var data in MapTransitionMaskForm.DataById.Values)
+                        foreach (var data in MapMaskForm.DataById.Values)
                         {
                             conData.Add(new UiToolItemParam()
                             {
@@ -308,7 +308,7 @@ namespace Ui.ModSceneMain
                     break;
                 case 4:
                     {
-                        foreach (var data in MapItemForm.DataById.Values)
+                        foreach (var data in MapObjectForm.DataById.Values)
                         {
                             conData.Add(new UiToolItemParam()
                             {

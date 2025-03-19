@@ -80,7 +80,7 @@ namespace Z_Map.Analysis
                     }
             }
 
-            foreach (var obs in ItemUnitForm.DataByUid.Values)
+            foreach (var obs in ObjectUnitForm.DataByUid.Values)
             {
                 if (obs != null && obs.isObstacle)
                 {

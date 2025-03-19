@@ -18,7 +18,7 @@ namespace Ui.ModStoryMaterial
 {
     public partial class UiModStoryMaterialMaskModel
     {
-        public MapTransitionMaskForm.Data curData;
+        public MapMaskForm.Data curData;
         public int curMask;
         
     }
@@ -64,7 +64,7 @@ namespace Ui.ModStoryMaterial
             con.Clear();
 
 
-            foreach (var data in MapTransitionMaskForm.DataById.Values)
+            foreach (var data in MapMaskForm.DataById.Values)
             {
                 if (data.id > MapBaseForm.autoIdCnt)
                     continue;
@@ -136,7 +136,7 @@ namespace Ui.ModStoryMaterial
             view.img_8.color = show.Contains(8) ? Color.green : Color.white;
             view.img_9.color = show.Contains(9) ? Color.green : Color.white;
         }
-        public void SetCur(MapTransitionMaskForm.Data data,int maskId)
+        public void SetCur(MapMaskForm.Data data,int maskId)
         {
                 model.curData = data;
             if (maskId != -1)
@@ -148,9 +148,9 @@ namespace Ui.ModStoryMaterial
             if (!string.IsNullOrEmpty(evt.importAssetName)&&isActive)
             {
                 string key = GlobalHelper.GetTexNickName(evt.importAssetName);
-                if (MapTransitionMaskForm.DataByName.ContainsKey(key))
+                if (MapMaskForm.DataByName.ContainsKey(key))
                 {
-                    SetCur(MapTransitionMaskForm.DataByName[key], -1);
+                    SetCur(MapMaskForm.DataByName[key], -1);
                 }
             }
             Refresh();
@@ -207,7 +207,7 @@ namespace Ui.ModStoryMaterial
             if (model.id != -1)
             {
                 view.txt_name.text = parent.model.curData.name + "_" + model.id;
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetTexRealName(MapTransitionMaskForm.DataById[parent.model.curData.id].name, model.id));
+                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetTexRealName(MapMaskForm.DataById[parent.model.curData.id].name, model.id));
                 view.sta_item.ChangeState(parent.model.curMask == model.id ? 1 : 0);
             }
             else
@@ -240,7 +240,7 @@ namespace Ui.ModStoryMaterial
                 if (model.id == -1)
                 {
                     int max = 1;
-                    foreach (var o in MapTransitionMaskForm.DataById.Values)
+                    foreach (var o in MapMaskForm.DataById.Values)
                     {
                         var splt = o.name.Split("newMask");
                         if (splt.Length > 1)
@@ -256,7 +256,7 @@ namespace Ui.ModStoryMaterial
                 }
                 else
                 {
-                    parent.SetCur(MapTransitionMaskForm.DataById[model.id], 0);
+                    parent.SetCur(MapMaskForm.DataById[model.id], 0);
                     parent.Refresh();
                 }
             });
@@ -270,8 +270,8 @@ namespace Ui.ModStoryMaterial
         {
             if (model.id != -1)
             {
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetMaskRealName(MapTransitionMaskForm.DataById[model.id].name, 0));
-                view.txt_name.text = MapTransitionMaskForm.DataById[model.id].name;
+                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetMaskRealName(MapMaskForm.DataById[model.id].name, 0));
+                view.txt_name.text = MapMaskForm.DataById[model.id].name;
             }
             else
             {

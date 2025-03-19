@@ -7,7 +7,66 @@ using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Os.File;
 using Z_Texture;
+namespace Z_DataSystem.Form
+{
+    public enum Type
+    {
+        Int = 0,
+        Bool = 1,
+    }
 
+    public partial class ParamForm
+    {
+        static public Type GetValueType(this Data data)
+        {
+            return (Type)data.valueType;
+        }
+    }
+    public partial class ProductForm
+    {
+        static public object GetValue(this Data data, ParamForm.Data prm)
+        {
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                    (int, int, int) info = (((int, int, int))data.paramDic[prm.name]);
+                    return info.Item1;
+                case Type.Bool:
+                    return (bool)data.paramDic[prm.name];
+                default:
+                    return data.paramDic[prm.name];
+            }
+        }
+        static public object GetValueMin(this Data data, ParamForm.Data prm)
+        {
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                    (int, int, int) info = (((int, int, int))data.paramDic[prm.name]);
+                    return info.Item2;
+                case Type.Bool:
+                    return false;
+                default:
+                    return data.paramDic[prm.name];
+            }
+        }
+        static public object GetValueMax(this Data data, ParamForm.Data prm)
+        {
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                    (int, int, int) info = (((int, int, int))data.paramDic[prm.name]);
+                    return info.Item3;
+                case Type.Bool:
+                    return true;
+                default:
+                    return data.paramDic[prm.name];
+            }
+        }
+
+    }
+
+}
 namespace Z_DataSystem
 {
     public class AssetEvent : Z_Event

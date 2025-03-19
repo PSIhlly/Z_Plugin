@@ -88,12 +88,12 @@ namespace Z_Map
 
             viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
 
-            foreach (var itemData in ItemUnitForm.DataByUid.Values)
+            foreach (var objectData in ObjectUnitForm.DataByUid.Values)
             {
-                var mapPos = utilCtrl.RealPos2MapPos(itemData.pos);
+                var mapPos = utilCtrl.RealPos2MapPos(objectData.pos);
                 if (utilCtrl.InArea(mapPos))
                 {
-                    MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(itemData.unit);
+                    MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(objectData.unit);
                 }
             }
             foreach (var characterData in CharacterUnitForm.DataByUid.Values)
@@ -141,7 +141,7 @@ namespace Z_Map
         {
             return data.AddMap(mapPos);
         }
-        public ItemUnitForm.Data AddItem(Vector3 realPos)
+        public ObjectUnitForm.Data AddItem(Vector3 realPos)
         {
             var mapPos = utilCtrl.RealPos2MapPos(realPos);
             if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))

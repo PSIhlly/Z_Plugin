@@ -107,7 +107,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             if (!string.IsNullOrEmpty(nickName))
             {
                 //fill other
-                MapTransitionMaskForm.AddData(new MapTransitionMaskForm.Data(-1, nickName, ""));
+                MapMaskForm.AddData(new MapMaskForm.Data(-1, nickName, ""));
                 for (int i = 1; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
                 {
                     var curName = GlobalHelper.GetMaskRealName(nickName, i);
@@ -131,7 +131,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
 
         //change
-        MapTransitionMaskForm.DataByName[oldName].name = newName;
+        MapMaskForm.DataByName[oldName].name = newName;
 
     }
 
@@ -153,21 +153,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 AssetManager.instance.DeleteTexAssetAutoDel(_super.GetStoryFolder(), key);
             }
         }
-       MapTransitionMaskForm.RemoveData(MapTransitionMaskForm.DataByName[name].id);
+       MapMaskForm.RemoveData(MapMaskForm.DataByName[name].id);
     }
     #endregion
 
-    #region item
-    public void DeleteItem(string name)
+    #region object
+    public void DeleteObject(string name)
     {
         for (int i = 0; i < GlobalSettings.ITEM_UNIT_MAX; i++)
         {
             var realName = GlobalHelper.GetMaskRealName(name, i);
             AssetManager.instance.DeleteTexAssetAutoDel(_super.GetStoryFolder(), realName);
         }
-        MapItemForm.RemoveData(MapItemForm.DataByName[name].id);
+        MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
     }
-    public void DeleteItemUnit(string name,int id)
+    public void DeleteObjectUnit(string name,int id)
     {
         var key = GlobalHelper.GetItemTexRealName(name, id);
         if (TexAssetForm.DataByName.ContainsKey(key))
@@ -190,24 +190,24 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 lastExist++;
             }
         }
-        var data=MapItemForm.DataByName[name];
+        var data= MapObjectForm.DataByName[name];
         data.subPrefabUnitName.RemoveAt(id);
         data.subPrefabUnitPos.RemoveAt(id);
         data.subPrefabUnitScale.RemoveAt(id);
     }
-    public void CreateItem(string name)
+    public void CreateObject(string name)
     {
-        MapItemForm.AddData(new MapItemForm.Data(-1, name, "", true, new List<string>(), new List<Vector3>(), new List<Vector3>()));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", true, new List<string>(), new List<Vector3>(), new List<Vector3>()));
     }
-    public void CreateItemUnit(MapItemForm.Data data)
+    public void CreateObjectUnit(MapObjectForm.Data data)
     {
-        ImportItemTex(GlobalHelper.GetItemTexRealName(data.name, data.subPrefabUnitName.Count));
+        ImportObjectTex(GlobalHelper.GetItemTexRealName(data.name, data.subPrefabUnitName.Count));
 
         data.subPrefabUnitName.Add("Cube");
         data.subPrefabUnitPos.Add(Vector3.zero);
         data.subPrefabUnitScale.Add(Vector3.one);
     }
-    public void ImportItemTex(string realName)
+    public void ImportObjectTex(string realName)
     {
         //try del old
         AssetManager.instance.DeleteTexAssetAutoDel(_super.GetStoryFolder(), realName);
@@ -218,7 +218,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
-    public void RenameItem(string oldName, string newName)
+    public void RenameObject(string oldName, string newName)
     {
         for (int i = 0; i < GlobalSettings.ITEM_UNIT_MAX; i++)
         {
@@ -230,8 +230,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         }
         //change
-        MapItemForm.DataByName[oldName].name = newName;
+        MapObjectForm.DataByName[oldName].name = newName;
 
     }
+    #endregion
+
+    #region character
+
+    public void CreateCharacterArg(string name)
+    {
+        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0));
+    }
+    public void DeleteCharacterArg(string name)
+    {
+        CharacterParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
+    }
+
     #endregion
 }

@@ -24,7 +24,7 @@ namespace Z_Map
         {
 
             MapUnitForm.Clear();
-            ItemUnitForm.Clear();
+            ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
             mainData = MapMainForm.GetDataByJo(JObject.Parse(formData));
             maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
@@ -36,10 +36,10 @@ namespace Z_Map
                 RegisterMap(mapDatas[i]);
             }
 
-            var itemDatas = ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.itemJa));
+            var itemDatas = ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
             for (int i = 0; i < itemDatas.Count; i++)
             {
-                ItemUnitForm.AddData(itemDatas[i]);
+                ObjectUnitForm.AddData(itemDatas[i]);
             }
 
             var charactersDatas = CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
@@ -53,7 +53,7 @@ namespace Z_Map
         public JObject GetJsonData()
         {
             mainData.mapJa = JsonConvert.SerializeObject(MapUnitForm.GetJaByDatas());
-            mainData.itemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
+            mainData.objectJa = JsonConvert.SerializeObject(ObjectUnitForm.GetJaByDatas());
 
             mainData.characterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
             return MapMainForm.GetJoByData(mainData);
@@ -62,7 +62,7 @@ namespace Z_Map
         {
 
             MapUnitForm.Clear();
-            ItemUnitForm.Clear();
+            ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
             maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
             mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
@@ -134,10 +134,10 @@ namespace Z_Map
 
             return data;
         }
-        public ItemUnitForm.Data AddItem()
+        public ObjectUnitForm.Data AddItem()
         {
-            var data = new ItemUnitForm.Data(-1,false,"","", Vector3.zero, Vector3.zero,Vector3.one,0);
-            ItemUnitForm.AddData(data);
+            var data = new ObjectUnitForm.Data(-1,false,"","", Vector3.zero, Vector3.zero,Vector3.one,0);
+            ObjectUnitForm.AddData(data);
             return data;
         }
     }

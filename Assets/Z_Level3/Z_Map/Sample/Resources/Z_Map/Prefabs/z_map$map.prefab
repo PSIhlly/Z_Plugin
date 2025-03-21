@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1290203504941911350}
   - component: {fileID: 1290203504941911337}
   m_Layer: 0
-  m_Name: $map
+  m_Name: z_map$map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

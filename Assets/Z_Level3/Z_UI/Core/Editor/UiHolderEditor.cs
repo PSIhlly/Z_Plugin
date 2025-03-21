@@ -20,7 +20,7 @@ namespace Z_Ui_Editor
             //绘制输入框
             uiHolder.uiName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
 
-            if (uiHolder.uiType == UiType.Panel)
+            if (uiHolder.uiType == UiType.Panel&&uiHolder.GetComponentsInParent<UiHolder>(true).Length==1)
             {
                 uiHolder.path = EditorGUILayout.TextField("Path: ", uiHolder.path);
                 // 绘制按钮
@@ -53,6 +53,7 @@ namespace Z_Ui_Editor
             declareContent = "";
             initContent = "";
             bindContent = "";
+            subContent = "";
 
             Queue<Transform> queue = new Queue<Transform>();
 
@@ -72,15 +73,14 @@ namespace Z_Ui_Editor
                     {
                         case UiType.Panel:
                             bindContent += $@"
-            view.page_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
+            view.page_{subHolder.uiName} = new {subHolder.uiName}.Ui{subHolder.uiName}Ctrl();
             view.page_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
-            public Ui{subHolder.uiName}Ctrl page_{subHolder.uiName};";
+            public {subHolder.uiName}.Ui{subHolder.uiName}Ctrl page_{subHolder.uiName};";
                             initContent += $@"
-            page_{subHolder.uiName} = (Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
-
-                            subEditor.GenerateFile();
+            page_{subHolder.uiName} = ({subHolder.uiName}.Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
+                            subContent += subEditor.GetCode(uiHolder.uiName);
                             break;
                         case UiType.Model:
                             bindContent += $@"
@@ -207,11 +207,12 @@ namespace Z_Ui_Editor
         string GetCode(string parentClass="")
         {
             RefreshPanelElementContent();
-            switch (uiHolder.uiType)
+
+            var res = "";
+            if(string.IsNullOrEmpty(parentClass))
             {
-                case UiType.Panel:
-                case UiType.Model:
-                    return $@"
+                
+                res=$@"
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -219,6 +220,21 @@ using Z_Ui.Base;
 using Z_Ui;
 {namespaceContent}
 namespace Ui.{uiHolder.uiName}
+";
+            }else
+            {
+                res= $@"
+namespace {uiHolder.uiName}
+";
+            }
+
+            switch (uiHolder.uiType)
+            {
+                case UiType.Panel:
+                case UiType.Model:
+
+                    Debug.Log(uiHolder.name + " " + parentClass + " " + GetCoreCode(parentClass) + " " + uiHolder.uiType);
+                    return res+$@"
 {{
 {GetCoreCode(parentClass)}
 }}

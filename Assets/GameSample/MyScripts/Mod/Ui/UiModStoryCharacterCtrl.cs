@@ -42,8 +42,8 @@ namespace Ui.ModStoryCharacter
         {
             view.sta_args.ChangeState(model.select == 0 ? 1 : 0);
             view.sta_list.ChangeState(model.select == 1 ? 1 : 0);
-            view.sub_ModStoryCharacterArguments.SetActive(model.select == 0);
-            view.sub_ModStoryCharacterList.SetActive(model.select == 1);
+            view.page_ModStoryCharacterArguments.SetActive(model.select == 0);
+            view.page_ModStoryCharacterList.SetActive(model.select == 1);
         }
     }
 

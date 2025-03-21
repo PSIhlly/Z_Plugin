@@ -14,7 +14,7 @@ using Z_DataSystem.Form;
 namespace Form
 {
 
-    public static partial class CharacterPruductForm
+    public static partial class CharacterProductForm
     {
 
         
@@ -52,28 +52,91 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,Dictionary<string,object>,Dictionary<string,object>> changeParamdicAction;
+        public static Action<Data,Dictionary<string,(int,int,int)>,Dictionary<string,(int,int,int)>> changeParamdicAction;
                 
         public static Action<Data,bool,bool> changeIsprotoAction;
+                
+        public static Action<Data,List<string>,List<string>> changeAnimnameAction;
+                
+        public static Action<Data,List<Vector2>,List<Vector2>> changeAnimposAction;
+                
+        public static Action<Data,List<float>,List<float>> changeAnimtimeintervalAction;
                 
 
 
         public partial class Data : ProductForm.Data
         {
 
-            public Data(int uid,string name,Dictionary<string,object> paramDic,bool isProto):base(uid,name,paramDic,isProto)
+                    private List<string>  _animName;
+                    /// <summary>
+                    ///动画
+                    ///</summary>
+                    public List<string>  animName{
+                                get{return _animName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAnimname(this,_animName,value); 
+                    }
+        
+                _animName = value;
+                }
+                 
+                     }
+                    
+                    private List<Vector2>  _animPos;
+                    /// <summary>
+                    ///动画关键位置
+                    ///</summary>
+                    public List<Vector2>  animPos{
+                                get{return _animPos;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAnimpos(this,_animPos,value); 
+                    }
+        
+                _animPos = value;
+                }
+                 
+                     }
+                    
+                    private List<float>  _animTimeInterval;
+                    /// <summary>
+                    ///动画间隔
+                    ///</summary>
+                    public List<float>  animTimeInterval{
+                                get{return _animTimeInterval;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAnimtimeinterval(this,_animTimeInterval,value); 
+                    }
+        
+                _animTimeInterval = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animName,List<Vector2> animPos,List<float> animTimeInterval):base(uid,name,paramDic,isProto)
             {
 
              this.uid = uid;
              this.name = name;
              this.paramDic = paramDic;
              this.isProto = isProto;
+             this.animName = animName;
+             this.animPos = animPos;
+             this.animTimeInterval = animTimeInterval;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,object>(){},false);
+                   public static Data defaultData=new Data(0,"",new Dictionary<string,(int,int,int)>(){},false,null,null,null);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -169,9 +232,15 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<Dictionary<string,object>>("paramDic"),
+                jo.Get<Dictionary<string,(int,int,int)>>("paramDic"),
 
-                jo.Get<bool>("isProto")
+                jo.Get<bool>("isProto"),
+
+                jo.Get<List<string>>("animName"),
+
+                jo.Get<List<Vector2>>("animPos"),
+
+                jo.Get<List<float>>("animTimeInterval")
                     );
 
             return data;
@@ -187,9 +256,15 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<Dictionary<string,object>>("paramDic",data.paramDic);
+            jo.Set<Dictionary<string,(int,int,int)>>("paramDic",data.paramDic);
 
             jo.Set<bool>("isProto",data.isProto);
+
+            jo.Set<List<string>>("animName",data.animName);
+
+            jo.Set<List<Vector2>>("animPos",data.animPos);
+
+            jo.Set<List<float>>("animTimeInterval",data.animTimeInterval);
 
             return jo;
         }
@@ -282,7 +357,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,object> oldV,Dictionary<string,object> newV)
+            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,(int,int,int)> oldV,Dictionary<string,(int,int,int)> newV)
             {
                 if(superData is Data data)
                 {
@@ -298,6 +373,36 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeIsprotoAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAnimname(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAnimpos(Data superData,List<Vector2> oldV,List<Vector2> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimposAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAnimtimeinterval(Data superData,List<float> oldV,List<float> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
                 }
                     
             }

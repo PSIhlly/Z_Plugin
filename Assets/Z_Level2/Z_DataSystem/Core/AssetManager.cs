@@ -26,41 +26,134 @@ namespace Z_DataSystem.Form
     {
         static public object GetValue(this Data data, ParamForm.Data prm)
         {
+            data.TryInit(prm);
+            (int, int, int) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
                 case Type.Int:
-                    (int, int, int) info = (((int, int, int))data.paramDic[prm.name]);
                     return info.Item1;
                 case Type.Bool:
-                    return (bool)data.paramDic[prm.name];
+                    return info.Item1==1?true:false;
                 default:
                     return data.paramDic[prm.name];
             }
         }
         static public object GetValueMin(this Data data, ParamForm.Data prm)
         {
+            data.TryInit(prm);
+            (int, int, int) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
                 case Type.Int:
-                    (int, int, int) info = (((int, int, int))data.paramDic[prm.name]);
                     return info.Item2;
                 case Type.Bool:
-                    return false;
+                    return info.Item2==1?true:false;
                 default:
                     return data.paramDic[prm.name];
             }
         }
         static public object GetValueMax(this Data data, ParamForm.Data prm)
         {
+            data.TryInit(prm);
+            (int, int, int) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
                 case Type.Int:
-                    (int, int, int) info = (((int, int, int))data.paramDic[prm.name]);
                     return info.Item3;
                 case Type.Bool:
-                    return true;
+                    return info.Item3==1?true:false;
                 default:
                     return data.paramDic[prm.name];
+            }
+        }
+
+        static public void SetValue(this Data data, ParamForm.Data prm,object v)
+        {
+            data.TryInit(prm);
+            (int, int, int) info = data.paramDic[prm.name];
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                    info.Item1 = (int)v;
+                    break;
+                case Type.Bool:
+                    info.Item1 = ((bool)v) ? 1 : 0;
+                    break;
+                default:
+                    break;
+            }
+            data.paramDic[prm.name] = info;
+            data.CheckInt(prm);
+        }
+        static public void SetValueMin(this Data data, ParamForm.Data prm, object v)
+        {
+            data.TryInit(prm);
+
+            (int, int, int) info = data.paramDic[prm.name];
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                    info.Item2 = (int)v;
+                    break;
+                case Type.Bool:
+                    info.Item2 = ((bool)v)?1:0;
+                    break;
+                default:
+                    break;
+            }
+            data.paramDic[prm.name] = info;
+            data.CheckInt(prm);
+        }
+        static public void SetValueMax(this Data data, ParamForm.Data prm, object v)
+        {
+            data.TryInit(prm);
+            (int, int, int) info = data.paramDic[prm.name];
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                    info.Item3 = (int)v;
+                    break;
+                case Type.Bool:
+                    info.Item3 = ((bool)v) ? 1 : 0;
+                    break;
+                default:
+                    break;
+            }
+            data.paramDic[prm.name] = info;
+            data.CheckInt(prm);
+        }
+        static private void TryInit(this Data data, ParamForm.Data prm)
+        {
+            if (!data.paramDic.ContainsKey(prm.name))
+            {
+                switch(prm.GetValueType())
+                {
+                    case Type.Int:
+                        data.paramDic[prm.name] = (100, 0, 100);
+                        break;
+                    case Type.Bool:
+                        data.paramDic[prm.name] = (0, 0, 1);
+                        break;
+                }
+
+            }
+        }
+        static private void CheckInt(this Data data, ParamForm.Data prm)
+        {
+            data.TryInit(prm);
+            (int, int, int) v = data.paramDic[prm.name];
+            switch (prm.GetValueType())
+            {
+                case Type.Int:
+                case Type.Bool:
+
+                    if (v.Item1 < v.Item2)
+                        v.Item1 = v.Item2;
+                    if (v.Item1 > v.Item3)
+                        v.Item1 = v.Item3;
+
+                    data.paramDic[prm.name] = v;
+                    break;
             }
         }
 

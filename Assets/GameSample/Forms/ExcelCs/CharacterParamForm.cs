@@ -53,18 +53,32 @@ namespace Form
         public partial class Data : ParamForm.Data
         {
 
-            public Data(int uid,string name,int valueType):base(uid,name,valueType)
+                    private int  _SpecialType;
+                    /// <summary>
+                    ///Ãÿ ‚¿‡–Õ
+                    ///</summary>
+                    public int  SpecialType{
+                                get{return _SpecialType;}
+private set{
+        
+                _SpecialType = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,int valueType,int SpecialType):base(uid,name,valueType)
             {
 
              this.uid = uid;
              this.name = name;
              this.valueType = valueType;
+             this.SpecialType = SpecialType;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0);
+                   public static Data defaultData=new Data(0,"",0,0);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -87,6 +101,16 @@ namespace Form
                 }
             }
     
+            static Dictionary<int, Data> _DataBySpecialtype;
+            public static Dictionary<int, Data> DataBySpecialtype
+            {
+                get
+                {
+                    Init();
+                    return _DataBySpecialtype;
+                }
+            }
+    
 
         static public void Init()
         {
@@ -106,6 +130,10 @@ namespace Form
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
+    
+                    };
+    
+                    _DataBySpecialtype = new Dictionary<int, Data>() {
     
                     };
     
@@ -160,7 +188,9 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                    defaultData.valueType
+                    defaultData.valueType,
+
+                    defaultData.SpecialType
                     );
 
             return data;
@@ -197,6 +227,8 @@ namespace Form
     
                     DataByName[data.name]=data;
     
+                    DataBySpecialtype[data.SpecialType]=data;
+    
 ParamForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -213,6 +245,8 @@ ParamForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
+                    DataBySpecialtype.Remove(data.SpecialType);
+    
 ParamForm.RemoveData(uid);
             childRemoveAction?.Invoke(data);
         }
@@ -223,6 +257,8 @@ ParamForm.RemoveData(uid);
                     DataByUid.Clear();
     
                     DataByName.Clear();
+    
+                    DataBySpecialtype.Clear();
     
             uidChain.Clear();
         }

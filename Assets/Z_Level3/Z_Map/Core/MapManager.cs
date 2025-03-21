@@ -24,7 +24,7 @@ namespace Z_Map
     {
         public static string GetTexRealName(string nickName, int animId)
         {
-            return "b$" + nickName + "$" + animId;
+            return "z_map_b$" + nickName + "$" + animId;
         }
         public static string GetTexNickName(string realName)
         {
@@ -35,16 +35,16 @@ namespace Z_Map
         }
         public static string GetMaskRealName(string nickName, int maskId)
         {
-            return "a$" + nickName + "$" + maskId;
+            return "z_map_a$" + nickName + "$" + maskId;
         }
 
         public static string GetInternalPrefabName(string name)
         {
-            return "$" + name;
+            return "z_map$" + name;
         }
         public static string GetItemTexRealName(string nickName, int prefabId)
         {
-            return "c$" + nickName + "$" + prefabId;
+            return "z_map_c$" + nickName + "$" + prefabId;
         }
     }
 

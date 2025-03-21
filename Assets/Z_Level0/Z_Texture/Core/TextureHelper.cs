@@ -101,12 +101,12 @@ namespace Z_Texture
 
         public static void RenameTexture(string path,string oldFileName,string newFileName)
         {
-            path = Path.GetFullPath(path+"/"+ oldFileName);
+            var oldPath = Path.GetFullPath(path+"/"+ oldFileName);
             var newPath = Path.GetFullPath(path+"/"+ newFileName);
             if (textureCache.ContainsKey(path))
             {
-                var tex = textureCache[path];
-                textureCache.Remove(path);
+                var tex = textureCache[oldPath];
+                textureCache.Remove(oldPath);
                 textureCache[newPath] = tex;
                 File.Move(path, newPath);
             }

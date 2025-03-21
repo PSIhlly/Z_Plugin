@@ -16,6 +16,26 @@ using Z_Input;
 using Z_Map;
 using Z_Ui;
 using Z_UnitSystem;
+public static class GlobalSettings
+{
+    public static int CHARACTER_AVATA_MAX => Character.GlobalSettings.CHARACTER_AVATA_MAX;
+    public static int CHARACTER_ANIM_MAX => Character.GlobalSettings.CHARACTER_ANIM_MAX;
+    public static int TEX_ANIM_MAX =>  Z_Map.GlobalSettings.TEX_ANIM_MAX;
+    public static int ITEM_UNIT_MAX =>  Z_Map.GlobalSettings.ITEM_UNIT_MAX;
+    public static bool NAV_DEBUG =>  Z_Map.GlobalSettings.NAV_DEBUG;
+    public static bool MAP_SHOW_DEBUG =>  Z_Map.GlobalSettings.MAP_SHOW_DEBUG;
+    public static bool OVERLAY_HIDE =>  Z_Map.GlobalSettings.OVERLAY_HIDE;
+}
+    public static class GlobalHelper
+{
+    public static string GetCharacterAvatarName(string nickName, int id) => Character.GlobalHelper.GetCharacterAvatarName(nickName, id);
+    public static string GetCharacterAnimName(string nickName,string animName,int part, int id) => Character.GlobalHelper.GetCharacterAnimName(nickName, animName, part,id);
+    public static string GetTexRealName(string nickName, int animId) => Z_Map.GlobalHelper.GetTexRealName(nickName, animId);
+    public static string GetTexNickName(string realName) => Z_Map.GlobalHelper.GetTexNickName(realName);
+    public static string GetMaskRealName(string nickName, int maskId) => Z_Map.GlobalHelper.GetMaskRealName(nickName,maskId);
+    public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
+    public static string GetItemTexRealName(string nickName, int prefabId) => Z_Map.GlobalHelper.GetItemTexRealName(nickName, prefabId);
+}
 
 public class GameManager : Z_MonoManager<GameManager>
 {
@@ -52,6 +72,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public void Start()
     {
+
         UiManager.instance.ShowUi<UiEnterMainCtrl>();
     }
     public void Update()

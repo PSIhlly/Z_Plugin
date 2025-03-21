@@ -1,0 +1,105 @@
+using Form;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Z_Ui.Base;
+using Z_DataSystem.Form;
+
+namespace Ui.ModStoryCharacterListArguments
+{
+    public partial class UiModStoryCharacterListArgumentsParam
+    {
+        public CharacterProductForm.Data data;
+    }
+    public partial class UiModStoryCharacterListArgumentsModel
+    {
+        public CharacterProductForm.Data data;
+    }
+    public partial class UiModStoryCharacterListArgumentsCtrl
+    {
+
+        UiScrViewContainer<UiUnitCtrl> con;
+        public override void OnCreate()
+        {
+            con = new UiScrViewContainer<UiUnitCtrl>(view.go_unit,view.scr_units);
+            view.btn_back.onClick.AddListener(() =>
+            {
+                Close();
+            });
+        }
+        public override void OnShow()
+        {
+            model.data = param.data;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            con.Clear();
+            foreach(var data in CharacterParamForm.DataByUid.Values)
+            {
+                con.Add(new UiUnitParam()
+                {
+                    data = data
+                });
+            }
+            con.Refresh();
+        }
+    }
+    public partial class UiUnitModel
+    {
+        public CharacterParamForm.Data data;
+    }
+    public partial class UiUnitParam
+    {
+        public CharacterParamForm.Data data;
+    }
+    public partial class UiUnitCtrl
+    {
+        public override void OnCreate()
+        {
+            view.ipt_default.onFinishInput += s =>
+            {
+                if (int.TryParse(s, out var v))
+                {
+                    parent.model.data.SetValue(model.data,v);
+                    parent.Refresh();
+                }
+            };
+            view.ipt_max.onFinishInput += s =>
+            {
+                if (int.TryParse(s, out var v))
+                {
+                    parent.model.data.SetValueMax(model.data, v);
+                    parent.Refresh();
+                }
+            };
+            view.ipt_min.onFinishInput += s =>
+            {
+                if (int.TryParse(s, out var v))
+                {
+                    parent.model.data.SetValueMin(model.data, v);
+                    parent.Refresh();
+                }
+            };
+        }
+        public override void OnShow()
+        {
+            model.data = param.data;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            
+                var dataCache = parent.model.data;
+                view.txt_name.text = model.data.name;
+                view.ipt_default.Set(dataCache.GetValue(model.data).ToString());
+                view.ipt_min.Set(dataCache.GetValueMin(model.data).ToString());
+                view.ipt_max.Set(dataCache.GetValueMax(model.data).ToString());
+        }
+
+
+    }
+
+}

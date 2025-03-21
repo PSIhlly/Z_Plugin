@@ -8,7 +8,7 @@ using UnityEngine;
 using Z_Text;
 using Z_Ui.Base;
 
-namespace Ui.ModStoryCharacter
+namespace Ui.ModStoryCharacter.ModStoryCharacterArguments
 {
     public partial class UiModStoryCharacterArgumentsCtrl
     {

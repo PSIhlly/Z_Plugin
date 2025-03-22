@@ -22,7 +22,7 @@ public class GameUtilController: Z_Controller<GameManager>
         InstancePoolManager.instance.Clear();
         foreach (var form in GameObjectAssetForm.DataById.Values)
         {
-            if(form.name.StartsWith("$"))
+            if(form.name.StartsWith(GlobalHelper.GetInternalPrefabName("")))
             {
                 InstancePoolManager.instance.AddPool(form.go);
             }

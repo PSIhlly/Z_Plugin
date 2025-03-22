@@ -19,7 +19,7 @@ namespace Z_Map
         public Dictionary<(int,int,int), MapUnitForm.Data>maps;
         public Dictionary<(int,int),SortedSet<int>>mapXZ2Y;
 
-        string mapName = "$map";
+        string mapName => GlobalHelper.GetInternalPrefabName("map");
         public MapData(string formData)
         {
 

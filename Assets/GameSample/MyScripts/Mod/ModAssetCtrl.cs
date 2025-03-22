@@ -260,7 +260,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void CreateCharacter(string name)
     {
         AssetManager.instance.LoadTexBytesAutoAdd(Texture2D.blackTexture, _super.GetStoryFolder(), GlobalHelper.GetCharacterAvatarName(name,0));
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1,name,new Dictionary<string, (int,int,int)>(),true,new List<string>(),new List<Vector2>()));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1,name,new Dictionary<string, (int,int,int)>(),true,new List<string>(), new List<Vector2>(), new List<float>()));
     }
     public void DeleteCharacter(string name)
     {

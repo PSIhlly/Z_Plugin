@@ -84,7 +84,6 @@ namespace Ui.ModStoryObject
             });
             con.Refresh();
 
-            view.sta_exist.ChangeState(model.curData == null ? 0 : 1);
 
             if (model.curData != null)
             {
@@ -115,6 +114,7 @@ namespace Ui.ModStoryObject
 
             }
 
+            view.sta_exist.ChangeState(model.curData == null ? 0 : 1);
         }
 
         public void SetCur(MapObjectForm.Data data)

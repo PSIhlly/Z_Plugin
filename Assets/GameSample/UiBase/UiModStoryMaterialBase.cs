@@ -6,6 +6,7 @@ using Z_Ui.Base;
 using Z_Ui;
 
 namespace Ui.ModStoryMaterial
+
 {
 
 
@@ -121,49 +122,55 @@ namespace Ui.ModStoryMaterial
     public partial class UiModStoryMaterialTextureView:UiView
     {
 
-            public Sta sta_exist;
+            public Sta sta_show;
             public GameObject go_items;
             public ScrView scr_items;
-            public Img img_tex;
-            public Btn btn_play;
-            public Ipt ipt_intervalSet;
-            public Btn btn_replace;
-            public Btn btn_delete;
-            public Ipt ipt_name;
+            public Sta sta_innerId;
             public GameObject go_anims;
             public ScrView scr_anims;
             public GameObject go_textureItem;
             public UiTextureItemCtrl sub_TextureItem;
+            public Btn btn_play;
+            public Ipt ipt_intervalSet;
+            public Btn btn_delete;
+            public Ipt ipt_name;
             public Txt txt_play;
             public Txt txt_intervalSet;
-            public Txt txt_replace;
             public Txt txt_delete;
             public Txt txt_name;
+            public Img img_tex;
+            public Btn btn_replace;
+            public Btn btn_deleteId;
+            public Txt txt_replace;
+            public Txt txt_deleteId;
             public GameObject go_animTypeItem;
             public UiAnimTypeItemCtrl sub_AnimTypeItem;
         public UiModStoryMaterialTextureView(UiHolder uiHolder):base(uiHolder)
         {
 
-            sta_exist = uiHolder.elementTrsLst[0].GetComponent<Sta>();
+            sta_show = uiHolder.elementTrsLst[0].GetComponent<Sta>();
             go_items = uiHolder.elementTrsLst[1].gameObject;
             scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            img_tex = uiHolder.elementTrsLst[3].GetComponent<Img>();
-            btn_play = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            ipt_intervalSet = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            btn_replace = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_delete = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            ipt_name = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
-            go_anims = uiHolder.elementTrsLst[9].gameObject;
-            scr_anims = uiHolder.elementTrsLst[10].GetComponent<ScrView>();
-            go_textureItem = uiHolder.elementTrsLst[11].gameObject;
-            sub_TextureItem = (UiTextureItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
-            txt_play = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            txt_intervalSet = uiHolder.elementTrsLst[14].GetComponent<Txt>();
-            txt_replace = uiHolder.elementTrsLst[15].GetComponent<Txt>();
-            txt_delete = uiHolder.elementTrsLst[16].GetComponent<Txt>();
-            txt_name = uiHolder.elementTrsLst[17].GetComponent<Txt>();
-            go_animTypeItem = uiHolder.elementTrsLst[18].gameObject;
-            sub_AnimTypeItem = (UiAnimTypeItemCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
+            sta_innerId = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            go_anims = uiHolder.elementTrsLst[4].gameObject;
+            scr_anims = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
+            go_textureItem = uiHolder.elementTrsLst[6].gameObject;
+            sub_TextureItem = (UiTextureItemCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            btn_play = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            ipt_intervalSet = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            btn_delete = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            txt_play = uiHolder.elementTrsLst[12].GetComponent<Txt>();
+            txt_intervalSet = uiHolder.elementTrsLst[13].GetComponent<Txt>();
+            txt_delete = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            txt_name = uiHolder.elementTrsLst[15].GetComponent<Txt>();
+            img_tex = uiHolder.elementTrsLst[16].GetComponent<Img>();
+            btn_replace = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            btn_deleteId = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            txt_replace = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            txt_deleteId = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            go_animTypeItem = uiHolder.elementTrsLst[21].gameObject;
+            sub_AnimTypeItem = (UiAnimTypeItemCtrl) uiHolder.elementTrsLst[22].GetComponent<UiHolder>().ctrl;
         }
 
     }

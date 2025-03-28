@@ -12,38 +12,28 @@ using Z_Map;
 using Z_Ui;
 using Z_UnitSystem;
 
-public class ModManager : Z_MonoManager<ModManager>
+public class PlayManager : Z_MonoManager<PlayManager>
 {
 
     private string _folderName;
 
-    #region Save
-    public void SaveMaterial()
-    {
-
-    }
-
-
-    #endregion
-
-
     #region life
 
-    private InternalModSceneController _sceneCtrl;
-    public ExternalModSceneController sceneCtrl;
-    public ModAssetCtrl assetCtrl;
+     private InternalPlaySceneController _sceneCtrl;
+     public ExternalPlaySceneController sceneCtrl;
+    // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
         base.Init();
-        var __sceneCtrl = new ModSceneController(this);
+        var __sceneCtrl = new PlaySceneController(this);
         _sceneCtrl = __sceneCtrl;
         sceneCtrl = __sceneCtrl;
 
-        assetCtrl = new ModAssetCtrl(this);
+      //  assetCtrl = new ModAssetCtrl(this);
     }
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
-        _sceneCtrl.OnMouse(click,pos,dir);
+        _sceneCtrl.OnMouse(click, pos, dir);
     }
     public void Update()
     {
@@ -66,29 +56,13 @@ public class ModManager : Z_MonoManager<ModManager>
         {
             data = await Task.Run(() =>
             {
-                return GameManager.instance.saveCtrl.LoadScene(fileName);
+                return new MapData(SaveAndLoad.Load<string>(fileName));
             });
         }
         else
         {
-            //new
-            data = await Task.Run(() =>
-            {
-                var data=new MapData();
-                data.mainData.texsName.Clear();
-                data.mainData.masksName.Clear();
-                //special init
-                foreach (var o in MapTextureForm.DataById.Values)
-                {
-                    data.mainData.texsName.Add(o.name);
-                }
-                foreach (var o in MapMaskForm.DataById.Values)
-                {
-                    data.mainData.masksName.Add(o.name);
-                }
-
-                return data;
-            });
+            Debug.LogError("No Scene!");
+            return;
         }
 
         _sceneCtrl.Begin(data, fileName);
@@ -107,13 +81,17 @@ public class ModManager : Z_MonoManager<ModManager>
     }
 
     #endregion
+
     public string GetSceneFileName()
     {
-        return  _folderName + "/Core/"+ _sceneCtrl.fileName;
+        return Application.persistentDataPath + "/" + _folderName + "/" + _sceneCtrl.folderName + "/scene";
     }
-   
-    public string GetStoryCoreFolder()
+    public string GetSceneFolder()
     {
-        return _folderName+"/Core/";
+        return Application.persistentDataPath + "/" + _folderName + "/" + _sceneCtrl.folderName + "/";
+    }
+    public string GetStoryFolder()
+    {
+        return Application.persistentDataPath + "/" + _folderName + "/";
     }
 }

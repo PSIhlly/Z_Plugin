@@ -31,6 +31,10 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         StartLoadStory(fileName);
         ModManager.instance.BeginStory(fileName);
     }
+    public void StartLoadStoryPlay(string fileName)
+    {
+        StartLoadStory(fileName);
+    }
     public void StartLoadStory(string fileName)
     {
     }
@@ -62,7 +66,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
     public async void StartLoadScene(string fileName)
     {
-        GameManager.instance.utilCtrl.ResetPrefabPool();
+        GameManager.instance.saveCtrl.ResetPrefabPool();
     }
     public void UnloadSceneUgc()
     {

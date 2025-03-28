@@ -60,6 +60,11 @@ namespace Ui.ModStoryObject
             SetCur(null);
             Refresh();
         }
+
+        public override void Close()
+        {
+            GameManager.instance.saveCtrl.SaveObject(ModManager.instance.GetStoryCoreFolder());
+        }
         public override void OnDisable()
         {
             DisplayCameraAreaManager.instance.Hide();
@@ -90,7 +95,7 @@ namespace Ui.ModStoryObject
                 unitCon.Clear();
                 for (int i = 0; i < model.curData.subPrefabUnitName.Count; i++)
                 {
-                    var curKey = GlobalHelper.GetTexRealName(model.curData.name, i);
+                    var curKey = GlobalNameHelper.GetTexRealName(model.curData.name, i);
                     unitCon.Add(new UiUnitParam
                     {
                         id = i
@@ -107,8 +112,17 @@ namespace Ui.ModStoryObject
                 }
 
                 DisplayCameraAreaManager.instance.Clear();
+
+                List<string> texNameLst = new List<string>();
+                List<bool> showShaddowLst = new List<bool>();
+
+                for (int i = 0; i < model.curData.subPrefabUnitName.Count; i++)
+                {
+                    texNameLst.Add(GlobalNameHelper.GetObjectTexRealName(model.curData.name, i));
+                    showShaddowLst.Add(true);
+                }
                 var showGo= GameManager.instance.utilCtrl.CombineNewItemByPrefabs(
-                    model.curData.name, model.curData.subPrefabUnitName, model.curData.subPrefabUnitPos, model.curData.subPrefabUnitScale, false);
+                    model.curData.name, model.curData.subPrefabUnitName, texNameLst, model.curData.subPrefabUnitPos, model.curData.subPrefabUnitScale, showShaddowLst, false);
                 showGo.SetActive(true);
                 DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
 
@@ -126,7 +140,7 @@ namespace Ui.ModStoryObject
         {
             if (!string.IsNullOrEmpty(evt.importAssetName) && isActive)
             {
-                string key = GlobalHelper.GetTexNickName(evt.importAssetName);
+                string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
                 if (MapObjectForm.DataByName.ContainsKey(key))
                 {
                     SetCur(MapObjectForm.DataByName[key]);
@@ -223,7 +237,7 @@ namespace Ui.ModStoryObject
 
             view.btn_tex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportObjectTex(GlobalHelper.GetItemTexRealName(parent.model.curData.name,model.id));
+                ModManager.instance.assetCtrl.ImportObjectTex(GlobalNameHelper.GetObjectTexRealName(parent.model.curData.name,model.id));
             });
         }
         public override void OnShow()
@@ -237,7 +251,7 @@ namespace Ui.ModStoryObject
             if (model.id != -1)
             {
                 var dataCache = parent.model.curData;
-                view.img_tex.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetItemTexRealName(dataCache.name, model.id));
+                view.img_tex.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetObjectTexRealName(dataCache.name, model.id)].sprite;
 
                 view.ipt_posX.Set(dataCache.subPrefabUnitPos[model.id].x.ToString("0.##"));
                 view.ipt_posY.Set(dataCache.subPrefabUnitPos[model.id].y.ToString("0.##"));
@@ -309,7 +323,7 @@ namespace Ui.ModStoryObject
         {
             if (model.id != -1)
             {
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetItemTexRealName(MapObjectForm.DataById[model.id].name, 0));
+                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetObjectTexRealName(MapObjectForm.DataById[model.id].name, 0)].sprite;
                 view.txt_name.text = MapObjectForm.DataById[model.id].name;
             }
             else

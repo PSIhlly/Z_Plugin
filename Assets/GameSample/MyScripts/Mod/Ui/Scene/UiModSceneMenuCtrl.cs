@@ -61,8 +61,7 @@ namespace Ui.ModSceneMenu
         public void Save()
         {
             model.lastSaveTime = Time.time;
-            SaveAndLoad.Save(ModManager.instance.GetSceneFileName(), JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));//先只存地图的
-
+            GameManager.instance.saveCtrl.SaveScene(ModManager.instance.GetSceneFileName());
         }
         public void Exit()
         {

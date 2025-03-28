@@ -38,6 +38,11 @@ namespace Ui.ModStoryCharacter
         {
             Refresh();
         }
+
+        public override void Close()
+        {
+            GameManager.instance.saveCtrl.SaveCharacter(ModManager.instance.GetStoryCoreFolder());
+        }
         public void Refresh()
         {
             view.sta_args.ChangeState(model.select == 0 ? 1 : 0);

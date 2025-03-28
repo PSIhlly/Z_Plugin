@@ -38,6 +38,11 @@ namespace Ui.ModStoryMaterial
         {
             Refresh();
         }
+
+        public override void Close()
+        {
+            GameManager.instance.saveCtrl.SaveMaterial(ModManager.instance.GetStoryCoreFolder());
+        }
         public void Refresh()
         {
             view.sta_texture.ChangeState(model.select == 0 ? 1 : 0);
@@ -45,6 +50,7 @@ namespace Ui.ModStoryMaterial
             view.sub_ModStoryMaterialTexture.SetActive(model.select == 0);
             view.sub_ModStoryMaterialMask.SetActive(model.select == 1);
         }
+
     }
 
 }

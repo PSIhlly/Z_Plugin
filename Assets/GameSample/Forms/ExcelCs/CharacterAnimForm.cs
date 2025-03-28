@@ -14,35 +14,21 @@ using Z_DataSystem.Form;
 namespace Form
 {
 
-    public static partial class CharacterProductForm
+    public static partial class CharacterAnimForm
     {
-
-        
+public static readonly int autoUidCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-                ProductForm.childInitAction+=InitInternal;
 
-
-                ProductForm.childRemoveAction+=RemoveChildren;
-                ProductForm.childAddAction+=AddChildren;
-            
-
-            ProductForm.changeUidAction+=ChangeUid;
-
-            ProductForm.changeNameAction+=ChangeName;
-
-            ProductForm.changeParamdicAction+=ChangeParamdic;
-
-            ProductForm.changeIsprotoAction+=ChangeIsproto;
 
         }
         
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain =>ProductForm.uidChain;
+        public static Z_Chain.Chain uidChain ;
 
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
@@ -52,49 +38,100 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,Dictionary<string,(int,int,int)>,Dictionary<string,(int,int,int)>> changeParamdicAction;
+        public static Action<Data,List<(float,float)>,List<(float,float)>> changeAnimposAction;
                 
-        public static Action<Data,bool,bool> changeIsprotoAction;
-                
-        public static Action<Data,List<string>,List<string>> changeAnimjoAction;
+        public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
 
 
-        public partial class Data : ProductForm.Data
+        public partial class Data
         {
 
-                    private List<string>  _animJo;
+                    private int  _uid;
                     /// <summary>
-                    ///动画
+                    ///
                     ///</summary>
-                    public List<string>  animJo{
-                                get{return _animJo;}
+                    public int  uid{
+                                get{return _uid;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeAnimjo(this,_animJo,value); 
+                       ChangeUid(this,_uid,value); 
                     }
         
-                _animJo = value;
+                _uid = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo):base(uid,name,paramDic,isProto)
+                    private string  _name;
+                    /// <summary>
+                    ///名称
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private List<(float,float)>  _animPos;
+                    /// <summary>
+                    ///动画关键位置
+                    ///</summary>
+                    public List<(float,float)>  animPos{
+                                get{return _animPos;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAnimpos(this,_animPos,value); 
+                    }
+        
+                _animPos = value;
+                }
+                 
+                     }
+                    
+                    private float  _animTimeInterval;
+                    /// <summary>
+                    ///动画间隔
+                    ///</summary>
+                    public float  animTimeInterval{
+                                get{return _animTimeInterval;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAnimtimeinterval(this,_animTimeInterval,value); 
+                    }
+        
+                _animTimeInterval = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<(float,float)> animPos,float animTimeInterval)
             {
 
              this.uid = uid;
              this.name = name;
-             this.paramDic = paramDic;
-             this.isProto = isProto;
-             this.animJo = animJo;
+             this.animPos = animPos;
+             this.animTimeInterval = animTimeInterval;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,(int,int,int)>(){},false,null);
+                   public static Data defaultData=new Data(0,"",null,0f);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -107,49 +144,27 @@ namespace Form
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
-                }
-            }
-    
 
         static public void Init()
         {
 
-            ProductForm.Init();
-
+            InitInternal();
         }
         public static void InitInternal()
         {
             if(inited)
                 return;
             inited=true;  
-
-        
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByName = new Dictionary<string, Data>() {
-    
-                    };
-    
 
             childInitAction?.Invoke();
             
 
-            foreach(var data in DataByUid.Values)
-            {
-                ProductForm.AddData(data);
-            }
-
-
-        
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -190,11 +205,9 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<Dictionary<string,(int,int,int)>>("paramDic"),
+                jo.Get<List<(float,float)>>("animPos"),
 
-                jo.Get<bool>("isProto"),
-
-                jo.Get<List<string>>("animJo")
+                jo.Get<float>("animTimeInterval")
                     );
 
             return data;
@@ -210,11 +223,9 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<Dictionary<string,(int,int,int)>>("paramDic",data.paramDic);
+            jo.Set<List<(float,float)>>("animPos",data.animPos);
 
-            jo.Set<bool>("isProto",data.isProto);
-
-            jo.Set<List<string>>("animJo",data.animJo);
+            jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
             return jo;
         }
@@ -235,9 +246,7 @@ namespace Form
 
         DataByUid[data.uid]=data;
     
-                    DataByName[data.name]=data;
-    
-ProductForm.AddData(data);
+
             childAddAction?.Invoke(data);
             return data.uid;
         }
@@ -251,9 +260,7 @@ ProductForm.AddData(data);
 
                     DataByUid.Remove(data.uid);
     
-                    DataByName.Remove(data.name);
-    
-ProductForm.RemoveData(uid);
+
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -262,18 +269,16 @@ ProductForm.RemoveData(uid);
 
                     DataByUid.Clear();
     
-                    DataByName.Clear();
-    
             uidChain.Clear();
         }
 
-         private static void RemoveChildren(ProductForm.Data data)
+         private static void RemoveChildren(Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.uid);      
         }
-         private static void AddChildren(ProductForm.Data superData)
+         private static void AddChildren(Data superData)
         {
             Init();
             if(superData is Data data)
@@ -284,7 +289,7 @@ ProductForm.RemoveData(uid);
 
 
 
-            public static void ChangeUid(ProductForm.Data superData,int oldV,int newV)
+            public static void ChangeUid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -294,45 +299,32 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeName(ProductForm.Data superData,string oldV,string newV)
+            public static void ChangeName(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
- 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,(int,int,int)> oldV,Dictionary<string,(int,int,int)> newV)
+            public static void ChangeAnimpos(Data superData,List<(float,float)> oldV,List<(float,float)> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeParamdicAction?.Invoke(data,oldV,newV);
+                changeAnimposAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeIsproto(ProductForm.Data superData,bool oldV,bool newV)
+            public static void ChangeAnimtimeinterval(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIsprotoAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeAnimjo(Data superData,List<string> oldV,List<string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeAnimjoAction?.Invoke(data,oldV,newV);
+                changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
                 }
                     
             }

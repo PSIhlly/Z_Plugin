@@ -42,7 +42,7 @@ namespace Z_Map
         {
             return "z_map$" + name;
         }
-        public static string GetItemTexRealName(string nickName, int prefabId)
+        public static string GetObjectTexRealName(string nickName, int prefabId)
         {
             return "z_map_c$" + nickName + "$" + prefabId;
         }
@@ -331,6 +331,11 @@ namespace Z_Map
                         curMap.unit.VisOff();
                     }
                 }
+            }
+            foreach (var curMap in curMapLst)
+            {
+                if (curMap.unit.isVising)
+                    unitUtilCtrl.UpdateAnim((MapInstance)curMap.unit.ins);
             }
 
         }

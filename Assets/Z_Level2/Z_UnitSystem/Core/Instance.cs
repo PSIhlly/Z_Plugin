@@ -8,7 +8,7 @@ namespace Z_UnitSystem
     {
         public Unit unit;
         private BoxCollider[] _boxColliders;
-        protected bool vising;
+        public bool vising;
         public BoxCollider[] boxColliders
         {
             get

@@ -6,13 +6,28 @@ namespace Z_Texture
 {
     public static class TextureHelper
     {
-        private static Dictionary<string,Texture> textureCache=new Dictionary<string, Texture>();
-        private static Dictionary<Texture, Sprite> spriteCache = new Dictionary<Texture, Sprite>();
+
+
+        private static Texture2D _transparentTexture;
+        public static Texture2D transparentTexture
+        {
+            get 
+            {
+                if (_transparentTexture == null)
+                {
+                    _transparentTexture = new Texture2D(5, 5);
+                    for (int y = 0; y < 5; y++)
+                        for (int x = 0; x < 5; x++)
+                        {
+                            _transparentTexture.SetPixel(x, y, new Color(0,0,0,1));
+                        }
+                }
+                return _transparentTexture; 
+            }
+        }
+
         public static Texture GetTextureByPath(string path)
         {
-            path = Path.GetFullPath(path);
-            if (textureCache.ContainsKey(path))
-                return textureCache[path];
             Texture res;
             if(File.Exists(path))
             {
@@ -22,7 +37,6 @@ namespace Z_Texture
             {
                 res = InternalGetTextureByPathWithoutExtension(path);
             }
-            textureCache[path] = res;
             return res;
         }
         public static Texture GetTextureByByte(byte[] data)
@@ -31,85 +45,34 @@ namespace Z_Texture
             texture.LoadImage(data);
             return texture;
         }
-        public static Sprite GetSpriteByPath(string path,string basePath="")
+        public static Sprite GetSpriteByPath(string path)
         {
-            if(string.IsNullOrEmpty(basePath))
-            {
-                basePath = Application.dataPath;
-            }
-            path = basePath + path;
-            Texture tex;
-            if (textureCache.ContainsKey(path))
-            {
-                tex = textureCache[path];
-            }else
-            {
-                tex = GetTextureByPath(path);
-            }
-
-            if (spriteCache.ContainsKey(tex))
-            {
-                return spriteCache[tex];
-            }
-            else
-            {
+                var tex = GetTextureByPath(path);
                 var s = Sprite.Create((Texture2D)tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                spriteCache[tex] = s;
                 return s;
-            }
         }
         public static Sprite GetSpriteByTexture(Texture tex)
         {
-            if (spriteCache.ContainsKey(tex))
-                return spriteCache[tex];
-            var s = Sprite.Create((Texture2D)tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            spriteCache[tex] = s;
-            return s;
+            return Sprite.Create((Texture2D)tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
-        public static void SaveTexture(Texture2D tex, string folder, string fileName)
+
+        public static byte[] GetTextureByte(Texture2D tex)
         {
-            SaveTexture(tex.EncodeToPNG(), folder, fileName);
-        }
-        public static void SaveTexture(Texture2D tex, string folder, string fileName,Vector2Int forceSize)
-        {
-            SaveTexture(tex.EncodeToPNG(), folder, fileName);
+            return tex.EncodeToPNG();
         }
         
-        public static void SaveTexture(byte[] data,string folder,string fileName)
-        {
-            if(!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-            File.WriteAllBytes(folder+fileName, data);
-        }
+        
 
         public static void DeleteTexture(string path)
         {
-            path = Path.GetFullPath(path);
-            if (textureCache.ContainsKey(path))
-            {
-                var tex = textureCache[path];
-                File.Delete(path);
-                if (spriteCache.ContainsKey(tex))
-                {
-                    spriteCache.Remove(tex);
-                }
-                textureCache.Remove(path);
-            }
+            File.Delete(path);
         }
 
         public static void RenameTexture(string path,string oldFileName,string newFileName)
         {
             var oldPath = Path.GetFullPath(path+"/"+ oldFileName);
             var newPath = Path.GetFullPath(path+"/"+ newFileName);
-            if (textureCache.ContainsKey(path))
-            {
-                var tex = textureCache[oldPath];
-                textureCache.Remove(oldPath);
-                textureCache[newPath] = tex;
-                File.Move(path, newPath);
-            }
+            File.Move(oldPath, newPath);
         }
 
         #region util

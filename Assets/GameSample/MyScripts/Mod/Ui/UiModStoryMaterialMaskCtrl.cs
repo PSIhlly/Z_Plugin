@@ -36,12 +36,12 @@ namespace Ui.ModStoryMaterial
 
             view.btn_replace.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportMaskTex(GlobalHelper.GetMaskRealName(model.curData.name, model.curMask), null);
+                ModManager.instance.assetCtrl.ImportMaskTex(GlobalNameHelper.GetMaskRealName(model.curData.name, model.curMask));
             });
 
             view.btn_delete.onClick.AddListener(() =>
             {
-            ModManager.instance.assetCtrl.DeleteMaskTex(model.curData.name);
+                ModManager.instance.assetCtrl.DeleteMaskTex(model.curData.name);
                 SetCur(null, 0);
 
                 Refresh();
@@ -86,7 +86,7 @@ namespace Ui.ModStoryMaterial
                 maskCon.Clear();
                 for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
                 {
-                    var curKey = GlobalHelper.GetTexRealName(model.curData.name, i);
+                    var curKey = GlobalNameHelper.GetTexRealName(model.curData.name, i);
                     maskCon.Add(new UiMaskTypeItemParam
                     {
                         id = i
@@ -96,7 +96,7 @@ namespace Ui.ModStoryMaterial
             maskCon.Refresh();
             if (model.curData != null)
             {
-                view.img_tex.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetMaskRealName(model.curData.name,  model.curMask));
+                view.img_tex.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetMaskRealName(model.curData.name,  model.curMask)].sprite;
                 view.ipt_name.Set(model.curData.name);
             }
             switch((AlphaTexBasic5)model.curMask)
@@ -147,7 +147,7 @@ namespace Ui.ModStoryMaterial
         {
             if (!string.IsNullOrEmpty(evt.importAssetName)&&isActive)
             {
-                string key = GlobalHelper.GetTexNickName(evt.importAssetName);
+                string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
                 if (MapMaskForm.DataByName.ContainsKey(key))
                 {
                     SetCur(MapMaskForm.DataByName[key], -1);
@@ -177,7 +177,7 @@ namespace Ui.ModStoryMaterial
                     string res = null;
                     for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
                     {
-                        var curKey = GlobalHelper.GetMaskRealName(parent.model.curData.name, i);
+                        var curKey = GlobalNameHelper.GetMaskRealName(parent.model.curData.name, i);
                         if (!TexAssetForm.DataByName.ContainsKey(curKey))
                         {
                             res = curKey;
@@ -187,7 +187,8 @@ namespace Ui.ModStoryMaterial
 
                     if (!string.IsNullOrEmpty(res))
                     {
-                        ModManager.instance.assetCtrl.ImportMaskTex(res, null);
+                        ModManager.instance.assetCtrl.ImportMaskTex(res);
+                        parent.Refresh();
                     }
                 }
                 else
@@ -207,7 +208,7 @@ namespace Ui.ModStoryMaterial
             if (model.id != -1)
             {
                 view.txt_name.text = parent.model.curData.name + "_" + model.id;
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetTexRealName(MapMaskForm.DataById[parent.model.curData.id].name, model.id));
+                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetTexRealName(MapMaskForm.DataById[parent.model.curData.id].name, model.id)].sprite;
                 view.sta_item.ChangeState(parent.model.curMask == model.id ? 1 : 0);
             }
             else
@@ -251,8 +252,8 @@ namespace Ui.ModStoryMaterial
                             }
                         }
                     }
-                    var key = GlobalHelper.GetMaskRealName("newMask" + max, 0);
-                    ModManager.instance.assetCtrl.ImportMaskTex(key, "newMask" + max);
+                    var key = GlobalNameHelper.GetMaskRealName("newMask" + max, 0);
+                    ModManager.instance.assetCtrl.CreateMaskTex("newMask" + max);
                 }
                 else
                 {
@@ -270,7 +271,7 @@ namespace Ui.ModStoryMaterial
         {
             if (model.id != -1)
             {
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetMaskRealName(MapMaskForm.DataById[model.id].name, 0));
+                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetMaskRealName(MapMaskForm.DataById[model.id].name, 0)].sprite;
                 view.txt_name.text = MapMaskForm.DataById[model.id].name;
             }
             else

@@ -16,17 +16,22 @@ using Z_Input;
 using Z_Map;
 using Z_Ui;
 using Z_UnitSystem;
-public static class GlobalSettings
+
+public class CameraMoveEvent : Z_Event
+{
+
+}
+
+public static class GlobalMaxSettings
 {
     public static int CHARACTER_AVATA_MAX => Character.GlobalSettings.CHARACTER_AVATA_MAX;
     public static int CHARACTER_ANIM_MAX => Character.GlobalSettings.CHARACTER_ANIM_MAX;
+    public static int CHARACTER_PART_MAX => Character.GlobalSettings.CHARACTER_PART_MAX;
     public static int TEX_ANIM_MAX =>  Z_Map.GlobalSettings.TEX_ANIM_MAX;
-    public static int ITEM_UNIT_MAX =>  Z_Map.GlobalSettings.ITEM_UNIT_MAX;
-    public static bool NAV_DEBUG =>  Z_Map.GlobalSettings.NAV_DEBUG;
-    public static bool MAP_SHOW_DEBUG =>  Z_Map.GlobalSettings.MAP_SHOW_DEBUG;
+    public static int OBJECT_UNIT_MAX =>  Z_Map.GlobalSettings.ITEM_UNIT_MAX;
     public static bool OVERLAY_HIDE =>  Z_Map.GlobalSettings.OVERLAY_HIDE;
 }
-    public static class GlobalHelper
+    public static class GlobalNameHelper
 {
     public static string GetCharacterAvatarName(string nickName, int id) => Character.GlobalHelper.GetCharacterAvatarName(nickName, id);
     public static string GetCharacterAnimName(string nickName,string animName,int part, int id) => Character.GlobalHelper.GetCharacterAnimName(nickName, animName, part,id);
@@ -34,12 +39,19 @@ public static class GlobalSettings
     public static string GetTexNickName(string realName) => Z_Map.GlobalHelper.GetTexNickName(realName);
     public static string GetMaskRealName(string nickName, int maskId) => Z_Map.GlobalHelper.GetMaskRealName(nickName,maskId);
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
-    public static string GetItemTexRealName(string nickName, int prefabId) => Z_Map.GlobalHelper.GetItemTexRealName(nickName, prefabId);
+    public static string GetObjectTexRealName(string nickName, int prefabId) => Z_Map.GlobalHelper.GetObjectTexRealName(nickName, prefabId);
+}
+public static class GlobalDataHelper
+{
+    public static CharacterAnimForm.Data GetCharacterAnim(this CharacterProductForm.Data data, int id) => Character.GlobalHelper.GetAnim( data,  id);
+    public static void SaveCharacterAnim(this CharacterProductForm.Data data, int id, CharacterAnimForm.Data info) => Character.GlobalHelper.SaveAnim(data, id,info);
+
 }
 
 public class GameManager : Z_MonoManager<GameManager>
 {
     public GameUtilController utilCtrl;
+    public GameSaveController saveCtrl;
     public Vector2 downPos;
     public Material mat;
     public Mesh mesh;
@@ -51,6 +63,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
 
         utilCtrl = new GameUtilController(this);
+        saveCtrl = new GameSaveController(this);
 
         Application.targetFrameRate = 100;//先锁100帧
         //default Assets
@@ -59,7 +72,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))
         {
-            var lst = ItemForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load(ItemDefines.SAVE_NAME)));
+            var lst = ItemForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(ItemDefines.SAVE_NAME)));
             for (int i = 0; i < lst.Count; i++)
             {
                 ItemForm.DataById[lst[i].id].count = lst[i].count;
@@ -139,6 +152,7 @@ public class GameManager : Z_MonoManager<GameManager>
             if (id==0&&ui==null&& downPos != Vector2.zero )//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
             {
                 ModManager.instance.OnMouse(false, pos, dir);
+                PlayManager.instance.OnMouse(false, pos, dir);
             }
         };
 
@@ -159,6 +173,7 @@ public class GameManager : Z_MonoManager<GameManager>
             if (id == 0 && ui == null && downPos != Vector2.zero && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < dragDis2)
             {
                 ModManager.instance.OnMouse(true, pos, Vector3.zero);
+                PlayManager.instance.OnMouse(false, pos, Vector3.zero);
             }
             downPos = Vector2.zero;
         };

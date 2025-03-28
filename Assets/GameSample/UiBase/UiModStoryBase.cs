@@ -6,6 +6,7 @@ using Z_Ui.Base;
 using Z_Ui;
 
 namespace Ui.ModStory
+
 {
 
 
@@ -178,6 +179,7 @@ namespace Ui.ModStory
             public Btn btn_back;
             public UiModStoryScenePanelCtrl sub_ModStoryScenePanel;
             public UiModStoryModulePanelCtrl sub_ModStoryModulePanel;
+            public Btn btn_play;
             public Btn btn_scene;
             public Sta sta_scene;
             public Btn btn_module;
@@ -191,12 +193,13 @@ namespace Ui.ModStory
             btn_back = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sub_ModStoryScenePanel = (UiModStoryScenePanelCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             sub_ModStoryModulePanel = (UiModStoryModulePanelCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            btn_scene = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_scene = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_module = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_module = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            txt_scene = uiHolder.elementTrsLst[8].GetComponent<Txt>();
-            txt_module = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            btn_play = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            btn_scene = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_scene = uiHolder.elementTrsLst[6].GetComponent<Sta>();
+            btn_module = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_module = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            txt_scene = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            txt_module = uiHolder.elementTrsLst[10].GetComponent<Txt>();
         }
 
     }

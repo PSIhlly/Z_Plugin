@@ -41,7 +41,7 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
             };
             view.btn_avatar.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportCharacterAvatar(GlobalHelper.GetCharacterAvatarName(model.curData.name,0));
+                ModManager.instance.assetCtrl.ImportCharacterAvatar(GlobalNameHelper.GetCharacterAvatarName(model.curData.name,0));
                 Refresh();
             });
             view.btn_args.onClick.AddListener(() =>
@@ -53,7 +53,10 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
             });
             view.btn_model.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiModStoryCharacterListModelCtrl>();
+                UiManager.instance.ShowUi<UiModStoryCharacterListModelCtrl>(new UiModStoryCharacterListModelParam()
+                {
+                    data = model.curData
+                });
             });
         }
 
@@ -88,7 +91,7 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
             if (model.curData != null)
             {
                 view.ipt_name.Set(model.curData.name);
-                view.img_avatar.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetCharacterAvatarName(model.curData.name, 0));
+                view.img_avatar.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetCharacterAvatarName(model.curData.name, 0)].sprite;
             }
 
         }
@@ -152,7 +155,7 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
         {
             if (model.id != -1)
             {
-                view.img_.sprite = AssetManager.instance.GetSprite(GlobalHelper.GetCharacterAvatarName(CharacterProductForm.DataByUid[model.id].name,0));
+                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetCharacterAvatarName(CharacterProductForm.DataByUid[model.id].name,0)].sprite;
                 view.txt_name.text = CharacterProductForm.DataByUid[model.id].name;
             }
             else

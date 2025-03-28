@@ -33,7 +33,7 @@ namespace Z_DataSystem.Form
                 case Type.Int:
                     return info.Item1;
                 case Type.Bool:
-                    return info.Item1==1?true:false;
+                    return info.Item1 == 1 ? true : false;
                 default:
                     return data.paramDic[prm.name];
             }
@@ -47,7 +47,7 @@ namespace Z_DataSystem.Form
                 case Type.Int:
                     return info.Item2;
                 case Type.Bool:
-                    return info.Item2==1?true:false;
+                    return info.Item2 == 1 ? true : false;
                 default:
                     return data.paramDic[prm.name];
             }
@@ -61,13 +61,13 @@ namespace Z_DataSystem.Form
                 case Type.Int:
                     return info.Item3;
                 case Type.Bool:
-                    return info.Item3==1?true:false;
+                    return info.Item3 == 1 ? true : false;
                 default:
                     return data.paramDic[prm.name];
             }
         }
 
-        static public void SetValue(this Data data, ParamForm.Data prm,object v)
+        static public void SetValue(this Data data, ParamForm.Data prm, object v)
         {
             data.TryInit(prm);
             (int, int, int) info = data.paramDic[prm.name];
@@ -96,7 +96,7 @@ namespace Z_DataSystem.Form
                     info.Item2 = (int)v;
                     break;
                 case Type.Bool:
-                    info.Item2 = ((bool)v)?1:0;
+                    info.Item2 = ((bool)v) ? 1 : 0;
                     break;
                 default:
                     break;
@@ -126,7 +126,7 @@ namespace Z_DataSystem.Form
         {
             if (!data.paramDic.ContainsKey(prm.name))
             {
-                switch(prm.GetValueType())
+                switch (prm.GetValueType())
                 {
                     case Type.Int:
                         data.paramDic[prm.name] = (100, 0, 100);
@@ -159,6 +159,27 @@ namespace Z_DataSystem.Form
 
     }
 
+
+    public partial class TexAssetForm
+    {
+        public partial class Data
+        {
+            private Sprite _sprite;
+            public Sprite sprite
+            {
+                get
+                {
+                    if (_sprite == null)
+                    {
+                        _sprite = TextureHelper.GetSpriteByTexture(tex);
+                    }
+                    return _sprite;
+                }
+            }
+
+        }
+    }
+
 }
 namespace Z_DataSystem
 {
@@ -167,8 +188,24 @@ namespace Z_DataSystem
         public string importAssetName;
     }
 
+    public class AssetCacheCtroller : Z_Controller<AssetManager>
+    {
+        public AssetCacheCtroller(AssetManager super) : base(super)
+        {
+            Init(super);
+        }
+        private static Dictionary<string, Texture> textureCache = new Dictionary<string, Texture>();
+        private static Dictionary<Texture, Sprite> spriteCache = new Dictionary<Texture, Sprite>();
+    }
+
+
     public class AssetManager : Z_MonoManager<AssetManager>
     {
+        AssetCacheCtroller cacheCtrl;
+        public AssetManager()
+        {
+            cacheCtrl = new AssetCacheCtroller(this);
+        }
         public int assetDefaultIdCnt;
         #region all
         public AssetsRes LoadAssetsByFolder(string path, bool isRes)
@@ -199,7 +236,7 @@ namespace Z_DataSystem
                     string extension = Path.GetExtension(file).ToLower();
                     if (Array.Exists(SupportedImageExtensions, ext => ext == extension))
                     {
-                        res.texs.Add((Path.GetFileNameWithoutExtension(file), TextureHelper.GetTextureByPath(file)));
+                        res.texs.Add((Path.GetFullPath(file), TextureHelper.GetTextureByPath(file)));
                     }
                 }
             }
@@ -211,12 +248,12 @@ namespace Z_DataSystem
             var res = LoadAssetsByFolder(path, isRes);
             for (int i = 0; i < res.texs.Count; i++)
             {
-                TexAssetForm.AddData(new TexAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, res.texs[i].Item1, res.texs[i].Item2));
+                TexAssetForm.AddData(new TexAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, Path.GetFileName(res.texs[i].Item1), res.texs[i].Item2));
             }
 
             for (int i = 0; i < res.gos.Count; i++)
             {
-                GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, res.gos[i].Item1, res.gos[i].Item2));
+                GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, Path.GetFileName(res.gos[i].Item1), res.gos[i].Item2));
             }
         }
 
@@ -230,12 +267,11 @@ namespace Z_DataSystem
     };
         public class AssetsRes
         {
-            public List<(string,Texture)> texs = new List<(string, Texture)>();
-            public List<(string,GameObject)> gos = new List<(string, GameObject)>();
+            public List<(string, Texture)> texs = new List<(string, Texture)>();
+            public List<(string, GameObject)> gos = new List<(string, GameObject)>();
         }
         public class SelectTexTask
         {
-            public string tarPath;
             public string fileName;
             public Action<Texture2D> callback;
             public Vector2Int forceSize;
@@ -247,55 +283,42 @@ namespace Z_DataSystem
             {
                 if (data != null)
                 {
-                    var tex=(Texture2D)TextureHelper.GetTextureByByte(data);
+                    var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
 
-                    instance.LoadTexBytesAutoAdd(tex, tarPath, fileName);
-                    callback?.Invoke((Texture2D)TextureHelper.GetTextureByPath(tarPath + fileName));
+                    instance.LoadTex(tex, fileName);
+                    callback?.Invoke(tex);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {
                         importAssetName = fileName
-                    }) ;
+                    });
                 }
             }
         }
-        public void SelectTexToAutoAdd(string tarPath,string fileName, Vector2Int forceSize, Action<Texture2D> callback=null)
+        public void SelectTex(string fileName, Vector2Int forceSize, Action<Texture2D> callback = null)
         {
             SelectTexTask task = new SelectTexTask();
-            task.tarPath = tarPath;
             task.fileName = fileName;
             task.callback = callback;
             task.forceSize = forceSize;
             task.Run();
         }
-        public void LoadTexBytesAutoAdd(Texture2D tex, string path, string fileName, Vector2Int forceSize)
+        public void LoadTex(Texture2D tex, string name, Vector2Int forceSize)
         {
-            LoadTexBytesAutoAdd(TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y).EncodeToPNG(), path, fileName);
+            LoadTexBytes(TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y).EncodeToPNG(), name);
         }
-        public void LoadTexBytesAutoAdd(Texture2D tex, string path, string fileName)
+        public void LoadTex(Texture2D tex, string name)
         {
-            LoadTexBytesAutoAdd(tex.EncodeToPNG(), path, fileName);
+            LoadTexBytes(tex.EncodeToPNG(), name);
         }
-        public void LoadTexBytesAutoAdd(byte[] data,string path,string fileName)
+        public void LoadTexBytes(byte[] data, string name)
         {
-            TextureHelper.SaveTexture(data, path, fileName);
-            var tex = TextureHelper.GetTextureByPath(path+fileName);
-            TexAssetForm.AddData(new TexAssetForm.Data(-1, fileName, tex));
-        }
-        public Sprite GetSprite(string name)
-        {
-            if (!TexAssetForm.DataByName.ContainsKey(name))
-                return null;
-            return TextureHelper.GetSpriteByTexture(TexAssetForm.DataByName[name].tex);
+            var tex = TextureHelper.GetTextureByByte(data);
+            TexAssetForm.AddData(new TexAssetForm.Data(-1, name, tex));
         }
 
-      
-        public void DeleteTexAsset(string path,string fileName)
-        {
-            TextureHelper.DeleteTexture(path + fileName);
-        }
-        public void DeleteTexAssetAutoDel(string path, string fileName)
+        public void DeleteTexAsset(string path, string fileName)
         {
             DeleteTexAsset(path, fileName);
             if (!TexAssetForm.DataByName.ContainsKey(fileName))
@@ -303,9 +326,8 @@ namespace Z_DataSystem
             var data = TexAssetForm.DataByName[fileName];
             TexAssetForm.RemoveData(data.id);
         }
-        public void RenameTargetAssetAuto(string path,string oldName,string newName)
+        public void RenameTargetAsset(string oldName, string newName)
         {
-            TextureHelper.RenameTexture(path, oldName, newName);
             TexAssetForm.DataByName[oldName].name = newName;
         }
 
@@ -315,7 +337,7 @@ namespace Z_DataSystem
 
         public GameObject GetGameObject(string name)
         {
-            return GameObjectAssetForm.DataByName.ContainsKey(name) ?GameObjectAssetForm.DataByName[name].go:null;
+            return GameObjectAssetForm.DataByName.ContainsKey(name) ? GameObjectAssetForm.DataByName[name].go : null;
         }
 
         #endregion
@@ -324,9 +346,9 @@ namespace Z_DataSystem
         public void UnloadAllAuto()
         {
             List<AssetForm.Data> texDatas = new List<AssetForm.Data>(AssetForm.DataById.Values);
-            foreach(var data in texDatas)
+            foreach (var data in texDatas)
             {
-                if(data.id<= AssetForm.autoIdCnt)
+                if (data.id <= AssetForm.autoIdCnt)
                 {
                     TexAssetForm.DataById.Remove(data.id);
                 }

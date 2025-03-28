@@ -104,6 +104,16 @@ namespace Z_DataSystem.Form
                 }
             }
     
+            static Dictionary<Texture, List<Data>> _DatasByTex;
+            public static Dictionary<Texture, List<Data>> DatasByTex
+            {
+                get
+                {
+                    Init();
+                    return _DatasByTex;
+                }
+            }
+    
 
         static public void Init()
         {
@@ -126,6 +136,10 @@ namespace Z_DataSystem.Form
     
                     };
     
+                    _DatasByTex = new Dictionary<Texture, List<Data>>() {
+    
+                };
+
 
             childInitAction?.Invoke();
             
@@ -216,6 +230,8 @@ namespace Z_DataSystem.Form
     
                     DataByName[data.name]=data;
     
+                    DatasByTex[data.tex].Add(data);
+    
 AssetForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -232,6 +248,8 @@ AssetForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
+                    DatasByTex[data.tex].Remove(data);
+    
 AssetForm.RemoveData(id);
             childRemoveAction?.Invoke(data);
         }
@@ -242,6 +260,8 @@ AssetForm.RemoveData(id);
                     DataById.Clear();
     
                     DataByName.Clear();
+    
+                    DatasByTex.Clear();
     
             idChain.Clear();
         }
@@ -291,6 +311,9 @@ AssetForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
+                    DatasByTex[oldV].Remove(data);
+                    DatasByTex[newV].Add(data);
+ 
                 changeTexAction?.Invoke(data,oldV,newV);
                 }
                     

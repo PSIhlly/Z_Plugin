@@ -15,13 +15,10 @@ using Z_Map.Form;
 using Z_Time;
 using Z_Ui;
 using Z_UnitSystem;
-public class CameraMoveEvent:Z_Event
-{
 
-}
 public interface InternalModSceneController
 {
-    public string folderName { get;  }
+    public string fileName { get;  }
     public void Begin(MapData dataCtrl, string fileName);
     public void End();
     public void Update();
@@ -56,8 +53,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     bool enable = false;
     bool waitForActive = false;
     #region internal Var
-    private string _folderName;
-    public string folderName { get => _folderName; }
+    private string _fileName;
+    public string fileName { get => _fileName; }
     #endregion
 
     #region extern Var
@@ -92,7 +89,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     public void Begin(MapData dataCtrl,string fileName)
     {
-        this._folderName = fileName;
+        this._fileName = fileName;
         GameManager.instance.RegisterInputByUgc();
         MapManager.instance.Begin(dataCtrl);
         CameraInstance.instance.Register(Vector3.zero,Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize),5,15);
@@ -158,7 +155,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                         if (terrainData.step == 0)
                         {
-                            mapData.prefabName = GlobalHelper.GetInternalPrefabName(terrainData.prefabName);
+                            mapData.prefabName = GlobalNameHelper.GetInternalPrefabName(terrainData.prefabName);
                             mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), MapManager.instance.data.mainData.mapUnitSize);
 
                         }
@@ -187,7 +184,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 if (MapManager.instance.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                 {
                                     var cur = MapManager.instance.data.maps[(stepX, mapData.mapPos.y, stepZ)];
-                                    cur.prefabName = GlobalHelper.GetInternalPrefabName(terrainData.prefabName);
+                                    cur.prefabName = GlobalNameHelper.GetInternalPrefabName(terrainData.prefabName);
                                     switch (Z_Math.Graph.GetFourDirByEuler(angle))
                                     {
                                         case Z_Math.Graph.FourDir.Up:

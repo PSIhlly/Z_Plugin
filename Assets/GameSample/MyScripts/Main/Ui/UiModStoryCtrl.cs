@@ -37,6 +37,11 @@ namespace Ui.ModStory
                 model.curUi = view.sub_ModStoryScenePanel;
                 Refresh();
             });
+            view.btn_play.onClick.AddListener(() =>
+            {
+                Main2StoryManager.instance.UnloadStoryUgc();
+                Close();
+            });
         }
 
 

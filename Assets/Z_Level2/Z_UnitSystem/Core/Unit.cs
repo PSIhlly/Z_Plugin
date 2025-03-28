@@ -34,7 +34,7 @@ namespace Z_UnitSystem
         private int lastUpdateFrame;
         public bool isShowing => ins != null && ins.gameObject != null && ins.gameObject.activeSelf;
 
-        public bool isVising => isShowing&&ins.GetComponent<Renderer>().enabled;
+        public bool isVising => isShowing&&ins.vising;
 
         public virtual Type GetInsType()
         {

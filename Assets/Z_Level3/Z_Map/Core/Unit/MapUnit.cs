@@ -62,8 +62,7 @@ namespace Z_Map
         {
             base.UpdateInfo();
 
-            if (ins != null)
-                MapManager.instance.unitUtilCtrl.UpdateAnim((MapInstance)ins);
+            
         }
         
 

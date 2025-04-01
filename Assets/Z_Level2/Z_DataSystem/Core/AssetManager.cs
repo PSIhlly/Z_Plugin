@@ -169,6 +169,7 @@ namespace Z_DataSystem.Form
             {
                 get
                 {
+                    
                     if (_sprite == null)
                     {
                         _sprite = TextureHelper.GetSpriteByTexture(tex);
@@ -208,6 +209,8 @@ namespace Z_DataSystem
         }
         public int assetDefaultIdCnt;
         #region all
+       
+
         public AssetsRes LoadAssetsByFolder(string path, bool isRes)
         {
             AssetsRes res = new AssetsRes();
@@ -236,7 +239,8 @@ namespace Z_DataSystem
                     string extension = Path.GetExtension(file).ToLower();
                     if (Array.Exists(SupportedImageExtensions, ext => ext == extension))
                     {
-                        res.texs.Add((Path.GetFullPath(file), TextureHelper.GetTextureByPath(file)));
+                        var tex = TextureHelper.GetTextureByPath(file);
+                            res.texs.Add((Path.GetFullPath(file), tex));
                     }
                 }
             }
@@ -248,7 +252,7 @@ namespace Z_DataSystem
             var res = LoadAssetsByFolder(path, isRes);
             for (int i = 0; i < res.texs.Count; i++)
             {
-                TexAssetForm.AddData(new TexAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, Path.GetFileName(res.texs[i].Item1), res.texs[i].Item2));
+                TexAssetForm.AddData(new TexAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, Path.GetFileNameWithoutExtension(res.texs[i].Item1), res.texs[i].Item2));
             }
 
             for (int i = 0; i < res.gos.Count; i++)
@@ -272,8 +276,7 @@ namespace Z_DataSystem
         }
         public class SelectTexTask
         {
-            public string fileName;
-            public Action<Texture2D> callback;
+            public Action<Texture2D, string> callback;
             public Vector2Int forceSize;
             public void Run()
             {
@@ -286,20 +289,47 @@ namespace Z_DataSystem
                     var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
-
-                    instance.LoadTex(tex, fileName);
-                    callback?.Invoke(tex);
+                    var nm = tex.imageContentsHash.GetHashCode().ToString();
+                    instance.LoadTex(tex, nm);
+                    callback?.Invoke(tex, nm);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {
-                        importAssetName = fileName
+                        importAssetName = nm
                     });
                 }
             }
         }
-        public void SelectTex(string fileName, Vector2Int forceSize, Action<Texture2D> callback = null)
+        public List<string> GetTexAssetsByFolder(string path, bool isRes)
+        {
+            List<string> res = new List<string>();
+            if (isRes)
+            {
+                Texture2D[] textures = Resources.LoadAll<Texture2D>(path);
+                foreach (var tex in textures)
+                {
+                    res.Add(tex.name);
+                }
+
+            }
+            else
+            {
+                string[] allFiles = Directory.GetFiles(path);
+                // 过滤出图片文件
+                foreach (string file in allFiles)
+                {
+                    string extension = Path.GetExtension(file).ToLower();
+                    if (Array.Exists(SupportedImageExtensions, ext => ext == extension))
+                    {
+                        res.Add(file);
+                    }
+                }
+            }
+            return res;
+        }
+
+        public void SelectTex(Vector2Int forceSize, Action<Texture2D,string> callback = null)
         {
             SelectTexTask task = new SelectTexTask();
-            task.fileName = fileName;
             task.callback = callback;
             task.forceSize = forceSize;
             task.Run();

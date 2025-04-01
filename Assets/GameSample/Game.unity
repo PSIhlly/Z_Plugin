@@ -14520,7 +14520,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1614467867063972345, guid: fed789db9e891cd4bb07ea99b1f032d9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 25.00003
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 1614467867063972345, guid: fed789db9e891cd4bb07ea99b1f032d9, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -23074,7 +23074,7 @@ MonoBehaviour:
   subUiHolderLst:
   - {fileID: 1935404020}
   - {fileID: 1525176069}
-  uiType: 1
+  uiType: 0
   layer: 0
 --- !u!114 &803628307
 MonoBehaviour:
@@ -34010,7 +34010,7 @@ GameObject:
   - component: {fileID: 1169279268}
   - component: {fileID: 1169279267}
   m_Layer: 5
-  m_Name: go_animTypeItem
+  m_Name: go_unit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34049,7 +34049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiName: AnimTypeItem
+  uiName: Unit
   path: \Z_Level3\Z_UI\Sample\Ui\UiBase
   parent: {fileID: 2074982915}
   elementTrsLst:
@@ -37079,7 +37079,7 @@ GameObject:
   - component: {fileID: 1299145395}
   - component: {fileID: 1299145394}
   m_Layer: 5
-  m_Name: go_textureItem
+  m_Name: go_item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37118,7 +37118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiName: TextureItem
+  uiName: Item
   path: \Z_Level3\Z_UI\Sample\Ui\UiBase
   parent: {fileID: 2074982915}
   elementTrsLst:
@@ -45235,7 +45235,7 @@ GameObject:
   - component: {fileID: 1525176070}
   - component: {fileID: 1525176069}
   m_Layer: 5
-  m_Name: go_maskTypeItem
+  m_Name: go_unit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45274,7 +45274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiName: MaskTypeItem
+  uiName: Unit
   path: \Z_Level3\Z_UI\Sample\Ui\UiBase
   parent: {fileID: 803628306}
   elementTrsLst:
@@ -57751,7 +57751,7 @@ GameObject:
   - component: {fileID: 1935404021}
   - component: {fileID: 1935404020}
   m_Layer: 5
-  m_Name: go_maskItem
+  m_Name: go_item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57790,7 +57790,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiName: MaskItem
+  uiName: Item
   path: \Z_Level3\Z_UI\Sample\Ui\UiBase
   parent: {fileID: 803628306}
   elementTrsLst:
@@ -62385,11 +62385,11 @@ MonoBehaviour:
   - {fileID: 480741273}
   - {fileID: 719379905}
   - {fileID: 298606165}
+  - {fileID: 781287903}
   - {fileID: 1708451380}
   - {fileID: 1039095985}
   - {fileID: 2130491025}
   - {fileID: 505426052}
-  - {fileID: 781287903}
   - {fileID: 629786232}
   - {fileID: 1922739265}
   - {fileID: 2027751705}
@@ -62399,7 +62399,7 @@ MonoBehaviour:
   subUiHolderLst:
   - {fileID: 1299145394}
   - {fileID: 1169279267}
-  uiType: 1
+  uiType: 0
   layer: 0
 --- !u!114 &2074982916
 MonoBehaviour:

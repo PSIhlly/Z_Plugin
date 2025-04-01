@@ -14,7 +14,7 @@ using Z_Time;
 using Z_Text;
 using System;
 
-namespace Ui.ModStoryMaterial
+namespace Ui.ModStoryMaterial.ModStoryMaterialMask
 {
     public partial class UiModStoryMaterialMaskModel
     {
@@ -25,18 +25,18 @@ namespace Ui.ModStoryMaterial
 
     public partial class UiModStoryMaterialMaskCtrl : IZ_Listener<AssetEvent>
     {
-        UiScrViewContainer<UiMaskItemCtrl> con;
-        UiScrViewContainer<UiMaskTypeItemCtrl> maskCon;
+        UiScrViewContainer<UiItemCtrl> con;
+        UiScrViewContainer<UiUnitCtrl> maskCon;
 
         public override void OnCreate()
         {
             this.Register<AssetEvent>();
-            con = new UiScrViewContainer<UiMaskItemCtrl>(view.go_maskItem, view.scr_items);
-            maskCon = new UiScrViewContainer<UiMaskTypeItemCtrl>(view.go_maskTypeItem, view.scr_masks);
+            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            maskCon = new UiScrViewContainer<UiUnitCtrl>(view.go_unit, view.scr_masks);
 
             view.btn_replace.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportMaskTex(GlobalNameHelper.GetMaskRealName(model.curData.name, model.curMask));
+                ModManager.instance.assetCtrl.ImportMaskTex(model.curData.name, model.curMask);
             });
 
             view.btn_delete.onClick.AddListener(() =>
@@ -68,12 +68,12 @@ namespace Ui.ModStoryMaterial
             {
                 if (data.id > MapBaseForm.autoIdCnt)
                     continue;
-                con.Add(new UiMaskItemParam
+                con.Add(new UiItemParam
                 {
                     id = data.id
                 });
             }
-            con.Add(new UiMaskItemParam
+            con.Add(new UiItemParam
             {
                 id = -1
             });
@@ -84,10 +84,9 @@ namespace Ui.ModStoryMaterial
             if (model.curData != null)
             {
                 maskCon.Clear();
-                for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
+                for (int i = 0; i < model.curData.texsName.Count; i++)
                 {
-                    var curKey = GlobalNameHelper.GetTexRealName(model.curData.name, i);
-                    maskCon.Add(new UiMaskTypeItemParam
+                    maskCon.Add(new UiUnitParam
                     {
                         id = i
                     });
@@ -96,7 +95,7 @@ namespace Ui.ModStoryMaterial
             maskCon.Refresh();
             if (model.curData != null)
             {
-                view.img_tex.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetMaskRealName(model.curData.name,  model.curMask)].sprite;
+                view.img_tex.sprite = TexAssetForm.DataByName[model.curData.texsName[model.curMask]].sprite;
                 view.ipt_name.Set(model.curData.name);
             }
             switch((AlphaTexBasic5)model.curMask)
@@ -147,92 +146,25 @@ namespace Ui.ModStoryMaterial
         {
             if (!string.IsNullOrEmpty(evt.importAssetName)&&isActive)
             {
-                string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
+                /*string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
                 if (MapMaskForm.DataByName.ContainsKey(key))
                 {
                     SetCur(MapMaskForm.DataByName[key], -1);
-                }
+                }*/
             }
             Refresh();
         }
 
     }
-
-    public partial class UiMaskTypeItemModel
+    public partial class UiItemModel
     {
         public int id;
     }
-    public partial class UiMaskTypeItemParam
+    public partial class UiItemParam
     {
         public int id;
     }
-    public partial class UiMaskTypeItemCtrl
-    {
-        public override void OnCreate()
-        {
-            view.btn_item.onClick.AddListener(() =>
-            {
-                if (model.id == -1)
-                {
-                    string res = null;
-                    for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
-                    {
-                        var curKey = GlobalNameHelper.GetMaskRealName(parent.model.curData.name, i);
-                        if (!TexAssetForm.DataByName.ContainsKey(curKey))
-                        {
-                            res = curKey;
-                            break;
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(res))
-                    {
-                        ModManager.instance.assetCtrl.ImportMaskTex(res);
-                        parent.Refresh();
-                    }
-                }
-                else
-                {
-                    parent.SetCur(parent.model.curData, model.id);
-                    parent.Refresh();
-                }
-            });
-        }
-        public override void OnShow()
-        {
-            model.id = param.id;
-            Refresh();
-        }
-        public void Refresh()
-        {
-            if (model.id != -1)
-            {
-                view.txt_name.text = parent.model.curData.name + "_" + model.id;
-                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetTexRealName(MapMaskForm.DataById[parent.model.curData.id].name, model.id)].sprite;
-                view.sta_item.ChangeState(parent.model.curMask == model.id ? 1 : 0);
-            }
-            else
-            {
-                view.txt_name.text = TextManager.instance.GetTxt("new");
-                /*view.img_.sprite = Texture2D.whiteTexture;*/
-                view.sta_item.ChangeState(0);
-            }
-        }
-
-
-    }
-
-
-
-    public partial class UiMaskItemModel
-    {
-        public int id;
-    }
-    public partial class UiMaskItemParam
-    {
-        public int id;
-    }
-    public partial class UiMaskItemCtrl
+    public partial class UiItemCtrl
     {
         public override void OnCreate()
         {
@@ -252,8 +184,8 @@ namespace Ui.ModStoryMaterial
                             }
                         }
                     }
-                    var key = GlobalNameHelper.GetMaskRealName("newMask" + max, 0);
                     ModManager.instance.assetCtrl.CreateMaskTex("newMask" + max);
+                    parent.Refresh();
                 }
                 else
                 {
@@ -271,7 +203,7 @@ namespace Ui.ModStoryMaterial
         {
             if (model.id != -1)
             {
-                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetMaskRealName(MapMaskForm.DataById[model.id].name, 0)].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[MapMaskForm.DataById[model.id].texsName.Count>0? MapMaskForm.DataById[model.id].texsName[0]: ""].sprite;
                 view.txt_name.text = MapMaskForm.DataById[model.id].name;
             }
             else
@@ -284,5 +216,51 @@ namespace Ui.ModStoryMaterial
 
 
     }
+    public partial class UiUnitModel
+    {
+        public int id;
+    }
+    public partial class UiUnitParam
+    {
+        public int id;
+    }
+    public partial class UiUnitCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_item.onClick.AddListener(() =>
+            {
+                
+                    parent.SetCur(parent.model.curData, model.id);
+                    parent.Refresh();
+            });
+        }
+        public override void OnShow()
+        {
+            model.id = param.id;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            if (model.id != -1)
+            {
+                view.txt_name.text = parent.model.curData.name + "_" + model.id;
+                view.img_.sprite = TexAssetForm.DataByName[MapMaskForm.DataById[parent.model.curData.id].texsName[ model.id]].sprite;
+                view.sta_item.ChangeState(parent.model.curMask == model.id ? 1 : 0);
+            }
+            else
+            {
+                view.txt_name.text = TextManager.instance.GetTxt("new");
+                /*view.img_.sprite = Texture2D.whiteTexture;*/
+                view.sta_item.ChangeState(0);
+            }
+        }
+
+
+    }
+
+
+
+    
 }
 

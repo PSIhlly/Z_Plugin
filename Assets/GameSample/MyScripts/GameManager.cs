@@ -33,13 +33,7 @@ public static class GlobalMaxSettings
 }
     public static class GlobalNameHelper
 {
-    public static string GetCharacterAvatarName(string nickName, int id) => Character.GlobalHelper.GetCharacterAvatarName(nickName, id);
-    public static string GetCharacterAnimName(string nickName,string animName,int part, int id) => Character.GlobalHelper.GetCharacterAnimName(nickName, animName, part,id);
-    public static string GetTexRealName(string nickName, int animId) => Z_Map.GlobalHelper.GetTexRealName(nickName, animId);
-    public static string GetTexNickName(string realName) => Z_Map.GlobalHelper.GetTexNickName(realName);
-    public static string GetMaskRealName(string nickName, int maskId) => Z_Map.GlobalHelper.GetMaskRealName(nickName,maskId);
-    public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
-    public static string GetObjectTexRealName(string nickName, int prefabId) => Z_Map.GlobalHelper.GetObjectTexRealName(nickName, prefabId);
+     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
 }
 public static class GlobalDataHelper
 {

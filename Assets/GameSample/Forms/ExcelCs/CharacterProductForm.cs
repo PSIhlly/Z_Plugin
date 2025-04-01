@@ -52,6 +52,8 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
+        public static Action<Data,string,string> changeAvatartexnameAction;
+                
         public static Action<Data,Dictionary<string,(int,int,int)>,Dictionary<string,(int,int,int)>> changeParamdicAction;
                 
         public static Action<Data,bool,bool> changeIsprotoAction;
@@ -63,6 +65,24 @@ namespace Form
         public partial class Data : ProductForm.Data
         {
 
+                    private string  _avatarTexName;
+                    /// <summary>
+                    ///Í·ÏñÃû³Æ
+                    ///</summary>
+                    public string  avatarTexName{
+                                get{return _avatarTexName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAvatartexname(this,_avatarTexName,value); 
+                    }
+        
+                _avatarTexName = value;
+                }
+                 
+                     }
+                    
                     private List<string>  _animJo;
                     /// <summary>
                     ///¶¯»­
@@ -81,11 +101,12 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo):base(uid,name,paramDic,isProto)
+            public Data(int uid,string name,string avatarTexName,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo):base(uid,name,paramDic,isProto)
             {
 
              this.uid = uid;
              this.name = name;
+             this.avatarTexName = avatarTexName;
              this.paramDic = paramDic;
              this.isProto = isProto;
              this.animJo = animJo;
@@ -94,7 +115,7 @@ namespace Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,(int,int,int)>(){},false,null);
+                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(int,int,int)>(){},false,null);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -190,6 +211,8 @@ namespace Form
 
                 jo.Get<string>("name"),
 
+                jo.Get<string>("avatarTexName"),
+
                 jo.Get<Dictionary<string,(int,int,int)>>("paramDic"),
 
                 jo.Get<bool>("isProto"),
@@ -209,6 +232,8 @@ namespace Form
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<string>("avatarTexName",data.avatarTexName);
 
             jo.Set<Dictionary<string,(int,int,int)>>("paramDic",data.paramDic);
 
@@ -303,6 +328,16 @@ ProductForm.RemoveData(uid);
                     DataByName[newV]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAvatartexname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAvatartexnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -64,6 +64,8 @@ namespace Ui.ModStoryObject
         public override void Close()
         {
             GameManager.instance.saveCtrl.SaveObject(ModManager.instance.GetStoryCoreFolder());
+
+            base.Close();
         }
         public override void OnDisable()
         {
@@ -95,7 +97,6 @@ namespace Ui.ModStoryObject
                 unitCon.Clear();
                 for (int i = 0; i < model.curData.subPrefabUnitName.Count; i++)
                 {
-                    var curKey = GlobalNameHelper.GetTexRealName(model.curData.name, i);
                     unitCon.Add(new UiUnitParam
                     {
                         id = i
@@ -118,7 +119,7 @@ namespace Ui.ModStoryObject
 
                 for (int i = 0; i < model.curData.subPrefabUnitName.Count; i++)
                 {
-                    texNameLst.Add(GlobalNameHelper.GetObjectTexRealName(model.curData.name, i));
+                    texNameLst.Add(model.curData.subUnitTexsName[i]);
                     showShaddowLst.Add(true);
                 }
                 var showGo= GameManager.instance.utilCtrl.CombineNewItemByPrefabs(
@@ -140,11 +141,11 @@ namespace Ui.ModStoryObject
         {
             if (!string.IsNullOrEmpty(evt.importAssetName) && isActive)
             {
-                string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
+                /*string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
                 if (MapObjectForm.DataByName.ContainsKey(key))
                 {
                     SetCur(MapObjectForm.DataByName[key]);
-                }
+                }*/
             }
             Refresh();
         }
@@ -237,7 +238,7 @@ namespace Ui.ModStoryObject
 
             view.btn_tex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportObjectTex(GlobalNameHelper.GetObjectTexRealName(parent.model.curData.name,model.id));
+                ModManager.instance.assetCtrl.ImportObjectTex(parent.model.curData.name,model.id);
             });
         }
         public override void OnShow()
@@ -251,7 +252,7 @@ namespace Ui.ModStoryObject
             if (model.id != -1)
             {
                 var dataCache = parent.model.curData;
-                view.img_tex.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetObjectTexRealName(dataCache.name, model.id)].sprite;
+                view.img_tex.sprite = TexAssetForm.DataByName[dataCache.subUnitTexsName[model.id]].sprite;
 
                 view.ipt_posX.Set(dataCache.subPrefabUnitPos[model.id].x.ToString("0.##"));
                 view.ipt_posY.Set(dataCache.subPrefabUnitPos[model.id].y.ToString("0.##"));
@@ -323,7 +324,7 @@ namespace Ui.ModStoryObject
         {
             if (model.id != -1)
             {
-                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetObjectTexRealName(MapObjectForm.DataById[model.id].name, 0)].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[MapObjectForm.DataById[model.id].subUnitTexsName.Count>0? MapObjectForm.DataById[model.id].subUnitTexsName [0]: ""].sprite;
                 view.txt_name.text = MapObjectForm.DataById[model.id].name;
             }
             else

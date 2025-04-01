@@ -19,7 +19,7 @@ using Z_UnitSystem;
 public interface InternalModSceneController
 {
     public string fileName { get;  }
-    public void Begin(MapData dataCtrl, string fileName);
+    public void Begin(string fileName);
     public void End();
     public void Update();
     public void OnMouse(bool click, Vector3 pos, Vector3 dir);
@@ -87,11 +87,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     #endregion
 
 
-    public void Begin(MapData dataCtrl,string fileName)
+    public void Begin(string fileName)
     {
         this._fileName = fileName;
         GameManager.instance.RegisterInputByUgc();
-        MapManager.instance.Begin(dataCtrl);
         CameraInstance.instance.Register(Vector3.zero,Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize),5,15);
         CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500),MapManager.instance.data.mainData.mapUnitSize);
         enable = true;

@@ -24,7 +24,11 @@ namespace Z_Map
 
         public Dictionary<(string, int), Texture2D> alphaTextureDic=new Dictionary<(string, int), Texture2D>();
         public Dictionary<string, List<Texture2D>> animTextureDic=new Dictionary<string, List<Texture2D>>();
-
+        public void Reset()
+        {
+            alphaTextureDic.Clear();
+            animTextureDic.Clear();
+        }
         public void CreateTexAnimVariants(string name, Texture2D[] rawAnimTex)
         {
             if (rawAnimTex == null || rawAnimTex.Length == 0 || rawAnimTex[0] == null)
@@ -665,9 +669,7 @@ namespace Z_Map
                 ins.renderers[i].GetPropertyBlock(propBlock);
                 if (data.texNameDic.ContainsKey(i))
                 {
-
-
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[GlobalHelper.GetTexRealName(data.texNameDic[i], 0)].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[data.texNameDic[i]].tex);
                     if (data.alphaTexNameDic.ContainsKey(i))
                     {
                         int linkDesc = 0;

@@ -54,6 +54,8 @@ namespace Form
                 
         public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
+        public static Action<Data,List<string>,List<string>> changeTexsnameAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -77,19 +79,38 @@ namespace Form
                  
                      }
                     
-            public Data(int id,string name,string icon,float animTimeInterval):base(id,name,icon)
+                    private List<string>  _texsName;
+                    /// <summary>
+                    ///ÌùÍ¼Ãû³Æ
+                    ///</summary>
+                    public List<string>  texsName{
+                                get{return _texsName;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeTexsname(this,_texsName,value); 
+                    }
+        
+                _texsName = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName):base(id,name,icon)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
              this.animTimeInterval = animTimeInterval;
+             this.texsName = texsName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",0f);
+                   public static Data defaultData=new Data(0,"","",0f,null);
 
 
             static Dictionary<int, Data> _DataById;
@@ -129,11 +150,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","",0f)},
+                {200001,new Data(200001,"floor","",0f,new List<string>(){"z_map_b$floor$0",})},
 
-                {200002,new Data(200002,"grass","",0f)},
+                {200002,new Data(200002,"grass","",0f,new List<string>(){"z_map_b$grass$0",})},
 
-                {200003,new Data(200003,"road","",0f)},
+                {200003,new Data(200003,"road","",0f,new List<string>(){"z_map_b$road$0",})},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -199,7 +220,9 @@ namespace Form
 
                 jo.Get<string>("icon"),
 
-                jo.Get<float>("animTimeInterval")
+                jo.Get<float>("animTimeInterval"),
+
+                jo.Get<List<string>>("texsName")
                     );
 
             return data;
@@ -218,6 +241,8 @@ namespace Form
             jo.Set<string>("icon",data.icon);
 
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
+
+            jo.Set<List<string>>("texsName",data.texsName);
 
             return jo;
         }
@@ -326,6 +351,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTexsname(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTexsnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

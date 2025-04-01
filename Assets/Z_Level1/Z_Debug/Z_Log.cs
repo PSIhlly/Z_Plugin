@@ -34,6 +34,29 @@ namespace Z_Debug
                 p += maxLength;
             }
         }
+        public static void Log(Texture2D tex)
+        {
+            Debug.Log(tex.name+":");
+            var t = "";
+            for (int i = 0; i < Mathf.Min(100,tex.width); i++)
+            {
+                for (int j = 0; j < Mathf.Min(100, tex.height); j++)
+                {
+                    if(tex.GetPixel(i, j).r> tex.GetPixel(i, j).g&& tex.GetPixel(i, j).r > tex.GetPixel(i, j).b)
+                        t += "<color=red>" + ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + "</color> ";
+                    else if (tex.GetPixel(i, j).g > tex.GetPixel(i, j).r && tex.GetPixel(i, j).g > tex.GetPixel(i, j).b)
+                        t += "<color=green>" + ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + "</color> ";
+                    else if (tex.GetPixel(i, j).b > tex.GetPixel(i, j).r && tex.GetPixel(i, j).b > tex.GetPixel(i, j).g)
+                        t += "<color=blue>"+((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + "</color> ";
+                    else
+                        t +=  ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + " ";
+
+                }
+                t += "\n";
+            }
+                Debug.Log(t);
+            
+        }
         public static void LogErr(string str)
         {
             Debug.LogError(str);

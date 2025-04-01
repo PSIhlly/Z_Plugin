@@ -42,6 +42,7 @@ namespace Ui.ModStoryCharacter
         public override void Close()
         {
             GameManager.instance.saveCtrl.SaveCharacter(ModManager.instance.GetStoryCoreFolder());
+            base.Close();
         }
         public void Refresh()
         {

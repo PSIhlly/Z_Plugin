@@ -131,14 +131,22 @@ namespace Z_DataSystem.Form
 
                 _DataById = new Dictionary<int, Data>() {
 
+                {100001,new Data(100001,"",Texture2D.blackTexture)},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
+    
+                        {"",_DataById[100001]},
     
                     };
     
                     _DatasByTex = new Dictionary<Texture, List<Data>>() {
     
+                            {Texture2D.blackTexture,new List<Data>()},
+        
                 };
+
+                    _DatasByTex[Texture2D.blackTexture].Add(_DataById[100001]);
 
 
             childInitAction?.Invoke();
@@ -191,7 +199,7 @@ namespace Z_DataSystem.Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<Texture>("tex")
+                    defaultData.tex
                     );
 
             return data;
@@ -206,8 +214,6 @@ namespace Z_DataSystem.Form
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
-
-            jo.Set<Texture>("tex",data.tex);
 
             return jo;
         }
@@ -230,6 +236,8 @@ namespace Z_DataSystem.Form
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByTex.ContainsKey(data.tex))
+                        DatasByTex[data.tex]=new List<Data>();
                     DatasByTex[data.tex].Add(data);
     
 AssetForm.AddData(data);

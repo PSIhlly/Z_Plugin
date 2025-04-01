@@ -60,6 +60,8 @@ namespace Form
                 
         public static Action<Data,List<Vector3>,List<Vector3>> changeSubprefabunitscaleAction;
                 
+        public static Action<Data,List<string>,List<string>> changeSubunittexsnameAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -137,7 +139,25 @@ namespace Form
                  
                      }
                     
-            public Data(int id,string name,string icon,bool isObstacle,List<string> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale):base(id,name,icon)
+                    private List<string>  _subUnitTexsName;
+                    /// <summary>
+                    ///×ÓÔ¤ÖÆ¼þ
+                    ///</summary>
+                    public List<string>  subUnitTexsName{
+                                get{return _subUnitTexsName;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeSubunittexsname(this,_subUnitTexsName,value); 
+                    }
+        
+                _subUnitTexsName = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string icon,bool isObstacle,List<string> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale,List<string> subUnitTexsName):base(id,name,icon)
             {
 
              this.id = id;
@@ -147,12 +167,13 @@ namespace Form
              this.subPrefabUnitName = subPrefabUnitName;
              this.subPrefabUnitPos = subPrefabUnitPos;
              this.subPrefabUnitScale = subPrefabUnitScale;
+             this.subUnitTexsName = subUnitTexsName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,null,null,null);
+                   public static Data defaultData=new Data(0,"","",false,null,new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},new List<string>(){"z_map_b$floor$0",});
 
 
             static Dictionary<int, Data> _DataById;
@@ -192,7 +213,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","",false,new List<string>(){"Cube",},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){new Vector3(1,2,0.5f),})},
+                {400001,new Data(400001,"wall","",false,new List<string>(){"Cube",},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},new List<string>(){"z_map_b$floor$0",})},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -260,7 +281,9 @@ namespace Form
 
                 jo.Get<List<Vector3>>("subPrefabUnitPos"),
 
-                jo.Get<List<Vector3>>("subPrefabUnitScale")
+                jo.Get<List<Vector3>>("subPrefabUnitScale"),
+
+                jo.Get<List<string>>("subUnitTexsName")
                     );
 
             return data;
@@ -285,6 +308,8 @@ namespace Form
             jo.Set<List<Vector3>>("subPrefabUnitPos",data.subPrefabUnitPos);
 
             jo.Set<List<Vector3>>("subPrefabUnitScale",data.subPrefabUnitScale);
+
+            jo.Set<List<string>>("subUnitTexsName",data.subUnitTexsName);
 
             return jo;
         }
@@ -423,6 +448,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeSubprefabunitscaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSubunittexsname(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSubunittexsnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -14,7 +14,7 @@ using Z_Time;
 using Z_Text;
 using System;
 
-namespace Ui.ModStoryMaterial
+namespace Ui.ModStoryMaterial.ModStoryMaterialTexture
 {
     public partial class UiModStoryMaterialTextureModel
     {
@@ -55,19 +55,19 @@ namespace Ui.ModStoryMaterial
 
     public partial class UiModStoryMaterialTextureCtrl : IZ_Listener<AssetEvent>
     {
-        UiScrViewContainer<UiTextureItemCtrl> con;
-        UiScrViewContainer<UiAnimTypeItemCtrl> animCon;
+        UiScrViewContainer<UiItemCtrl> con;
+        UiScrViewContainer<UiUnitCtrl> animCon;
 
         public override void OnCreate()
         {
             this.Register<AssetEvent>();
             model.RefreshAct = Refresh;
-            con = new UiScrViewContainer<UiTextureItemCtrl>(view.go_textureItem, view.scr_items);
-            animCon = new UiScrViewContainer<UiAnimTypeItemCtrl>(view.go_animTypeItem, view.scr_anims);
+            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            animCon = new UiScrViewContainer<UiUnitCtrl>(view.go_unit, view.scr_anims);
 
             view.btn_replace.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportAnimTex(GlobalNameHelper.GetTexRealName(model.curData.name, model.curAnim));
+                ModManager.instance.assetCtrl.ImportAnimTex(model.curData.name, model.curAnim);
             });
             view.btn_play.onClick.AddListener(() =>
             {
@@ -90,12 +90,12 @@ namespace Ui.ModStoryMaterial
                 Refresh();
             });
 
-       
-        view.ipt_name.onFinishInput += (v) =>
-            {
-                ModManager.instance.assetCtrl.RenameAnimTex(model.curData.name, v);
-                Refresh();
-            };
+
+            view.ipt_name.onFinishInput += (v) =>
+                {
+                    ModManager.instance.assetCtrl.RenameAnimTex(model.curData.name, v);
+                    Refresh();
+                };
             view.ipt_intervalSet.onFinishInput += (v) =>
             {
                 if (float.TryParse(v, out var itv))
@@ -125,38 +125,30 @@ namespace Ui.ModStoryMaterial
             {
                 if (data.id > MapBaseForm.autoIdCnt)
                     continue;
-                con.Add(new UiTextureItemParam
+                con.Add(new UiItemParam
                 {
                     id = data.id
                 });
             }
-            con.Add(new UiTextureItemParam
+            con.Add(new UiItemParam
             {
                 id = -1
             });
             con.Refresh();
 
-            view.sta_show.ChangeState(model.curData == null ? 0 : 1);
-            view.sta_innerId.ChangeState(model.curAnim==-1 ? 0 : 1);
             animCon.Clear();
             if (model.curData != null)
             {
 
-                for (int i = 0; i < GlobalMaxSettings.TEX_ANIM_MAX; i++)
+                for (int i = 0; i < model.curData.texsName.Count; i++)
                 {
-                    var curKey = GlobalNameHelper.GetTexRealName(model.curData.name, i);
-                    if (TexAssetForm.DataByName.ContainsKey(curKey))
+                    animCon.Add(new UiUnitParam
                     {
-                        animCon.Add(new UiAnimTypeItemParam
-                        {
-                            id = i
-                        });
-                    }
-                    else
-                        break;
+                        id = i
+                    });
                 }
 
-                animCon.Add(new UiAnimTypeItemParam
+                animCon.Add(new UiUnitParam
                 {
                     id = -1
                 });
@@ -165,7 +157,10 @@ namespace Ui.ModStoryMaterial
 
                 if (model.curData != null)
                 {
-                    view.img_tex.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetTexRealName(model.curData.name, model.playing >= 0 ? model.playing % (animCon.paramLst.Count - 1) : model.curAnim)].sprite;
+                    if (model.curAnim != -1)
+                        view.img_tex.sprite = TexAssetForm.DataByName[model.curData.texsName[model.playing >= 0 ? model.playing % (animCon.paramLst.Count - 1) : model.curAnim]].sprite;
+                    else
+                        view.img_tex.sprite = TextureHelper.transparentSprite;
                     view.ipt_name.Set(model.curData.name);
                     view.ipt_intervalSet.Set(model.curData.animTimeInterval.ToString("0.##"));
                 }
@@ -174,8 +169,11 @@ namespace Ui.ModStoryMaterial
 
             }
             animCon.Refresh();
+
+            view.sta_show.ChangeState(model.curData == null ? 0 : 1);
+            view.sta_innerId.ChangeState(model.curAnim == -1 ? 0 : 1);
         }
-        public void SetCur(MapTextureForm.Data data=null, int animId=-1)
+        public void SetCur(MapTextureForm.Data data = null, int animId = -1)
         {
             model.curData = data;
             model.curAnim = animId;
@@ -186,92 +184,27 @@ namespace Ui.ModStoryMaterial
         {
             if (!string.IsNullOrEmpty(evt.importAssetName) && isActive)
             {
-                string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
-                if (MapTextureForm.DataByName.ContainsKey(key))
-                {
-                    SetCur(MapTextureForm.DataByName[key], -1);
-                }
+                /*                string key = GlobalNameHelper.GetTexNickName(evt.importAssetName);
+                                if (MapTextureForm.DataByName.ContainsKey(key))
+                                {
+                                    SetCur(MapTextureForm.DataByName[key], -1);
+                                }*/
             }
             Refresh();
         }
 
     }
 
-    public partial class UiAnimTypeItemModel
+
+    public partial class UiItemModel
     {
         public int id;
     }
-    public partial class UiAnimTypeItemParam
+    public partial class UiItemParam
     {
         public int id;
     }
-    public partial class UiAnimTypeItemCtrl
-    {
-        public override void OnCreate()
-        {
-            view.btn_item.onClick.AddListener(() =>
-            {
-                if (model.id == -1)
-                {
-                    string res = null;
-                    for (int i = 0; i < GlobalMaxSettings.TEX_ANIM_MAX; i++)
-                    {
-                        var curKey = GlobalNameHelper.GetTexRealName(parent.model.curData.name, i);
-                        if (!TexAssetForm.DataByName.ContainsKey(curKey))
-                        {
-                            res = curKey;
-                            break;
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(res))
-                    {
-                        ModManager.instance.assetCtrl.ImportAnimTex(res);
-                        parent.Refresh();
-                    }
-                }
-                else
-                {
-                    parent.SetCur(parent.model.curData, model.id);
-                    parent.Refresh();
-                }
-            });
-        }
-        public override void OnShow()
-        {
-            model.id = param.id;
-            Refresh();
-        }
-        public void Refresh()
-        {
-            if (model.id != -1)
-            {
-                view.txt_name.text = parent.model.curData.name + "_" + model.id;
-                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetTexRealName(MapTextureForm.DataById[parent.model.curData.id].name, model.id)].sprite;
-                view.sta_item.ChangeState(parent.model.curAnim == model.id ? 1 : 0);
-            }
-            else
-            {
-                view.txt_name.text = TextManager.instance.GetTxt("new");
-                /*view.img_.sprite = Texture2D.whiteTexture;*/
-                view.sta_item.ChangeState(0);
-            }
-        }
-
-
-    }
-
-
-
-    public partial class UiTextureItemModel
-    {
-        public int id;
-    }
-    public partial class UiTextureItemParam
-    {
-        public int id;
-    }
-    public partial class UiTextureItemCtrl
+    public partial class UiItemCtrl
     {
         public override void OnCreate()
         {
@@ -311,7 +244,7 @@ namespace Ui.ModStoryMaterial
         {
             if (model.id != -1)
             {
-                view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetTexRealName(MapTextureForm.DataById[model.id].name, 0)].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[MapTextureForm.DataById[model.id].texsName.Count > 0 ? MapTextureForm.DataById[model.id].texsName[0] : ""].sprite;
                 view.txt_name.text = MapTextureForm.DataById[model.id].name;
             }
             else
@@ -324,5 +257,59 @@ namespace Ui.ModStoryMaterial
 
 
     }
+
+
+    public partial class UiUnitModel
+    {
+        public int id;
+    }
+    public partial class UiUnitParam
+    {
+        public int id;
+    }
+    public partial class UiUnitCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_item.onClick.AddListener(() =>
+            {
+                if (model.id == -1)
+                {
+
+                    parent.model.curData.texsName.Add("");
+                    parent.Refresh();
+                }
+                else
+                {
+                    parent.SetCur(parent.model.curData, model.id);
+                    parent.Refresh();
+                }
+            });
+        }
+        public override void OnShow()
+        {
+            model.id = param.id;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            if (model.id != -1)
+            {
+                view.txt_name.text = parent.model.curData.name + "_" + model.id;
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.curData.texsName[model.id]].sprite;
+                view.sta_item.ChangeState(parent.model.curAnim == model.id ? 1 : 0);
+            }
+            else
+            {
+                view.txt_name.text = TextManager.instance.GetTxt("new");
+                /*view.img_.sprite = Texture2D.whiteTexture;*/
+                view.sta_item.ChangeState(0);
+            }
+        }
+
+
+    }
+
+
 }
 

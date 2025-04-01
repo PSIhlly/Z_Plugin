@@ -23,124 +23,69 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     #region anim
 
-    public void CreateAnimTex(string nickName)
+    public void CreateAnimTex(string name)
     {
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, nickName, "", 1));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() {""}));
     }
-    public void ImportAnimTex(string realName)
+    public void ImportAnimTex(string name,int id)
     {
-        //try del old
-        AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
-
-        AssetManager.instance.SelectTex(realName, new Vector2Int(100, 100));
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100),(v,nm)=>
+        {
+            if(MapTextureForm.DataByName[name].texsName.Count>id)
+            {
+                MapTextureForm.DataByName[name].texsName[id] = nm;
+            }
+            else
+            {
+                MapTextureForm.DataByName[name].texsName.Add(nm);
+            }
+        });
 
     }
-
+    
     public void RenameAnimTex(string oldName, string newName)
     {
-        for (int i = 0; i < GlobalMaxSettings.TEX_ANIM_MAX; i++)
-        {
-            var oldKey = GlobalNameHelper.GetTexRealName(oldName, i);
-            var newKey = GlobalNameHelper.GetTexRealName(newName, i);
-            if (oldKey != newKey && TexAssetForm.DataByName.ContainsKey(oldKey))
-            {
-                AssetManager.instance.RenameTargetAsset(oldKey, newKey);
-            }
-        }
-
-        //change
         MapTextureForm.DataByName[oldName].name = newName;
-
     }
 
     public void DeleteAnimTexId(string name, int animId)
     {
-        var key = GlobalNameHelper.GetTexRealName(name, animId);
-        if (TexAssetForm.DataByName.ContainsKey(key))
-        {
-            //del
-            AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), key);
-        }
-        int lastExist = -1;
-
-        for (int i = 0; i < GlobalMaxSettings.TEX_ANIM_MAX; i++)
-        {
-            var cur = GlobalNameHelper.GetTexRealName(name, i);
-            if (TexAssetForm.DataByName.ContainsKey(cur))
-            {
-                if (lastExist + 1 != i)
-                {
-                    var now = GlobalNameHelper.GetTexRealName(name, lastExist + 1);
-                    AssetManager.instance.RenameTargetAsset(cur, now);
-                }
-                lastExist++;
-            }
-        }
-
+        MapTextureForm.DataByName[name].texsName.RemoveAt(animId);
     }
 
     public void DeleteAnimTex(string name)
     {
-        for (int i = 0; i < GlobalMaxSettings.TEX_ANIM_MAX; i++)
-        {
-            var key = GlobalNameHelper.GetTexRealName(name, i);
-            if (TexAssetForm.DataByName.ContainsKey(key))
-            {
-                //del
-                AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), key);
-            }
-        }
         MapTextureForm.RemoveData(MapTextureForm.DataByName[name].id);
     }
     #endregion
     #region mask
-    public void CreateMaskTex(string nickName)
+    public void CreateMaskTex(string name)
     {
-        MapMaskForm.AddData(new MapMaskForm.Data(-1, nickName, ""));
-        for (int i = 1; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
-        {
-            var curName = GlobalNameHelper.GetMaskRealName(nickName, i);
-            AssetManager.instance.LoadTex(Texture2D.whiteTexture, curName, new Vector2Int(100, 100));
-        }
+        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() {"","","","","",""}));
     }
-public void ImportMaskTex(string realName)
+public void ImportMaskTex(string name,int id)
     {
-        //try del old
-        AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
-
-        AssetManager.instance.SelectTex(realName, new Vector2Int(100, 100));
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        {
+            if (MapMaskForm.DataByName[name].texsName.Count > id)
+            {
+                MapMaskForm.DataByName[name].texsName[id] = nm;
+            }
+            else
+            {
+                MapMaskForm.DataByName[name].texsName.Add(nm);
+            }
+        });
 
     }
 
     public void RenameMaskTex(string oldName, string newName)
     {
-        for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
-        {
-            var oldKey = GlobalNameHelper.GetMaskRealName(oldName, i);
-            var newKey = GlobalNameHelper.GetMaskRealName(newName, i);
-            if (oldKey != newKey && TexAssetForm.DataByName.ContainsKey(oldKey))
-            {
-                AssetManager.instance.RenameTargetAsset(oldKey, newKey);
-            }
-        }
-
-        //change
         MapMaskForm.DataByName[oldName].name = newName;
-
     }
 
     public void DeleteMaskTex(string name)
     {
-
-        for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
-        {
-            var key = GlobalNameHelper.GetMaskRealName(name, i);
-            if (TexAssetForm.DataByName.ContainsKey(key))
-            {
-                //del
-                AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), key);
-            }
-        }
         MapMaskForm.RemoveData(MapMaskForm.DataByName[name].id);
     }
     #endregion
@@ -148,76 +93,48 @@ public void ImportMaskTex(string realName)
     #region object
     public void DeleteObject(string name)
     {
-        for (int i = 0; i < GlobalMaxSettings.OBJECT_UNIT_MAX; i++)
-        {
-            var realName = GlobalNameHelper.GetMaskRealName(name, i);
-            AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
-        }
         MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
     }
     public void DeleteObjectUnit(string name, int id)
     {
-        var key = GlobalNameHelper.GetObjectTexRealName(name, id);
-        if (TexAssetForm.DataByName.ContainsKey(key))
-        {
-            //del
-            AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), key);
-        }
-        int lastExist = -1;
 
-        for (int i = 0; i < GlobalMaxSettings.OBJECT_UNIT_MAX; i++)
-        {
-            var cur = GlobalNameHelper.GetObjectTexRealName(name, i);
-            if (TexAssetForm.DataByName.ContainsKey(cur))
-            {
-                if (lastExist + 1 != i)
-                {
-                    var now = GlobalNameHelper.GetObjectTexRealName(name, lastExist + 1);
-                    AssetManager.instance.RenameTargetAsset( cur, now);
-                }
-                lastExist++;
-            }
-        }
         var data = MapObjectForm.DataByName[name];
         data.subPrefabUnitName.RemoveAt(id);
         data.subPrefabUnitPos.RemoveAt(id);
         data.subPrefabUnitScale.RemoveAt(id);
+        data.subUnitTexsName.RemoveAt(id);
     }
     public void CreateObject(string name)
     {
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", true, new List<string>(), new List<Vector3>(), new List<Vector3>()));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", true, new List<string>(), new List<Vector3>(), new List<Vector3>(), new List<string>()));
     }
     public void CreateObjectUnit(MapObjectForm.Data data)
     {
-        ImportObjectTex(GlobalNameHelper.GetObjectTexRealName(data.name, data.subPrefabUnitName.Count));
+        ImportObjectTex(data.name, data.subPrefabUnitName.Count);
 
         data.subPrefabUnitName.Add("Cube");
         data.subPrefabUnitPos.Add(Vector3.zero);
         data.subPrefabUnitScale.Add(Vector3.one);
     }
-    public void ImportObjectTex(string realName)
+    public void ImportObjectTex(string name,int id)
     {
-        //try del old
-        AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
-
-        AssetManager.instance.SelectTex(realName, new Vector2Int(100, 100), (v) =>
+       
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
         {
-
+            if (MapObjectForm.DataByName[name].subUnitTexsName.Count > id)
+            {
+                MapObjectForm.DataByName[name].subUnitTexsName[id] = nm;
+            }
+            else
+            {
+                MapObjectForm.DataByName[name].subUnitTexsName.Add(nm);
+            }
         });
 
     }
     public void RenameObject(string oldName, string newName)
     {
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_AVATA_MAX; i++)
-        {
-            var oldKey = GlobalNameHelper.GetMaskRealName(oldName, i);
-            var newKey = GlobalNameHelper.GetMaskRealName(newName, i);
-            if (oldKey != newKey && TexAssetForm.DataByName.ContainsKey(oldKey))
-            {
-                AssetManager.instance.RenameTargetAsset(oldKey, newKey);
-            }
-        }
-        //change
+        
         CharacterProductForm.DataByName[oldName].name = newName;
 
     }
@@ -234,64 +151,32 @@ public void ImportMaskTex(string realName)
         CharacterParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
     }
 
-    public void ImportCharacterAvatar(string realName)
+    public void ImportCharacterAvatar(string name)
     {
-        //try del old
-        AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
 
-        AssetManager.instance.SelectTex(realName, new Vector2Int(100, 100), (v) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
         {
-
+             CharacterProductForm.DataByName[name].avatarTexName=nm;
         });
 
     }
     private string CreateCharacterAnimJo(string name= "newAnim1")
     {
-        var data = new CharacterAnimForm.Data(0, name, new List<(float,float)>() { (0,0) }, 0.2f);
+        var data = new CharacterAnimForm.Data(0, name, new List<(float,float)>() { (0,0) }, 0.2f,new List<List<string>>() { new List<string> { "" }, new List<string> { "" } });
         return CharacterAnimForm.GetJoByData(data).ToString();
     }
 
 
     public void CreateCharacter(string name)
     {
-        AssetManager.instance.LoadTex(Texture2D.blackTexture, GlobalNameHelper.GetCharacterAvatarName(name, 0));
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, new Dictionary<string, (int, int, int)>(), true, new List<string>() { CreateCharacterAnimJo() }));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", new Dictionary<string, (int, int, int)>(), true, new List<string>() { CreateCharacterAnimJo() }));
     }
     public void DeleteCharacter(string name)
     {
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_AVATA_MAX; i++)
-        {
-            var realName = GlobalNameHelper.GetCharacterAvatarName(name, i);
-            AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
-        }
         CharacterProductForm.RemoveData(CharacterProductForm.DataByName[name].uid);
     }
     public void RenameCharacter(string oldName, string newName)
     {
-        //try del old
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_AVATA_MAX; i++)
-        {
-            var oldKey = GlobalNameHelper.GetCharacterAvatarName(oldName, i);
-            var newKey = GlobalNameHelper.GetCharacterAvatarName(newName, i);
-            if (oldKey != newKey && TexAssetForm.DataByName.ContainsKey(oldKey))
-            {
-                AssetManager.instance.RenameTargetAsset(oldKey, newKey);
-            }
-        }
-
-        for (int k = 0; k < CharacterProductForm.DataByName[oldName].animJo.Count; k++)
-            for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
-                for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
-                {
-                    var data = CharacterAnimForm.GetDataByJo(JObject.Parse(CharacterProductForm.DataByName[oldName].animJo[k]));
-                    var oldKey = GlobalNameHelper.GetCharacterAnimName(oldName, data.name, j, i);
-                    var newKey = GlobalNameHelper.GetCharacterAnimName(newName, data.name, j, i);
-                    if (oldKey != newKey && TexAssetForm.DataByName.ContainsKey(oldKey))
-                    {
-                        AssetManager.instance.RenameTargetAsset( oldKey, newKey);
-                    }
-                }
-
         //change
         CharacterProductForm.DataByName[oldName].name = newName;
     }
@@ -300,60 +185,17 @@ public void ImportMaskTex(string realName)
     {
         var data = CharacterProductForm.DataByName[name];
         var anim = data.GetCharacterAnim(animId);
-        var key = GlobalNameHelper.GetCharacterAnimName(name, anim.name, part, id);
-        if (TexAssetForm.DataByName.ContainsKey(key))
-        {
-            //del
-            AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), key);
-        }
-        int lastExist = -1;
-
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
-        {
-            var cur = GlobalNameHelper.GetCharacterAnimName(name, anim.name, part, i);
-            if (TexAssetForm.DataByName.ContainsKey(cur))
-            {
-                if (lastExist + 1 != i)
-                {
-                    var now = GlobalNameHelper.GetCharacterAnimName(name, anim.name, part, lastExist + 1);
-                    AssetManager.instance.RenameTargetAsset(cur, now);
-                }
-                lastExist++;
-            }
-        }
+        anim.partAnimTexsName[part].RemoveAt(id);
+        data.SaveCharacterAnim(animId, anim);
         return false;
     }
     public void DeleteCharacterAnim(string name, int animId)
     {
-        var data = CharacterProductForm.DataByName[name];
-        var anim = data.GetCharacterAnim(animId);
-
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
-        for (int j=0;j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
-            {
-                var key = GlobalNameHelper.GetCharacterAnimName(name, anim.name, j, i);
-                if (TexAssetForm.DataByName.ContainsKey(key))
-                {
-                    //del
-                    AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), key);
-                }
-            }
-        data.animJo.RemoveAt(animId);
+        CharacterProductForm.DataByName[name].animJo.RemoveAt(animId);
     }
 
     public void RenameCharacterAnim(string CharacterName, string oldName, string newName)
     {
-
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
-            for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
-            {
-                var oldKey = GlobalNameHelper.GetCharacterAnimName(CharacterName, oldName, j, i);
-                var newKey = GlobalNameHelper.GetCharacterAnimName(CharacterName, newName, j, i);
-                if (oldKey != newKey && TexAssetForm.DataByName.ContainsKey(oldKey))
-                {
-                    AssetManager.instance.RenameTargetAsset( oldKey, newKey);
-                }
-            }
 
         //change
         for (int k = 0; k < CharacterProductForm.DataByName[oldName].animJo.Count; k++)
@@ -366,20 +208,38 @@ public void ImportMaskTex(string realName)
             }
         }
     }
-    public void ImportCharacterAnim(string realName)
+    public void ImportCharacterAnim(string name,int animId,int part,int id)
     {
-        //try del old
-        AssetManager.instance.DeleteTexAsset(_super.GetStoryCoreFolder(), realName);
 
-        AssetManager.instance.SelectTex(realName, new Vector2Int(100, 100), (v) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
         {
-
+            var data = CharacterProductForm.DataByName[name]; 
+            var anim = data.GetCharacterAnim(animId);
+            if (anim.partAnimTexsName[part].Count > id)
+            {
+                anim.partAnimTexsName[part][id] = nm;
+            }
+            else
+            {
+                anim.partAnimTexsName[part].Add(nm);
+            }
+            data.SaveCharacterAnim(animId, anim);
         });
     }
     public void CreateCharacterAnim(string name, string animName)
     {
         var data = CharacterProductForm.DataByName[name];
         data.animJo.Add(CreateCharacterAnimJo(animName));
+
+    }
+    public void CreateCharacterAnimId(string name, int animId,int part,int id)
+    {
+        var data = CharacterProductForm.DataByName[name];
+        var anim=data.GetCharacterAnim(animId);
+        anim.animPos.Add((0, 0));
+        anim.partAnimTexsName[0].Add("");
+        anim.partAnimTexsName[1].Add("");
+        data.SaveCharacterAnim(animId, anim);
 
     }
     #endregion

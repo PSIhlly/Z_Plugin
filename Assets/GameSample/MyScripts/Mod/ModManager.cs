@@ -17,14 +17,7 @@ public class ModManager : Z_MonoManager<ModManager>
 
     private string _folderName;
 
-    #region Save
-    public void SaveMaterial()
-    {
 
-    }
-
-
-    #endregion
 
 
     #region life
@@ -59,45 +52,7 @@ public class ModManager : Z_MonoManager<ModManager>
     }
     public async void BeginScene(string fileName)
     {
-        UiManager.instance.ShowUi<UiLoadingCtrl>();
-        MapData data;
-
-        if (SaveAndLoad.Exist(fileName))
-        {
-            data = await Task.Run(() =>
-            {
-                return GameManager.instance.saveCtrl.LoadScene(fileName);
-            });
-        }
-        else
-        {
-            //new
-            data = await Task.Run(() =>
-            {
-                var data=new MapData();
-                data.mainData.texsName.Clear();
-                data.mainData.masksName.Clear();
-                //special init
-                foreach (var o in MapTextureForm.DataById.Values)
-                {
-                    data.mainData.texsName.Add(o.name);
-                }
-                foreach (var o in MapMaskForm.DataById.Values)
-                {
-                    data.mainData.masksName.Add(o.name);
-                }
-
-                return data;
-            });
-        }
-
-        _sceneCtrl.Begin(data, fileName);
-
-        Z_EventHelper.Invoke(new LoadingEvent()
-        {
-            state = LoadingState.Done
-        });
-        UiManager.instance.CloseUi<UiLoadingCtrl>();
+        _sceneCtrl.Begin(fileName);
         UiManager.instance.ShowUi<UiModSceneMainCtrl>();
     }
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_Debug;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Texture;
@@ -25,16 +26,25 @@ public class GameSaveController : Z_Controller<GameManager>
     { 
     }
     #region save
+
+    public void RemoveTexUse(string startSign)
+    {
+
+
+    }
+
+
     public void SaveMaterial(string storyCoreFolder)
     {
 
-        SaveAndLoad.Save(storyCoreFolder+"/"+ mapTextureFormFileName, MapTextureForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + mapTextureFormFileName, MapTextureForm.GetJaByDatas().ToString());
+
         foreach (var data in MapTextureForm.DataById.Values)
         {
-            for(int i=0;i<GlobalMaxSettings.TEX_ANIM_MAX;i++)
+            for(int i=0;i<data.texsName.Count;i++)
             {
-                var nm = GlobalNameHelper.GetTexRealName(data.name, i);
-                if (TexAssetForm.DataByName.ContainsKey(nm))
+                var nm = data.texsName[i];
+                if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
                 {
                     var tex = TexAssetForm.DataByName[nm];
                     SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
@@ -47,8 +57,8 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
             {
-                var nm = GlobalNameHelper.GetMaskRealName(data.name, i);
-                if (TexAssetForm.DataByName.ContainsKey(nm))
+                var nm = data.texsName[i];
+                if (TexAssetForm.DataByName.ContainsKey(nm)&&nm!="")
                 {
                     var tex = TexAssetForm.DataByName[nm];
                     SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
@@ -62,10 +72,10 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectFormFileName, MapObjectForm.GetJaByDatas().ToString());
         foreach (var data in MapObjectForm.DataById.Values)
         {
-            for (int i = 0; i < GlobalMaxSettings.OBJECT_UNIT_MAX; i++)
+            for (int i = 0; i < data.subUnitTexsName.Count; i++)
             {
-                var nm = GlobalNameHelper.GetObjectTexRealName(data.name, i);
-                if (TexAssetForm.DataByName.ContainsKey(nm))
+                var nm = data.subUnitTexsName[i];
+                if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
                 {
                     var tex = TexAssetForm.DataByName[nm];
                     SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
@@ -82,11 +92,11 @@ public class GameSaveController : Z_Controller<GameManager>
             for (int k = 0;k < data.animJo.Count;k ++)
             {
                 var anim = data.GetCharacterAnim(k);
-                for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
-                    for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
+                for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
+                    for (int i = 0; i < anim.partAnimTexsName[j].Count; i++)
                     {
-                        var nm = GlobalNameHelper.GetCharacterAnimName(data.name, anim.name,j, i);
-                        if (TexAssetForm.DataByName.ContainsKey(nm))
+                        var nm = anim.partAnimTexsName[j][i];
+                        if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
                         {
                             var tex = TexAssetForm.DataByName[nm];
                             SaveAndLoad.Save(storyCoreFolder + "/"+nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
@@ -109,11 +119,11 @@ public class GameSaveController : Z_Controller<GameManager>
         MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(storyCoreFolder + "/" + mapTextureFormFileName)));
         foreach (var data in MapTextureForm.DataById.Values)
         {
-            for (int i = 0; i < GlobalMaxSettings.TEX_ANIM_MAX; i++)
+            for (int i = 0; i < data.texsName.Count; i++)
             {
-                var nm = GlobalNameHelper.GetTexRealName(data.name, i);
+                var nm = data.texsName[i];
                 var path = storyCoreFolder + "/" + nm;
-                if (SaveAndLoad.Exist(path))
+                if (SaveAndLoad.Exist(path)&&!TexAssetForm.DataByName.ContainsKey(nm))
                 {
                     AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
                 }
@@ -124,9 +134,9 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
             {
-                var nm = GlobalNameHelper.GetMaskRealName(data.name, i);
+                var nm = data.texsName[i];
                 var path = storyCoreFolder + "/" + nm;
-                if (SaveAndLoad.Exist(path))
+                if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                 {
                     AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
                 }
@@ -138,11 +148,11 @@ public class GameSaveController : Z_Controller<GameManager>
         MapObjectForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(storyCoreFolder + "/" + mapObjectFormFileName)));
         foreach (var data in MapObjectForm.DataById.Values)
         {
-            for (int i = 0; i < GlobalMaxSettings.OBJECT_UNIT_MAX; i++)
+            for (int i = 0; i < data.subUnitTexsName.Count; i++)
             {
-                var nm = GlobalNameHelper.GetObjectTexRealName(data.name, i);
+                var nm = data.subUnitTexsName[i];
                 var path = storyCoreFolder + "/" + nm;
-                if (SaveAndLoad.Exist(path))
+                if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                 {
                     AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
                 }
@@ -158,10 +168,10 @@ public class GameSaveController : Z_Controller<GameManager>
             for (int k = 0; k < data.animJo.Count; k++)
             {
                 var anim = data.GetCharacterAnim(k);
-                for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
-                    for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
+                for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
+                    for (int i = 0; i < anim.partAnimTexsName[j].Count; i++)
                     {
-                        var nm = GlobalNameHelper.GetCharacterAnimName(data.name, anim.name, j, i);
+                        var nm = anim.partAnimTexsName[j][i];
                         var path = storyCoreFolder + "/" + nm;
                         if (SaveAndLoad.Exist(path))
                         {
@@ -193,7 +203,7 @@ public class GameSaveController : Z_Controller<GameManager>
             List<bool> showShaddowLst = new List<bool>();
             for (int i = 0; i < form.subPrefabUnitName.Count; i++)
             {
-                texNameLst.Add(GlobalNameHelper.GetObjectTexRealName(form.name, i));
+                texNameLst.Add(form.subUnitTexsName[i]);
                 showShaddowLst.Add(true);
             }
             InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewItemByPrefabs(form.name, form.subPrefabUnitName, texNameLst, form.subPrefabUnitPos, form.subPrefabUnitScale, showShaddowLst, true));

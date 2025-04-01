@@ -52,23 +52,44 @@ namespace Form
                 
         public static Action<Data,string,string> changeIconAction;
                 
+        public static Action<Data,List<string>,List<string>> changeTexsnameAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
         {
 
-            public Data(int id,string name,string icon):base(id,name,icon)
+                    private List<string>  _texsName;
+                    /// <summary>
+                    ///ÌùÍ¼Ãû³Æ
+                    ///</summary>
+                    public List<string>  texsName{
+                                get{return _texsName;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeTexsname(this,_texsName,value); 
+                    }
+        
+                _texsName = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string icon,List<string> texsName):base(id,name,icon)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
+             this.texsName = texsName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","");
+                   public static Data defaultData=new Data(0,"","",null);
 
 
             static Dictionary<int, Data> _DataById;
@@ -108,7 +129,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {300001,new Data(300001,"alpha","")},
+                {300001,new Data(300001,"alpha","",new List<string>(){"z_map_a$alpha$0","z_map_a$alpha$1","z_map_a$alpha$2","z_map_a$alpha$3","z_map_a$alpha$4","z_map_a$alpha$5",})},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -168,7 +189,9 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("icon")
+                jo.Get<string>("icon"),
+
+                jo.Get<List<string>>("texsName")
                     );
 
             return data;
@@ -185,6 +208,8 @@ namespace Form
             jo.Set<string>("name",data.name);
 
             jo.Set<string>("icon",data.icon);
+
+            jo.Set<List<string>>("texsName",data.texsName);
 
             return jo;
         }
@@ -283,6 +308,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTexsname(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTexsnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -14,11 +14,30 @@ public static class SaveAndLoad
         }
         public static void Save(string key, byte[] content)
         {
-            File.WriteAllBytes((key.Contains("HlZy") ? "" : (perPath + "/")) + key, content);
+            var path = (key.Contains("HlZy") ? "" : (perPath + "/")) + key;
+            Build(path);
+            File.WriteAllBytes(path, content);
         }
         public static void Save(string key,string content)
         {
-            File.WriteAllText((key.Contains("HlZy")?"":(perPath + "/")) + key, content);
+            var path = (key.Contains("HlZy") ? "" : (perPath + "/")) + key;
+            Build(path);
+            File.WriteAllText(path, content);
+        }
+        public static void Build(string path)
+        {
+            string directoryPath = Path.GetDirectoryName(path);
+
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            if (!File.Exists(path))
+            {
+                var f = File.Create(path);
+                f.Close();
+            }
         }
         public static bool Exist(string key)
         {

@@ -223,7 +223,10 @@ def assign_data_handle():
                 if ('auto' in formInfo.var_config_dic[title]) and pd.isna(cur_row[title]) and last_row is not None:
                     cur_row[title] = last_row[title]
                 content = cur_row[title]
-                dic[title] = get_value(formInfo.var_type_dic[title],str(content))
+                if 'custom' in formInfo.var_config_dic[title]:
+                    dic[title] = str(content)
+                else:
+                    dic[title] = get_value(formInfo.var_type_dic[title],str(content))
                     
             formInfo.data_list.append(dic)
             last_row = cur_row
@@ -292,6 +295,8 @@ def dic_index_handle():
                     _DatasBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, List<Data>>() {{
     '''
                 formInfo.add_str+=f'''
+                    if(!DatasBy{name.capitalize()}.ContainsKey(data.{name}))
+                        DatasBy{name.capitalize()}[data.{name}]=new List<Data>();
                     DatasBy{name.capitalize()}[data.{name}].Add(data);
     '''         
                 formInfo.remove_str+=f'''
@@ -328,7 +333,7 @@ def serialize_handle():
 '''               
         for name in formInfo.var_list:
 
-            if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name]:
+            if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name] and 'unsave' not in formInfo.var_config_dic[name] :
                 formInfo.serialize_str+=f'''
             jo.Set<{formInfo.var_type_dic[name]}>("{name}",data.{name});
 '''               
@@ -339,7 +344,7 @@ def serialize_handle():
 '''               
         for name in formInfo.var_list: 
 
-            if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name]:
+            if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name] and 'unsave' not in formInfo.var_config_dic[name] :
                 formInfo.deserialize_str+=f'''
                 jo.Get<{formInfo.var_type_dic[name]}>("{name}"),
 '''             

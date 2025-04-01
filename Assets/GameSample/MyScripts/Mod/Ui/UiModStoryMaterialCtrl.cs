@@ -42,13 +42,14 @@ namespace Ui.ModStoryMaterial
         public override void Close()
         {
             GameManager.instance.saveCtrl.SaveMaterial(ModManager.instance.GetStoryCoreFolder());
+            base.Close();
         }
         public void Refresh()
         {
             view.sta_texture.ChangeState(model.select == 0 ? 1 : 0);
             view.sta_mask.ChangeState(model.select == 1 ? 1 : 0);
-            view.sub_ModStoryMaterialTexture.SetActive(model.select == 0);
-            view.sub_ModStoryMaterialMask.SetActive(model.select == 1);
+            view.page_ModStoryMaterialTexture.SetActive(model.select == 0);
+            view.page_ModStoryMaterialMask.SetActive(model.select == 1);
         }
 
     }

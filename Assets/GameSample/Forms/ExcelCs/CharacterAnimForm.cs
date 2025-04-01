@@ -42,6 +42,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
+        public static Action<Data,List<List<string>>,List<List<string>>> changePartanimtexsnameAction;
+                
 
 
         public partial class Data
@@ -119,19 +121,38 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,List<(float,float)> animPos,float animTimeInterval)
+                    private List<List<string>>  _partAnimTexsName;
+                    /// <summary>
+                    ///ÌùÍ¼Ãû³Æ
+                    ///</summary>
+                    public List<List<string>>  partAnimTexsName{
+                                get{return _partAnimTexsName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePartanimtexsname(this,_partAnimTexsName,value); 
+                    }
+        
+                _partAnimTexsName = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<(float,float)> animPos,float animTimeInterval,List<List<string>> partAnimTexsName)
             {
 
              this.uid = uid;
              this.name = name;
              this.animPos = animPos;
              this.animTimeInterval = animTimeInterval;
+             this.partAnimTexsName = partAnimTexsName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null,0f);
+                   public static Data defaultData=new Data(0,"",null,0f,null);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -207,7 +228,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<(float,float)>>("animPos"),
 
-                jo.Get<float>("animTimeInterval")
+                jo.Get<float>("animTimeInterval"),
+
+                jo.Get<List<List<string>>>("partAnimTexsName")
                     );
 
             return data;
@@ -226,6 +249,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<List<(float,float)>>("animPos",data.animPos);
 
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
+
+            jo.Set<List<List<string>>>("partAnimTexsName",data.partAnimTexsName);
 
             return jo;
         }
@@ -325,6 +350,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePartanimtexsname(Data superData,List<List<string>> oldV,List<List<string>> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePartanimtexsnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

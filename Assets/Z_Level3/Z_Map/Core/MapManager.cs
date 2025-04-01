@@ -22,35 +22,17 @@ namespace Z_Map
 
     public static class GlobalHelper
     {
-        public static string GetTexRealName(string nickName, int animId)
-        {
-            return "z_map_b$" + nickName + "$" + animId;
-        }
-        public static string GetTexNickName(string realName)
-        {
-            string[] splt = realName.Split("$");
-            if (splt.Length < 3)
-                return "";
-            return splt[1];
-        }
-        public static string GetMaskRealName(string nickName, int maskId)
-        {
-            return "z_map_a$" + nickName + "$" + maskId;
-        }
-
+        
         public static string GetInternalPrefabName(string name)
         {
             return "z_map$" + name;
-        }
-        public static string GetObjectTexRealName(string nickName, int prefabId)
-        {
-            return "z_map_c$" + nickName + "$" + prefabId;
         }
     }
 
 
     public class MapManager : Z_MonoManager<MapManager>
     {
+        
         public Vector3 sizeLimit = new Vector3(1000, 1000, 1000);
         public MapData data;
         public GameObject mainGo;
@@ -85,7 +67,6 @@ namespace Z_Map
             mainGo.SetActive(true);
             this.data = dataCtrl;
 
-
             viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
 
             foreach (var objectData in ObjectUnitForm.DataByUid.Values)
@@ -104,35 +85,6 @@ namespace Z_Map
                     MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(characterData.unit);
                 }
             }
-
-            foreach (var name in dataCtrl.mainData.texsName)
-            {
-                List<Texture2D> lst = new List<Texture2D>();
-                for (int i = 0; i < GlobalSettings.TEX_ANIM_MAX; i++)
-                {
-                    var curKey = GlobalHelper.GetTexRealName(name, i);
-                    if (TexAssetForm.DataByName.ContainsKey(curKey))
-                        lst.Add((Texture2D)TexAssetForm.DataByName[curKey].tex);
-                    else
-                        break;
-                }
-                unitUtilCtrl.CreateTexAnimVariants(name, lst.ToArray());
-            }
-
-            foreach (var name in dataCtrl.mainData.masksName)
-            {
-                var raws = new Texture2D[] {
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,0)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,1)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,2)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,3)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,4)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,5)]?.tex
-                };
-                unitUtilCtrl.CreateAlphaVariantsByBasic5(name, raws);
-            }
-
-
 
             navigationCtrl.Build();
             mainGo.SetActive(true);
@@ -170,6 +122,8 @@ namespace Z_Map
                 data = null;
             }
             lastView = (0, 0, 0, 0, 0, 0);
+
+            unitUtilCtrl.Reset();
         }
 
 

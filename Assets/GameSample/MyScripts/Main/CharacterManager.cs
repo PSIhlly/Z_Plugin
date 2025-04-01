@@ -17,14 +17,7 @@ namespace Character
     }
     public static class GlobalHelper
     {
-        public static string GetCharacterAvatarName(string nickName, int id)
-        {
-            return "character_a$" + nickName + "$" + id;
-        }
-        public static string GetCharacterAnimName(string nickName,string animName,int part, int id)
-        {
-            return (part==0?"character_b_up$": "character_b_down$") + nickName + "$"+ animName+"$" + id;
-        }
+
 
 
         public static CharacterAnimForm.Data GetAnim(this CharacterProductForm.Data data, int id)

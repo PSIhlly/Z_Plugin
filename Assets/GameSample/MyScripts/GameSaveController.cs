@@ -110,13 +110,25 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
     }
+    public void SavePlayData(string playDataPath)
+    {
+        SaveAndLoad.Save(playDataPath, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
+    }
+
     #endregion
 
     #region load
     public void LoadMaterial(string storyCoreFolder)
     {
-
-        MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(storyCoreFolder + "/" + mapTextureFormFileName)));
+        var pathForm = storyCoreFolder + "/" + mapTextureFormFileName;
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                MapTextureForm.AddData(form);
+            }
+        }
+       
         foreach (var data in MapTextureForm.DataById.Values)
         {
             for (int i = 0; i < data.texsName.Count; i++)
@@ -129,7 +141,15 @@ public class GameSaveController : Z_Controller<GameManager>
                 }
             }
         }
-        MapMaskForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(storyCoreFolder + "/" + mapMaskFormFileName)));
+
+        pathForm = storyCoreFolder + "/" + mapMaskFormFileName;
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in MapMaskForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                MapMaskForm.AddData(form);
+            }
+        }
         foreach (var data in MapMaskForm.DataById.Values)
         {
             for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
@@ -145,7 +165,15 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void LoadObject(string storyCoreFolder)
     {
-        MapObjectForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(storyCoreFolder + "/" + mapObjectFormFileName)));
+        var pathForm = storyCoreFolder + "/" + mapObjectFormFileName;
+        if (SaveAndLoad.Exist(pathForm))
+        {
+
+            foreach (var form in MapObjectForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+        {
+            MapObjectForm.AddData(form);
+        }
+        }
         foreach (var data in MapObjectForm.DataById.Values)
         {
             for (int i = 0; i < data.subUnitTexsName.Count; i++)
@@ -162,7 +190,15 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void LoadCharacter(string storyCoreFolder)
     {
-        CharacterProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(storyCoreFolder + "/" + characterProductFormFormFileName)));
+        var pathForm = storyCoreFolder + "/" + characterProductFormFormFileName;
+
+        if (SaveAndLoad.Exist(pathForm))
+        { 
+            foreach (var form in CharacterProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+        {
+            CharacterProductForm.AddData(form);
+        }
+        }
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
             for (int k = 0; k < data.animJo.Count; k++)
@@ -173,7 +209,7 @@ public class GameSaveController : Z_Controller<GameManager>
                     {
                         var nm = anim.partAnimTexsName[j][i];
                         var path = storyCoreFolder + "/" + nm;
-                        if (SaveAndLoad.Exist(path))
+                        if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                         {
                             AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
                         }
@@ -184,6 +220,11 @@ public class GameSaveController : Z_Controller<GameManager>
     public MapData LoadScene(string scenePath)
     {
         return new MapData(SaveAndLoad.Load<string>(scenePath));
+    }
+
+    public PlayData LoadPlayData(string playDataPath)
+    {
+        return new PlayData(SaveAndLoad.Load<string>(playDataPath));
     }
     #endregion
 

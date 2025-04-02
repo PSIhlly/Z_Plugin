@@ -14,13 +14,13 @@ using Z_UnitSystem;
 
 public class PlayManager : Z_MonoManager<PlayManager>
 {
-
+    public PlayData data;
     private string _folderName;
 
     #region life
 
-     private InternalPlaySceneController _sceneCtrl;
-     public ExternalPlaySceneController sceneCtrl;
+    private InternalPlaySceneController _sceneCtrl;
+    public ExternalPlaySceneController sceneCtrl;
     // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
@@ -29,7 +29,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         _sceneCtrl = __sceneCtrl;
         sceneCtrl = __sceneCtrl;
 
-      //  assetCtrl = new ModAssetCtrl(this);
+        //  assetCtrl = new ModAssetCtrl(this);
     }
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
@@ -39,9 +39,31 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         _sceneCtrl.Update();
     }
-    public void BeginStory(string storyName)
+    public async void BeginStory(string storyName, bool ignoreSave)
     {
         this._folderName = storyName;
+        PlayData data = null;
+        if (!ignoreSave)
+        {
+            if (SaveAndLoad.Exist(GetStoryPlayDataFileName()))
+            {
+                data = await Task.Run(() =>
+                {
+                    return GameManager.instance.saveCtrl.LoadPlayData(GetStoryPlayDataFileName());
+                });
+            }else
+            {
+                //copy to save
+            }
+            
+        }
+
+        data = await Task.Run(() =>
+        {
+            var data = new PlayData();
+            return data;
+        });
+
     }
     public void EndStory()
     {
@@ -49,30 +71,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
     public async void BeginScene(string fileName)
     {
-        UiManager.instance.ShowUi<UiLoadingCtrl>();
-        MapData data;
-
-        if (SaveAndLoad.Exist(fileName))
-        {
-            data = await Task.Run(() =>
-            {
-                return new MapData(SaveAndLoad.Load<string>(fileName));
-            });
-        }
-        else
-        {
-            Debug.LogError("No Scene!");
-            return;
-        }
-
-        _sceneCtrl.Begin(data, fileName);
-
-        Z_EventHelper.Invoke(new LoadingEvent()
-        {
-            state = LoadingState.Done
-        });
-        UiManager.instance.CloseUi<UiLoadingCtrl>();
-        UiManager.instance.ShowUi<UiModSceneMainCtrl>();
+        _sceneCtrl.Begin(fileName);
     }
 
     public void EndScene()
@@ -81,17 +80,17 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
 
     #endregion
-
     public string GetSceneFileName()
     {
-        return Application.persistentDataPath + "/" + _folderName + "/" + _sceneCtrl.folderName + "/scene";
+        return _folderName + "/Save/" + _sceneCtrl.fileName;
     }
-    public string GetSceneFolder()
+
+    public string GetStorySaveFolder()
     {
-        return Application.persistentDataPath + "/" + _folderName + "/" + _sceneCtrl.folderName + "/";
+        return _folderName + "/Save/";
     }
-    public string GetStoryFolder()
+    public string GetStoryPlayDataFileName()
     {
-        return Application.persistentDataPath + "/" + _folderName + "/";
+        return _folderName + "/Save/playData";
     }
 }

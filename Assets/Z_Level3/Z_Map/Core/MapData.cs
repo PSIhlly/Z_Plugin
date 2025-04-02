@@ -20,6 +20,8 @@ namespace Z_Map
         public Dictionary<(int,int),SortedSet<int>>mapXZ2Y;
 
         string mapName => GlobalHelper.GetInternalPrefabName("map");
+        string defaultTextureName => "grass";
+
         public MapData(string formData)
         {
 
@@ -82,7 +84,7 @@ namespace Z_Map
                     {
                         realPos.z = k * unitSize.z;
                         mapPos.z = k;
-                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, "z_map_b$grass$0" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 },{1,0 },{ 2,0} }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
+                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 },{1,0 },{ 2,0} }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
                         MapUnitForm.AddData(data);
                         RegisterMap(data);
                     }
@@ -126,7 +128,7 @@ namespace Z_Map
 
         public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, "z_map_b$grass$0" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 }, { 1, 0 },{2,0 } }, mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0);
+            var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 }, { 1, 0 },{2,0 } }, mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0);
             MapUnitForm.AddData(data);
             RegisterMap(data);
 

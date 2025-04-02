@@ -268,6 +268,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     

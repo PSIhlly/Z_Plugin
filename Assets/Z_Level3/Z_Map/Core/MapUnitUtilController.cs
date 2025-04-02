@@ -669,7 +669,7 @@ namespace Z_Map
                 ins.renderers[i].GetPropertyBlock(propBlock);
                 if (data.texNameDic.ContainsKey(i))
                 {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[data.texNameDic[i]].tex);
+                    propBlock.SetTexture("_Tex", animTextureDic[data.texNameDic[i]][0]);
                     if (data.alphaTexNameDic.ContainsKey(i))
                     {
                         int linkDesc = 0;

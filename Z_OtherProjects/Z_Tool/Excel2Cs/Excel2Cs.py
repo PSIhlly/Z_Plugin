@@ -224,6 +224,8 @@ def assign_data_handle():
                     cur_row[title] = last_row[title]
                 content = cur_row[title]
                 if 'custom' in formInfo.var_config_dic[title]:
+                    if str(content) == 'nan':
+                        content="null"
                     dic[title] = str(content)
                 else:
                     dic[title] = get_value(formInfo.var_type_dic[title],str(content))

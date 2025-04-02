@@ -104,6 +104,7 @@ namespace {self.file_namespace}
                     return -1;
                 data.{self.id_str}={self.id_str};  
             }}
+            {self.id_str}Chain.PopId(data.{self.id_str});
 {self.add_str}
 {add_op_base_str}
             childAddAction?.Invoke(data);

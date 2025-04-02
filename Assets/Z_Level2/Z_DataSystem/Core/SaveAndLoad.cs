@@ -14,13 +14,13 @@ public static class SaveAndLoad
         }
         public static void Save(string key, byte[] content)
         {
-            var path = (key.Contains("HlZy") ? "" : (perPath + "/")) + key;
+            var path = GetRealPath(key);
             Build(path);
             File.WriteAllBytes(path, content);
         }
         public static void Save(string key,string content)
         {
-            var path = (key.Contains("HlZy") ? "" : (perPath + "/")) + key;
+            var path = GetRealPath(key);
             Build(path);
             File.WriteAllText(path, content);
         }
@@ -41,20 +41,32 @@ public static class SaveAndLoad
         }
         public static bool Exist(string key)
         {
-            return File.Exists((key.Contains("HlZy") ? "" : (perPath + "/")) + "/" + key);
+            var path = GetRealPath(key);
+            if (Directory.Exists(path))
+                return true;
+            return File.Exists(path);
         }
         public static T Load<T>(string key)
         {
-            if(typeof(T) == typeof(byte[]))
+            var path = GetRealPath(key);
+            if(Exist(path))
             {
-                return (T)(object)File.ReadAllBytes((key.Contains("HlZy") ? "" : (perPath + "/")) + "/" + key);
+            if (typeof(T) == typeof(byte[]))
+            {
+                return (T)(object)File.ReadAllBytes(path);
             }
             else
             {
-                return (T)(object)File.ReadAllText((key.Contains("HlZy") ? "" : (perPath + "/")) + "/" + key);
+                return (T)(object)File.ReadAllText(path);
+                }
+
             }
+            return (T)(object)null;
         }
-        
+        private static string GetRealPath(string key)
+        {
+            return Path.GetFullPath((key.Contains("HlZy") ? "" : (perPath + "/")) + key);
+        }
     }
 
 

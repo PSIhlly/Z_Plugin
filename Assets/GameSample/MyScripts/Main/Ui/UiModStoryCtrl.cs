@@ -40,6 +40,7 @@ namespace Ui.ModStory
             view.btn_play.onClick.AddListener(() =>
             {
                 Main2StoryManager.instance.UnloadStoryUgc();
+                Main2StoryManager.instance.StartLoadStoryPlay(ModManager.instance.GetFolderName(),true);
                 Close();
             });
         }

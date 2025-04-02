@@ -26,20 +26,20 @@ namespace Z_ByteSerialize
             else if (value is List<Vector3> v3lst)
             {
                 JArray ja = new JArray();
-                jo[key] = JToken.FromObject(ja);
                 foreach(var v in v3lst)
                 {
                     ja.Add(v.x + "|" + v.y + "|" + v.z);
                 }
+                jo[key] = ja;
             }
             else if (value is List<Vector3Int> v3ilst)
             {
                 JArray ja = new JArray();
-                jo[key] = JToken.FromObject(ja);
                 foreach (var v in v3ilst)
                 {
                     ja.Add(v.x + "|" + v.y + "|" + v.z);
                 }
+                jo[key] = ja;
             }
             else
             {

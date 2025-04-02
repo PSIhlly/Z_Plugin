@@ -26,18 +26,24 @@ public class LoadingEvent : Z_Event
 public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 {
     #region story
-    public void StartLoadStoryUgc(string fileName)
+    public void StartLoadStoryUgc(string storyFolder)
     {
-        StartLoadStory(fileName);
-        ModManager.instance.BeginStory(fileName);
+        StartLoadStory(storyFolder);
+        ModManager.instance.BeginStory(storyFolder);
     }
-    public void StartLoadStoryPlay(string fileName)
+    public void StartLoadStoryPlay(string storyFolder,bool ignoreSave)
     {
-        StartLoadStory(fileName);
+        StartLoadStory(storyFolder);
+        PlayManager.instance.BeginStory(storyFolder, ignoreSave);
     }
-    public void StartLoadStory(string fileName)
+    public void StartLoadStory(string storyFolder)
     {
-
+        if (SaveAndLoad.Exist(storyFolder + "/core"))
+        {
+            GameManager.instance.saveCtrl.LoadMaterial(storyFolder + "/core");
+            GameManager.instance.saveCtrl.LoadObject(storyFolder + "/core");
+            GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core");
+        }
     }
     public void UnloadStoryUgc()
     {
@@ -61,8 +67,13 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     #region scene
     public async void StartLoadSceneUgc(string fileName)
     {
-        bool ok=await StartLoadScene(fileName);
+        bool ok=await StartLoadScene(ModManager.instance.GetStoryCoreFolder()+"/"+ fileName);
         ModManager.instance.BeginScene(fileName);
+    }
+    public async void StartLoadScenePlay(string fileName)
+    {
+        bool ok = await StartLoadScene(PlayManager.instance.GetStorySaveFolder() + "/" + fileName);
+        PlayManager.instance.BeginScene(fileName);
     }
 
     public async Task<bool> StartLoadScene(string fileName)
@@ -99,7 +110,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             {
                 lst.Add((Texture2D)TexAssetForm.DataByName[texData.texsName[i]].tex);
             }
-            MapManager.instance.unitUtilCtrl.CreateTexAnimVariants(name, lst.ToArray());
+            MapManager.instance.unitUtilCtrl.CreateTexAnimVariants(texData.name, lst.ToArray());
         }
 
         foreach (var maskData in MapMaskForm.DataById.Values)
@@ -110,7 +121,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             {
                 raws[i] = (Texture2D)TexAssetForm.DataByName[maskData.texsName[i]].tex;
             }
-            MapManager.instance.unitUtilCtrl.CreateAlphaVariantsByBasic5(name, raws);
+            MapManager.instance.unitUtilCtrl.CreateAlphaVariantsByBasic5(maskData.name, raws);
         }
 
 

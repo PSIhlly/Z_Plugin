@@ -47,8 +47,6 @@ public class GameManager : Z_MonoManager<GameManager>
     public GameUtilController utilCtrl;
     public GameSaveController saveCtrl;
     public Vector2 downPos;
-    public Material mat;
-    public Mesh mesh;
     public float dragDis2 => InputManager.instance.screenSize.x/25;
 
     public override void Init()

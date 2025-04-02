@@ -71,4 +71,8 @@ public class ModManager : Z_MonoManager<ModManager>
     {
         return _folderName+"/Core/";
     }
+    public string GetFolderName()
+    {
+        return _folderName;
+    }
 }

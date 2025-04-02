@@ -231,6 +231,7 @@ namespace Z_DataSystem.Form
                     return -1;
                 data.id=id;  
             }
+            idChain.PopId(data.id);
 
         DataById[data.id]=data;
     

@@ -345,6 +345,7 @@ namespace Z_Map.Form
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     

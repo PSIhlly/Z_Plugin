@@ -491,6 +491,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     return -1;
                 data.id=id;  
             }
+            idChain.PopId(data.id);
 
         DataById[data.id]=data;
     

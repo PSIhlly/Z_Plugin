@@ -356,6 +356,7 @@ namespace Z_Fight.Form
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     

@@ -40,6 +40,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Vector3,Vector3> changePosAction;
                 
+        public static Action<Data,string,string> changeCharacternameAction;
+                
 
 
         public partial class Data
@@ -99,18 +101,37 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos)
+                    private string  _characterName;
+                    /// <summary>
+                    ///Íæ¼Ò½ÇÉ«Ãû
+                    ///</summary>
+                    public string  characterName{
+                                get{return _characterName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCharactername(this,_characterName,value); 
+                    }
+        
+                _characterName = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,string characterName)
             {
 
              this.uid = uid;
              this.sceneId = sceneId;
              this.pos = pos;
+             this.characterName = characterName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,0,Vector3.zero);
+                   public static Data defaultData=new Data(0,0,Vector3.zero,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -184,7 +205,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("sceneId"),
 
-                jo.Get<Vector3>("pos")
+                jo.Get<Vector3>("pos"),
+
+                jo.Get<string>("characterName")
                     );
 
             return data;
@@ -201,6 +224,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("sceneId",data.sceneId);
 
             jo.Set<Vector3>("pos",data.pos);
+
+            jo.Set<string>("characterName",data.characterName);
 
             return jo;
         }
@@ -291,6 +316,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCharactername(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCharacternameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

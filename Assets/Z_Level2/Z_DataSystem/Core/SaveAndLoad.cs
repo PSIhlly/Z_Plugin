@@ -67,6 +67,13 @@ public static class SaveAndLoad
         {
             return Path.GetFullPath((key.Contains("HlZy") ? "" : (perPath + "/")) + key);
         }
+        public static void Copy(string from, string to)
+        {
+            to = GetRealPath(to);
+            from = GetRealPath(from);
+            Build(to);
+            File.Copy(from, to);
+        }
     }
 
 

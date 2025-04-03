@@ -93,14 +93,26 @@ namespace Z_Map
         {
             return data.AddMap(mapPos);
         }
-        public ObjectUnitForm.Data AddItem(Vector3 realPos)
+        public ObjectUnitForm.Data AddItem(Vector3 realPos, string prefabName)
         {
             var mapPos = utilCtrl.RealPos2MapPos(realPos);
             if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
             {
                 return null;
             }
-            var data = this.data.AddItem();
+            var data = this.data.AddItem(prefabName);
+            data.pos = realPos;
+            this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
+            return data;
+        }
+        public CharacterUnitForm.Data AddCharacter(Vector3 realPos,string prefabName,bool isMine=false)
+        {
+            var mapPos = utilCtrl.RealPos2MapPos(realPos);
+            if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+            {
+                return null;
+            }
+            var data = this.data.AddCharacter(prefabName);
             data.pos = realPos;
             this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
             return data;

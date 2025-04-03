@@ -27,6 +27,9 @@ public interface InternalPlaySceneController
 public interface ExternalPlaySceneController
 {
     public void SetCamera(float x, float y, float z);
+    public Vector3 GetPlayerPos();
+    public void SetPlayerPos(Vector3 pos);
+    public void SetPlayerRotation(Vector3 dir, float speed);
 
     public void ForceUpdate();
 }
@@ -39,6 +42,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     bool enable = false;
     bool waitForActive = false;
+
+    Vector3 lastPlayerPos;
+    CharacterUnitForm.Data playerM;
+    CharacterProductForm.Data playerG;
+
     #region internal Var
     private string _fileName;
     public string fileName { get => _fileName; }
@@ -53,9 +61,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     public void Begin(string fileName)
     {
         this._fileName = fileName;
-        GameManager.instance.RegisterInputByUgc();
+        GameManager.instance.RegisterInputByPlay();
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 5, 15);
-        CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
+        //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
+       
         enable = true;
         waitForActive = false;
     }
@@ -112,20 +121,45 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         if (!enable)
             return;
 
+        if (playerG == null)
+        {
+            playerG = CharacterProductForm.DataByName[_super.data.progress.characterName];
+        }
+        if (playerM == null)
+        {
+            playerM = MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetInternalPrefabName("character"), true);
+        }
+
         {
             MapManager.instance.UpdateInfo();
             {
                 MapManager.instance.SetPos(CameraInstance.instance.tarTrs.position);
             }
         }
-
-
+        lastPlayerPos = playerM.pos;
+        SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
     }
     public void SetCamera(float x, float y, float z)
     {
         CameraInstance.instance.tarTrs.position = new Vector3(x, y, z);
-        Z_EventHelper.Invoke(new CameraMoveEvent());
+        //Z_EventHelper.Invoke(new CameraMoveEvent());
     }
-
-
+    public Vector3 GetPlayerPos()
+    {
+        return lastPlayerPos;
+    }
+    public void SetPlayerPos(Vector3 pos)
+    {
+        if (playerM == null)
+            return;
+        playerM.pos = pos;
+    }
+    public void SetPlayerRotation(Vector3 dir,float speed=360)
+    {
+        if (playerM == null)
+            return;
+        dir.y = 0;
+        Quaternion targetRotation = Quaternion.LookRotation(dir);
+        playerM.euler= Quaternion.Slerp(Quaternion.Euler(playerM.euler), targetRotation, speed * Time.deltaTime).eulerAngles;
+    }
 }

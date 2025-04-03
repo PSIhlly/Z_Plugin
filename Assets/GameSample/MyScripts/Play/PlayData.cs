@@ -30,7 +30,13 @@ using Z_UnitSystem.Form;
         }
         public PlayData()
         {
-            progress = new ProgressForm.Data(1,1,Vector3.zero);
+        Debug.LogError("No character!!!");
+        string nm = "";
+        foreach(var c in CharacterProductForm.DataByName.Values)
+        {
+            nm = c.name;
+        }
+            progress = new ProgressForm.Data(1,1,Vector3.zero, nm);
         }
         public void Unload()
         {

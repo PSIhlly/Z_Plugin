@@ -136,20 +136,16 @@ namespace Ui.ModStoryCharacterListModel
 
 
                 DisplayCameraAreaManager.instance.Clear();
-                if(model.id!=-1)
+                if (model.id != -1)
                 {
                     List<string> texNameLst = new List<string>() {
                 anim.partAnimTexsName[0][ model.id],
                  anim.partAnimTexsName[1][ model.id],
                 ""
                 };
-                    List<bool> showShaddowLst = new List<bool>()
-                {
-                    false,false,true
-                };
+                  
 
-                    var showGo = GameManager.instance.utilCtrl.CombineNewGoByPrefabs(
-                        "fakeChara", new List<string>() { "Quad", "Quad", "Capsule" }, texNameLst, new List<Vector3>() { Vector3.up * 0.5f, Vector3.up * 0.2f, Vector3.zero }, new List<Vector3>() { Vector3.one, Vector3.one, new Vector3(0.3f, 0.5f, 0.3f) }, showShaddowLst);
+                    var showGo = GameManager.instance.utilCtrl.CombineNewCharacterByPrefabs("fakeChara",texNameLst,false);
                     showGo.SetActive(true);
                     DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
                 }

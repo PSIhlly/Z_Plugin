@@ -134,10 +134,16 @@ namespace Z_Map
 
             return data;
         }
-        public ObjectUnitForm.Data AddItem()
+        public ObjectUnitForm.Data AddItem(string prefabName="")
         {
-            var data = new ObjectUnitForm.Data(-1,false,"","", Vector3.zero, Vector3.zero,Vector3.one,0);
+            var data = new ObjectUnitForm.Data(-1,false,"", prefabName, Vector3.zero, Vector3.zero,Vector3.one,0);
             ObjectUnitForm.AddData(data);
+            return data;
+        }
+        public CharacterUnitForm.Data AddCharacter(string prefabName = "",bool isMine=false)
+        {
+            var data = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero,4, 4,4, isMine,"", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0);
+            CharacterUnitForm.AddData(data);
             return data;
         }
     }

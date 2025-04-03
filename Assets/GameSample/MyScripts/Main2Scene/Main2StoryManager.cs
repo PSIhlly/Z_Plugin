@@ -31,10 +31,10 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         StartLoadStory(storyFolder);
         ModManager.instance.BeginStory(storyFolder);
     }
-    public void StartLoadStoryPlay(string storyFolder,bool ignoreSave)
+    public void StartLoadStoryPlay(string storyFolder,bool boxPlay)
     {
         StartLoadStory(storyFolder);
-        PlayManager.instance.BeginStory(storyFolder, ignoreSave);
+        PlayManager.instance.BeginStory(storyFolder, boxPlay);
     }
     public void StartLoadStory(string storyFolder)
     {
@@ -72,7 +72,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
     public async void StartLoadScenePlay(string fileName)
     {
-        bool ok = await StartLoadScene(PlayManager.instance.GetStorySaveFolder() + "/" + fileName);
+        bool ok = await StartLoadScene(
+            PlayManager.instance.boxPlay?
+                (PlayManager.instance.GetStoryCoreFolder() + "/" + fileName)
+                : (PlayManager.instance.GetStorySaveFolder() + "/" + fileName));
+
         PlayManager.instance.BeginScene(fileName);
     }
 

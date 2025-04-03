@@ -17,6 +17,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public PlayData data;
     private string _folderName;
 
+    public bool boxPlay;
+
+    
+
     #region life
 
     private InternalPlaySceneController _sceneCtrl;
@@ -39,30 +43,38 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         _sceneCtrl.Update();
     }
-    public async void BeginStory(string storyName, bool ignoreSave)
+    public async void BeginStory(string storyName, bool boxPlay)
     {
         this._folderName = storyName;
-        PlayData data = null;
-        if (!ignoreSave)
+        PlayData data = null; 
+        this.boxPlay = boxPlay;
+        if (!boxPlay)
         {
-            if (SaveAndLoad.Exist(GetStoryPlayDataFileName()))
+            if (!SaveAndLoad.Exist(GetStorySavePlayDataFileName()))
             {
-                data = await Task.Run(() =>
-                {
-                    return GameManager.instance.saveCtrl.LoadPlayData(GetStoryPlayDataFileName());
-                });
-            }else
-            {
-                //copy to save
+                //new , copy to save
+                SaveAndLoad.Copy(GetStoryCoreFolder() + "scene1", GetStorySaveFolder() + "scene1");
+
+                SaveAndLoad.Copy(GetStoryCorePlayDataFileName(), GetStorySavePlayDataFileName());
+
             }
-            
+
+            data = await Task.Run(() =>
+            {
+                return GameManager.instance.saveCtrl.LoadPlayData(GetStorySavePlayDataFileName());
+            });
+
+        }
+        else
+        {
+            data = await Task.Run(() =>
+            {
+                return GameManager.instance.saveCtrl.LoadPlayData(GetStoryCorePlayDataFileName());
+            });
         }
 
-        data = await Task.Run(() =>
-        {
-            var data = new PlayData();
-            return data;
-        });
+
+        Main2StoryManager.instance.StartLoadScenePlay("scene1");
 
     }
     public void EndStory()
@@ -80,17 +92,26 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
 
     #endregion
-    public string GetSceneFileName()
+    public string GetSceneSaveFileName()
     {
         return _folderName + "/Save/" + _sceneCtrl.fileName;
+    }
+    public string GetStoryCoreFolder()
+    {
+        return _folderName + "/Core/";
     }
 
     public string GetStorySaveFolder()
     {
         return _folderName + "/Save/";
     }
-    public string GetStoryPlayDataFileName()
+    public string GetStorySavePlayDataFileName()
     {
         return _folderName + "/Save/playData";
     }
+    public string GetStoryCorePlayDataFileName()
+    {
+        return _folderName + "/Core/playData";
+    }
+
 }

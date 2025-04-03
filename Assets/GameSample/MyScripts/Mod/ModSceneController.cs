@@ -260,10 +260,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             }
                             if(allow)
                             {
-                                var newItemData = MapManager.instance.AddItem(finalPos);
+                                var newItemData = MapManager.instance.AddItem(finalPos, itemData.name);
                                 newItemData.isObstacle = true;
                                 newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
-                                newItemData.prefabName = itemData.name;
                                 newItemData.name = itemData.name;
                             }
                         }

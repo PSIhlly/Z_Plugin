@@ -74,7 +74,7 @@ namespace Z_Map.Form
         {
 
                 /// <summary>
-                ///单位逻辑
+                ///鍗曚綅閫昏緫
                 ///</summary>
                 public ObjectUnit unit
                 {
@@ -86,7 +86,7 @@ namespace Z_Map.Form
 
                     private bool  _isObstacle;
                     /// <summary>
-                    ///是障碍物
+                    ///鏄殰纰嶇墿
                     ///</summary>
                     public bool  isObstacle{
                                 get{return _isObstacle;}

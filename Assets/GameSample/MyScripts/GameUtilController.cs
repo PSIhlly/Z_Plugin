@@ -12,13 +12,25 @@ using Z_Map;
 using Z_Texture;
 using Z_UnitSystem;
 
-public class GameUtilController: Z_Controller<GameManager>
+public class GameUtilController : Z_Controller<GameManager>
 {
-    public GameUtilController(GameManager super):base(super)
+    public GameUtilController(GameManager super) : base(super)
     { }
 
-   
 
+    public GameObject CombineNewCharacterByPrefabs(string name, List<string> texRealName, bool forGame)
+    {
+
+        List<bool> showShaddowLst = new List<bool>()
+                {
+                    false,false,true
+                };
+
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.5f, Vector3.up * 0.2f, Vector3.zero }, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.5f, 0.3f)  }, showShaddowLst);
+        if (forGame)
+            res.AddComponent<ItemInstance>();
+        return res;
+    }
     public GameObject CombineNewItemByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow, bool forGame)
     {
         var res = CombineNewGoByPrefabs(name, prefabKeys, texRealName, poss, scales, showShadow);

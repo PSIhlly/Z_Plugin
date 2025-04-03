@@ -224,7 +224,11 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public PlayData LoadPlayData(string playDataPath)
     {
-        return new PlayData(SaveAndLoad.Load<string>(playDataPath));
+        if (SaveAndLoad.Exist(playDataPath))
+        {
+            return new PlayData(SaveAndLoad.Load<string>(playDataPath));
+        }
+        return new PlayData();
     }
     #endregion
 
@@ -249,6 +253,9 @@ public class GameSaveController : Z_Controller<GameManager>
             }
             InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewItemByPrefabs(form.name, form.subPrefabUnitName, texNameLst, form.subPrefabUnitPos, form.subPrefabUnitScale, showShaddowLst, true));
         }
+
+        InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewCharacterByPrefabs(GlobalNameHelper.GetRuntimePrefabName("character"), new List<string>() {"","",""} , true));
+
     }
 
 

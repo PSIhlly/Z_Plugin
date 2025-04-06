@@ -21,7 +21,8 @@ public class GameSaveController : Z_Controller<GameManager>
     public string mapMaskFormFileName => "mmf";
     public string mapObjectFormFileName => "mof";
     public string characterParamFormFileName => "cpaf";
-    public string characterProductFormFormFileName => "cprf";
+    public string characterProductFormFileName => "cprf";
+    public string configFormFileName => "cf";
     public GameSaveController(GameManager super):base(super)
     { 
     }
@@ -86,7 +87,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveCharacter(string storyCoreFolder)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFormFileName, CharacterProductForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas().ToString());
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
             for (int k = 0;k < data.animJo.Count;k ++)
@@ -110,11 +111,14 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
     }
-    public void SavePlayData(string playDataPath)
+    public void SaveConfig(string storyCoreFolder)
     {
-        SaveAndLoad.Save(playDataPath, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
+        SaveAndLoad.Save(storyCoreFolder + "/" + configFormFileName, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
     }
-
+    public void SaveProgress(string progressPath)
+    {
+        SaveAndLoad.Save(progressPath, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
+    }
     #endregion
 
     #region load
@@ -190,7 +194,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void LoadCharacter(string storyCoreFolder)
     {
-        var pathForm = storyCoreFolder + "/" + characterProductFormFormFileName;
+        var pathForm = storyCoreFolder + "/" + characterProductFormFileName;
 
         if (SaveAndLoad.Exist(pathForm))
         { 
@@ -221,15 +225,28 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         return new MapData(SaveAndLoad.Load<string>(scenePath));
     }
-
-    public PlayData LoadPlayData(string playDataPath)
+    public void LoadConfig(string storyCoreFolder)
     {
-        if (SaveAndLoad.Exist(playDataPath))
+        var pathForm = storyCoreFolder + "/" + configFormFileName;
+
+        if (SaveAndLoad.Exist(pathForm))
         {
-            return new PlayData(SaveAndLoad.Load<string>(playDataPath));
+            foreach (var form in ConfigForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                ConfigForm.AddData(form);
+            }
+        }
+    }
+
+    public PlayData LoadProgress(string progressPath)
+    {
+        if (SaveAndLoad.Exist(progressPath))
+        {
+            return new PlayData( SaveAndLoad.Load<string>(progressPath));
         }
         return new PlayData();
     }
+
     #endregion
 
     public void ResetPrefabPool()

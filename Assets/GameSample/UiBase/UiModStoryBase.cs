@@ -120,11 +120,14 @@ namespace Ui.ModStory
             public Sta sta_material;
             public Btn btn_item;
             public Sta sta_item;
-            public Btn btn_Character;
-            public Sta sta_Character;
+            public Btn btn_character;
+            public Sta sta_character;
+            public Btn btn_config;
+            public Sta sta_config;
             public Txt txt_material;
             public Txt txt_item;
             public Txt txt_character;
+            public Txt txt_config;
         public UiModStoryModulePanelView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -132,11 +135,14 @@ namespace Ui.ModStory
             sta_material = uiHolder.elementTrsLst[1].GetComponent<Sta>();
             btn_item = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             sta_item = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            btn_Character = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_Character = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            txt_material = uiHolder.elementTrsLst[6].GetComponent<Txt>();
-            txt_item = uiHolder.elementTrsLst[7].GetComponent<Txt>();
-            txt_character = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            btn_character = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_character = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            btn_config = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            sta_config = uiHolder.elementTrsLst[7].GetComponent<Sta>();
+            txt_material = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_item = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            txt_character = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            txt_config = uiHolder.elementTrsLst[11].GetComponent<Txt>();
         }
 
     }

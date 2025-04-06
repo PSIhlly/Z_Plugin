@@ -50,18 +50,20 @@ public class PlayManager : Z_MonoManager<PlayManager>
         this.boxPlay = boxPlay;
         if (!boxPlay)
         {
-            if (!SaveAndLoad.Exist(GetStorySavePlayDataFileName()))
+            if (!SaveAndLoad.Exist(GetStorySaveProgressFileName()))
             {
                 //new , copy to save
                 SaveAndLoad.Copy(GetStoryCoreFolder() + "scene1", GetStorySaveFolder() + "scene1");
 
-                SaveAndLoad.Copy(GetStoryCorePlayDataFileName(), GetStorySavePlayDataFileName());
+                SaveAndLoad.Copy(GetStoryCoreConfigFileName(), GetStorySaveProgressFileName());
 
+                //create play only
+                SaveAndLoad.Save(GetStorySaveProgressFileName(), ProgressForm.GetJoByData(GetInitPlayDataByConfig().progress).ToString());
             }
 
             data = await Task.Run(() =>
             {
-                return GameManager.instance.saveCtrl.LoadPlayData(GetStorySavePlayDataFileName());
+                return GameManager.instance.saveCtrl.LoadProgress(GetStorySaveProgressFileName());
             });
 
         }
@@ -69,7 +71,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         {
             data = await Task.Run(() =>
             {
-                return GameManager.instance.saveCtrl.LoadPlayData(GetStoryCorePlayDataFileName());
+                return GetInitPlayDataByConfig();
             });
         }
 
@@ -77,6 +79,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
         Main2StoryManager.instance.StartLoadScenePlay("scene1");
 
     }
+
+    public static PlayData GetInitPlayDataByConfig()
+    {
+        var config = ConfigForm.DataByUid[1];
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName));
+    }
+
     public void EndStory()
     {
 
@@ -105,13 +114,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         return _folderName + "/Save/";
     }
-    public string GetStorySavePlayDataFileName()
+    public string GetStorySaveProgressFileName()
     {
-        return _folderName + "/Save/playData";
+        return _folderName + "/Save/progress";
     }
-    public string GetStoryCorePlayDataFileName()
+    public string GetStoryCoreConfigFileName()
     {
-        return _folderName + "/Core/playData";
+        return _folderName + "/Core/config";
     }
 
 }

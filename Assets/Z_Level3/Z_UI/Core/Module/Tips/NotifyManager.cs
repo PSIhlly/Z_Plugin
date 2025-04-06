@@ -14,6 +14,15 @@ namespace Z_Ui.Notify
         public string content;
         public int id;
     }
+    public class ChooseInfo
+    {
+        public string title;
+        public Action<int> act;
+        public List<string> words;
+        public List<Sprite> sprites;
+        public bool canClose;
+        public int id;
+    }
     public class PopupInfo
     {
         public string title;
@@ -24,9 +33,11 @@ namespace Z_Ui.Notify
         public int id;
     }
 
+
     public class NotifyManager : Z_Manager<NotifyManager>
     {
         public static int tipIdCnt;
+        public static int chooseIdCnt;
         public static int popupIdCnt;
         public void AddTip(string content,float time=2)
        {
@@ -48,6 +59,30 @@ namespace Z_Ui.Notify
                 }) ;
             }
        }
+        public void AddChoose(string title, bool canClose, Action<int> act, List<string> words, List<Sprite> sprites)
+        {
+            var info = new ChooseInfo()
+            {
+                title = title,
+                words = words,
+                act = act,
+                sprites= sprites,
+                canClose= canClose,
+                id = popupIdCnt++
+            };
+            var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
+            if (ctrl != null && ctrl.isActive)
+            {
+                ctrl.Add(info);
+            }
+            else
+            {
+                UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
+                {
+                    chooseInfo = info
+                });
+            }
+        }
         public void AddPopup(string title,string content, bool canClose,List<string>words,List<Func<bool>> funcs)
         {
             var info = new PopupInfo()
@@ -72,7 +107,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-
+       
         public override void Init()
         {
         }

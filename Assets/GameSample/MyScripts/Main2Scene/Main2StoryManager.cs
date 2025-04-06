@@ -43,6 +43,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadMaterial(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadObject(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core");
+            GameManager.instance.saveCtrl.LoadConfig(storyFolder + "/core");
         }
     }
     public void UnloadStoryUgc()

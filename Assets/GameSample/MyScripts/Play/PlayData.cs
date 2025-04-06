@@ -14,17 +14,21 @@ using Z_UnitSystem.Form;
     public class PlayData
     {
         public ProgressForm.Data progress;
-        
 
-        
 
-        public PlayData(string formData)
+
+
+    public PlayData(string progressData)
         {
 
-        progress = ProgressForm.GetDataByJo(JObject.Parse(formData));
+        progress = ProgressForm.GetDataByJo(JObject.Parse(progressData));
 
-        }
-        public JObject GetJsonData()
+    }
+    public PlayData(ProgressForm.Data progressData)
+    {
+        progress = progressData;
+    }
+    public JObject GetJsonData()
         {
             return ProgressForm.GetJoByData(progress);
         }

@@ -199,17 +199,20 @@ namespace Ui.Notify
     public partial class UiChooseCtrl
     {
 
-        UiContainer<UiItemCtrl> con;
+        UiScrViewContainer<UiItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiContainer<UiItemCtrl>(view.sub_Item.gameObject);
+            con = new UiScrViewContainer<UiItemCtrl>(view.go_item,view.scr_items);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();
             });
             view.btn_choose.onClick.AddListener(() =>
             {
-                model.info.act?.Invoke(model.cur);
+                if(model.info.func(model.cur))
+                {
+                    Close();
+                }
             });
         }
         public override void Close()
@@ -243,7 +246,7 @@ namespace Ui.Notify
                 {
                     name = model.info.words[i],
                     sprite = model.info.sprites[i],
-                    id = model.info.id
+                    id = i
                 });
             }
             con.Refresh();

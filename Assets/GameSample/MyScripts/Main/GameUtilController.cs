@@ -15,7 +15,8 @@ using Z_UnitSystem;
 public class GameUtilController : Z_Controller<GameManager>
 {
     public GameUtilController(GameManager super) : base(super)
-    { }
+    {
+    }
 
 
     public GameObject CombineNewCharacterByPrefabs(string name, List<string> texRealName, bool forGame)
@@ -26,9 +27,15 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false,true
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.5f, Vector3.up * 0.2f, Vector3.zero }, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.5f, 0.3f)  }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.5f, Vector3.up * 0.2f, Vector3.up*0.25f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.5f, 0.3f)  }, showShaddowLst);
         if (forGame)
-            res.AddComponent<ItemInstance>();
+        {
+            res.AddComponent<CharacterInstance>();
+            res.transform.GetChild(0).gameObject.GetComponent<MeshCollider>().enabled=false;
+            res.transform.GetChild(1).gameObject.GetComponent<MeshCollider>().enabled=false;
+            var rb=res.AddComponent<Rigidbody>();
+            rb.freezeRotation = true;
+        }
         return res;
     }
     public GameObject CombineNewItemByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow, bool forGame)
@@ -50,10 +57,10 @@ public class GameUtilController : Z_Controller<GameManager>
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             var render = go.GetComponent<Renderer>();
             render.GetPropertyBlock(propBlock);
-            var tex = TexAssetForm.DataByName[texRealName[i]].tex;
 
-            if (tex == null)
+            if (string.IsNullOrEmpty(texRealName[i]))
             {
+                propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])
                 {
                     render.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
@@ -65,6 +72,7 @@ public class GameUtilController : Z_Controller<GameManager>
             }
             else
             {
+                var tex = TexAssetForm.DataByName[texRealName[i]].tex;
                 render.shadowCastingMode = showShadow[i] ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
                 propBlock.SetTexture("_Tex", tex);
             }

@@ -169,7 +169,7 @@ public void ImportMaskTex(string name,int id)
 
     public void CreateCharacter(string name)
     {
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", new Dictionary<string, (int, int, int)>(), true, new List<string>() { CreateCharacterAnimJo() }));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", new Dictionary<string, (int, int, int)>(), true, new List<string>() { CreateCharacterAnimJo() },"","",""));
     }
     public void DeleteCharacter(string name)
     {

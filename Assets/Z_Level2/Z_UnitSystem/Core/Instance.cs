@@ -8,6 +8,7 @@ namespace Z_UnitSystem
     {
         public Unit unit;
         private BoxCollider[] _boxColliders;
+        private CapsuleCollider[] _capsuleColliders;
         public bool vising;
         public BoxCollider[] boxColliders
         {
@@ -16,6 +17,15 @@ namespace Z_UnitSystem
                 if (_boxColliders == null)
                     _boxColliders = GetComponentsInChildren<BoxCollider>();
                 return _boxColliders;
+            }
+        }
+        public CapsuleCollider[] capsuleColliders
+        {
+            get
+            {
+                if (_capsuleColliders == null)
+                    _capsuleColliders = GetComponentsInChildren<CapsuleCollider>();
+                return _capsuleColliders;
             }
         }
         private Renderer[] _renderers;

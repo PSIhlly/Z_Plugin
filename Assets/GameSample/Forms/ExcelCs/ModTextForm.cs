@@ -14,7 +14,7 @@ using Z_DataSystem.Form;
 namespace Form
 {
 
-    public static partial class ModSceneTextForm
+    public static partial class ModTextForm
     {
 
         
@@ -133,6 +133,8 @@ namespace Form
 
                 {1001001,new Data(1001001,"minYTip","The height must be greater than the floor of this level.","高度必须大于该层地板")},
 
+                {1100001,new Data(1100001,"Choose main character","Choose main character","选择主角")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -155,6 +157,8 @@ namespace Form
                         {"maxYTip",_DataById[1001000]},
     
                         {"minYTip",_DataById[1001001]},
+    
+                        {"Choose main character",_DataById[1100001]},
     
                     };
     

@@ -44,6 +44,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadObject(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadConfig(storyFolder + "/core");
+        }else
+        {
+            ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500),""));
         }
     }
     public void UnloadStoryUgc()
@@ -62,6 +65,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 MapBaseForm.RemoveData(id);
             }
         }
+        ConfigForm.Clear();
     }
     #endregion
 
@@ -115,7 +119,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             {
                 lst.Add((Texture2D)TexAssetForm.DataByName[texData.texsName[i]].tex);
             }
-            MapManager.instance.unitUtilCtrl.CreateTexAnimVariants(texData.name, lst.ToArray());
+            GameManager.instance.mapCtrl.CreateTexAnimVariants(texData.name, lst.ToArray());
         }
 
         foreach (var maskData in MapMaskForm.DataById.Values)
@@ -126,7 +130,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             {
                 raws[i] = (Texture2D)TexAssetForm.DataByName[maskData.texsName[i]].tex;
             }
-            MapManager.instance.unitUtilCtrl.CreateAlphaVariantsByBasic5(maskData.name, raws);
+            GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic5(maskData.name, raws);
         }
 
 
@@ -145,7 +149,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
     public void UnloadScene()
     {
-
+        GameManager.instance.mapCtrl.Reset();
     }
     #endregion
 

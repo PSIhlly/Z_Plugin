@@ -17,7 +17,7 @@ namespace Z_Ui.Notify
     public class ChooseInfo
     {
         public string title;
-        public Action<int> act;
+        public Func<int, bool> func;
         public List<string> words;
         public List<Sprite> sprites;
         public bool canClose;
@@ -59,13 +59,13 @@ namespace Z_Ui.Notify
                 }) ;
             }
        }
-        public void AddChoose(string title, bool canClose, Action<int> act, List<string> words, List<Sprite> sprites)
+        public void AddChoose(string title, bool canClose, Func<int, bool> func, List<string> words, List<Sprite> sprites)
         {
             var info = new ChooseInfo()
             {
                 title = title,
                 words = words,
-                act = act,
+                func = func,
                 sprites= sprites,
                 canClose= canClose,
                 id = popupIdCnt++

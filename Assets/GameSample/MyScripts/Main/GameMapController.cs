@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Map;
 using Z_Map.Form;
 using Z_Texture;
 
-namespace Z_Map
-{
     public enum AlphaTexBasic5
     {
         OOOOXOOOO,
@@ -18,9 +17,12 @@ namespace Z_Map
         XXXOOOOOO,
         XXXXOXXXX
     }
-    public class MapUnitUtilController : Z_Controller<MapManager>
+    public class GameMapController : Z_Controller<GameManager>, IZ_Listener<MapEvent>
+{
+        public GameMapController(GameManager super) : base(super)
     {
-        public MapUnitUtilController(MapManager super) : base(super) { }
+        Z_EventHelper.Register(this);
+    }
 
         public Dictionary<(string, int), Texture2D> alphaTextureDic=new Dictionary<(string, int), Texture2D>();
         public Dictionary<string, List<Texture2D>> animTextureDic=new Dictionary<string, List<Texture2D>>();
@@ -680,9 +682,9 @@ namespace Z_Map
                                 if (x == 0 && z == 0)
                                     continue;
                                 var pos = (x + data.mapPos.x, data.mapPos.y, z + data.mapPos.z);
-                                if (_super.data.maps.ContainsKey(pos)
-                                    && _super.data.maps[pos].texNameDic.ContainsKey(i)
-                                    && _super.data.maps[pos].texNameDic[i] == data.texNameDic[i])
+                                if (MapManager.instance.data.maps.ContainsKey(pos)
+                                    && MapManager.instance.data.maps[pos].texNameDic.ContainsKey(i)
+                                    && MapManager.instance.data.maps[pos].texNameDic[i] == data.texNameDic[i])
                                 {
                                     linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
                                 }
@@ -727,7 +729,17 @@ namespace Z_Map
             }  
         }
 
-
-
+    public void OnEvent(MapEvent evt)
+    {
+        switch (evt.type)
+        {
+            case MapEvent.Type.Show:
+                ShowFinalMat((MapInstance)evt.unit.ins);
+                break;
+            case MapEvent.Type.AfterUpdate:
+                UpdateAnim((MapInstance)evt.unit.ins);
+                break;
+        }
     }
+
 }

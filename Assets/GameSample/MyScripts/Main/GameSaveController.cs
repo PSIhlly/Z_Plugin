@@ -87,6 +87,8 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveCharacter(string storyCoreFolder)
     {
+        SaveAndLoad.Save(storyCoreFolder + "/" + characterParamFormFileName, CharacterParamForm.GetJaByDatas().ToString());
+
         SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas().ToString());
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
@@ -113,7 +115,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveConfig(string storyCoreFolder)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + configFormFileName, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
+        SaveAndLoad.Save(storyCoreFolder + "/" + configFormFileName, ConfigForm.GetJaByDatas().ToString());
     }
     public void SaveProgress(string progressPath)
     {
@@ -194,7 +196,17 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void LoadCharacter(string storyCoreFolder)
     {
-        var pathForm = storyCoreFolder + "/" + characterProductFormFileName;
+        var pathForm = storyCoreFolder + "/" + characterParamFormFileName;
+
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in CharacterParamForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                CharacterParamForm.AddData(form);
+            }
+        }
+
+        pathForm = storyCoreFolder + "/" + characterProductFormFileName;
 
         if (SaveAndLoad.Exist(pathForm))
         { 
@@ -203,6 +215,7 @@ public class GameSaveController : Z_Controller<GameManager>
             CharacterProductForm.AddData(form);
         }
         }
+       
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
             for (int k = 0; k < data.animJo.Count; k++)

@@ -60,6 +60,12 @@ namespace Form
                 
         public static Action<Data,List<string>,List<string>> changeAnimjoAction;
                 
+        public static Action<Data,string,string> changeMoveanimnameAction;
+                
+        public static Action<Data,string,string> changeSpeedparamnameAction;
+                
+        public static Action<Data,string,string> changeHpparamnameAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -101,7 +107,61 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string avatarTexName,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo):base(uid,name,paramDic,isProto)
+                    private string  _moveAnimName;
+                    /// <summary>
+                    ///移动动画名
+                    ///</summary>
+                    public string  moveAnimName{
+                                get{return _moveAnimName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMoveanimname(this,_moveAnimName,value); 
+                    }
+        
+                _moveAnimName = value;
+                }
+                 
+                     }
+                    
+                    private string  _speedParamName;
+                    /// <summary>
+                    ///速度参数名
+                    ///</summary>
+                    public string  speedParamName{
+                                get{return _speedParamName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeSpeedparamname(this,_speedParamName,value); 
+                    }
+        
+                _speedParamName = value;
+                }
+                 
+                     }
+                    
+                    private string  _hpParamName;
+                    /// <summary>
+                    ///血量参数名
+                    ///</summary>
+                    public string  hpParamName{
+                                get{return _hpParamName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeHpparamname(this,_hpParamName,value); 
+                    }
+        
+                _hpParamName = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string avatarTexName,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,paramDic,isProto)
             {
 
              this.uid = uid;
@@ -110,12 +170,15 @@ namespace Form
              this.paramDic = paramDic;
              this.isProto = isProto;
              this.animJo = animJo;
+             this.moveAnimName = moveAnimName;
+             this.speedParamName = speedParamName;
+             this.hpParamName = hpParamName;
 
             }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(int,int,int)>(){},false,null);
+                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(int,int,int)>(){},false,null,"","","");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -217,7 +280,13 @@ namespace Form
 
                 jo.Get<bool>("isProto"),
 
-                jo.Get<List<string>>("animJo")
+                jo.Get<List<string>>("animJo"),
+
+                jo.Get<string>("moveAnimName"),
+
+                jo.Get<string>("speedParamName"),
+
+                jo.Get<string>("hpParamName")
                     );
 
             return data;
@@ -240,6 +309,12 @@ namespace Form
             jo.Set<bool>("isProto",data.isProto);
 
             jo.Set<List<string>>("animJo",data.animJo);
+
+            jo.Set<string>("moveAnimName",data.moveAnimName);
+
+            jo.Set<string>("speedParamName",data.speedParamName);
+
+            jo.Set<string>("hpParamName",data.hpParamName);
 
             return jo;
         }
@@ -369,6 +444,36 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeAnimjoAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMoveanimname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMoveanimnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSpeedparamname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSpeedparamnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHpparamname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHpparamnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

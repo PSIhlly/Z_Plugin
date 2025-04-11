@@ -29,6 +29,7 @@ public interface ExternalPlaySceneController
     public void SetCamera(float x, float y, float z);
     public Vector3 GetPlayerPos();
     public void SetPlayerPos(Vector3 pos);
+    public void SetPlayerMove(Vector3 dir);
     public void SetPlayerRotation(Vector3 dir, float speed);
 
     public void ForceUpdate();
@@ -44,6 +45,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     bool waitForActive = false;
 
     Vector3 lastPlayerPos;
+    Vector3 setPlayerMove;
     CharacterUnitForm.Data playerM;
     CharacterProductForm.Data playerG;
 
@@ -64,8 +66,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         GameManager.instance.RegisterInputByPlay();
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 5, 15);
         //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
-       
-        enable = true;
+        setPlayerMove = Vector3.zero;
+         enable = true;
         waitForActive = false;
     }
     public void End()
@@ -127,15 +129,24 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         if (playerM == null)
         {
-            playerM = MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetInternalPrefabName("character"), true);
+            playerM = MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
         }
-
         {
             MapManager.instance.UpdateInfo();
             {
                 MapManager.instance.SetPos(CameraInstance.instance.tarTrs.position);
             }
         }
+
+        if (setPlayerMove != Vector3.zero)
+        {
+            if (playerM != null)
+            {
+                playerM.unit.Move(setPlayerMove);
+            }
+            setPlayerMove = Vector3.zero;
+        }
+
         lastPlayerPos = playerM.pos;
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
     }
@@ -150,9 +161,16 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerPos(Vector3 pos)
     {
-        if (playerM == null)
+      if (playerM == null|| playerM.unit.ins==null)
             return;
-        playerM.pos = pos;
+        playerM.unit.ins.transform.position = pos;
+    }
+    public void SetPlayerMove(Vector3 dir)
+    {
+        if (playerM == null || playerM.unit.ins == null)
+            return;
+
+        setPlayerMove += dir;
     }
     public void SetPlayerRotation(Vector3 dir,float speed=360)
     {

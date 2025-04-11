@@ -27,19 +27,19 @@ public static class GlobalMaxSettings
     public static int CHARACTER_AVATA_MAX => Character.GlobalSettings.CHARACTER_AVATA_MAX;
     public static int CHARACTER_ANIM_MAX => Character.GlobalSettings.CHARACTER_ANIM_MAX;
     public static int CHARACTER_PART_MAX => Character.GlobalSettings.CHARACTER_PART_MAX;
-    public static int TEX_ANIM_MAX =>  Z_Map.GlobalSettings.TEX_ANIM_MAX;
-    public static int OBJECT_UNIT_MAX =>  Z_Map.GlobalSettings.ITEM_UNIT_MAX;
-    public static bool OVERLAY_HIDE =>  Z_Map.GlobalSettings.OVERLAY_HIDE;
+    public static int TEX_ANIM_MAX => Z_Map.GlobalSettings.TEX_ANIM_MAX;
+    public static int OBJECT_UNIT_MAX => Z_Map.GlobalSettings.ITEM_UNIT_MAX;
+    public static bool OVERLAY_HIDE => Z_Map.GlobalSettings.OVERLAY_HIDE;
 }
-    public static class GlobalNameHelper
+public static class GlobalNameHelper
 {
-     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
-     public static string GetRuntimePrefabName(string name) => "runtime$" + name;
+    public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
+    public static string GetRuntimePrefabName(string name) => "runtime$" + name;
 }
 public static class GlobalDataHelper
 {
-    public static CharacterAnimForm.Data GetCharacterAnim(this CharacterProductForm.Data data, int id) => Character.GlobalHelper.GetAnim( data,  id);
-    public static void SaveCharacterAnim(this CharacterProductForm.Data data, int id, CharacterAnimForm.Data info) => Character.GlobalHelper.SaveAnim(data, id,info);
+    public static CharacterAnimForm.Data GetCharacterAnim(this CharacterProductForm.Data data, int id) => Character.GlobalHelper.GetAnim(data, id);
+    public static void SaveCharacterAnim(this CharacterProductForm.Data data, int id, CharacterAnimForm.Data info) => Character.GlobalHelper.SaveAnim(data, id, info);
 
 }
 
@@ -47,16 +47,17 @@ public class GameManager : Z_MonoManager<GameManager>
 {
     public GameUtilController utilCtrl;
     public GameSaveController saveCtrl;
+    public GameMapController mapCtrl;
     public Vector2 downPos;
-    public float dragDis2 => InputManager.instance.screenSize.x/25;
+    public float dragDis2 => InputManager.instance.screenSize.x / 25;
 
     public override void Init()
     {
         base.Init();
 
-
         utilCtrl = new GameUtilController(this);
         saveCtrl = new GameSaveController(this);
+        mapCtrl = new GameMapController(this);
 
         Application.targetFrameRate = 100;//先锁100帧
         //default Assets
@@ -125,25 +126,25 @@ public class GameManager : Z_MonoManager<GameManager>
 
         config.onButtonW = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerPos(PlayManager.instance.sceneCtrl.GetPlayerPos()+ Time.deltaTime * Vector3.forward * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.forward * 4);
         };
         config.onButtonS = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerPos(PlayManager.instance.sceneCtrl.GetPlayerPos() + Time.deltaTime * Vector3.back * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.back * 4);
         };
 
         config.onButtonA = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerPos(PlayManager.instance.sceneCtrl.GetPlayerPos() + Time.deltaTime * Vector3.left * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.left * 4);
         };
         config.onButtonD = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerPos(PlayManager.instance.sceneCtrl.GetPlayerPos() + Time.deltaTime * Vector3.right * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.right * 4);
         };
-        config.onMouse = (id, pos, dir,ui) =>
+        config.onMouse = (id, pos, dir, ui) =>
         {
-            
-            if (id==0&&ui==null&& downPos != Vector2.zero )//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
+
+            if (id == 0 && ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
             {
                 PlayManager.instance.OnMouse(false, pos, dir);
             }
@@ -151,8 +152,8 @@ public class GameManager : Z_MonoManager<GameManager>
 
         config.onMouseDown = (id, pos, ui) =>
         {
-            
-            if (ui==null)
+
+            if (ui == null)
             {
                 downPos = pos;
             }
@@ -205,7 +206,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
             if (id == 0 && ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
             {
-                PlayManager.instance.OnMouse(false, pos, dir);
+                ModManager.instance.OnMouse(false, pos, dir);
             }
         };
 
@@ -225,7 +226,7 @@ public class GameManager : Z_MonoManager<GameManager>
         {
             if (id == 0 && ui == null && downPos != Vector2.zero && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < dragDis2)
             {
-                PlayManager.instance.OnMouse(true, pos, Vector3.zero);
+                ModManager.instance.OnMouse(true, pos, Vector3.zero);
             }
             downPos = Vector2.zero;
         };

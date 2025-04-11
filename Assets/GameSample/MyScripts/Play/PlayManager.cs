@@ -46,7 +46,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public async void BeginStory(string storyName, bool boxPlay)
     {
         this._folderName = storyName;
-        PlayData data = null; 
+        data = null; 
         this.boxPlay = boxPlay;
         if (!boxPlay)
         {

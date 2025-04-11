@@ -33,6 +33,8 @@ namespace Ui.ModStoryConfig.ModStoryConfigInit
                     true, (id) =>
                     {
                         ConfigForm.DataByUid[1].mainCharacterName = lst[id];
+                        Refresh();
+                        return true;
                     }, lst, spriteLst);
             });
         }

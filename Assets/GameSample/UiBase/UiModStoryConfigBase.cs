@@ -22,15 +22,13 @@ namespace ModStoryConfigInit
     public partial class UiModStoryConfigInitView:UiView
     {
 
-            public Sta sta_exist;
             public Btn btn_mainCharacter;
             public Txt txt_mainCharacter;
         public UiModStoryConfigInitView(UiHolder uiHolder):base(uiHolder)
         {
 
-            sta_exist = uiHolder.elementTrsLst[0].GetComponent<Sta>();
-            btn_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            txt_mainCharacter = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            btn_mainCharacter = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            txt_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Txt>();
         }
 
     }
@@ -76,15 +74,13 @@ namespace ModStoryConfigGlobal
     public partial class UiModStoryConfigGlobalView:UiView
     {
 
-            public Sta sta_exist;
             public Btn btn_mainCharacter;
             public Txt txt_mainCharacter;
         public UiModStoryConfigGlobalView(UiHolder uiHolder):base(uiHolder)
         {
 
-            sta_exist = uiHolder.elementTrsLst[0].GetComponent<Sta>();
-            btn_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            txt_mainCharacter = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            btn_mainCharacter = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            txt_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Txt>();
         }
 
     }

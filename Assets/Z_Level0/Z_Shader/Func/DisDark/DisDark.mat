@@ -29,7 +29,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
@@ -85,7 +85,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Tex:
-        m_Texture: {fileID: 2800000, guid: 849e135716317804aaa3f87a22477a17, type: 3}
+        m_Texture: {fileID: 2800000, guid: 30cd9603abb0ef54d845ce7276495790, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture2DAsset_f5c10dfa6632467eba0c9d6679b34a6e_Out_0:
@@ -124,6 +124,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
+    - _Mode: 0
     - _NeedCloseHide: 0
     - _NotNeedCloseHide: 0
     - _OcclusionStrength: 1
@@ -138,6 +139,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _UVSec: 0
     - _UseCloseHide: 0
     - _WorkflowMode: 1
     - _ZWrite: 1

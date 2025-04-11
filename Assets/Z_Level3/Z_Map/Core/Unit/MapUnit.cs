@@ -28,8 +28,6 @@ namespace Z_Map
         {
             base.Show();
 
-            MapManager.instance.unitUtilCtrl.ShowFinalMat((MapInstance)ins);
-            
         }
        
        

@@ -32,34 +32,34 @@ namespace Z_Map
 
         public override void UpdateInfo()
         {
-           
 
-                if (data.updateType== (int)UpdateType.Always||isShowing)
+
+            if (data.updateType == (int)UpdateType.Always || isShowing)
             {
                 //nav
                 if (data.navEnabled)
                 {
-                    if((data.destination- data.pos).sqrMagnitude< data.alertDis * data.alertDis)
+                    if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
                     {
                         Vector3 dir = MapManager.instance.GetNavDir(data.pos, data.destination, (int)data.pathDis);
 
                         ins.transform.position = ins.transform.position + dir * Time.deltaTime * data.speed;
                     }
-                    
+
                 }
-                
+
                 var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
                 if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
-                    
+
                     var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
-                    if(superUnit!=newMap.unit)
+                    if (superUnit != newMap.unit)
                     {
                         superUnit.Unbind(this);
                         newMap.unit.Bind(this);
                         SubUpdateActive();
                     }
-                    
+
                 }
                 var newPos = ins.transform.position;
 
@@ -79,10 +79,27 @@ namespace Z_Map
                 //fix
                 newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
                 ins.transform.position = newPos;
-                
+
                 data.pos = ins.transform.position;
                 data.euler = ins.transform.eulerAngles;
 
+            }
+        }
+        public void Move(Vector3 dir)
+        {
+            if (ins != null)
+            {
+                var selfLength = ins.capsuleColliders[0].radius * ins.capsuleColliders[0].transform.localScale.x;
+                if (Physics.Raycast(ins.transform.position + Vector3.up * 0.5f, dir, out var res, selfLength+dir.magnitude))
+                {
+                    
+                    var dis = res.distance - selfLength;
+                    if (dis < 0)
+                        return;
+                    dir *= dis / dir.magnitude;
+                }
+
+                ins.transform.position += dir;
             }
         }
         public override void Remove()

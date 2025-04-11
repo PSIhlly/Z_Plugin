@@ -733,10 +733,10 @@ using Z_Texture;
     {
         switch (evt.type)
         {
-            case MapEvent.Type.Show:
+            case MapEventType.Show:
                 ShowFinalMat((MapInstance)evt.unit.ins);
                 break;
-            case MapEvent.Type.AfterUpdate:
+            case MapEventType.AfterUpdate:
                 UpdateAnim((MapInstance)evt.unit.ins);
                 break;
         }

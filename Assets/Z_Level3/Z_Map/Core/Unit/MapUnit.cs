@@ -27,12 +27,16 @@ namespace Z_Map
         public override void Show()
         {
             base.Show();
-
+            Z_EventHelper.Invoke(new MapEvent()
+            {
+                type = MapEventType.Show,
+                unit = this
+            });
         }
-       
-       
-       
-      
+
+
+
+
         public float GetYByPoint(Vector2 selfPos)
         {
             float length = 0;
@@ -40,8 +44,9 @@ namespace Z_Map
                 return -999;//直接坠落
             if (data.euler.x != 0)
             {
-                length = selfPos.y* (float)Math.Tan(-data.euler.x * 3.14f / 180);
-            } else
+                length = selfPos.y * (float)Math.Tan(-data.euler.x * 3.14f / 180);
+            }
+            else
             {
                 length = selfPos.x * (float)Math.Tan(-data.euler.z * 3.14f / 180);
             }
@@ -60,9 +65,14 @@ namespace Z_Map
         {
             base.UpdateInfo();
 
-            
+            Z_EventHelper.Invoke(new MapEvent()
+            {
+                type = MapEventType.AfterUpdate,
+                unit = this
+            });
+
         }
-        
+
 
     }
 }

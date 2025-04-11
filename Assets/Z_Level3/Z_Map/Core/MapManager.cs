@@ -29,15 +29,23 @@ namespace Z_Map
             return "z_map$" + name;
         }
     }
+    public enum MapEventType
+    {
+        Show,
+        AfterUpdate,
+    }
     public class MapEvent:Z_Event
     {
-        public enum Type
-        {
-            Show,
-            AfterUpdate,
-        }
+        
         public MapUnit unit;
-        public Type type;
+        public MapEventType type;
+    }
+
+    public class CharacterEvent : Z_Event
+    {
+        
+        public CharacterUnit unit;
+        public MapEventType type;
     }
 
     public class MapManager : Z_MonoManager<MapManager>
@@ -228,11 +236,7 @@ namespace Z_Map
                         var map = data.maps[(i, j, k)];
                         map.unit.Show();
                         lst.Add(map);
-                        Z_EventHelper.Invoke(new MapEvent()
-                        {
-                            type = MapEvent.Type.Show,
-                            unit = map.unit
-                        });
+                        
                     }
                 }
             }
@@ -348,14 +352,7 @@ namespace Z_Map
             }
             UpdateVision();
 
-            foreach (var map in curMapLst)
-            {
-                Z_EventHelper.Invoke(new MapEvent()
-                {
-                    type = MapEvent.Type.AfterUpdate,
-                    unit = map.unit
-                });
-            }
+
         }
         public void DebugShow()
         {

@@ -29,7 +29,15 @@ namespace Z_Map
         {
             return typeof(CharacterInstance);
         }
-
+        public override void Show()
+        {
+            base.Show();
+            Z_EventHelper.Invoke(new CharacterEvent()
+            {
+                type = MapEventType.Show,
+                unit = this
+            });
+        }
         public override void UpdateInfo()
         {
 
@@ -79,11 +87,17 @@ namespace Z_Map
                 //fix
                 newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
                 ins.transform.position = newPos;
-
+                ins.step =   newPos - data.pos;
                 data.pos = ins.transform.position;
                 data.euler = ins.transform.eulerAngles;
 
             }
+
+            Z_EventHelper.Invoke(new CharacterEvent()
+            {
+                type = MapEventType.AfterUpdate,
+                unit = this
+            });
         }
         public void Move(Vector3 dir)
         {

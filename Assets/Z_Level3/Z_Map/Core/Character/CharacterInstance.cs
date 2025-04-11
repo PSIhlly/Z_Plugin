@@ -12,5 +12,6 @@ namespace Z_Map
             set { base.unit = value; }
             get { return (CharacterUnit)base.unit; }
         }
+        public Vector3 step;
     }
 }

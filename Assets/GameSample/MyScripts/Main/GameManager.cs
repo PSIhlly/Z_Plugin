@@ -172,6 +172,10 @@ public class GameManager : Z_MonoManager<GameManager>
             }
             downPos = Vector2.zero;
         };
+        config.onMouseMove = (pos) =>
+        {
+            PlayManager.instance.OnMouseMove(pos);
+        };
 
         config.onMouseScroll = (v) =>
         {

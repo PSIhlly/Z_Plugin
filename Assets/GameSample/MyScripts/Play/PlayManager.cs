@@ -40,6 +40,11 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         _sceneCtrl.OnMouse(click, pos, dir);
     }
+    public void OnMouseMove(Vector3 pos)
+    {
+        _sceneCtrl.OnMouseMove(pos);
+    }
+    
     public void Update()
     {
         _sceneCtrl.Update();

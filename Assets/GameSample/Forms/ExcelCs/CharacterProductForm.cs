@@ -60,6 +60,8 @@ namespace Form
                 
         public static Action<Data,List<string>,List<string>> changeAnimjoAction;
                 
+        public static Action<Data,string,string> changeIdleanimnameAction;
+                
         public static Action<Data,string,string> changeMoveanimnameAction;
                 
         public static Action<Data,string,string> changeSpeedparamnameAction;
@@ -103,6 +105,24 @@ namespace Form
                     }
         
                 _animJo = value;
+                }
+                 
+                     }
+                    
+                    private string  _idleAnimName;
+                    /// <summary>
+                    ///ÏÐÖÃ¶¯»­Ãû
+                    ///</summary>
+                    public string  idleAnimName{
+                                get{return _idleAnimName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeIdleanimname(this,_idleAnimName,value); 
+                    }
+        
+                _idleAnimName = value;
                 }
                  
                      }
@@ -161,7 +181,7 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string avatarTexName,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,paramDic,isProto)
+            public Data(int uid,string name,string avatarTexName,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,paramDic,isProto)
             {
 
              this.uid = uid;
@@ -170,6 +190,7 @@ namespace Form
              this.paramDic = paramDic;
              this.isProto = isProto;
              this.animJo = animJo;
+             this.idleAnimName = idleAnimName;
              this.moveAnimName = moveAnimName;
              this.speedParamName = speedParamName;
              this.hpParamName = hpParamName;
@@ -178,7 +199,7 @@ namespace Form
             
         }
 
-                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(int,int,int)>(){},false,null,"","","");
+                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(int,int,int)>(){},false,null,"","","","");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -282,6 +303,8 @@ namespace Form
 
                 jo.Get<List<string>>("animJo"),
 
+                jo.Get<string>("idleAnimName"),
+
                 jo.Get<string>("moveAnimName"),
 
                 jo.Get<string>("speedParamName"),
@@ -309,6 +332,8 @@ namespace Form
             jo.Set<bool>("isProto",data.isProto);
 
             jo.Set<List<string>>("animJo",data.animJo);
+
+            jo.Set<string>("idleAnimName",data.idleAnimName);
 
             jo.Set<string>("moveAnimName",data.moveAnimName);
 
@@ -444,6 +469,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeAnimjoAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIdleanimname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIdleanimnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

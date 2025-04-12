@@ -7,27 +7,23 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_DataSystem.Form;
 
-namespace Ui.ModStoryCharacterListArguments
+namespace Ui.ModStoryCharacterListArguments.ModStoryCharacterListArgumentsCustom
 {
-    public partial class UiModStoryCharacterListArgumentsParam
+    public partial class UiModStoryCharacterListArgumentsCustomParam
     {
         public CharacterProductForm.Data data;
     }
-    public partial class UiModStoryCharacterListArgumentsModel
+    public partial class UiModStoryCharacterListArgumentsCustomModel
     {
         public CharacterProductForm.Data data;
     }
-    public partial class UiModStoryCharacterListArgumentsCtrl
+    public partial class UiModStoryCharacterListArgumentsCustomCtrl
     {
 
         UiScrViewContainer<UiUnitCtrl> con;
         public override void OnCreate()
         {
             con = new UiScrViewContainer<UiUnitCtrl>(view.go_unit,view.scr_units);
-            view.btn_back.onClick.AddListener(() =>
-            {
-                Close();
-            });
         }
         public override void OnShow()
         {

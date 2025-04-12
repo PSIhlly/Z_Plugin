@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Z_String;
 using Z_Ui.Base;
 
 namespace Z_Ui_Editor
@@ -10,8 +12,134 @@ namespace Z_Ui_Editor
     [CustomEditor(typeof(UiHolder))]
     public class UiHolderEditor : Editor
     {
+        
+        public string GetQuickCode() {
+            string modelCode = "";
+            string showCode = "";
+            string paramCode = "";
+
+            string declareCode = "";
+            string initCode = "";
+            string refreshCode = "";
+
+            string subCode = "";
+
+            if (uiHolder.subUiHolderLst.Find(x=>x.uiType== UiType.Panel)!=null)
+            {
+                modelCode += $@"
+            public int selPage;";
+                paramCode += $@"
+            public int selPage;";
+                showCode += $@"
+            if(param!=null)
+                model.selPage=param.selPage;";
+            }
+
+            HashSet<Transform> exist = new HashSet<Transform>();
+
+            foreach (var o in uiHolder.elementTrsLst)
+            {
+                if (exist.Contains(o))
+                    continue;
+                exist.Add(o);
+
+                if (o.TryGetComponent<UiHolder>(out var subHolder))
+                {
+                    if(subHolder.uiType == UiType.Sub)
+                    {
+                        string scrCode = "view."+( o.transform.GetComponentInParent<ScrView>() == null ? "" : o.transform.GetComponentInParent<ScrView>().transform.name);
+
+                        declareCode += $@"
+            UiScrViewContainer<Ui{subHolder.uiName}Ctrl> {subHolder.uiName.FirstToLower()}Con;";
+                        initCode += $@"
+            {subHolder.uiName.FirstToLower()}Con = new UiScrViewContainer<Ui{subHolder.uiName}Ctrl>(view.go_{o.gameObject.name.Split("_")[1]},{scrCode});";
+                        refreshCode += $@"
+            {subHolder.uiName.FirstToLower()}Con.Clear();
+            for(int i=0,icnt= ;i<icnt;i++)
+            {{
+                {subHolder.uiName.FirstToLower()}Con.Add(new Ui{subHolder.uiName}Param()
+                {{
+                    
+                }});
+            }}
+            {subHolder.uiName.FirstToLower()}Con.Refresh();";
+
+                        subCode += ((UiHolderEditor)CreateEditor(subHolder)).GetQuickCode();
+                    }
+                    else if (subHolder.uiType == UiType.Panel)
+                    {
+                        refreshCode+= $@"
+            view.page_{subHolder.uiName}.SetActive(model.selPage == 0);";
+                    }
+                }else if (o.name.Split("_")[0].Split("|").Contains("btn"))
+                {
+                    initCode += $@"
+            view.btn_{o.name.Split("_")[1]}.onClick.AddListener(() =>
+            {{
+
+            }});";
+                }else if (o.name.Split("_")[0].Split("|").Contains("sta"))
+                {
+                    refreshCode += $@"
+            view.sta_{o.name.Split("_")[1]}.ChangeState(0);";
+                }else if (o.name.Split("_")[0].Split("|").Contains("img"))
+                {
+                    refreshCode += $@"
+            view.img_{o.name.Split("_")[1]}.sprite=TextureHelper.transparentSprite;";
+                }else if (o.name.Split("_")[0].Split("|").Contains("txt"))
+                {
+                    refreshCode += $@"
+            view.txt_{o.name.Split("_")[1]}.text="""" ;";
+                }
+            }
+
+            
 
 
+
+            return $@"
+{(uiHolder.uiType == UiType.Sub ? "": $@"
+using Form;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Z_Ui.Base;
+using Z_Texture;
+{namespaceContent}
+namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolder.parent.uiName+".":"" )+uiHolder.uiName)}
+{{
+")}
+    public partial class Ui{uiHolder.uiName}Param
+    {{
+{paramCode}
+    }}
+    public partial class Ui{uiHolder.uiName}Model
+    {{
+{modelCode}
+    }}
+    public partial class Ui{uiHolder.uiName}Ctrl
+    {{
+{declareCode}
+        public override void OnCreate()
+        {{
+{initCode}
+
+        }}
+        public override void OnShow()
+        {{
+{showCode}
+            Refresh();
+        }}
+        public void Refresh()
+        {{
+{refreshCode}            
+        }}
+    }}
+{subCode}
+{(uiHolder.uiType == UiType.Sub ? "":"}")}";
+        }
         public bool binded;
         UiHolder uiHolder=> (UiHolder)target;
         public override void OnInspectorGUI()
@@ -19,7 +147,10 @@ namespace Z_Ui_Editor
 
             //绘制输入框
             uiHolder.uiName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
-
+            if (GUILayout.Button("CopyQuickCode"))
+            {
+                GUIUtility.systemCopyBuffer = GetQuickCode();
+            }
             if (uiHolder.uiType == UiType.Panel&&uiHolder.GetComponentsInParent<UiHolder>(true).Length==1)
             {
                 uiHolder.path = EditorGUILayout.TextField("Path: ", uiHolder.path);
@@ -28,7 +159,8 @@ namespace Z_Ui_Editor
                 {
                     GenerateFile();
                 }
-                
+
+
             }
             
 

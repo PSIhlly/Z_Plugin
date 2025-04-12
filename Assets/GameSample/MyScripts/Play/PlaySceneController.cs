@@ -24,6 +24,9 @@ public interface InternalPlaySceneController
     public void End();
     public void Update();
     public void OnMouse(bool click, Vector3 pos, Vector3 dir);
+    public void OnMouseMove(Vector3 pos);
+
+    
 }
 public interface ExternalPlaySceneController
 {
@@ -113,6 +116,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
        
     }
+    public void OnMouseMove(Vector3 pos)
+    {
+        SetPlayerRotation( new Vector3(pos.x - InputManager.instance.screenSize.x/2,0, pos.y - InputManager.instance.screenSize.y / 2));
+    }
+    
     public void ForceUpdate()
     {
 
@@ -195,10 +203,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerRotation(Vector3 dir,float speed=360)
     {
-        if (playerM == null)
+        if (playerM == null|| playerM.unit.ins==null)
             return;
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-        playerM.euler= Quaternion.Slerp(Quaternion.Euler(playerM.euler), targetRotation, speed * Time.deltaTime).eulerAngles;
+        playerM.unit.ins.transform.rotation= Quaternion.Slerp(Quaternion.Euler(playerM.euler), targetRotation, speed * Time.deltaTime);
     }
 }

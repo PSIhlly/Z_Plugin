@@ -48,7 +48,7 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
             {
                 UiManager.instance.ShowUi<UiModStoryCharacterListArgumentsCtrl>(new UiModStoryCharacterListArgumentsParam()
                 {
-                    data = model.curData
+                   // data = model.curData
                 }) ;
             });
             view.btn_model.onClick.AddListener(() =>

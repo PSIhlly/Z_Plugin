@@ -34,6 +34,7 @@ namespace Z_Input
         public Action<int, Vector3,GameObject> onMouseDown;
         public Action<int, Vector3, Vector3, GameObject> onMouse;
         public Action<int, Vector3, GameObject> onMouseUp;
+        public Action<Vector3> onMouseMove;
 
         public Action<float> onMouseScroll;
 
@@ -49,6 +50,8 @@ namespace Z_Input
         public Dictionary<int, Vector2> mousePos = new Dictionary<int, Vector2>();
         public Dictionary<int, Vector2> mouseOldPos = new Dictionary<int, Vector2>();
 
+        private Vector3 lastMousePos;
+
         public Dictionary<int, Vector2> id2Pos = new Dictionary<int, Vector2>();
         public Dictionary<int, Vector2> id2OldPos = new Dictionary<int, Vector2>();
 
@@ -56,12 +59,14 @@ namespace Z_Input
         private List<int> tmpList = new List<int>();
         private HashSet<int> tmpHash = new HashSet<int>();
         private int pointCnt;
+
         public override void Init()
         {
             screenSize = new Vector2(Screen.width, Screen.height);
         }
         public void Register(InputConfig config)
         {
+            lastMousePos = Vector3.zero;
             cur = config;
         }
 
@@ -187,8 +192,11 @@ namespace Z_Input
             {
                 cur?.onMouseScroll?.Invoke(scroll);
             }
-           
-
+            if((lastMousePos- Input.mousePosition).sqrMagnitude>0.0001f)
+            {
+                lastMousePos = Input.mousePosition;
+                cur?.onMouseMove?.Invoke(lastMousePos);
+            }
 
         }
 

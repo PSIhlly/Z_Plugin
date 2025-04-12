@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System.Collections;
 using System.Collections.Generic;
 using Ui;
+using Ui.ModSceneMain;
 using Ui.ModSceneUnit;
 using Ui.ModStory;
 using UnityEditor;
@@ -95,6 +96,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500),MapManager.instance.data.mainData.mapUnitSize);
         enable = true;
         waitForActive = false;
+        UiManager.instance.ShowUi<UiModSceneMainCtrl>();
     }
     public void End()
     {

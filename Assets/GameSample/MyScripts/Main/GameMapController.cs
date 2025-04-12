@@ -26,10 +26,12 @@ using Z_Texture;
 
         public Dictionary<(string, int), Texture2D> alphaTextureDic=new Dictionary<(string, int), Texture2D>();
         public Dictionary<string, List<Texture2D>> animTextureDic=new Dictionary<string, List<Texture2D>>();
-        public void Reset()
+        public Dictionary<MapUnitForm.Data,Dictionary<int, int>> animCurCache = new Dictionary<MapUnitForm.Data, Dictionary<int, int>>();
+    public void Reset()
         {
             alphaTextureDic.Clear();
             animTextureDic.Clear();
+            animCurCache.Clear(); 
         }
         public void CreateTexAnimVariants(string name, Texture2D[] rawAnimTex)
         {
@@ -665,7 +667,11 @@ using Z_Texture;
         public void ShowFinalMat(MapInstance ins)
         {
             var data = ins.unit.data;
-            for (int i = 0; i < ins.renderers.Length; i++)
+        if (!animCurCache.ContainsKey(data))
+        {
+            animCurCache[data] = new Dictionary<int, int>();
+        }
+        for (int i = 0; i < ins.renderers.Length; i++)
             {
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 ins.renderers[i].GetPropertyBlock(propBlock);
@@ -716,11 +722,12 @@ using Z_Texture;
                     int all = data.animInterval[i] * animTextureDic[data.texNameDic[i]].Count;
 
                     int cur = (Time.frameCount % all) / data.animInterval[i];
-                    if (all > 0 && (!ins.animCur.ContainsKey(i) || ins.animCur[i] != cur))
+                
+                    if (all > 0 && (!animCurCache[data].ContainsKey(i)|| animCurCache[data][i] != cur))
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         ins.renderers[i].GetPropertyBlock(propBlock);
-                        ins.animCur[i] = cur;
+                        animCurCache[data][i] = cur;
                         propBlock.SetTexture("_Tex", animTextureDic[data.texNameDic[i]][cur]);
                         ins.renderers[i].SetPropertyBlock(propBlock);
                     }

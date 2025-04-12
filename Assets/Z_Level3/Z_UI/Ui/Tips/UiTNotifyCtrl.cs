@@ -55,6 +55,7 @@ namespace Ui.Notify
         }
         public void Refresh()
         {
+            view.btn_back.gameObject.SetActive(false);
             //tip:
 
             tipCon.Clear();

@@ -56,7 +56,6 @@ namespace Ui.Mod
             view.btn_mod.onClick.AddListener(() =>
             {
                 Main2StoryManager.instance.StartLoadStoryUgc("story1");
-                UiManager.instance.ShowUi<UiModStoryCtrl>();
                 parent.Close();
             });
         }

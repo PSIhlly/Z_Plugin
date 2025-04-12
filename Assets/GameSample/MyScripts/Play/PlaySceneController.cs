@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.ModStory;
+using Ui.PlaySceneMain;
 using UnityEditor;
 using UnityEngine;
 using Z_Debug;
@@ -33,6 +34,8 @@ public interface ExternalPlaySceneController
     public void SetPlayerRotation(Vector3 dir, float speed);
 
     public void ForceUpdate();
+
+    public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data);
 }
 public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController
 {
@@ -48,6 +51,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     Vector3 setPlayerMove;
     CharacterUnitForm.Data playerM;
     CharacterProductForm.Data playerG;
+    private Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data> _characterDic;
 
     #region internal Var
     private string _fileName;
@@ -69,6 +73,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         setPlayerMove = Vector3.zero;
          enable = true;
         waitForActive = false;
+        _characterDic = new Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data>();
+        UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
+        playerM = null;
+        playerG = null;
     }
     public void End()
     {
@@ -129,7 +137,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         if (playerM == null)
         {
-            playerM = MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
+            playerM = CreateCharacter(playerG); 
         }
         {
             MapManager.instance.UpdateInfo();
@@ -155,6 +163,19 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         CameraInstance.instance.tarTrs.position = new Vector3(x, y, z);
         //Z_EventHelper.Invoke(new CameraMoveEvent());
     }
+    public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data)
+    {
+        if (!_characterDic.ContainsKey(data))
+            return null;
+        return _characterDic[data];
+    }
+    public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
+    {
+        var unitData=  MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
+        _characterDic[unitData] = data;
+        return unitData;
+    }
+
     public Vector3 GetPlayerPos()
     {
         return lastPlayerPos;

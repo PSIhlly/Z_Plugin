@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TreeEditor;
 using Ui;
 using Ui.Loading;
 using Ui.ModSceneMain;
@@ -52,6 +53,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     public void UnloadStoryUgc()
     {
         ModManager.instance.EndStory();
+        UnloadStory();
+    }
+    public void UnloadStoryPlay()
+    {
+        PlayManager.instance.EndStory();
         UnloadStory();
     }
     public void UnloadStory()
@@ -133,7 +139,13 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic5(maskData.name, raws);
         }
 
-
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            var anim=character.GetCharacterAnim(0);
+            var idleUpLst = new List<string>(anim.partAnimTexsName[0]);
+            var idleDownLst = new List<string>(anim.partAnimTexsName[1]);
+            GameManager.instance.characterCtrl.CreateAnim(character, idleUpLst, idleDownLst);
+        }
 
         Z_EventHelper.Invoke(new LoadingEvent()
         {
@@ -147,9 +159,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         UnloadScene();
         ModManager.instance.EndScene();
     }
+    public void UnloadScenePlay()
+    {
+        UnloadScene();
+        PlayManager.instance.EndScene();
+    }
     public void UnloadScene()
     {
         GameManager.instance.mapCtrl.Reset();
+        GameManager.instance.characterCtrl.Reset();
     }
     #endregion
 

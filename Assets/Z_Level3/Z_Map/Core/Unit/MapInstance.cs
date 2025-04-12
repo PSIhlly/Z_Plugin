@@ -12,7 +12,6 @@ namespace Z_Map
             set { base.unit = value; }
             get { return (MapUnit)base.unit; }
         }
-        public Dictionary<int,int> animCur=new Dictionary<int, int>();
 
         public override void VisOn()
         {

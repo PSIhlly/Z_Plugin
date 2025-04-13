@@ -5,7 +5,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 
-namespace Ui.ModStoryCharacterListModel
+namespace Ui.ModStoryCharacterListAnim
 
 {
 
@@ -37,7 +37,7 @@ namespace Ui.ModStoryCharacterListModel
         public UiItemView view;
         public UiItemModel model;
         public UiItemParam param;
-        public UiModStoryCharacterListModelCtrl parent=>(UiModStoryCharacterListModelCtrl)uiHolder.parent.ctrl;
+        public UiModStoryCharacterListAnimCtrl parent=>(UiModStoryCharacterListAnimCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -89,7 +89,7 @@ namespace Ui.ModStoryCharacterListModel
         public UiUnitView view;
         public UiUnitModel model;
         public UiUnitParam param;
-        public UiModStoryCharacterListModelCtrl parent=>(UiModStoryCharacterListModelCtrl)uiHolder.parent.ctrl;
+        public UiModStoryCharacterListAnimCtrl parent=>(UiModStoryCharacterListAnimCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -112,11 +112,11 @@ namespace Ui.ModStoryCharacterListModel
     {
         
     }
-    public partial class UiModStoryCharacterListModelParam:UiParam
+    public partial class UiModStoryCharacterListAnimParam:UiParam
     {
     }
 
-    public partial class UiModStoryCharacterListModelView:UiView
+    public partial class UiModStoryCharacterListAnimView:UiView
     {
 
             public Btn btn_back;
@@ -150,7 +150,7 @@ namespace Ui.ModStoryCharacterListModel
             public Btn btn_deleteId;
             public GameObject go_unit;
             public UiUnitCtrl sub_Unit;
-        public UiModStoryCharacterListModelView(UiHolder uiHolder):base(uiHolder)
+        public UiModStoryCharacterListAnimView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
@@ -187,16 +187,16 @@ namespace Ui.ModStoryCharacterListModel
         }
 
     }
-    public partial class UiModStoryCharacterListModelCtrl:UiCtrl
+    public partial class UiModStoryCharacterListAnimCtrl:UiCtrl
     {
-        public UiModStoryCharacterListModelView view;
-        public UiModStoryCharacterListModelModel model;
-        public UiModStoryCharacterListModelParam param;
+        public UiModStoryCharacterListAnimView view;
+        public UiModStoryCharacterListAnimModel model;
+        public UiModStoryCharacterListAnimParam param;
         
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiModStoryCharacterListModelParam)param;
+            this.param = (UiModStoryCharacterListAnimParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -204,8 +204,8 @@ namespace Ui.ModStoryCharacterListModel
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiModStoryCharacterListModelView(uiHolder);
-            model=new UiModStoryCharacterListModelModel();
+            view = new UiModStoryCharacterListAnimView(uiHolder);
+            model=new UiModStoryCharacterListAnimModel();
 
 
             view.sub_Item = new UiItemCtrl();
@@ -215,7 +215,7 @@ namespace Ui.ModStoryCharacterListModel
         }
 
     }
-    public partial class UiModStoryCharacterListModelModel:UiModel
+    public partial class UiModStoryCharacterListAnimModel:UiModel
     {
         
     }

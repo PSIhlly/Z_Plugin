@@ -203,7 +203,7 @@ namespace ModStoryCharacterList
             public Btn btn_delete;
             public Ipt ipt_name;
             public Btn btn_args;
-            public Btn btn_model;
+            public Btn btn_anim;
             public GameObject go_item;
             public UiItemCtrl sub_Item;
             public Img img_avatar;
@@ -212,8 +212,8 @@ namespace ModStoryCharacterList
             public Txt txt_name;
             public Img img_args;
             public Txt txt_args;
-            public Img img_model;
-            public Txt txt_model;
+            public Img img_anim;
+            public Txt txt_anim;
         public UiModStoryCharacterListView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -224,7 +224,7 @@ namespace ModStoryCharacterList
             btn_delete = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             btn_args = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_model = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_anim = uiHolder.elementTrsLst[7].GetComponent<Btn>();
             go_item = uiHolder.elementTrsLst[8].gameObject;
             sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
             img_avatar = uiHolder.elementTrsLst[10].GetComponent<Img>();
@@ -233,8 +233,8 @@ namespace ModStoryCharacterList
             txt_name = uiHolder.elementTrsLst[13].GetComponent<Txt>();
             img_args = uiHolder.elementTrsLst[14].GetComponent<Img>();
             txt_args = uiHolder.elementTrsLst[15].GetComponent<Txt>();
-            img_model = uiHolder.elementTrsLst[16].GetComponent<Img>();
-            txt_model = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            img_anim = uiHolder.elementTrsLst[16].GetComponent<Img>();
+            txt_anim = uiHolder.elementTrsLst[17].GetComponent<Txt>();
         }
 
     }

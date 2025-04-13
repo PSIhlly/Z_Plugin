@@ -135,6 +135,14 @@ namespace Form
 
                 {1100001,new Data(1100001,"Choose main character","Choose main character","选择主角")},
 
+                {1110001,new Data(1110001,"Choose Hp Param","Choose Hp Param","选择血量参数")},
+
+                {1110002,new Data(1110002,"Choose Speed Param","Choose Speed Param","选择移速参数")},
+
+                {1110003,new Data(1110003,"Choose Idle anim","Choose Idle anim","选择闲置动画")},
+
+                {1110004,new Data(1110004,"Choose Move anim","Choose Move anim","选择移动动画")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -159,6 +167,14 @@ namespace Form
                         {"minYTip",_DataById[1001001]},
     
                         {"Choose main character",_DataById[1100001]},
+    
+                        {"Choose Hp Param",_DataById[1110001]},
+    
+                        {"Choose Speed Param",_DataById[1110002]},
+    
+                        {"Choose Idle anim",_DataById[1110003]},
+    
+                        {"Choose Move anim",_DataById[1110004]},
     
                     };
     

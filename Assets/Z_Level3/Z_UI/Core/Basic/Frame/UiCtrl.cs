@@ -43,10 +43,13 @@ namespace Z_Ui.Base
         {
             gameObject.SetActive(false);
         }
-        public void SetActive(bool active)
+        public void SetActive(bool active,UiParam param=null)
         {
             if(uiHolder!=null&&uiHolder.gameObject!=null)
-            uiHolder.gameObject.SetActive(active);
+            {
+                SetParam(param);
+                uiHolder.gameObject.SetActive(active);
+            }
         }
         public bool isActive => (uiHolder != null && uiHolder.gameObject != null)?uiHolder.gameObject.activeSelf:false;
     }

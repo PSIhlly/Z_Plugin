@@ -1,28 +1,24 @@
 using Form;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Ui.Base;
 
-namespace Ui.ModStoryCharacterListModel
+namespace Ui.ModStoryCharacterListAnim
 {
-    public partial class UiModStoryCharacterListModelParam
+    public partial class UiModStoryCharacterListAnimParam
     {
         public CharacterProductForm.Data data;
     }
-    public partial class UiModStoryCharacterListModelModel
+    public partial class UiModStoryCharacterListAnimModel
     {
         public CharacterProductForm.Data data;
         public int animId;
         public int part;
         public int id;
     }
-    public partial class UiModStoryCharacterListModelCtrl
+    public partial class UiModStoryCharacterListAnimCtrl
     {
         UiScrViewContainer<UiItemCtrl> con;
         UiScrViewContainer<UiUnitCtrl> animCon;

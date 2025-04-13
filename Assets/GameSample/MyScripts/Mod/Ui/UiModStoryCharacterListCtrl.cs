@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ui.ModStoryCharacterListArguments;
-using Ui.ModStoryCharacterListModel;
+using Ui.ModStoryCharacterListAnim;
 using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
@@ -48,12 +48,12 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
             {
                 UiManager.instance.ShowUi<UiModStoryCharacterListArgumentsCtrl>(new UiModStoryCharacterListArgumentsParam()
                 {
-                   // data = model.curData
+                    data = model.curData
                 }) ;
             });
-            view.btn_model.onClick.AddListener(() =>
+            view.btn_anim.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiModStoryCharacterListModelCtrl>(new UiModStoryCharacterListModelParam()
+                UiManager.instance.ShowUi<UiModStoryCharacterListAnimCtrl>(new UiModStoryCharacterListAnimParam()
                 {
                     data = model.curData
                 });

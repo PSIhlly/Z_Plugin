@@ -22,9 +22,25 @@ namespace ModStoryCharacterListArgumentsStatic
     public partial class UiModStoryCharacterListArgumentsStaticView:UiView
     {
 
+            public Btn btn_hpArgument;
+            public Btn btn_speedArgument;
+            public Btn btn_idleAnim;
+            public Btn btn_moveAnim;
+            public Txt txt_hpArgument;
+            public Txt txt_speedArgument;
+            public Txt txt_idleAnim;
+            public Txt txt_moveAnim;
         public UiModStoryCharacterListArgumentsStaticView(UiHolder uiHolder):base(uiHolder)
         {
 
+            btn_hpArgument = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            btn_speedArgument = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            btn_idleAnim = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_moveAnim = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            txt_hpArgument = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+            txt_speedArgument = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_idleAnim = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_moveAnim = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }

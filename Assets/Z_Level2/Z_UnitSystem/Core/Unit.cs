@@ -31,7 +31,7 @@ namespace Z_UnitSystem
         public List<Unit> subUnits=new List<Unit>();
         public Unit superUnit;
 
-        private int lastUpdateFrame;
+        protected int lastUpdateFrame;
         public bool isShowing => ins != null && ins.gameObject != null && ins.gameObject.activeSelf;
 
         public bool isVising => isShowing&&ins.vising;

@@ -14,12 +14,12 @@ namespace Z_Time
         public static List<(Action, GameObject)> NextFrameList = new List<(Action, GameObject)>();
         public static List<(Action, GameObject)> NextFixedFrameList = new List<(Action, GameObject)>();
 
-        public Timer StartTimer(float interval, Func<bool> func, MonoBehaviour bind = null)
+        public Timer StartTimer(float delay,float interval, Func<bool> func, MonoBehaviour bind = null)
         {
             Timer timer = new Timer() {
                 bind = bind == null ? this : bind
             };
-            StartCoroutine(Work(timer,interval, func));
+            StartCoroutine(Work(timer, delay,interval, func));
             return timer;
         }
         public void CancelTimer(Timer timer)
@@ -28,8 +28,9 @@ namespace Z_Time
                 return;
             timer.cancel = true;
         }
-        private IEnumerator Work(Timer timer,float interval, Func<bool> func)
+        private IEnumerator Work(Timer timer,float delay,float interval, Func<bool> func)
         {
+            yield return new WaitForSeconds(delay);
             while (true)
             {
                 yield return new WaitForSeconds(interval);

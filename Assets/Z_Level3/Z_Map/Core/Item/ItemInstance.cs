@@ -5,6 +5,7 @@ using Z_UnitSystem;
 
 namespace Z_Map
 {
+    
     public class ItemInstance : Instance
     {
         public ObjectUnit unit
@@ -12,5 +13,6 @@ namespace Z_Map
             set { base.unit = value; }
             get { return (ObjectUnit)base.unit; }
         }
+
     }
 }

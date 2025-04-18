@@ -48,7 +48,8 @@ namespace Z_Fight
                         pos: data.pos + cur.attackPos,
                         euler: Quaternion.LookRotation(dir).eulerAngles,
                         scale: Vector3.one,
-                        updateType: 0
+                        updateType: 0,
+                        ""
                     );
                     FightManager.instance.AddUnit(bulletData.unit);
                 }

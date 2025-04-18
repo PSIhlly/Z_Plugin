@@ -145,12 +145,12 @@ namespace Ui.Dialog
             var interval = Mathf.Max(0.1f, 1f / DialogManager.instance.settings.textDisplaySpeed);
 
             TimeManager.instance.CancelTimer(model.wordTimer);
-            model.wordTimer = TimeManager.instance.StartTimer(interval, Write, uiHolder);
+            model.wordTimer = TimeManager.instance.StartTimer(0,interval, Write, uiHolder);
         }
         public void DelayForOver(float delay)
         {
             TimeManager.instance.CancelTimer(model.overTimer);
-            model.overTimer = TimeManager.instance.StartTimer(delay, () =>
+            model.overTimer = TimeManager.instance.StartTimer(delay,0, () =>
             {
                 Z_EventHelper.Invoke(new ClipPlayEvent()
                 {

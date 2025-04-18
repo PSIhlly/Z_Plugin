@@ -169,7 +169,7 @@ public void ImportMaskTex(string name,int id)
 
     public void CreateCharacter(string name)
     {
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", new Dictionary<string, (int, int, int)>(), true, new List<string>() { CreateCharacterAnimJo() },"","","",""));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", new Dictionary<string, (float, float, float)>(), true, new List<string>() { CreateCharacterAnimJo() },"","","",""));
     }
     public void DeleteCharacter(string name)
     {
@@ -194,26 +194,26 @@ public void ImportMaskTex(string name,int id)
         CharacterProductForm.DataByName[name].animJo.RemoveAt(animId);
     }
 
-    public void RenameCharacterAnim(string CharacterName, string oldName, string newName)
+    public void RenameCharacterAnim(string characterName, string oldName, string newName)
     {
-
+        var data = CharacterProductForm.DataByName[characterName];
         //change
-        for (int k = 0; k < CharacterProductForm.DataByName[oldName].animJo.Count; k++)
+        for (int k = 0; k < data.animJo.Count; k++)
         {
-            var data = GlobalDataHelper.GetCharacterAnim(CharacterProductForm.DataByName[oldName],k);
-            if (data.name == oldName)
+            var anim = GlobalDataHelper.GetCharacterAnim(data, k);
+            if (anim.name == oldName)
             {
-                data.name = newName;
-                GlobalDataHelper.SaveCharacterAnim(CharacterProductForm.DataByName[oldName], k, data);
+                anim.name = newName;
+                GlobalDataHelper.SaveCharacterAnim(data, k, anim);
             }
         }
     }
-    public void ImportCharacterAnim(string name,int animId,int part,int id)
+    public void ImportCharacterAnim(string characterName,int animId,int part,int id)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
         {
-            var data = CharacterProductForm.DataByName[name]; 
+            var data = CharacterProductForm.DataByName[characterName]; 
             var anim = data.GetCharacterAnim(animId);
             if (anim.partAnimTexsName[part].Count > id)
             {

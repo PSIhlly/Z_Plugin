@@ -22,26 +22,16 @@ public class CameraMoveEvent : Z_Event
 
 }
 
-public static class GlobalMaxSettings
+public static partial class GlobalMaxSettings
 {
-    public static int CHARACTER_AVATA_MAX => Character.GlobalSettings.CHARACTER_AVATA_MAX;
-    public static int CHARACTER_ANIM_MAX => Character.GlobalSettings.CHARACTER_ANIM_MAX;
-    public static int CHARACTER_PART_MAX => Character.GlobalSettings.CHARACTER_PART_MAX;
-    public static int TEX_ANIM_MAX => Z_Map.GlobalSettings.TEX_ANIM_MAX;
-    public static int OBJECT_UNIT_MAX => Z_Map.GlobalSettings.ITEM_UNIT_MAX;
-    public static bool OVERLAY_HIDE => Z_Map.GlobalSettings.OVERLAY_HIDE;
+    public static int TERRAIN_LAYER_MAX => 3;
 }
 public static class GlobalNameHelper
 {
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
     public static string GetRuntimePrefabName(string name) => "runtime$" + name;
 }
-public static class GlobalDataHelper
-{
-    public static CharacterAnimForm.Data GetCharacterAnim(this CharacterProductForm.Data data, int id) => Character.GlobalHelper.GetAnim(data, id);
-    public static void SaveCharacterAnim(this CharacterProductForm.Data data, int id, CharacterAnimForm.Data info) => Character.GlobalHelper.SaveAnim(data, id, info);
 
-}
 
 public class GameManager : Z_MonoManager<GameManager>
 {
@@ -128,20 +118,20 @@ public class GameManager : Z_MonoManager<GameManager>
 
         config.onButtonW = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.forward * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.forward);
         };
         config.onButtonS = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.back * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.back);
         };
 
         config.onButtonA = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.left * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.left);
         };
         config.onButtonD = () =>
         {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.right * 4);
+            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.right);
         };
         config.onMouse = (id, pos, dir, ui) =>
         {

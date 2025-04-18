@@ -3,6 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Z_UnitSystem
 {
+    public enum CollideEventType
+    {
+        TriggerEnter,
+        TriggerExit
+    }
+    public class CollideEvent : Z_Event
+    {
+        public CollideEventType type;
+        public Instance a;
+        public Instance b;
+    }
 
     public abstract class Instance: MonoBehaviour
     {
@@ -67,6 +78,25 @@ namespace Z_UnitSystem
             {
                 render.enabled = true;
             }
+        }
+
+        public virtual void OnInstanceEnter(Instance ins)
+        {
+            Z_EventHelper.Invoke(new CollideEvent()
+            {
+                type = CollideEventType.TriggerEnter,
+                a = this,
+                b = ins
+            });
+        }
+        public virtual void OnInstanceExit(Instance ins)
+        {
+            Z_EventHelper.Invoke(new CollideEvent()
+            {
+                type = CollideEventType.TriggerExit,
+                a = this,
+                b = ins
+            });
         }
     }
 }

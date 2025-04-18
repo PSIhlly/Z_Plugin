@@ -45,6 +45,7 @@ namespace Z_Input
         public bool enabled = true;
         public InputConfig cur;
         public Vector2 screenSize;
+        public Vector2 screenWorldSize;
 
 
         public Dictionary<int, Vector2> mousePos = new Dictionary<int, Vector2>();
@@ -63,6 +64,9 @@ namespace Z_Input
         public override void Init()
         {
             screenSize = new Vector2(Screen.width, Screen.height);
+            float orthographicSize = Camera.main.orthographicSize;
+            float aspect = Camera.main.aspect;
+            screenWorldSize = new Vector2(orthographicSize * aspect, orthographicSize);
         }
         public void Register(InputConfig config)
         {

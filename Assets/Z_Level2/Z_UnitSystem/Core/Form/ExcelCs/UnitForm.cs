@@ -45,6 +45,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,int,int> changeUpdatetypeAction;
                 
+        public static Action<Data,string,string> changeExtraAction;
+                
 
 
         public partial class Data
@@ -189,7 +191,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType)
+                    private string  _extra;
+                    /// <summary>
+                    ///À©Õ¹Î»
+                    ///</summary>
+                    public string  extra{
+                                get{return _extra;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeExtra(this,_extra,value); 
+                    }
+        
+                _extra = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType,string extra)
             {
 
              this.uid = uid;
@@ -199,6 +219,7 @@ public static readonly int autoUidCnt=1000000;
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new Unit(this);
 
@@ -206,7 +227,7 @@ public static readonly int autoUidCnt=1000000;
             
         }
 
-                   public static Data defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,0,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -288,7 +309,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<int>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -313,6 +336,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<int>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -443,6 +468,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

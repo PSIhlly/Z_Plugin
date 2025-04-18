@@ -42,6 +42,8 @@ namespace Z_Map.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeExtraAction+=ChangeExtra;
+
         }
         
         private static bool inited;
@@ -78,13 +80,15 @@ namespace Z_Map.Form
                 
         public static Action<Data,int,int> changeUpdatetypeAction;
                 
+        public static Action<Data,string,string> changeExtraAction;
+                
 
 
         public partial class Data : UnitForm.Data
         {
 
                 /// <summary>
-                ///å•ä½é€»è¾‘
+                ///µ¥Î»Âß¼­
                 ///</summary>
                 public CharacterUnit unit
                 {
@@ -96,7 +100,7 @@ namespace Z_Map.Form
 
                     private bool  _navEnabled;
                     /// <summary>
-                    ///å¯ç”¨
+                    ///ÆôÓÃ
                     ///</summary>
                     public bool  navEnabled{
                                 get{return _navEnabled;}
@@ -114,7 +118,7 @@ namespace Z_Map.Form
                     
                     private Vector3  _destination;
                     /// <summary>
-                    ///ç›®çš„åœ°
+                    ///Ä¿µÄµØ
                     ///</summary>
                     public Vector3  destination{
                                 get{return _destination;}
@@ -132,7 +136,7 @@ namespace Z_Map.Form
                     
                     private float  _speed;
                     /// <summary>
-                    ///é€Ÿåº¦
+                    ///ËÙ¶È
                     ///</summary>
                     public float  speed{
                                 get{return _speed;}
@@ -150,7 +154,7 @@ namespace Z_Map.Form
                     
                     private float  _alertDis;
                     /// <summary>
-                    ///å¯åŠ¨è·ç¦»
+                    ///Æô¶¯¾àÀë
                     ///</summary>
                     public float  alertDis{
                                 get{return _alertDis;}
@@ -168,7 +172,7 @@ namespace Z_Map.Form
                     
                     private float  _pathDis;
                     /// <summary>
-                    ///å¯»è·¯è·ç¦»ä¸Šé™
+                    ///Ñ°Â·¾àÀëÉÏÏŞ
                     ///</summary>
                     public float  pathDis{
                                 get{return _pathDis;}
@@ -186,7 +190,7 @@ namespace Z_Map.Form
                     
                     private bool  _isMine;
                     /// <summary>
-                    ///æ˜¯æˆ‘è‡ªå·±
+                    ///ÊÇÎÒ×Ô¼º
                     ///</summary>
                     public bool  isMine{
                                 get{return _isMine;}
@@ -202,7 +206,7 @@ namespace Z_Map.Form
                  
                      }
                     
-            public Data(int uid,bool navEnabled,Vector3 destination,float speed,float alertDis,float pathDis,bool isMine,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,bool navEnabled,Vector3 destination,float speed,float alertDis,float pathDis,bool isMine,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
@@ -218,6 +222,7 @@ namespace Z_Map.Form
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new CharacterUnit(this);
 
@@ -225,7 +230,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,false,Vector3.zero,0f,0f,0f,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,false,Vector3.zero,0f,0f,0f,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -327,7 +332,9 @@ namespace Z_Map.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<int>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -364,6 +371,8 @@ namespace Z_Map.Form
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<int>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -553,7 +562,17 @@ UnitForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
-                    changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

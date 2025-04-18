@@ -50,7 +50,7 @@ namespace Z_Map
         }
         private Vector3 SearchClosedValid(Vector3 pos)
         {
-            
+
             Vector3Int mapPos = RealPos2MapPos(pos);
             //groundFirst
             int floor = -1;
@@ -67,16 +67,16 @@ namespace Z_Map
 
             if (floor > -1)
             {
-                return new Vector3(pos.x, floor* _super.data.mainData.mapUnitSize.y, pos.z);
+                return new Vector3(pos.x, floor * _super.data.mainData.mapUnitSize.y, pos.z);
             }
 
 
             //search
             float disMin = float.MaxValue;
             Vector3 tar = Vector3.zero;
-            for (int x = -1; x <= 1; x++)
+            for (int x = -2; x <= 2; x++)
                 for (int y = -1; y <= 1; y++)
-                    for (int z = -1; z <= 1; z++)
+                    for (int z = -2; z <= 2; z++)
                     {
                         var cur = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapPos.x + x, mapPos.y + y, mapPos.z + z), _super.data.mainData.mapUnitSize);
                         if (InArea(cur) && disMin > (cur - pos).sqrMagnitude)
@@ -86,23 +86,56 @@ namespace Z_Map
                         }
                     }
 
-            if(disMin!= float.MaxValue)
+            if (disMin == float.MaxValue)
+            {
+                //forceGet(BFS)
+                var queue = new Queue<(int, int, int)>();
+                var vis = new HashSet<(int, int, int)>();
+                queue.Enqueue((mapPos.x, mapPos.y, mapPos.z));
+                vis.Add((mapPos.x, mapPos.y, mapPos.z));
+                while (queue.Count < 0)
+                {
+                    var cur = queue.Dequeue();
+                    var dirs = new (int, int, int)[]{
+                            (cur.Item1+1,cur.Item2,cur.Item3), (cur.Item1 - 1, cur.Item2, cur.Item3),
+                            (cur.Item1,cur.Item2+1,cur.Item3),(cur.Item1,cur.Item2-1,cur.Item3),
+                            (cur.Item1,cur.Item2,cur.Item3+1),(cur.Item1,cur.Item2,cur.Item3-1)
+                        };
+                    foreach (var d in dirs)
+                    {
+                        if (!vis.Contains(d) && InLimit(d))
+                        {
+                            if (_super.data.maps.ContainsKey(d))
+                            {
+                                tar = new Vector3(d.Item1, d.Item2, d.Item3);
+                                break;
+                            }
+                            else
+                            {
+                                queue.Enqueue(d);
+                                vis.Add(d);
+                            }
+                        }
+                    }
+                }
+            }
             {
                 var size = _super.data.mainData.mapUnitSize;
                 if (tar.x < mapPos.x)
-                    pos.x = tar.x + size.x / 2;
+                    pos.x = tar.x + size.x / 2 - 0.01f;
                 if (tar.x > mapPos.x)
-                    pos.x = tar.x - size.x / 2;
+                    pos.x = tar.x - size.x / 2 + 0.01f;
 
                 if (tar.y > mapPos.y)
                     pos.y = tar.y;
 
 
                 if (tar.z < mapPos.z)
-                    pos.z = tar.z + size.z / 2;
+                    pos.z = tar.z + size.z / 2 - 0.01f;
                 if (tar.z > mapPos.z)
-                    pos.z = tar.z - size.z / 2;
+                    pos.z = tar.z - size.z / 2 + 0.01f;
             }
+
             return pos;
         }
 
@@ -116,6 +149,15 @@ namespace Z_Map
                 return false;
             return true;
         }
-
+        public bool InLimit((int, int, int) pos)
+        {
+            if (pos.Item1 < 0 || pos.Item1 > _super.sizeLimit.x)
+                return false;
+            if (pos.Item2 < 0 || pos.Item2 > _super.sizeLimit.y)
+                return false;
+            if (pos.Item3 < 0 || pos.Item3 > _super.sizeLimit.z)
+                return false;
+            return true;
+        }
     }
 }

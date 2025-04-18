@@ -41,7 +41,7 @@ namespace Ui.ModStoryCharacterListArguments
             });
             view.btn_custom.onClick.AddListener(() =>
             {
-                model.selPage = 0;
+                model.selPage = 1;
                 Refresh();
             });
 

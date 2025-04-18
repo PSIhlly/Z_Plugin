@@ -42,6 +42,8 @@ namespace Z_Map.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeExtraAction+=ChangeExtra;
+
         }
         
         private static bool inited;
@@ -68,13 +70,15 @@ namespace Z_Map.Form
                 
         public static Action<Data,int,int> changeUpdatetypeAction;
                 
+        public static Action<Data,string,string> changeExtraAction;
+                
 
 
         public partial class Data : UnitForm.Data
         {
 
                 /// <summary>
-                ///鍗曚綅閫昏緫
+                ///单位逻辑
                 ///</summary>
                 public ObjectUnit unit
                 {
@@ -86,7 +90,7 @@ namespace Z_Map.Form
 
                     private bool  _isObstacle;
                     /// <summary>
-                    ///鏄殰纰嶇墿
+                    ///是障碍物
                     ///</summary>
                     public bool  isObstacle{
                                 get{return _isObstacle;}
@@ -102,7 +106,7 @@ namespace Z_Map.Form
                  
                      }
                     
-            public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
@@ -113,6 +117,7 @@ namespace Z_Map.Form
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new ObjectUnit(this);
 
@@ -120,7 +125,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -212,7 +217,9 @@ namespace Z_Map.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<int>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -239,6 +246,8 @@ namespace Z_Map.Form
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<int>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -379,6 +388,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

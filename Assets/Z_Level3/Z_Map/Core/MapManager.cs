@@ -43,7 +43,6 @@ namespace Z_Map
 
     public class CharacterEvent : Z_Event
     {
-        
         public CharacterUnit unit;
         public MapEventType type;
     }
@@ -247,6 +246,7 @@ namespace Z_Map
 
         private void UpdateMapInfo()
         {
+            //return;
             //update
             foreach (var map in curMapLst)
             {

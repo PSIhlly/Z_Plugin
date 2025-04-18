@@ -22,7 +22,7 @@ namespace Z_Map
             set { base.ins = value; }
             get { return (ItemInstance)base.ins; }
         }
-
+        
 
         public override Type GetInsType()
         {

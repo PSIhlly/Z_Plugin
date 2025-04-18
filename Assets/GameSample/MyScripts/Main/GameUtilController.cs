@@ -27,7 +27,7 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false,true
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.2f, Vector3.up * 0.1f, Vector3.up*0.25f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.5f, 0.3f)  }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.2f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
         if (forGame)
         {
             res.AddComponent<CharacterInstance>();
@@ -58,7 +58,7 @@ public class GameUtilController : Z_Controller<GameManager>
             var render = go.GetComponent<Renderer>();
             render.GetPropertyBlock(propBlock);
 
-            if (string.IsNullOrEmpty(texRealName[i]))
+            if (texRealName[i]==null)
             {
                 propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])

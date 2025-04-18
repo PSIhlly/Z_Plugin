@@ -84,7 +84,7 @@ namespace Z_Map
                     {
                         realPos.z = k * unitSize.z;
                         mapPos.z = k;
-                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 },{1,0 },{ 2,0} }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
+                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0,"");
                         MapUnitForm.AddData(data);
                         RegisterMap(data);
                     }
@@ -128,7 +128,7 @@ namespace Z_Map
 
         public MapUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 }, { 1, 0 },{2,0 } }, mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0);
+            var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } },  mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0,"");
             MapUnitForm.AddData(data);
             RegisterMap(data);
 
@@ -136,13 +136,13 @@ namespace Z_Map
         }
         public ObjectUnitForm.Data AddItem(string prefabName="")
         {
-            var data = new ObjectUnitForm.Data(-1,false,"", prefabName, Vector3.zero, Vector3.zero,Vector3.one,0);
+            var data = new ObjectUnitForm.Data(-1,false,"", prefabName, Vector3.zero, Vector3.zero,Vector3.one,0,"");
             ObjectUnitForm.AddData(data);
             return data;
         }
         public CharacterUnitForm.Data AddCharacter(string prefabName = "",bool isMine=false)
         {
-            var data = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero,4, 4,4, isMine,"", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0);
+            var data = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero,4, 4,4, isMine,"", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,"");
             CharacterUnitForm.AddData(data);
             return data;
         }

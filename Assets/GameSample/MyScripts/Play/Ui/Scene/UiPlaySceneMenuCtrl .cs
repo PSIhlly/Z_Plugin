@@ -36,7 +36,7 @@ namespace Ui.PlaySceneMenu
             });
             view.btn_exit.onClick.AddListener(() =>
             {
-                if (Time.time - model.lastSaveTime > 60)
+                if (Time.time - model.lastSaveTime > 60&&!PlayManager.instance.boxPlay)
                 {
                     NotifyManager.instance.AddPopup(
                         "", TextManager.instance.GetTxt("savePopupTitle"), true,

@@ -8,6 +8,7 @@ using Ui.ModStory;
 using Ui.PlaySceneMain;
 using UnityEditor;
 using UnityEngine;
+using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Input;
@@ -198,8 +199,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         if (playerM == null || playerM.unit.ins == null)
             return;
-
-        setPlayerMove += dir;
+        if(CharacterParamForm.DataByName.ContainsKey(playerG.speedParamName))
+        {
+            setPlayerMove += dir * playerG.GetValue<float>(CharacterParamForm.DataByName[playerG.speedParamName]);
+        }else
+        {
+            setPlayerMove += dir;
+        }
     }
     public void SetPlayerRotation(Vector3 dir,float speed=360)
     {

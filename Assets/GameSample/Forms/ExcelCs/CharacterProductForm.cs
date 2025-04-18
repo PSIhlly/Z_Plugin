@@ -54,7 +54,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeAvatartexnameAction;
                 
-        public static Action<Data,Dictionary<string,(int,int,int)>,Dictionary<string,(int,int,int)>> changeParamdicAction;
+        public static Action<Data,Dictionary<string,(float,float,float)>,Dictionary<string,(float,float,float)>> changeParamdicAction;
                 
         public static Action<Data,bool,bool> changeIsprotoAction;
                 
@@ -181,7 +181,7 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string avatarTexName,Dictionary<string,(int,int,int)> paramDic,bool isProto,List<string> animJo,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,paramDic,isProto)
+            public Data(int uid,string name,string avatarTexName,Dictionary<string,(float,float,float)> paramDic,bool isProto,List<string> animJo,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,paramDic,isProto)
             {
 
              this.uid = uid;
@@ -199,7 +199,7 @@ namespace Form
             
         }
 
-                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(int,int,int)>(){},false,null,"","","","");
+                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(float,float,float)>(){},false,null,"","","","");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -297,7 +297,7 @@ namespace Form
 
                 jo.Get<string>("avatarTexName"),
 
-                jo.Get<Dictionary<string,(int,int,int)>>("paramDic"),
+                jo.Get<Dictionary<string,(float,float,float)>>("paramDic"),
 
                 jo.Get<bool>("isProto"),
 
@@ -327,7 +327,7 @@ namespace Form
 
             jo.Set<string>("avatarTexName",data.avatarTexName);
 
-            jo.Set<Dictionary<string,(int,int,int)>>("paramDic",data.paramDic);
+            jo.Set<Dictionary<string,(float,float,float)>>("paramDic",data.paramDic);
 
             jo.Set<bool>("isProto",data.isProto);
 
@@ -443,7 +443,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,(int,int,int)> oldV,Dictionary<string,(int,int,int)> newV)
+            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,(float,float,float)> oldV,Dictionary<string,(float,float,float)> newV)
             {
                 if(superData is Data data)
                 {

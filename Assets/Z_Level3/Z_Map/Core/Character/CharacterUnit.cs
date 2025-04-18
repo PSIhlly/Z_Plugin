@@ -40,7 +40,9 @@ namespace Z_Map
         }
         public override void UpdateInfo()
         {
-
+            if (lastUpdateFrame == Time.frameCount)
+                return;
+            lastUpdateFrame = Time.frameCount;
 
             if (data.updateType == (int)UpdateType.Always || isShowing)
             {
@@ -88,6 +90,7 @@ namespace Z_Map
                 newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
                 ins.transform.position = newPos;
                 ins.step =   newPos - data.pos;
+                
                 data.pos = ins.transform.position;
                 data.euler = ins.transform.eulerAngles;
 

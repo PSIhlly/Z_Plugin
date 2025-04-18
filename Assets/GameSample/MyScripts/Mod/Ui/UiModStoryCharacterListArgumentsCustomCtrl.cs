@@ -90,9 +90,9 @@ namespace Ui.ModStoryCharacterListArguments.ModStoryCharacterListArgumentsCustom
             
                 var dataCache = parent.model.data;
                 view.txt_name.text = model.data.name;
-                view.ipt_default.Set(dataCache.GetValue(model.data).ToString());
-                view.ipt_min.Set(dataCache.GetValueMin(model.data).ToString());
-                view.ipt_max.Set(dataCache.GetValueMax(model.data).ToString());
+                view.ipt_default.Set(dataCache.GetValue<float>(model.data).ToString("0.##"));
+                view.ipt_min.Set(dataCache.GetValueMin<float>(model.data).ToString("0.##"));
+                view.ipt_max.Set(dataCache.GetValueMax<float>(model.data).ToString("0.##"));
         }
 
 

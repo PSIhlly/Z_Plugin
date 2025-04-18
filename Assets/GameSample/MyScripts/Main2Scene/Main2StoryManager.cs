@@ -11,6 +11,7 @@ using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Input;
 using Z_Map;
 using Z_Ui;
 using Z_UnitSystem;
@@ -45,9 +46,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadObject(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadConfig(storyFolder + "/core");
-        }else
+        }else //初始化
         {
+            CharacterParamForm.AddData(new CharacterParamForm.Data(-1, "Hp", 0,0));
+            CharacterParamForm.AddData(new CharacterParamForm.Data(-1, "Speed", 0,0));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","",new Dictionary<string, (float, float, float)>() { {"Hp",(100f,0f,100f) }, { "Speed", (5f, 5f, 5f) } },true,new List<string>(),"","","Speed","Hp"));
             ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500),""));
+
+            GameManager.instance.saveCtrl.SaveCharacter(storyFolder + "/core");
+            GameManager.instance.saveCtrl.SaveConfig(storyFolder + "/core");
         }
     }
     public void UnloadStoryUgc()
@@ -114,19 +121,12 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 return data;
             });
         }
+        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x/2)+2, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y/2)+2);
 
         MapManager.instance.Begin(data);
 
 
-        foreach (var texData in MapTextureForm.DataById.Values)
-        {
-            List<Texture2D> lst = new List<Texture2D>();
-            for (int i = 0; i < texData.texsName.Count; i++)
-            {
-                lst.Add((Texture2D)TexAssetForm.DataByName[texData.texsName[i]].tex);
-            }
-            GameManager.instance.mapCtrl.CreateTexAnimVariants(texData.name, lst.ToArray());
-        }
+       
 
         foreach (var maskData in MapMaskForm.DataById.Values)
         {
@@ -141,10 +141,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            var anim=character.GetCharacterAnim(0);
-            var idleUpLst = new List<string>(anim.partAnimTexsName[0]);
-            var idleDownLst = new List<string>(anim.partAnimTexsName[1]);
-            GameManager.instance.characterCtrl.CreateAnim(character, idleUpLst, idleDownLst);
+            GameManager.instance.characterCtrl.CreateAnim(character, character.GetCharacterAnim(character.idleAnimName), character.GetCharacterAnim(character.moveAnimName));
         }
 
         Z_EventHelper.Invoke(new LoadingEvent()

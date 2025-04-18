@@ -171,7 +171,7 @@ namespace Ui.Notify
                 view.txt_.text = param.info.content;
                 model.info = param.info;
             }
-            model.removeTimer = TimeManager.instance.StartTimer(param.info.time - Time.time, () =>
+            model.removeTimer = TimeManager.instance.StartTimer(param.info.time - Time.time,0, () =>
             {
                 Close();
                 return true;

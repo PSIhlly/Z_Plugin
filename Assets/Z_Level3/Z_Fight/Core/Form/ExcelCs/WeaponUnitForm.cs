@@ -42,6 +42,8 @@ namespace Z_Fight.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeExtraAction+=ChangeExtra;
+
         }
         
         private static bool inited;
@@ -75,6 +77,8 @@ namespace Z_Fight.Form
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
         public static Action<Data,int,int> changeUpdatetypeAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
                 
 
 
@@ -182,7 +186,7 @@ namespace Z_Fight.Form
                  
                      }
                     
-            public Data(int uid,string name,int fightUid,List<int> weaponBulletsId,int curWeaponBulletAid,float cdRemain,int magazineRemain,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,int fightUid,List<int> weaponBulletsId,int curWeaponBulletAid,float cdRemain,int magazineRemain,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
@@ -197,6 +201,7 @@ namespace Z_Fight.Form
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new WeaponUnit(this);
 
@@ -204,7 +209,7 @@ namespace Z_Fight.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,null,0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"",0,null,0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -304,7 +309,9 @@ namespace Z_Fight.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<int>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -339,6 +346,8 @@ namespace Z_Fight.Form
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<int>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -519,6 +528,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

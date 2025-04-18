@@ -35,7 +35,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,Dictionary<string,(int,int,int)>,Dictionary<string,(int,int,int)>> changeParamdicAction;
+        public static Action<Data,Dictionary<string,(float,float,float)>,Dictionary<string,(float,float,float)>> changeParamdicAction;
                 
         public static Action<Data,bool,bool> changeIsprotoAction;
                 
@@ -80,11 +80,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private Dictionary<string,(int,int,int)>  _paramDic;
+                    private Dictionary<string,(float,float,float)>  _paramDic;
                     /// <summary>
                     ///Êý¾Ý
                     ///</summary>
-                    public Dictionary<string,(int,int,int)>  paramDic{
+                    public Dictionary<string,(float,float,float)>  paramDic{
                                 get{return _paramDic;}
  set{
 
@@ -116,7 +116,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<string,(int,int,int)> paramDic,bool isProto)
+            public Data(int uid,string name,Dictionary<string,(float,float,float)> paramDic,bool isProto)
             {
 
              this.uid = uid;
@@ -128,7 +128,7 @@ public static readonly int autoUidCnt=100;
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,(int,int,int)>(){},false);
+                   public static Data defaultData=new Data(0,"",new Dictionary<string,(float,float,float)>(){},false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -202,7 +202,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<Dictionary<string,(int,int,int)>>("paramDic"),
+                jo.Get<Dictionary<string,(float,float,float)>>("paramDic"),
 
                 jo.Get<bool>("isProto")
                     );
@@ -220,7 +220,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<Dictionary<string,(int,int,int)>>("paramDic",data.paramDic);
+            jo.Set<Dictionary<string,(float,float,float)>>("paramDic",data.paramDic);
 
             jo.Set<bool>("isProto",data.isProto);
 
@@ -307,7 +307,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeParamdic(Data superData,Dictionary<string,(int,int,int)> oldV,Dictionary<string,(int,int,int)> newV)
+            public static void ChangeParamdic(Data superData,Dictionary<string,(float,float,float)> oldV,Dictionary<string,(float,float,float)> newV)
             {
                 if(superData is Data data)
                 {

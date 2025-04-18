@@ -218,8 +218,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             continue;
                         var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
                         mapData.texNameDic[layer] = textureData.name;
-                        mapData.animInterval[layer] = textureData.animTimeInterval==0?0:Mathf.Max((int)(textureData.animTimeInterval*Application.targetFrameRate),1);
-                        
+                         
                     }
             }
             else if (curData is MapMaskForm.Data maskData)
@@ -231,7 +230,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             continue;
 
                         var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
-                        mapData.alphaTexNameDic[layer] = maskData.name;
+                        mapData.texNameDic[GlobalMaxSettings.TERRAIN_LAYER_MAX+layer] = maskData.name;
                     }
             }
             else if(curData is MapObjectForm.Data itemData)
@@ -296,10 +295,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         {
                             if (mapData.texNameDic.ContainsKey(layer))
                                 mapData.texNameDic.Remove(layer);
-                            if (mapData.animInterval.ContainsKey(layer))
-                                mapData.animInterval[layer] = 0;
-                            if (mapData.alphaTexNameDic.ContainsKey(layer))
-                                mapData.alphaTexNameDic.Remove(layer);
                         }
                     }
             }

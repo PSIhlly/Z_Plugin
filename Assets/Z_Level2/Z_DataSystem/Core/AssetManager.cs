@@ -11,7 +11,7 @@ namespace Z_DataSystem.Form
 {
     public enum Type
     {
-        Int = 0,
+        Float = 0,
         Bool = 1,
     }
 
@@ -24,56 +24,56 @@ namespace Z_DataSystem.Form
     }
     public partial class ProductForm
     {
-        static public object GetValue(this Data data, ParamForm.Data prm)
+        static public T GetValue<T>(this Data data, ParamForm.Data prm)
         {
             data.TryInit(prm);
-            (int, int, int) info = data.paramDic[prm.name];
+            (float, float, float) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
-                    return info.Item1;
+                case Type.Float:
+                    return (T)(object)info.Item1;
                 case Type.Bool:
-                    return info.Item1 == 1 ? true : false;
+                    return info.Item1 == 1 ? (T)(object)true : (T)(object)false;
                 default:
-                    return data.paramDic[prm.name];
+                    return (T)(object)data.paramDic[prm.name];
             }
         }
-        static public object GetValueMin(this Data data, ParamForm.Data prm)
+        static public T GetValueMin<T>(this Data data, ParamForm.Data prm)
         {
             data.TryInit(prm);
-            (int, int, int) info = data.paramDic[prm.name];
+            (float, float, float) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
-                    return info.Item2;
+                case Type.Float:
+                    return (T)(object)info.Item2;
                 case Type.Bool:
-                    return info.Item2 == 1 ? true : false;
+                    return info.Item2 == 1 ? (T)(object)true : (T)(object)false;
                 default:
-                    return data.paramDic[prm.name];
+                    return (T)(object)data.paramDic[prm.name];
             }
         }
-        static public object GetValueMax(this Data data, ParamForm.Data prm)
+        static public T GetValueMax<T>(this Data data, ParamForm.Data prm)
         {
             data.TryInit(prm);
-            (int, int, int) info = data.paramDic[prm.name];
+            (float, float, float) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
-                    return info.Item3;
+                case Type.Float:
+                    return (T)(object)info.Item3;
                 case Type.Bool:
-                    return info.Item3 == 1 ? true : false;
+                    return info.Item3 == 1 ? (T)(object)true : (T)(object)false;
                 default:
-                    return data.paramDic[prm.name];
+                    return (T)(object)data.paramDic[prm.name];
             }
         }
 
         static public void SetValue(this Data data, ParamForm.Data prm, object v)
         {
             data.TryInit(prm);
-            (int, int, int) info = data.paramDic[prm.name];
+            (float, float, float) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
+                case Type.Float:
                     info.Item1 = (int)v;
                     break;
                 case Type.Bool:
@@ -89,10 +89,10 @@ namespace Z_DataSystem.Form
         {
             data.TryInit(prm);
 
-            (int, int, int) info = data.paramDic[prm.name];
+            (float, float, float) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
+                case Type.Float:
                     info.Item2 = (int)v;
                     break;
                 case Type.Bool:
@@ -107,10 +107,10 @@ namespace Z_DataSystem.Form
         static public void SetValueMax(this Data data, ParamForm.Data prm, object v)
         {
             data.TryInit(prm);
-            (int, int, int) info = data.paramDic[prm.name];
+            (float, float, float) info = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
+                case Type.Float:
                     info.Item3 = (int)v;
                     break;
                 case Type.Bool:
@@ -128,7 +128,7 @@ namespace Z_DataSystem.Form
             {
                 switch (prm.GetValueType())
                 {
-                    case Type.Int:
+                    case Type.Float:
                         data.paramDic[prm.name] = (100, 0, 100);
                         break;
                     case Type.Bool:
@@ -141,10 +141,10 @@ namespace Z_DataSystem.Form
         static private void CheckInt(this Data data, ParamForm.Data prm)
         {
             data.TryInit(prm);
-            (int, int, int) v = data.paramDic[prm.name];
+            (float, float, float) v = data.paramDic[prm.name];
             switch (prm.GetValueType())
             {
-                case Type.Int:
+                case Type.Float:
                 case Type.Bool:
 
                     if (v.Item1 < v.Item2)

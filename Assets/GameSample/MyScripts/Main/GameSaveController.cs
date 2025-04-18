@@ -284,7 +284,7 @@ public class GameSaveController : Z_Controller<GameManager>
             InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewItemByPrefabs(form.name, form.subPrefabUnitName, texNameLst, form.subPrefabUnitPos, form.subPrefabUnitScale, showShaddowLst, true));
         }
 
-        InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewCharacterByPrefabs(GlobalNameHelper.GetRuntimePrefabName("character"), new List<string>() {"","",""} , true));
+        InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewCharacterByPrefabs(GlobalNameHelper.GetRuntimePrefabName("character"), new List<string>() {"","",null} , true));
 
     }
 

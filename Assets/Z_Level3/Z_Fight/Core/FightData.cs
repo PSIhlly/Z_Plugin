@@ -107,7 +107,8 @@ namespace Z_Fight
                      pos:poss[i],
                      euler:new Vector3(0, 0, 0),
                      scale:Vector3.one,
-                     updateType: 0
+                     updateType: 0,
+                     ""
                      ));
             }
 
@@ -126,7 +127,8 @@ namespace Z_Fight
                      pos: poss[i],
                      euler: new Vector3(0, 0, 0),
                      scale: Vector3.one,
-                     updateType: 0
+                     updateType: 0,
+                     ""
                      );
                 WeaponUnitForm.AddData(data);
             }

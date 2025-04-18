@@ -42,6 +42,8 @@ namespace Z_Map.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeExtraAction+=ChangeExtra;
+
         }
         
         private static bool inited;
@@ -58,10 +60,6 @@ namespace Z_Map.Form
                 
         public static Action<Data,Dictionary<int,string>,Dictionary<int,string>> changeTexnamedicAction;
                 
-        public static Action<Data,Dictionary<int,string>,Dictionary<int,string>> changeAlphatexnamedicAction;
-                
-        public static Action<Data,Dictionary<int,int>,Dictionary<int,int>> changeAnimintervalAction;
-                
         public static Action<Data,Vector3Int,Vector3Int> changeMapposAction;
                 
         public static Action<Data,string,string> changePrefabnameAction;
@@ -73,6 +71,8 @@ namespace Z_Map.Form
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
         public static Action<Data,int,int> changeUpdatetypeAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
                 
 
 
@@ -108,42 +108,6 @@ namespace Z_Map.Form
                  
                      }
                     
-                    private Dictionary<int,string>  _alphaTexNameDic;
-                    /// <summary>
-                    ///透明度纹理名字（索引）
-                    ///</summary>
-                    public Dictionary<int,string>  alphaTexNameDic{
-                                get{return _alphaTexNameDic;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeAlphatexnamedic(this,_alphaTexNameDic,value); 
-                    }
-        
-                _alphaTexNameDic = value;
-                }
-                 
-                     }
-                    
-                    private Dictionary<int,int>  _animInterval;
-                    /// <summary>
-                    ///动画间隔
-                    ///</summary>
-                    public Dictionary<int,int>  animInterval{
-                                get{return _animInterval;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeAniminterval(this,_animInterval,value); 
-                    }
-        
-                _animInterval = value;
-                }
-                 
-                     }
-                    
                     private Vector3Int  _mapPos;
                     /// <summary>
                     ///离散位置
@@ -162,20 +126,19 @@ namespace Z_Map.Form
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<int,string> texNameDic,Dictionary<int,string> alphaTexNameDic,Dictionary<int,int> animInterval,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
              this.name = name;
              this.texNameDic = texNameDic;
-             this.alphaTexNameDic = alphaTexNameDic;
-             this.animInterval = animInterval;
              this.mapPos = mapPos;
              this.prefabName = prefabName;
              this.pos = pos;
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new MapUnit(this);
 
@@ -183,7 +146,7 @@ namespace Z_Map.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},new Dictionary<int,string>(){},new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   public static Data defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,0,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -281,10 +244,6 @@ namespace Z_Map.Form
 
                 jo.Get<Dictionary<int,string>>("texNameDic"),
 
-                jo.Get<Dictionary<int,string>>("alphaTexNameDic"),
-
-                jo.Get<Dictionary<int,int>>("animInterval"),
-
                 jo.Get<Vector3Int>("mapPos"),
 
                 jo.Get<string>("prefabName"),
@@ -295,7 +254,9 @@ namespace Z_Map.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<int>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -313,10 +274,6 @@ namespace Z_Map.Form
 
             jo.Set<Dictionary<int,string>>("texNameDic",data.texNameDic);
 
-            jo.Set<Dictionary<int,string>>("alphaTexNameDic",data.alphaTexNameDic);
-
-            jo.Set<Dictionary<int,int>>("animInterval",data.animInterval);
-
             jo.Set<Vector3Int>("mapPos",data.mapPos);
 
             jo.Set<string>("prefabName",data.prefabName);
@@ -328,6 +285,8 @@ namespace Z_Map.Form
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<int>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -428,26 +387,6 @@ UnitForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeAlphatexnamedic(Data superData,Dictionary<int,string> oldV,Dictionary<int,string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeAlphatexnamedicAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeAniminterval(Data superData,Dictionary<int,int> oldV,Dictionary<int,int> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeAnimintervalAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
             public static void ChangeMappos(Data superData,Vector3Int oldV,Vector3Int newV)
             {
                 if(superData is Data data)
@@ -507,6 +446,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

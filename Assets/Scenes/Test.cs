@@ -4,15 +4,8 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public GameObject go;
-    // Update is called once per frame
-
-    void Update()
+    public void OnTriggerEnter(Collider other)
     {
-
-            go?.SetActive(true);
-        if (Input.GetKeyDown(KeyCode.A))
-            Destroy(go);
+        Debug.Log("碰了"+other.gameObject.name);
     }
 }

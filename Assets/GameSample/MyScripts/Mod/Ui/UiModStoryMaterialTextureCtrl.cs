@@ -32,7 +32,7 @@ namespace Ui.ModStoryMaterial.ModStoryMaterialTexture
                 _playing = value;
                 if (value != -1)
                 {
-                    animTimer = TimeManager.instance.StartTimer(curData.animTimeInterval, () =>
+                    animTimer = TimeManager.instance.StartTimer(0,curData.animTimeInterval, () =>
                      {
                          _playing++;
                          RefreshAct?.Invoke();

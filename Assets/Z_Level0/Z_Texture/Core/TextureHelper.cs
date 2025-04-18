@@ -11,7 +11,7 @@ namespace Z_Texture
         private static Texture2D _transparentTexture;
         public static Texture2D transparentTexture
         {
-            get 
+            get
             {
                 if (_transparentTexture == null)
                 {
@@ -19,10 +19,10 @@ namespace Z_Texture
                     for (int y = 0; y < 5; y++)
                         for (int x = 0; x < 5; x++)
                         {
-                            _transparentTexture.SetPixel(x, y, new Color(0,0,0,1));
+                            _transparentTexture.SetPixel(x, y, new Color(0, 0, 0, 1));
                         }
                 }
-                return _transparentTexture; 
+                return _transparentTexture;
             }
         }
         private static Sprite _transparentSprite;
@@ -41,7 +41,7 @@ namespace Z_Texture
         public static Texture GetTextureByPath(string path)
         {
             Texture res;
-            if(File.Exists(path))
+            if (File.Exists(path))
             {
                 res = InternalGetTextureByPath(path);
             }
@@ -59,9 +59,9 @@ namespace Z_Texture
         }
         public static Sprite GetSpriteByPath(string path)
         {
-                var tex = GetTextureByPath(path);
-                var s = Sprite.Create((Texture2D)tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                return s;
+            var tex = GetTextureByPath(path);
+            var s = Sprite.Create((Texture2D)tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            return s;
         }
         public static Sprite GetSpriteByTexture(Texture tex)
         {
@@ -76,20 +76,30 @@ namespace Z_Texture
         public static Texture2D DeCompress(Texture2D source)
         {
             RenderTexture renderTex = RenderTexture.GetTemporary(
-                        source.width,
-                        source.height,
-                        0,
-                        RenderTextureFormat.Default,
-                        RenderTextureReadWrite.Linear);
+      source.width,
+      source.height,
+      0,
+      RenderTextureFormat.ARGB32,  // 使用 ARGB32 格式
+      RenderTextureReadWrite.sRGB);  // 使用 sRGB 空间
 
+            // 进行 Blit 操作，确保图像没有颜色偏差
             Graphics.Blit(source, renderTex);
+
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = renderTex;
-            Texture2D readableText = new Texture2D(source.width, source.height);
+
+            // 创建一个高质量的 Texture2D
+            Texture2D readableText = new Texture2D(source.width, source.height, TextureFormat.RGBA32, false);
+            readableText.filterMode = FilterMode.Bilinear; // 使用双线性过滤
+            readableText.wrapMode = TextureWrapMode.Repeat; // 设置纹理的环绕模式
+
+            // 读取像素
             readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
             readableText.Apply();
+
             RenderTexture.active = previous;
             RenderTexture.ReleaseTemporary(renderTex);
+
             return readableText;
         }
 
@@ -98,10 +108,10 @@ namespace Z_Texture
             File.Delete(path);
         }
 
-        public static void RenameTexture(string path,string oldFileName,string newFileName)
+        public static void RenameTexture(string path, string oldFileName, string newFileName)
         {
-            var oldPath = Path.GetFullPath(path+"/"+ oldFileName);
-            var newPath = Path.GetFullPath(path+"/"+ newFileName);
+            var oldPath = Path.GetFullPath(path + "/" + oldFileName);
+            var newPath = Path.GetFullPath(path + "/" + newFileName);
             File.Move(oldPath, newPath);
         }
 
@@ -134,7 +144,7 @@ namespace Z_Texture
             return Texture2D.whiteTexture;
         }
 
-        
+
 
         #endregion
     }

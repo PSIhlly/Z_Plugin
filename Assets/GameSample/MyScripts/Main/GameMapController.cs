@@ -10,6 +10,10 @@ using Z_Map.Form;
 using Z_Texture;
 using Z_Time;
 
+
+
+
+
 public enum AlphaTexBasic5
 {
     OOOOXOOOO,
@@ -19,7 +23,7 @@ public enum AlphaTexBasic5
     XXXOOOOOO,
     XXXXOXXXX
 }
-public class GameMapController : Z_Controller<GameManager>, IZ_Listener<MapEvent>
+public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEvent>
 {
     public GameMapController(GameManager super) : base(super)
     {
@@ -27,7 +31,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<MapEvent
     }
 
     public Dictionary<(string, int), Texture2D> alphaTextureDic = new Dictionary<(string, int), Texture2D>();
-    public Dictionary<MapUnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<MapUnitForm.Data, Dictionary<int, int>>();
+    public Dictionary<TileUnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<TileUnitForm.Data, Dictionary<int, int>>();
     public void Reset()
     {
         alphaTextureDic.Clear();
@@ -655,7 +659,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<MapEvent
         alphaTextureDic[(name, (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9))] = rawAlphaTex[(int)AlphaTexBasic5.XXXXOXXXX];
 
     }
-    public void ShowFinalMat(MapInstance ins)
+    public void ShowFinalMat(TileInstance ins)
     {
         var data = ins.unit.data;
         if (!animCurCache.ContainsKey(data))
@@ -668,38 +672,40 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<MapEvent
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             ins.renderers[i].GetPropertyBlock(propBlock);
 
-
-            if (data.texNameDic.ContainsKey(i + GlobalMaxSettings.TERRAIN_LAYER_MAX) && MapMaskForm.DataByName.ContainsKey(data.texNameDic[i + GlobalMaxSettings.TERRAIN_LAYER_MAX]))
-            {
-                var maskForm = MapMaskForm.DataByName[data.texNameDic[i + GlobalMaxSettings.TERRAIN_LAYER_MAX]];
-
-                int linkDesc = 0;
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int z = -1; z <= 1; z++)
-                    {
-                        if (x == 0 && z == 0)
-                            continue;
-                        var pos = (x + data.mapPos.x, data.mapPos.y, z + data.mapPos.z);
-                        if (MapManager.instance.data.maps.ContainsKey(pos)
-                            && MapManager.instance.data.maps[pos].texNameDic.ContainsKey(i)
-                            && MapManager.instance.data.maps[pos].texNameDic[i] == data.texNameDic[i])
-                        {
-                            linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
-                        }
-                    }
-                }
-                propBlock.SetTexture("_AlphaTex", alphaTextureDic[(maskForm.name, linkDesc)]);
-
-            }
-            else
-            {
-                propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
-            }
-
-
             if (data.texNameDic.ContainsKey(i)&& MapTextureForm.DataByName.ContainsKey(data.texNameDic[i]))
             {
+
+                int maskId = i + GlobalMaxSettings.TERRAIN_LAYER_MAX;
+                if (data.texNameDic.ContainsKey(maskId) && MapMaskForm.DataByName.ContainsKey(data.texNameDic[maskId]))
+                {
+                    var maskForm = MapMaskForm.DataByName[data.texNameDic[maskId]];
+
+                    int linkDesc = 0;
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        for (int z = -1; z <= 1; z++)
+                        {
+                            if (x == 0 && z == 0)
+                                continue;
+                            var pos = (x + data.mapPos.x, data.mapPos.y, z + data.mapPos.z);
+                            if (MapManager.instance.data.maps.ContainsKey(pos)
+                                && MapManager.instance.data.maps[pos].texNameDic.ContainsKey(i)
+                                && MapManager.instance.data.maps[pos].texNameDic[i] == data.texNameDic[i])
+                            {
+                                linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
+                            }
+                        }
+                    }
+                    propBlock.SetTexture("_AlphaTex", alphaTextureDic[(maskForm.name, linkDesc)]);
+
+                }
+                else
+                {
+                    propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
+                }
+
+
+
                 ins.renderers[i].enabled = true;
 
                 var texForm = MapTextureForm.DataByName[data.texNameDic[i]];
@@ -741,12 +747,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<MapEvent
         }
     }
 
-    public void OnEvent(MapEvent evt)
+    public void OnEvent(TileEvent evt)
     {
         switch (evt.type)
         {
             case MapEventType.Show:
-                ShowFinalMat((MapInstance)evt.unit.ins);
+                ShowFinalMat((TileInstance)evt.unit.ins);
                 break;
             case MapEventType.AfterUpdate:
                 break;

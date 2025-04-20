@@ -16,7 +16,7 @@ namespace Z_Map
     public class MapData
     {
         public MapMainForm.Data mainData;
-        public Dictionary<(int,int,int), MapUnitForm.Data>maps;
+        public Dictionary<(int,int,int), TileUnitForm.Data>maps;
         public Dictionary<(int,int),SortedSet<int>>mapXZ2Y;
 
         string mapName => GlobalHelper.GetInternalPrefabName("map");
@@ -25,16 +25,16 @@ namespace Z_Map
         public MapData(string formData)
         {
 
-            MapUnitForm.Clear();
+            TileUnitForm.Clear();
             ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
             mainData = MapMainForm.GetDataByJo(JObject.Parse(formData));
-            maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
+            maps = new Dictionary<(int, int, int), TileUnitForm.Data>();
             mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
-            var mapDatas = MapUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
+            var mapDatas = TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
             for (int i = 0; i < mapDatas.Count; i++)
             {
-                MapUnitForm.AddData(mapDatas[i]);
+                TileUnitForm.AddData(mapDatas[i]);
                 RegisterMap(mapDatas[i]);
             }
 
@@ -54,7 +54,7 @@ namespace Z_Map
         }
         public JObject GetJsonData()
         {
-            mainData.mapJa = JsonConvert.SerializeObject(MapUnitForm.GetJaByDatas());
+            mainData.mapJa = JsonConvert.SerializeObject(TileUnitForm.GetJaByDatas());
             mainData.objectJa = JsonConvert.SerializeObject(ObjectUnitForm.GetJaByDatas());
 
             mainData.characterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
@@ -63,10 +63,10 @@ namespace Z_Map
         public MapData()
         {
 
-            MapUnitForm.Clear();
+            TileUnitForm.Clear();
             ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
-            maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
+            maps = new Dictionary<(int, int, int), TileUnitForm.Data>();
             mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
             var unitSize = new Vector3(1, 2, 1);
             Vector3 realPos = Vector3.one; 
@@ -84,8 +84,8 @@ namespace Z_Map
                     {
                         realPos.z = k * unitSize.z;
                         mapPos.z = k;
-                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0,"");
-                        MapUnitForm.AddData(data);
+                        var data = new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0,"");
+                        TileUnitForm.AddData(data);
                         RegisterMap(data);
                     }
                 }
@@ -107,7 +107,7 @@ namespace Z_Map
                 data.unit.Hide();
             }
         }
-        public void RegisterMap(MapUnitForm.Data data)
+        public void RegisterMap(TileUnitForm.Data data)
         {
             maps[(data.mapPos.x, data.mapPos.y, data.mapPos.z)] = data;
 
@@ -117,7 +117,7 @@ namespace Z_Map
 
             
         }
-        public void UnRegisterMap(MapUnitForm.Data data)
+        public void UnRegisterMap(TileUnitForm.Data data)
         {
             if (maps.ContainsKey((data.mapPos.x, data.mapPos.y, data.mapPos.z)))
                 maps.Remove((data.mapPos.x, data.mapPos.y, data.mapPos.z));
@@ -126,10 +126,10 @@ namespace Z_Map
                 mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Remove(data.mapPos.y);
         }
 
-        public MapUnitForm.Data AddMap(Vector3Int mapPos)
+        public TileUnitForm.Data AddMap(Vector3Int mapPos)
         {
-            var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } },  mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0,"");
-            MapUnitForm.AddData(data);
+            var data = new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } },  mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0,"");
+            TileUnitForm.AddData(data);
             RegisterMap(data);
 
             return data;

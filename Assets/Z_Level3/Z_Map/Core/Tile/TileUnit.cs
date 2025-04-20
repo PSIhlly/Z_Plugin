@@ -10,24 +10,27 @@ using Z_UnitSystem;
 namespace Z_Map
 {
 
-    public class MapUnit : Unit
+    public partial class TileUnit : MapUnit
     {
-        public MapUnit(MapUnitForm.Data data) : base(data)
+        public TileUnit(TileUnitForm.Data data) : base(data)
         {
         }
-        public MapUnitForm.Data data => (MapUnitForm.Data)_data;
-
-
+        public TileUnitForm.Data data => (TileUnitForm.Data)_data;
+        public TileInstance ins
+        {
+            set { base.ins = value; }
+            get { return (TileInstance)base.ins; }
+        }
 
         public override Type GetInsType()
         {
-            return typeof(MapInstance);
+            return typeof(TileInstance);
         }
 
         public override void Show()
         {
             base.Show();
-            Z_EventHelper.Invoke(new MapEvent()
+            Z_EventHelper.Invoke(new TileEvent()
             {
                 type = MapEventType.Show,
                 unit = this
@@ -57,7 +60,7 @@ namespace Z_Map
         public override void Remove()
         {
             MapManager.instance.data.UnRegisterMap(data);
-            MapUnitForm.RemoveData(data.uid);
+            TileUnitForm.RemoveData(data.uid);
             base.Remove();
         }
 
@@ -65,7 +68,7 @@ namespace Z_Map
         {
             base.UpdateInfo();
 
-            Z_EventHelper.Invoke(new MapEvent()
+            Z_EventHelper.Invoke(new TileEvent()
             {
                 type = MapEventType.AfterUpdate,
                 unit = this

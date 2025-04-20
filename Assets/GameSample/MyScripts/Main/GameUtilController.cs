@@ -42,7 +42,7 @@ public class GameUtilController : Z_Controller<GameManager>
     {
         var res = CombineNewGoByPrefabs(name, prefabKeys, texRealName, poss, scales, showShadow);
         if (forGame)
-            res.AddComponent<ItemInstance>();
+            res.AddComponent<ObjectInstance>();
         return res;
     }
     public GameObject CombineNewGoByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow)

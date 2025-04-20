@@ -5,7 +5,7 @@ using Z_UnitSystem;
 
 namespace Z_Map
 {
-    public class CharacterInstance : Instance
+    public class CharacterInstance : MapInstance
     {
         public CharacterUnit unit
         {

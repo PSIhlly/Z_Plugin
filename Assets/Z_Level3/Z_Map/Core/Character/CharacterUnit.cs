@@ -10,7 +10,7 @@ using Z_UnitSystem;
 namespace Z_Map
 {
 
-    public class CharacterUnit : Unit
+    public partial class CharacterUnit : MapUnit
     {
         public CharacterUnit(CharacterUnitForm.Data data) : base(data)
         {

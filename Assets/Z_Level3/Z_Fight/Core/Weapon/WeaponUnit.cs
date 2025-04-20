@@ -6,16 +6,22 @@ using UnityEngine;
 using Z_ByteSerialize;
 using Z_Debug;
 using Z_Fight.Form;
+using Z_Map;
 using Z_UnitSystem;
 
 namespace Z_Fight
 {
-    public class WeaponUnit : Unit
+    public partial class WeaponUnit : Unit
     {
         public WeaponUnit(WeaponUnitForm.Data data):base(data)
         {
         }
         public WeaponUnitForm.Data data=>(WeaponUnitForm.Data)_data;
+        public WeaponInstance ins
+        {
+            set { base.ins = value; }
+            get { return (WeaponInstance)base.ins; }
+        }
 
         public WeaponBulletForm.Data weaponBullet(int weaponBulletAid) => WeaponBulletForm.DataById[data.weaponBulletsId[weaponBulletAid]];
    

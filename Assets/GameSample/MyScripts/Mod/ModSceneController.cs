@@ -308,7 +308,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 foreach(var hit in hits)
                 {
                     var ins = hit.transform.parent.GetComponent<Instance>();
-                    if(ins!=null&&ins is ItemInstance itemIns)
+                    if(ins!=null&&ins is ObjectInstance itemIns)
                     {
                         UiManager.instance.ShowUi<UiModSceneUnitCtrl>(new UiModSceneUnitParam()
                         {

@@ -49,7 +49,7 @@ namespace Ui.ModSceneUnit
             {
                 float.TryParse(value, out float v); 
                 
-                MapUnitForm.Data belongMap = (MapUnitForm.Data)data.unit.superUnit.data;
+                TileUnitForm.Data belongMap = (TileUnitForm.Data)data.unit.superUnit.data;
                 float minV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset;
                 float maxV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset+0.9f;
 
@@ -144,7 +144,7 @@ namespace Ui.ModSceneUnit
 
             view.btn_pos.onClick.AddListener(() =>
             {
-                MapUnitForm.Data mapData= (MapUnitForm.Data)model.data.unit.superUnit.data;
+                TileUnitForm.Data mapData= (TileUnitForm.Data)model.data.unit.superUnit.data;
                 model.posX = (mapData.mapPos.x- ModManager.instance.sceneCtrl.offset).ToString();
                 model.posY = (mapData.mapPos.y  - ModManager.instance.sceneCtrl.offset).ToString();
                 model.posZ = (mapData.mapPos.z - ModManager.instance.sceneCtrl.offset).ToString();

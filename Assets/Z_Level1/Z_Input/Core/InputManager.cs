@@ -183,7 +183,7 @@ namespace Z_Input
 
             for (int i = 0; i <= 1; i++)
             {
-                if (Input.GetMouseButton(i)&&!tmpHash.Contains(i))//ignore first frame
+                if (Input.GetMouseButton(i)&&!tmpHash.Contains(i)&& mouseOldPos.ContainsKey(i))//ignore first frame
                 {
                     mousePos[i] = Input.mousePosition;
                     cur?.onMouse?.Invoke(i, mousePos[i], mousePos[i] - mouseOldPos[i], UICheck(mousePos[i]));

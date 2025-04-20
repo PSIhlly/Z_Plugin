@@ -6,7 +6,7 @@ using Z_UnitSystem;
 namespace Z_Map
 {
     
-    public class ItemInstance : Instance
+    public class ObjectInstance : MapInstance
     {
         public ObjectUnit unit
         {

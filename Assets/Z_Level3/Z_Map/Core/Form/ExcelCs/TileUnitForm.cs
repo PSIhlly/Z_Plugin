@@ -12,7 +12,7 @@ using Z_UnitSystem.Form;
 namespace Z_Map.Form
 {
 
-    public static partial class MapUnitForm
+    public static partial class TileUnitForm
     {
 
         
@@ -82,11 +82,11 @@ namespace Z_Map.Form
                 /// <summary>
                 ///µ¥Î»Âß¼­
                 ///</summary>
-                public MapUnit unit
+                public TileUnit unit
                 {
                     get
                     {
-                        return (MapUnit) _unit;
+                        return (TileUnit) _unit;
                     }
                 }
 
@@ -140,7 +140,7 @@ namespace Z_Map.Form
              this.updateType = updateType;
              this.extra = extra;
 
-                    _unit=new MapUnit(this);
+                    _unit=new TileUnit(this);
 
             }
             

@@ -5,12 +5,12 @@ using Z_UnitSystem;
 
 namespace Z_Map
 {
-    public class MapInstance : Instance
+    public class TileInstance : MapInstance
     {
-        public MapUnit unit
+        public TileUnit unit
         {
             set { base.unit = value; }
-            get { return (MapUnit)base.unit; }
+            get { return (TileUnit)base.unit; }
         }
 
         public override void VisOn()

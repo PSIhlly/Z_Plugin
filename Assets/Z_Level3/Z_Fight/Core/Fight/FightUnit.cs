@@ -9,14 +9,18 @@ using Z_UnitSystem;
 using Z_Debug;
 namespace Z_Fight
 {
-    public class FightUnit : Unit
+    public partial class FightUnit : Unit
     {
         public FightUnit(FightUnitForm.Data data) : base(data)
         {
         }
         public FightUnitForm.Data data => (FightUnitForm.Data)_data;
 
-
+        public FightInstance ins
+        {
+            set { base.ins = value; }
+            get { return (FightInstance)base.ins; }
+        }
         public FightUnit target => data.targetFightUid >0&&FightUnitForm.DataByUid.ContainsKey(data.targetFightUid)?
             (FightUnit) FightUnitForm.DataByUid[data.targetFightUid].unit:null; 
        

@@ -9,13 +9,17 @@ using Z_UnitSystem;
 
 namespace Z_Fight
 {
-    public class BulletUnit : Unit
+    public partial class BulletUnit : Unit
     {
         public BulletUnit(BulletUnitForm.Data data) : base(data)
         {
         }
         public BulletUnitForm.Data data => (BulletUnitForm.Data)_data;
-
+        public BulletInstance ins
+        {
+            set { base.ins = value; }
+            get { return (BulletInstance)base.ins; }
+        }
         public WeaponBulletForm.Data weaponBullet=> WeaponBulletForm.DataById[data.weaponBulletId];
         public Vector3 dir => Quaternion.Euler(data.euler) * Vector3.forward;
 

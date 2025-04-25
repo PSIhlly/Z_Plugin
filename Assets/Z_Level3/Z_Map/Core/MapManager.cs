@@ -71,6 +71,44 @@ namespace Z_Map
             set { base.unit = value; }
             get { return (MapUnit)base.unit; }
         }
+        public override void VisOn()
+        {
+            if (vising)
+                return;
+            vising = true;
+            foreach (var render in renderers)
+            {
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                render.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_Show", 1);
+                render.SetPropertyBlock(propBlock);
+            }
+        }
+        public override void VisDegree(float degree)
+        {
+            if (!vising)
+                return;
+            foreach (var render in renderers)
+            {
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                render.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_Show", degree);
+                render.SetPropertyBlock(propBlock);
+            }
+        }
+        public override void VisOff()
+        {
+            if (!vising)
+                return;
+            vising = false;
+            foreach (var render in renderers)
+            {
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                render.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_Show", 0);
+                render.SetPropertyBlock(propBlock);
+            }
+        }
     }
 }
 
@@ -85,7 +123,8 @@ public class MapManager : Z_MonoManager<MapManager>
     public NavigationController navigationCtrl;
     public MapUtilController utilCtrl;
 
-    private Vector3Int curCenterPos;
+    private Vector3 curCenterPos;
+    private Vector3 lastCenterPos;
     private Vector3Int viewCenter;
 
     public List<TileUnitForm.Data> curMapLst
@@ -135,30 +174,30 @@ public class MapManager : Z_MonoManager<MapManager>
         navigationCtrl.Build();
         mainGo.SetActive(true);
     }
-    public TileUnitForm.Data AddMap(Vector3Int mapPos)
+    public TileUnitForm.Data AddMap(Vector3Int mapPos, object[] prms = null)
     {
-        return data.AddMap(mapPos);
+        return data.AddTile(mapPos, prms);
     }
-    public ObjectUnitForm.Data AddItem(Vector3 realPos, string prefabName)
+    public ObjectUnitForm.Data AddItem(Vector3 realPos, string prefabName, object[] prms = null)
     {
         var mapPos = utilCtrl.RealPos2MapPos(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
             return null;
         }
-        var data = this.data.AddItem(prefabName);
+        var data = this.data.AddObject(prefabName, prms);
         data.pos = realPos;
         this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
         return data;
     }
-    public CharacterUnitForm.Data AddCharacter(Vector3 realPos, string prefabName, bool isMine = false)
+    public CharacterUnitForm.Data AddCharacter(Vector3 realPos, string prefabName, bool isMine = false,object[] prms=null)
     {
         var mapPos = utilCtrl.RealPos2MapPos(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
             return null;
         }
-        var data = this.data.AddCharacter(prefabName);
+        var data = this.data.AddCharacter(prefabName,isMine, prms);
         data.pos = realPos;
         this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
         return data;
@@ -166,7 +205,7 @@ public class MapManager : Z_MonoManager<MapManager>
 
     public void SetPos(Vector3 curCenterPos)
     {
-        this.curCenterPos = utilCtrl.RealPos2MapPos(curCenterPos);
+        this.curCenterPos = curCenterPos;
     }
 
     public void End()
@@ -180,6 +219,7 @@ public class MapManager : Z_MonoManager<MapManager>
             data = null;
         }
         lastView = (0, 0, 0, 0, 0, 0);
+        lastCenterPos = Vector3.one * -9999999;
     }
 
 
@@ -281,6 +321,11 @@ public class MapManager : Z_MonoManager<MapManager>
         }
 
     }
+    (int, int)[] dir9 = new[] {
+                    (0, 0), (1, 0), (-1, 0),
+                    (0, 1), (0, -1), (1, 1),
+                    (-1,-1),(1, -1),(-1, 1)
+                };
     /// <summary>
     /// Manage vison
     /// </summary>
@@ -289,10 +334,10 @@ public class MapManager : Z_MonoManager<MapManager>
         if (GlobalSettings.OVERLAY_HIDE)
         {
             var viewSize = data.mainData.viewSize;
-
             foreach (var curMap in curMapLst)
             {
                 curMap.unit.VisOn();
+                curMap.unit.VisDegree(1f);
             }
             HashSet<(int, int)> visited = new HashSet<(int, int)>();
             Queue<(int, int)> queue = new Queue<(int, int)>();
@@ -300,33 +345,62 @@ public class MapManager : Z_MonoManager<MapManager>
             {
                 visited.Clear();
                 queue.Clear();
-                if (data.maps.ContainsKey((viewCenter.x, i, viewCenter.z)))
+
+                List<((int,int), float)> dis = new List<((int, int), float)>();
+                for (int dirId = 0; dirId < dir9.Length; dirId++)
                 {
-                    visited.Add((viewCenter.x, viewCenter.z));
-                    queue.Enqueue((viewCenter.x, viewCenter.z));
-                    while (queue.Count > 0)
+                    var dir = dir9[dirId];
+                    dir.Item1 += viewCenter.x;
+                    dir.Item2 += viewCenter.z;
+                    dis.Add((dir, new Vector2(curCenterPos.x - dir.Item1, curCenterPos.z - dir.Item2).magnitude));
+                }
+                dis.Sort((a, b) => { return a.Item2.CompareTo(b.Item2); });
+
+                foreach (var d in dis)
+                {
+                    var dir = d.Item1;
+                    float degree = Math.Clamp(d.Item2 - 0.75f, 0, 1);
+                    if (data.maps.ContainsKey((dir.Item1, i, dir.Item2)))
                     {
-                        var cur = queue.Dequeue();
-                        data.maps[(cur.Item1, i, cur.Item2)].unit.VisOff();
-                        for (int x = cur.Item1 - 1; x <= cur.Item1 + 1 && x < viewCenter.x + viewSize.x && x >= viewCenter.x - viewSize.x; x += 2)
+                        if(!visited.Contains(dir))
                         {
-                            if (!visited.Contains((x, cur.Item2)) && data.maps.ContainsKey((x, i, cur.Item2)))
-                            {
-                                visited.Add((x, cur.Item2));
-                                queue.Enqueue((x, cur.Item2));
-                            }
+                            visited.Add(dir);
+                            queue.Enqueue(dir);
                         }
-                        for (int z = cur.Item2 - 1; z <= cur.Item2 + 1 && z < viewCenter.z + viewSize.z && z >= viewCenter.z - viewSize.z; z += 2)
+                        while (queue.Count > 0)
                         {
-                            if (!visited.Contains((cur.Item1, z)) && data.maps.ContainsKey((cur.Item1, i, z)))
+                            var cur = queue.Dequeue();
+                            if (d.Item2 <= 0)
                             {
-                                visited.Add((cur.Item1, z));
-                                queue.Enqueue((cur.Item1, z));
+                                data.maps[(cur.Item1, i, cur.Item2)].unit.VisOff();
                             }
+                            else
+                            {
+                                data.maps[(cur.Item1, i, cur.Item2)].unit.VisDegree(degree);
+                            }
+                            for (int x = cur.Item1 - 1; x <= cur.Item1 + 1 && x < dir.Item1 + viewSize.x && x >= dir.Item1 - viewSize.x; x += 2)
+                            {
+                                if (!visited.Contains((x, cur.Item2)) && data.maps.ContainsKey((x, i, cur.Item2)))
+                                {
+                                    visited.Add((x, cur.Item2));
+                                    queue.Enqueue((x, cur.Item2));
+                                }
+                            }
+                            for (int z = cur.Item2 - 1; z <= cur.Item2 + 1 && z < dir.Item2 + viewSize.z && z >= dir.Item2 - viewSize.z; z += 2)
+                            {
+                                if (!visited.Contains((cur.Item1, z)) && data.maps.ContainsKey((cur.Item1, i, z)))
+                                {
+                                    visited.Add((cur.Item1, z));
+                                    queue.Enqueue((cur.Item1, z));
+                                }
+                            }
+
                         }
 
                     }
+
                 }
+
             }
 
         }
@@ -367,19 +441,19 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         UpdateMapInfo();
 
-        if (forceFresh || (curCenterPos - viewCenter).sqrMagnitude > 0.2f)
+        viewCenter = utilCtrl.RealPos2MapPos(curCenterPos);
+
+        if (forceFresh || (curCenterPos - lastCenterPos).sqrMagnitude >= 1f)
         {
 
-            viewCenter = curCenterPos;
             if (GlobalSettings.MAP_SHOW_DEBUG)
             {
                 Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:" + viewCenter);
             }
             FreshMap();
+            lastCenterPos = curCenterPos;
         }
         UpdateVision();
-
-
     }
     public void DebugShow()
     {

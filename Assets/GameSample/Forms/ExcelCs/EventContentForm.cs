@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -24,6 +26,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -36,11 +45,11 @@ public static readonly int autoUidCnt=100;
 
         public static Action<Data,int,int> changeUidAction;
                 
-        public static Action<Data,string,string> changeEventjoAction;
+        public static Action<Data,EventForm.Data,EventForm.Data> changeEvtAction;
                 
         public static Action<Data,int,int> changeCurAction;
                 
-        public static Action<Data,float,float> changeProgressAction;
+        public static Action<Data,List<VarForm.Data>,List<VarForm.Data>> changeStackAction;
                 
 
 
@@ -78,27 +87,27 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _eventJo;
+                    private EventForm.Data  _evt;
                     /// <summary>
                     ///事件全部event
                     ///</summary>
-                    public string  eventJo{
-                                get{return _eventJo;}
+                    public EventForm.Data  evt{
+                                get{return _evt;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeEventjo(this,_eventJo,value); 
+                       ChangeEvt(this,_evt,value); 
                     }
         
-                _eventJo = value;
+                _evt = value;
                 }
                  
                      }
                     
                     private int  _cur;
                     /// <summary>
-                    ///现在正执行的序号
+                    ///程序计数器
                     ///</summary>
                     public int  cur{
                                 get{return _cur;}
@@ -114,39 +123,44 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private float  _progress;
+                    private List<VarForm.Data>  _stack;
                     /// <summary>
-                    ///进度
+                    ///结果栈
                     ///</summary>
-                    public float  progress{
-                                get{return _progress;}
+                    public List<VarForm.Data>  stack{
+                                get{return _stack;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeProgress(this,_progress,value); 
+                       ChangeStack(this,_stack,value); 
                     }
         
-                _progress = value;
+                _stack = value;
                 }
                  
                      }
                     
-            public Data(int uid,string eventJo,int cur,float progress)
+            public Data(int uid,EventForm.Data evt,int cur,List<VarForm.Data> stack)
             {
 
              this.uid = uid;
-             this.eventJo = eventJo;
+             this.evt = evt;
              this.cur = cur;
-             this.progress = progress;
+             this.stack = stack;
 
                     _ctrl=new EventContentController(this);
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,evt,cur,stack);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0f);
+                   public static Data defaultData=new Data(0,null,0,null);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -218,11 +232,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("uid"),
 
-                jo.Get<string>("eventJo"),
+                jo.Get<EventForm.Data>("evt"),
 
                 jo.Get<int>("cur"),
 
-                jo.Get<float>("progress")
+                jo.Get<List<VarForm.Data>>("stack")
                     );
 
             return data;
@@ -236,11 +250,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("eventJo",data.eventJo);
+            jo.Set<EventForm.Data>("evt",data.evt);
 
             jo.Set<int>("cur",data.cur);
 
-            jo.Set<float>("progress",data.progress);
+            jo.Set<List<VarForm.Data>>("stack",data.stack);
 
             return jo;
         }
@@ -277,6 +291,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -315,12 +330,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeEventjo(Data superData,string oldV,string newV)
+            public static void ChangeEvt(Data superData,EventForm.Data oldV,EventForm.Data newV)
             {
                 if(superData is Data data)
                 {
 
-                changeEventjoAction?.Invoke(data,oldV,newV);
+                changeEvtAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -335,12 +350,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeProgress(Data superData,float oldV,float newV)
+            public static void ChangeStack(Data superData,List<VarForm.Data> oldV,List<VarForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeProgressAction?.Invoke(data,oldV,newV);
+                changeStackAction?.Invoke(data,oldV,newV);
                 }
                     
             }

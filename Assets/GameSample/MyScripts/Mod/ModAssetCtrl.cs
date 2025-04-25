@@ -142,13 +142,39 @@ public void ImportMaskTex(string name,int id)
 
     #region character
 
+    public void RenameCharacterParam(string oldName,string newName)
+    {
+        CharacterParamForm.DataByName[oldName].name = newName;
+        foreach(var character in CharacterProductForm.DataByUid.Values)
+        {
+            foreach(var k in character.paramDic.Keys)
+            {
+                if(k==oldName)
+                {
+                    var prm = character.paramDic[k];
+                    prm.name = newName;
+                    character.paramDic.Remove(k);
+                    character.paramDic[newName] = prm;
+                }
+            }
+        }
+    }
+
     public void CreateCharacterArg(string name)
     {
-        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0));
+        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0f,0f,1f,0));
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            character.paramDic[name]=new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
+        }
     }
     public void DeleteCharacterArg(string name)
     {
         CharacterParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+             character.paramDic.Remove(name);
+        }
     }
 
     public void ImportCharacterAvatar(string name)
@@ -160,16 +186,22 @@ public void ImportMaskTex(string name,int id)
         });
 
     }
-    private string CreateCharacterAnimJo(string name= "newAnim1")
+    private CharacterAnimForm.Data CreateCharacterAnim(string name= "newAnim1")
     {
-        var data = new CharacterAnimForm.Data(0, name, new List<(float,float)>() { (0,0) }, 0.2f,new List<List<string>>() { new List<string> { "" }, new List<string> { "" } });
-        return CharacterAnimForm.GetJoByData(data).ToString();
+        return new CharacterAnimForm.Data(0, name, new List<(float,float)>() { (0,0) }, 0.2f,new List<List<string>>() { new List<string> { "" }, new List<string> { "" } });
     }
 
 
     public void CreateCharacter(string name)
     {
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", new Dictionary<string, (float, float, float)>(), true, new List<string>() { CreateCharacterAnimJo() },"","","",""));
+        var tmpAnimNm = "newAnim1";
+        var dic=new Dictionary<string, CharacterParamForm.Data>();
+        foreach (var prm in CharacterParamForm.DataByName.Values)
+        {
+            dic[prm.name] = new CharacterParamForm.Data(prm.uid, prm.name, prm.valueType, prm.min, prm.v, prm.max, prm.SpecialType);
+
+        }    
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } },"","","",""));
     }
     public void DeleteCharacter(string name)
     {
@@ -181,40 +213,33 @@ public void ImportMaskTex(string name,int id)
         CharacterProductForm.DataByName[oldName].name = newName;
     }
 
-    public bool DeleteCharacterAnimId(string name, int animId, int part, int id)
+    public bool DeleteCharacterAnimId(string name, string animNm, int part, int id)
     {
         var data = CharacterProductForm.DataByName[name];
-        var anim = data.GetCharacterAnim(animId);
+        var anim = data.animDic[animNm];
         anim.partAnimTexsName[part].RemoveAt(id);
-        data.SaveCharacterAnim(animId, anim);
         return false;
     }
-    public void DeleteCharacterAnim(string name, int animId)
+    public void DeleteCharacterAnim(string name, string animNm)
     {
-        CharacterProductForm.DataByName[name].animJo.RemoveAt(animId);
+        CharacterProductForm.DataByName[name].animDic.Remove(animNm);
     }
 
     public void RenameCharacterAnim(string characterName, string oldName, string newName)
     {
         var data = CharacterProductForm.DataByName[characterName];
-        //change
-        for (int k = 0; k < data.animJo.Count; k++)
-        {
-            var anim = GlobalDataHelper.GetCharacterAnim(data, k);
-            if (anim.name == oldName)
-            {
-                anim.name = newName;
-                GlobalDataHelper.SaveCharacterAnim(data, k, anim);
-            }
-        }
+        var anim = data.animDic[oldName];
+        data.animDic.Remove(oldName);
+        anim.name= newName;
+        data.animDic[newName]= anim;
     }
-    public void ImportCharacterAnim(string characterName,int animId,int part,int id)
+    public void ImportCharacterAnim(string characterName,string animNm,int part,int id)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
         {
             var data = CharacterProductForm.DataByName[characterName]; 
-            var anim = data.GetCharacterAnim(animId);
+            var anim = data.animDic[animNm];
             if (anim.partAnimTexsName[part].Count > id)
             {
                 anim.partAnimTexsName[part][id] = nm;
@@ -223,23 +248,21 @@ public void ImportMaskTex(string name,int id)
             {
                 anim.partAnimTexsName[part].Add(nm);
             }
-            data.SaveCharacterAnim(animId, anim);
         });
     }
     public void CreateCharacterAnim(string name, string animName)
     {
         var data = CharacterProductForm.DataByName[name];
-        data.animJo.Add(CreateCharacterAnimJo(animName));
+        data.animDic[animName]=CreateCharacterAnim(animName);
 
     }
-    public void CreateCharacterAnimId(string name, int animId,int part,int id)
+    public void CreateCharacterAnimId(string name, string animNm,int part,int id)
     {
         var data = CharacterProductForm.DataByName[name];
-        var anim=data.GetCharacterAnim(animId);
+        var anim=data.animDic[animNm];
         anim.animPos.Add((0, 0));
         anim.partAnimTexsName[0].Add("");
         anim.partAnimTexsName[1].Add("");
-        data.SaveCharacterAnim(animId, anim);
 
     }
     #endregion

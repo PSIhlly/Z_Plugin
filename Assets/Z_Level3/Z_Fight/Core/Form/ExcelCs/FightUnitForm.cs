@@ -44,6 +44,13 @@ namespace Z_Fight.Form
 
             UnitForm.changeExtraAction+=ChangeExtra;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -311,6 +318,11 @@ namespace Z_Fight.Form
                     _unit=new FightUnit(this);
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,itemIdCountDic,curUsingWeaponsSid,curReloadWeaponsSid,alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,extra);
+                }
             
         }
 
@@ -509,6 +521,7 @@ UnitForm.AddData(data);
                     DataByUid.Remove(data.uid);
     
 UnitForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

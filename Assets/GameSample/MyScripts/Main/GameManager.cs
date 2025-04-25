@@ -2,6 +2,7 @@ using Form;
 using Item;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Ui;
@@ -46,6 +47,9 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public override void Init()
     {
+
+
+
         base.Init();
 
         utilCtrl = new GameUtilController(this);
@@ -76,7 +80,6 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public void Start()
     {
-
         UiManager.instance.ShowUi<UiEnterMainCtrl>();
     }
     public void Update()

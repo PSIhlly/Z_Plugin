@@ -21,6 +21,13 @@ public static readonly int autoUidCnt=1000000;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -36,6 +43,12 @@ public static readonly int autoUidCnt=1000000;
         public static Action<Data,string,string> changeNameAction;
                 
         public static Action<Data,int,int> changeValuetypeAction;
+                
+        public static Action<Data,float,float> changeMinAction;
+                
+        public static Action<Data,float,float> changeVAction;
+                
+        public static Action<Data,float,float> changeMaxAction;
                 
 
 
@@ -96,18 +109,80 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,int valueType)
+                    private float  _min;
+                    /// <summary>
+                    ///最小值
+                    ///</summary>
+                    public float  min{
+                                get{return _min;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMin(this,_min,value); 
+                    }
+        
+                _min = value;
+                }
+                 
+                     }
+                    
+                    private float  _v;
+                    /// <summary>
+                    ///当前值
+                    ///</summary>
+                    public float  v{
+                                get{return _v;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeV(this,_v,value); 
+                    }
+        
+                _v = value;
+                }
+                 
+                     }
+                    
+                    private float  _max;
+                    /// <summary>
+                    ///最大值
+                    ///</summary>
+                    public float  max{
+                                get{return _max;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMax(this,_max,value); 
+                    }
+        
+                _max = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,int valueType,float min,float v,float max)
             {
 
              this.uid = uid;
              this.name = name;
              this.valueType = valueType;
+             this.min = min;
+             this.v = v;
+             this.max = max;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,valueType,min,v,max);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0);
+                   public static Data defaultData=new Data(0,"",0,0f,0f,0f);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -181,7 +256,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<int>("valueType")
+                jo.Get<int>("valueType"),
+
+                jo.Get<float>("min"),
+
+                jo.Get<float>("v"),
+
+                jo.Get<float>("max")
                     );
 
             return data;
@@ -198,6 +279,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("name",data.name);
 
             jo.Set<int>("valueType",data.valueType);
+
+            jo.Set<float>("min",data.min);
+
+            jo.Set<float>("v",data.v);
+
+            jo.Set<float>("max",data.max);
 
             return jo;
         }
@@ -234,6 +321,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -288,6 +376,36 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeValuetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMin(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMinAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeV(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeVAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMax(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMaxAction?.Invoke(data,oldV,newV);
                 }
                     
             }

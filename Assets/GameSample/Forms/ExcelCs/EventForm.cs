@@ -10,13 +10,15 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
 
     public static partial class EventForm
     {
-public static readonly int autoUidCnt=100;
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
@@ -24,6 +26,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -38,7 +47,11 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeCmdjaAction;
+        public static Action<Data,List<CmdForm.Data>,List<CmdForm.Data>> changeCmdsAction;
+                
+        public static Action<Data,string,string> changeLabAction;
+                
+        public static Action<Data,string,string> changeSublabAction;
                 
         public static Action<Data,bool,bool> changeGlobalenableAction;
                 
@@ -87,20 +100,56 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _cmdJa;
+                    private List<CmdForm.Data>  _cmds;
                     /// <summary>
-                    ///语句序列Ja
+                    ///语句
                     ///</summary>
-                    public string  cmdJa{
-                                get{return _cmdJa;}
+                    public List<CmdForm.Data>  cmds{
+                                get{return _cmds;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeCmdja(this,_cmdJa,value); 
+                       ChangeCmds(this,_cmds,value); 
                     }
         
-                _cmdJa = value;
+                _cmds = value;
+                }
+                 
+                     }
+                    
+                    private string  _lab;
+                    /// <summary>
+                    ///一级标签
+                    ///</summary>
+                    public string  lab{
+                                get{return _lab;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeLab(this,_lab,value); 
+                    }
+        
+                _lab = value;
+                }
+                 
+                     }
+                    
+                    private string  _subLab;
+                    /// <summary>
+                    ///二级标签
+                    ///</summary>
+                    public string  subLab{
+                                get{return _subLab;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeSublab(this,_subLab,value); 
+                    }
+        
+                _subLab = value;
                 }
                  
                      }
@@ -159,21 +208,28 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string cmdJa,bool globalEnable,bool terrainEnable,bool objectEnable)
+            public Data(int uid,string name,List<CmdForm.Data> cmds,string lab,string subLab,bool globalEnable,bool terrainEnable,bool objectEnable)
             {
 
              this.uid = uid;
              this.name = name;
-             this.cmdJa = cmdJa;
+             this.cmds = cmds;
+             this.lab = lab;
+             this.subLab = subLab;
              this.globalEnable = globalEnable;
              this.terrainEnable = terrainEnable;
              this.objectEnable = objectEnable;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,cmds,lab,subLab,globalEnable,terrainEnable,objectEnable);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,false,false);
+                   public static Data defaultData=new Data(0,"",null,"","",false,false,false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -183,6 +239,36 @@ public static readonly int autoUidCnt=100;
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLab;
+            public static Dictionary<string, List<Data>> DatasByLab
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLab;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasBySublab;
+            public static Dictionary<string, List<Data>> DatasBySublab
+            {
+                get
+                {
+                    Init();
+                    return _DatasBySublab;
                 }
             }
     
@@ -201,13 +287,47 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"OnTouch","",false,false,false)},
+                {1000001,new Data(1000001,"OnTouch",null,"","",false,true,true)},
 
-                {2,new Data(2,"OnLeave","",false,false,false)},
+                {1000002,new Data(1000002,"OnLeave",null,"","",false,true,true)},
 
-                {3,new Data(3,"OnShow","",false,false,false)},
+                {1000003,new Data(1000003,"OnShow",null,"","",false,true,true)},
 
                 };
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"OnTouch",_DataByUid[1000001]},
+    
+                        {"OnLeave",_DataByUid[1000002]},
+    
+                        {"OnShow",_DataByUid[1000003]},
+    
+                    };
+    
+                    _DatasByLab = new Dictionary<string, List<Data>>() {
+    
+                            {"",new List<Data>()},
+        
+                };
+
+                    _DatasByLab[""].Add(_DataByUid[1000001]);
+
+                    _DatasByLab[""].Add(_DataByUid[1000002]);
+
+                    _DatasByLab[""].Add(_DataByUid[1000003]);
+
+                    _DatasBySublab = new Dictionary<string, List<Data>>() {
+    
+                            {"",new List<Data>()},
+        
+                };
+
+                    _DatasBySublab[""].Add(_DataByUid[1000001]);
+
+                    _DatasBySublab[""].Add(_DataByUid[1000002]);
+
+                    _DatasBySublab[""].Add(_DataByUid[1000003]);
+
 
             childInitAction?.Invoke();
             
@@ -253,7 +373,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("cmdJa"),
+                jo.Get<List<CmdForm.Data>>("cmds"),
+
+                jo.Get<string>("lab"),
+
+                jo.Get<string>("subLab"),
 
                 jo.Get<bool>("globalEnable"),
 
@@ -275,7 +399,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("cmdJa",data.cmdJa);
+            jo.Set<List<CmdForm.Data>>("cmds",data.cmds);
+
+            jo.Set<string>("lab",data.lab);
+
+            jo.Set<string>("subLab",data.subLab);
 
             jo.Set<bool>("globalEnable",data.globalEnable);
 
@@ -303,6 +431,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
+                    DataByName[data.name]=data;
+    
+                    if(!DatasByLab.ContainsKey(data.lab))
+                        DatasByLab[data.lab]=new List<Data>();
+                    DatasByLab[data.lab].Add(data);
+    
+                    if(!DatasBySublab.ContainsKey(data.subLab))
+                        DatasBySublab[data.subLab]=new List<Data>();
+                    DatasBySublab[data.subLab].Add(data);
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -317,7 +455,14 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                     DataByUid.Remove(data.uid);
     
+                    DataByName.Remove(data.name);
+    
+                    DatasByLab[data.lab].Remove(data);
+    
+                    DatasBySublab[data.subLab].Remove(data);
+    
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -325,6 +470,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             Init();
 
                     DataByUid.Clear();
+    
+                    DataByName.Clear();
+    
+                    DatasByLab.Clear();
+    
+                    DatasBySublab.Clear();
     
             uidChain.Clear();
         }
@@ -361,17 +512,46 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 if(superData is Data data)
                 {
 
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeCmdja(Data superData,string oldV,string newV)
+            public static void ChangeCmds(Data superData,List<CmdForm.Data> oldV,List<CmdForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeCmdjaAction?.Invoke(data,oldV,newV);
+                changeCmdsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLab(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByLab[oldV].Remove(data);
+                    DatasByLab[newV].Add(data);
+ 
+                changeLabAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSublab(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasBySublab[oldV].Remove(data);
+                    DatasBySublab[newV].Add(data);
+ 
+                changeSublabAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -44,6 +44,13 @@ namespace Z_Map.Form
 
             UnitForm.changeExtraAction+=ChangeExtra;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -143,6 +150,11 @@ namespace Z_Map.Form
                     _unit=new TileUnit(this);
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,texNameDic,mapPos,prefabName,pos,euler,scale,updateType,extra);
+                }
             
         }
 
@@ -327,6 +339,7 @@ UnitForm.AddData(data);
                     DataByMappos.Remove(data.mapPos);
     
 UnitForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

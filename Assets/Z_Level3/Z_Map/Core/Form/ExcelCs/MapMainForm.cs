@@ -22,6 +22,13 @@ public static readonly int autoUidCnt=1000000;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -189,6 +196,11 @@ public static readonly int autoUidCnt=1000000;
              this.characterJa = characterJa;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,mapUnitSize,logicSize,viewSize,mapJa,objectJa,characterJa);
+                }
             
         }
 
@@ -335,6 +347,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

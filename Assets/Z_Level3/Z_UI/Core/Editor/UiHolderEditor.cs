@@ -63,7 +63,7 @@ namespace Z_Ui_Editor
                 }});
             }}
             {subHolder.uiName.FirstToLower()}Con.Refresh();";
-
+                        
                         subCode += ((UiHolderEditor)CreateEditor(subHolder)).GetQuickCode();
                     }
                     else if (subHolder.uiType == UiType.Panel)
@@ -365,7 +365,7 @@ namespace {uiHolder.uiName}
                 case UiType.Panel:
                 case UiType.Model:
 
-                    Debug.Log(uiHolder.name + " " + parentClass + " " + GetCoreCode(parentClass) + " " + uiHolder.uiType);
+                    
                     return res+$@"
 {{
 {GetCoreCode(parentClass)}

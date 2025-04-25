@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -24,6 +26,13 @@ public static readonly int autoIdCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -100,6 +109,11 @@ private set{
              this.needLayer = needLayer;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,NameKey,icon,needLayer);
+                }
             
         }
 

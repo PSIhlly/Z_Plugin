@@ -723,7 +723,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                        ins.renderers[i].GetPropertyBlock(propBlock);
+                        ins.renderers[renderId].GetPropertyBlock(propBlock);
                         cur = (cur + 1) % texForm.texsName.Count;
                         animCurCache[data][renderId] = cur;
                         propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].tex);

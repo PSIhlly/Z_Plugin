@@ -68,9 +68,8 @@ namespace Ui.ModStoryCharacterListArguments.ModStoryCharacterListArgumentsStatic
             {
                 List<string> lst = new List<string>();
                 List<Sprite> spriteLst = new List<Sprite>();
-                for (int i=0;i< model.data.animJo.Count;i++)
+                foreach (var anim in model.data.animDic.Values)
                 {
-                    var anim = model.data.GetCharacterAnim(i);
                     lst.Add(anim.name);
                     spriteLst.Add(TextureHelper.transparentSprite);
                 }
@@ -86,9 +85,8 @@ namespace Ui.ModStoryCharacterListArguments.ModStoryCharacterListArgumentsStatic
             {
                 List<string> lst = new List<string>();
                 List<Sprite> spriteLst = new List<Sprite>();
-                for (int i = 0; i < model.data.animJo.Count; i++)
+                foreach (var anim in model.data.animDic.Values)
                 {
-                    var anim = model.data.GetCharacterAnim(i);
                     lst.Add(anim.name);
                     spriteLst.Add(TextureHelper.transparentSprite);
                 }

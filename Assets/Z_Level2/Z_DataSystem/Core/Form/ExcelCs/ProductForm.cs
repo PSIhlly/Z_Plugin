@@ -21,6 +21,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -34,8 +41,6 @@ public static readonly int autoUidCnt=100;
         public static Action<Data,int,int> changeUidAction;
                 
         public static Action<Data,string,string> changeNameAction;
-                
-        public static Action<Data,Dictionary<string,(float,float,float)>,Dictionary<string,(float,float,float)>> changeParamdicAction;
                 
         public static Action<Data,bool,bool> changeIsprotoAction;
                 
@@ -80,24 +85,6 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private Dictionary<string,(float,float,float)>  _paramDic;
-                    /// <summary>
-                    ///数据
-                    ///</summary>
-                    public Dictionary<string,(float,float,float)>  paramDic{
-                                get{return _paramDic;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeParamdic(this,_paramDic,value); 
-                    }
-        
-                _paramDic = value;
-                }
-                 
-                     }
-                    
                     private bool  _isProto;
                     /// <summary>
                     ///是原型
@@ -116,19 +103,23 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<string,(float,float,float)> paramDic,bool isProto)
+            public Data(int uid,string name,bool isProto)
             {
 
              this.uid = uid;
              this.name = name;
-             this.paramDic = paramDic;
              this.isProto = isProto;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,isProto);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<string,(float,float,float)>(){},false);
+                   public static Data defaultData=new Data(0,"",false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -202,8 +193,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<Dictionary<string,(float,float,float)>>("paramDic"),
-
                 jo.Get<bool>("isProto")
                     );
 
@@ -219,8 +208,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
-
-            jo.Set<Dictionary<string,(float,float,float)>>("paramDic",data.paramDic);
 
             jo.Set<bool>("isProto",data.isProto);
 
@@ -259,6 +246,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -303,16 +291,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeNameAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeParamdic(Data superData,Dictionary<string,(float,float,float)> oldV,Dictionary<string,(float,float,float)> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeParamdicAction?.Invoke(data,oldV,newV);
                 }
                     
             }

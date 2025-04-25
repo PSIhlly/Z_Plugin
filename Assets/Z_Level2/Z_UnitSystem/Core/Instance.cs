@@ -69,6 +69,11 @@ namespace Z_UnitSystem
                 render.enabled = false;
             }
         }
+        public virtual void VisDegree(float degree)
+        {
+            if (!vising)
+                return;
+        }
         public virtual void VisOn()
         {
             if (vising)

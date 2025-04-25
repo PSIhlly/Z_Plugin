@@ -44,6 +44,13 @@ namespace Z_Map.Form
 
             UnitForm.changeExtraAction+=ChangeExtra;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -227,6 +234,11 @@ namespace Z_Map.Form
                     _unit=new CharacterUnit(this);
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,navEnabled,destination,speed,alertDis,pathDis,isMine,name,prefabName,pos,euler,scale,updateType,extra);
+                }
             
         }
 
@@ -409,6 +421,7 @@ UnitForm.AddData(data);
                     DataByUid.Remove(data.uid);
     
 UnitForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

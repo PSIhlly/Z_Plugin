@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -24,6 +26,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -149,6 +158,11 @@ public static readonly int autoUidCnt=100;
              this.partAnimTexsName = partAnimTexsName;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,animPos,animTimeInterval,partAnimTexsName);
+                }
             
         }
 
@@ -287,6 +301,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

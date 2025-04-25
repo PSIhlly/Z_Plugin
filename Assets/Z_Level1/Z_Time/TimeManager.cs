@@ -34,7 +34,7 @@ namespace Z_Time
             while (true)
             {
                 yield return new WaitForSeconds(interval);
-                if (timer.cancel||!timer.bind.gameObject.activeInHierarchy || func())
+                if (timer.cancel||timer.bind.gameObject==null||!timer.bind.gameObject.activeInHierarchy || func())
                     break;
             }
 

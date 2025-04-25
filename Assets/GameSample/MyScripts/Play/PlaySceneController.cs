@@ -201,7 +201,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return;
         if(CharacterParamForm.DataByName.ContainsKey(playerG.speedParamName))
         {
-            setPlayerMove += dir * playerG.GetValue<float>(CharacterParamForm.DataByName[playerG.speedParamName]);
+            setPlayerMove += dir * (float)playerG.paramDic[playerG.speedParamName].v;
         }else
         {
             setPlayerMove += dir;

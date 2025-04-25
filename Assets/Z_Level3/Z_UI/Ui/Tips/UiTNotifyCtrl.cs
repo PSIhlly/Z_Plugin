@@ -15,12 +15,14 @@ namespace Ui.Notify
         public TipInfo tipInfo;
         public PopupInfo popupInfo;
         public ChooseInfo chooseInfo;
+        public MultipleChooseInfo multipleChooseInfo;
     }
     public partial class UiNotifyModel
     {
         public List<TipInfo> tipInfos = new List<TipInfo>();
         public List<PopupInfo> popupInfos = new List<PopupInfo>();
         public List<ChooseInfo> chooseInfos = new List<ChooseInfo>();
+        public List<MultipleChooseInfo> multipleChooseInfos = new List<MultipleChooseInfo>();
 
         public int id;
     }
@@ -28,12 +30,14 @@ namespace Ui.Notify
     {
         UiContainer<UiTipCtrl> tipCon;
         UiContainer<UiChooseCtrl> chooseCon;
+        UiContainer<UiMultipleChooseCtrl> multipleChooseCon;
         UiContainer<UiPopupCtrl> popupCon;
         public override void OnCreate()
         {
             tipCon = new UiContainer<UiTipCtrl>(view.sub_Tip.gameObject);
             chooseCon = new UiContainer<UiChooseCtrl>(view.sub_Choose.gameObject);
             popupCon = new UiContainer<UiPopupCtrl>(view.sub_Popup.gameObject);
+            multipleChooseCon = new UiContainer<UiMultipleChooseCtrl>(view.sub_MultipleChoose.gameObject);
 
 
             view.btn_back.onClick.AddListener(() =>
@@ -48,6 +52,8 @@ namespace Ui.Notify
                 if (param.tipInfo != null)
                     Add(param.tipInfo);
                 if (param.chooseInfo != null)
+                    Add(param.chooseInfo); 
+                if (param.multipleChooseInfo != null)
                     Add(param.chooseInfo);
                 if (param.popupInfo != null)
                     Add(param.popupInfo);
@@ -81,6 +87,18 @@ namespace Ui.Notify
             }
             chooseCon.Refresh();
 
+            //multipleChoose
+            multipleChooseCon.Clear();
+            if (model.multipleChooseInfos.Count > 0)
+            {
+                var cur = model.multipleChooseInfos[model.multipleChooseInfos.Count - 1];
+                multipleChooseCon.Add(new UiMultipleChooseParam()
+                {
+                    info = cur
+                });
+            }
+            multipleChooseCon.Refresh();
+
             //popup:
             popupCon.Clear();
             view.go_block.SetActive(false);
@@ -106,6 +124,11 @@ namespace Ui.Notify
         public void Add(ChooseInfo info)
         {
             model.chooseInfos.Add(info);
+            Refresh();
+        }
+        public void Add(MultipleChooseInfo info)
+        {
+            model.multipleChooseInfos.Add(info);
             Refresh();
         }
         public void Add(PopupInfo info)
@@ -139,6 +162,19 @@ namespace Ui.Notify
             }
             Refresh();
         }
+        public void RemoveMultipleChoose(int id)
+        {
+            for (int i = 0; i < model.multipleChooseInfos.Count; i++)
+            {
+
+                if (model.multipleChooseInfos[i].id == id)
+                {
+                    model.multipleChooseInfos.RemoveAt(i);
+                    break;
+                }
+            }
+            Refresh();
+        }
         public void RemovePopup(int id)
         {
             for (int i = 0; i < model.popupInfos.Count; i++)
@@ -152,249 +188,5 @@ namespace Ui.Notify
             Refresh();
         }
     }
-    public partial class UiTipModel
-    {
-        public Timer removeTimer;
-        public TipInfo info;
-    }
-    public partial class UiTipParam
-    {
-        public TipInfo info;
-    }
-
-    public partial class UiTipCtrl
-    {
-        public override void OnShow()
-        {
-            if (param != null)
-            {
-                view.txt_.text = param.info.content;
-                model.info = param.info;
-            }
-            model.removeTimer = TimeManager.instance.StartTimer(param.info.time - Time.time,0, () =>
-            {
-                Close();
-                return true;
-            }, uiHolder);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-        }
-        public override void Close()
-        {
-            base.Close();
-            parent.RemoveTip(model.info.id);
-        }
-
-    }
-
-    public partial class UiChooseParam
-    {
-        public ChooseInfo info;
-    }
-    public partial class UiChooseModel
-    {
-        public ChooseInfo info;
-        public int cur;
-    }
-
-    public partial class UiChooseCtrl
-    {
-
-        UiScrViewContainer<UiItemCtrl> con;
-        public override void OnCreate()
-        {
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item,view.scr_items);
-            view.btn_close.onClick.AddListener(() =>
-            {
-                Close();
-            });
-            view.btn_choose.onClick.AddListener(() =>
-            {
-                if(model.info.func(model.cur))
-                {
-                    Close();
-                }
-            });
-        }
-        public override void Close()
-        {
-            base.Close();
-            parent.RemoveChoose(model.info.id);
-        }
-        public override void OnShow()
-        {
-            model.cur = -1;
-
-            if (param != null)
-            {
-                model.info = param.info;
-            }
-            Refresh();
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-
-        }
-        public void Refresh()
-        {
-            con.Clear();
-            view.txt_title.text = model.info.title;
-            view.go_close.SetActive(model.info.canClose);
-            view.go_choose.SetActive(model.cur!=-1);
-
-            for (int i = 0; i < model.info.words.Count; i++)
-            {
-                con.Add(new UiItemParam()
-                {
-                    name = model.info.words[i],
-                    sprite = model.info.sprites[i],
-                    id = i
-                });
-            }
-            con.Refresh();
-        }
-        public void SetCur(int id)
-        {
-            model.cur = id;
-            Refresh();
-        }
-
-
-
-    }
-
-    public partial class UiItemParam
-    {
-        public Sprite sprite;
-        public string name;
-        public int id;
-    }
-    public partial class UiItemModel
-    {
-        public Sprite sprite;
-        public string name;
-        public int id;
-    }
-    public partial class UiItemCtrl
-    {
-        public override void OnCreate()
-        {
-            view.btn_.onClick.AddListener(() =>
-            {
-                parent.SetCur(model.id);
-            });
-        }
-        public override void OnShow()
-        {
-            if (param != null)
-            {
-                model.sprite = param.sprite;
-                model.name = param.name;
-                model.id = param.id;
-            }
-            Refresh();
-        }
-        public void Refresh()
-        {
-            view.txt_.text= model.name;
-            view.img_.sprite = model.sprite;
-            view.sta_sel.ChangeState(parent.model.cur == model.id ? 1 : 0);
-        }
-    }
-
-    public partial class UiPopupParam
-    {
-        public PopupInfo info;
-    }
-    public partial class UiPopupModel
-    {
-        public PopupInfo info;
-    }
-
-    public partial class UiPopupCtrl
-    {
-
-        UiContainer<UiSelectionCtrl> con;
-        public override void OnCreate()
-        {
-            con = new UiContainer<UiSelectionCtrl>(view.sub_Selection.gameObject);
-            view.btn_close.onClick.AddListener(() =>
-            {
-                Close();
-            });
-        }
-        public override void Close()
-        {
-            base.Close();
-            parent.RemovePopup(model.info.id);
-        }
-        public override void OnShow()
-        {
-            if (param != null)
-            {
-                model.info = param.info;
-            }
-            Refresh();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-
-        }
-        public void Refresh()
-        {
-            con.Clear();
-
-            view.txt_content.text = model.info.content;
-            view.go_close.SetActive(model.info.canClose);
-            view.txt_title.text = model.info.title;
-
-            for (int i = 0; i < model.info.selectionWords.Count; i++)
-            {
-                con.Add(new UiSelectionParam()
-                {
-                    name = model.info.selectionWords[i],
-                    func = model.info.funcs[i],
-                    id = i
-                });
-            }
-
-            con.Refresh();
-        }
-
-    }
-
-    public partial class UiSelectionParam
-    {
-        public Func<bool> func;
-        public string name;
-        public int id;
-    }
-    public partial class UiSelectionModel
-    {
-        public Func<bool> funcs;
-        public int id;
-    }
-    public partial class UiSelectionCtrl
-    {
-        public override void OnCreate()
-        {
-            view.btn_.onClick.AddListener(() =>
-            {
-                if (model.funcs != null)
-                {
-                    if (model.funcs())
-                    {
-                        parent.Close();
-                    }
-                }
-            });
-        }
-        public override void OnShow()
-        {
-            if (param != null)
-            {
-                model.funcs = param.func;
-                view.txt_.text = param.name;
-                model.id = param.id;
-            }
-        }
-    }
-
+  
 }

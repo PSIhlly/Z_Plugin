@@ -106,6 +106,17 @@ namespace Z_UnitSystem
             }
             return true;
         }
+        public virtual bool VisDegree(float degree)
+        {
+            if (ins == null || ins.gameObject == null)
+                return false;
+            ins.VisDegree(degree);
+            foreach (var unit in subUnits)
+            {
+                unit.VisDegree(degree);
+            }
+            return true;
+        }
         public virtual bool VisOn()
         {
             if (ins == null || ins.gameObject == null)

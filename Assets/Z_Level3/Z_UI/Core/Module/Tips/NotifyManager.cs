@@ -23,6 +23,15 @@ namespace Z_Ui.Notify
         public bool canClose;
         public int id;
     }
+    public class MultipleChooseInfo
+    {
+        public string title;
+        public Func<(int,int), bool> func;
+        public List<(string,List<string>)> words;
+        public List<(Sprite, List<Sprite>)> sprites;
+        public bool canClose;
+        public int id;
+    }
     public class PopupInfo
     {
         public string title;
@@ -80,6 +89,30 @@ namespace Z_Ui.Notify
                 UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
                 {
                     chooseInfo = info
+                });
+            }
+        }
+        public void AddMultipleChoose(string title, bool canClose, Func<(int,int), bool> func, List<(string,List<string>)> words, List<(Sprite,List<Sprite>)> sprites)
+        {
+            var info = new MultipleChooseInfo()
+            {
+                title = title,
+                words = words,
+                func = func,
+                sprites = sprites,
+                canClose = canClose,
+                id = popupIdCnt++
+            };
+            var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
+            if (ctrl != null && ctrl.isActive)
+            {
+                ctrl.Add(info);
+            }
+            else
+            {
+                UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
+                {
+                    multipleChooseInfo = info
                 });
             }
         }

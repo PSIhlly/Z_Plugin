@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -36,6 +38,13 @@ namespace Form
 
             MapBaseForm.changeIconAction+=ChangeIcon;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -86,6 +95,11 @@ namespace Form
              this.texsName = texsName;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,icon,texsName);
+                }
             
         }
 
@@ -250,6 +264,7 @@ MapBaseForm.AddData(data);
                     DataByName.Remove(data.name);
     
 MapBaseForm.RemoveData(id);
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

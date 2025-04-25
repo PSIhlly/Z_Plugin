@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -24,6 +26,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -38,7 +47,13 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
+        public static Action<Data,int,int> changeTypeAction;
+                
         public static Action<Data,float,float> changeVAction;
+                
+        public static Action<Data,string,string> changeSAction;
+                
+        public static Action<Data,int,int> changeUnituidAction;
                 
 
 
@@ -81,6 +96,24 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
+                    private int  _type;
+                    /// <summary>
+                    ///类型
+                    ///</summary>
+                    public int  type{
+                                get{return _type;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeType(this,_type,value); 
+                    }
+        
+                _type = value;
+                }
+                 
+                     }
+                    
                     private float  _v;
                     /// <summary>
                     ///值
@@ -99,18 +132,62 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,float v)
+                    private string  _s;
+                    /// <summary>
+                    ///值
+                    ///</summary>
+                    public string  s{
+                                get{return _s;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeS(this,_s,value); 
+                    }
+        
+                _s = value;
+                }
+                 
+                     }
+                    
+                    private int  _unitUid;
+                    /// <summary>
+                    ///引用unit
+                    ///</summary>
+                    public int  unitUid{
+                                get{return _unitUid;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUnituid(this,_unitUid,value); 
+                    }
+        
+                _unitUid = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,int type,float v,string s,int unitUid)
             {
 
              this.uid = uid;
              this.name = name;
+             this.type = type;
              this.v = v;
+             this.s = s;
+             this.unitUid = unitUid;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,type,v,s,unitUid);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0f);
+                   public static Data defaultData=new Data(0,"",0,0f,"",0);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -184,7 +261,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<float>("v")
+                jo.Get<int>("type"),
+
+                jo.Get<float>("v"),
+
+                jo.Get<string>("s"),
+
+                jo.Get<int>("unitUid")
                     );
 
             return data;
@@ -200,7 +283,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
+            jo.Set<int>("type",data.type);
+
             jo.Set<float>("v",data.v);
+
+            jo.Set<string>("s",data.s);
+
+            jo.Set<int>("unitUid",data.unitUid);
 
             return jo;
         }
@@ -237,6 +326,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -285,12 +375,42 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
+            public static void ChangeType(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
             public static void ChangeV(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
                 changeVAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeS(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUnituid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUnituidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

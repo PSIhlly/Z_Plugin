@@ -88,6 +88,7 @@ namespace Z_Map
 
                 //fix
                 newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
+
                 ins.transform.position = newPos;
                 ins.step =   newPos - data.pos;
                 

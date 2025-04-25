@@ -1,3 +1,4 @@
+using Form;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ using Z_Ui.Notify;
 public class TipsCmd : CmdBase
 {
 
-    public override CmdRes Execute(object[] prs)
+    public override CmdRes Execute(VarForm.Data[] prs)
     {
-        NotifyManager.instance.AddTip((string)prs[0]);
+        NotifyManager.instance.AddTip(prs[0].s);
         return new CmdRes()
         { 
         };

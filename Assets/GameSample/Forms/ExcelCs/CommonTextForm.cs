@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -38,6 +40,13 @@ namespace Form
 
             TextBaseForm.changeContentcnAction+=ChangeContentcn;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -70,6 +79,11 @@ namespace Form
              this.contentCn = contentCn;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,key,contentEn,contentCn);
+                }
             
         }
 
@@ -123,6 +137,8 @@ namespace Form
 
                 {5,new Data(5,"stop","Stop","停止")},
 
+                {6,new Data(6,"custom","Costom","自定义")},
+
                 {10001,new Data(10001,"savePopupTitle","Do you need Save?","需要保存吗?")},
 
                 };
@@ -137,6 +153,8 @@ namespace Form
                         {"play_1",_DataById[4]},
     
                         {"stop",_DataById[5]},
+    
+                        {"custom",_DataById[6]},
     
                         {"savePopupTitle",_DataById[10001]},
     
@@ -254,6 +272,7 @@ TextBaseForm.AddData(data);
                     DataByKey.Remove(data.key);
     
 TextBaseForm.RemoveData(id);
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

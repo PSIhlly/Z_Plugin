@@ -57,25 +57,25 @@ namespace Ui.ModStoryCharacterListArguments.ModStoryCharacterListArgumentsCustom
         {
             view.ipt_default.onFinishInput += s =>
             {
-                if (int.TryParse(s, out var v))
+                if (float.TryParse(s, out var v))
                 {
-                    parent.model.data.SetValue(model.data,v);
+                    parent.model.data.paramDic[model.data.name].v = v;
                     parent.Refresh();
                 }
             };
             view.ipt_max.onFinishInput += s =>
             {
-                if (int.TryParse(s, out var v))
+                if (float.TryParse(s, out var v))
                 {
-                    parent.model.data.SetValueMax(model.data, v);
+                    parent.model.data.paramDic[model.data.name].max= v;
                     parent.Refresh();
                 }
             };
             view.ipt_min.onFinishInput += s =>
             {
-                if (int.TryParse(s, out var v))
+                if (float.TryParse(s, out var v))
                 {
-                    parent.model.data.SetValueMin(model.data, v);
+                    parent.model.data.paramDic[model.data.name].min = v;
                     parent.Refresh();
                 }
             };
@@ -90,9 +90,9 @@ namespace Ui.ModStoryCharacterListArguments.ModStoryCharacterListArgumentsCustom
             
                 var dataCache = parent.model.data;
                 view.txt_name.text = model.data.name;
-                view.ipt_default.Set(dataCache.GetValue<float>(model.data).ToString("0.##"));
-                view.ipt_min.Set(dataCache.GetValueMin<float>(model.data).ToString("0.##"));
-                view.ipt_max.Set(dataCache.GetValueMax<float>(model.data).ToString("0.##"));
+                view.ipt_default.Set(((float)dataCache.paramDic[model.data.name].v).ToString("0.##"));
+                view.ipt_min.Set(((float)dataCache.paramDic[model.data.name].min).ToString("0.##"));
+                view.ipt_max.Set(((float)dataCache.paramDic[model.data.name].max).ToString("0.##"));
         }
 
 

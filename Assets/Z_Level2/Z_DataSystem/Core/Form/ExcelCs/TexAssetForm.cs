@@ -31,6 +31,13 @@ namespace Z_DataSystem.Form
 
             AssetForm.changeNameAction+=ChangeName;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -78,6 +85,11 @@ namespace Z_DataSystem.Form
              this.tex = tex;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,tex);
+                }
             
         }
 
@@ -260,6 +272,7 @@ AssetForm.AddData(data);
                     DatasByTex[data.tex].Remove(data);
     
 AssetForm.RemoveData(id);
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

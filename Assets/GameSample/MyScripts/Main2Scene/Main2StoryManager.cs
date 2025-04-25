@@ -48,10 +48,16 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadConfig(storyFolder + "/core");
         }else //初始化
         {
-            CharacterParamForm.AddData(new CharacterParamForm.Data(-1, "Hp", 0,0));
-            CharacterParamForm.AddData(new CharacterParamForm.Data(-1, "Speed", 0,0));
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","",new Dictionary<string, (float, float, float)>() { {"Hp",(100f,0f,100f) }, { "Speed", (5f, 5f, 5f) } },true,new List<string>(),"","","Speed","Hp"));
-            ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500),""));
+            var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0);
+            var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, 0f, 5f, 5f, 0);
+            CharacterParamForm.AddData(hpParamData);
+            CharacterParamForm.AddData(speedParamData);
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","",new Dictionary<string, CharacterParamForm.Data>() { {"Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } },true,new Dictionary<string, CharacterAnimForm.Data>(),"","","Speed","Hp"));
+            ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500), "Player"));
+            
+            var data = new GameMapData();
+            data.Init();
+            GameManager.instance.saveCtrl.SaveScene(storyFolder + "/core/" + "scene1",data);
 
             GameManager.instance.saveCtrl.SaveCharacter(storyFolder + "/core");
             GameManager.instance.saveCtrl.SaveConfig(storyFolder + "/core");
@@ -117,7 +123,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             //new
             data = await Task.Run(() =>
             {
-                var data = new MapData();
+                var data = new GameMapData();
+                data.Init();
                 return data;
             });
         }
@@ -141,7 +148,21 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            GameManager.instance.characterCtrl.CreateAnim(character, character.GetCharacterAnim(character.idleAnimName), character.GetCharacterAnim(character.moveAnimName));
+            CharacterAnimForm.Data idleAnim = null;
+            CharacterAnimForm.Data moveAnim = null;
+            foreach (var anim in character.animDic.Values)
+            {
+                if(anim.name== character.idleAnimName)
+                {
+                    idleAnim = anim;
+                }
+                else if(anim.name == character.moveAnimName)
+                {
+                    moveAnim = anim;
+                }
+            }
+            GameManager.instance.characterCtrl.CreateAnim(character, idleAnim, moveAnim);
+
         }
 
         Z_EventHelper.Invoke(new LoadingEvent()

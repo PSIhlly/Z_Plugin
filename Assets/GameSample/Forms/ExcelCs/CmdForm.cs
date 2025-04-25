@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -24,6 +26,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -38,9 +47,13 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changePrmjaAction;
+        public static Action<Data,int,int> changePrmcntAction;
                 
-        public static Action<Data,string,string> changeRetjaAction;
+        public static Action<Data,int,int> changeRescntAction;
+                
+        public static Action<Data,float,float> changeConstvAction;
+                
+        public static Action<Data,string,string> changeLabAction;
                 
 
 
@@ -83,55 +96,98 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _prmJa;
+                    private int  _prmCnt;
                     /// <summary>
-                    ///参数语句序列
+                    ///参数数量
                     ///</summary>
-                    public string  prmJa{
-                                get{return _prmJa;}
+                    public int  prmCnt{
+                                get{return _prmCnt;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangePrmja(this,_prmJa,value); 
+                       ChangePrmcnt(this,_prmCnt,value); 
                     }
         
-                _prmJa = value;
+                _prmCnt = value;
                 }
                  
                      }
                     
-                    private string  _retJa;
+                    private int  _resCnt;
                     /// <summary>
-                    ///返回语句序列
+                    ///结果数量
                     ///</summary>
-                    public string  retJa{
-                                get{return _retJa;}
+                    public int  resCnt{
+                                get{return _resCnt;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeRetja(this,_retJa,value); 
+                       ChangeRescnt(this,_resCnt,value); 
                     }
         
-                _retJa = value;
+                _resCnt = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,string prmJa,string retJa)
+                    private float  _constV;
+                    /// <summary>
+                    ///常量
+                    ///</summary>
+                    public float  constV{
+                                get{return _constV;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeConstv(this,_constV,value); 
+                    }
+        
+                _constV = value;
+                }
+                 
+                     }
+                    
+                    private string  _lab;
+                    /// <summary>
+                    ///一级标签
+                    ///</summary>
+                    public string  lab{
+                                get{return _lab;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeLab(this,_lab,value); 
+                    }
+        
+                _lab = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,int prmCnt,int resCnt,float constV,string lab)
             {
 
              this.uid = uid;
              this.name = name;
-             this.prmJa = prmJa;
-             this.retJa = retJa;
+             this.prmCnt = prmCnt;
+             this.resCnt = resCnt;
+             this.constV = constV;
+             this.lab = lab;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,prmCnt,resCnt,constV,lab);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"","","");
+                   public static Data defaultData=new Data(0,"",0,0,0f,"");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -141,6 +197,26 @@ public static readonly int autoUidCnt=100;
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLab;
+            public static Dictionary<string, List<Data>> DatasByLab
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLab;
                 }
             }
     
@@ -159,11 +235,31 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"dialog","","")},
+                {1,new Data(1,"dialog",1,0,0f,"弹窗")},
 
-                {2,new Data(2,"tips","","")},
+                {2,new Data(2,"tips",1,0,0f,"提示")},
 
                 };
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"dialog",_DataByUid[1]},
+    
+                        {"tips",_DataByUid[2]},
+    
+                    };
+    
+                    _DatasByLab = new Dictionary<string, List<Data>>() {
+    
+                            {"弹窗",new List<Data>()},
+        
+                            {"提示",new List<Data>()},
+        
+                };
+
+                    _DatasByLab["弹窗"].Add(_DataByUid[1]);
+
+                    _DatasByLab["提示"].Add(_DataByUid[2]);
+
 
             childInitAction?.Invoke();
             
@@ -209,9 +305,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("prmJa"),
+                jo.Get<int>("prmCnt"),
 
-                jo.Get<string>("retJa")
+                jo.Get<int>("resCnt"),
+
+                jo.Get<float>("constV"),
+
+                jo.Get<string>("lab")
                     );
 
             return data;
@@ -227,9 +327,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("prmJa",data.prmJa);
+            jo.Set<int>("prmCnt",data.prmCnt);
 
-            jo.Set<string>("retJa",data.retJa);
+            jo.Set<int>("resCnt",data.resCnt);
+
+            jo.Set<float>("constV",data.constV);
+
+            jo.Set<string>("lab",data.lab);
 
             return jo;
         }
@@ -251,6 +355,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
+                    DataByName[data.name]=data;
+    
+                    if(!DatasByLab.ContainsKey(data.lab))
+                        DatasByLab[data.lab]=new List<Data>();
+                    DatasByLab[data.lab].Add(data);
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -265,7 +375,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                     DataByUid.Remove(data.uid);
     
+                    DataByName.Remove(data.name);
+    
+                    DatasByLab[data.lab].Remove(data);
+    
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -273,6 +388,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             Init();
 
                     DataByUid.Clear();
+    
+                    DataByName.Clear();
+    
+                    DatasByLab.Clear();
     
             uidChain.Clear();
         }
@@ -309,27 +428,53 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 if(superData is Data data)
                 {
 
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangePrmja(Data superData,string oldV,string newV)
+            public static void ChangePrmcnt(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changePrmjaAction?.Invoke(data,oldV,newV);
+                changePrmcntAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeRetja(Data superData,string oldV,string newV)
+            public static void ChangeRescnt(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeRetjaAction?.Invoke(data,oldV,newV);
+                changeRescntAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeConstv(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeConstvAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLab(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByLab[oldV].Remove(data);
+                    DatasByLab[newV].Add(data);
+ 
+                changeLabAction?.Invoke(data,oldV,newV);
                 }
                     
             }

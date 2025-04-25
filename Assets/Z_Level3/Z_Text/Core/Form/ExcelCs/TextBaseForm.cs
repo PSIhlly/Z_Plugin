@@ -21,6 +21,13 @@ public static readonly int autoIdCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -125,6 +132,11 @@ public static readonly int autoIdCnt=100;
              this.contentCn = contentCn;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,key,contentEn,contentCn);
+                }
             
         }
 
@@ -277,6 +289,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     DataByKey.Remove(data.key);
     
 
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()

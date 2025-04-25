@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -34,10 +36,15 @@ namespace Form
 
             ProductForm.changeNameAction+=ChangeName;
 
-            ProductForm.changeParamdicAction+=ChangeParamdic;
-
             ProductForm.changeIsprotoAction+=ChangeIsproto;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -54,11 +61,11 @@ namespace Form
                 
         public static Action<Data,string,string> changeAvatartexnameAction;
                 
-        public static Action<Data,Dictionary<string,(float,float,float)>,Dictionary<string,(float,float,float)>> changeParamdicAction;
+        public static Action<Data,Dictionary<string,CharacterParamForm.Data>,Dictionary<string,CharacterParamForm.Data>> changeParamdicAction;
                 
         public static Action<Data,bool,bool> changeIsprotoAction;
                 
-        public static Action<Data,List<string>,List<string>> changeAnimjoAction;
+        public static Action<Data,Dictionary<string,CharacterAnimForm.Data>,Dictionary<string,CharacterAnimForm.Data>> changeAnimdicAction;
                 
         public static Action<Data,string,string> changeIdleanimnameAction;
                 
@@ -91,20 +98,38 @@ namespace Form
                  
                      }
                     
-                    private List<string>  _animJo;
+                    private Dictionary<string,CharacterParamForm.Data>  _paramDic;
                     /// <summary>
-                    ///动画
+                    ///数据
                     ///</summary>
-                    public List<string>  animJo{
-                                get{return _animJo;}
+                    public Dictionary<string,CharacterParamForm.Data>  paramDic{
+                                get{return _paramDic;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeAnimjo(this,_animJo,value); 
+                       ChangeParamdic(this,_paramDic,value); 
                     }
         
-                _animJo = value;
+                _paramDic = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<string,CharacterAnimForm.Data>  _animDic;
+                    /// <summary>
+                    ///动画
+                    ///</summary>
+                    public Dictionary<string,CharacterAnimForm.Data>  animDic{
+                                get{return _animDic;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAnimdic(this,_animDic,value); 
+                    }
+        
+                _animDic = value;
                 }
                  
                      }
@@ -181,7 +206,7 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string avatarTexName,Dictionary<string,(float,float,float)> paramDic,bool isProto,List<string> animJo,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,paramDic,isProto)
+            public Data(int uid,string name,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,isProto)
             {
 
              this.uid = uid;
@@ -189,17 +214,22 @@ namespace Form
              this.avatarTexName = avatarTexName;
              this.paramDic = paramDic;
              this.isProto = isProto;
-             this.animJo = animJo;
+             this.animDic = animDic;
              this.idleAnimName = idleAnimName;
              this.moveAnimName = moveAnimName;
              this.speedParamName = speedParamName;
              this.hpParamName = hpParamName;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,avatarTexName,paramDic,isProto,animDic,idleAnimName,moveAnimName,speedParamName,hpParamName);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",new Dictionary<string,(float,float,float)>(){},false,null,"","","","");
+                   public static Data defaultData=new Data(0,"","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -297,11 +327,11 @@ namespace Form
 
                 jo.Get<string>("avatarTexName"),
 
-                jo.Get<Dictionary<string,(float,float,float)>>("paramDic"),
+                jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDic"),
 
                 jo.Get<bool>("isProto"),
 
-                jo.Get<List<string>>("animJo"),
+                jo.Get<Dictionary<string,CharacterAnimForm.Data>>("animDic"),
 
                 jo.Get<string>("idleAnimName"),
 
@@ -327,11 +357,11 @@ namespace Form
 
             jo.Set<string>("avatarTexName",data.avatarTexName);
 
-            jo.Set<Dictionary<string,(float,float,float)>>("paramDic",data.paramDic);
+            jo.Set<Dictionary<string,CharacterParamForm.Data>>("paramDic",data.paramDic);
 
             jo.Set<bool>("isProto",data.isProto);
 
-            jo.Set<List<string>>("animJo",data.animJo);
+            jo.Set<Dictionary<string,CharacterAnimForm.Data>>("animDic",data.animDic);
 
             jo.Set<string>("idleAnimName",data.idleAnimName);
 
@@ -380,6 +410,7 @@ ProductForm.AddData(data);
                     DataByName.Remove(data.name);
     
 ProductForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -443,7 +474,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeParamdic(ProductForm.Data superData,Dictionary<string,(float,float,float)> oldV,Dictionary<string,(float,float,float)> newV)
+            public static void ChangeParamdic(Data superData,Dictionary<string,CharacterParamForm.Data> oldV,Dictionary<string,CharacterParamForm.Data> newV)
             {
                 if(superData is Data data)
                 {
@@ -463,12 +494,12 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeAnimjo(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeAnimdic(Data superData,Dictionary<string,CharacterAnimForm.Data> oldV,Dictionary<string,CharacterAnimForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeAnimjoAction?.Invoke(data,oldV,newV);
+                changeAnimdicAction?.Invoke(data,oldV,newV);
                 }
                     
             }

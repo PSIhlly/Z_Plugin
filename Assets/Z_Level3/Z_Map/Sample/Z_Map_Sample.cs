@@ -19,7 +19,9 @@ public class Z_Map_Sample : MonoBehaviour
         {
             TexAssetForm.AddData(new TexAssetForm.Data(-1, tex.Item1, tex.Item2));
         }
-        MapManager.instance.Begin(new MapData());
+        var data = new MapData();
+        data.Init();
+        MapManager.instance.Begin(data);
     }
     public void Update()
     {

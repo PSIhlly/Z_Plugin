@@ -92,7 +92,7 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterArguments
             });
             view.ipt_name.onFinishInput += (s) =>
             {
-                CharacterParamForm.DataByUid[model.id].name = s;
+                ModManager.instance.assetCtrl.RenameCharacterParam(CharacterParamForm.DataByUid[model.id].name, s);
                 parent.Refresh();
             };
 

@@ -10,6 +10,8 @@ using Z_DesignStyle;
 using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
 namespace Form
 {
@@ -34,6 +36,21 @@ namespace Form
 
             ParamForm.changeNameAction+=ChangeName;
 
+            ParamForm.changeValuetypeAction+=ChangeValuetype;
+
+            ParamForm.changeMinAction+=ChangeMin;
+
+            ParamForm.changeVAction+=ChangeV;
+
+            ParamForm.changeMaxAction+=ChangeMax;
+
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -47,6 +64,14 @@ namespace Form
         public static Action<Data,int,int> changeUidAction;
                 
         public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,int,int> changeValuetypeAction;
+                
+        public static Action<Data,float,float> changeMinAction;
+                
+        public static Action<Data,float,float> changeVAction;
+                
+        public static Action<Data,float,float> changeMaxAction;
                 
 
 
@@ -66,19 +91,27 @@ private set{
                  
                      }
                     
-            public Data(int uid,string name,int valueType,int SpecialType):base(uid,name,valueType)
+            public Data(int uid,string name,int valueType,float min,float v,float max,int SpecialType):base(uid,name,valueType,min,v,max)
             {
 
              this.uid = uid;
              this.name = name;
              this.valueType = valueType;
+             this.min = min;
+             this.v = v;
+             this.max = max;
              this.SpecialType = SpecialType;
 
             }
+
+                public Data Copy()
+                {
+        return new Data(-1,name,valueType,min,v,max,SpecialType);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0);
+                   public static Data defaultData=new Data(0,"",0,0f,0f,0f,0);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -188,7 +221,13 @@ private set{
 
                 jo.Get<string>("name"),
 
-                    defaultData.valueType,
+                jo.Get<int>("valueType"),
+
+                jo.Get<float>("min"),
+
+                jo.Get<float>("v"),
+
+                jo.Get<float>("max"),
 
                     defaultData.SpecialType
                     );
@@ -205,6 +244,14 @@ private set{
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<int>("valueType",data.valueType);
+
+            jo.Set<float>("min",data.min);
+
+            jo.Set<float>("v",data.v);
+
+            jo.Set<float>("max",data.max);
 
             return jo;
         }
@@ -249,6 +296,7 @@ ParamForm.AddData(data);
                     DataBySpecialtype.Remove(data.SpecialType);
     
 ParamForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
@@ -300,6 +348,46 @@ ParamForm.RemoveData(uid);
                     DataByName[newV]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeValuetype(ParamForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeValuetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMin(ParamForm.Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMinAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeV(ParamForm.Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeVAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMax(ParamForm.Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMaxAction?.Invoke(data,oldV,newV);
                 }
                     
             }

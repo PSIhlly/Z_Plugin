@@ -13,6 +13,8 @@ namespace Z_DataSystem.Form
     {
         Float = 0,
         Bool = 1,
+        String = 2,
+        Unit = 3,
     }
 
     public partial class ParamForm
@@ -22,142 +24,7 @@ namespace Z_DataSystem.Form
             return (Type)data.valueType;
         }
     }
-    public partial class ProductForm
-    {
-        static public T GetValue<T>(this Data data, ParamForm.Data prm)
-        {
-            data.TryInit(prm);
-            (float, float, float) info = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                    return (T)(object)info.Item1;
-                case Type.Bool:
-                    return info.Item1 == 1 ? (T)(object)true : (T)(object)false;
-                default:
-                    return (T)(object)data.paramDic[prm.name];
-            }
-        }
-        static public T GetValueMin<T>(this Data data, ParamForm.Data prm)
-        {
-            data.TryInit(prm);
-            (float, float, float) info = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                    return (T)(object)info.Item2;
-                case Type.Bool:
-                    return info.Item2 == 1 ? (T)(object)true : (T)(object)false;
-                default:
-                    return (T)(object)data.paramDic[prm.name];
-            }
-        }
-        static public T GetValueMax<T>(this Data data, ParamForm.Data prm)
-        {
-            data.TryInit(prm);
-            (float, float, float) info = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                    return (T)(object)info.Item3;
-                case Type.Bool:
-                    return info.Item3 == 1 ? (T)(object)true : (T)(object)false;
-                default:
-                    return (T)(object)data.paramDic[prm.name];
-            }
-        }
 
-        static public void SetValue(this Data data, ParamForm.Data prm, object v)
-        {
-            data.TryInit(prm);
-            (float, float, float) info = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                    info.Item1 = (int)v;
-                    break;
-                case Type.Bool:
-                    info.Item1 = ((bool)v) ? 1 : 0;
-                    break;
-                default:
-                    break;
-            }
-            data.paramDic[prm.name] = info;
-            data.CheckInt(prm);
-        }
-        static public void SetValueMin(this Data data, ParamForm.Data prm, object v)
-        {
-            data.TryInit(prm);
-
-            (float, float, float) info = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                    info.Item2 = (int)v;
-                    break;
-                case Type.Bool:
-                    info.Item2 = ((bool)v) ? 1 : 0;
-                    break;
-                default:
-                    break;
-            }
-            data.paramDic[prm.name] = info;
-            data.CheckInt(prm);
-        }
-        static public void SetValueMax(this Data data, ParamForm.Data prm, object v)
-        {
-            data.TryInit(prm);
-            (float, float, float) info = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                    info.Item3 = (int)v;
-                    break;
-                case Type.Bool:
-                    info.Item3 = ((bool)v) ? 1 : 0;
-                    break;
-                default:
-                    break;
-            }
-            data.paramDic[prm.name] = info;
-            data.CheckInt(prm);
-        }
-        static private void TryInit(this Data data, ParamForm.Data prm)
-        {
-            if (!data.paramDic.ContainsKey(prm.name))
-            {
-                switch (prm.GetValueType())
-                {
-                    case Type.Float:
-                        data.paramDic[prm.name] = (100, 0, 100);
-                        break;
-                    case Type.Bool:
-                        data.paramDic[prm.name] = (0, 0, 1);
-                        break;
-                }
-
-            }
-        }
-        static private void CheckInt(this Data data, ParamForm.Data prm)
-        {
-            data.TryInit(prm);
-            (float, float, float) v = data.paramDic[prm.name];
-            switch (prm.GetValueType())
-            {
-                case Type.Float:
-                case Type.Bool:
-
-                    if (v.Item1 < v.Item2)
-                        v.Item1 = v.Item2;
-                    if (v.Item1 > v.Item3)
-                        v.Item1 = v.Item3;
-
-                    data.paramDic[prm.name] = v;
-                    break;
-            }
-        }
-
-    }
 
 
     public partial class TexAssetForm

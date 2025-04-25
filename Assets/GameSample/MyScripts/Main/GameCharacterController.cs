@@ -18,26 +18,7 @@ public static partial class GlobalMaxSettings
 }
 public static partial class GlobalDataHelper
 {
-    public static CharacterAnimForm.Data GetCharacterAnim(this CharacterProductForm.Data data, int id)
-    {
-        return CharacterAnimForm.GetDataByJo(JObject.Parse(data.animJo[id]));
-    }
-    public static CharacterAnimForm.Data GetCharacterAnim(this CharacterProductForm.Data data, string name)
-    {
-        for (int i = 0; i < data.animJo.Count; i++)
-        {
-            var anim = data.GetCharacterAnim(i);
-            if (anim.name == name)
-            {
-                return anim;
-            }
-        }
-        return null;
-    }
-    public static void SaveCharacterAnim(this CharacterProductForm.Data data, int id, CharacterAnimForm.Data info)
-    {
-        data.animJo[id] = CharacterAnimForm.GetJoByData(info).ToString();
-    }
+    
 
 }
 public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
@@ -117,7 +98,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             {
                 animCurCache[part] = "";
             }
-            if (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name)
+            if (anim==null||(animCurCache.ContainsKey(part) && animCurCache[part] == anim.name))
             {
                 return;
             }
@@ -130,11 +111,10 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 TimeManager.instance.CancelTimer(animTimer[part]);
                 if (anim.animTimeInterval > 0)
                 {
-                    float all = anim.animTimeInterval * anim.partAnimTexsName.Count;
-
-                    int cur = (int)((Time.time % all) / anim.animTimeInterval);
+                    float all = anim.animTimeInterval * anim.partAnimTexsName[part].Count;
+                    int cur = (int)((Time.time % all) / anim.animTimeInterval-0.0001f);
+                 
                     float timeProgress = (Time.time % anim.animTimeInterval);
-
                     render.GetPropertyBlock(propBlock);
                     animCurCache[part] = anim.name;
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.partAnimTexsName[part][cur]].tex);
@@ -153,7 +133,6 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 {
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.partAnimTexsName[part][0]].tex);
                 }
-                propBlock.SetFloat("_Show", 1);
                 render.SetPropertyBlock(propBlock);
             }
 

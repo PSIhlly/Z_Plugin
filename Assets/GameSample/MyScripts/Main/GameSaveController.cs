@@ -92,9 +92,8 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas().ToString());
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
-            for (int k = 0;k < data.animJo.Count;k ++)
+            foreach (var anim in data.animDic.Values)
             {
-                var anim = data.GetCharacterAnim(k);
                 for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
                     for (int i = 0; i < anim.partAnimTexsName[j].Count; i++)
                     {
@@ -112,6 +111,10 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveScene(string scenePath)
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
+    }
+    public void SaveScene(string scenePath, MapData data)
+    {
+        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
     }
     public void SaveConfig(string storyCoreFolder)
     {
@@ -218,9 +221,8 @@ public class GameSaveController : Z_Controller<GameManager>
        
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
-            for (int k = 0; k < data.animJo.Count; k++)
+            foreach (var anim in data.animDic.Values)
             {
-                var anim = data.GetCharacterAnim(k);
                 for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
                     for (int i = 0; i < anim.partAnimTexsName[j].Count; i++)
                     {
@@ -236,7 +238,9 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public MapData LoadScene(string scenePath)
     {
-        return new MapData(SaveAndLoad.Load<string>(scenePath));
+        var mapData= new GameMapData();
+        mapData.Init(SaveAndLoad.Load<string>(scenePath));
+        return mapData;
     }
     public void LoadConfig(string storyCoreFolder)
     {
@@ -265,6 +269,10 @@ public class GameSaveController : Z_Controller<GameManager>
     public void ResetPrefabPool()
     {
         InstancePoolManager.instance.Clear();
+        foreach (Transform child in InstancePoolManager.instance.defaultRoot)
+        {
+            GameObject.Destroy(child.gameObject); // 销毁子物体
+        }
         foreach (var form in GameObjectAssetForm.DataById.Values)
         {
             if (form.name.StartsWith(GlobalNameHelper.GetInternalPrefabName("")))
@@ -281,10 +289,13 @@ public class GameSaveController : Z_Controller<GameManager>
                 texNameLst.Add(form.subUnitTexsName[i]);
                 showShaddowLst.Add(true);
             }
-            InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewItemByPrefabs(form.name, form.subPrefabUnitName, texNameLst, form.subPrefabUnitPos, form.subPrefabUnitScale, showShaddowLst, true));
+            var obj = _super.utilCtrl.CombineNewItemByPrefabs(form.name, form.subPrefabUnitName, texNameLst, form.subPrefabUnitPos, form.subPrefabUnitScale, showShaddowLst, true);
+            obj.transform.parent = InstancePoolManager.instance.defaultRoot;
+            InstancePoolManager.instance.AddPool(obj);
         }
-
-        InstancePoolManager.instance.AddPool(_super.utilCtrl.CombineNewCharacterByPrefabs(GlobalNameHelper.GetRuntimePrefabName("character"), new List<string>() {"","",null} , true));
+        var character = _super.utilCtrl.CombineNewCharacterByPrefabs(GlobalNameHelper.GetRuntimePrefabName("character"), new List<string>() { "", "", null }, true);
+        character.transform.parent = InstancePoolManager.instance.defaultRoot;
+        InstancePoolManager.instance.AddPool(character);
 
     }
 

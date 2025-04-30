@@ -15,6 +15,8 @@ namespace Z_DataSystem.Form
         Bool = 1,
         String = 2,
         Unit = 3,
+        Object=4,
+        Action=5
     }
 
     public partial class ParamForm
@@ -239,7 +241,7 @@ namespace Z_DataSystem
 
         #endregion
 
-
+       
         public void UnloadAllAuto()
         {
             List<AssetForm.Data> texDatas = new List<AssetForm.Data>(AssetForm.DataById.Values);

@@ -212,20 +212,8 @@ namespace Ui.ModStoryMaterial.ModStoryMaterialTexture
             {
                 if (model.id == -1)
                 {
-                    int max = 1;
-                    foreach (var o in MapTextureForm.DataById.Values)
-                    {
-                        var splt = o.name.Split("newTex");
-                        if (splt.Length > 1)
-                        {
-                            if (int.TryParse(splt[1], out int v))
-                            {
-                                max = Mathf.Max(max, v + 1);
-                            }
-                        }
-                    }
-
-                    ModManager.instance.assetCtrl.CreateAnimTex("newTex" + max);
+                    
+                    ModManager.instance.assetCtrl.CreateAnimTex("");
                     parent.Refresh();
                 }
                 else

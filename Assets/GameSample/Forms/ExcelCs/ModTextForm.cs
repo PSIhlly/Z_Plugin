@@ -157,6 +157,24 @@ namespace Form
 
                 {1110004,new Data(1110004,"Choose Move anim","Choose Move anim","选择移动动画")},
 
+                {1210001,new Data(1210001,"dialog","dialog","对话")},
+
+                {1210002,new Data(1210002,"tips","tips","提示")},
+
+                {1210003,new Data(1210003,"empty","empty","空")},
+
+                {1210004,new Data(1210004,"if","if","如果")},
+
+                {1210005,new Data(1210005,"then","then","满足执行")},
+
+                {1210006,new Data(1210006,"else","else","不满足执行")},
+
+                {1210007,new Data(1210007,"content","content","内容")},
+
+                {1210008,new Data(1210008,"conditionJudge","condition judge","条件")},
+
+                {1210009,new Data(1210009,"execute","execute","执行内容")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -189,6 +207,24 @@ namespace Form
                         {"Choose Idle anim",_DataById[1110003]},
     
                         {"Choose Move anim",_DataById[1110004]},
+    
+                        {"dialog",_DataById[1210001]},
+    
+                        {"tips",_DataById[1210002]},
+    
+                        {"empty",_DataById[1210003]},
+    
+                        {"if",_DataById[1210004]},
+    
+                        {"then",_DataById[1210005]},
+    
+                        {"else",_DataById[1210006]},
+    
+                        {"content",_DataById[1210007]},
+    
+                        {"conditionJudge",_DataById[1210008]},
+    
+                        {"execute",_DataById[1210009]},
     
                     };
     
@@ -316,6 +352,17 @@ TextBaseForm.RemoveData(id);
                     DataByKey.Clear();
     
             idChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataById.Values)
+            {
+                if(data.id<idChain.cnt)
+                    RemoveData(data.id);
+            }
+            
         }
 
          private static void RemoveChildren(TextBaseForm.Data data)

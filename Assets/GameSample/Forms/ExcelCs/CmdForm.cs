@@ -47,13 +47,23 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,int,int> changePrmcntAction;
+        public static Action<Data,List<int>,List<int>> changePrmtypesAction;
                 
-        public static Action<Data,int,int> changeRescntAction;
+        public static Action<Data,List<string>,List<string>> changePrmnameAction;
                 
-        public static Action<Data,float,float> changeConstvAction;
+        public static Action<Data,List<int>,List<int>> changeRestypesAction;
+                
+        public static Action<Data,string,string> changeConstvAction;
                 
         public static Action<Data,string,string> changeLabAction;
+                
+        public static Action<Data,List<string>,List<string>> changeAdditioncmdsAction;
+                
+        public static Action<Data,bool,bool> changeGlobalenableAction;
+                
+        public static Action<Data,bool,bool> changeTerrainenableAction;
+                
+        public static Action<Data,bool,bool> changeObjectenableAction;
                 
 
 
@@ -96,47 +106,65 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private int  _prmCnt;
+                    private List<int>  _prmTypes;
                     /// <summary>
-                    ///参数数量
+                    ///参数类型
                     ///</summary>
-                    public int  prmCnt{
-                                get{return _prmCnt;}
+                    public List<int>  prmTypes{
+                                get{return _prmTypes;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangePrmcnt(this,_prmCnt,value); 
+                       ChangePrmtypes(this,_prmTypes,value); 
                     }
         
-                _prmCnt = value;
+                _prmTypes = value;
                 }
                  
                      }
                     
-                    private int  _resCnt;
+                    private List<string>  _prmName;
                     /// <summary>
-                    ///结果数量
+                    ///参数名称
                     ///</summary>
-                    public int  resCnt{
-                                get{return _resCnt;}
+                    public List<string>  prmName{
+                                get{return _prmName;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeRescnt(this,_resCnt,value); 
+                       ChangePrmname(this,_prmName,value); 
                     }
         
-                _resCnt = value;
+                _prmName = value;
                 }
                  
                      }
                     
-                    private float  _constV;
+                    private List<int>  _resTypes;
+                    /// <summary>
+                    ///结果类型
+                    ///</summary>
+                    public List<int>  resTypes{
+                                get{return _resTypes;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeRestypes(this,_resTypes,value); 
+                    }
+        
+                _resTypes = value;
+                }
+                 
+                     }
+                    
+                    private string  _constV;
                     /// <summary>
                     ///常量
                     ///</summary>
-                    public float  constV{
+                    public string  constV{
                                 get{return _constV;}
  set{
 
@@ -168,26 +196,103 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,int prmCnt,int resCnt,float constV,string lab)
+                    private List<string>  _additionCmds;
+                    /// <summary>
+                    ///附加语句
+                    ///</summary>
+                    public List<string>  additionCmds{
+                                get{return _additionCmds;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeAdditioncmds(this,_additionCmds,value); 
+                    }
+        
+                _additionCmds = value;
+                }
+                 
+                     }
+                    
+                    private bool  _globalEnable;
+                    /// <summary>
+                    ///允许全局
+                    ///</summary>
+                    public bool  globalEnable{
+                                get{return _globalEnable;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeGlobalenable(this,_globalEnable,value); 
+                    }
+        
+                _globalEnable = value;
+                }
+                 
+                     }
+                    
+                    private bool  _terrainEnable;
+                    /// <summary>
+                    ///允许地形用
+                    ///</summary>
+                    public bool  terrainEnable{
+                                get{return _terrainEnable;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTerrainenable(this,_terrainEnable,value); 
+                    }
+        
+                _terrainEnable = value;
+                }
+                 
+                     }
+                    
+                    private bool  _objectEnable;
+                    /// <summary>
+                    ///允许物体用
+                    ///</summary>
+                    public bool  objectEnable{
+                                get{return _objectEnable;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeObjectenable(this,_objectEnable,value); 
+                    }
+        
+                _objectEnable = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<int> prmTypes,List<string> prmName,List<int> resTypes,string constV,string lab,List<string> additionCmds,bool globalEnable,bool terrainEnable,bool objectEnable)
             {
 
              this.uid = uid;
              this.name = name;
-             this.prmCnt = prmCnt;
-             this.resCnt = resCnt;
+             this.prmTypes = prmTypes;
+             this.prmName = prmName;
+             this.resTypes = resTypes;
              this.constV = constV;
              this.lab = lab;
+             this.additionCmds = additionCmds;
+             this.globalEnable = globalEnable;
+             this.terrainEnable = terrainEnable;
+             this.objectEnable = objectEnable;
 
             }
 
                 public Data Copy()
                 {
-        return new Data(-1,name,prmCnt,resCnt,constV,lab);
+        return new Data(-1,name,prmTypes,prmName,resTypes,constV,lab,additionCmds,globalEnable,terrainEnable,objectEnable);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0,0f,"");
+                   public static Data defaultData=new Data(0,"empty",null,null,null,"","",null,false,false,false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -200,16 +305,6 @@ public static readonly int autoUidCnt=100;
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
-                }
-            }
-    
             static Dictionary<string, List<Data>> _DatasByLab;
             public static Dictionary<string, List<Data>> DatasByLab
             {
@@ -217,6 +312,16 @@ public static readonly int autoUidCnt=100;
                 {
                     Init();
                     return _DatasByLab;
+                }
+            }
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
                 }
             }
     
@@ -235,9 +340,17 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"dialog",1,0,0f,"弹窗")},
+                {1,new Data(1,"dialog",new List<int>(){2,},new List<string>(){"content",},null,"","popup",null,true,true,true)},
 
-                {2,new Data(2,"tips",1,0,0f,"提示")},
+                {2,new Data(2,"tips",new List<int>(){2,},new List<string>(){"content",},null,"","tips",null,true,true,true)},
+
+                {3,new Data(3,"if",new List<int>(){1,},new List<string>(){"conditionJudge",},null,"","logic",new List<string>(){"then;else;endif",},true,true,true)},
+
+                {4,new Data(4,"then",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true)},
+
+                {5,new Data(5,"else",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true)},
+
+                {6,new Data(6,"value",null,null,new List<int>(){2,},"","value",null,true,true,true)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -246,19 +359,41 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
     
                         {"tips",_DataByUid[2]},
     
+                        {"if",_DataByUid[3]},
+    
+                        {"then",_DataByUid[4]},
+    
+                        {"else",_DataByUid[5]},
+    
+                        {"value",_DataByUid[6]},
+    
                     };
     
                     _DatasByLab = new Dictionary<string, List<Data>>() {
     
-                            {"弹窗",new List<Data>()},
+                            {"popup",new List<Data>()},
         
-                            {"提示",new List<Data>()},
+                            {"tips",new List<Data>()},
+        
+                            {"logic",new List<Data>()},
+        
+                            {"",new List<Data>()},
+        
+                            {"value",new List<Data>()},
         
                 };
 
-                    _DatasByLab["弹窗"].Add(_DataByUid[1]);
+                    _DatasByLab["popup"].Add(_DataByUid[1]);
 
-                    _DatasByLab["提示"].Add(_DataByUid[2]);
+                    _DatasByLab["tips"].Add(_DataByUid[2]);
+
+                    _DatasByLab["logic"].Add(_DataByUid[3]);
+
+                    _DatasByLab[""].Add(_DataByUid[4]);
+
+                    _DatasByLab[""].Add(_DataByUid[5]);
+
+                    _DatasByLab["value"].Add(_DataByUid[6]);
 
 
             childInitAction?.Invoke();
@@ -305,13 +440,23 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<int>("prmCnt"),
+                jo.Get<List<int>>("prmTypes"),
 
-                jo.Get<int>("resCnt"),
+                jo.Get<List<string>>("prmName"),
 
-                jo.Get<float>("constV"),
+                jo.Get<List<int>>("resTypes"),
 
-                jo.Get<string>("lab")
+                jo.Get<string>("constV"),
+
+                jo.Get<string>("lab"),
+
+                jo.Get<List<string>>("additionCmds"),
+
+                jo.Get<bool>("globalEnable"),
+
+                jo.Get<bool>("terrainEnable"),
+
+                jo.Get<bool>("objectEnable")
                     );
 
             return data;
@@ -327,13 +472,23 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<int>("prmCnt",data.prmCnt);
+            jo.Set<List<int>>("prmTypes",data.prmTypes);
 
-            jo.Set<int>("resCnt",data.resCnt);
+            jo.Set<List<string>>("prmName",data.prmName);
 
-            jo.Set<float>("constV",data.constV);
+            jo.Set<List<int>>("resTypes",data.resTypes);
+
+            jo.Set<string>("constV",data.constV);
 
             jo.Set<string>("lab",data.lab);
+
+            jo.Set<List<string>>("additionCmds",data.additionCmds);
+
+            jo.Set<bool>("globalEnable",data.globalEnable);
+
+            jo.Set<bool>("terrainEnable",data.terrainEnable);
+
+            jo.Set<bool>("objectEnable",data.objectEnable);
 
             return jo;
         }
@@ -378,6 +533,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByName.Remove(data.name);
     
                     DatasByLab[data.lab].Remove(data);
+                    if(DatasByLab[data.lab].Count==0)
+                        DatasByLab.Remove(data.lab);
     
 
             uidChain.PushId(data.uid);
@@ -394,6 +551,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DatasByLab.Clear();
     
             uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataByUid.Values)
+            {
+                if(data.uid<uidChain.cnt)
+                    RemoveData(data.uid);
+            }
+            
         }
 
          private static void RemoveChildren(Data data)
@@ -436,27 +604,37 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangePrmcnt(Data superData,int oldV,int newV)
+            public static void ChangePrmtypes(Data superData,List<int> oldV,List<int> newV)
             {
                 if(superData is Data data)
                 {
 
-                changePrmcntAction?.Invoke(data,oldV,newV);
+                changePrmtypesAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeRescnt(Data superData,int oldV,int newV)
+            public static void ChangePrmname(Data superData,List<string> oldV,List<string> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeRescntAction?.Invoke(data,oldV,newV);
+                changePrmnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeConstv(Data superData,float oldV,float newV)
+            public static void ChangeRestypes(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRestypesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeConstv(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -472,9 +650,53 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                     DatasByLab[oldV].Remove(data);
+                    if(DatasByLab[oldV].Count==0)
+                        DatasByLab.Remove(oldV);
+                    if(!DatasByLab.ContainsKey(newV))
+                        DatasByLab[newV]=new List<Data>();
                     DatasByLab[newV].Add(data);
  
                 changeLabAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAdditioncmds(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAdditioncmdsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeGlobalenable(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeGlobalenableAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTerrainenable(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTerrainenableAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeObjectenable(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeObjectenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

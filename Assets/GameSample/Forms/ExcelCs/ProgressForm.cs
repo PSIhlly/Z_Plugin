@@ -287,6 +287,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
             uidChain.Clear();
         }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataByUid.Values)
+            {
+                if(data.uid<uidChain.cnt)
+                    RemoveData(data.uid);
+            }
+            
+        }
 
          private static void RemoveChildren(Data data)
         {

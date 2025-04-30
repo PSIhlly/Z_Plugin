@@ -305,6 +305,17 @@ MapBaseForm.RemoveData(id);
     
             idChain.Clear();
         }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataById.Values)
+            {
+                if(data.id<idChain.cnt)
+                    RemoveData(data.id);
+            }
+            
+        }
 
          private static void RemoveChildren(MapBaseForm.Data data)
         {

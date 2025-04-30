@@ -3,10 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Policy;
+using Ui.ModStoryEventCmds;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Text;
 using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
@@ -14,14 +16,14 @@ namespace Ui.ModStoryEvent
 {
     public partial class UiModStoryEventParam
     {
-        public Action<string> func;
+        public Action<EventForm.Data> func;
     }
     public partial class UiModStoryEventModel
     {
         public string curLab;
         public string curSubLab;
-        public string curItem;
-        public Action<string> func;
+        public EventForm.Data curItem;
+        public Action<EventForm.Data> func;
 
     }
 
@@ -45,9 +47,22 @@ namespace Ui.ModStoryEvent
                 model.func(model.curItem);
                 Close();
             });
+            view.btn_edit.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModStoryEventCmdsCtrl>(new UiModStoryEventCmdsParam()
+                {
+                    data = model.curItem,
+                    onClose = () =>
+                     {
+                         SetCur(model.curItem.lab, model.curItem.subLab, model.curItem);
+                         Refresh();
+                     }
+                });
+            });
         }
         public override void Close()
         {
+            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder());
             base.Close();
         }
         public override void OnShow()
@@ -66,7 +81,8 @@ namespace Ui.ModStoryEvent
         }
         public void Refresh()
         {
-            view.go_choose.SetActive(model.curItem !=null);
+            view.go_choose.SetActive(model.curItem != null && model.func != null);
+            view.sta_show.ChangeState(model.curItem != null ? 1 : 0);
             labelCon.Clear();
             foreach (var name in EventForm.DatasByLab.Keys)
             {
@@ -75,43 +91,53 @@ namespace Ui.ModStoryEvent
                     name = name
                 });
             }
+            labelCon.Add(new UiLabelParam()
+            {
+                name = null
+            });
             labelCon.Refresh();
 
             subLabelcon.Clear();
             if (model.curLab != null)
             {
-                foreach (var name in EventForm.DatasBySublab.Keys)
+                foreach (var lst in EventForm.DatasByLab.Values)
                 {
-                    if(EventForm.DatasBySublab[name][0].lab==model.curLab)
+                    subLabelcon.Add(new UiSubLabelParam()
                     {
-                        subLabelcon.Add(new UiSubLabelParam()
-                        {
-                            name = name
-                        });
-                    }
+                        name = lst[0].subLab
+                    });
                 }
-                
+                subLabelcon.Add(new UiSubLabelParam()
+                {
+                    name = null
+                });
             }
+
             subLabelcon.Refresh();
 
             con.Clear();
             if (model.curSubLab != null)
             {
-                foreach (var name in EventForm.DatasBySublab.Keys)
+                foreach (var data in EventForm.DatasByLabSublab[(model.curLab, model.curSubLab)])
                 {
-                    if (EventForm.DatasBySublab[name][0].lab == model.curLab)
+                    con.Add(new UiItemParam()
                     {
-                        con.Add(new UiItemParam()
-                        {
-                            name = name
-                        });
-                    }
+                        data = data
+                    });
                 }
-
+                con.Add(new UiItemParam()
+                {
+                    data = null
+                });
             }
             con.Refresh();
+
+            if (model.curItem != null)
+            {
+                view.txt_content.text = model.curItem.name;
+            }
         }
-        public void SetCur(string lab = null, string subLab = null, string item=null)
+        public void SetCur(string lab = null, string subLab = null, EventForm.Data item = null)
         {
             model.curLab = lab;
             model.curSubLab = subLab;
@@ -136,7 +162,15 @@ namespace Ui.ModStoryEvent
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCur(model.name);
+                if (model.name == null)
+                {
+                    ModManager.instance.assetCtrl.CreateEvent("", "", "");
+                    parent.Refresh();
+                }
+                else
+                {
+                    parent.SetCur(model.name);
+                }
             });
         }
         public override void OnShow()
@@ -149,8 +183,15 @@ namespace Ui.ModStoryEvent
         }
         public void Refresh()
         {
-            view.txt_.text = model.name==""? TextManager.instance.GetTxt("custom") : model.name;
-            view.sta_sel.ChangeState(parent.model.curLab == model.name ? 1 : 0);
+            if (model.name == null)
+            {
+
+                view.txt_.text = TextManager.instance.GetTxt("new");
+            }
+            else {
+                view.txt_.text = model.name == "" ? TextManager.instance.GetTxt("custom") : model.name;
+            view.sta_sel.ChangeState(model.name != null && parent.model.curLab == model.name ? 1 : 0);
+            }
         }
     }
 
@@ -169,7 +210,16 @@ namespace Ui.ModStoryEvent
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCur(parent.model.curLab, model.name);
+                if (model.name == null)
+                {
+                    ModManager.instance.assetCtrl.CreateEvent("", parent.model.curLab, "");
+                    parent.Refresh();
+                }
+                else
+                {
+                    parent.SetCur(parent.model.curLab, model.name);
+
+                }
             });
         }
         public override void OnShow()
@@ -182,8 +232,16 @@ namespace Ui.ModStoryEvent
         }
         public void Refresh()
         {
-            view.txt_.text = model.name == "" ? TextManager.instance.GetTxt("custom") : model.name;
-            view.sta_sel.ChangeState(parent.model.curItem == model.name ? 1 : 0);
+            if(model.name==null)
+            {
+                view.txt_.text = TextManager.instance.GetTxt("new");
+            }
+            else
+            {
+                view.txt_.text = model.name == "" ? TextManager.instance.GetTxt("custom") : model.name;
+                view.sta_sel.ChangeState(model.name != null && parent.model.curSubLab == model.name ? 1 : 0);
+
+            }
         }
     }
 
@@ -194,9 +252,8 @@ namespace Ui.ModStoryEvent
     }
     public partial class UiItemModel
     {
-        public Sprite sprite;
-        public string name;
-        public int id;
+        public EventForm.Data data;
+
     }
     public partial class UiItemCtrl
     {
@@ -204,24 +261,36 @@ namespace Ui.ModStoryEvent
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCur(parent.model.curLab, model.id);
+                if (model.data == null)
+                {
+                    ModManager.instance.assetCtrl.CreateEvent("", parent.model.curLab, parent.model.curSubLab);
+                    parent.Refresh();
+                }
+                else
+                {
+                    parent.SetCur(parent.model.curLab, parent.model.curSubLab, model.data);
+                }
             });
         }
         public override void OnShow()
         {
             if (param != null)
             {
-                model.sprite = param.sprite;
-                model.name = param.name;
-                model.id = param.id;
+                model.data = param.data;
             }
             Refresh();
         }
         public void Refresh()
         {
-            view.txt_.text = model.name;
-            view.img_.sprite = model.sprite;
-            view.sta_sel.ChangeState(parent.model.curItem == model.id ? 1 : 0);
+            if (model.data == null)
+            {
+                view.txt_.text = TextManager.instance.GetTxt("new");
+            }
+            else
+            {
+                view.txt_.text = model.data == null ? TextManager.instance.GetTxt("custom") : model.data.name;
+                view.sta_sel.ChangeState(model.data != null && parent.model.curItem == model.data ? 1 : 0);
+            }
         }
     }
 

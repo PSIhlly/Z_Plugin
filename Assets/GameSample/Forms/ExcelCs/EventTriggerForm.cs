@@ -7,11 +7,16 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
+using Z_UnitSystem.Form;
+using Z_Text.Form;
+using Z_DataSystem.Form;
+using Z_Map.Form;
+using Z_Map;
 
-namespace Z_DataSystem.Form
+namespace Form
 {
 
-    public static partial class ParamForm
+    public static partial class EventTriggerForm
     {
 public static readonly int autoUidCnt=1000000;
 
@@ -42,13 +47,13 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,int,int> changeValuetypeAction;
+        public static Action<Data,string,string> changeEvtAction;
                 
-        public static Action<Data,float,float> changeMinAction;
+        public static Action<Data,bool,bool> changeGlobalenableAction;
                 
-        public static Action<Data,float,float> changeVAction;
+        public static Action<Data,bool,bool> changeTerrainenableAction;
                 
-        public static Action<Data,float,float> changeMaxAction;
+        public static Action<Data,bool,bool> changeObjectenableAction;
                 
 
 
@@ -91,98 +96,98 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private int  _valueType;
+                    private string  _evt;
                     /// <summary>
-                    ///数据类型
+                    ///事件名称
                     ///</summary>
-                    public int  valueType{
-                                get{return _valueType;}
+                    public string  evt{
+                                get{return _evt;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeValuetype(this,_valueType,value); 
+                       ChangeEvt(this,_evt,value); 
                     }
         
-                _valueType = value;
+                _evt = value;
                 }
                  
                      }
                     
-                    private float  _min;
+                    private bool  _globalEnable;
                     /// <summary>
-                    ///最小值
+                    ///允许全局
                     ///</summary>
-                    public float  min{
-                                get{return _min;}
+                    public bool  globalEnable{
+                                get{return _globalEnable;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeMin(this,_min,value); 
+                       ChangeGlobalenable(this,_globalEnable,value); 
                     }
         
-                _min = value;
+                _globalEnable = value;
                 }
                  
                      }
                     
-                    private float  _v;
+                    private bool  _terrainEnable;
                     /// <summary>
-                    ///当前值
+                    ///允许地形用
                     ///</summary>
-                    public float  v{
-                                get{return _v;}
+                    public bool  terrainEnable{
+                                get{return _terrainEnable;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeV(this,_v,value); 
+                       ChangeTerrainenable(this,_terrainEnable,value); 
                     }
         
-                _v = value;
+                _terrainEnable = value;
                 }
                  
                      }
                     
-                    private float  _max;
+                    private bool  _objectEnable;
                     /// <summary>
-                    ///最大值
+                    ///允许物体用
                     ///</summary>
-                    public float  max{
-                                get{return _max;}
+                    public bool  objectEnable{
+                                get{return _objectEnable;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeMax(this,_max,value); 
+                       ChangeObjectenable(this,_objectEnable,value); 
                     }
         
-                _max = value;
+                _objectEnable = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,int valueType,float min,float v,float max)
+            public Data(int uid,string name,string evt,bool globalEnable,bool terrainEnable,bool objectEnable)
             {
 
              this.uid = uid;
              this.name = name;
-             this.valueType = valueType;
-             this.min = min;
-             this.v = v;
-             this.max = max;
+             this.evt = evt;
+             this.globalEnable = globalEnable;
+             this.terrainEnable = terrainEnable;
+             this.objectEnable = objectEnable;
 
             }
 
                 public Data Copy()
                 {
-        return new Data(-1,name,valueType,min,v,max);
+        return new Data(-1,name,evt,globalEnable,terrainEnable,objectEnable);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0f,0f,0f);
+                   public static Data defaultData=new Data(0,"","",false,false,false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -192,6 +197,16 @@ public static readonly int autoUidCnt=1000000;
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
                 }
             }
     
@@ -210,7 +225,23 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
+                {1,new Data(1,"OnTouch","",false,true,true)},
+
+                {2,new Data(2,"OnLeave","",false,true,true)},
+
+                {3,new Data(3,"OnShow","",false,true,true)},
+
                 };
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"OnTouch",_DataByUid[1]},
+    
+                        {"OnLeave",_DataByUid[2]},
+    
+                        {"OnShow",_DataByUid[3]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -256,13 +287,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<int>("valueType"),
+                jo.Get<string>("evt"),
 
-                jo.Get<float>("min"),
+                jo.Get<bool>("globalEnable"),
 
-                jo.Get<float>("v"),
+                jo.Get<bool>("terrainEnable"),
 
-                jo.Get<float>("max")
+                jo.Get<bool>("objectEnable")
                     );
 
             return data;
@@ -278,13 +309,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<int>("valueType",data.valueType);
+            jo.Set<string>("evt",data.evt);
 
-            jo.Set<float>("min",data.min);
+            jo.Set<bool>("globalEnable",data.globalEnable);
 
-            jo.Set<float>("v",data.v);
+            jo.Set<bool>("terrainEnable",data.terrainEnable);
 
-            jo.Set<float>("max",data.max);
+            jo.Set<bool>("objectEnable",data.objectEnable);
 
             return jo;
         }
@@ -306,6 +337,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
+                    DataByName[data.name]=data;
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -320,6 +353,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                     DataByUid.Remove(data.uid);
     
+                    DataByName.Remove(data.name);
+    
 
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
@@ -329,6 +364,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             Init();
 
                     DataByUid.Clear();
+    
+                    DataByName.Clear();
     
             uidChain.Clear();
         }
@@ -376,47 +413,50 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 if(superData is Data data)
                 {
 
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeValuetype(Data superData,int oldV,int newV)
+            public static void ChangeEvt(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeValuetypeAction?.Invoke(data,oldV,newV);
+                changeEvtAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeMin(Data superData,float oldV,float newV)
+            public static void ChangeGlobalenable(Data superData,bool oldV,bool newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMinAction?.Invoke(data,oldV,newV);
+                changeGlobalenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeV(Data superData,float oldV,float newV)
+            public static void ChangeTerrainenable(Data superData,bool oldV,bool newV)
             {
                 if(superData is Data data)
                 {
 
-                changeVAction?.Invoke(data,oldV,newV);
+                changeTerrainenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeMax(Data superData,float oldV,float newV)
+            public static void ChangeObjectenable(Data superData,bool oldV,bool newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMaxAction?.Invoke(data,oldV,newV);
+                changeObjectenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

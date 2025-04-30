@@ -291,19 +291,8 @@ namespace Ui.ModStoryObject
             {
                 if (model.id == -1)
                 {
-                    int max = 1;
-                    foreach (var o in MapObjectForm.DataById.Values)
-                    {
-                        var splt = o.name.Split("newItem");
-                        if (splt.Length > 1)
-                        {
-                            if (int.TryParse(splt[1], out int v))
-                            {
-                                max = Mathf.Max(max, v + 1);
-                            }
-                        }
-                    }
-                    ModManager.instance.assetCtrl.CreateObject("newItem" + max);
+                    
+                    ModManager.instance.assetCtrl.CreateObject("");
                     parent.Refresh();
                 }
                 else

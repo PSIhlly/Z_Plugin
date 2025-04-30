@@ -172,19 +172,7 @@ namespace Ui.ModStoryCharacterListAnim
             {
                 if (string.IsNullOrEmpty(model.nm))
                 {
-                    int max = 1;
-                    foreach (var anim in parent.model.data.animDic.Values)
-                    {
-                        var splt = anim.name.Split("newAnim");
-                        if (splt.Length > 1)
-                        {
-                            if (int.TryParse(splt[1], out int v))
-                            {
-                                max = Mathf.Max(max, v + 1);
-                            }
-                        }
-                    }
-                    ModManager.instance.assetCtrl.CreateCharacterAnim(parent.model.data.name, "newAnim" + max);
+                    ModManager.instance.assetCtrl.CreateCharacterAnim(parent.model.data.name, "");
                     parent.Refresh();
                 }
                 else

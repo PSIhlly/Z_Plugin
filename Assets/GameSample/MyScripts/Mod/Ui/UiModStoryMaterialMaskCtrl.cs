@@ -172,19 +172,8 @@ namespace Ui.ModStoryMaterial.ModStoryMaterialMask
             {
                 if (model.id == -1)
                 {
-                    int max = 1;
-                    foreach (var o in MapMaskForm.DataById.Values)
-                    {
-                        var splt = o.name.Split("newMask");
-                        if (splt.Length > 1)
-                        {
-                            if (int.TryParse(splt[1], out int v))
-                            {
-                                max = Mathf.Max(max, v + 1);
-                            }
-                        }
-                    }
-                    ModManager.instance.assetCtrl.CreateMaskTex("newMask" + max);
+                    
+                    ModManager.instance.assetCtrl.CreateMaskTex("");
                     parent.Refresh();
                 }
                 else

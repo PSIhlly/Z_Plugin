@@ -44,7 +44,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             GameManager.instance.saveCtrl.LoadMaterial(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadObject(storyFolder + "/core");
-            GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core");
+            GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core"); 
+            GameManager.instance.saveCtrl.LoadEvent(storyFolder + "/core"); 
             GameManager.instance.saveCtrl.LoadConfig(storyFolder + "/core");
         }else //初始化
         {
@@ -60,6 +61,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.SaveScene(storyFolder + "/core/" + "scene1",data);
 
             GameManager.instance.saveCtrl.SaveCharacter(storyFolder + "/core");
+            GameManager.instance.saveCtrl.SaveEvent(storyFolder + "/core");
             GameManager.instance.saveCtrl.SaveConfig(storyFolder + "/core");
         }
     }

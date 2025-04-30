@@ -7,7 +7,7 @@ namespace Z_DesignStyle
     {
         public class Chain
         {
-            int cnt;
+            public int cnt;
             public Chain(int cnt)
             {
                 this.cnt = cnt;

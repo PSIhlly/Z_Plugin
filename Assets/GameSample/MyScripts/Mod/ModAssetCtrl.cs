@@ -25,24 +25,33 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public void CreateAnimTex(string name)
     {
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() {""}));
-    }
-    public void ImportAnimTex(string name,int id)
-    {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100),(v,nm)=>
+        if (string.IsNullOrEmpty(name))
         {
-            if(MapTextureForm.DataByName[name].texsName.Count>id)
+            for (int i = 0; i < GlobalMaxSettings.TEXTURE_ANIM_MAX; i++)
             {
-                MapTextureForm.DataByName[name].texsName[id] = nm;
+                name = "new tex" + i;
+                if (!MapTextureForm.DataByName.ContainsKey(name))
+                    break;
             }
-            else
-            {
-                MapTextureForm.DataByName[name].texsName.Add(nm);
-            }
-        });
+        }
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" }));
+    }
+    public void ImportAnimTex(string name, int id)
+    {
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+         {
+             if (MapTextureForm.DataByName[name].texsName.Count > id)
+             {
+                 MapTextureForm.DataByName[name].texsName[id] = nm;
+             }
+             else
+             {
+                 MapTextureForm.DataByName[name].texsName.Add(nm);
+             }
+         });
 
     }
-    
+
     public void RenameAnimTex(string oldName, string newName)
     {
         MapTextureForm.DataByName[oldName].name = newName;
@@ -61,9 +70,18 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region mask
     public void CreateMaskTex(string name)
     {
-        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() {"","","","","",""}));
+        if (string.IsNullOrEmpty(name))
+        {
+            for (int i = 0; i < GlobalMaxSettings.TEXTURE_ANIM_MAX; i++)
+            {
+                name = "new mask" + i;
+                if (!MapMaskForm.DataByName.ContainsKey(name))
+                    break;
+            }
+        }
+        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }));
     }
-public void ImportMaskTex(string name,int id)
+    public void ImportMaskTex(string name, int id)
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
@@ -106,6 +124,16 @@ public void ImportMaskTex(string name,int id)
     }
     public void CreateObject(string name)
     {
+        if (string.IsNullOrEmpty(name))
+        {
+            for (int i = 0; i < GlobalMaxSettings.OBJECT_MAX; i++)
+            {
+                name = "new object" + i;
+                if (!MapObjectForm.DataByName.ContainsKey(name))
+                    break;
+            }
+        }
+
         MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", true, new List<string>(), new List<Vector3>(), new List<Vector3>(), new List<string>()));
     }
     public void CreateObjectUnit(MapObjectForm.Data data)
@@ -116,10 +144,10 @@ public void ImportMaskTex(string name,int id)
         data.subPrefabUnitPos.Add(Vector3.zero);
         data.subPrefabUnitScale.Add(Vector3.one);
     }
-    public void ImportObjectTex(string name,int id)
+    public void ImportObjectTex(string name, int id)
     {
-       
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
+
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
             if (MapObjectForm.DataByName[name].subUnitTexsName.Count > id)
             {
@@ -134,7 +162,7 @@ public void ImportMaskTex(string name,int id)
     }
     public void RenameObject(string oldName, string newName)
     {
-        
+
         CharacterProductForm.DataByName[oldName].name = newName;
 
     }
@@ -142,14 +170,14 @@ public void ImportMaskTex(string name,int id)
 
     #region character
 
-    public void RenameCharacterParam(string oldName,string newName)
+    public void RenameCharacterParam(string oldName, string newName)
     {
         CharacterParamForm.DataByName[oldName].name = newName;
-        foreach(var character in CharacterProductForm.DataByUid.Values)
+        foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            foreach(var k in character.paramDic.Keys)
+            foreach (var k in character.paramDic.Keys)
             {
-                if(k==oldName)
+                if (k == oldName)
                 {
                     var prm = character.paramDic[k];
                     prm.name = newName;
@@ -162,10 +190,19 @@ public void ImportMaskTex(string name,int id)
 
     public void CreateCharacterArg(string name)
     {
-        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0f,0f,1f,0));
+        if (string.IsNullOrEmpty(name))
+        {
+            for (int i = 0; i < GlobalMaxSettings.CHARACTER_PARAM_MAX; i++)
+            {
+                name = "new arg" + i;
+                if (!CharacterParamForm.DataByName.ContainsKey(name))
+                    break;
+            }
+        }
+        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            character.paramDic[name]=new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
+            character.paramDic[name] = new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
         }
     }
     public void DeleteCharacterArg(string name)
@@ -173,35 +210,35 @@ public void ImportMaskTex(string name,int id)
         CharacterParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-             character.paramDic.Remove(name);
+            character.paramDic.Remove(name);
         }
     }
 
     public void ImportCharacterAvatar(string name)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
-             CharacterProductForm.DataByName[name].avatarTexName=nm;
+            CharacterProductForm.DataByName[name].avatarTexName = nm;
         });
 
     }
-    private CharacterAnimForm.Data CreateCharacterAnim(string name= "newAnim1")
+    private CharacterAnimForm.Data CreateCharacterAnim(string name = "new anim1")
     {
-        return new CharacterAnimForm.Data(0, name, new List<(float,float)>() { (0,0) }, 0.2f,new List<List<string>>() { new List<string> { "" }, new List<string> { "" } });
+        return new CharacterAnimForm.Data(0, name, new List<(float, float)>() { (0, 0) }, 0.2f, new List<List<string>>() { new List<string> { "" }, new List<string> { "" } });
     }
 
 
     public void CreateCharacter(string name)
     {
-        var tmpAnimNm = "newAnim1";
-        var dic=new Dictionary<string, CharacterParamForm.Data>();
+        var tmpAnimNm = "new anim1";
+        var dic = new Dictionary<string, CharacterParamForm.Data>();
         foreach (var prm in CharacterParamForm.DataByName.Values)
         {
             dic[prm.name] = new CharacterParamForm.Data(prm.uid, prm.name, prm.valueType, prm.min, prm.v, prm.max, prm.SpecialType);
 
-        }    
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name,"", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } },"","","",""));
+        }
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } }, "", "", "", ""));
     }
     public void DeleteCharacter(string name)
     {
@@ -230,15 +267,15 @@ public void ImportMaskTex(string name,int id)
         var data = CharacterProductForm.DataByName[characterName];
         var anim = data.animDic[oldName];
         data.animDic.Remove(oldName);
-        anim.name= newName;
-        data.animDic[newName]= anim;
+        anim.name = newName;
+        data.animDic[newName] = anim;
     }
-    public void ImportCharacterAnim(string characterName,string animNm,int part,int id)
+    public void ImportCharacterAnim(string characterName, string animNm, int part, int id)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v,nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
-            var data = CharacterProductForm.DataByName[characterName]; 
+            var data = CharacterProductForm.DataByName[characterName];
             var anim = data.animDic[animNm];
             if (anim.partAnimTexsName[part].Count > id)
             {
@@ -253,17 +290,53 @@ public void ImportMaskTex(string name,int id)
     public void CreateCharacterAnim(string name, string animName)
     {
         var data = CharacterProductForm.DataByName[name];
-        data.animDic[animName]=CreateCharacterAnim(animName);
+        for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
+        {
+            name = "new anim" + i;
+            if (!data.animDic.ContainsKey(name))
+                break;
+        }
+
+        data.animDic[animName] = CreateCharacterAnim(animName);
 
     }
-    public void CreateCharacterAnimId(string name, string animNm,int part,int id)
+    public void CreateCharacterAnimId(string name, string animNm, int part, int id)
     {
         var data = CharacterProductForm.DataByName[name];
-        var anim=data.animDic[animNm];
+        var anim = data.animDic[animNm];
         anim.animPos.Add((0, 0));
         anim.partAnimTexsName[0].Add("");
         anim.partAnimTexsName[1].Add("");
 
     }
+    #endregion
+
+    #region event
+    public void RenameEvent(string oldName, string newName = null, string newLabel = null, string newSubLabel = null)
+    {
+        var data = EventForm.DataByName[oldName];
+        if (newName != null && data.name != newName)
+            data.name = newName;
+        if (newLabel != null && data.lab != newLabel)
+            data.lab = newLabel;
+        if (newSubLabel != null && data.subLab != newSubLabel)
+            data.subLab = newSubLabel;
+
+    }
+
+    public void CreateEvent(string name = "", string label = "", string subLabel = "")
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            for (int i = 0; i < GlobalMaxSettings.CUSTOM_EVENT_MAX; i++)
+            {
+                name = "new event" + i;
+                if (!EventForm.DataByName.ContainsKey((name)))
+                    break;
+            }
+        }
+        EventForm.AddData(new EventForm.Data(-1, name, new List<CmdForm.Data>() { CmdForm.defaultData }, label, subLabel));
+    }
+
     #endregion
 }

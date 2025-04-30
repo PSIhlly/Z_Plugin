@@ -115,11 +115,11 @@ namespace Ui.ModStoryEvent
         
     }
 
-    public partial class UiSubLabelParam:UiParam
+    public partial class UiItemParam:UiParam
     {
     }
 
-    public partial class UiSubLabelView:UiView
+    public partial class UiItemView:UiView
     {
 
             public GameObject go_item;
@@ -127,7 +127,7 @@ namespace Ui.ModStoryEvent
             public Btn btn_;
             public Sta sta_sel;
             public Txt txt_;
-        public UiSubLabelView(UiHolder uiHolder):base(uiHolder)
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
@@ -138,16 +138,16 @@ namespace Ui.ModStoryEvent
         }
 
     }
-    public partial class UiSubLabelCtrl:UiCtrl
+    public partial class UiItemCtrl:UiCtrl
     {
-        public UiSubLabelView view;
-        public UiSubLabelModel model;
-        public UiSubLabelParam param;
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
         public UiModStoryEventCtrl parent=>(UiModStoryEventCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiSubLabelParam)param;
+            this.param = (UiItemParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -155,64 +155,14 @@ namespace Ui.ModStoryEvent
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiSubLabelView(uiHolder);
-            model=new UiSubLabelModel();
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
 
 
         }
 
     }
-    public partial class UiSubLabelModel:UiModel
-    {
-        
-    }
-
-    public partial class UiCmdParam:UiParam
-    {
-    }
-
-    public partial class UiCmdView:UiView
-    {
-
-            public GameObject go_cmd;
-            public Img img_;
-            public Btn btn_;
-            public Txt txt_;
-        public UiCmdView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_cmd = uiHolder.elementTrsLst[0].gameObject;
-            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
-            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiCmdCtrl:UiCtrl
-    {
-        public UiCmdView view;
-        public UiCmdModel model;
-        public UiCmdParam param;
-        public UiModStoryEventCtrl parent=>(UiModStoryEventCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiCmdParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiCmdView(uiHolder);
-            model=new UiCmdModel();
-
-
-        }
-
-    }
-    public partial class UiCmdModel:UiModel
+    public partial class UiItemModel:UiModel
     {
         
     }
@@ -230,28 +180,22 @@ namespace Ui.ModStoryEvent
             public GameObject go_items;
             public ScrView scr_items;
             public Sta sta_show;
-            public GameObject go_choose;
-            public Btn btn_choose;
             public Txt txt_title;
             public GameObject go_close;
             public Btn btn_close;
-            public Txt txt_choose;
-            public GameObject go_cmds;
-            public ScrView scr_cmds;
-            public Ipt ipt_name;
-            public Ipt ipt_label;
-            public Ipt ipt_subLabel;
+            public GameObject go_edit;
+            public Btn btn_edit;
+            public GameObject go_choose;
+            public Btn btn_choose;
             public GameObject go_label;
             public UiLabelCtrl sub_Label;
             public GameObject go_subLabel;
             public UiSubLabelCtrl sub_SubLabel;
             public GameObject go_item;
-            public UiSubLabelCtrl sub_SubLabel;
-            public Txt txt_name;
-            public Txt txt_label;
-            public Txt txt_subLabel;
-            public GameObject go_cmd;
-            public UiCmdCtrl sub_Cmd;
+            public UiItemCtrl sub_Item;
+            public Txt txt_content;
+            public Txt txt_edit;
+            public Txt txt_choose;
         public UiModStoryEventView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -262,28 +206,22 @@ namespace Ui.ModStoryEvent
             go_items = uiHolder.elementTrsLst[4].gameObject;
             scr_items = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
             sta_show = uiHolder.elementTrsLst[6].GetComponent<Sta>();
-            go_choose = uiHolder.elementTrsLst[7].gameObject;
-            btn_choose = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            txt_title = uiHolder.elementTrsLst[9].GetComponent<Txt>();
-            go_close = uiHolder.elementTrsLst[10].gameObject;
-            btn_close = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            txt_choose = uiHolder.elementTrsLst[12].GetComponent<Txt>();
-            go_cmds = uiHolder.elementTrsLst[13].gameObject;
-            scr_cmds = uiHolder.elementTrsLst[14].GetComponent<ScrView>();
-            ipt_name = uiHolder.elementTrsLst[15].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[16].GetComponent<Ipt>();
-            ipt_subLabel = uiHolder.elementTrsLst[17].GetComponent<Ipt>();
-            go_label = uiHolder.elementTrsLst[18].gameObject;
-            sub_Label = (UiLabelCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
-            go_subLabel = uiHolder.elementTrsLst[20].gameObject;
-            sub_SubLabel = (UiSubLabelCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[22].gameObject;
-            sub_SubLabel = (UiSubLabelCtrl) uiHolder.elementTrsLst[23].GetComponent<UiHolder>().ctrl;
-            txt_name = uiHolder.elementTrsLst[24].GetComponent<Txt>();
-            txt_label = uiHolder.elementTrsLst[25].GetComponent<Txt>();
-            txt_subLabel = uiHolder.elementTrsLst[26].GetComponent<Txt>();
-            go_cmd = uiHolder.elementTrsLst[27].gameObject;
-            sub_Cmd = (UiCmdCtrl) uiHolder.elementTrsLst[28].GetComponent<UiHolder>().ctrl;
+            txt_title = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            go_close = uiHolder.elementTrsLst[8].gameObject;
+            btn_close = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            go_edit = uiHolder.elementTrsLst[10].gameObject;
+            btn_edit = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            go_choose = uiHolder.elementTrsLst[12].gameObject;
+            btn_choose = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            go_label = uiHolder.elementTrsLst[14].gameObject;
+            sub_Label = (UiLabelCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            go_subLabel = uiHolder.elementTrsLst[16].gameObject;
+            sub_SubLabel = (UiSubLabelCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[18].gameObject;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
+            txt_content = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            txt_edit = uiHolder.elementTrsLst[21].GetComponent<Txt>();
+            txt_choose = uiHolder.elementTrsLst[22].GetComponent<Txt>();
         }
 
     }
@@ -312,10 +250,8 @@ namespace Ui.ModStoryEvent
             view.sub_Label.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_SubLabel = new UiSubLabelCtrl();
             view.sub_SubLabel.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
-            view.sub_SubLabel = new UiSubLabelCtrl();
-            view.sub_SubLabel.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
-            view.sub_Cmd = new UiCmdCtrl();
-            view.sub_Cmd.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.sub_Item = new UiItemCtrl();
+            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }

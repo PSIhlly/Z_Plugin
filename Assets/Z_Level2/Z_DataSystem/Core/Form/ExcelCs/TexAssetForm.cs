@@ -106,16 +106,6 @@ namespace Z_DataSystem.Form
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
-                }
-            }
-    
             static Dictionary<Texture, List<Data>> _DatasByTex;
             public static Dictionary<Texture, List<Data>> DatasByTex
             {
@@ -123,6 +113,16 @@ namespace Z_DataSystem.Form
                 {
                     Init();
                     return _DatasByTex;
+                }
+            }
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
                 }
             }
     
@@ -270,6 +270,8 @@ AssetForm.AddData(data);
                     DataByName.Remove(data.name);
     
                     DatasByTex[data.tex].Remove(data);
+                    if(DatasByTex[data.tex].Count==0)
+                        DatasByTex.Remove(data.tex);
     
 AssetForm.RemoveData(id);
             idChain.PushId(data.id);
@@ -286,6 +288,17 @@ AssetForm.RemoveData(id);
                     DatasByTex.Clear();
     
             idChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataById.Values)
+            {
+                if(data.id<idChain.cnt)
+                    RemoveData(data.id);
+            }
+            
         }
 
          private static void RemoveChildren(AssetForm.Data data)
@@ -334,6 +347,10 @@ AssetForm.RemoveData(id);
                 {
 
                     DatasByTex[oldV].Remove(data);
+                    if(DatasByTex[oldV].Count==0)
+                        DatasByTex.Remove(oldV);
+                    if(!DatasByTex.ContainsKey(newV))
+                        DatasByTex[newV]=new List<Data>();
                     DatasByTex[newV].Add(data);
  
                 changeTexAction?.Invoke(data,oldV,newV);

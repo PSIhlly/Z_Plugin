@@ -69,19 +69,7 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterArguments
             view.btn_new.onClick.AddListener(() =>
             {
                 
-                    int max = 1;
-                    foreach (var nm in CharacterParamForm.DataByName.Keys)
-                    {
-                        var splt = nm.Split("newArg");
-                        if (splt.Length > 1)
-                        {
-                            if (int.TryParse(splt[1], out int v))
-                            {
-                                max = Mathf.Max(max, v + 1);
-                            }
-                        }
-                    }
-                    ModManager.instance.assetCtrl.CreateCharacterArg("newArg" + max);
+                    ModManager.instance.assetCtrl.CreateCharacterArg("");
                     parent.Refresh();
             });
 

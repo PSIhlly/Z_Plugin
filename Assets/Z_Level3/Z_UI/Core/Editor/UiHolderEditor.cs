@@ -42,7 +42,6 @@ namespace Z_Ui_Editor
                 if (exist.Contains(o))
                     continue;
                 exist.Add(o);
-
                 if (o.TryGetComponent<UiHolder>(out var subHolder))
                 {
                     if(subHolder.uiType == UiType.Sub)
@@ -63,8 +62,8 @@ namespace Z_Ui_Editor
                 }});
             }}
             {subHolder.uiName.FirstToLower()}Con.Refresh();";
-                        
-                        subCode += ((UiHolderEditor)CreateEditor(subHolder)).GetQuickCode();
+                        if(subHolder!=uiHolder)
+                            subCode += ((UiHolderEditor)CreateEditor(subHolder)).GetQuickCode();
                     }
                     else if (subHolder.uiType == UiType.Panel)
                     {

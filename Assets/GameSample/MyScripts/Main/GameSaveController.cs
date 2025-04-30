@@ -22,6 +22,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string mapObjectFormFileName => "mof";
     public string characterParamFormFileName => "cpaf";
     public string characterProductFormFileName => "cprf";
+    public string eventFormFileName => "ef";
     public string configFormFileName => "cf";
     public GameSaveController(GameManager super):base(super)
     { 
@@ -108,6 +109,10 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+    public void SaveEvent(string storyCoreFolder)
+    {
+        SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventForm.GetJaByDatas().ToString());
+    }
     public void SaveScene(string scenePath)
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
@@ -124,12 +129,15 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(progressPath, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
     }
+
+    
     #endregion
 
     #region load
     public void LoadMaterial(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + mapTextureFormFileName;
+        MapMaskForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -152,6 +160,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
 
         pathForm = storyCoreFolder + "/" + mapMaskFormFileName;
+        MapMaskForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in MapMaskForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -175,6 +184,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public void LoadObject(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + mapObjectFormFileName;
+        MapObjectForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
 
@@ -200,7 +210,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public void LoadCharacter(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + characterParamFormFileName;
-
+        CharacterParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in CharacterParamForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -210,7 +220,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
 
         pathForm = storyCoreFolder + "/" + characterProductFormFileName;
-
+        CharacterProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         { 
             foreach (var form in CharacterProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -235,6 +245,20 @@ public class GameSaveController : Z_Controller<GameManager>
                     }
             }
         }
+    }
+    public void LoadEvent(string storyCoreFolder)
+    {
+        var pathForm = storyCoreFolder + "/" + eventFormFileName;
+        EventForm.ClearAuto();
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in EventForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                EventForm.AddData(form);
+            }
+        }
+
+       
     }
     public MapData LoadScene(string scenePath)
     {

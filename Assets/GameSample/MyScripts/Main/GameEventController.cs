@@ -15,6 +15,15 @@ public enum EventType
     Object=2,
     Character=3
 }
+public class ShowCmd
+{
+    public CmdForm.Data data;
+    public int depth;
+    public int oriId;
+    public ShowCmd belong;
+    public List<ShowCmd> prms=new List<ShowCmd>();
+    public int prmId;
+}
 namespace Form
 {
     public class EventContentController
@@ -33,14 +42,14 @@ namespace Form
                 var cmd = GameEventController.GetCmd(data.evt.cmds[data.cur].name);
                 if (cmd != null)
                 {
-                    var prms = new VarForm.Data[data.evt.cmds[data.cur].prmCnt];
-                    for(int i=0;i< data.evt.cmds[data.cur].prmCnt;i++)
+                    var prms = new VarForm.Data[data.evt.cmds[data.cur].prmName.Count];
+                    for(int i=0;i< prms.Length;i++)
                     {
                         prms[i] = data.stack[data.stack.Count-1];
                         data.stack.RemoveAt(data.stack.Count - 1);
                     }
                     var res=cmd.Execute(prms);
-                    for(int i=0;i < data.evt.cmds[data.cur].resCnt; i++)
+                    for(int i=0;i < data.evt.cmds[data.cur].resTypes.Count; i++)
                     {
                         data.stack.Add(res.v[i]);
                     }
@@ -61,23 +70,23 @@ namespace Z_Map
     public partial class MapUnit
     {
         public static string evtKey = "evt";
-        private Dictionary<string,EventForm.Data> _evtSet;
-        public Dictionary<string, EventForm.Data> evtDic
+        private Dictionary<string, EventTriggerForm.Data> _evtSet;
+        public Dictionary<string, EventTriggerForm.Data> evtDic
         {
             get
             {
                 if (_evtSet == null)
                 {
-                    _evtSet = new Dictionary<string, EventForm.Data>();
+                    _evtSet = new Dictionary<string, EventTriggerForm.Data>();
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
                         if (jo != null && jo[evtKey] != null)
                         {
-                            foreach (JObject j in (JArray)jo[evtKey])
+                            var ja = (JArray)jo[evtKey];
+                            foreach (var subJo in ja)
                             {
-                                Debug.Log(j);
-                                var data = EventForm.GetDataByJo(j);
+                                var data= EventTriggerForm.GetDataByJo((JObject)subJo);
                                 _evtSet[data.name] = data;
                             }
                         }
@@ -97,23 +106,27 @@ namespace Z_Map
                 {
                     foreach (var evt in value.Values)
                     {
-                        ja.Add(EventForm.GetJoByData(evt));
+                        ja.Add(EventTriggerForm.GetJoByData(evt));
                     }
                 }
-                data.extra = ja.ToString();
+                data.extra = jo.ToString();
                 _evtSet = value;
             }
 
         }
         public void ExecuteEvt(string name)
         {
-            if(evtDic.ContainsKey(name))
+            if(evtDic.ContainsKey(name)&&EventForm.DataByName.ContainsKey(evtDic[name].evt))
             {
-                GameManager.instance.evtCtrl.Execute(evtDic[name],data.uid);
+                GameManager.instance.evtCtrl.Execute(EventForm.DataByName[evtDic[name].evt], data.uid);
             }
         }
 
     }
+}
+public static partial class GlobalMaxSettings
+{
+    public static int CUSTOM_EVENT_MAX => 1000000;
 }
 public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEvent>,IZ_Listener<TileEvent>,IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
 {
@@ -150,29 +163,40 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
         }
         
     }
-
-    public JArray GetEventJa(EventType type)
+    public static JArray GetEventTriggerJa(EventType type)
     {
+        var lst = GetEventTrigger(type);
         JArray ja = new JArray();
-        foreach(var data in EventForm.DataByUid.Values)
+        foreach(var data in lst)
         {
+           ja.Add( EventTriggerForm.GetJoByData(data));
+        }
+        return ja;
+    }
+    public static List<EventTriggerForm.Data> GetEventTrigger(EventType type)
+    {
+        var lst = new List<EventTriggerForm.Data> ();
+        foreach (var data in EventTriggerForm.DataByUid.Values)
+        {
+            if (data.uid < EventForm.autoUidCnt)
+                continue;
             switch (type)
             {
                 case EventType.Global:
                     if (data.globalEnable)
-                        ja.Add( EventForm.GetJoByData(data));
+                        lst.Add(data);
                     break;
                 case EventType.Tile:
                     if (data.terrainEnable)
-                        ja.Add(EventForm.GetJoByData(data));
+                        lst.Add(data);
                     break;
                 case EventType.Object:
                     if (data.objectEnable)
-                        ja.Add(EventForm.GetJoByData(data));
+                        lst.Add(data);
                     break;
             }
         }
-        return ja;
+        return lst;
     }
     public void OnEvent(CollideEvent evt)
     {
@@ -235,4 +259,70 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
         }
         EventContentForm.AddData(new EventContentForm.Data(-1, evt.Copy(), 0, initPrs));
     }
+
+    public List<ShowCmd> GetShowCmds(List<CmdForm.Data> cmds)
+    {
+        Dictionary<int,ShowCmd> dic = new Dictionary<int, ShowCmd>();
+        for (int i = 0; i < cmds.Count; i++)
+        {
+            dic[i] = new ShowCmd()
+            {
+                oriId = i,
+                data = cmds[i]
+            };
+        }
+        Stack<ShowCmd> stack = new Stack<ShowCmd>();
+        for (int i = 0; i < cmds.Count; i++)
+        {
+            if (cmds[i].prmTypes != null)
+            {
+                for (int j = 0; j < cmds[i].prmTypes.Count; j++)
+                {
+                    var prm = stack.Pop();
+                    prm.belong = dic[i];
+                    prm.prmId = dic[i].prms.Count;
+                    dic[i].prms.Add(prm);
+                }
+            }
+           
+            switch(dic[i].data.name)
+            {
+                case "then":
+                    while(stack.Peek().data.name!="if")
+                    {
+                        stack.Pop().belong = dic[i];
+                    }
+                    break;
+                case "else":
+                    while (stack.Peek().data.name != "then")
+                    {
+                        stack.Pop().belong = dic[i];
+                    }
+                    break;
+            }
+            stack.Push(dic[i]);
+        }
+
+        Queue<ShowCmd> depthQ = new Queue<ShowCmd>();
+        foreach(var data in stack)
+        {
+            data.depth = 0;
+            depthQ.Enqueue(data);
+        }
+        while(depthQ.Count>0)
+        {
+            var q = depthQ.Dequeue();
+            foreach(var q2 in q.prms)
+            {
+                q2.depth = q.depth + 1;
+                depthQ.Enqueue(q2);
+            }
+        }
+
+        var res = new List<ShowCmd>(stack.ToArray());
+        res.Reverse();
+        return res;
+
+    }
+
 }

@@ -19,7 +19,7 @@ using Z_UnitSystem.Form;
     public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
     {
         JObject extra = new JObject();
-        extra[MapUnit.evtKey] = GameManager.instance.evtCtrl.GetEventJa(EventType.Tile);
+        extra[MapUnit.evtKey] = GameEventController.GetEventTriggerJa(EventType.Tile);
         return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, extra.ToString());
     }
    
@@ -32,7 +32,7 @@ using Z_UnitSystem.Form;
     public override ObjectUnitForm.Data GetNewObject(string prefabName = "", object[] prms = null)
     {
         JObject extra = new JObject();
-        extra[MapUnit.evtKey] = GameManager.instance.evtCtrl.GetEventJa(EventType.Object);
+        extra[MapUnit.evtKey] = GameEventController.GetEventTriggerJa(EventType.Object);
         return new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, extra.ToString());
     }
    
@@ -44,7 +44,7 @@ using Z_UnitSystem.Form;
     public override TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
     {
         JObject extra = new JObject();
-        extra[MapUnit.evtKey] = GameManager.instance.evtCtrl.GetEventJa(EventType.Tile);
+        extra[MapUnit.evtKey] = GameEventController.GetEventTriggerJa(EventType.Tile);
         return new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, extra.ToString());
     }
  

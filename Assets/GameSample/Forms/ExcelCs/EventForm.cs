@@ -53,12 +53,6 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeSublabAction;
                 
-        public static Action<Data,bool,bool> changeGlobalenableAction;
-                
-        public static Action<Data,bool,bool> changeTerrainenableAction;
-                
-        public static Action<Data,bool,bool> changeObjectenableAction;
-                
 
 
         public partial class Data
@@ -154,61 +148,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private bool  _globalEnable;
-                    /// <summary>
-                    ///允许全局
-                    ///</summary>
-                    public bool  globalEnable{
-                                get{return _globalEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeGlobalenable(this,_globalEnable,value); 
-                    }
-        
-                _globalEnable = value;
-                }
-                 
-                     }
-                    
-                    private bool  _terrainEnable;
-                    /// <summary>
-                    ///允许地形用
-                    ///</summary>
-                    public bool  terrainEnable{
-                                get{return _terrainEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeTerrainenable(this,_terrainEnable,value); 
-                    }
-        
-                _terrainEnable = value;
-                }
-                 
-                     }
-                    
-                    private bool  _objectEnable;
-                    /// <summary>
-                    ///允许物体用
-                    ///</summary>
-                    public bool  objectEnable{
-                                get{return _objectEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeObjectenable(this,_objectEnable,value); 
-                    }
-        
-                _objectEnable = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,string name,List<CmdForm.Data> cmds,string lab,string subLab,bool globalEnable,bool terrainEnable,bool objectEnable)
+            public Data(int uid,string name,List<CmdForm.Data> cmds,string lab,string subLab)
             {
 
              this.uid = uid;
@@ -216,20 +156,17 @@ public static readonly int autoUidCnt=1000000;
              this.cmds = cmds;
              this.lab = lab;
              this.subLab = subLab;
-             this.globalEnable = globalEnable;
-             this.terrainEnable = terrainEnable;
-             this.objectEnable = objectEnable;
 
             }
 
                 public Data Copy()
                 {
-        return new Data(-1,name,cmds,lab,subLab,globalEnable,terrainEnable,objectEnable);
+        return new Data(-1,name,cmds,lab,subLab);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null,"","",false,false,false);
+                   public static Data defaultData=new Data(0,"",null,"","");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -242,13 +179,13 @@ public static readonly int autoUidCnt=1000000;
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
+            static Dictionary<(string,string), List<Data>> _DatasByLabSublab;
+            public static Dictionary<(string,string), List<Data>> DatasByLabSublab
             {
                 get
                 {
                     Init();
-                    return _DataByName;
+                    return _DatasByLabSublab;
                 }
             }
     
@@ -262,13 +199,13 @@ public static readonly int autoUidCnt=1000000;
                 }
             }
     
-            static Dictionary<string, List<Data>> _DatasBySublab;
-            public static Dictionary<string, List<Data>> DatasBySublab
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
                 get
                 {
                     Init();
-                    return _DatasBySublab;
+                    return _DataByName;
                 }
             }
     
@@ -287,46 +224,18 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1000001,new Data(1000001,"OnTouch",null,"","",false,true,true)},
-
-                {1000002,new Data(1000002,"OnLeave",null,"","",false,true,true)},
-
-                {1000003,new Data(1000003,"OnShow",null,"","",false,true,true)},
-
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
-                        {"OnTouch",_DataByUid[1000001]},
-    
-                        {"OnLeave",_DataByUid[1000002]},
-    
-                        {"OnShow",_DataByUid[1000003]},
-    
                     };
     
+                    _DatasByLabSublab = new Dictionary<(string,string), List<Data>>() {
+    
+                };
+
                     _DatasByLab = new Dictionary<string, List<Data>>() {
     
-                            {"",new List<Data>()},
-        
                 };
-
-                    _DatasByLab[""].Add(_DataByUid[1000001]);
-
-                    _DatasByLab[""].Add(_DataByUid[1000002]);
-
-                    _DatasByLab[""].Add(_DataByUid[1000003]);
-
-                    _DatasBySublab = new Dictionary<string, List<Data>>() {
-    
-                            {"",new List<Data>()},
-        
-                };
-
-                    _DatasBySublab[""].Add(_DataByUid[1000001]);
-
-                    _DatasBySublab[""].Add(_DataByUid[1000002]);
-
-                    _DatasBySublab[""].Add(_DataByUid[1000003]);
 
 
             childInitAction?.Invoke();
@@ -377,13 +286,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("lab"),
 
-                jo.Get<string>("subLab"),
-
-                jo.Get<bool>("globalEnable"),
-
-                jo.Get<bool>("terrainEnable"),
-
-                jo.Get<bool>("objectEnable")
+                jo.Get<string>("subLab")
                     );
 
             return data;
@@ -404,12 +307,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("lab",data.lab);
 
             jo.Set<string>("subLab",data.subLab);
-
-            jo.Set<bool>("globalEnable",data.globalEnable);
-
-            jo.Set<bool>("terrainEnable",data.terrainEnable);
-
-            jo.Set<bool>("objectEnable",data.objectEnable);
 
             return jo;
         }
@@ -433,13 +330,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByLabSublab.ContainsKey((data.lab,data.subLab)))
+                        DatasByLabSublab[(data.lab,data.subLab)]=new List<Data>();
+                    DatasByLabSublab[(data.lab,data.subLab)].Add(data);
+    
                     if(!DatasByLab.ContainsKey(data.lab))
                         DatasByLab[data.lab]=new List<Data>();
                     DatasByLab[data.lab].Add(data);
-    
-                    if(!DatasBySublab.ContainsKey(data.subLab))
-                        DatasBySublab[data.subLab]=new List<Data>();
-                    DatasBySublab[data.subLab].Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -457,9 +354,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
                     DataByName.Remove(data.name);
     
-                    DatasByLab[data.lab].Remove(data);
+                    DatasByLabSublab[(data.lab,data.subLab)].Remove(data);
+                    if(DatasByLabSublab[(data.lab,data.subLab)].Count==0)
+                        DatasByLabSublab.Remove((data.lab,data.subLab));
     
-                    DatasBySublab[data.subLab].Remove(data);
+                    DatasByLab[data.lab].Remove(data);
+                    if(DatasByLab[data.lab].Count==0)
+                        DatasByLab.Remove(data.lab);
     
 
             uidChain.PushId(data.uid);
@@ -473,11 +374,22 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
                     DataByName.Clear();
     
+                    DatasByLabSublab.Clear();
+    
                     DatasByLab.Clear();
     
-                    DatasBySublab.Clear();
-    
             uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataByUid.Values)
+            {
+                if(data.uid<uidChain.cnt)
+                    RemoveData(data.uid);
+            }
+            
         }
 
          private static void RemoveChildren(Data data)
@@ -536,7 +448,18 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                     DatasByLab[oldV].Remove(data);
+                    if(DatasByLab[oldV].Count==0)
+                        DatasByLab.Remove(oldV);
+                    if(!DatasByLab.ContainsKey(newV))
+                        DatasByLab[newV]=new List<Data>();
                     DatasByLab[newV].Add(data);
+ 
+                    DatasByLabSublab[(oldV,data.subLab)].Remove(data);
+                    if(DatasByLabSublab[(oldV,data.subLab)].Count==0)
+                        DatasByLabSublab.Remove((oldV,data.subLab));
+                    if(!DatasByLabSublab.ContainsKey((newV,data.subLab)))
+                        DatasByLabSublab[(newV,data.subLab)]=new List<Data>();
+                    DatasByLabSublab[(newV,data.subLab)].Add(data);
  
                 changeLabAction?.Invoke(data,oldV,newV);
                 }
@@ -548,40 +471,14 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 if(superData is Data data)
                 {
 
-                    DatasBySublab[oldV].Remove(data);
-                    DatasBySublab[newV].Add(data);
+                    DatasByLabSublab[(data.lab,oldV)].Remove(data);
+                    if(DatasByLabSublab[(data.lab,oldV)].Count==0)
+                        DatasByLabSublab.Remove((data.lab,oldV));
+                    if(!DatasByLabSublab.ContainsKey((data.lab,newV)))
+                        DatasByLabSublab[(data.lab,newV)]=new List<Data>();
+                    DatasByLabSublab[(data.lab,newV)].Add(data);
  
                 changeSublabAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeGlobalenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeGlobalenableAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeTerrainenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeTerrainenableAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeObjectenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeObjectenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

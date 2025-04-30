@@ -423,6 +423,17 @@ ProductForm.RemoveData(uid);
     
             uidChain.Clear();
         }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            foreach(var data in DataByUid.Values)
+            {
+                if(data.uid<uidChain.cnt)
+                    RemoveData(data.uid);
+            }
+            
+        }
 
          private static void RemoveChildren(ProductForm.Data data)
         {

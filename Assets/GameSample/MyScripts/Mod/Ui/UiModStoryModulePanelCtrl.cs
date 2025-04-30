@@ -10,6 +10,7 @@ using Ui.ModStoryMaterial;
 using Ui.ModStoryObject;
 using Ui.ModStoryCharacter;
 using Ui.ModStoryConfig;
+using Ui.ModStoryEvent;
 
 namespace Ui.ModStory
 {
@@ -36,6 +37,11 @@ namespace Ui.ModStory
             view.btn_config.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModStoryConfigCtrl>();
+
+            });
+            view.btn_event.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModStoryEventCtrl>();
 
             });
         }

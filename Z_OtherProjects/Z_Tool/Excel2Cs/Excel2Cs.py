@@ -3,6 +3,7 @@ import sys
 import os
 from formBaseInfo import FormInfo
 from dataAnalysis import get_value
+from collections import defaultdict
 file_namespace = "Form"
 file_using=""
 files_root_excels = "Excels/"
@@ -56,6 +57,21 @@ def create_forms():
                     formInfo.id_cnt = 10000
             
                 form_info_list.append(formInfo)
+
+def get_dic_info(info,vs):
+    type=""
+    name=""
+    prm=""
+    for v in vs:
+        type+=info.var_type_dic[v]+","
+        name+=v.capitalize()
+        prm+=f"data.{v},"
+    type=type[0:-1]
+    prm=prm[0:-1]
+    if len(vs) > 1:
+        type=f"({type})"
+        prm=f"({prm})"
+    return type,name,prm
 
 def args_handle():
     global files_root_excels,files_root_cs,file_namespace,file_using
@@ -153,47 +169,70 @@ def dic_handle():
                 }}
             }}
     """
+        combine_dic=defaultdict(list)
+        combine_uni_dic=defaultdict(list)
         for name in formInfo.var_list:
-
+            for i in range(0,10):
+                if 'uniqueIndex'+str(i) in formInfo.var_config_dic[name]:
+                    combine_uni_dic[i].append(name)
+            for i in range(0,10):
+                if 'index'+str(i) in formInfo.var_config_dic[name]:
+                    combine_dic[i].append(name)
             if 'uniqueIndex' in formInfo.var_config_dic[name]:
-                formInfo.dic_str+=f"""
-            static Dictionary<{formInfo.var_type_dic[name]}, Data> _DataBy{name.capitalize()};
-            public static Dictionary<{formInfo.var_type_dic[name]}, Data> DataBy{name.capitalize()}
+                combine_uni_dic[name].append(name)
+            if 'index' in formInfo.var_config_dic[name]:
+                combine_dic[name].append(name)
+        for group,vs in combine_dic.items():
+            type,name,prm=get_dic_info(formInfo,vs)
+
+            formInfo.dic_str+=f"""
+            static Dictionary<{type}, List<Data>> _DatasBy{name};
+            public static Dictionary<{type}, List<Data>> DatasBy{name}
             {{
                 get
                 {{
                     Init();
-                    return _DataBy{name.capitalize()};
+                    return _DatasBy{name};
+                }}
+            }}
+    """
+        for group,vs in combine_uni_dic.items():
+            type,name,prm=get_dic_info(formInfo,vs)
+
+            formInfo.dic_str+=f"""
+            static Dictionary<{type}, Data> _DataBy{name};
+            public static Dictionary<{type}, Data> DataBy{name}
+            {{
+                get
+                {{
+                    Init();
+                    return _DataBy{name};
                 }}
             }}
     """
 
-            if 'index' in formInfo.var_config_dic[name]:
-                formInfo.dic_str+=f"""
-            static Dictionary<{formInfo.var_type_dic[name]}, List<Data>> _DatasBy{name.capitalize()};
-            public static Dictionary<{formInfo.var_type_dic[name]}, List<Data>> DatasBy{name.capitalize()}
-            {{
-                get
-                {{
-                    Init();
-                    return _DatasBy{name.capitalize()};
-                }}
-            }}
-    """
+
 
 def create_data_handle():
     for formInfo in form_info_list:
          #类型构造方法设置
         con_extend_str = ':base('
         con_arg_str = ''
+        con_copy_str= f'''
+                public Data Copy()
+                {{
+        return new Data(-1,'''
         con_set_str = ''
         for key in formInfo.var_type_dic:
+            if key is not formInfo.id_str:
+                con_copy_str+=key+','
             if 'override' in formInfo.var_config_dic[key]:
                 con_extend_str+=key+','
             con_arg_str+=formInfo.var_type_dic[key] + ' ' + key + ','
             con_set_str+=f'''
              this.{key} = {key};'''
-
+        con_copy_str=con_copy_str[0:-1]+f''');
+                }}'''
         con_extend_str=con_extend_str[0:-1]+')'
         if formInfo.extend_data_str == '':
             con_extend_str=''
@@ -203,6 +242,7 @@ def create_data_handle():
 {con_set_str}
 {formInfo.declare_sub_str}
             }}
+{con_copy_str}
             '''
 
             
@@ -268,64 +308,106 @@ def add_remove_handle():
 
 def dic_index_handle():
     for formInfo in form_info_list:
+        combine_dic=defaultdict(list)
+        combine_uni_dic=defaultdict(list)
         #index
         for name in formInfo.var_list:
+            for i in range(0,10):
+                if 'uniqueIndex'+str(i) in formInfo.var_config_dic[name]:
+                    combine_uni_dic[i].append(name)
+            for i in range(0,10):
+                if 'index'+str(i) in formInfo.var_config_dic[name]:
+                    combine_dic[i].append(name)
             if 'uniqueIndex' in formInfo.var_config_dic[name]:
-                formInfo.content_str+=f'''
-                    _DataBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, Data>() {{
+                    combine_uni_dic[name].append(name)
+            if 'index' in formInfo.var_config_dic[name]:
+                    combine_dic[name].append(name)
+
+        for group,vs in combine_uni_dic.items():
+            type,name,prm=get_dic_info(formInfo,vs)
+
+
+            formInfo.content_str+=f'''
+                    _DataBy{name} = new Dictionary<{type}, Data>() {{
     '''
-                formInfo.add_str+=f'''
-                    DataBy{name.capitalize()}[data.{name}]=data;
+            formInfo.add_str+=f'''
+                    DataBy{name}[{prm}]=data;
     '''         
-                formInfo.remove_str+=f'''
-                    DataBy{name.capitalize()}.Remove(data.{name});
+            formInfo.remove_str+=f'''
+                    DataBy{name}.Remove({prm});
     '''                   
-                formInfo.clear_str+=f'''
-                    DataBy{name.capitalize()}.Clear();
+            formInfo.clear_str+=f'''
+                    DataBy{name}.Clear();
     '''
-                for data in formInfo.data_list:
+            for data in formInfo.data_list:
                     if data[formInfo.id_str]=='0':
                         continue
+                    k=""
+                    for v in vs:
+                        k+=data[v]+","
+                    k=k[0:-1]
+                    if len(vs) > 1:
+                        k=f"({k})"
                     formInfo.content_str+=f'''
-                        {{{data[name]},_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]}},
+                        {{{k},_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]}},
     '''
-                formInfo.content_str+=f'''
+            formInfo.content_str+=f'''
                     }};
     '''
-            if 'index' in formInfo.var_config_dic[name]:
-                formInfo.content_str+=f'''
-                    _DatasBy{name.capitalize()} = new Dictionary<{formInfo.var_type_dic[name]}, List<Data>>() {{
+        for group,vs in combine_dic.items():
+            type,name,prm=get_dic_info(formInfo,vs)
+           
+            formInfo.content_str+=f'''
+                    _DatasBy{name} = new Dictionary<{type}, List<Data>>() {{
     '''
-                formInfo.add_str+=f'''
-                    if(!DatasBy{name.capitalize()}.ContainsKey(data.{name}))
-                        DatasBy{name.capitalize()}[data.{name}]=new List<Data>();
-                    DatasBy{name.capitalize()}[data.{name}].Add(data);
+            formInfo.add_str+=f'''
+                    if(!DatasBy{name}.ContainsKey({prm}))
+                        DatasBy{name}[{prm}]=new List<Data>();
+                    DatasBy{name}[{prm}].Add(data);
     '''         
-                formInfo.remove_str+=f'''
-                    DatasBy{name.capitalize()}[data.{name}].Remove(data);
+            formInfo.remove_str+=f'''
+                    DatasBy{name}[{prm}].Remove(data);
+                    if(DatasBy{name}[{prm}].Count==0)
+                        DatasBy{name}.Remove({prm});
     '''
-                formInfo.clear_str+=f'''
-                    DatasBy{name.capitalize()}.Clear();
+            formInfo.clear_str+=f'''
+                    DatasBy{name}.Clear();
     '''
                 #登记list
-                exist_list = []
-                for data in formInfo.data_list:
-                    if data[name] in exist_list or data[formInfo.id_str]=='0':
+            exist_list = []
+            for data in formInfo.data_list:
+                 if data[formInfo.id_str]=='0':
                         continue
-                    exist_list.append(data[name])
+                 k=""
+                 for v in vs:
+                    k+=data[v]+","
+                 k=k[0:-1]
+                 if len(vs) > 1:
+                    k=f"({k})"
+                 if k not in exist_list :
+                    exist_list.append(k)
                     formInfo.content_str+=f'''
-                            {{{data[name]},new List<Data>()}},
+                            {{{k},new List<Data>()}},
         '''                 
-                formInfo.content_str+=f'''
+            formInfo.content_str+=f'''
                 }};
 '''
                 #注册
-                for data in formInfo.data_list:
-                    if data[formInfo.id_str]=='0':
+            for data in formInfo.data_list:
+                if data[formInfo.id_str]=='0':
                         continue
-                    formInfo.content_str+=f'''
-                    _DatasBy{name.capitalize()}[{data[name]}].Add(_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]);
+                k=""
+                for v in vs:
+                   k+=data[v]+","
+                k=k[0:-1]
+                if len(vs) > 1:
+                   k=f"({k})"
+                formInfo.content_str+=f'''
+                    _DatasBy{name}[{k}].Add(_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]);
 ''' 
+
+
+
 
 def serialize_handle():
     for formInfo in form_info_list:

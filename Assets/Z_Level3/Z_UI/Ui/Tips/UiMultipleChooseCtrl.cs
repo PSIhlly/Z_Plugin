@@ -71,7 +71,7 @@ namespace Ui.Notify
             lableCon.Clear();
             for (int i = 0; i < model.info.words.Count; i++)
             {
-                lableCon.Add(new UiSubItemParam()
+                lableCon.Add(new UiLabelParam()
                 {
                     name = model.info.words[i].Item1,
                     sprite = model.info.sprites[i].Item1,

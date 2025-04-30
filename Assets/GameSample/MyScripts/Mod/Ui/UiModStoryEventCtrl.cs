@@ -67,8 +67,7 @@ namespace Ui.ModStoryEvent
         }
         public override void OnShow()
         {
-            model.curLab = null;
-            model.curItem = null;
+            SetCur();
 
             if (param != null)
             {

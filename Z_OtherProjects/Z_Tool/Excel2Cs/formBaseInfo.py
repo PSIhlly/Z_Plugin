@@ -119,6 +119,7 @@ namespace {self.file_namespace}
             var data=DataBy{self.id_str.capitalize()}[{self.id_str}];
 {self.remove_str}
 {remove_op_base_str}
+            {self.id_str}Chain.PushId(data.{self.id_str});
             childRemoveAction?.Invoke(data);
         }}
         public static void Clear()
@@ -126,6 +127,17 @@ namespace {self.file_namespace}
             Init();
 {self.clear_str}
             {self.id_str}Chain.Clear();
+        }}
+        
+        public static void ClearAuto()
+        {{
+            Init();
+            foreach(var data in DataBy{self.id_str.capitalize()}.Values)
+            {{
+                if(data.{self.id_str}<{self.id_str}Chain.cnt)
+                    RemoveData(data.{self.id_str});
+            }}
+            
         }}
 
          private static void RemoveChildren({'' if self.extend_data_str == '' else f'{self.extend_data_str}Form.'}Data data)
@@ -152,14 +164,61 @@ namespace {self.file_namespace}
                 '''
                 change_dic=''
                 if 'index' in self.var_config_dic[name]:
-                    change_dic=f'''
+                    change_dic+=f'''
                     DatasBy{name.capitalize()}[oldV].Remove(data);
+                    if(DatasBy{name.capitalize()}[oldV].Count==0)
+                        DatasBy{name.capitalize()}.Remove(oldV);
+                    if(!DatasBy{name.capitalize()}.ContainsKey(newV))
+                        DatasBy{name.capitalize()}[newV]=new List<Data>();
                     DatasBy{name.capitalize()}[newV].Add(data);
  '''
                 if 'uniqueIndex' in self.var_config_dic[name]:
-                    change_dic=f'''
+                    change_dic+=f'''
                     DataBy{name.capitalize()}.Remove(oldV);
                     DataBy{name.capitalize()}[newV]=data;
+ '''
+                for i in range(0,10):
+                    if 'uniqueIndex'+str(i) in self.var_config_dic[name]:
+                        name_dic=""
+                        old_v_dic=""
+                        new_v_dic=""
+                        for other in self.var_list:
+                             if 'uniqueIndex'+str(i) in self.var_config_dic[other]:
+                                name_dic+=other.capitalize()
+                                if other==name:
+                                    old_v_dic+="oldV,"
+                                    new_v_dic+="newV,"
+                                else:
+                                    old_v_dic+=f"data.{other},"
+                                    new_v_dic+=f"data.{other},"
+                        old_v_dic=f"({old_v_dic[0:-1]})"
+                        new_v_dic=f"({new_v_dic[0:-1]})"
+                        change_dic+=f'''
+                    DataBy{name_dic}.Remove({old_v_dic});
+                    DataBy{name_dic}[{new_v_dic}]=data;
+ '''         
+                    if 'index'+str(i) in self.var_config_dic[name]:
+                        name_dic=""
+                        old_v_dic=""
+                        new_v_dic=""
+                        for other in self.var_list:
+                             if 'index'+str(i) in self.var_config_dic[other]:
+                                name_dic+=other.capitalize()
+                                if other==name:
+                                    old_v_dic+="oldV,"
+                                    new_v_dic+="newV,"
+                                else:
+                                    old_v_dic+=f"data.{other},"
+                                    new_v_dic+=f"data.{other},"
+                        old_v_dic=f"({old_v_dic[0:-1]})"
+                        new_v_dic=f"({new_v_dic[0:-1]})"
+                        change_dic+=f'''
+                    DatasBy{name_dic}[{old_v_dic}].Remove(data);
+                    if(DatasBy{name_dic}[{old_v_dic}].Count==0)
+                        DatasBy{name_dic}.Remove({old_v_dic});
+                    if(!DatasBy{name_dic}.ContainsKey({new_v_dic}))
+                        DatasBy{name_dic}[{new_v_dic}]=new List<Data>();
+                    DatasBy{name_dic}[{new_v_dic}].Add(data);
  '''
                 super_type=''
                 if 'override' in self.var_config_dic[name]:
@@ -222,6 +281,13 @@ namespace {self.file_namespace}
 {self.init_children_action_str}
 {self.remove_add_children_action_str}
 {self.init_change_action_str}
+            Z_Json.extra[typeof(Data)]=((obj)=>{{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            }},(jo)=>{{
+            return GetDataByJo(jo);
+            }});
         }}
         
         private static bool inited;

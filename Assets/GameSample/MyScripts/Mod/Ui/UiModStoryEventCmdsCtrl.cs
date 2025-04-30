@@ -136,10 +136,18 @@ namespace Ui.ModStoryEventCmds
                       var top = model.showCmd;
                       while (top.prms != null && top.prms.Count > 0)
                           top = top.prms[top.prms.Count - 1];
-                      parent.model.data.cmds.Insert(top.oriId, parent.model.dataLst[id.Item1][id.Item2].Copy());
+
+
+                      GameEventController.InsertCmd(parent.model.data.cmds, top.oriId, parent.model.dataLst[id.Item1][id.Item2]);
+
+
+                      parent.Refresh();
                       return true;
                   }, parent.model.wordsLst, parent.model.spriteLst);
-                parent.Refresh();
+            });
+            view.btn_name.onClick.AddListener(() =>
+            {
+                model.showCmd.data.constV = "??";
             });
 
         }
@@ -158,8 +166,8 @@ namespace Ui.ModStoryEventCmds
 
             view.txt_name.text = belong + value;
 
-            view.txt_add.gameObject.SetActive(model.showCmd.data.uid!=0);
-            view.txt_del.gameObject.SetActive(!string.IsNullOrEmpty(model.showCmd.data.lab));
+            view.btn_add.gameObject.SetActive(model.showCmd.data.uid==0||!string.IsNullOrEmpty(model.showCmd.data.lab));
+            view.btn_del.gameObject.SetActive(!string.IsNullOrEmpty(model.showCmd.data.lab));
         }
     }
 

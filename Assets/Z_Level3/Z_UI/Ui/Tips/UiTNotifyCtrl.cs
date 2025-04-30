@@ -54,7 +54,7 @@ namespace Ui.Notify
                 if (param.chooseInfo != null)
                     Add(param.chooseInfo); 
                 if (param.multipleChooseInfo != null)
-                    Add(param.chooseInfo);
+                    Add(param.multipleChooseInfo);
                 if (param.popupInfo != null)
                     Add(param.popupInfo);
             }

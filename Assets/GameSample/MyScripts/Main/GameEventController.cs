@@ -163,6 +163,20 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
         }
         
     }
+    public static void InsertCmd(List<CmdForm.Data> lst,int id,CmdForm.Data cmd)
+    {
+        lst.Insert(id, cmd.Copy());
+        if(cmd.additionCmds!=null)
+        {
+            for (int i = 0; i < cmd.additionCmds.Count; i++)
+                InsertCmd(lst, id + 1, CmdForm.DataByName[cmd.additionCmds[i]].Copy());
+        }
+        if (cmd.prmName != null)
+        {
+            for (int i = 0; i < cmd.prmName.Count; i++)
+                InsertCmd(lst, id, CmdForm.defaultData.Copy());
+        }
+    }
     public static JArray GetEventTriggerJa(EventType type)
     {
         var lst = GetEventTrigger(type);

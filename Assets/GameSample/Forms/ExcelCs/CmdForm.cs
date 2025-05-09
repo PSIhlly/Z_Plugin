@@ -65,6 +65,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,bool,bool> changeObjectenableAction;
                 
+        public static Action<Data,bool,bool> changeCharacterenableAction;
+                
 
 
         public partial class Data
@@ -268,7 +270,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,List<int> prmTypes,List<string> prmName,List<int> resTypes,string constV,string lab,List<string> additionCmds,bool globalEnable,bool terrainEnable,bool objectEnable)
+                    private bool  _characterEnable;
+                    /// <summary>
+                    ///ÔÊÐí½ÇÉ«ÓÃ
+                    ///</summary>
+                    public bool  characterEnable{
+                                get{return _characterEnable;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCharacterenable(this,_characterEnable,value); 
+                    }
+        
+                _characterEnable = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<int> prmTypes,List<string> prmName,List<int> resTypes,string constV,string lab,List<string> additionCmds,bool globalEnable,bool terrainEnable,bool objectEnable,bool characterEnable)
             {
 
              this.uid = uid;
@@ -282,17 +302,18 @@ public static readonly int autoUidCnt=100;
              this.globalEnable = globalEnable;
              this.terrainEnable = terrainEnable;
              this.objectEnable = objectEnable;
+             this.characterEnable = characterEnable;
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,name,prmTypes,prmName,resTypes,constV,lab,additionCmds,globalEnable,terrainEnable,objectEnable);
+        return new Data(sameId? uid:uidChain.GetId(),name,prmTypes,prmName,resTypes,constV,lab,additionCmds,globalEnable,terrainEnable,objectEnable,characterEnable);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"empty",null,null,null,"","",null,false,false,false);
+                   public static Data defaultData=new Data(0,"empty",null,null,new List<int>(){4,},"","",null,false,false,false,false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -340,17 +361,19 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"dialog",new List<int>(){2,},new List<string>(){"content",},null,"","popup",null,true,true,true)},
+                {1,new Data(1,"dialog",new List<int>(){2,},new List<string>(){"content",},null,"","popup",null,true,true,true,true)},
 
-                {2,new Data(2,"tips",new List<int>(){2,},new List<string>(){"content",},null,"","tips",null,true,true,true)},
+                {2,new Data(2,"tips",new List<int>(){2,},new List<string>(){"content",},null,"","tips",null,true,true,true,true)},
 
-                {3,new Data(3,"if",new List<int>(){1,},new List<string>(){"conditionJudge",},null,"","logic",new List<string>(){"then;else;endif",},true,true,true)},
+                {3,new Data(3,"if",new List<int>(){1,},new List<string>(){"conditionJudge",},null,"","logic",new List<string>(){"then","else",},true,true,true,true)},
 
-                {4,new Data(4,"then",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true)},
+                {4,new Data(4,"then",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true,true)},
 
-                {5,new Data(5,"else",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true)},
+                {5,new Data(5,"else",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true,true)},
 
-                {6,new Data(6,"value",null,null,new List<int>(){2,},"","value",null,true,true,true)},
+                {6,new Data(6,"num",null,null,new List<int>(){0,},"","value",null,true,true,true,true)},
+
+                {7,new Data(7,"text",null,null,new List<int>(){2,},"","value",null,true,true,true,true)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -365,7 +388,9 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
     
                         {"else",_DataByUid[5]},
     
-                        {"value",_DataByUid[6]},
+                        {"num",_DataByUid[6]},
+    
+                        {"text",_DataByUid[7]},
     
                     };
     
@@ -394,6 +419,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                     _DatasByLab[""].Add(_DataByUid[5]);
 
                     _DatasByLab["value"].Add(_DataByUid[6]);
+
+                    _DatasByLab["value"].Add(_DataByUid[7]);
 
 
             childInitAction?.Invoke();
@@ -456,7 +483,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<bool>("terrainEnable"),
 
-                jo.Get<bool>("objectEnable")
+                jo.Get<bool>("objectEnable"),
+
+                jo.Get<bool>("characterEnable")
                     );
 
             return data;
@@ -489,6 +518,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("terrainEnable",data.terrainEnable);
 
             jo.Set<bool>("objectEnable",data.objectEnable);
+
+            jo.Set<bool>("characterEnable",data.characterEnable);
 
             return jo;
         }
@@ -556,12 +587,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataByUid.Values)
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
             {
-                if(data.uid<uidChain.cnt)
-                    RemoveData(data.uid);
+                if(key < uidChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(Data data)
@@ -697,6 +728,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeObjectenableAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCharacterenable(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCharacterenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -151,9 +151,9 @@ namespace Z_Map.Form
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,name,texNameDic,mapPos,prefabName,pos,euler,scale,updateType,extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,texNameDic,mapPos,prefabName,pos,euler,scale,updateType,extra);
                 }
             
         }
@@ -356,12 +356,12 @@ UnitForm.RemoveData(uid);
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataByUid.Values)
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
             {
-                if(data.uid<uidChain.cnt)
-                    RemoveData(data.uid);
+                if(key < uidChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(UnitForm.Data data)

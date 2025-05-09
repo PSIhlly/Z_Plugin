@@ -10,6 +10,8 @@ using Z_Texture;
 using Z_Time;
 using Z_Ui.Base;
 using Z_Ui.Notify;
+using Z_DataSystem.Form;
+using Type = Z_DataSystem.Form.Type;
 
 namespace Ui.ModStoryEventCmds
 {
@@ -39,6 +41,9 @@ namespace Ui.ModStoryEventCmds
             model.dataLst = new List<List<CmdForm.Data>>();
             foreach (var pair in CmdForm.DatasByLab)
             {
+                if (string.IsNullOrEmpty(pair.Key))
+                    continue;
+
                 var subWordsLst = new List<string>();
                 var subSpriteLst = new List<Sprite>();
                 var subDataLst = new List<CmdForm.Data>();
@@ -58,23 +63,19 @@ namespace Ui.ModStoryEventCmds
             {
                 Close();
             });
-            view.btn_save.onClick.AddListener(() =>
-            {
-                Close();
-            });
             view.ipt_name.onFinishInput += (s) =>
             {
-                ModManager.instance.assetCtrl.RenameEvent(model.data.name,  s);
+                ModManager.instance.assetCtrl.RenameEvent(model.data.name, s);
                 Refresh();
             };
-            view.ipt_label.onFinishInput+=(s) =>
-            {
-                ModManager.instance.assetCtrl.RenameEvent(model.data.name, null, s);
-                Refresh();
-            };
+            view.ipt_label.onFinishInput += (s) =>
+              {
+                  ModManager.instance.assetCtrl.RenameEvent(model.data.name, null, s);
+                  Refresh();
+              };
             view.ipt_subLabel.onFinishInput += (s) =>
             {
-                ModManager.instance.assetCtrl.RenameEvent(model.data.name, null, null,s);
+                ModManager.instance.assetCtrl.RenameEvent(model.data.name, null, null, s);
                 Refresh();
             };
         }
@@ -101,14 +102,16 @@ namespace Ui.ModStoryEventCmds
             var showCmds = GameManager.instance.evtCtrl.GetShowCmds(model.data.cmds);
 
             cmdCon.Clear();
+            List<Vector3> offsets = new List<Vector3>();
             foreach (var showCmd in showCmds)
             {
+                offsets.Add(new Vector3(showCmd.depth *50, 0,0));
                 cmdCon.Add(new UiCmdParam()
                 {
                     showCmd = showCmd
                 });
             }
-            cmdCon.Refresh();
+            cmdCon.Refresh(offsets);
 
 
             view.ipt_name.Set(model.data.name);
@@ -132,22 +135,57 @@ namespace Ui.ModStoryEventCmds
             view.btn_add.onClick.AddListener(() =>
             {
                 NotifyManager.instance.AddMultipleChoose("", true, (id) =>
-                  {
-                      var top = model.showCmd;
-                      while (top.prms != null && top.prms.Count > 0)
-                          top = top.prms[top.prms.Count - 1];
+                {
+                    var top = model.showCmd;
+                    //remove empty
+                    if (model.showCmd.data.uid == 0 && model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)Type.Action))
+                    {
+                        GameEventController.DeleteCmd(parent.model.data.cmds, top.oriId);
+                    }
+                    else
+                    {
+                        while (top.prms != null && top.prms.Count > 0)
+                            top = top.prms[top.prms.Count - 1];
+                    }
+                    GameEventController.InsertCmd(parent.model.data.cmds, top.oriId, parent.model.dataLst[id.Item1][id.Item2]);
 
 
-                      GameEventController.InsertCmd(parent.model.data.cmds, top.oriId, parent.model.dataLst[id.Item1][id.Item2]);
-
-
-                      parent.Refresh();
-                      return true;
-                  }, parent.model.wordsLst, parent.model.spriteLst);
+                    parent.Refresh();
+                    return true;
+                }, parent.model.wordsLst, parent.model.spriteLst);
             });
             view.btn_name.onClick.AddListener(() =>
             {
-                model.showCmd.data.constV = "??";
+                if(model.showCmd.data.isValue)
+                {
+                    NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), false, (s) =>
+                    {
+                        switch((Type)model.showCmd.data.resTypes[0])
+                        {
+                            case (Type.Float):
+                                if(float.TryParse(s, out var res)) {
+                                model.showCmd.data.constV = res.ToString("#0.000");
+                                }
+                                break;
+                            case (Type.String):
+                                model.showCmd.data.constV = s;
+                                break;
+                        }
+                        parent.Refresh();
+                        return true;
+                    });
+                }
+
+            });
+            view.btn_del.onClick.AddListener(() =>
+            {
+                GameEventController.DeleteCmd(parent.model.data.cmds, model.showCmd.oriId);
+                //add empty
+                if(model.showCmd.belong!=null&&!model.showCmd.belong.data.prmTypes.Contains((int)Type.Action))
+                {
+                    GameEventController.InsertCmd(parent.model.data.cmds, model.showCmd.oriId, CmdForm.defaultData);
+                }
+                parent.Refresh();
             });
 
         }
@@ -161,12 +199,12 @@ namespace Ui.ModStoryEventCmds
         }
         public void Refresh()
         {
-            var belong = model.showCmd.belong != null ? TextManager.instance.GetTxt(model.showCmd.belong.data.prmName[model.showCmd.prmId]) + " : " : "";
+            var belong = model.showCmd.belong != null&& !model.showCmd.belong.data.prmTypes.Contains((int)Type.Action) ? TextManager.instance.GetTxt(model.showCmd.belong.data.prmName[model.showCmd.prmId]) + " : " : "";
             var value = string.IsNullOrEmpty(model.showCmd.data.constV) ? TextManager.instance.GetTxt(model.showCmd.data.name) : model.showCmd.data.constV;
 
             view.txt_name.text = belong + value;
 
-            view.btn_add.gameObject.SetActive(model.showCmd.data.uid==0||!string.IsNullOrEmpty(model.showCmd.data.lab));
+            view.btn_add.gameObject.SetActive(model.showCmd.data.uid == 0 || !string.IsNullOrEmpty(model.showCmd.data.lab));
             view.btn_del.gameObject.SetActive(!string.IsNullOrEmpty(model.showCmd.data.lab));
         }
     }

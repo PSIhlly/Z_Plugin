@@ -219,9 +219,9 @@ def create_data_handle():
         con_extend_str = ':base('
         con_arg_str = ''
         con_copy_str= f'''
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {{
-        return new Data(-1,'''
+        return new Data(sameId? {formInfo.id_str}:{formInfo.id_str}Chain.GetId(),'''
         con_set_str = ''
         for key in formInfo.var_type_dic:
             if key is not formInfo.id_str:

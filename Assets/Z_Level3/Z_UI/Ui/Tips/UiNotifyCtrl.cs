@@ -16,6 +16,7 @@ namespace Ui.Notify
         public PopupInfo popupInfo;
         public ChooseInfo chooseInfo;
         public MultipleChooseInfo multipleChooseInfo;
+        public InputAreaInfo inputAreaInfo;
     }
     public partial class UiNotifyModel
     {
@@ -23,7 +24,8 @@ namespace Ui.Notify
         public List<PopupInfo> popupInfos = new List<PopupInfo>();
         public List<ChooseInfo> chooseInfos = new List<ChooseInfo>();
         public List<MultipleChooseInfo> multipleChooseInfos = new List<MultipleChooseInfo>();
-
+        public List<InputAreaInfo> inputAreaInfos = new List<InputAreaInfo>();
+        
         public int id;
     }
     public partial class UiNotifyCtrl
@@ -32,13 +34,15 @@ namespace Ui.Notify
         UiContainer<UiChooseCtrl> chooseCon;
         UiContainer<UiMultipleChooseCtrl> multipleChooseCon;
         UiContainer<UiPopupCtrl> popupCon;
+        UiContainer<UiInputAreaCtrl> inputAreaCon;
         public override void OnCreate()
         {
             tipCon = new UiContainer<UiTipCtrl>(view.sub_Tip.gameObject);
             chooseCon = new UiContainer<UiChooseCtrl>(view.sub_Choose.gameObject);
             popupCon = new UiContainer<UiPopupCtrl>(view.sub_Popup.gameObject);
             multipleChooseCon = new UiContainer<UiMultipleChooseCtrl>(view.sub_MultipleChoose.gameObject);
-
+            inputAreaCon = new UiContainer<UiInputAreaCtrl>(view.sub_InputArea.gameObject);
+            
 
             view.btn_back.onClick.AddListener(() =>
             {
@@ -57,6 +61,9 @@ namespace Ui.Notify
                     Add(param.multipleChooseInfo);
                 if (param.popupInfo != null)
                     Add(param.popupInfo);
+                if (param.inputAreaInfo != null)
+                    Add(param.inputAreaInfo);
+                
             }
         }
         public void Refresh()
@@ -114,6 +121,20 @@ namespace Ui.Notify
             }
             popupCon.Refresh();
 
+            //InputArea:
+            inputAreaCon.Clear();
+            view.go_block.SetActive(false);
+            if (model.inputAreaInfos.Count > 0)
+            {
+                var cur = model.inputAreaInfos[model.inputAreaInfos.Count - 1];
+                inputAreaCon.Add(new UiInputAreaParam()
+                {
+                    info = cur
+                });
+                view.go_block.SetActive(true);
+
+            }
+            inputAreaCon.Refresh();
         }
 
         public void Add(TipInfo info)
@@ -136,6 +157,12 @@ namespace Ui.Notify
             model.popupInfos.Add(info);
             Refresh();
         }
+        public void Add(InputAreaInfo info)
+        {
+            model.inputAreaInfos.Add(info);
+            Refresh();
+        }
+        
         public void RemoveTip(int id)
         {
             for (int i = 0; i < model.tipInfos.Count; i++)
@@ -182,6 +209,18 @@ namespace Ui.Notify
                 if (model.popupInfos[i].id == id)
                 {
                     model.popupInfos.RemoveAt(i);
+                    break;
+                }
+            }
+            Refresh();
+        }
+        public void RemoveInputArea(int id)
+        {
+            for (int i = 0; i < model.inputAreaInfos.Count; i++)
+            {
+                if (model.inputAreaInfos[i].id == id)
+                {
+                    model.inputAreaInfos.RemoveAt(i);
                     break;
                 }
             }

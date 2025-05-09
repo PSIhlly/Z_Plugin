@@ -132,12 +132,12 @@ namespace {self.file_namespace}
         public static void ClearAuto()
         {{
             Init();
-            foreach(var data in DataBy{self.id_str.capitalize()}.Values)
+            var keys = new List<int>(DataBy{self.id_str.capitalize()}.Keys);
+            foreach(var key in keys)
             {{
-                if(data.{self.id_str}<{self.id_str}Chain.cnt)
-                    RemoveData(data.{self.id_str});
+                if(key < {self.id_str}Chain.cnt)
+                    RemoveData(key);
             }}
-            
         }}
 
          private static void RemoveChildren({'' if self.extend_data_str == '' else f'{self.extend_data_str}Form.'}Data data)

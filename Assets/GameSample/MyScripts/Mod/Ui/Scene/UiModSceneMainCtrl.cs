@@ -14,6 +14,17 @@ namespace Ui.ModSceneMain
 {
     public partial class UiModSceneMainModel
     {
+        public DesignType designType
+        {
+            set
+            {
+                ModManager.instance.sceneCtrl.designType = value;
+            }
+            get
+            {
+                return ModManager.instance.sceneCtrl.designType;
+            }
+        }
         public string viewX
         {
             set
@@ -84,7 +95,16 @@ namespace Ui.ModSceneMain
                 model.viewZ = v;
                 Refresh();
             };
-
+            view.btn_model.onClick.AddListener(() =>
+            {
+                model.designType = DesignType.Model;
+                Refresh();
+            });
+            view.btn_behaviour.onClick.AddListener(() =>
+            {
+                model.designType = DesignType.Behaviour;
+                Refresh();
+            });
             Refresh();
 
         }
@@ -101,6 +121,8 @@ namespace Ui.ModSceneMain
                 view.ipt_viewPosSetY.Set(model.viewY);
 
                 view.ipt_viewPosSetZ.Set(model.viewZ);
+            view.sta_selModel.ChangeState(model.designType == DesignType.Model?1:0);
+            view.sta_selBehaviour.ChangeState(model.designType == DesignType.Behaviour?1:0);
         }
     }
    

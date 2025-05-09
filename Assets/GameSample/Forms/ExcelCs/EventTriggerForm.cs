@@ -55,6 +55,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,bool,bool> changeObjectenableAction;
                 
+        public static Action<Data,bool,bool> changeCharacterenableAction;
+                
 
 
         public partial class Data
@@ -168,7 +170,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string evt,bool globalEnable,bool terrainEnable,bool objectEnable)
+                    private bool  _characterEnable;
+                    /// <summary>
+                    ///ÔÊÐí½ÇÉ«ÓÃ
+                    ///</summary>
+                    public bool  characterEnable{
+                                get{return _characterEnable;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCharacterenable(this,_characterEnable,value); 
+                    }
+        
+                _characterEnable = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string evt,bool globalEnable,bool terrainEnable,bool objectEnable,bool characterEnable)
             {
 
              this.uid = uid;
@@ -177,17 +197,18 @@ public static readonly int autoUidCnt=1000000;
              this.globalEnable = globalEnable;
              this.terrainEnable = terrainEnable;
              this.objectEnable = objectEnable;
+             this.characterEnable = characterEnable;
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,name,evt,globalEnable,terrainEnable,objectEnable);
+        return new Data(sameId? uid:uidChain.GetId(),name,evt,globalEnable,terrainEnable,objectEnable,characterEnable);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,false,false);
+                   public static Data defaultData=new Data(0,"","",false,false,false,false);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -225,11 +246,11 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"OnTouch","",false,true,true)},
+                {1,new Data(1,"OnTouch","",false,true,true,true)},
 
-                {2,new Data(2,"OnLeave","",false,true,true)},
+                {2,new Data(2,"OnLeave","",false,true,true,true)},
 
-                {3,new Data(3,"OnShow","",false,true,true)},
+                {3,new Data(3,"OnShow","",false,true,true,true)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -293,7 +314,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<bool>("terrainEnable"),
 
-                jo.Get<bool>("objectEnable")
+                jo.Get<bool>("objectEnable"),
+
+                jo.Get<bool>("characterEnable")
                     );
 
             return data;
@@ -316,6 +339,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("terrainEnable",data.terrainEnable);
 
             jo.Set<bool>("objectEnable",data.objectEnable);
+
+            jo.Set<bool>("characterEnable",data.characterEnable);
 
             return jo;
         }
@@ -373,12 +398,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataByUid.Values)
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
             {
-                if(data.uid<uidChain.cnt)
-                    RemoveData(data.uid);
+                if(key < uidChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(Data data)
@@ -457,6 +482,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeObjectenableAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCharacterenable(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCharacterenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

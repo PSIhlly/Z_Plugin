@@ -21,9 +21,11 @@ namespace Z_Ui.Base
             base.Clear();
             paramLst.Clear();
         }
-        public override void Refresh()
+        public override void Refresh(List<Vector3> offsets=null)
         {
-            sv.RefreshView(paramLst.Count);
+            if (offsets == null)
+                offsets = new List<Vector3>();
+            sv.RefreshView(paramLst.Count, offsets);
         }
         
     }

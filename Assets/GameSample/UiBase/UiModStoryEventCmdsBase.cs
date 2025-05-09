@@ -84,15 +84,12 @@ namespace Ui.ModStoryEventCmds
             public Ipt ipt_subLabel;
             public GameObject go_cmds;
             public ScrView scr_cmds;
-            public GameObject go_save;
-            public Btn btn_save;
             public Txt txt_title;
             public GameObject go_close;
             public Btn btn_close;
             public Txt txt_name;
             public Txt txt_label;
             public Txt txt_subLabel;
-            public Txt txt_save;
             public GameObject go_cmd;
             public UiCmdCtrl sub_Cmd;
         public UiModStoryEventCmdsView(UiHolder uiHolder):base(uiHolder)
@@ -103,17 +100,14 @@ namespace Ui.ModStoryEventCmds
             ipt_subLabel = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
             go_cmds = uiHolder.elementTrsLst[3].gameObject;
             scr_cmds = uiHolder.elementTrsLst[4].GetComponent<ScrView>();
-            go_save = uiHolder.elementTrsLst[5].gameObject;
-            btn_save = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            txt_title = uiHolder.elementTrsLst[7].GetComponent<Txt>();
-            go_close = uiHolder.elementTrsLst[8].gameObject;
-            btn_close = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            txt_name = uiHolder.elementTrsLst[10].GetComponent<Txt>();
-            txt_label = uiHolder.elementTrsLst[11].GetComponent<Txt>();
-            txt_subLabel = uiHolder.elementTrsLst[12].GetComponent<Txt>();
-            txt_save = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            go_cmd = uiHolder.elementTrsLst[14].gameObject;
-            sub_Cmd = (UiCmdCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            txt_title = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            go_close = uiHolder.elementTrsLst[6].gameObject;
+            btn_close = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            txt_name = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_label = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            txt_subLabel = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            go_cmd = uiHolder.elementTrsLst[11].gameObject;
+            sub_Cmd = (UiCmdCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
         }
 
     }

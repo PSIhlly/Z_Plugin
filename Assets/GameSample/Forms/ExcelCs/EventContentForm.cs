@@ -51,6 +51,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<VarForm.Data>,List<VarForm.Data>> changeStackAction;
                 
+        public static Action<Data,float,float> changeProgressAction;
+                
 
 
         public partial class Data
@@ -141,26 +143,45 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,EventForm.Data evt,int cur,List<VarForm.Data> stack)
+                    private float  _progress;
+                    /// <summary>
+                    ///½ø¶È
+                    ///</summary>
+                    public float  progress{
+                                get{return _progress;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeProgress(this,_progress,value); 
+                    }
+        
+                _progress = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,EventForm.Data evt,int cur,List<VarForm.Data> stack,float progress)
             {
 
              this.uid = uid;
              this.evt = evt;
              this.cur = cur;
              this.stack = stack;
+             this.progress = progress;
 
                     _ctrl=new EventContentController(this);
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,evt,cur,stack);
+        return new Data(sameId? uid:uidChain.GetId(),evt,cur,stack,progress);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,null,0,null);
+                   public static Data defaultData=new Data(0,null,0,null,0f);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -236,7 +257,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("cur"),
 
-                jo.Get<List<VarForm.Data>>("stack")
+                jo.Get<List<VarForm.Data>>("stack"),
+
+                jo.Get<float>("progress")
                     );
 
             return data;
@@ -255,6 +278,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("cur",data.cur);
 
             jo.Set<List<VarForm.Data>>("stack",data.stack);
+
+            jo.Set<float>("progress",data.progress);
 
             return jo;
         }
@@ -306,12 +331,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataByUid.Values)
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
             {
-                if(data.uid<uidChain.cnt)
-                    RemoveData(data.uid);
+                if(key < uidChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(Data data)
@@ -367,6 +392,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeStackAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeProgress(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeProgressAction?.Invoke(data,oldV,newV);
                 }
                     
             }

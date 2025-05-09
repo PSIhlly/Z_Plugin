@@ -8,12 +8,14 @@ using Z_DesignStyle;
 using Z_Map;
 using Z_UnitSystem;
 using Z_DataSystem.Form;
+using Z_Debug;
+
 public enum EventType
 {
-    Global=0,
-    Tile=1,
-    Object=2,
-    Character=3
+    Global = 0,
+    Tile = 1,
+    Object = 2,
+    Character = 3
 }
 public class ShowCmd
 {
@@ -21,11 +23,18 @@ public class ShowCmd
     public int depth;
     public int oriId;
     public ShowCmd belong;
-    public List<ShowCmd> prms=new List<ShowCmd>();
+    public List<ShowCmd> prms = new List<ShowCmd>();
     public int prmId;
 }
 namespace Form
 {
+    public partial class CmdForm
+    {
+        public partial class Data
+        {
+            public bool isValue => lab == "value";
+        }
+    }
     public class EventContentController
     {
         public EventContentController(EventContentForm.Data data)
@@ -33,26 +42,68 @@ namespace Form
             this.data = data;
         }
         public EventContentForm.Data data;
+        public CmdBase cmd;
         public bool InterpretFrame()
         {
             if (data.evt.cmds == null)
                 return true;
-            while(data.cur<data.evt.cmds.Count)
+            while (data.cur < data.evt.cmds.Count)
             {
-                var cmd = GameEventController.GetCmd(data.evt.cmds[data.cur].name);
+                if(cmd==null)
+                    cmd = GameEventController.GetCmd(data.evt.cmds[data.cur].name);
                 if (cmd != null)
                 {
-                    var prms = new VarForm.Data[data.evt.cmds[data.cur].prmName.Count];
-                    for(int i=0;i< prms.Length;i++)
+                    var prms = new VarForm.Data[0];
+                    if (data.evt.cmds[data.cur].prmName != null)
                     {
-                        prms[i] = data.stack[data.stack.Count-1];
+                        prms = new VarForm.Data[data.evt.cmds[data.cur].prmName.Count];
+                    }
+
+                    for (int i = 0; i < prms.Length; i++)
+                    {
+                        prms[i] = data.stack[data.stack.Count - i - 1];
+                    }
+
+                    var res = cmd.Execute(data.evt.cmds[data.cur], prms, data.progress);
+                    data.progress = res.progress;
+                    if (data.progress != 1)
+                        return false;
+
+                    for (int i = 0; i < prms.Length; i++)
+                    {
                         data.stack.RemoveAt(data.stack.Count - 1);
                     }
-                    var res=cmd.Execute(prms);
-                    for(int i=0;i < data.evt.cmds[data.cur].resTypes.Count; i++)
+
+
+                    if (!string.IsNullOrEmpty(res.ignoreUntilCmd))
                     {
-                        data.stack.Add(res.v[i]);
+                        Nxt();
+                        int times = 0;
+                        while (data.evt.cmds.Count > data.cur)
+                        {
+                            if (data.evt.cmds[data.cur].name == res.ignoreUntilCmd)
+                            {
+                                times--;
+                                if (times < 0)
+                                    break;
+                            }
+                            else if (data.evt.cmds[data.cur].name == res.ignoreTimesCmd)
+                            {
+                                times++;
+                            }
+                            Nxt();
+                        }
                     }
+
+                    if (data.evt.cmds[data.cur].resTypes != null)
+                    {
+                        for (int i = 0; i < data.evt.cmds[data.cur].resTypes.Count; i++)
+                        {
+                            data.stack.Add(res.v[i]);
+                        }
+                    }
+
+
                 }
                 Nxt();
             }
@@ -61,6 +112,8 @@ namespace Form
         private void Nxt()
         {
             data.cur++;
+            data.progress = 0;
+            cmd = null;
         }
     }
 }
@@ -86,7 +139,7 @@ namespace Z_Map
                             var ja = (JArray)jo[evtKey];
                             foreach (var subJo in ja)
                             {
-                                var data= EventTriggerForm.GetDataByJo((JObject)subJo);
+                                var data = EventTriggerForm.GetDataByJo((JObject)subJo);
                                 _evtSet[data.name] = data;
                             }
                         }
@@ -116,7 +169,7 @@ namespace Z_Map
         }
         public void ExecuteEvt(string name)
         {
-            if(evtDic.ContainsKey(name)&&EventForm.DataByName.ContainsKey(evtDic[name].evt))
+            if (evtDic.ContainsKey(name) && EventForm.DataByName.ContainsKey(evtDic[name].evt))
             {
                 GameManager.instance.evtCtrl.Execute(EventForm.DataByName[evtDic[name].evt], data.uid);
             }
@@ -128,9 +181,9 @@ public static partial class GlobalMaxSettings
 {
     public static int CUSTOM_EVENT_MAX => 1000000;
 }
-public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEvent>,IZ_Listener<TileEvent>,IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
+public class GameEventController : Z_Controller<GameManager>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
 {
-    
+
 
     public GameEventController(GameManager super) : base(super)
     {
@@ -146,29 +199,39 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
         {
             case "dialog":
                 return new DialogCmd();
-            default:
+            case "tips":
                 return new TipsCmd();
+            case "num":
+                return new NumCmd();
+            case "text":
+                return new TextCmd();
+            case "if":
+                return new IfCmd();
+            case "then":
+                return new ThenCmd();
+            default:
+                return new EmptyCmd();
         }
     }
 
     public void Update()
     {
         var lst = new List<EventContentForm.Data>(EventContentForm.DataByUid.Values);
-        foreach(var data in lst)
+        foreach (var data in lst)
         {
-            if(data.ctrl.InterpretFrame())
+            if (data.ctrl.InterpretFrame())
             {
                 EventContentForm.RemoveData(data.uid);
             }
         }
-        
+
     }
-    public static void InsertCmd(List<CmdForm.Data> lst,int id,CmdForm.Data cmd)
+    public static void InsertCmd(List<CmdForm.Data> lst, int id, CmdForm.Data cmd)
     {
         lst.Insert(id, cmd.Copy());
-        if(cmd.additionCmds!=null)
+        if (cmd.additionCmds != null)
         {
-            for (int i = 0; i < cmd.additionCmds.Count; i++)
+            for (int i = cmd.additionCmds.Count - 1; i >= 0; i--)
                 InsertCmd(lst, id + 1, CmdForm.DataByName[cmd.additionCmds[i]].Copy());
         }
         if (cmd.prmName != null)
@@ -177,23 +240,68 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
                 InsertCmd(lst, id, CmdForm.defaultData.Copy());
         }
     }
+    public static void DeleteCmd(List<CmdForm.Data> lst, int id)
+    {
+        var cur = lst[id];
+        if (cur.additionCmds != null && cur.additionCmds.Count > 0)
+        {
+            int times = 0;
+            while (id + 1 < lst.Count)
+            {
+                if (lst[id + 1].name == cur.name)
+                {
+                    times++;
+                }
+                else if (lst[id + 1].name == cur.additionCmds[cur.additionCmds.Count - 1])
+                {
+                    times--;
+                    if (times < 0)
+                        break;
+                }
+                lst.RemoveAt(id + 1);
+            }
+            lst.RemoveAt(id + 1);
+        }
+        if (cur.prmName != null)
+        {
+            int cmdCounnt = cur.prmName.Count;
+            while (cmdCounnt > 0)
+            {
+                id--;
+                if (lst[id].prmTypes != null && !lst[id].prmTypes.Contains((int)Type.Action))
+                    cmdCounnt += lst[id].prmName.Count;
+                if (lst[id].resTypes != null)
+                    cmdCounnt -= lst[id].resTypes.Count;
+                lst.RemoveAt(id);
+            }
+        }
+        lst.RemoveAt(id);
+    }
+    public static Dictionary<string, EventTriggerForm.Data> GetEventTriggerDic(EventType type)
+    {
+        var dic = new Dictionary<string, EventTriggerForm.Data>();
+        var lst = GetEventTrigger(type);
+        foreach (var data in lst)
+        {
+            dic[data.name] = data;
+        }
+        return dic;
+    }
     public static JArray GetEventTriggerJa(EventType type)
     {
         var lst = GetEventTrigger(type);
         JArray ja = new JArray();
-        foreach(var data in lst)
+        foreach (var data in lst)
         {
-           ja.Add( EventTriggerForm.GetJoByData(data));
+            ja.Add(EventTriggerForm.GetJoByData(data));
         }
         return ja;
     }
     public static List<EventTriggerForm.Data> GetEventTrigger(EventType type)
     {
-        var lst = new List<EventTriggerForm.Data> ();
+        var lst = new List<EventTriggerForm.Data>();
         foreach (var data in EventTriggerForm.DataByUid.Values)
         {
-            if (data.uid < EventForm.autoUidCnt)
-                continue;
             switch (type)
             {
                 case EventType.Global:
@@ -206,6 +314,10 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
                     break;
                 case EventType.Object:
                     if (data.objectEnable)
+                        lst.Add(data);
+                    break;
+                case EventType.Character:
+                    if (data.characterEnable)
                         lst.Add(data);
                     break;
             }
@@ -264,19 +376,21 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
             }
         }
     }
-    public void Execute(EventForm.Data evt,int uid=-1)
+    public void Execute(EventForm.Data evt, int uid = -1)
     {
+
         var initPrs = new List<VarForm.Data>();
-        if (uid!=-1)
+        if (uid != -1)
         {
             initPrs.Add(new VarForm.Data(-1, "ref", (int)Type.Unit, 0, "", uid));
         }
-        EventContentForm.AddData(new EventContentForm.Data(-1, evt.Copy(), 0, initPrs));
+        EventContentForm.AddData(new EventContentForm.Data(-1, evt.Copy(), 0, initPrs, 1));
     }
 
     public List<ShowCmd> GetShowCmds(List<CmdForm.Data> cmds)
     {
-        Dictionary<int,ShowCmd> dic = new Dictionary<int, ShowCmd>();
+        Dictionary<int, ShowCmd> dic = new Dictionary<int, ShowCmd>();
+        HashSet<int> ignore = new HashSet<int>();
         for (int i = 0; i < cmds.Count; i++)
         {
             dic[i] = new ShowCmd()
@@ -288,29 +402,39 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
         Stack<ShowCmd> stack = new Stack<ShowCmd>();
         for (int i = 0; i < cmds.Count; i++)
         {
-            if (cmds[i].prmTypes != null)
-            {
-                for (int j = 0; j < cmds[i].prmTypes.Count; j++)
-                {
-                    var prm = stack.Pop();
-                    prm.belong = dic[i];
-                    prm.prmId = dic[i].prms.Count;
-                    dic[i].prms.Add(prm);
-                }
-            }
-           
-            switch(dic[i].data.name)
+
+            switch (dic[i].data.name)
             {
                 case "then":
-                    while(stack.Peek().data.name!="if")
+                    while (stack.Peek().data.name != "if" || ignore.Contains(stack.Peek().oriId))
                     {
-                        stack.Pop().belong = dic[i];
+                        var prm = stack.Pop();
+                        prm.belong = dic[i];
+                        prm.prmId = dic[i].prms.Count;
+                        dic[i].prms.Add(prm);
                     }
+                    ignore.Add(stack.Peek().oriId);
                     break;
                 case "else":
-                    while (stack.Peek().data.name != "then")
+                    while (stack.Peek().data.name != "then" || ignore.Contains(stack.Peek().oriId))
                     {
-                        stack.Pop().belong = dic[i];
+                        var prm = stack.Pop();
+                        prm.belong = dic[i];
+                        prm.prmId = dic[i].prms.Count;
+                        dic[i].prms.Add(prm);
+                    }
+                    ignore.Add(stack.Peek().oriId);
+                    break;
+                default:
+                    if (cmds[i].prmTypes != null)
+                    {
+                        for (int j = 0; j < cmds[i].prmTypes.Count; j++)
+                        {
+                            var prm = stack.Pop();
+                            prm.belong = dic[i];
+                            prm.prmId = dic[i].prms.Count;
+                            dic[i].prms.Add(prm);
+                        }
                     }
                     break;
             }
@@ -318,23 +442,23 @@ public class GameEventController:Z_Controller<GameManager>,IZ_Listener<CollideEv
         }
 
         Queue<ShowCmd> depthQ = new Queue<ShowCmd>();
-        foreach(var data in stack)
+        var res = new List<ShowCmd>(stack.ToArray());
+        res.Reverse();
+        foreach (var data in res)
         {
             data.depth = 0;
             depthQ.Enqueue(data);
         }
-        while(depthQ.Count>0)
+        while (depthQ.Count > 0)
         {
             var q = depthQ.Dequeue();
-            foreach(var q2 in q.prms)
+            foreach (var q2 in q.prms)
             {
                 q2.depth = q.depth + 1;
                 depthQ.Enqueue(q2);
+                res.Insert(res.FindIndex(e => e == q) + 1, q2);
             }
         }
-
-        var res = new List<ShowCmd>(stack.ToArray());
-        res.Reverse();
         return res;
 
     }

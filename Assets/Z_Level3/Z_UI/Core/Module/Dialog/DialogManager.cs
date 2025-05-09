@@ -10,7 +10,7 @@ namespace Z_Ui.Dialog
     public class Settings
     {
             public float autoPlaySpeed;//0~2
-            public float textDisplaySpeed=5;//1~10
+            public float textDisplaySpeed;//1~10
     }
     public enum PlayType
     {
@@ -48,14 +48,16 @@ namespace Z_Ui.Dialog
         private List<Clip> clipLst = new List<Clip>();
         private Action onComplete;
 
+        public bool enabled;
+
         public override void Init()
         {
             this.Register<ClipPlayEvent>();
-
+            
             settings = new Settings()
             {
                 autoPlaySpeed = 0,
-                textDisplaySpeed = 1,
+                textDisplaySpeed = 5,
             };
 
         }
@@ -77,6 +79,7 @@ namespace Z_Ui.Dialog
         public void Begin(List<Clip> clipLst, Action onComplete)
         {
             Init();
+            enabled = true;
             this.clipLst = clipLst;
             this.onComplete = onComplete;
             UiManager.instance.ShowUi<UiDialogCtrl>(new UiDialogParam()
@@ -88,6 +91,7 @@ namespace Z_Ui.Dialog
 
         public void End()
         {
+            enabled = false;
             UiManager.instance.CloseUi<UiDialogCtrl>();
             onComplete?.Invoke();
         }

@@ -81,11 +81,13 @@ namespace Z_Ui.Base
         {
             paramLst.RemoveAt(id);
         }
-        public virtual void Refresh()
+        public virtual void Refresh(List<Vector3> offsets = null)
         {
-            foreach(var param in paramLst)
+            if (offsets == null)
+                offsets = new List<Vector3>();
+            for(int i=0;i< paramLst.Count;i++)
             {
-                AddReal(param);
+                var go=AddReal(paramLst[i]);
             }
         }
     }

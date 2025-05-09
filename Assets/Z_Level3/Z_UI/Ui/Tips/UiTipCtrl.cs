@@ -35,8 +35,12 @@ namespace Ui.Notify
                 Close();
                 return true;
             }, uiHolder);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            TimeManager.instance.AddNextBigFrameAction(()=>
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            }, gameObject);
+            
         }
         public override void Close()
         {

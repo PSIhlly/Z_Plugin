@@ -221,6 +221,7 @@ namespace Ui.Dialog
         }
         private void Display(List<Clip> clips = null)
         {
+            model.curClipId = -1;
             if (clips != null)
             {
                 model.clips = clips;

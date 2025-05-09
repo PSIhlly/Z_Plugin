@@ -6,12 +6,13 @@ using UnityEngine;
 public class CmdRes
 {
     public List<VarForm.Data> v;
-    public bool breakFlag;
+    public string ignoreUntilCmd;
+    public string ignoreTimesCmd;
+    public float progress=1;
 
 }
 
 public abstract class CmdBase 
 {
-    public abstract CmdRes Execute(VarForm.Data[] prs);
-
+    public abstract CmdRes Execute(CmdForm.Data self,VarForm.Data[] prs, float progress=0);
 }

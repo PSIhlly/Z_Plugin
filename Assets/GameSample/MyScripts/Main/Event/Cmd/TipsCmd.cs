@@ -10,7 +10,7 @@ using Z_Ui.Notify;
 public class TipsCmd : CmdBase
 {
 
-    public override CmdRes Execute(VarForm.Data[] prs)
+    public override CmdRes Execute(CmdForm.Data self,VarForm.Data[] prs, float progress)
     {
         NotifyManager.instance.AddTip(prs[0].s);
         return new CmdRes()

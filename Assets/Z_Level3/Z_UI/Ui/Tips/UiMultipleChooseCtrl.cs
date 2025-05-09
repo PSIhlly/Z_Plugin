@@ -29,7 +29,7 @@ namespace Ui.Notify
         public override void OnCreate()
         {
             lableCon = new UiScrViewContainer<UiLabelCtrl>(view.go_label,view.scr_labels);
-            con = new UiScrViewContainer<UiSubItemCtrl>(view.go_item,view.scr_items);
+            con = new UiScrViewContainer<UiSubItemCtrl>(view.go_subItem, view.scr_subItems);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();

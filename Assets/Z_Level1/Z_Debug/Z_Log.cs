@@ -7,11 +7,11 @@ namespace Z_Debug
     public static class Z_Log
     {
         const int maxLength = 5000;
-        public static void Log<T>(IEnumerable<T> enumerable)
+        public static void Log(ICollection col)
         {
             int i = 0;
-            string res = enumerable.GetType().Name+":\n";
-            foreach(var o in enumerable)
+            string res = col.GetType().Name+":\n";
+            foreach(var o in col)
             {
                 ++i;
                 res += i +" : " + o + "\n";
@@ -34,6 +34,7 @@ namespace Z_Debug
                 p += maxLength;
             }
         }
+        
         public static void Log(Texture2D tex)
         {
             Debug.Log(tex.name+":");

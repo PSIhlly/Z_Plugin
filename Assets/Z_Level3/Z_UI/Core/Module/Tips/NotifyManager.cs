@@ -41,7 +41,13 @@ namespace Z_Ui.Notify
         public bool canClose;
         public int id;
     }
-
+    public class InputAreaInfo
+    {
+        public string title;
+        public Func<string,bool> func;
+        public bool canClose;
+        public int id;
+    }
 
     public class NotifyManager : Z_Manager<NotifyManager>
     {
@@ -140,7 +146,29 @@ namespace Z_Ui.Notify
                 });
             }
         }
-       
+        public void AddInputArea(string title, bool canClose, Func<string,bool> func)
+        {
+            var info = new InputAreaInfo()
+            {
+                title = title,
+                canClose = canClose,
+                func = func,
+                id = popupIdCnt++
+            };
+            var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
+            if (ctrl != null && ctrl.isActive)
+            {
+                ctrl.Add(info);
+            }
+            else
+            {
+                UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
+                {
+                    inputAreaInfo = info
+                });
+            }
+        }
+        
         public override void Init()
         {
         }

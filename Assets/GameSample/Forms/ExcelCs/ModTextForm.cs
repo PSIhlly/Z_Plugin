@@ -80,9 +80,9 @@ namespace Form
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,key,contentEn,contentCn);
+        return new Data(sameId? id:idChain.GetId(),key,contentEn,contentCn);
                 }
             
         }
@@ -157,6 +157,8 @@ namespace Form
 
                 {1110004,new Data(1110004,"Choose Move anim","Choose Move anim","选择移动动画")},
 
+                {1110005,new Data(1110005,"input value","Input value","输入值")},
+
                 {1210001,new Data(1210001,"dialog","dialog","对话")},
 
                 {1210002,new Data(1210002,"tips","tips","提示")},
@@ -174,6 +176,10 @@ namespace Form
                 {1210008,new Data(1210008,"conditionJudge","condition judge","条件")},
 
                 {1210009,new Data(1210009,"execute","execute","执行内容")},
+
+                {1210010,new Data(1210010,"text","text","文本")},
+
+                {1210011,new Data(1210011,"num","num","数值")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -208,6 +214,8 @@ namespace Form
     
                         {"Choose Move anim",_DataById[1110004]},
     
+                        {"input value",_DataById[1110005]},
+    
                         {"dialog",_DataById[1210001]},
     
                         {"tips",_DataById[1210002]},
@@ -225,6 +233,10 @@ namespace Form
                         {"conditionJudge",_DataById[1210008]},
     
                         {"execute",_DataById[1210009]},
+    
+                        {"text",_DataById[1210010]},
+    
+                        {"num",_DataById[1210011]},
     
                     };
     
@@ -357,12 +369,12 @@ TextBaseForm.RemoveData(id);
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataById.Values)
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
             {
-                if(data.id<idChain.cnt)
-                    RemoveData(data.id);
+                if(key < idChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(TextBaseForm.Data data)

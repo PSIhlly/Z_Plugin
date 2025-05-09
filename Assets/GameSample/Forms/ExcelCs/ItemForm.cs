@@ -117,9 +117,9 @@ private set{
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,name,icon,count);
+        return new Data(sameId? id:idChain.GetId(),name,icon,count);
                 }
             
         }

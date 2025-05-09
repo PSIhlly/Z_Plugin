@@ -175,9 +175,9 @@ public static readonly int autoUidCnt=1000000;
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,name,valueType,min,v,max);
+        return new Data(sameId? uid:uidChain.GetId(),name,valueType,min,v,max);
                 }
             
         }
@@ -336,12 +336,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataByUid.Values)
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
             {
-                if(data.uid<uidChain.cnt)
-                    RemoveData(data.uid);
+                if(key < uidChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(Data data)

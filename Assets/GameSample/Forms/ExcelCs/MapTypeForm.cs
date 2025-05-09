@@ -110,9 +110,9 @@ private set{
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,NameKey,icon,needLayer);
+        return new Data(sameId? id:idChain.GetId(),NameKey,icon,needLayer);
                 }
             
         }

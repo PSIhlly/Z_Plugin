@@ -71,6 +71,7 @@ namespace Z_Map
             set { base.unit = value; }
             get { return (MapUnit)base.unit; }
         }
+        private float degree=0;
         public override void VisOn()
         {
             if (vising)
@@ -81,20 +82,23 @@ namespace Z_Map
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 propBlock.SetFloat("_Show", 1);
+                degree = 1;
                 render.SetPropertyBlock(propBlock);
             }
         }
         public override void VisDegree(float degree)
         {
-            if (!vising)
+            if (degree==this.degree)
                 return;
             foreach (var render in renderers)
             {
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 propBlock.SetFloat("_Show", degree);
+                this.degree = degree;
                 render.SetPropertyBlock(propBlock);
             }
+
         }
         public override void VisOff()
         {
@@ -106,6 +110,7 @@ namespace Z_Map
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 propBlock.SetFloat("_Show", 0);
+                degree = 0;
                 render.SetPropertyBlock(propBlock);
             }
         }

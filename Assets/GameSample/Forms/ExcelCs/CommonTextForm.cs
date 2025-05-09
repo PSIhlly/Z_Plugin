@@ -80,9 +80,9 @@ namespace Form
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,key,contentEn,contentCn);
+        return new Data(sameId? id:idChain.GetId(),key,contentEn,contentCn);
                 }
             
         }
@@ -289,12 +289,12 @@ TextBaseForm.RemoveData(id);
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataById.Values)
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
             {
-                if(data.id<idChain.cnt)
-                    RemoveData(data.id);
+                if(key < idChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(TextBaseForm.Data data)

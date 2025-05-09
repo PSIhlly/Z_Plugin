@@ -6,6 +6,7 @@ using Z_Ui.Base;
 using Z_Ui;
 
 namespace Ui.ModSceneMain
+
 {
 
 
@@ -262,9 +263,17 @@ namespace Ui.ModSceneMain
             public Ipt ipt_viewPosSetY;
             public Ipt ipt_viewPosSetZ;
             public Btn btn_view;
+            public Btn btn_model;
+            public Btn btn_behaviour;
             public Txt txt_menu;
             public Img img_;
             public Txt txt_center;
+            public Img img_model;
+            public Txt txt_model;
+            public Sta sta_selModel;
+            public Img img_behaviour;
+            public Txt txt_behaviour;
+            public Sta sta_selBehaviour;
         public UiModSceneMainView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -276,9 +285,17 @@ namespace Ui.ModSceneMain
             ipt_viewPosSetY = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             ipt_viewPosSetZ = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
             btn_view = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            txt_menu = uiHolder.elementTrsLst[8].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[9].GetComponent<Img>();
-            txt_center = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            btn_model = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_behaviour = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            txt_menu = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[11].GetComponent<Img>();
+            txt_center = uiHolder.elementTrsLst[12].GetComponent<Txt>();
+            img_model = uiHolder.elementTrsLst[13].GetComponent<Img>();
+            txt_model = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            sta_selModel = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            img_behaviour = uiHolder.elementTrsLst[16].GetComponent<Img>();
+            txt_behaviour = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            sta_selBehaviour = uiHolder.elementTrsLst[18].GetComponent<Sta>();
         }
 
     }

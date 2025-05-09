@@ -99,12 +99,18 @@ namespace Ui.ModStoryEvent
             subLabelcon.Clear();
             if (model.curLab != null)
             {
-                foreach (var lst in EventForm.DatasByLab.Values)
+                HashSet<string> visited = new HashSet<string>();
+                foreach (var sub in EventForm.DatasByLab[model.curLab])
                 {
-                    subLabelcon.Add(new UiSubLabelParam()
+                    if(!visited.Contains(sub.subLab))
                     {
-                        name = lst[0].subLab
-                    });
+                        subLabelcon.Add(new UiSubLabelParam()
+                        {
+                            name = sub.subLab
+                        });
+                        visited.Add(sub.subLab);
+                    }
+                    
                 }
                 subLabelcon.Add(new UiSubLabelParam()
                 {

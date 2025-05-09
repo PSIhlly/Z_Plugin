@@ -15,16 +15,14 @@ namespace Ui.ModStoryEventTrigger
 
     public partial class UiModStoryEventTriggerParam
     {
-        public EventType type;
-        public Dictionary<string, EventForm.Data> dic;
-        public Action<Dictionary<string,EventForm.Data>> act;
+        public Dictionary<string, EventTriggerForm.Data> dic;
+        public Action<Dictionary<string, EventTriggerForm.Data>> act;
 
     }
     public partial class UiModStoryEventTriggerModel
     {
-        public EventType type;
-        public Dictionary<string, EventForm.Data> dic;
-        public Action<Dictionary<string, EventForm.Data>> act;
+        public Dictionary<string, EventTriggerForm.Data> dic;
+        public Action<Dictionary<string, EventTriggerForm.Data>> act;
     }
     public partial class UiModStoryEventTriggerCtrl
     {
@@ -32,7 +30,6 @@ namespace Ui.ModStoryEventTrigger
         UiScrViewContainer<UiTriggerCtrl> triggerCon;
         public override void OnCreate()
         {
-
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();
@@ -43,13 +40,13 @@ namespace Ui.ModStoryEventTrigger
         public override void Close()
         {
             model.act(model.dic);
+            base.Close();
         }
         public override void OnShow()
         {
             if(param!=null)
             {
                 model.act = param.act;
-                model.type = param.type;
                 model.dic = param.dic;
             }
             Refresh();
@@ -91,7 +88,7 @@ namespace Ui.ModStoryEventTrigger
                 {
                     func = (data) =>
                     {
-                        parent.model.dic[model.name] = data;
+                        parent.model.dic[model.name].evt = data.name;
                         parent.Refresh();
                     }
                 });
@@ -106,7 +103,7 @@ namespace Ui.ModStoryEventTrigger
         public void Refresh()
         {
             view.txt_triggerName.text = model.name;
-            view.txt_eventName.text = parent.model.dic[model.name].name;
+            view.txt_eventName.text = parent.model.dic[model.name].evt;
         }
     }
 

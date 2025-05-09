@@ -16,7 +16,8 @@ namespace Z_DataSystem.Form
         String = 2,
         Unit = 3,
         Object=4,
-        Action=5
+        Action=5,
+        Image=6,
     }
 
     public partial class ParamForm

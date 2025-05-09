@@ -180,14 +180,14 @@ public static readonly int autoUidCnt=100;
 
             }
 
-                public Data Copy()
+                public Data Copy(bool sameId = true)
                 {
-        return new Data(-1,name,type,v,s,unitUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,type,v,s,unitUid);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0f,"",0);
+                   public static Data defaultData=new Data(0,"",4,0f,"",0);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -341,12 +341,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static void ClearAuto()
         {
             Init();
-            foreach(var data in DataByUid.Values)
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
             {
-                if(data.uid<uidChain.cnt)
-                    RemoveData(data.uid);
+                if(key < uidChain.cnt)
+                    RemoveData(key);
             }
-            
         }
 
          private static void RemoveChildren(Data data)

@@ -49,11 +49,11 @@ namespace Ui.ModStoryEventCmds
                 var subDataLst = new List<CmdForm.Data>();
                 foreach (var sub in pair.Value)
                 {
-                    subWordsLst.Add(sub.name);
+                    subWordsLst.Add(TextManager.instance.GetTxt(sub.name));
                     subSpriteLst.Add(TextureHelper.transparentSprite);
                     subDataLst.Add(sub);
                 }
-                model.wordsLst.Add((pair.Key, subWordsLst));
+                model.wordsLst.Add((TextManager.instance.GetTxt(pair.Key), subWordsLst));
                 model.spriteLst.Add((TextureHelper.transparentSprite, subSpriteLst));
                 model.dataLst.Add(subDataLst);
             }

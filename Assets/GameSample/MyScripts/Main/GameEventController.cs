@@ -214,7 +214,7 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
         }
     }
 
-    public void Update()
+    public void LateUpdate()
     {
         var lst = new List<EventContentForm.Data>(EventContentForm.DataByUid.Values);
         foreach (var data in lst)

@@ -48,7 +48,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public void Update()
     {
         _sceneCtrl.Update();
-        GameManager.instance.evtCtrl.Update();
+    }
+    public void LateUpdate()
+    {
+        GameManager.instance.evtCtrl.LateUpdate();
     }
     public async void BeginStory(string storyName, bool boxPlay)
     {

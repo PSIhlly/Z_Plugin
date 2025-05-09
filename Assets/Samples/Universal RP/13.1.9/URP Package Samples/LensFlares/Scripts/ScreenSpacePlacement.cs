@@ -17,8 +17,8 @@ public class ScreenSpacePlacement : MonoBehaviour
         Event currentEvent = Event.current;
         Vector2 mousePos = new Vector2();
 
-        if (currentEvent.type == EventType.MouseDown) m_MouseDown = true;
-        if (currentEvent.type == EventType.MouseUp) m_MouseDown = false;
+        if (currentEvent.type == UnityEngine.EventType.MouseDown) m_MouseDown = true;
+        if (currentEvent.type == UnityEngine.EventType.MouseUp) m_MouseDown = false;
 
         mousePos.x = currentEvent.mousePosition.x;
         mousePos.y = m_Cam.pixelHeight - currentEvent.mousePosition.y;

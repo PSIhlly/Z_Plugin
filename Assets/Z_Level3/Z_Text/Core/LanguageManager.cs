@@ -17,7 +17,7 @@ namespace Z_Language
         {
             private set;
             get;
-        } = Language.En;
+        } = Language.Cn;
         public void SetLanguage(Language language)
         {
             this.language = language;

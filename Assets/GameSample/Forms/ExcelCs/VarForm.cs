@@ -12,6 +12,7 @@ using Z_Text.Form;
 using Z_DataSystem.Form;
 using Z_Map.Form;
 using Z_Map;
+using Z_Ui.Form;
 
 namespace Form
 {
@@ -52,6 +53,8 @@ public static readonly int autoUidCnt=100;
         public static Action<Data,float,float> changeVAction;
                 
         public static Action<Data,string,string> changeSAction;
+                
+        public static Action<Data,List<ClipForm.Data>,List<ClipForm.Data>> changeClipsAction;
                 
         public static Action<Data,int,int> changeUnituidAction;
                 
@@ -116,7 +119,7 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _v;
                     /// <summary>
-                    ///值
+                    ///数字值
                     ///</summary>
                     public float  v{
                                 get{return _v;}
@@ -134,7 +137,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _s;
                     /// <summary>
-                    ///值
+                    ///字符串值
                     ///</summary>
                     public string  s{
                                 get{return _s;}
@@ -146,6 +149,24 @@ public static readonly int autoUidCnt=100;
                     }
         
                 _s = value;
+                }
+                 
+                     }
+                    
+                    private List<ClipForm.Data>  _clips;
+                    /// <summary>
+                    ///对话值
+                    ///</summary>
+                    public List<ClipForm.Data>  clips{
+                                get{return _clips;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeClips(this,_clips,value); 
+                    }
+        
+                _clips = value;
                 }
                  
                      }
@@ -168,7 +189,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,int type,float v,string s,int unitUid)
+            public Data(int uid,string name,int type,float v,string s,List<ClipForm.Data> clips,int unitUid)
             {
 
              this.uid = uid;
@@ -176,18 +197,19 @@ public static readonly int autoUidCnt=100;
              this.type = type;
              this.v = v;
              this.s = s;
+             this.clips = clips;
              this.unitUid = unitUid;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,type,v,s,unitUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,type,v,s,clips,unitUid);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",4,0f,"",0);
+                   public static Data defaultData=new Data(0,"",4,0f,"",null,0);
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -267,6 +289,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("s"),
 
+                jo.Get<List<ClipForm.Data>>("clips"),
+
                 jo.Get<int>("unitUid")
                     );
 
@@ -288,6 +312,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<float>("v",data.v);
 
             jo.Set<string>("s",data.s);
+
+            jo.Set<List<ClipForm.Data>>("clips",data.clips);
 
             jo.Set<int>("unitUid",data.unitUid);
 
@@ -412,6 +438,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeSAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeClips(Data superData,List<ClipForm.Data> oldV,List<ClipForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeClipsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

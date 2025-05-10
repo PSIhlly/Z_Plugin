@@ -12,6 +12,7 @@ using Z_Text.Form;
 using Z_DataSystem.Form;
 using Z_Map.Form;
 using Z_Map;
+using Z_Ui.Form;
 
 namespace Form
 {
@@ -181,6 +182,14 @@ namespace Form
 
                 {1210011,new Data(1210011,"num","num","数值")},
 
+                {1210012,new Data(1210012,"dialogClip","dialog clip","对话片段")},
+
+                {1210013,new Data(1210013,"value","value","值")},
+
+                {1210014,new Data(1210014,"logic","logic","逻辑")},
+
+                {1210015,new Data(1210015,"window","window","窗体")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -237,6 +246,14 @@ namespace Form
                         {"text",_DataById[1210010]},
     
                         {"num",_DataById[1210011]},
+    
+                        {"dialogClip",_DataById[1210012]},
+    
+                        {"value",_DataById[1210013]},
+    
+                        {"logic",_DataById[1210014]},
+    
+                        {"window",_DataById[1210015]},
     
                     };
     

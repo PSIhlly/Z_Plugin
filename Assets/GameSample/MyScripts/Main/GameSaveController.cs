@@ -7,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Z_ByteSerialize;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Texture;
+using Z_Ui.Form;
 using Z_UnitSystem;
 
 public class GameSaveController : Z_Controller<GameManager>
@@ -112,6 +114,35 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveEvent(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventForm.GetJaByDatas().ToString());
+        foreach (var data in EventForm.DataByUid.Values)
+        {
+            foreach (var cmd in data.cmds)
+            {
+                if (cmd.isValue && cmd.resTypes[0]==(int)ValueType.Clips&&!string.IsNullOrEmpty(cmd.constV))
+                {
+                    var jo = JObject.Parse(cmd.constV);
+                    var lst=jo.Get<List<ClipForm.Data>>(ValueType.Clips.ToString());
+                    foreach (var clip in lst)
+                    {
+                        var nm = clip.profilePicture;
+                        if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
+                        {
+                            var tex = TexAssetForm.DataByName[nm];
+                            SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
+                        }
+                        nm = clip.mainPicture;
+                        if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
+                        {
+                            var tex = TexAssetForm.DataByName[nm];
+                            SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
+                        }
+                    }
+                }
+                        
+
+
+            }
+        }
     }
     public void SaveScene(string scenePath)
     {
@@ -255,6 +286,32 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in EventForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
                 EventForm.AddData(form);
+                foreach (var cmd in form.cmds)
+                {
+                    if (cmd.isValue && cmd.resTypes[0] == (int)ValueType.Clips && !string.IsNullOrEmpty(cmd.constV))
+                    {
+                        var jo = JObject.Parse(cmd.constV);
+                        var lst = jo.Get<List<ClipForm.Data>>(ValueType.Clips.ToString());
+                        foreach (var clip in lst)
+                        {
+                            var nm = clip.profilePicture;
+                            var path = storyCoreFolder + "/" + nm;
+                            if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
+                            {
+                                AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                            }
+                            nm = clip.mainPicture;
+                            path = storyCoreFolder + "/" + nm;
+                            if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
+                            {
+                                AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                            }
+                        }
+                    }
+
+
+
+                }
             }
         }
 

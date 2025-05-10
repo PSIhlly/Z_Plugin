@@ -337,6 +337,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         EventForm.AddData(new EventForm.Data(-1, name, new List<CmdForm.Data>() { CmdForm.defaultData }, label, subLabel));
     }
+    public void ImportClipTex(Action<string> callback)
+    {
+        AssetManager.instance.SelectTex(callback:(v, nm) =>
+        {
+            callback?.Invoke(nm);
+        });
 
+    }
     #endregion
 }

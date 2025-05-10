@@ -12,6 +12,7 @@ using Z_Text.Form;
 using Z_DataSystem.Form;
 using Z_Map.Form;
 using Z_Map;
+using Z_Ui.Form;
 
 namespace Form
 {
@@ -361,7 +362,7 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"dialog",new List<int>(){2,},new List<string>(){"content",},null,"","popup",null,true,true,true,true)},
+                {1,new Data(1,"dialog",new List<int>(){7,},new List<string>(){"content",},null,"","window",null,true,true,true,true)},
 
                 {2,new Data(2,"tips",new List<int>(){2,},new List<string>(){"content",},null,"","tips",null,true,true,true,true)},
 
@@ -374,6 +375,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 {6,new Data(6,"num",null,null,new List<int>(){0,},"","value",null,true,true,true,true)},
 
                 {7,new Data(7,"text",null,null,new List<int>(){2,},"","value",null,true,true,true,true)},
+
+                {8,new Data(8,"dialogClip",null,null,new List<int>(){7,},"","value",null,true,true,true,true)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -392,11 +395,13 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
     
                         {"text",_DataByUid[7]},
     
+                        {"dialogClip",_DataByUid[8]},
+    
                     };
     
                     _DatasByLab = new Dictionary<string, List<Data>>() {
     
-                            {"popup",new List<Data>()},
+                            {"window",new List<Data>()},
         
                             {"tips",new List<Data>()},
         
@@ -408,7 +413,7 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
         
                 };
 
-                    _DatasByLab["popup"].Add(_DataByUid[1]);
+                    _DatasByLab["window"].Add(_DataByUid[1]);
 
                     _DatasByLab["tips"].Add(_DataByUid[2]);
 
@@ -421,6 +426,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                     _DatasByLab["value"].Add(_DataByUid[6]);
 
                     _DatasByLab["value"].Add(_DataByUid[7]);
+
+                    _DatasByLab["value"].Add(_DataByUid[8]);
 
 
             childInitAction?.Invoke();

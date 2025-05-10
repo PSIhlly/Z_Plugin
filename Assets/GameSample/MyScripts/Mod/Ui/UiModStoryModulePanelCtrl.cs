@@ -43,7 +43,7 @@ namespace Ui.ModStory
             {
                 UiManager.instance.ShowUi<UiModStoryEventCtrl>();
 
-            });
+            }); 
         }
 
 

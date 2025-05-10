@@ -14,10 +14,15 @@ public class DialogCmd : CmdBase
     private float localProgress;
     public override CmdRes Execute(CmdForm.Data self,VarForm.Data[] prs,float progress)
     {
-        if(localProgress==0)
+        if (prs[0].clips.Count==0)
+        {
+            new CmdRes();
+        }
+        if (localProgress==0)
         {
             localProgress = 0.1f;
-            DialogManager.instance.Begin(new List<string>() { prs[0].s }, new List<string>() { prs[0].s }, new List<Sprite>() { TextureHelper.transparentSprite }, new List<Sprite>() { TextureHelper.transparentSprite },
+
+            DialogManager.instance.Begin(prs[0].clips,
            
                 () => {  localProgress = 1; });
         }

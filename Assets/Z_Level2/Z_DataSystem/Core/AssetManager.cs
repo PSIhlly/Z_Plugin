@@ -13,11 +13,7 @@ namespace Z_DataSystem.Form
     {
         Float = 0,
         Bool = 1,
-        String = 2,
-        Unit = 3,
-        Object=4,
-        Action=5,
-        Image=6,
+        String = 2
     }
 
     public partial class ParamForm
@@ -197,7 +193,7 @@ namespace Z_DataSystem
             return res;
         }
 
-        public void SelectTex(Vector2Int forceSize, Action<Texture2D,string> callback = null)
+        public void SelectTex(Vector2Int forceSize=default, Action<Texture2D,string> callback = null)
         {
             SelectTexTask task = new SelectTexTask();
             task.callback = callback;
@@ -215,6 +211,11 @@ namespace Z_DataSystem
         public void LoadTexBytes(byte[] data, string name)
         {
             var tex = TextureHelper.GetTextureByByte(data);
+            TexAssetForm.AddData(new TexAssetForm.Data(-1, name, tex));
+        }
+        public void LoadTexPath(string path, string name)
+        {
+            var tex = TextureHelper.GetTextureByPath(path);
             TexAssetForm.AddData(new TexAssetForm.Data(-1, name, tex));
         }
 

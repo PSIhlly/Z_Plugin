@@ -12,7 +12,7 @@ public class TextCmd : CmdBase
     {
         return new CmdRes()
         {
-            v = new List<VarForm.Data>() { new VarForm.Data(-1, "", 0, 0, self.constV, 0) }
+            v = new List<VarForm.Data>() { new VarForm.Data(-1, "", 0, 0, self.constV,null, 0) }
         };
     }
 

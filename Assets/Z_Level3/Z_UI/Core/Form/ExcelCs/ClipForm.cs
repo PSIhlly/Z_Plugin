@@ -8,16 +8,11 @@ using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
-using Z_Text.Form;
-using Z_DataSystem.Form;
-using Z_Map.Form;
-using Z_Map;
-using Z_Ui.Form;
 
-namespace Form
+namespace Z_Ui.Form
 {
 
-    public static partial class CharacterAnimForm
+    public static partial class ClipForm
     {
 public static readonly int autoUidCnt=100;
 
@@ -46,13 +41,13 @@ public static readonly int autoUidCnt=100;
 
         public static Action<Data,int,int> changeUidAction;
                 
-        public static Action<Data,string,string> changeNameAction;
+        public static Action<Data,string,string> changeTitleAction;
                 
-        public static Action<Data,List<(float,float)>,List<(float,float)>> changeAnimposAction;
+        public static Action<Data,string,string> changeMaintextAction;
                 
-        public static Action<Data,float,float> changeAnimtimeintervalAction;
+        public static Action<Data,string,string> changeMainpictureAction;
                 
-        public static Action<Data,List<List<string>>,List<List<string>>> changePartanimtexsnameAction;
+        public static Action<Data,string,string> changeProfilepictureAction;
                 
 
 
@@ -77,97 +72,97 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _name;
+                    private string  _title;
                     /// <summary>
-                    ///名称
+                    ///标题
                     ///</summary>
-                    public string  name{
-                                get{return _name;}
+                    public string  title{
+                                get{return _title;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeName(this,_name,value); 
+                       ChangeTitle(this,_title,value); 
                     }
         
-                _name = value;
+                _title = value;
                 }
                  
                      }
                     
-                    private List<(float,float)>  _animPos;
+                    private string  _mainText;
                     /// <summary>
-                    ///动画关键位置
+                    ///内容
                     ///</summary>
-                    public List<(float,float)>  animPos{
-                                get{return _animPos;}
+                    public string  mainText{
+                                get{return _mainText;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeAnimpos(this,_animPos,value); 
+                       ChangeMaintext(this,_mainText,value); 
                     }
         
-                _animPos = value;
+                _mainText = value;
                 }
                  
                      }
                     
-                    private float  _animTimeInterval;
+                    private string  _mainPicture;
                     /// <summary>
-                    ///动画间隔
+                    ///背景图片
                     ///</summary>
-                    public float  animTimeInterval{
-                                get{return _animTimeInterval;}
+                    public string  mainPicture{
+                                get{return _mainPicture;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeAnimtimeinterval(this,_animTimeInterval,value); 
+                       ChangeMainpicture(this,_mainPicture,value); 
                     }
         
-                _animTimeInterval = value;
+                _mainPicture = value;
                 }
                  
                      }
                     
-                    private List<List<string>>  _partAnimTexsName;
+                    private string  _profilePicture;
                     /// <summary>
-                    ///贴图名称
+                    ///头像图片
                     ///</summary>
-                    public List<List<string>>  partAnimTexsName{
-                                get{return _partAnimTexsName;}
+                    public string  profilePicture{
+                                get{return _profilePicture;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangePartanimtexsname(this,_partAnimTexsName,value); 
+                       ChangeProfilepicture(this,_profilePicture,value); 
                     }
         
-                _partAnimTexsName = value;
+                _profilePicture = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,List<(float,float)> animPos,float animTimeInterval,List<List<string>> partAnimTexsName)
+            public Data(int uid,string title,string mainText,string mainPicture,string profilePicture)
             {
 
              this.uid = uid;
-             this.name = name;
-             this.animPos = animPos;
-             this.animTimeInterval = animTimeInterval;
-             this.partAnimTexsName = partAnimTexsName;
+             this.title = title;
+             this.mainText = mainText;
+             this.mainPicture = mainPicture;
+             this.profilePicture = profilePicture;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,animPos,animTimeInterval,partAnimTexsName);
+        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPicture,profilePicture);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null,0f,null);
+                   public static Data defaultData=new Data(0,"","","","");
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -239,13 +234,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.Get<string>("title"),
 
-                jo.Get<List<(float,float)>>("animPos"),
+                jo.Get<string>("mainText"),
 
-                jo.Get<float>("animTimeInterval"),
+                jo.Get<string>("mainPicture"),
 
-                jo.Get<List<List<string>>>("partAnimTexsName")
+                jo.Get<string>("profilePicture")
                     );
 
             return data;
@@ -259,13 +254,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("name",data.name);
+            jo.Set<string>("title",data.title);
 
-            jo.Set<List<(float,float)>>("animPos",data.animPos);
+            jo.Set<string>("mainText",data.mainText);
 
-            jo.Set<float>("animTimeInterval",data.animTimeInterval);
+            jo.Set<string>("mainPicture",data.mainPicture);
 
-            jo.Set<List<List<string>>>("partAnimTexsName",data.partAnimTexsName);
+            jo.Set<string>("profilePicture",data.profilePicture);
 
             return jo;
         }
@@ -352,42 +347,42 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeName(Data superData,string oldV,string newV)
+            public static void ChangeTitle(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeNameAction?.Invoke(data,oldV,newV);
+                changeTitleAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeAnimpos(Data superData,List<(float,float)> oldV,List<(float,float)> newV)
+            public static void ChangeMaintext(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeAnimposAction?.Invoke(data,oldV,newV);
+                changeMaintextAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeAnimtimeinterval(Data superData,float oldV,float newV)
+            public static void ChangeMainpicture(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
+                changeMainpictureAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangePartanimtexsname(Data superData,List<List<string>> oldV,List<List<string>> newV)
+            public static void ChangeProfilepicture(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changePartanimtexsnameAction?.Invoke(data,oldV,newV);
+                changeProfilepictureAction?.Invoke(data,oldV,newV);
                 }
                     
             }

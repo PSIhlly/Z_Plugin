@@ -7,11 +7,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using Z_Text;
 using Z_Texture;
+using Z_ByteSerialize;
 using Z_Time;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 using Z_DataSystem.Form;
-using Type = Z_DataSystem.Form.Type;
+using Z_Ui;
+using Ui.ModStoryEventCmdClips;
+using Newtonsoft.Json.Linq;
+using Z_Ui.Form;
 
 namespace Ui.ModStoryEventCmds
 {
@@ -105,7 +109,7 @@ namespace Ui.ModStoryEventCmds
             List<Vector3> offsets = new List<Vector3>();
             foreach (var showCmd in showCmds)
             {
-                offsets.Add(new Vector3(showCmd.depth *50, 0,0));
+                offsets.Add(new Vector3(showCmd.depth * 50, 0, 0));
                 cmdCon.Add(new UiCmdParam()
                 {
                     showCmd = showCmd
@@ -138,7 +142,7 @@ namespace Ui.ModStoryEventCmds
                 {
                     var top = model.showCmd;
                     //remove empty
-                    if (model.showCmd.data.uid == 0 && model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)Type.Action))
+                    if (model.showCmd.data.uid == 0 && model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)ValueType.Action))
                     {
                         GameEventController.DeleteCmd(parent.model.data.cmds, top.oriId);
                     }
@@ -156,24 +160,45 @@ namespace Ui.ModStoryEventCmds
             });
             view.btn_name.onClick.AddListener(() =>
             {
-                if(model.showCmd.data.isValue)
+                if (model.showCmd.data.isValue)
                 {
-                    NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), false, (s) =>
+
+                    switch ((ValueType)model.showCmd.data.resTypes[0])
                     {
-                        switch((Type)model.showCmd.data.resTypes[0])
-                        {
-                            case (Type.Float):
-                                if(float.TryParse(s, out var res)) {
-                                model.showCmd.data.constV = res.ToString("#0.000");
+                        case (ValueType.Float):
+                            NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), false, (s) =>
+                            {
+                                if (float.TryParse(s, out var res))
+                                {
+                                    model.showCmd.data.constV = res.ToString("#0.000");
                                 }
-                                break;
-                            case (Type.String):
+                                parent.Refresh();
+                                return true;
+                            });
+                            break;
+                        case (ValueType.String):
+                            NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), false, (s) =>
+                            {
                                 model.showCmd.data.constV = s;
-                                break;
-                        }
-                        parent.Refresh();
-                        return true;
-                    });
+                                parent.Refresh();
+                                return true;
+                            });
+                            break;
+                        case (ValueType.Clips):
+                            UiManager.instance.ShowUi<UiModStoryEventCmdClipsCtrl>(new UiModStoryEventCmdClipsParam()
+                            {
+                                clipsJo = model.showCmd.data.constV,
+                                 func=(lst) =>
+                                {
+                                    var jo = new JObject();
+                                    jo.Set(ValueType.Clips.ToString(), lst);
+                                    model.showCmd.data.constV = jo.ToString();
+                                    parent.Refresh();
+                                    return true;
+                                }
+                            });
+                            break;
+                    }
                 }
 
             });
@@ -181,7 +206,7 @@ namespace Ui.ModStoryEventCmds
             {
                 GameEventController.DeleteCmd(parent.model.data.cmds, model.showCmd.oriId);
                 //add empty
-                if(model.showCmd.belong!=null&&!model.showCmd.belong.data.prmTypes.Contains((int)Type.Action))
+                if (model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)ValueType.Action))
                 {
                     GameEventController.InsertCmd(parent.model.data.cmds, model.showCmd.oriId, CmdForm.defaultData);
                 }
@@ -199,9 +224,34 @@ namespace Ui.ModStoryEventCmds
         }
         public void Refresh()
         {
-            var belong = model.showCmd.belong != null&& !model.showCmd.belong.data.prmTypes.Contains((int)Type.Action) ? TextManager.instance.GetTxt(model.showCmd.belong.data.prmName[model.showCmd.prmId]) + " : " : "";
-            var value = string.IsNullOrEmpty(model.showCmd.data.constV) ? TextManager.instance.GetTxt(model.showCmd.data.name) : model.showCmd.data.constV;
+            var belong = model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)ValueType.Action) ? TextManager.instance.GetTxt(model.showCmd.belong.data.prmName[model.showCmd.prmId]) + " : " : "";
+            var value = TextManager.instance.GetTxt(model.showCmd.data.name);
+            if(model.showCmd.data.isValue)
+            {
+                switch ((ValueType)model.showCmd.data.resTypes[0])
+                {
+                    case ValueType.String:
+                    case ValueType.Float:
+                        value = model.showCmd.data.constV;
+                        break;
+                    case ValueType.Clips:
+                        if(!string.IsNullOrEmpty(model.showCmd.data.constV))
+                        {
+                            var jo=JObject.Parse(model.showCmd.data.constV);
+                            var lst = jo.Get<List<ClipForm.Data>>(ValueType.Clips.ToString());
+                            if(lst.Count>0)
+                            {
+                                var startTxt = lst[0].mainText;
+                                var endTxt = lst[lst.Count - 1].mainText;
+                                value = startTxt.Substring(0, startTxt.Length>5?5: startTxt.Length)
+                                    +"..."+ endTxt.Substring(endTxt.Length > 5 ? endTxt.Length-5 : 0, endTxt.Length > 5 ? 5 : endTxt.Length) 
+                                    + " cnt:"+lst.Count;
+                            }
+                        }
 
+                        break;
+                }
+            }
             view.txt_name.text = belong + value;
 
             view.btn_add.gameObject.SetActive(model.showCmd.data.uid == 0 || !string.IsNullOrEmpty(model.showCmd.data.lab));

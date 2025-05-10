@@ -12,7 +12,7 @@ public class NumCmd : CmdBase
     {
         return new CmdRes()
         {
-            v = new List<VarForm.Data>() { new VarForm.Data(-1,"",0, float.Parse(self.constV),null,0) }
+            v = new List<VarForm.Data>() { new VarForm.Data(-1,"",0, float.Parse(self.constV),null,null,0) }
         };
     }
 

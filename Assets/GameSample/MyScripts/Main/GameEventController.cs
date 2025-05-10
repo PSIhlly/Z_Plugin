@@ -7,9 +7,18 @@ using Z_DataSystem;
 using Z_DesignStyle;
 using Z_Map;
 using Z_UnitSystem;
-using Z_DataSystem.Form;
 using Z_Debug;
-
+public enum ValueType
+{
+    Float = 0,
+    Bool = 1,
+    String = 2,
+    Unit = 3,
+    Object = 4,
+    Action = 5,
+    Image = 6,
+    Clips=7,
+}
 public enum EventType
 {
     Global = 0,
@@ -205,6 +214,8 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
                 return new NumCmd();
             case "text":
                 return new TextCmd();
+            case "dialogClip":
+                return new DialogClipCmd();
             case "if":
                 return new IfCmd();
             case "then":
@@ -268,7 +279,7 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
             while (cmdCounnt > 0)
             {
                 id--;
-                if (lst[id].prmTypes != null && !lst[id].prmTypes.Contains((int)Type.Action))
+                if (lst[id].prmTypes != null && !lst[id].prmTypes.Contains((int)ValueType.Action))
                     cmdCounnt += lst[id].prmName.Count;
                 if (lst[id].resTypes != null)
                     cmdCounnt -= lst[id].resTypes.Count;
@@ -382,7 +393,7 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
         var initPrs = new List<VarForm.Data>();
         if (uid != -1)
         {
-            initPrs.Add(new VarForm.Data(-1, "ref", (int)Type.Unit, 0, "", uid));
+            initPrs.Add(new VarForm.Data(-1, "ref", (int)ValueType.Unit, 0, "",null, uid));
         }
         EventContentForm.AddData(new EventContentForm.Data(-1, evt.Copy(), 0, initPrs, 1));
     }

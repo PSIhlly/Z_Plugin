@@ -57,6 +57,11 @@ namespace Z_ByteSerialize
                 }
                 jo[key] = ja;
             }
+            else if (value is Enum)
+            {
+                
+                jo[key] = (int)value;
+            }
             else
             {
                 jo[key] = JToken.FromObject(value);
@@ -124,6 +129,11 @@ namespace Z_ByteSerialize
                             dic[sub.Get(tp.GetGenericArguments()[0], "k")] = sub.Get(tp.GetGenericArguments()[1], "v");
                         }
                     }
+                    return obj;
+                }
+                else if (tp.IsEnum)
+                {
+                    var obj = jo.Get<int>(key);
                     return obj;
                 }
                 else

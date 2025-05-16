@@ -52,7 +52,7 @@ namespace Ui.ModStoryEventCmdClips
                 if (!string.IsNullOrEmpty(param.clipsJo))
                 {
 
-                    model.clips = JObject.Parse(param.clipsJo).Get<List<ClipForm.Data>>(ValueType.Clips.ToString());
+                    model.clips = JObject.Parse(param.clipsJo).Get<List<ClipForm.Data>>(EvtValType.Clips.ToString());
                 }
                 else
                     model.clips = new List<ClipForm.Data>();

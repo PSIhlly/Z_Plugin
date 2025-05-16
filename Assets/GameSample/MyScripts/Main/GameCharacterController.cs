@@ -16,6 +16,7 @@ public static partial class GlobalMaxSettings
     public const int CHARACTER_ANIM_MAX = 10;
     public const int CHARACTER_PART_MAX = 2;
     public const int CHARACTER_PARAM_MAX = 100000;
+    public const int ITEM_PARAM_MAX = 100000;
 
 }
 public static partial class GlobalDataHelper

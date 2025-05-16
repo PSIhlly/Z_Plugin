@@ -52,6 +52,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeCharacternameAction;
                 
+        public static Action<Data,List<int>,List<int>> changeBagAction;
+                
 
 
         public partial class Data
@@ -129,24 +131,44 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,string characterName)
+                    private List<int>  _bag;
+                    /// <summary>
+                    ///±³°ü£¨µÀ¾ßuid£©
+                    ///</summary>
+                    public List<int>  bag{
+                                get{return _bag;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeBag(this,_bag,value); 
+                    }
+        
+                _bag = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,string characterName,List<int> bag)
             {
 
              this.uid = uid;
              this.sceneId = sceneId;
              this.pos = pos;
              this.characterName = characterName;
+             this.bag = bag;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterName);
+        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterName,new List<int>(bag));
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,0,Vector3.zero,"");
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -222,7 +244,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<Vector3>("pos"),
 
-                jo.Get<string>("characterName")
+                jo.Get<string>("characterName"),
+
+                jo.Get<List<int>>("bag")
                     );
 
             return data;
@@ -241,6 +265,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<Vector3>("pos",data.pos);
 
             jo.Set<string>("characterName",data.characterName);
+
+            jo.Set<List<int>>("bag",data.bag);
 
             return jo;
         }
@@ -353,6 +379,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeCharacternameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBag(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBagAction?.Invoke(data,oldV,newV);
                 }
                     
             }

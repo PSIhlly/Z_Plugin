@@ -6,6 +6,7 @@ using UnityEngine;
 using Z_ByteSerialize;
 using Z_Map.Form;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Map
 {
@@ -44,7 +45,7 @@ namespace Z_Map
                 return;
             lastUpdateFrame = Time.frameCount;
 
-            if (data.updateType == (int)UpdateType.Always || isShowing)
+            if (data.updateType == UpdateType.Always || isShowing)
             {
                 //nav
                 if (data.navEnabled)

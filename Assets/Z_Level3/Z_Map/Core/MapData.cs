@@ -106,7 +106,7 @@ namespace Z_Map
             if (mapXZ2Y.ContainsKey((data.mapPos.x, data.mapPos.z)))
                 mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Remove(data.mapPos.y);
         }
-
+        #region unit
         public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)
         {
             var data = GetNewTile(mapPos, prms);
@@ -127,6 +127,19 @@ namespace Z_Map
             RegisterNewCharacter(data);
             return data;
         }
+        public void RemoveTile(TileUnitForm.Data data)
+        {
+            UnregisterObject(data);
+        }
+        public void RemoveObject(ObjectUnitForm.Data data)
+        {
+            UnregisterObject(data);
+        }
+        public void RemoveCharacter(CharacterUnitForm.Data data)
+        {
+            UnregisterCharacter(data);
+        }
+        #endregion
 
         public virtual JObject GetJsonData()
         {
@@ -161,6 +174,18 @@ namespace Z_Map
         public virtual List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
         {
             return ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
+        }
+        public virtual void UnregisterObject(TileUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+        public virtual void UnregisterCharacter(CharacterUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+        public virtual void UnregisterObject(ObjectUnitForm.Data data)
+        {
+            data.unit.Remove();
         }
 
         public virtual TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)

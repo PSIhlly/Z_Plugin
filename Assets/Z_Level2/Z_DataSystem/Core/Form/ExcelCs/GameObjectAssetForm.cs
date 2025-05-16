@@ -93,7 +93,8 @@ namespace Z_DataSystem.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",null);
+                   private static Data _defaultData=new Data(0,"",null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;

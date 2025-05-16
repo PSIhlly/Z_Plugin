@@ -6,14 +6,18 @@ using System.Drawing.Printing;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_UnitSystem.Form;
-
-namespace Z_UnitSystem
+namespace Z_UnitSystem.Form
 {
     public enum UpdateType
     {
         ShowOnly,
         Always,
     }
+}
+namespace Z_UnitSystem
+{
+
+   
 
     public class Unit
     {

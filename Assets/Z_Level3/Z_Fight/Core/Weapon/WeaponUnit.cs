@@ -8,6 +8,7 @@ using Z_Debug;
 using Z_Fight.Form;
 using Z_Map;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Fight
 {
@@ -95,7 +96,7 @@ namespace Z_Fight
 
         public override void UpdateInfo()
         {
-            if ((data.updateType == (int)UpdateType.Always || isShowing))
+            if ((data.updateType == UpdateType.Always || isShowing))
             {
                 //持握姿势影响
                 data.pos = superUnit.data.pos;

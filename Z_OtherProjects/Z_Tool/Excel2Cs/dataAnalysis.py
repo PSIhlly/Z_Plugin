@@ -47,7 +47,7 @@ def get_default_form(type):
     return 'null'
 def translate_string_to_cs(content):
     return content.replace('\\','\\\\')
-def get_value(type,value):
+def get_value(type,value,config):
     #拆外壳
     value = get_naked(value)
     #转nan
@@ -63,7 +63,7 @@ def get_value(type,value):
          for i in range(len(sub_types)):
             if len(sub_values) - 1 <= i:
                 sub_values.append(get_default_form(sub_types[i]))
-            content+=get_value(sub_types[i],sub_values[i]) + ','
+            content+=get_value(sub_types[i],sub_values[i],config) + ','
          content = content[0:-1] + ')'
          return content
     elif type[0] == '<':
@@ -75,7 +75,7 @@ def get_value(type,value):
          for i in range(len(sub_types)):
             if len(sub_values) - 1 <= i:
                 sub_values.append(get_default_form(sub_types[i]))
-            content+=get_value(sub_types[i],sub_values[i]) + ','
+            content+=get_value(sub_types[i],sub_values[i],config) + ','
          content = content[0:-1]
          return content
     elif type[0:4] == 'List':
@@ -84,13 +84,13 @@ def get_value(type,value):
          values = get_naked_subs(value)
          content = ''
          for v in values:
-             content+=get_value(type[4:],v) + ','
+             content+=get_value(type[4:],v,config) + ','
          return 'new ' + type + '(){' + content + '}'
     elif type[0:10] == 'Dictionary':
          values = get_naked_subs(value)
          content = ''
          for v in values:
-             content+='{' + get_value(type[10:],v) + '},'
+             content+='{' + get_value(type[10:],v,config) + '},'
          return 'new ' + type + '(){' + content + '}'
     #basic type
     elif type == 'float':
@@ -102,6 +102,17 @@ def get_value(type,value):
             return 'false'
     elif type == 'string':
         return '"' + str(translate_string_to_cs(value)) + '"'
+    elif 'enum:'+type in config:
+        if value=='null':
+            return 'default'
+        return type+'.'+value
     else:
-        return value
+        data_strings = [s for s in config if s is not None and s.startswith('data:'+type)]
+        if len(data_strings)>0:
+            if value!='null':
+                return data_strings[0][5:]+f'[{value}].Copy()'
+            return type[:-4]+'defaultData'
+
+        else:
+            return value
     return 'null'

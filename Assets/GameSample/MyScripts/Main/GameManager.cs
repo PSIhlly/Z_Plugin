@@ -51,8 +51,6 @@ public class GameManager : Z_MonoManager<GameManager>
     public override void Init()
     {
 
-
-
         base.Init();
 
         utilCtrl = new GameUtilController(this);

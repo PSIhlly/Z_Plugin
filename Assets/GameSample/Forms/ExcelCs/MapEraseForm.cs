@@ -139,7 +139,8 @@ private set{
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,false,false,false);
+                   private static Data _defaultData=new Data(0,"","",false,false,false,false);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -249,13 +250,13 @@ private set{
 
                 jo.Get<string>("icon"),
 
-                    defaultData.terrain,
+                    _defaultData.terrain,
 
-                    defaultData.item,
+                    _defaultData.item,
 
-                    defaultData.character,
+                    _defaultData.character,
 
-                    defaultData.texture
+                    _defaultData.texture
                     );
 
             return data;

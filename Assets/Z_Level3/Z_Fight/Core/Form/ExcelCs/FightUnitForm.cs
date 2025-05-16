@@ -93,7 +93,7 @@ namespace Z_Fight.Form
                 
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
-        public static Action<Data,int,int> changeUpdatetypeAction;
+        public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
                 
         public static Action<Data,string,string> changeExtraAction;
                 
@@ -293,7 +293,7 @@ namespace Z_Fight.Form
                  
                      }
                     
-            public Data(int uid,string name,Dictionary<int,int> itemIdCountDic,List<int> curUsingWeaponsSid,List<int> curReloadWeaponsSid,float alertDistance,float hp,float hpMax,float defence,int targetFightUid,float reloadTime,bool isMine,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
+            public Data(int uid,string name,Dictionary<int,int> itemIdCountDic,List<int> curUsingWeaponsSid,List<int> curReloadWeaponsSid,float alertDistance,float hp,float hpMax,float defence,int targetFightUid,float reloadTime,bool isMine,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
@@ -321,12 +321,13 @@ namespace Z_Fight.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,itemIdCountDic,curUsingWeaponsSid,curReloadWeaponsSid,alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<int,int>(itemIdCountDic),new List<int>(curUsingWeaponsSid),new List<int>(curReloadWeaponsSid),alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,extra);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",new Dictionary<int,int>(){},null,null,0f,0f,0f,0f,0,0f,false,"",Vector3.zero,Vector3.zero,Vector3.zero,0,"");
+                   private static Data _defaultData=new Data(0,"",new Dictionary<int,int>(){},null,null,0f,0f,0f,0f,0,0f,false,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -436,7 +437,7 @@ namespace Z_Fight.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType"),
+                jo.Get<UpdateType>("updateType"),
 
                 jo.Get<string>("extra")
                     );
@@ -482,7 +483,7 @@ namespace Z_Fight.Form
 
             jo.Set<Vector3>("scale",data.scale);
 
-            jo.Set<int>("updateType",data.updateType);
+            jo.Set<UpdateType>("updateType",data.updateType);
 
             jo.Set<string>("extra",data.extra);
 
@@ -721,7 +722,7 @@ UnitForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            public static void ChangeUpdatetype(UnitForm.Data superData,UpdateType oldV,UpdateType newV)
             {
                 if(superData is Data data)
                 {

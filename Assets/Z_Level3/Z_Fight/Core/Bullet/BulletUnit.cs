@@ -6,6 +6,7 @@ using UnityEngine;
 using Z_ByteSerialize;
 using Z_Fight.Form;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Fight
 {
@@ -42,7 +43,7 @@ namespace Z_Fight
             }
             data.pos = (data.pos + dis * dir);
             data.rangeLast -= dis;
-            if (data.updateType == (int)UpdateType.Always || isShowing)
+            if (data.updateType == UpdateType.Always || isShowing)
             {
                 ins.transform.position = data.pos;
             }

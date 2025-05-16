@@ -118,7 +118,8 @@ private set{
             
         }
 
-                   public static Data defaultData=new Data(0,"","","",0f);
+                   private static Data _defaultData=new Data(0,"","","",0f);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -234,7 +235,7 @@ private set{
 
                 jo.Get<string>("icon"),
 
-                    defaultData.step
+                    _defaultData.step
                     );
 
             return data;

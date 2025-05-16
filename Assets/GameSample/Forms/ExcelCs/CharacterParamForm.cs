@@ -66,7 +66,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,int,int> changeValuetypeAction;
+        public static Action<Data,ValType,ValType> changeValuetypeAction;
                 
         public static Action<Data,float,float> changeMinAction;
                 
@@ -92,7 +92,7 @@ private set{
                  
                      }
                     
-            public Data(int uid,string name,int valueType,float min,float v,float max,int SpecialType):base(uid,name,valueType,min,v,max)
+            public Data(int uid,string name,ValType valueType,float min,float v,float max,int SpecialType):base(uid,name,valueType,min,v,max)
             {
 
              this.uid = uid;
@@ -112,7 +112,8 @@ private set{
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0f,0f,0f,0);
+                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f,0);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -222,7 +223,7 @@ private set{
 
                 jo.Get<string>("name"),
 
-                jo.Get<int>("valueType"),
+                jo.Get<ValType>("valueType"),
 
                 jo.Get<float>("min"),
 
@@ -230,7 +231,7 @@ private set{
 
                 jo.Get<float>("max"),
 
-                    defaultData.SpecialType
+                    _defaultData.SpecialType
                     );
 
             return data;
@@ -246,7 +247,7 @@ private set{
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<int>("valueType",data.valueType);
+            jo.Set<ValType>("valueType",data.valueType);
 
             jo.Set<float>("min",data.min);
 
@@ -364,7 +365,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeValuetype(ParamForm.Data superData,int oldV,int newV)
+            public static void ChangeValuetype(ParamForm.Data superData,ValType oldV,ValType newV)
             {
                 if(superData is Data data)
                 {

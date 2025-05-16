@@ -8,7 +8,7 @@ using Z_DesignStyle;
 using Z_Map;
 using Z_UnitSystem;
 using Z_Debug;
-public enum ValueType
+public enum EvtValType
 {
     Float = 0,
     Bool = 1,
@@ -139,6 +139,7 @@ namespace Z_Map
             {
                 if (_evtSet == null)
                 {
+                    bool needCreate = true;
                     _evtSet = new Dictionary<string, EventTriggerForm.Data>();
                     if (!string.IsNullOrEmpty(data.extra))
                     {
@@ -151,16 +152,32 @@ namespace Z_Map
                                 var data = EventTriggerForm.GetDataByJo((JObject)subJo);
                                 _evtSet[data.name] = data;
                             }
+                            needCreate = false;
+                        }
+                    }
+                    if(needCreate)
+                    {
+                        if (this is CharacterUnit)
+                        {
+                            _evtSet = GameEventController.GetEventTriggerDic(EventType.Character);
+                        }
+                        else if (this is ObjectUnit)
+                        {
+                            _evtSet = GameEventController.GetEventTriggerDic(EventType.Object);
+                        }
+                        else if (this is TileUnit)
+                        {
+                            _evtSet = GameEventController.GetEventTriggerDic(EventType.Tile);
                         }
                     }
                 }
+                
                 return _evtSet;
             }
             set
             {
-                var jo = JObject.Parse(data.extra);
-                if (jo == null)
-                    jo = new JObject();
+                
+                var jo = string.IsNullOrEmpty(data.extra)?new JObject():JObject.Parse(data.extra);
 
                 JArray ja = new JArray();
                 jo[evtKey] = ja;
@@ -180,7 +197,7 @@ namespace Z_Map
         {
             if (evtDic.ContainsKey(name) && EventForm.DataByName.ContainsKey(evtDic[name].evt))
             {
-                GameManager.instance.evtCtrl.Execute(EventForm.DataByName[evtDic[name].evt], data.uid);
+                GameManager.instance.evtCtrl.Execute(EventForm.DataByName[evtDic[name].evt], productInfo.Item2);
             }
         }
 
@@ -248,7 +265,7 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
         if (cmd.prmName != null)
         {
             for (int i = 0; i < cmd.prmName.Count; i++)
-                InsertCmd(lst, id, CmdForm.defaultData.Copy());
+                InsertCmd(lst, id, CmdForm.defaultData);
         }
     }
     public static void DeleteCmd(List<CmdForm.Data> lst, int id)
@@ -279,7 +296,7 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
             while (cmdCounnt > 0)
             {
                 id--;
-                if (lst[id].prmTypes != null && !lst[id].prmTypes.Contains((int)ValueType.Action))
+                if (lst[id].prmTypes != null && !lst[id].prmTypes.Contains(EvtValType.Action))
                     cmdCounnt += lst[id].prmName.Count;
                 if (lst[id].resTypes != null)
                     cmdCounnt -= lst[id].resTypes.Count;
@@ -317,19 +334,19 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
             {
                 case EventType.Global:
                     if (data.globalEnable)
-                        lst.Add(data);
+                        lst.Add(data.Copy());
                     break;
                 case EventType.Tile:
                     if (data.terrainEnable)
-                        lst.Add(data);
+                        lst.Add(data.Copy());
                     break;
                 case EventType.Object:
                     if (data.objectEnable)
-                        lst.Add(data);
+                        lst.Add(data.Copy());
                     break;
                 case EventType.Character:
                     if (data.characterEnable)
-                        lst.Add(data);
+                        lst.Add(data.Copy());
                     break;
             }
         }
@@ -389,13 +406,8 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
     }
     public void Execute(EventForm.Data evt, int uid = -1)
     {
-
         var initPrs = new List<VarForm.Data>();
-        if (uid != -1)
-        {
-            initPrs.Add(new VarForm.Data(-1, "ref", (int)ValueType.Unit, 0, "",null, uid));
-        }
-        EventContentForm.AddData(new EventContentForm.Data(-1, evt.Copy(), 0, initPrs, 1));
+        EventContentForm.AddData(new EventContentForm.Data(-1, evt.Copy(), 0, initPrs, 1, uid));
     }
 
     public List<ShowCmd> GetShowCmds(List<CmdForm.Data> cmds)

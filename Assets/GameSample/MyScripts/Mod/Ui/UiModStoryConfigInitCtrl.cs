@@ -24,10 +24,13 @@ namespace Ui.ModStoryConfig.ModStoryConfigInit
             {
                 List<string> lst=new List<string>();
                 List<Sprite> spriteLst=new List<Sprite>();
-                foreach(var data in CharacterProductForm.DataByName.Values)
+                if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
                 {
-                    lst.Add(data.name);
-                    spriteLst.Add(TexAssetForm.DataByName[data.avatarTexName].sprite);
+                    foreach (var data in CharacterProductForm.DatasByIsproto[true])
+                    {
+                        lst.Add(data.name);
+                        spriteLst.Add(TexAssetForm.DataByName[data.avatarTexName].sprite);
+                    }
                 }
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
                     true, (id) =>

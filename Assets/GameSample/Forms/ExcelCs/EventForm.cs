@@ -162,12 +162,13 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,cmds,lab,subLab);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<CmdForm.Data>(cmds),lab,subLab);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null,"","");
+                   private static Data _defaultData=new Data(0,"",null,"","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;

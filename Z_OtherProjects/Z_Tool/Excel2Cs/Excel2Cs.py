@@ -218,17 +218,21 @@ def create_data_handle():
          #类型构造方法设置
         con_extend_str = ':base('
         con_arg_str = ''
+
         con_copy_str= f'''
                 public Data Copy(bool sameId = true)
                 {{
         return new Data(sameId? {formInfo.id_str}:{formInfo.id_str}Chain.GetId(),'''
         con_set_str = ''
-        for key in formInfo.var_type_dic:
+        for key,val in formInfo.var_type_dic.items():
             if key is not formInfo.id_str:
-                con_copy_str+=key+','
+                if val.startswith('List') or val.startswith('Dictionary'):
+                    con_copy_str+=f'new {val}({key}),'
+                else:
+                    con_copy_str+=key+','
             if 'override' in formInfo.var_config_dic[key]:
                 con_extend_str+=key+','
-            con_arg_str+=formInfo.var_type_dic[key] + ' ' + key + ','
+            con_arg_str+=val + ' ' + key + ','
             con_set_str+=f'''
              this.{key} = {key};'''
         con_copy_str=con_copy_str[0:-1]+f''');
@@ -268,7 +272,7 @@ def assign_data_handle():
                         content="null"
                     dic[title] = str(content)
                 else:
-                    dic[title] = get_value(formInfo.var_type_dic[title],str(content))
+                    dic[title] = get_value(formInfo.var_type_dic[title],str(content),formInfo.var_config_dic[title])
                     
             formInfo.data_list.append(dic)
             last_row = cur_row
@@ -280,7 +284,8 @@ def assign_data_handle():
                 args+=data[key] + ','
             if data[formInfo.id_str]=='0':
                 formInfo.default_content_str=f'''
-                   public static Data defaultData=new Data({args[0:-1]});
+                   private static Data _defaultData=new Data({args[0:-1]});
+                   public static Data defaultData=>_defaultData.Copy();
 '''
             else:
                 var_assign+=f'''
@@ -434,7 +439,7 @@ def serialize_handle():
 '''             
             else:#不可用的取default
                 formInfo.deserialize_str+=f'''
-                    defaultData.{name},
+                    _defaultData.{name},
 '''               
 
         #去结尾,

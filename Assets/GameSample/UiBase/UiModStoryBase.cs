@@ -118,37 +118,43 @@ namespace Ui.ModStory
 
             public Btn btn_material;
             public Sta sta_material;
-            public Btn btn_item;
-            public Sta sta_item;
+            public Btn btn_obstacle;
+            public Sta sta_obstacle;
             public Btn btn_character;
             public Sta sta_character;
             public Btn btn_config;
             public Sta sta_config;
             public Btn btn_event;
             public Sta sta_event;
+            public Btn btn_item;
+            public Sta sta_item;
             public Txt txt_material;
-            public Txt txt_item;
+            public Txt txt_obstacle;
             public Txt txt_character;
             public Txt txt_config;
             public Txt txt_event;
+            public Txt txt_item;
         public UiModStoryModulePanelView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_material = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             sta_material = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_item = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_item = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            btn_obstacle = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            sta_obstacle = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             btn_character = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             sta_character = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             btn_config = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             sta_config = uiHolder.elementTrsLst[7].GetComponent<Sta>();
             btn_event = uiHolder.elementTrsLst[8].GetComponent<Btn>();
             sta_event = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            txt_material = uiHolder.elementTrsLst[10].GetComponent<Txt>();
-            txt_item = uiHolder.elementTrsLst[11].GetComponent<Txt>();
-            txt_character = uiHolder.elementTrsLst[12].GetComponent<Txt>();
-            txt_config = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            txt_event = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            btn_item = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_item = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            txt_material = uiHolder.elementTrsLst[12].GetComponent<Txt>();
+            txt_obstacle = uiHolder.elementTrsLst[13].GetComponent<Txt>();
+            txt_character = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            txt_config = uiHolder.elementTrsLst[15].GetComponent<Txt>();
+            txt_event = uiHolder.elementTrsLst[16].GetComponent<Txt>();
+            txt_item = uiHolder.elementTrsLst[17].GetComponent<Txt>();
         }
 
     }

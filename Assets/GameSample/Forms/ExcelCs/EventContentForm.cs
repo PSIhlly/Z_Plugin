@@ -54,6 +54,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,float,float> changeProgressAction;
                 
+        public static Action<Data,int,int> changeUserAction;
+                
 
 
         public partial class Data
@@ -162,7 +164,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,EventForm.Data evt,int cur,List<VarForm.Data> stack,float progress)
+                    private int  _user;
+                    /// <summary>
+                    ///µ÷ÓÃÕßProductuid
+                    ///</summary>
+                    public int  user{
+                                get{return _user;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUser(this,_user,value); 
+                    }
+        
+                _user = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,EventForm.Data evt,int cur,List<VarForm.Data> stack,float progress,int user)
             {
 
              this.uid = uid;
@@ -170,6 +190,7 @@ public static readonly int autoUidCnt=100;
              this.cur = cur;
              this.stack = stack;
              this.progress = progress;
+             this.user = user;
 
                     _ctrl=new EventContentController(this);
 
@@ -177,12 +198,13 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),evt,cur,stack,progress);
+        return new Data(sameId? uid:uidChain.GetId(),evt,cur,new List<VarForm.Data>(stack),progress,user);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,null,0,null,0f);
+                   private static Data _defaultData=new Data(0,null,0,null,0f,0);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -260,7 +282,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<VarForm.Data>>("stack"),
 
-                jo.Get<float>("progress")
+                jo.Get<float>("progress"),
+
+                jo.Get<int>("user")
                     );
 
             return data;
@@ -281,6 +305,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<List<VarForm.Data>>("stack",data.stack);
 
             jo.Set<float>("progress",data.progress);
+
+            jo.Set<int>("user",data.user);
 
             return jo;
         }
@@ -403,6 +429,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeProgressAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUser(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUserAction?.Invoke(data,oldV,newV);
                 }
                     
             }

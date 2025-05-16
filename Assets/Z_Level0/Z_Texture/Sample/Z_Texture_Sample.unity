@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   members:
-  - {fileID: 21300000, guid: 7b0b31222dfd7834facbcc0917ce082d, type: 3}
+  - {fileID: 21300000, guid: 8076b91b8d375e349884f54f7bc538b0, type: 3}
   - {fileID: 21300000, guid: 73d9ccc282df66a47a3c8d0d6928ed83, type: 3}
   - {fileID: 21300000, guid: 2667629a66e85954c94001a144db6d7d, type: 3}
   - {fileID: 21300000, guid: a4137cdc8c059744d8227e83019abcb1, type: 3}
@@ -219,6 +219,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -777,7 +778,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit

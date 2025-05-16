@@ -44,7 +44,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             GameManager.instance.saveCtrl.LoadMaterial(storyFolder + "/core");
             GameManager.instance.saveCtrl.LoadObject(storyFolder + "/core");
-            GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core"); 
+            GameManager.instance.saveCtrl.LoadCharacter(storyFolder + "/core");
+            GameManager.instance.saveCtrl.LoadItem(storyFolder + "/core");
+            
             GameManager.instance.saveCtrl.LoadEvent(storyFolder + "/core"); 
             GameManager.instance.saveCtrl.LoadConfig(storyFolder + "/core");
         }else //初始化
@@ -54,7 +56,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterParamForm.AddData(hpParamData);
             CharacterParamForm.AddData(speedParamData);
             CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","",new Dictionary<string, CharacterParamForm.Data>() { {"Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } },true,new Dictionary<string, CharacterAnimForm.Data>(),"","","Speed","Hp"));
-            ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500), "Player"));
+            ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500), "Player",new List<int>()));
             
             var data = new GameMapData();
             data.Init();

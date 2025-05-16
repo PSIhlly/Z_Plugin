@@ -160,7 +160,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     var newMapPos = new Vector3Int(x, hitPos.y, z);
                                     if (MapManager.instance.utilCtrl.InLimit(newMapPos))
                                     {
-                                        MapManager.instance.AddMap(newMapPos);
+                                        MapManager.instance.AddTile(newMapPos);
                                     }
                                     else
                                     {
@@ -276,7 +276,12 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     }
                                     if (allow)
                                     {
-                                        var newItemData = MapManager.instance.AddItem(finalPos, itemData.name);
+                                        object[] prms = null;
+                                        if(itemData.isItem)
+                                        {
+                                            prms = new object[] { (itemData.name,-1) };
+                                        }
+                                        var newItemData = MapManager.instance.AddItem(finalPos, itemData.name, prms);
                                         newItemData.isObstacle = true;
                                         newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
                                         newItemData.name = itemData.name;
@@ -294,7 +299,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
                                 if (eraseData.terrain)
                                 {
-                                    mapData.unit.Remove();
+                                    MapManager.instance.RemoveTile(mapData);
                                 }
                                 else if (eraseData.item)
                                 {
@@ -302,7 +307,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     {
                                         if (sub is ObjectUnit item)
                                         {
-                                            sub.Remove();
+                                            MapManager.instance.RemoveObject(item.data);
                                         }
                                     }
                                 }

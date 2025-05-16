@@ -179,7 +179,8 @@ public class MapManager : Z_MonoManager<MapManager>
         navigationCtrl.Build();
         mainGo.SetActive(true);
     }
-    public TileUnitForm.Data AddMap(Vector3Int mapPos, object[] prms = null)
+    #region unit
+    public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)
     {
         return data.AddTile(mapPos, prms);
     }
@@ -207,7 +208,19 @@ public class MapManager : Z_MonoManager<MapManager>
         this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
         return data;
     }
-
+    public void RemoveTile(TileUnitForm.Data form)
+    {
+        data.RemoveTile(form);
+    }
+    public void RemoveCharacter(CharacterUnitForm.Data form)
+    {
+        data.RemoveCharacter(form);
+    }
+    public void RemoveObject(ObjectUnitForm.Data form)
+    {
+        data.RemoveObject(form);
+    }
+    #endregion
     public void SetPos(Vector3 curCenterPos)
     {
         this.curCenterPos = curCenterPos;

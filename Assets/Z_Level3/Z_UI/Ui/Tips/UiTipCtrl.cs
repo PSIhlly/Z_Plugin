@@ -30,9 +30,10 @@ namespace Ui.Notify
                 view.txt_.text = param.info.content;
                 model.info = param.info;
             }
+            TimeManager.instance.CancelTimer(model.removeTimer);
             model.removeTimer = TimeManager.instance.StartTimer(param.info.time - Time.time,0, () =>
             {
-                Close();
+                parent.RemoveTip(model.info.id);
                 return true;
             }, uiHolder);
             TimeManager.instance.AddNextBigFrameAction(()=>
@@ -41,11 +42,6 @@ namespace Ui.Notify
                 LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
             }, gameObject);
             
-        }
-        public override void Close()
-        {
-            base.Close();
-            parent.RemoveTip(model.info.id);
         }
 
     }

@@ -62,133 +62,71 @@ namespace Form
                 
         public static Action<Data,string,string> changeIconAction;
                 
-        public static Action<Data,bool,bool> changeIsobstacleAction;
+        public static Action<Data,MapModelForm.Data,MapModelForm.Data> changeModelAction;
                 
-        public static Action<Data,List<string>,List<string>> changeSubprefabunitnameAction;
-                
-        public static Action<Data,List<Vector3>,List<Vector3>> changeSubprefabunitposAction;
-                
-        public static Action<Data,List<Vector3>,List<Vector3>> changeSubprefabunitscaleAction;
-                
-        public static Action<Data,List<string>,List<string>> changeSubunittexsnameAction;
+        public static Action<Data,bool,bool> changeIsitemAction;
                 
 
 
         public partial class Data : MapBaseForm.Data
         {
 
-                    private bool  _isObstacle;
+                    private MapModelForm.Data  _model;
                     /// <summary>
-                    ///是否可通行
+                    ///模型
                     ///</summary>
-                    public bool  isObstacle{
-                                get{return _isObstacle;}
+                    public MapModelForm.Data  model{
+                                get{return _model;}
  set{
 
                     if(_DataById!=null&&_DataById.ContainsValue(this))
                     {
-                       ChangeIsobstacle(this,_isObstacle,value); 
+                       ChangeModel(this,_model,value); 
                     }
         
-                _isObstacle = value;
+                _model = value;
                 }
                  
                      }
                     
-                    private List<string>  _subPrefabUnitName;
+                    private bool  _isItem;
                     /// <summary>
-                    ///子预制件
+                    ///是物品
                     ///</summary>
-                    public List<string>  subPrefabUnitName{
-                                get{return _subPrefabUnitName;}
+                    public bool  isItem{
+                                get{return _isItem;}
  set{
 
                     if(_DataById!=null&&_DataById.ContainsValue(this))
                     {
-                       ChangeSubprefabunitname(this,_subPrefabUnitName,value); 
+                       ChangeIsitem(this,_isItem,value); 
                     }
         
-                _subPrefabUnitName = value;
+                _isItem = value;
                 }
                  
                      }
                     
-                    private List<Vector3>  _subPrefabUnitPos;
-                    /// <summary>
-                    ///子预制件坐标
-                    ///</summary>
-                    public List<Vector3>  subPrefabUnitPos{
-                                get{return _subPrefabUnitPos;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeSubprefabunitpos(this,_subPrefabUnitPos,value); 
-                    }
-        
-                _subPrefabUnitPos = value;
-                }
-                 
-                     }
-                    
-                    private List<Vector3>  _subPrefabUnitScale;
-                    /// <summary>
-                    ///子预制件缩放
-                    ///</summary>
-                    public List<Vector3>  subPrefabUnitScale{
-                                get{return _subPrefabUnitScale;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeSubprefabunitscale(this,_subPrefabUnitScale,value); 
-                    }
-        
-                _subPrefabUnitScale = value;
-                }
-                 
-                     }
-                    
-                    private List<string>  _subUnitTexsName;
-                    /// <summary>
-                    ///子预制件
-                    ///</summary>
-                    public List<string>  subUnitTexsName{
-                                get{return _subUnitTexsName;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeSubunittexsname(this,_subUnitTexsName,value); 
-                    }
-        
-                _subUnitTexsName = value;
-                }
-                 
-                     }
-                    
-            public Data(int id,string name,string icon,bool isObstacle,List<string> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale,List<string> subUnitTexsName):base(id,name,icon)
+            public Data(int id,string name,string icon,MapModelForm.Data model,bool isItem):base(id,name,icon)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
-             this.isObstacle = isObstacle;
-             this.subPrefabUnitName = subPrefabUnitName;
-             this.subPrefabUnitPos = subPrefabUnitPos;
-             this.subPrefabUnitScale = subPrefabUnitScale;
-             this.subUnitTexsName = subUnitTexsName;
+             this.model = model;
+             this.isItem = isItem;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,isObstacle,subPrefabUnitName,subPrefabUnitPos,subPrefabUnitScale,subUnitTexsName);
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,isItem);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false,null,new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},new List<string>(){"z_map_b$floor$0",});
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,false);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -228,7 +166,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","",false,new List<string>(){"Cube",},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},new List<string>(){"z_map_b$floor$0",})},
+                {400001,new Data(400001,"wall","",MapModelForm.defaultData,false)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -290,15 +228,9 @@ namespace Form
 
                 jo.Get<string>("icon"),
 
-                jo.Get<bool>("isObstacle"),
+                jo.Get<MapModelForm.Data>("model"),
 
-                jo.Get<List<string>>("subPrefabUnitName"),
-
-                jo.Get<List<Vector3>>("subPrefabUnitPos"),
-
-                jo.Get<List<Vector3>>("subPrefabUnitScale"),
-
-                jo.Get<List<string>>("subUnitTexsName")
+                jo.Get<bool>("isItem")
                     );
 
             return data;
@@ -316,15 +248,9 @@ namespace Form
 
             jo.Set<string>("icon",data.icon);
 
-            jo.Set<bool>("isObstacle",data.isObstacle);
+            jo.Set<MapModelForm.Data>("model",data.model);
 
-            jo.Set<List<string>>("subPrefabUnitName",data.subPrefabUnitName);
-
-            jo.Set<List<Vector3>>("subPrefabUnitPos",data.subPrefabUnitPos);
-
-            jo.Set<List<Vector3>>("subPrefabUnitScale",data.subPrefabUnitScale);
-
-            jo.Set<List<string>>("subUnitTexsName",data.subUnitTexsName);
+            jo.Set<bool>("isItem",data.isItem);
 
             return jo;
         }
@@ -440,52 +366,22 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeIsobstacle(Data superData,bool oldV,bool newV)
+            public static void ChangeModel(Data superData,MapModelForm.Data oldV,MapModelForm.Data newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIsobstacleAction?.Invoke(data,oldV,newV);
+                changeModelAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeSubprefabunitname(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeIsitem(Data superData,bool oldV,bool newV)
             {
                 if(superData is Data data)
                 {
 
-                changeSubprefabunitnameAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeSubprefabunitpos(Data superData,List<Vector3> oldV,List<Vector3> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeSubprefabunitposAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeSubprefabunitscale(Data superData,List<Vector3> oldV,List<Vector3> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeSubprefabunitscaleAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeSubunittexsname(Data superData,List<string> oldV,List<string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeSubunittexsnameAction?.Invoke(data,oldV,newV);
+                changeIsitemAction?.Invoke(data,oldV,newV);
                 }
                     
             }

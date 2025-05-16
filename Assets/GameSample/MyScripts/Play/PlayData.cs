@@ -11,15 +11,15 @@ using Z_Debug;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
 
-    public class PlayData
-    {
-        public ProgressForm.Data progress;
+public class PlayData
+{
+    public ProgressForm.Data progress;
 
 
 
 
     public PlayData(string progressData)
-        {
+    {
 
         progress = ProgressForm.GetDataByJo(JObject.Parse(progressData));
 
@@ -29,24 +29,27 @@ using Z_UnitSystem.Form;
         progress = progressData;
     }
     public JObject GetJsonData()
-        {
-            return ProgressForm.GetJoByData(progress);
-        }
-        public PlayData()
-        {
+    {
+        return ProgressForm.GetJoByData(progress);
+    }
+    public PlayData()
+    {
         Debug.LogError("No character!!!");
         string nm = "";
-        foreach(var c in CharacterProductForm.DataByName.Values)
+        if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
         {
-            nm = c.name;
+            foreach (var c in CharacterProductForm.DatasByIsproto[true])
+            {
+                nm = c.name;
+            }
         }
-            progress = new ProgressForm.Data(1,1,Vector3.zero, nm);
-        }
-        public void Unload()
-        {
-         
-        }
-       
-       
+        progress = new ProgressForm.Data(1, 1, Vector3.zero, nm,new List<int>());
     }
+    public void Unload()
+    {
+
+    }
+
+
+}
 

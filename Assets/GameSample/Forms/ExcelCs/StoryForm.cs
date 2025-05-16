@@ -120,12 +120,13 @@ public static readonly int autoIdCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,sceneIds);
+        return new Data(sameId? id:idChain.GetId(),name,new List<int>(sceneIds));
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null);
+                   private static Data _defaultData=new Data(0,"",null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;

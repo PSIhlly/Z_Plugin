@@ -11,6 +11,7 @@ using Ui.ModStoryObject;
 using Ui.ModStoryCharacter;
 using Ui.ModStoryConfig;
 using Ui.ModStoryEvent;
+using Ui.ModStoryItem;
 
 namespace Ui.ModStory
 {
@@ -24,7 +25,7 @@ namespace Ui.ModStory
                 UiManager.instance.ShowUi<UiModStoryMaterialCtrl>();
 
             });
-            view.btn_item.onClick.AddListener(() =>
+            view.btn_obstacle.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModStoryObjectCtrl>();
 
@@ -43,7 +44,12 @@ namespace Ui.ModStory
             {
                 UiManager.instance.ShowUi<UiModStoryEventCtrl>();
 
-            }); 
+            });
+            view.btn_item.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModStoryItemCtrl>();
+
+            });
         }
 
 

@@ -2,7 +2,7 @@
 
 
 class FormInfo:
-    path_output=""
+    path_output = ""
     
     df = None
 
@@ -13,10 +13,10 @@ class FormInfo:
         self.var_type_dic = {}
         self.data_list = []
         self.name = 'default'
-        self.id_cnt= 100
+        self.id_cnt = 100
         
-        self.file_namespace=file_namespace
-        self.file_using=file_using
+        self.file_namespace = file_namespace
+        self.file_using = file_using
 
         self.declare_sub_str = f""""""
         self.declare_str = f""""""
@@ -30,12 +30,12 @@ class FormInfo:
         self.clear_str = f""""""
         self.content_str = f""""""
         self.extend_data_str = ''
-        self.change_op_str=''
+        self.change_op_str = ''
 
         self.id_str = 'id'
 
     def refresh_namespace_str(self):
-       self.namespace_str= f"""using UnityEngine;
+       self.namespace_str = f"""using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
@@ -49,14 +49,14 @@ namespace {self.file_namespace}
 {{
 """
     def refresh_init(self):
-        self.init_op_base_str=f'''
+        self.init_op_base_str = f'''
             InitInternal();'''
-        self.init_internal_base_str=""
-        self.init_children_action_str=""
-        self.init_change_action_str=""
+        self.init_internal_base_str = ""
+        self.init_children_action_str = ""
+        self.init_change_action_str = ""
 
-        if self.extend_data_str!='':
-            self.init_op_base_str=f"""
+        if self.extend_data_str != '':
+            self.init_op_base_str = f"""
             {self.extend_data_str}Form.Init();
 """
             self.init_children_action_str+=f'''
@@ -75,7 +75,7 @@ namespace {self.file_namespace}
 '''
 
     def refresh_add_remove(self):
-        self.remove_add_children_action_str=""
+        self.remove_add_children_action_str = ""
         self.add_remove_clear_op_str = ""
 
         add_op_base_str = ""
@@ -85,9 +85,9 @@ namespace {self.file_namespace}
 
         if 'write' in self.var_config_dic[self.id_str]:
             if self.extend_data_str != '':
-                add_op_base_str=self.extend_data_str+"Form.AddData(data);"
-                remove_op_base_str=self.extend_data_str+f"""Form.RemoveData({self.id_str});"""
-                self.remove_add_children_action_str=f'''
+                add_op_base_str = self.extend_data_str + "Form.AddData(data);"
+                remove_op_base_str = self.extend_data_str + f"""Form.RemoveData({self.id_str});"""
+                self.remove_add_children_action_str = f'''
                 {self.extend_data_str}Form.childRemoveAction+=RemoveChildren;
                 {self.extend_data_str}Form.childAddAction+=AddChildren;
             '''
@@ -156,13 +156,13 @@ namespace {self.file_namespace}
 
 '''
     def refresh_change(self):
-        self.declare_change_action=''
+        self.declare_change_action = ''
         for name in self.var_list:
             if 'write' in self.var_config_dic[name]:
                 self.declare_change_action+=f'''
         public static Action<Data,{self.var_type_dic[name]},{self.var_type_dic[name]}> change{name.capitalize()}Action;
                 '''
-                change_dic=''
+                change_dic = ''
                 if 'index' in self.var_config_dic[name]:
                     change_dic+=f'''
                     DatasBy{name.capitalize()}[oldV].Remove(data);
@@ -178,40 +178,40 @@ namespace {self.file_namespace}
                     DataBy{name.capitalize()}[newV]=data;
  '''
                 for i in range(0,10):
-                    if 'uniqueIndex'+str(i) in self.var_config_dic[name]:
-                        name_dic=""
-                        old_v_dic=""
-                        new_v_dic=""
+                    if 'uniqueIndex' + str(i) in self.var_config_dic[name]:
+                        name_dic = ""
+                        old_v_dic = ""
+                        new_v_dic = ""
                         for other in self.var_list:
-                             if 'uniqueIndex'+str(i) in self.var_config_dic[other]:
+                             if 'uniqueIndex' + str(i) in self.var_config_dic[other]:
                                 name_dic+=other.capitalize()
-                                if other==name:
+                                if other == name:
                                     old_v_dic+="oldV,"
                                     new_v_dic+="newV,"
                                 else:
                                     old_v_dic+=f"data.{other},"
                                     new_v_dic+=f"data.{other},"
-                        old_v_dic=f"({old_v_dic[0:-1]})"
-                        new_v_dic=f"({new_v_dic[0:-1]})"
+                        old_v_dic = f"({old_v_dic[0:-1]})"
+                        new_v_dic = f"({new_v_dic[0:-1]})"
                         change_dic+=f'''
                     DataBy{name_dic}.Remove({old_v_dic});
                     DataBy{name_dic}[{new_v_dic}]=data;
  '''         
-                    if 'index'+str(i) in self.var_config_dic[name]:
-                        name_dic=""
-                        old_v_dic=""
-                        new_v_dic=""
+                    if 'index' + str(i) in self.var_config_dic[name]:
+                        name_dic = ""
+                        old_v_dic = ""
+                        new_v_dic = ""
                         for other in self.var_list:
-                             if 'index'+str(i) in self.var_config_dic[other]:
+                             if 'index' + str(i) in self.var_config_dic[other]:
                                 name_dic+=other.capitalize()
-                                if other==name:
+                                if other == name:
                                     old_v_dic+="oldV,"
                                     new_v_dic+="newV,"
                                 else:
                                     old_v_dic+=f"data.{other},"
                                     new_v_dic+=f"data.{other},"
-                        old_v_dic=f"({old_v_dic[0:-1]})"
-                        new_v_dic=f"({new_v_dic[0:-1]})"
+                        old_v_dic = f"({old_v_dic[0:-1]})"
+                        new_v_dic = f"({new_v_dic[0:-1]})"
                         change_dic+=f'''
                     DatasBy{name_dic}[{old_v_dic}].Remove(data);
                     if(DatasBy{name_dic}[{old_v_dic}].Count==0)
@@ -220,9 +220,9 @@ namespace {self.file_namespace}
                         DatasBy{name_dic}[{new_v_dic}]=new List<Data>();
                     DatasBy{name_dic}[{new_v_dic}].Add(data);
  '''
-                super_type=''
+                super_type = ''
                 if 'override' in self.var_config_dic[name]:
-                    super_type= f'{self.extend_data_str}Form.'
+                    super_type = f'{self.extend_data_str}Form.'
                 self.change_op_str+=f'''
             public static void Change{name.capitalize()}({super_type}Data superData,{self.var_type_dic[name]} oldV,{self.var_type_dic[name]} newV)
             {{
@@ -236,35 +236,35 @@ namespace {self.file_namespace}
             ''' 
 
     def refresh_extend(self):
-        self.data_declare=f'''
+        self.data_declare = f'''
         public partial class Data'''
-        if self.extend_data_str=='':
+        if self.extend_data_str == '':
             self.data_declare+= ''
         else  :
            self.data_declare+= f" : {self.extend_data_str}Form.Data"
     def refresh_id_chain(self):
     
-        self.id_chain_declare=f'''
+        self.id_chain_declare = f'''
         '''
-        self.id_chain_get=f'''
+        self.id_chain_get = f'''
         public static Z_Chain.Chain {self.id_str}Chain '''
-        self.id_chain_init=f'''
+        self.id_chain_init = f'''
         '''
-        self.id_chain_fill=f'''
+        self.id_chain_fill = f'''
         '''
 
         if self.extend_data_str != '':
            self.id_chain_get+=f'=>{self.extend_data_str}Form.{self.id_str}Chain'
         else :
-            self.id_chain_declare=f'public static readonly int auto{self.id_str.capitalize()}Cnt={self.id_cnt};'
-            self.id_chain_init=f"{self.id_str}Chain=new Z_Chain.Chain (auto{self.id_str.capitalize()}Cnt);"
-            self.id_chain_fill=f'foreach(var k in _DataBy{self.id_str.capitalize()}.Keys){{ {self.id_str}Chain.PopId(k); }}'
+            self.id_chain_declare = f'public static readonly int auto{self.id_str.capitalize()}Cnt={self.id_cnt};'
+            self.id_chain_init = f"{self.id_str}Chain=new Z_Chain.Chain (auto{self.id_str.capitalize()}Cnt);"
+            self.id_chain_fill = f'foreach(var k in _DataBy{self.id_str.capitalize()}.Keys){{ {self.id_str}Chain.PopId(k); }}'
 
         self.id_chain_get+=";"
 
     def get_result(self):
         self.refresh_namespace_str()
-        self.refresh_extend();
+        self.refresh_extend()
         self.refresh_add_remove()
         self.refresh_change()
         self.refresh_init()

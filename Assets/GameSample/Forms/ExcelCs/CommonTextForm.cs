@@ -88,7 +88,8 @@ namespace Form
             
         }
 
-                   public static Data defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"","","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -140,6 +141,8 @@ namespace Form
 
                 {6,new Data(6,"custom","Costom","自定义")},
 
+                {7,new Data(7,"gain","Gain","获得")},
+
                 {10001,new Data(10001,"savePopupTitle","Do you need Save?","需要保存吗?")},
 
                 };
@@ -156,6 +159,8 @@ namespace Form
                         {"stop",_DataById[5]},
     
                         {"custom",_DataById[6]},
+    
+                        {"gain",_DataById[7]},
     
                         {"savePopupTitle",_DataById[10001]},
     

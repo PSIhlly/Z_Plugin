@@ -95,7 +95,7 @@ namespace Ui.ModStoryObject
             if (model.curData != null)
             {
                 unitCon.Clear();
-                for (int i = 0; i < model.curData.subPrefabUnitName.Count; i++)
+                for (int i = 0; i < model.curData.model.subPrefabUnitName.Count; i++)
                 {
                     unitCon.Add(new UiUnitParam
                     {
@@ -114,16 +114,8 @@ namespace Ui.ModStoryObject
 
                 DisplayCameraAreaManager.instance.Clear();
 
-                List<string> texNameLst = new List<string>();
-                List<bool> showShaddowLst = new List<bool>();
-
-                for (int i = 0; i < model.curData.subPrefabUnitName.Count; i++)
-                {
-                    texNameLst.Add(model.curData.subUnitTexsName[i]);
-                    showShaddowLst.Add(true);
-                }
-                var showGo= GameManager.instance.utilCtrl.CombineNewItemByPrefabs(
-                    model.curData.name, model.curData.subPrefabUnitName, texNameLst, model.curData.subPrefabUnitPos, model.curData.subPrefabUnitScale, showShaddowLst, false);
+                var showGo= GameManager.instance.utilCtrl.CombineNewObjectByPrefabs(
+                    model.curData.name, model.curData.model, false);
                 showGo.SetActive(true);
                 DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
 
@@ -171,8 +163,8 @@ namespace Ui.ModStoryObject
             });
             view.btn_prefab.onClick.AddListener(() =>
             {
-                var pre=MapPrefabForm.DataByName[parent.model.curData.subPrefabUnitName[model.id]];
-                parent.model.curData.subPrefabUnitName[model.id] = MapPrefabForm.DataById[((pre.id) % MapPrefabForm.DataById.Count) + 1].name;
+                var pre=MapPrefabForm.DataByName[parent.model.curData.model.subPrefabUnitName[model.id]];
+                parent.model.curData.model.subPrefabUnitName[model.id] = MapPrefabForm.DataById[((pre.id) % MapPrefabForm.DataById.Count) + 1].name;
                 parent.Refresh();
             });
             view.btn_delete.onClick.AddListener(() =>
@@ -184,8 +176,8 @@ namespace Ui.ModStoryObject
               {
                   if (float.TryParse(s, out var v))
                   {
-                      parent.model.curData.subPrefabUnitPos[model.id] =
-                      parent.model.curData.subPrefabUnitPos[model.id].SetX(v);
+                      parent.model.curData.model.subPrefabUnitPos[model.id] =
+                      parent.model.curData.model.subPrefabUnitPos[model.id].SetX(v);
                       parent.Refresh();
                   }
               };
@@ -193,8 +185,8 @@ namespace Ui.ModStoryObject
             {
                 if (float.TryParse(s, out var v))
                 {
-                    parent.model.curData.subPrefabUnitPos[model.id] =
-                    parent.model.curData.subPrefabUnitPos[model.id].SetY(v);
+                    parent.model.curData.model.subPrefabUnitPos[model.id] =
+                    parent.model.curData.model.subPrefabUnitPos[model.id].SetY(v);
                     parent.Refresh();
                 }
             };
@@ -202,8 +194,8 @@ namespace Ui.ModStoryObject
             {
                 if (float.TryParse(s, out var v))
                 {
-                    parent.model.curData.subPrefabUnitPos[model.id] =
-                    parent.model.curData.subPrefabUnitPos[model.id].SetZ(v);
+                    parent.model.curData.model.subPrefabUnitPos[model.id] =
+                    parent.model.curData.model.subPrefabUnitPos[model.id].SetZ(v);
                     parent.Refresh();
                 }
             };
@@ -212,8 +204,8 @@ namespace Ui.ModStoryObject
             {
                 if (float.TryParse(s, out var v))
                 {
-                    parent.model.curData.subPrefabUnitScale[model.id] =
-                    parent.model.curData.subPrefabUnitScale[model.id].SetX(v);
+                    parent.model.curData.model.subPrefabUnitScale[model.id] =
+                    parent.model.curData.model.subPrefabUnitScale[model.id].SetX(v);
                     parent.Refresh();
                 }
             };
@@ -221,8 +213,8 @@ namespace Ui.ModStoryObject
             {
                 if (float.TryParse(s, out var v))
                 {
-                    parent.model.curData.subPrefabUnitScale[model.id] =
-                    parent.model.curData.subPrefabUnitScale[model.id].SetY(v);
+                    parent.model.curData.model.subPrefabUnitScale[model.id] =
+                    parent.model.curData.model.subPrefabUnitScale[model.id].SetY(v);
                     parent.Refresh();
                 }
             };
@@ -230,8 +222,8 @@ namespace Ui.ModStoryObject
             {
                 if (float.TryParse(s, out var v))
                 {
-                    parent.model.curData.subPrefabUnitScale[model.id] =
-                    parent.model.curData.subPrefabUnitScale[model.id].SetZ(v);
+                    parent.model.curData.model.subPrefabUnitScale[model.id] =
+                    parent.model.curData.model.subPrefabUnitScale[model.id].SetZ(v);
                     parent.Refresh();
                 }
             };
@@ -251,16 +243,16 @@ namespace Ui.ModStoryObject
             view.sta_unit.ChangeState(model.id != -1 ? 1 : 0);
             if (model.id != -1)
             {
-                var dataCache = parent.model.curData;
-                view.img_tex.sprite = TexAssetForm.DataByName[dataCache.subUnitTexsName[model.id]].sprite;
+                var modelCache = parent.model.curData.model;
+                view.img_tex.sprite = TexAssetForm.DataByName[modelCache.subUnitTexsName[model.id]].sprite;
 
-                view.ipt_posX.Set(dataCache.subPrefabUnitPos[model.id].x.ToString("0.##"));
-                view.ipt_posY.Set(dataCache.subPrefabUnitPos[model.id].y.ToString("0.##"));
-                view.ipt_posZ.Set(dataCache.subPrefabUnitPos[model.id].z.ToString("0.##"));
+                view.ipt_posX.Set(modelCache.subPrefabUnitPos[model.id].x.ToString("0.##"));
+                view.ipt_posY.Set(modelCache.subPrefabUnitPos[model.id].y.ToString("0.##"));
+                view.ipt_posZ.Set(modelCache.subPrefabUnitPos[model.id].z.ToString("0.##"));
 
-                view.ipt_scaleX.Set(dataCache.subPrefabUnitScale[model.id].x.ToString("0.##"));
-                view.ipt_scaleY.Set(dataCache.subPrefabUnitScale[model.id].y.ToString("0.##"));
-                view.ipt_scaleZ.Set(dataCache.subPrefabUnitScale[model.id].z.ToString("0.##"));
+                view.ipt_scaleX.Set(modelCache.subPrefabUnitScale[model.id].x.ToString("0.##"));
+                view.ipt_scaleY.Set(modelCache.subPrefabUnitScale[model.id].y.ToString("0.##"));
+                view.ipt_scaleZ.Set(modelCache.subPrefabUnitScale[model.id].z.ToString("0.##"));
 
             }
             else
@@ -313,7 +305,7 @@ namespace Ui.ModStoryObject
         {
             if (model.id != -1)
             {
-                view.img_.sprite = TexAssetForm.DataByName[MapObjectForm.DataById[model.id].subUnitTexsName.Count>0? MapObjectForm.DataById[model.id].subUnitTexsName [0]: ""].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[MapObjectForm.DataById[model.id].model.subUnitTexsName.Count>0? MapObjectForm.DataById[model.id].model.subUnitTexsName [0]: ""].sprite;
                 view.txt_name.text = MapObjectForm.DataById[model.id].name;
             }
             else

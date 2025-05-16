@@ -26,6 +26,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     private InternalPlaySceneController _sceneCtrl;
     public ExternalPlaySceneController sceneCtrl;
+
+    private InternalPlayInfoController _infoCtrl;
+    public ExternalPlayInfoController infoCtrl;
+    
     // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
@@ -33,6 +37,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
         var __sceneCtrl = new PlaySceneController(this);
         _sceneCtrl = __sceneCtrl;
         sceneCtrl = __sceneCtrl;
+
+        var __infoCtrl = new PlayInfoController(this);
+        _infoCtrl = __infoCtrl;
+        infoCtrl = __infoCtrl;
 
         //  assetCtrl = new ModAssetCtrl(this);
     }
@@ -48,6 +56,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public void Update()
     {
         _sceneCtrl.Update();
+        _infoCtrl.Update();
     }
     public void LateUpdate()
     {
@@ -93,7 +102,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public static PlayData GetInitPlayDataByConfig()
     {
         var config = ConfigForm.DataByUid[1];
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName));
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName,config.defaultBag));
     }
 
     public void EndStory()
@@ -103,11 +112,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public async void BeginScene(string fileName)
     {
         _sceneCtrl.Begin(fileName);
+        _infoCtrl.Begin();
     }
 
     public void EndScene()
     {
         _sceneCtrl.End();
+        _infoCtrl.End();
     }
 
     #endregion

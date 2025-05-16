@@ -118,7 +118,8 @@ private set{
             
         }
 
-                   public static Data defaultData=new Data(0,"","",false);
+                   private static Data _defaultData=new Data(0,"","",false);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -153,6 +154,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 {3,new Data(3,"transition mask","",true)},
 
                 {4,new Data(4,"obstacle","",false)},
+
+                {5,new Data(5,"item","",false)},
 
                 {100,new Data(100,"erase","",false)},
 
@@ -200,11 +203,11 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.Get<int>("id"),
 
-                    defaultData.NameKey,
+                    _defaultData.NameKey,
 
-                    defaultData.icon,
+                    _defaultData.icon,
 
-                    defaultData.needLayer
+                    _defaultData.needLayer
                     );
 
             return data;

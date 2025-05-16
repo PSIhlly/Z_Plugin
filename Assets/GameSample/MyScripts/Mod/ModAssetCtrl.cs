@@ -113,15 +113,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
     }
-    public void DeleteObjectUnit(string name, int id)
-    {
-
-        var data = MapObjectForm.DataByName[name];
-        data.subPrefabUnitName.RemoveAt(id);
-        data.subPrefabUnitPos.RemoveAt(id);
-        data.subPrefabUnitScale.RemoveAt(id);
-        data.subUnitTexsName.RemoveAt(id);
-    }
+    
     public void CreateObject(string name)
     {
         if (string.IsNullOrEmpty(name))
@@ -134,28 +126,37 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         }
 
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", true, new List<string>(), new List<Vector3>(), new List<Vector3>(), new List<string>()));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData,false));
+    }
+    public void DeleteObjectUnit(string name, int id)
+    {
+
+        var data = MapObjectForm.DataByName[name];
+        data.model.subPrefabUnitName.RemoveAt(id);
+        data.model.subPrefabUnitPos.RemoveAt(id);
+        data.model.subPrefabUnitScale.RemoveAt(id);
+        data.model.subUnitTexsName.RemoveAt(id);
     }
     public void CreateObjectUnit(MapObjectForm.Data data)
     {
-        ImportObjectTex(data.name, data.subPrefabUnitName.Count);
+        ImportObjectTex(data.name, data.model.subPrefabUnitName.Count);
 
-        data.subPrefabUnitName.Add("Cube");
-        data.subPrefabUnitPos.Add(Vector3.zero);
-        data.subPrefabUnitScale.Add(Vector3.one);
+        data.model.subPrefabUnitName.Add("Cube");
+        data.model.subPrefabUnitPos.Add(Vector3.zero);
+        data.model.subPrefabUnitScale.Add(Vector3.one);
     }
     public void ImportObjectTex(string name, int id)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
-            if (MapObjectForm.DataByName[name].subUnitTexsName.Count > id)
+            if (MapObjectForm.DataByName[name].model.subUnitTexsName.Count > id)
             {
-                MapObjectForm.DataByName[name].subUnitTexsName[id] = nm;
+                MapObjectForm.DataByName[name].model.subUnitTexsName[id] = nm;
             }
             else
             {
-                MapObjectForm.DataByName[name].subUnitTexsName.Add(nm);
+                MapObjectForm.DataByName[name].model.subUnitTexsName.Add(nm);
             }
         });
 
@@ -163,7 +164,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void RenameObject(string oldName, string newName)
     {
 
-        CharacterProductForm.DataByName[oldName].name = newName;
+        CharacterProductForm.DataByNameIsproto[(oldName, true)].name = newName;
 
     }
     #endregion
@@ -219,7 +220,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
-            CharacterProductForm.DataByName[name].avatarTexName = nm;
+            CharacterProductForm.DataByNameIsproto[(name, true)].avatarTexName = nm;
         });
 
     }
@@ -235,36 +236,36 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         var dic = new Dictionary<string, CharacterParamForm.Data>();
         foreach (var prm in CharacterParamForm.DataByName.Values)
         {
-            dic[prm.name] = new CharacterParamForm.Data(prm.uid, prm.name, prm.valueType, prm.min, prm.v, prm.max, prm.SpecialType);
+            dic[prm.name] = prm.Copy();
 
         }
         CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } }, "", "", "", ""));
     }
     public void DeleteCharacter(string name)
     {
-        CharacterProductForm.RemoveData(CharacterProductForm.DataByName[name].uid);
+        CharacterProductForm.RemoveData(CharacterProductForm.DataByNameIsproto[(name, true)].uid);
     }
     public void RenameCharacter(string oldName, string newName)
     {
         //change
-        CharacterProductForm.DataByName[oldName].name = newName;
+        CharacterProductForm.DataByNameIsproto[(oldName, true)].name = newName;
     }
 
     public bool DeleteCharacterAnimId(string name, string animNm, int part, int id)
     {
-        var data = CharacterProductForm.DataByName[name];
+        var data = CharacterProductForm.DataByNameIsproto[(name, true)];
         var anim = data.animDic[animNm];
         anim.partAnimTexsName[part].RemoveAt(id);
         return false;
     }
     public void DeleteCharacterAnim(string name, string animNm)
     {
-        CharacterProductForm.DataByName[name].animDic.Remove(animNm);
+        CharacterProductForm.DataByNameIsproto[(name, true)].animDic.Remove(animNm);
     }
 
     public void RenameCharacterAnim(string characterName, string oldName, string newName)
     {
-        var data = CharacterProductForm.DataByName[characterName];
+        var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
         var anim = data.animDic[oldName];
         data.animDic.Remove(oldName);
         anim.name = newName;
@@ -275,7 +276,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
         {
-            var data = CharacterProductForm.DataByName[characterName];
+            var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
             var anim = data.animDic[animNm];
             if (anim.partAnimTexsName[part].Count > id)
             {
@@ -289,7 +290,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateCharacterAnim(string name, string animName)
     {
-        var data = CharacterProductForm.DataByName[name];
+        var data = CharacterProductForm.DataByNameIsproto[(name, true)];
         for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
         {
             name = "new anim" + i;
@@ -302,7 +303,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateCharacterAnimId(string name, string animNm, int part, int id)
     {
-        var data = CharacterProductForm.DataByName[name];
+        var data = CharacterProductForm.DataByNameIsproto[(name,true)];
         var anim = data.animDic[animNm];
         anim.animPos.Add((0, 0));
         anim.partAnimTexsName[0].Add("");
@@ -345,5 +346,124 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
+    #endregion
+
+    #region item
+
+    public void RenameItemParam(string oldName, string newName)
+    {
+        ItemParamForm.DataByName[oldName].name = newName;
+        foreach (var item in ItemProductForm.DataByUid.Values)
+        {
+            foreach (var k in item.paramDic.Keys)
+            {
+                if (k == oldName)
+                {
+                    var prm = item.paramDic[k];
+                    prm.name = newName;
+                    item.paramDic.Remove(k);
+                    item.paramDic[newName] = prm;
+                }
+            }
+        }
+    }
+
+    public void CreateItemArg(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            for (int i = 0; i < GlobalMaxSettings.ITEM_PARAM_MAX; i++)
+            {
+                name = "new arg" + i;
+                if (!ItemParamForm.DataByName.ContainsKey(name))
+                    break;
+            }
+        }
+        ItemParamForm.AddData(new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
+        foreach (var item in ItemProductForm.DataByUid.Values)
+        {
+            item.paramDic[name] = new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
+        }
+    }
+    public void DeleteItemArg(string name)
+    {
+        ItemParamForm.RemoveData(ItemParamForm.DataByName[name].uid);
+        foreach (var item in ItemProductForm.DataByUid.Values)
+        {
+            item.paramDic.Remove(name);
+        }
+    }
+
+    public void ImportItemIcon(string name)
+    {
+
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        {
+            ItemProductForm.DataByNameIsproto[(name, true)].iconTexName = nm;
+        });
+
+    }
+   
+
+
+    public void CreateItem(string name)
+    {
+        var dic = new Dictionary<string, ItemParamForm.Data>();
+        foreach (var prm in ItemParamForm.DataByName.Values)
+        {
+            dic[prm.name] = prm.Copy();
+
+        }
+        var model = MapModelForm.defaultData;
+        model.isObstacle = false;
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", dic, true, model,1));
+    }
+    public void DeleteItem(string name)
+    {
+        ItemProductForm.RemoveData(ItemProductForm.DataByNameIsproto[(name, true)].uid);
+    }
+
+    public void DeleteItemModelUnit(string name, int id)
+    {
+
+        var data = ItemProductForm.DataByNameIsproto[(name, true)];
+        data.model.subPrefabUnitName.RemoveAt(id);
+        data.model.subPrefabUnitPos.RemoveAt(id);
+        data.model.subPrefabUnitScale.RemoveAt(id);
+        data.model.subUnitTexsName.RemoveAt(id);
+    }
+    public void CreateItemModelUnit(ItemProductForm.Data data)
+    {
+        ImportItemModelUnitTex(data.name, data.model.subPrefabUnitName.Count);
+
+        data.model.subPrefabUnitName.Add("Cube");
+        data.model.subPrefabUnitPos.Add(Vector3.zero);
+        data.model.subPrefabUnitScale.Add(Vector3.one);
+    }
+    public void ImportItemModelUnitTex(string name, int id)
+    {
+
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        {
+            var data = ItemProductForm.DataByNameIsproto[(name, true)];
+            if (data.model.subUnitTexsName.Count > id)
+            {
+                data.model.subUnitTexsName[id] = nm;
+            }
+            else
+            {
+                data.model.subUnitTexsName.Add(nm);
+            }
+        });
+
+    }
+    public void RenameItem(string oldName, string newName)
+    {
+        //change
+        ItemProductForm.DataByNameIsproto[(oldName, true)].name = newName;
+    }
+
+   
+   
     #endregion
 }

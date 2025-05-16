@@ -25,7 +25,7 @@ public class DialogClipCmd : CmdBase
 
         return new CmdRes()
         {
-            v = new List<VarForm.Data>() { new VarForm.Data(-1, "", 7, 0, null, jo.Get<List<ClipForm.Data>>(ValueType.Clips.ToString()), 0)
+            v = new List<VarForm.Data>() { new VarForm.Data(-1, "", 7, 0, null, jo.Get<List<ClipForm.Data>>(EvtValType.Clips.ToString()), 0)
 
             }
         };

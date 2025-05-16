@@ -93,7 +93,8 @@ namespace Z_DataSystem.Form
             
         }
 
-                   public static Data defaultData=new Data(0,"",Texture2D.blackTexture);
+                   private static Data _defaultData=new Data(0,"",Texture2D.blackTexture);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -211,7 +212,7 @@ namespace Z_DataSystem.Form
 
                 jo.Get<string>("name"),
 
-                    defaultData.tex
+                    _defaultData.tex
                     );
 
             return data;

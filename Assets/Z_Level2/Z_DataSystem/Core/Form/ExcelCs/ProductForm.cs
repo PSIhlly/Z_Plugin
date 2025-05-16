@@ -119,7 +119,8 @@ public static readonly int autoUidCnt=100;
             
         }
 
-                   public static Data defaultData=new Data(0,"",false);
+                   private static Data _defaultData=new Data(0,"",false);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;

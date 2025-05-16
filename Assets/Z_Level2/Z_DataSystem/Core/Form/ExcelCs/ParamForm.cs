@@ -42,7 +42,7 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,int,int> changeValuetypeAction;
+        public static Action<Data,ValType,ValType> changeValuetypeAction;
                 
         public static Action<Data,float,float> changeMinAction;
                 
@@ -91,11 +91,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private int  _valueType;
+                    private ValType  _valueType;
                     /// <summary>
                     ///数据类型
                     ///</summary>
-                    public int  valueType{
+                    public ValType  valueType{
                                 get{return _valueType;}
  set{
 
@@ -163,7 +163,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,int valueType,float min,float v,float max)
+            public Data(int uid,string name,ValType valueType,float min,float v,float max)
             {
 
              this.uid = uid;
@@ -182,7 +182,8 @@ public static readonly int autoUidCnt=1000000;
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0f,0f,0f);
+                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -256,7 +257,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<int>("valueType"),
+                jo.Get<ValType>("valueType"),
 
                 jo.Get<float>("min"),
 
@@ -278,7 +279,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<int>("valueType",data.valueType);
+            jo.Set<ValType>("valueType",data.valueType);
 
             jo.Set<float>("min",data.min);
 
@@ -381,7 +382,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeValuetype(Data superData,int oldV,int newV)
+            public static void ChangeValuetype(Data superData,ValType oldV,ValType newV)
             {
                 if(superData is Data data)
                 {

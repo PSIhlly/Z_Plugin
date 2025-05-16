@@ -85,7 +85,7 @@ namespace Ui.ModStoryEventCmds
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder());
+            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder(),model.data);
             model.onClose?.Invoke();
             base.Close();
         }
@@ -142,7 +142,7 @@ namespace Ui.ModStoryEventCmds
                 {
                     var top = model.showCmd;
                     //remove empty
-                    if (model.showCmd.data.uid == 0 && model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)ValueType.Action))
+                    if (model.showCmd.data.uid == 0 && model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains(EvtValType.Action))
                     {
                         GameEventController.DeleteCmd(parent.model.data.cmds, top.oriId);
                     }
@@ -163,9 +163,9 @@ namespace Ui.ModStoryEventCmds
                 if (model.showCmd.data.isValue)
                 {
 
-                    switch ((ValueType)model.showCmd.data.resTypes[0])
+                    switch ((EvtValType)model.showCmd.data.resTypes[0])
                     {
-                        case (ValueType.Float):
+                        case (EvtValType.Float):
                             NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), false, (s) =>
                             {
                                 if (float.TryParse(s, out var res))
@@ -176,7 +176,7 @@ namespace Ui.ModStoryEventCmds
                                 return true;
                             });
                             break;
-                        case (ValueType.String):
+                        case (EvtValType.String):
                             NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), false, (s) =>
                             {
                                 model.showCmd.data.constV = s;
@@ -184,14 +184,14 @@ namespace Ui.ModStoryEventCmds
                                 return true;
                             });
                             break;
-                        case (ValueType.Clips):
+                        case (EvtValType.Clips):
                             UiManager.instance.ShowUi<UiModStoryEventCmdClipsCtrl>(new UiModStoryEventCmdClipsParam()
                             {
                                 clipsJo = model.showCmd.data.constV,
                                  func=(lst) =>
                                 {
                                     var jo = new JObject();
-                                    jo.Set(ValueType.Clips.ToString(), lst);
+                                    jo.Set(EvtValType.Clips.ToString(), lst);
                                     model.showCmd.data.constV = jo.ToString();
                                     parent.Refresh();
                                     return true;
@@ -206,7 +206,7 @@ namespace Ui.ModStoryEventCmds
             {
                 GameEventController.DeleteCmd(parent.model.data.cmds, model.showCmd.oriId);
                 //add empty
-                if (model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)ValueType.Action))
+                if (model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains(EvtValType.Action))
                 {
                     GameEventController.InsertCmd(parent.model.data.cmds, model.showCmd.oriId, CmdForm.defaultData);
                 }
@@ -224,21 +224,21 @@ namespace Ui.ModStoryEventCmds
         }
         public void Refresh()
         {
-            var belong = model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains((int)ValueType.Action) ? TextManager.instance.GetTxt(model.showCmd.belong.data.prmName[model.showCmd.prmId]) + " : " : "";
+            var belong = model.showCmd.belong != null && !model.showCmd.belong.data.prmTypes.Contains(EvtValType.Action) ? TextManager.instance.GetTxt(model.showCmd.belong.data.prmName[model.showCmd.prmId]) + " : " : "";
             var value = TextManager.instance.GetTxt(model.showCmd.data.name);
             if(model.showCmd.data.isValue)
             {
-                switch ((ValueType)model.showCmd.data.resTypes[0])
+                switch (model.showCmd.data.resTypes[0])
                 {
-                    case ValueType.String:
-                    case ValueType.Float:
+                    case EvtValType.String:
+                    case EvtValType.Float:
                         value = model.showCmd.data.constV;
                         break;
-                    case ValueType.Clips:
+                    case EvtValType.Clips:
                         if(!string.IsNullOrEmpty(model.showCmd.data.constV))
                         {
                             var jo=JObject.Parse(model.showCmd.data.constV);
-                            var lst = jo.Get<List<ClipForm.Data>>(ValueType.Clips.ToString());
+                            var lst = jo.Get<List<ClipForm.Data>>(EvtValType.Clips.ToString());
                             if(lst.Count>0)
                             {
                                 var startTxt = lst[0].mainText;

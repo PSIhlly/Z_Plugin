@@ -52,6 +52,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeMaincharacternameAction;
                 
+        public static Action<Data,List<int>,List<int>> changeDefaultbagAction;
+                
 
 
         public partial class Data
@@ -129,24 +131,44 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName)
+                    private List<int>  _defaultBag;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼±³°ü
+                    ///</summary>
+                    public List<int>  defaultBag{
+                                get{return _defaultBag;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDefaultbag(this,_defaultBag,value); 
+                    }
+        
+                _defaultBag = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultBag)
             {
 
              this.uid = uid;
              this.startSceneId = startSceneId;
              this.startpos = startpos;
              this.mainCharacterName = mainCharacterName;
+             this.defaultBag = defaultBag;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName);
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultBag));
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,0,Vector3.zero,"");
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -222,7 +244,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<Vector3>("startpos"),
 
-                jo.Get<string>("mainCharacterName")
+                jo.Get<string>("mainCharacterName"),
+
+                jo.Get<List<int>>("defaultBag")
                     );
 
             return data;
@@ -241,6 +265,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<Vector3>("startpos",data.startpos);
 
             jo.Set<string>("mainCharacterName",data.mainCharacterName);
+
+            jo.Set<List<int>>("defaultBag",data.defaultBag);
 
             return jo;
         }
@@ -353,6 +379,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeMaincharacternameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDefaultbag(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDefaultbagAction?.Invoke(data,oldV,newV);
                 }
                     
             }

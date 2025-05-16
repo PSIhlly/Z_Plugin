@@ -38,9 +38,16 @@ public class GameUtilController : Z_Controller<GameManager>
         }
         return res;
     }
-    public GameObject CombineNewItemByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow, bool forGame)
+    public GameObject CombineNewObjectByPrefabs(string name, MapModelForm.Data model, bool forGame)
     {
-        var res = CombineNewGoByPrefabs(name, prefabKeys, texRealName, poss, scales, showShadow);
+        if (model == null)
+            return new GameObject(name);
+
+        var showShadow = new List<bool>();
+        for (int i = 0; i < model.subPrefabUnitName.Count; i++)
+            showShadow.Add(true);
+
+        var res = CombineNewGoByPrefabs(name, model.subPrefabUnitName, model.subUnitTexsName, model.subPrefabUnitPos, model.subPrefabUnitScale, showShadow);
         if (forGame)
             res.AddComponent<ObjectInstance>();
         return res;

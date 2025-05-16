@@ -88,7 +88,8 @@ namespace Form
             
         }
 
-                   public static Data defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"","","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -135,6 +136,8 @@ namespace Form
                 {1000003,new Data(1000003,"transition mask","Transition mask","过渡遮罩")},
 
                 {1000004,new Data(1000004,"obstacle","Obstacle","障碍物")},
+
+                {1000005,new Data(1000005,"item","item","道具")},
 
                 {1000100,new Data(1000100,"erase","Erase","清除")},
 
@@ -200,6 +203,8 @@ namespace Form
                         {"transition mask",_DataById[1000003]},
     
                         {"obstacle",_DataById[1000004]},
+    
+                        {"item",_DataById[1000005]},
     
                         {"erase",_DataById[1000100]},
     

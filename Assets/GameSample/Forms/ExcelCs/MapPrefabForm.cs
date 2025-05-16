@@ -104,7 +104,8 @@ private set{
             
         }
 
-                   public static Data defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -198,9 +199,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.Get<int>("id"),
 
-                    defaultData.name,
+                    _defaultData.name,
 
-                    defaultData.icon
+                    _defaultData.icon
                     );
 
             return data;

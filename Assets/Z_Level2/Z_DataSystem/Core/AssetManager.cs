@@ -9,22 +9,12 @@ using Z_Os.File;
 using Z_Texture;
 namespace Z_DataSystem.Form
 {
-    public enum Type
+    public enum ValType
     {
         Float = 0,
         Bool = 1,
         String = 2
     }
-
-    public partial class ParamForm
-    {
-        static public Type GetValueType(this Data data)
-        {
-            return (Type)data.valueType;
-        }
-    }
-
-
 
     public partial class TexAssetForm
     {
@@ -46,7 +36,17 @@ namespace Z_DataSystem.Form
 
         }
     }
+    public partial class ProductForm
+    {
+        public partial class Data
+        {
+            public void ToProduct()
+            {
+                isProto = false;
+            }
 
+        }
+    }
 }
 namespace Z_DataSystem
 {

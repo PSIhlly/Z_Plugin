@@ -162,12 +162,13 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,animPos,animTimeInterval,partAnimTexsName);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<(float,float)>(animPos),animTimeInterval,new List<List<string>>(partAnimTexsName));
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null,0f,null);
+                   private static Data _defaultData=new Data(0,"",null,0f,null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;

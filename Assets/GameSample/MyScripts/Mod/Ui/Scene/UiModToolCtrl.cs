@@ -2,6 +2,7 @@ using Form;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_DataSystem.Form;
 using Z_Map;
 using Z_Map.Form;
 using Z_ObjectAnimator.Base;
@@ -18,6 +19,7 @@ namespace Ui.ModSceneMain
     {
         public bool show;
         public MapTypeForm.Data curType;
+        public List<MapObjectForm.Data> itemModels = new List<MapObjectForm.Data>();
         public MapBaseForm.Data curData
         {
             set
@@ -263,6 +265,18 @@ namespace Ui.ModSceneMain
         }
         public override void OnShow()
         {
+            model.itemModels.Clear();
+
+            if(ItemProductForm.DatasByIsproto.ContainsKey(true))
+            {
+                foreach (var data in ItemProductForm.DatasByIsproto[true])
+                {
+                    if (data.uid > ProductForm.autoUidCnt)
+                        continue;
+                    model.itemModels.Add(new MapObjectForm.Data(-1, data.name, data.iconTexName, data.model,true));
+                }
+            }
+            
             model.curType = MapTypeForm.DataById[1];
             Refresh();
 
@@ -317,6 +331,18 @@ namespace Ui.ModSceneMain
                         }
                     }
                     break;
+                case 5:
+                    {
+                        foreach (var data in model.itemModels)
+                        {
+                            conData.Add(new UiToolItemParam()
+                            {
+                                data = data
+                            });
+                        }
+                    }
+                    break;
+                    
                 case 100:
                     {
                         foreach (var data in MapEraseForm.DataById.Values)

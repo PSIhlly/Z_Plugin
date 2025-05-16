@@ -48,11 +48,11 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,List<int>,List<int>> changePrmtypesAction;
+        public static Action<Data,List<EvtValType>,List<EvtValType>> changePrmtypesAction;
                 
         public static Action<Data,List<string>,List<string>> changePrmnameAction;
                 
-        public static Action<Data,List<int>,List<int>> changeRestypesAction;
+        public static Action<Data,List<EvtValType>,List<EvtValType>> changeRestypesAction;
                 
         public static Action<Data,string,string> changeConstvAction;
                 
@@ -109,11 +109,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private List<int>  _prmTypes;
+                    private List<EvtValType>  _prmTypes;
                     /// <summary>
                     ///参数类型
                     ///</summary>
-                    public List<int>  prmTypes{
+                    public List<EvtValType>  prmTypes{
                                 get{return _prmTypes;}
  set{
 
@@ -145,11 +145,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private List<int>  _resTypes;
+                    private List<EvtValType>  _resTypes;
                     /// <summary>
                     ///结果类型
                     ///</summary>
-                    public List<int>  resTypes{
+                    public List<EvtValType>  resTypes{
                                 get{return _resTypes;}
  set{
 
@@ -289,7 +289,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,List<int> prmTypes,List<string> prmName,List<int> resTypes,string constV,string lab,List<string> additionCmds,bool globalEnable,bool terrainEnable,bool objectEnable,bool characterEnable)
+            public Data(int uid,string name,List<EvtValType> prmTypes,List<string> prmName,List<EvtValType> resTypes,string constV,string lab,List<string> additionCmds,bool globalEnable,bool terrainEnable,bool objectEnable,bool characterEnable)
             {
 
              this.uid = uid;
@@ -309,12 +309,13 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,prmTypes,prmName,resTypes,constV,lab,additionCmds,globalEnable,terrainEnable,objectEnable,characterEnable);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<EvtValType>(prmTypes),new List<string>(prmName),new List<EvtValType>(resTypes),constV,lab,new List<string>(additionCmds),globalEnable,terrainEnable,objectEnable,characterEnable);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"empty",null,null,new List<int>(){4,},"","",null,false,false,false,false);
+                   private static Data _defaultData=new Data(0,"empty",null,null,new List<EvtValType>(){EvtValType.Object,},"","",null,false,false,false,false);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -362,21 +363,21 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"dialog",new List<int>(){7,},new List<string>(){"content",},null,"","window",null,true,true,true,true)},
+                {1,new Data(1,"dialog",new List<EvtValType>(){EvtValType.Clips,},new List<string>(){"content",},null,"","window",null,true,true,true,true)},
 
-                {2,new Data(2,"tips",new List<int>(){2,},new List<string>(){"content",},null,"","tips",null,true,true,true,true)},
+                {2,new Data(2,"tips",new List<EvtValType>(){EvtValType.String,},new List<string>(){"content",},null,"","tips",null,true,true,true,true)},
 
-                {3,new Data(3,"if",new List<int>(){1,},new List<string>(){"conditionJudge",},null,"","logic",new List<string>(){"then","else",},true,true,true,true)},
+                {3,new Data(3,"if",new List<EvtValType>(){EvtValType.Bool,},new List<string>(){"conditionJudge",},null,"","logic",new List<string>(){"then","else",},true,true,true,true)},
 
-                {4,new Data(4,"then",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true,true)},
+                {4,new Data(4,"then",new List<EvtValType>(){EvtValType.Action,},new List<string>(){"execute",},null,"","",null,true,true,true,true)},
 
-                {5,new Data(5,"else",new List<int>(){5,},new List<string>(){"execute",},null,"","",null,true,true,true,true)},
+                {5,new Data(5,"else",new List<EvtValType>(){EvtValType.Action,},new List<string>(){"execute",},null,"","",null,true,true,true,true)},
 
-                {6,new Data(6,"num",null,null,new List<int>(){0,},"","value",null,true,true,true,true)},
+                {6,new Data(6,"num",null,null,new List<EvtValType>(){EvtValType.Float,},"","value",null,true,true,true,true)},
 
-                {7,new Data(7,"text",null,null,new List<int>(){2,},"","value",null,true,true,true,true)},
+                {7,new Data(7,"text",null,null,new List<EvtValType>(){EvtValType.String,},"","value",null,true,true,true,true)},
 
-                {8,new Data(8,"dialogClip",null,null,new List<int>(){7,},"","value",null,true,true,true,true)},
+                {8,new Data(8,"dialogClip",null,null,new List<EvtValType>(){EvtValType.Clips,},"","value",null,true,true,true,true)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -474,11 +475,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<List<int>>("prmTypes"),
+                jo.Get<List<EvtValType>>("prmTypes"),
 
                 jo.Get<List<string>>("prmName"),
 
-                jo.Get<List<int>>("resTypes"),
+                jo.Get<List<EvtValType>>("resTypes"),
 
                 jo.Get<string>("constV"),
 
@@ -508,11 +509,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<List<int>>("prmTypes",data.prmTypes);
+            jo.Set<List<EvtValType>>("prmTypes",data.prmTypes);
 
             jo.Set<List<string>>("prmName",data.prmName);
 
-            jo.Set<List<int>>("resTypes",data.resTypes);
+            jo.Set<List<EvtValType>>("resTypes",data.resTypes);
 
             jo.Set<string>("constV",data.constV);
 
@@ -642,7 +643,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangePrmtypes(Data superData,List<int> oldV,List<int> newV)
+            public static void ChangePrmtypes(Data superData,List<EvtValType> oldV,List<EvtValType> newV)
             {
                 if(superData is Data data)
                 {
@@ -662,7 +663,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeRestypes(Data superData,List<int> oldV,List<int> newV)
+            public static void ChangeRestypes(Data superData,List<EvtValType> oldV,List<EvtValType> newV)
             {
                 if(superData is Data data)
                 {

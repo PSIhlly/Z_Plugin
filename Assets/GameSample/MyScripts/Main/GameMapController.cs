@@ -1,4 +1,5 @@
 using Form;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +13,50 @@ using Z_Time;
 
 
 
+namespace Z_Map
+{
+    public partial class MapUnit
+    {
+        public static string productKey = "pdt";
+        private (string,int) _productInfo;
+        public (string, int) productInfo
+        {
+            get
+            {
+                if (_productInfo == default)
+                {
+                    _productInfo = ("",-1);
+                    if (!string.IsNullOrEmpty(data.extra))
+                    {
+                        var jo = JObject.Parse(data.extra);
+                        if (jo != null && jo[productKey] != null)
+                        {
+                            _productInfo.Item1 = (string)jo[productKey][0];
+                            _productInfo.Item2 = (int)jo[productKey][1];
+                        }
+                    }
+                }
+                return _productInfo;
+            }
+            set
+            {
+                
+                var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
+                var ja = new JArray();
+                ja.Add( value.Item1);
+                ja.Add( value.Item2);
+                jo[productKey] = ja;
 
+                data.extra = jo.ToString();
+                _productInfo = value;
+            }
+
+        }
+
+
+
+    }
+}
 
 public enum AlphaTexBasic5
 {

@@ -204,12 +204,13 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,type,v,s,clips,unitUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,type,v,s,new List<ClipForm.Data>(clips),unitUid);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"",4,0f,"",null,0);
+                   private static Data _defaultData=new Data(0,"",4,0f,"",null,0);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;

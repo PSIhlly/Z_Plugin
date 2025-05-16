@@ -225,12 +225,13 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,avatarTexName,paramDic,isProto,animDic,idleAnimName,moveAnimName,speedParamName,hpParamName);
+        return new Data(sameId? uid:uidChain.GetId(),name,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName);
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","");
+                   private static Data _defaultData=new Data(0,"","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -243,13 +244,23 @@ namespace Form
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
+            static Dictionary<bool, List<Data>> _DatasByIsproto;
+            public static Dictionary<bool, List<Data>> DatasByIsproto
             {
                 get
                 {
                     Init();
-                    return _DataByName;
+                    return _DatasByIsproto;
+                }
+            }
+    
+            static Dictionary<(string,bool), Data> _DataByNameIsproto;
+            public static Dictionary<(string,bool), Data> DataByNameIsproto
+            {
+                get
+                {
+                    Init();
+                    return _DataByNameIsproto;
                 }
             }
     
@@ -271,10 +282,14 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DataByNameIsproto = new Dictionary<(string,bool), Data>() {
     
                     };
     
+                    _DatasByIsproto = new Dictionary<bool, List<Data>>() {
+    
+                };
+
 
             childInitAction?.Invoke();
             
@@ -392,7 +407,11 @@ namespace Form
 
         DataByUid[data.uid]=data;
     
-                    DataByName[data.name]=data;
+                    DataByNameIsproto[(data.name,data.isProto)]=data;
+    
+                    if(!DatasByIsproto.ContainsKey(data.isProto))
+                        DatasByIsproto[data.isProto]=new List<Data>();
+                    DatasByIsproto[data.isProto].Add(data);
     
 ProductForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -408,7 +427,11 @@ ProductForm.AddData(data);
 
                     DataByUid.Remove(data.uid);
     
-                    DataByName.Remove(data.name);
+                    DataByNameIsproto.Remove((data.name,data.isProto));
+    
+                    DatasByIsproto[data.isProto].Remove(data);
+                    if(DatasByIsproto[data.isProto].Count==0)
+                        DatasByIsproto.Remove(data.isProto);
     
 ProductForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -420,7 +443,9 @@ ProductForm.RemoveData(uid);
 
                     DataByUid.Clear();
     
-                    DataByName.Clear();
+                    DataByNameIsproto.Clear();
+    
+                    DatasByIsproto.Clear();
     
             uidChain.Clear();
         }
@@ -468,8 +493,8 @@ ProductForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DataByNameIsproto.Remove((oldV,data.isProto));
+                    DataByNameIsproto[(newV,data.isProto)]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
@@ -501,6 +526,16 @@ ProductForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
+                    DatasByIsproto[oldV].Remove(data);
+                    if(DatasByIsproto[oldV].Count==0)
+                        DatasByIsproto.Remove(oldV);
+                    if(!DatasByIsproto.ContainsKey(newV))
+                        DatasByIsproto[newV]=new List<Data>();
+                    DatasByIsproto[newV].Add(data);
+ 
+                    DataByNameIsproto.Remove((data.name,oldV));
+                    DataByNameIsproto[(data.name,newV)]=data;
+ 
                 changeIsprotoAction?.Invoke(data,oldV,newV);
                 }
                     

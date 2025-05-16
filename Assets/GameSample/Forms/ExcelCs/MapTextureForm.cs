@@ -120,12 +120,13 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texsName);
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,new List<string>(texsName));
                 }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",0f,null);
+                   private static Data _defaultData=new Data(0,"","",0f,null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;

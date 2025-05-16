@@ -43,17 +43,7 @@ namespace Ui.ModSceneBehaviourUnit
             view.btn_evt.onClick.AddListener(() =>
             {
                 var unit = (MapUnit)model.data.unit;
-                if (model.data.unit is CharacterUnit)
-                {
-                    unit.evtDic = GameEventController.GetEventTriggerDic(EventType.Character);
-                }else if (model.data.unit is ObjectUnit)
-                {
-                    unit.evtDic = GameEventController.GetEventTriggerDic(EventType.Object);
-                }
-                else if (model.data.unit is TileUnit)
-                {
-                    unit.evtDic = GameEventController.GetEventTriggerDic(EventType.Tile);
-                }
+                
                 UiManager.instance.ShowUi<UiModStoryEventTriggerCtrl>(new UiModStoryEventTriggerParam()
                 {
                     dic= unit.evtDic,

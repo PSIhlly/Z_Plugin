@@ -31,6 +31,8 @@ public interface InternalPlaySceneController
 }
 public interface ExternalPlaySceneController
 {
+    public CharacterUnitForm.Data playerM { get; }
+    public CharacterProductForm.Data playerG { get; }
     public void SetCamera(float x, float y, float z);
     public Vector3 GetPlayerPos();
     public void SetPlayerPos(Vector3 pos);
@@ -53,8 +55,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     Vector3 lastPlayerPos;
     Vector3 setPlayerMove;
-    CharacterUnitForm.Data playerM;
-    CharacterProductForm.Data playerG;
+    private CharacterUnitForm.Data _playerM;
+    private CharacterProductForm.Data _playerG;
     private Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data> _characterDic;
 
     #region internal Var
@@ -63,7 +65,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     #endregion
 
     #region extern Var
-
+    public CharacterUnitForm.Data playerM=> _playerM;
+    public CharacterProductForm.Data playerG=> _playerG;
 
     #endregion
 
@@ -79,8 +82,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         waitForActive = false;
         _characterDic = new Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data>();
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
-        playerM = null;
-        playerG = null;
+        _playerM = null;
+        _playerG = null;
     }
     public void End()
     {
@@ -140,13 +143,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         if (!enable)
             return;
 
-        if (playerG == null)
+        if (_playerG == null)
         {
-            playerG = CharacterProductForm.DataByName[_super.data.progress.characterName];
+            _playerG = CharacterProductForm.DataByNameIsproto[(_super.data.progress.characterName,true)];
         }
-        if (playerM == null)
+        if (_playerM == null)
         {
-            playerM = CreateCharacter(playerG); 
+            _playerM = CreateCharacter(_playerG); 
         }
         {
             MapManager.instance.UpdateInfo();
@@ -157,14 +160,14 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         if (setPlayerMove != Vector3.zero)
         {
-            if (playerM != null)
+            if (_playerM != null)
             {
-                playerM.unit.Move(setPlayerMove);
+                _playerM.unit.Move(setPlayerMove);
             }
             setPlayerMove = Vector3.zero;
         }
 
-        lastPlayerPos = playerM.pos;
+        lastPlayerPos = _playerM.pos;
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
     }
     public void SetCamera(float x, float y, float z)
@@ -178,6 +181,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return null;
         return _characterDic[data];
     }
+
     public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
     {
         var unitData=  MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
@@ -191,17 +195,17 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerPos(Vector3 pos)
     {
-      if (playerM == null|| playerM.unit.ins==null)
+      if (_playerM == null|| _playerM.unit.ins==null)
             return;
-        playerM.unit.ins.transform.position = pos;
+        _playerM.unit.ins.transform.position = pos;
     }
     public void SetPlayerMove(Vector3 dir)
     {
-        if (playerM == null || playerM.unit.ins == null)
+        if (_playerM == null || _playerM.unit.ins == null)
             return;
-        if(CharacterParamForm.DataByName.ContainsKey(playerG.speedParamName))
+        if(CharacterParamForm.DataByName.ContainsKey(_playerG.speedParamName))
         {
-            setPlayerMove += dir * (float)playerG.paramDic[playerG.speedParamName].v;
+            setPlayerMove += dir * (float)_playerG.paramDic[_playerG.speedParamName].v;
         }else
         {
             setPlayerMove += dir;
@@ -209,10 +213,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerRotation(Vector3 dir,float speed=360)
     {
-        if (playerM == null|| playerM.unit.ins==null)
+        if (_playerM == null|| _playerM.unit.ins==null)
             return;
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-        playerM.unit.ins.transform.rotation= Quaternion.Slerp(Quaternion.Euler(playerM.euler), targetRotation, speed * Time.deltaTime);
+        _playerM.unit.ins.transform.rotation= Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
     }
 }

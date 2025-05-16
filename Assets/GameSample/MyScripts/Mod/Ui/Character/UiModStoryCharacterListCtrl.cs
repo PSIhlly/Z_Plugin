@@ -70,15 +70,17 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
         {
             con.Clear();
 
-
-            foreach (var data in CharacterProductForm.DataByUid.Values)
+            if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
             {
-                if (data.uid > ProductForm.autoUidCnt)
-                    continue;
-                con.Add(new UiItemParam
+                foreach (var data in CharacterProductForm.DatasByIsproto[true])
                 {
-                    id = data.uid
-                });
+                    if (data.uid > ProductForm.autoUidCnt)
+                        continue;
+                    con.Add(new UiItemParam
+                    {
+                        id = data.uid
+                    });
+                }
             }
             con.Add(new UiItemParam
             {
@@ -123,14 +125,17 @@ namespace Ui.ModStoryCharacter.ModStoryCharacterList
                 if (model.id == -1)
                 {
                     int max = 1;
-                    foreach (var o in CharacterProductForm.DataByUid.Values)
+                    if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
                     {
-                        var splt = o.name.Split("newCharacter");
-                        if (splt.Length > 1)
+                        foreach (var o in CharacterProductForm.DatasByIsproto[true])
                         {
-                            if (int.TryParse(splt[1], out int v))
+                            var splt = o.name.Split("newCharacter");
+                            if (splt.Length > 1)
                             {
-                                max = Mathf.Max(max, v + 1);
+                                if (int.TryParse(splt[1], out int v))
+                                {
+                                    max = Mathf.Max(max, v + 1);
+                                }
                             }
                         }
                     }

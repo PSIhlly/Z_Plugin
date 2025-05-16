@@ -20,6 +20,6 @@ public class Z_Texture_Sample :MonoBehaviour
         TextureTransform.GetTargetSize(texList.ToArray(), 50, 50);
         var newTex = TextureCombine.FillTexture2DsToTexture2D(texList.ToArray(), 2, 2, 10);
         target.texture = newTex;
-        File.WriteAllBytes(Application.dataPath+"/test.png",TextureHelper.GetTextureByte(TextureTransform.GetTargetSize(texList[0],250,100)));
+        File.WriteAllBytes(Application.dataPath+"/test.png",TextureHelper.GetTextureByte(TextureTransform.GetTargetSize(texList[0],300,100)));
     }
 }

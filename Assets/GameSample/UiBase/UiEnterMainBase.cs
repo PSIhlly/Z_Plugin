@@ -6,6 +6,7 @@ using Z_Ui.Base;
 using Z_Ui;
 
 namespace Ui.EnterMain
+
 {
 
 
@@ -16,7 +17,7 @@ namespace Ui.EnterMain
     public partial class UiEnterMainView:UiView
     {
 
-            public Txt txt_title;
+            public Btn btn_news;
             public Btn btn_start;
             public Btn btn_warRoom;
             public Btn btn_setting;
@@ -25,7 +26,7 @@ namespace Ui.EnterMain
         public UiEnterMainView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_title = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            btn_news = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_start = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             btn_warRoom = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_setting = uiHolder.elementTrsLst[3].GetComponent<Btn>();

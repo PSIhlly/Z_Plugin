@@ -195,6 +195,25 @@ public class GameSaveController : Z_Controller<GameManager>
     #endregion
 
     #region load
+    public void AddStoryTex(StoryTexAssetForm.Data data)
+    {
+        if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = StoryTexAssetForm.DataByName[data.name];
+            StoryTexAssetForm.RemoveData(oldData.id);
+        }
+        StoryTexAssetForm.AddData(data);
+    }
+    public void AddStoryTex(TexAssetForm.Data rawData)
+    {
+        StoryTexAssetForm.Data data = (StoryTexAssetForm.Data)rawData;
+        if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = StoryTexAssetForm.DataByName[data.name];
+            StoryTexAssetForm.RemoveData(oldData.id);
+        }
+        StoryTexAssetForm.AddData(data);
+    }
     public void LoadMaterial(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + mapTextureFormFileName;
@@ -215,7 +234,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 var path = storyCoreFolder + "/" + nm;
                 if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                 {
-                    AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                    AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                 }
             }
         }
@@ -237,7 +256,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 var path = storyCoreFolder + "/" + nm;
                 if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                 {
-                    AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                    AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                 }
             }
         }
@@ -262,7 +281,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 var path = storyCoreFolder + "/" + nm;
                 if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                 {
-                    AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                    AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                 }
             }
         }
@@ -296,7 +315,7 @@ public class GameSaveController : Z_Controller<GameManager>
             var path = storyCoreFolder + "/" + icon;
             if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(icon))
             {
-                AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), icon);
+                AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), icon));
             }
             foreach (var anim in data.animDic.Values)
             {
@@ -307,7 +326,7 @@ public class GameSaveController : Z_Controller<GameManager>
                         path = storyCoreFolder + "/" + nm;
                         if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                         {
-                            AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                            AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                         }
                     }
             }
@@ -341,14 +360,14 @@ public class GameSaveController : Z_Controller<GameManager>
             var path = storyCoreFolder + "/" + icon;
             if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(icon))
             {
-                AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), icon);
+                AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), icon));
             }
             foreach (var nm in data.model.subUnitTexsName)
             {
                 path = storyCoreFolder + "/" + nm;
                 if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                 {
-                    AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                    AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                 }
             }
         }
@@ -374,13 +393,13 @@ public class GameSaveController : Z_Controller<GameManager>
                             var path = storyCoreFolder + "/" + nm;
                             if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                             {
-                                AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                                AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                             }
                             nm = clip.mainPicture;
                             path = storyCoreFolder + "/" + nm;
                             if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                             {
-                                AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm);
+                                AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                             }
                         }
                     }
@@ -421,6 +440,12 @@ public class GameSaveController : Z_Controller<GameManager>
         return new PlayData();
     }
 
+
+
+    public void LoadLocalModStory()
+    {
+
+    }
     #endregion
 
     public void ResetPrefabPool()

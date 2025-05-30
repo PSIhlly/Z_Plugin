@@ -2,6 +2,7 @@ using Form;
 using System.Collections;
 using System.Collections.Generic;
 using Ui.ModSceneMenu;
+using Ui.PlayData;
 using Ui.PlaySceneMenu;
 using UnityEngine;
 using Z_Map;
@@ -21,6 +22,10 @@ namespace Ui.PlaySceneMain
             view.btn_menu.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiPlaySceneMenuCtrl>();
+            });
+            view.btn_data.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiPlayDataCtrl>();
             });
 
         }

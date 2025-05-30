@@ -145,6 +145,32 @@ namespace Form
 
                 {10001,new Data(10001,"savePopupTitle","Do you need Save?","需要保存吗?")},
 
+                {20001,new Data(20001,"play_2","Start","开始游戏")},
+
+                {20002,new Data(20002,"workshop","Workshop","创意工坊")},
+
+                {20003,new Data(20003,"lounge","Lounge","休息室")},
+
+                {20004,new Data(20004,"setting","Settings","设置")},
+
+                {20005,new Data(20005,"exit","Exit","退出")},
+
+                {20006,new Data(20006,"news","News","资讯")},
+
+                {20007,new Data(20007,"back","Back","返回")},
+
+                {20008,new Data(20008,"backpack","Backpack","背包")},
+
+                {20009,new Data(20009,"use","Use","使用")},
+
+                {20010,new Data(20010,"drop","Drop","丢弃")},
+
+                {20011,new Data(20011,"equip","Equip","装备")},
+
+                {20012,new Data(20012,"character","Character","角色")},
+
+                {20013,new Data(20013,"basicInformation","Basic Information","基础信息")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -163,6 +189,32 @@ namespace Form
                         {"gain",_DataById[7]},
     
                         {"savePopupTitle",_DataById[10001]},
+    
+                        {"play_2",_DataById[20001]},
+    
+                        {"workshop",_DataById[20002]},
+    
+                        {"lounge",_DataById[20003]},
+    
+                        {"setting",_DataById[20004]},
+    
+                        {"exit",_DataById[20005]},
+    
+                        {"news",_DataById[20006]},
+    
+                        {"back",_DataById[20007]},
+    
+                        {"backpack",_DataById[20008]},
+    
+                        {"use",_DataById[20009]},
+    
+                        {"drop",_DataById[20010]},
+    
+                        {"equip",_DataById[20011]},
+    
+                        {"character",_DataById[20012]},
+    
+                        {"basicInformation",_DataById[20013]},
     
                     };
     

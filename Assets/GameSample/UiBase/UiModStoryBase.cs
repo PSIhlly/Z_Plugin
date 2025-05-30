@@ -108,84 +108,6 @@ namespace Ui.ModStory
     {
         
     }
-
-    public partial class UiModStoryModulePanelParam:UiParam
-    {
-    }
-
-    public partial class UiModStoryModulePanelView:UiView
-    {
-
-            public Btn btn_material;
-            public Sta sta_material;
-            public Btn btn_obstacle;
-            public Sta sta_obstacle;
-            public Btn btn_character;
-            public Sta sta_character;
-            public Btn btn_config;
-            public Sta sta_config;
-            public Btn btn_event;
-            public Sta sta_event;
-            public Btn btn_item;
-            public Sta sta_item;
-            public Txt txt_material;
-            public Txt txt_obstacle;
-            public Txt txt_character;
-            public Txt txt_config;
-            public Txt txt_event;
-            public Txt txt_item;
-        public UiModStoryModulePanelView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            btn_material = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            sta_material = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_obstacle = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_obstacle = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            btn_character = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_character = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_config = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_config = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_event = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_event = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            btn_item = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            sta_item = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            txt_material = uiHolder.elementTrsLst[12].GetComponent<Txt>();
-            txt_obstacle = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            txt_character = uiHolder.elementTrsLst[14].GetComponent<Txt>();
-            txt_config = uiHolder.elementTrsLst[15].GetComponent<Txt>();
-            txt_event = uiHolder.elementTrsLst[16].GetComponent<Txt>();
-            txt_item = uiHolder.elementTrsLst[17].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiModStoryModulePanelCtrl:UiCtrl
-    {
-        public UiModStoryModulePanelView view;
-        public UiModStoryModulePanelModel model;
-        public UiModStoryModulePanelParam param;
-        public UiModStoryCtrl parent=>(UiModStoryCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiModStoryModulePanelParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiModStoryModulePanelView(uiHolder);
-            model=new UiModStoryModulePanelModel();
-
-
-        }
-
-    }
-    public partial class UiModStoryModulePanelModel:UiModel
-    {
-        
-    }
     public partial class UiModStoryParam:UiParam
     {
     }
@@ -193,31 +115,59 @@ namespace Ui.ModStory
     public partial class UiModStoryView:UiView
     {
 
-            public Txt txt_title;
             public Btn btn_back;
-            public UiModStoryScenePanelCtrl sub_ModStoryScenePanel;
-            public UiModStoryModulePanelCtrl sub_ModStoryModulePanel;
             public Btn btn_play;
+            public UiModStoryScenePanelCtrl sub_ModStoryScenePanel;
+            public Txt txt_title;
+            public Btn btn_overview;
+            public Sta sta_overview;
+            public Btn btn_parameter;
+            public Sta sta_parameter;
+            public Btn btn_character;
+            public Sta sta_character;
+            public Btn btn_item;
+            public Sta sta_item;
+            public Btn btn_mapObject;
+            public Sta sta_mapObject;
+            public Btn btn_event;
+            public Sta sta_event;
             public Btn btn_scene;
             public Sta sta_scene;
-            public Btn btn_module;
-            public Sta sta_module;
+            public Txt txt_overview;
+            public Txt txt_parameter;
+            public Txt txt_character;
+            public Txt txt_item;
+            public Txt txt_mapObject;
+            public Txt txt_event;
             public Txt txt_scene;
-            public Txt txt_module;
         public UiModStoryView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_title = uiHolder.elementTrsLst[0].GetComponent<Txt>();
-            btn_back = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            btn_play = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sub_ModStoryScenePanel = (UiModStoryScenePanelCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            sub_ModStoryModulePanel = (UiModStoryModulePanelCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            btn_play = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            btn_scene = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            sta_scene = uiHolder.elementTrsLst[6].GetComponent<Sta>();
-            btn_module = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            sta_module = uiHolder.elementTrsLst[8].GetComponent<Sta>();
-            txt_scene = uiHolder.elementTrsLst[9].GetComponent<Txt>();
-            txt_module = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            txt_title = uiHolder.elementTrsLst[3].GetComponent<Txt>();
+            btn_overview = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_overview = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            btn_parameter = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            sta_parameter = uiHolder.elementTrsLst[7].GetComponent<Sta>();
+            btn_character = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_character = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_item = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_item = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            btn_mapObject = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_mapObject = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            btn_event = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            sta_event = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            btn_scene = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            sta_scene = uiHolder.elementTrsLst[17].GetComponent<Sta>();
+            txt_overview = uiHolder.elementTrsLst[18].GetComponent<Txt>();
+            txt_parameter = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            txt_character = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            txt_item = uiHolder.elementTrsLst[21].GetComponent<Txt>();
+            txt_mapObject = uiHolder.elementTrsLst[22].GetComponent<Txt>();
+            txt_event = uiHolder.elementTrsLst[23].GetComponent<Txt>();
+            txt_scene = uiHolder.elementTrsLst[24].GetComponent<Txt>();
         }
 
     }
@@ -244,8 +194,6 @@ namespace Ui.ModStory
 
             view.sub_ModStoryScenePanel = new UiModStoryScenePanelCtrl();
             view.sub_ModStoryScenePanel.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_ModStoryModulePanel = new UiModStoryModulePanelCtrl();
-            view.sub_ModStoryModulePanel.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

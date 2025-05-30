@@ -6,6 +6,7 @@ using Z_Ui.Base;
 using Z_Ui;
 
 namespace Ui.Mod
+
 {
 
 
@@ -64,16 +65,16 @@ namespace Ui.Mod
     public partial class UiModView:UiView
     {
 
-            public Txt txt_title;
             public Btn btn_back;
+            public Txt txt_title;
             public ScrView scr_tt;
             public GameObject go_storyItem;
             public UiStoryItemCtrl sub_StoryItem;
         public UiModView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_title = uiHolder.elementTrsLst[0].GetComponent<Txt>();
-            btn_back = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             scr_tt = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             go_storyItem = uiHolder.elementTrsLst[3].gameObject;
             sub_StoryItem = (UiStoryItemCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;

@@ -17,21 +17,23 @@ namespace Ui.EnterMain
     public partial class UiEnterMainView:UiView
     {
 
+            public Btn btn_email;
             public Btn btn_news;
-            public Btn btn_start;
-            public Btn btn_warRoom;
+            public Btn btn_play;
+            public Btn btn_mod;
+            public Btn btn_lounge;
             public Btn btn_setting;
             public Btn btn_quit;
-            public Btn btn_email;
         public UiEnterMainView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_news = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            btn_start = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            btn_warRoom = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_setting = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_quit = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            btn_email = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            btn_email = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            btn_news = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            btn_play = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_mod = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_lounge = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            btn_setting = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            btn_quit = uiHolder.elementTrsLst[6].GetComponent<Btn>();
         }
 
     }

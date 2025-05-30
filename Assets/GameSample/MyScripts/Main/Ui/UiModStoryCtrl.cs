@@ -26,10 +26,17 @@ namespace Ui.ModStory
                 UiManager.instance.ShowUi<UiModCtrl>();
                 Close();
             });
-
-            view.btn_module.onClick.AddListener(() =>
+            view.btn_play.onClick.AddListener(() =>
             {
-                model.curUi = view.sub_ModStoryModulePanel;
+                Main2StoryManager.instance.UnloadStoryUgc();
+                Main2StoryManager.instance.StartLoadStoryPlay(ModManager.instance.GetFolderName(), true);
+                Close();
+            });
+
+
+            view.btn_overview.onClick.AddListener(() =>
+            {
+                //model.curUi = ;
                 Refresh();
             });
             view.btn_scene.onClick.AddListener(() =>
@@ -37,28 +44,19 @@ namespace Ui.ModStory
                 model.curUi = view.sub_ModStoryScenePanel;
                 Refresh();
             });
-            view.btn_play.onClick.AddListener(() =>
-            {
-                Main2StoryManager.instance.UnloadStoryUgc();
-                Main2StoryManager.instance.StartLoadStoryPlay(ModManager.instance.GetFolderName(),true);
-                Close();
-            });
+            
         }
 
 
 
         public override void OnShow()
         {
-            model.curUi = view.sub_ModStoryScenePanel;
+            //model.curUi = view.sub;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_scene.ChangeState(model.curUi == view.sub_ModStoryScenePanel ? 1 : 0);
-            view.sub_ModStoryScenePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryScenePanel);
 
-            view.sta_module.ChangeState(model.curUi == view.sub_ModStoryModulePanel ? 1 : 0);
-            view.sub_ModStoryModulePanel.gameObject.SetActive(model.curUi == view.sub_ModStoryModulePanel);
         }
 
     }

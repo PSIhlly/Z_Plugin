@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Ui;
 using Ui.EnterMain;
 using UnityEngine;
@@ -63,7 +64,16 @@ public class GameManager : Z_MonoManager<GameManager>
 
         Application.targetFrameRate = 100;//先锁100帧
         //default Assets
-        AssetManager.instance.LoadAssetsByFolderAutoAdd("Z_Map/", true, true);
+
+        var res=AssetManager.instance.LoadAssetsByFolder("Z_Map/", true);
+        for (int i = 0; i < res.texs.Count; i++)
+        {
+            TexAssetForm.AddData(new TexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(res.texs[i].Item1), res.texs[i].Item2));
+        }
+        for (int i = 0; i < res.gos.Count; i++)
+        {
+            GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(-1 , Path.GetFileName(res.gos[i].Item1), res.gos[i].Item2));
+        }
 
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))

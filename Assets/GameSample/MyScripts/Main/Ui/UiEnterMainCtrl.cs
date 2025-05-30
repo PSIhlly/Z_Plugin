@@ -5,8 +5,9 @@ using Form;
 using Item;
 using Z_Texture;
 using Z_Ui;
-using Ui.WarRoom;
 using Ui.Start;
+using Ui.Mod;
+using Ui.Lounge;
 
 namespace Ui.EnterMain
 {
@@ -14,14 +15,20 @@ namespace Ui.EnterMain
     {
         public override void OnCreate()
         {
-            view.btn_warRoom.onClick.AddListener(()=>
+            view.btn_lounge.onClick.AddListener(()=>
             {
-                UiManager.instance.ShowUi<UiWarRoomCtrl>();
+                UiManager.instance.ShowUi<UiLoungeCtrl>();
                 Close();
             });
-            view.btn_start.onClick.AddListener(() =>
+            view.btn_play.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiStartCtrl>();
+                Close();
+            });
+
+            view.btn_mod.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModCtrl>();
                 Close();
             });
         }

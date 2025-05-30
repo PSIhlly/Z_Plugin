@@ -95,7 +95,7 @@ namespace Ui.ModStoryItem.ModStoryItemList
             if (model.curData != null)
             {
                 view.ipt_name.Set(model.curData.name);
-                view.img_avatar.sprite = TexAssetForm.DataByName[model.curData.iconTexName].sprite;
+                view.img_icon.sprite = TexAssetForm.DataByName[model.curData.iconTexName].sprite;
             }
 
         }

@@ -163,6 +163,26 @@ namespace Form
 
                 {1110005,new Data(1110005,"input value","Input value","输入值")},
 
+                {1110006,new Data(1110006,"icon","Icon","图标")},
+
+                {1110007,new Data(1110007,"avatar","Avatar","头像")},
+
+                {1110008,new Data(1110008,"overview","Overview","简介")},
+
+                {1110009,new Data(1110009,"parameter","Parameter","参数")},
+
+                {1110010,new Data(1110010,"character","Character","人物")},
+
+                {1110012,new Data(1110012,"mapObject","Map object","地图元素")},
+
+                {1110013,new Data(1110013,"event","Event","事件")},
+
+                {1110014,new Data(1110014,"scene","Scene","场景")},
+
+                {1110015,new Data(1110015,"name","Name","名称")},
+
+                {1110016,new Data(1110016,"introduction","Introduction","介绍")},
+
                 {1210001,new Data(1210001,"dialog","dialog","对话")},
 
                 {1210002,new Data(1210002,"tips","tips","提示")},
@@ -229,6 +249,26 @@ namespace Form
                         {"Choose Move anim",_DataById[1110004]},
     
                         {"input value",_DataById[1110005]},
+    
+                        {"icon",_DataById[1110006]},
+    
+                        {"avatar",_DataById[1110007]},
+    
+                        {"overview",_DataById[1110008]},
+    
+                        {"parameter",_DataById[1110009]},
+    
+                        {"character",_DataById[1110010]},
+    
+                        {"mapObject",_DataById[1110012]},
+    
+                        {"event",_DataById[1110013]},
+    
+                        {"scene",_DataById[1110014]},
+    
+                        {"name",_DataById[1110015]},
+    
+                        {"introduction",_DataById[1110016]},
     
                         {"dialog",_DataById[1210001]},
     

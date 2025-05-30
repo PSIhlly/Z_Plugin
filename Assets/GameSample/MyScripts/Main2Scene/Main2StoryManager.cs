@@ -40,6 +40,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
     public void StartLoadStory(string storyFolder)
     {
+
+        StoryTexAssetForm.Clear();
+
         if (SaveAndLoad.Exist(storyFolder + "/core"))
         {
             GameManager.instance.saveCtrl.LoadMaterial(storyFolder + "/core");

@@ -48,7 +48,9 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,List<int>,List<int>> changeSceneidsAction;
+        public static Action<Data,string,string> changeDescAction;
+                
+        public static Action<Data,string,string> changeIconAction;
                 
 
 
@@ -91,41 +93,60 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-                    private List<int>  _sceneIds;
+                    private string  _desc;
                     /// <summary>
-                    ///°üº¬³¡¾°id
+                    ///¼ò½é
                     ///</summary>
-                    public List<int>  sceneIds{
-                                get{return _sceneIds;}
+                    public string  desc{
+                                get{return _desc;}
  set{
 
                     if(_DataById!=null&&_DataById.ContainsValue(this))
                     {
-                       ChangeSceneids(this,_sceneIds,value); 
+                       ChangeDesc(this,_desc,value); 
                     }
         
-                _sceneIds = value;
+                _desc = value;
                 }
                  
                      }
                     
-            public Data(int id,string name,List<int> sceneIds)
+                    private string  _icon;
+                    /// <summary>
+                    ///·âÃæ
+                    ///</summary>
+                    public string  icon{
+                                get{return _icon;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeIcon(this,_icon,value); 
+                    }
+        
+                _icon = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string desc,string icon)
             {
 
              this.id = id;
              this.name = name;
-             this.sceneIds = sceneIds;
+             this.desc = desc;
+             this.icon = icon;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,new List<int>(sceneIds));
+        return new Data(sameId? id:idChain.GetId(),name,desc,icon);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null);
+                   private static Data _defaultData=new Data(0,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -200,7 +221,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<List<int>>("sceneIds")
+                jo.Get<string>("desc"),
+
+                jo.Get<string>("icon")
                     );
 
             return data;
@@ -216,7 +239,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<List<int>>("sceneIds",data.sceneIds);
+            jo.Set<string>("desc",data.desc);
+
+            jo.Set<string>("icon",data.icon);
 
             return jo;
         }
@@ -313,12 +338,22 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     
             }
             
-            public static void ChangeSceneids(Data superData,List<int> oldV,List<int> newV)
+            public static void ChangeDesc(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeSceneidsAction?.Invoke(data,oldV,newV);
+                changeDescAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIcon(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
                 }
                     
             }

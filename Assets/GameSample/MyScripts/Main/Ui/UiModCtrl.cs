@@ -8,6 +8,8 @@ using Z_Ui.Base;
 using Z_Ui;
 using Ui.Start;
 using Ui.ModStory;
+using Ui.EnterMain;
+using Z_Text;
 
 namespace Ui.Mod
 {
@@ -19,7 +21,7 @@ namespace Ui.Mod
             con = new UiScrViewContainer<UiStoryItemCtrl>(view.go_storyItem, view.scr_tt);
             view.btn_back.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiStartCtrl>();
+                UiManager.instance.ShowUi<UiEnterMainCtrl>();
                 Close();
             });
         }
@@ -32,13 +34,20 @@ namespace Ui.Mod
         public void Refresh()
         {
             con.Clear();
-            for (int i = 0; i < 1; i++)
+            int i = 0;
+            for (; i < 8; i++)
             {
                 con.Add(new UiStoryItemParam()
                 {
-                    name="mod1"
+                    name="mod1",
+                    id= i
                 });
             }
+            con.Add(new UiStoryItemParam()
+            {
+                name = null,
+                id= i
+            });
             con.Refresh();
         }
 
@@ -48,6 +57,12 @@ namespace Ui.Mod
     public partial class UiStoryItemParam
     {
         public string name;
+        public int id;
+    }
+    public partial class UiStoryItemModel
+    {
+        public string name;
+        public int id;
     }
     public partial class UiStoryItemCtrl
     {
@@ -55,13 +70,29 @@ namespace Ui.Mod
         {
             view.btn_mod.onClick.AddListener(() =>
             {
-                Main2StoryManager.instance.StartLoadStoryUgc("story1");
+                if(model.name!=null)
+                {
+
+                    Main2StoryManager.instance.StartLoadStoryUgc(model.name);
+                }else
+                {
+                    Main2StoryManager.instance.StartLoadStoryUgc("newStory"+ model.id);
+                }
                 parent.Close();
             });
         }
         public override void OnShow()
         {
-            view.txt_modName.text = param.name;
+            model.name = param.name;
+            model.id = param.id;
+            if(model.name==null)
+            {
+                TextManager.instance.GetTxt("new");
+            }
+            else
+            {
+                view.txt_modName.text = model.name;
+            }
             Refresh();
         }
         public void Refresh()

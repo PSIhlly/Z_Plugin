@@ -17,7 +17,7 @@ namespace Z_Language
         {
             private set;
             get;
-        } = Language.Cn;
+        } = Language.En;
         public void SetLanguage(Language language)
         {
             this.language = language;
@@ -25,7 +25,7 @@ namespace Z_Language
 
         public string GetTxt(string key)
         {
-            if(!TextBaseForm.DataByKey.ContainsKey(key))
+            if(string.IsNullOrEmpty(key)|| !TextBaseForm.DataByKey.ContainsKey(key))
             {
                 Debug.LogError("Language text key: "+ key + " not exist!");
                 return key;

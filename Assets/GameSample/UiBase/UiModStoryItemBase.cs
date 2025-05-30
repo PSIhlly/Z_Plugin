@@ -206,8 +206,8 @@ namespace ModStoryItemList
             public Btn btn_model;
             public GameObject go_item;
             public UiItemCtrl sub_Item;
-            public Img img_avatar;
-            public Txt txt_avatar;
+            public Img img_icon;
+            public Txt txt_icon;
             public Txt txt_delete;
             public Txt txt_name;
             public Img img_args;
@@ -227,8 +227,8 @@ namespace ModStoryItemList
             btn_model = uiHolder.elementTrsLst[7].GetComponent<Btn>();
             go_item = uiHolder.elementTrsLst[8].gameObject;
             sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            img_avatar = uiHolder.elementTrsLst[10].GetComponent<Img>();
-            txt_avatar = uiHolder.elementTrsLst[11].GetComponent<Txt>();
+            img_icon = uiHolder.elementTrsLst[10].GetComponent<Img>();
+            txt_icon = uiHolder.elementTrsLst[11].GetComponent<Txt>();
             txt_delete = uiHolder.elementTrsLst[12].GetComponent<Txt>();
             txt_name = uiHolder.elementTrsLst[13].GetComponent<Txt>();
             img_args = uiHolder.elementTrsLst[14].GetComponent<Img>();

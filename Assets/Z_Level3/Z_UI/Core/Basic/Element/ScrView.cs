@@ -141,12 +141,23 @@ namespace Z_Ui.Base
 
             var relaPos = new Vector3(0, 0, 0);
 
+            var unitSize = Vector2.zero;
+            if (fiilType == FillType.Average)
+            {
+                unitSize = new Vector2(width / columnCnt * content.lossyScale.x,  height / rowCnt * content.lossyScale.y);
+
+            }
+            else
+            {
+                unitSize = new Vector2(cell.rect.width * content.lossyScale.x,  cell.rect.height * content.lossyScale.y);
+
+            }
 
             if (dir == Direction.Vertical)
             {
-                int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / cell.rect.height / content.lossyScale.y);
+                int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / unitSize.y);
                 needs.Clear();
-                while (contentCorners[1].y - curRowId * cell.rect.height * content.lossyScale.y > viewPortCorners[0].y)
+                while (contentCorners[1].y - curRowId * unitSize.y > viewPortCorners[0].y)
                 {
                     for (int i = 0; i < columnCnt; i++)
                     {
@@ -162,25 +173,15 @@ namespace Z_Ui.Base
                 {
                     int row = id / columnCnt;
                     int column = id % columnCnt;
-
-                    if (fiilType == FillType.Average)
-                    {
-                        relaPos = new Vector3((column + 0.5f) * width / columnCnt * content.lossyScale.x, -(row + 0.5f) * height / rowCnt * content.lossyScale.y, 0);
-
-                    }
-                    else
-                    {
-                        relaPos = new Vector3((column + 0.5f) * cell.rect.width * content.lossyScale.x, -(row + 0.5f) * cell.rect.height * content.lossyScale.y, 0);
-
-                    }
+                    relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
                     Add(id, contentCorners[1] + relaPos);
                 }
             }
             else
             {
-                int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / cell.rect.width / content.lossyScale.x);
+                int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / unitSize.x);
                 needs.Clear();
-                while (contentCorners[1].x + curColumnId * cell.rect.width * content.lossyScale.x < viewPortCorners[2].x)
+                while (contentCorners[1].x + curColumnId * unitSize.x < viewPortCorners[2].x)
                 {
                     for (int i = 0; i < rowCnt; i++)
                     {
@@ -197,20 +198,14 @@ namespace Z_Ui.Base
 
                     int column = id / rowCnt;
                     int row = id % rowCnt;
-                    if (fiilType == FillType.Average)
-                    {
-                        relaPos = new Vector3((column + 0.5f) * width / columnCnt * content.lossyScale.x, -(row + 0.5f) * height / rowCnt * content.lossyScale.y, 0);
+                    relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
 
-                    }
-                    else
-                    {
-                        relaPos = new Vector3((column + 0.5f) * cell.rect.width * content.lossyScale.x, -(row + 0.5f) * cell.rect.height * content.lossyScale.y, 0);
-
-                    }
                     
                     Add(id, contentCorners[1] + relaPos);
                 }
             }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(content);
         }
         private void UpdateDic()
         {

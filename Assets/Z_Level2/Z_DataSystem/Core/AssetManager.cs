@@ -43,8 +43,12 @@ namespace Z_DataSystem.Form
             public void ToProduct()
             {
                 isProto = false;
+                AddData(this);
             }
-
+            public void DestroyProduct()
+            {
+                RemoveData(uid);
+            }
         }
     }
 }
@@ -73,7 +77,6 @@ namespace Z_DataSystem
         {
             cacheCtrl = new AssetCacheCtroller(this);
         }
-        public int assetDefaultIdCnt;
         #region all
        
 
@@ -113,19 +116,6 @@ namespace Z_DataSystem
 
             return res;
         }
-        public void LoadAssetsByFolderAutoAdd(string path, bool isRes, bool isDefault)
-        {
-            var res = LoadAssetsByFolder(path, isRes);
-            for (int i = 0; i < res.texs.Count; i++)
-            {
-                TexAssetForm.AddData(new TexAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, Path.GetFileNameWithoutExtension(res.texs[i].Item1), res.texs[i].Item2));
-            }
-
-            for (int i = 0; i < res.gos.Count; i++)
-            {
-                GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(isDefault ? ((++assetDefaultIdCnt) + AssetForm.autoIdCnt) : -1, Path.GetFileName(res.gos[i].Item1), res.gos[i].Item2));
-            }
-        }
 
         #endregion
 
@@ -142,7 +132,7 @@ namespace Z_DataSystem
         }
         public class SelectTexTask
         {
-            public Action<Texture2D, string> callback;
+            public Action<TexAssetForm.Data> callback;
             public Vector2Int forceSize;
             public void Run()
             {
@@ -156,8 +146,8 @@ namespace Z_DataSystem
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
                     var nm = tex.imageContentsHash.GetHashCode().ToString();
-                    instance.LoadTex(tex, nm);
-                    callback?.Invoke(tex, nm);
+                    var form=instance.LoadTex(tex, nm);
+                    callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {
                         importAssetName = nm
@@ -193,44 +183,32 @@ namespace Z_DataSystem
             return res;
         }
 
-        public void SelectTex(Vector2Int forceSize=default, Action<Texture2D,string> callback = null)
+        public void SelectTex(Vector2Int forceSize=default, Action<TexAssetForm.Data> callback = null)
         {
             SelectTexTask task = new SelectTexTask();
             task.callback = callback;
             task.forceSize = forceSize;
             task.Run();
         }
-        public void LoadTex(Texture2D tex, string name, Vector2Int forceSize)
+        public TexAssetForm.Data LoadTex(Texture2D tex, string name, Vector2Int forceSize)
         {
-            LoadTexBytes(TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y).EncodeToPNG(), name);
+            return LoadTexBytes(TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y).EncodeToPNG(), name);
         }
-        public void LoadTex(Texture2D tex, string name)
+        public TexAssetForm.Data LoadTex(Texture2D tex, string name)
         {
-            LoadTexBytes(tex.EncodeToPNG(), name);
+            return LoadTexBytes(tex.EncodeToPNG(), name);
         }
-        public void LoadTexBytes(byte[] data, string name)
+        public TexAssetForm.Data LoadTexBytes(byte[] data, string name)
         {
             var tex = TextureHelper.GetTextureByByte(data);
-            TexAssetForm.AddData(new TexAssetForm.Data(-1, name, tex));
+            return new TexAssetForm.Data(-1, name, tex);
         }
-        public void LoadTexPath(string path, string name)
+        public TexAssetForm.Data LoadTexPath(string path, string name)
         {
             var tex = TextureHelper.GetTextureByPath(path);
-            TexAssetForm.AddData(new TexAssetForm.Data(-1, name, tex));
+            return new TexAssetForm.Data(-1, name, tex);
         }
 
-        public void DeleteTexAsset(string path, string fileName)
-        {
-            DeleteTexAsset(path, fileName);
-            if (!TexAssetForm.DataByName.ContainsKey(fileName))
-                return;
-            var data = TexAssetForm.DataByName[fileName];
-            TexAssetForm.RemoveData(data.id);
-        }
-        public void RenameTargetAsset(string oldName, string newName)
-        {
-            TexAssetForm.DataByName[oldName].name = newName;
-        }
 
         #endregion
 
@@ -244,17 +222,7 @@ namespace Z_DataSystem
         #endregion
 
        
-        public void UnloadAllAuto()
-        {
-            List<AssetForm.Data> texDatas = new List<AssetForm.Data>(AssetForm.DataById.Values);
-            foreach (var data in texDatas)
-            {
-                if (data.id <= AssetForm.autoIdCnt)
-                {
-                    TexAssetForm.DataById.Remove(data.id);
-                }
-            }
-        }
+        
 
     }
 }

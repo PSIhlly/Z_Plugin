@@ -24,6 +24,14 @@ public static partial class GlobalDataHelper
     
 
 }
+
+public enum EquipType
+{
+    None=0,
+    LeftHand=1,
+    RightHand=2,
+}
+
 public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
 {
     public GameCharacterController(GameManager super) : base(super)

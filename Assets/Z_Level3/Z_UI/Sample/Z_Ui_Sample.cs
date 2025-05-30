@@ -14,6 +14,7 @@ using Z_Ui.Notify;
 using System;
 using Z_Time;
 using Z_DataSystem;
+using Z_DataSystem.Form;
 
 public class Z_Ui_Sample : MonoBehaviour
 {
@@ -32,11 +33,11 @@ public class Z_Ui_Sample : MonoBehaviour
                 contentLst.Add(v.text);
                 nameLst.Add(Sample_NpcForm.Datas[v.speaker_npcId].name);
                 var bgForm = Sample_ImgForm.Datas[v.background_imgId];
-                AssetManager.instance.LoadTexPath(Application.dataPath + bgForm.path, bgForm.id+"bg");
+                TexAssetForm.AddData( AssetManager.instance.LoadTexPath(Application.dataPath + bgForm.path, bgForm.id+"bg"));
                 bgLst.Add(bgForm.id + "bg");
 
                 var avatarForm = Sample_ImgForm.Datas[Sample_NpcForm.Datas[v.speaker_npcId].avatar_imgId];
-                AssetManager.instance.LoadTexPath(Application.dataPath + avatarForm.path, avatarForm.id + "avt");
+                TexAssetForm.AddData(AssetManager.instance.LoadTexPath(Application.dataPath + avatarForm.path, avatarForm.id + "avt"));
                 avatarLst.Add(avatarForm.id + "avt");
             }
         }

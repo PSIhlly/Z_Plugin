@@ -5,9 +5,9 @@ using Form;
 using Item;
 using Z_Texture;
 
-namespace Ui.WarRoom
+namespace Ui.Lounge
 {
-    public partial class UiWarRoomCtrl: IZ_Listener<ItemEvent>
+    public partial class UiLoungeCtrl : IZ_Listener<ItemEvent>
     {
         public override void OnCreate()
         {

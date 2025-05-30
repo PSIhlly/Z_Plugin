@@ -68,7 +68,13 @@ namespace Form
                 
         public static Action<Data,MapModelForm.Data,MapModelForm.Data> changeModelAction;
                 
+        public static Action<Data,string,string> changeDescAction;
+                
         public static Action<Data,int,int> changeAmountAction;
+                
+        public static Action<Data,int,int> changeMaxamountperAction;
+                
+        public static Action<Data,EquipType,EquipType> changeEquipAction;
                 
 
 
@@ -129,6 +135,24 @@ namespace Form
                  
                      }
                     
+                    private string  _desc;
+                    /// <summary>
+                    ///描述
+                    ///</summary>
+                    public string  desc{
+                                get{return _desc;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDesc(this,_desc,value); 
+                    }
+        
+                _desc = value;
+                }
+                 
+                     }
+                    
                     private int  _amount;
                     /// <summary>
                     ///数量
@@ -147,7 +171,43 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,int amount):base(uid,name,isProto)
+                    private int  _maxAmountPer;
+                    /// <summary>
+                    ///单体最大数量
+                    ///</summary>
+                    public int  maxAmountPer{
+                                get{return _maxAmountPer;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMaxamountper(this,_maxAmountPer,value); 
+                    }
+        
+                _maxAmountPer = value;
+                }
+                 
+                     }
+                    
+                    private EquipType  _equip;
+                    /// <summary>
+                    ///装备位置
+                    ///</summary>
+                    public EquipType  equip{
+                                get{return _equip;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEquip(this,_equip,value); 
+                    }
+        
+                _equip = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipType equip):base(uid,name,isProto)
             {
 
              this.uid = uid;
@@ -156,18 +216,21 @@ namespace Form
              this.paramDic = paramDic;
              this.isProto = isProto;
              this.model = model;
+             this.desc = desc;
              this.amount = amount;
+             this.maxAmountPer = maxAmountPer;
+             this.equip = equip;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,amount);
+        return new Data(sameId? uid:uidChain.GetId(),name,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,1);
+                   private static Data _defaultData=new Data(0,"","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -286,7 +349,13 @@ namespace Form
 
                 jo.Get<MapModelForm.Data>("model"),
 
-                jo.Get<int>("amount")
+                jo.Get<string>("desc"),
+
+                jo.Get<int>("amount"),
+
+                jo.Get<int>("maxAmountPer"),
+
+                jo.Get<EquipType>("equip")
                     );
 
             return data;
@@ -310,7 +379,13 @@ namespace Form
 
             jo.Set<MapModelForm.Data>("model",data.model);
 
+            jo.Set<string>("desc",data.desc);
+
             jo.Set<int>("amount",data.amount);
+
+            jo.Set<int>("maxAmountPer",data.maxAmountPer);
+
+            jo.Set<EquipType>("equip",data.equip);
 
             return jo;
         }
@@ -476,12 +551,42 @@ ProductForm.RemoveData(uid);
                     
             }
             
+            public static void ChangeDesc(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDescAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
             public static void ChangeAmount(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
                 changeAmountAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMaxamountper(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMaxamountperAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEquip(Data superData,EquipType oldV,EquipType newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEquipAction?.Invoke(data,oldV,newV);
                 }
                     
             }

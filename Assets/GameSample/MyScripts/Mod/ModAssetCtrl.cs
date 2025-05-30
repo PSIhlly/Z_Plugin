@@ -19,7 +19,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     }
     public int modId;
+    #region main
 
+
+    #endregion
 
     #region anim
 
@@ -38,15 +41,17 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportAnimTex(string name, int id)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
          {
+             GameManager.instance.saveCtrl.AddStoryTex(form);
+
              if (MapTextureForm.DataByName[name].texsName.Count > id)
              {
-                 MapTextureForm.DataByName[name].texsName[id] = nm;
+                 MapTextureForm.DataByName[name].texsName[id] = form.name;
              }
              else
              {
-                 MapTextureForm.DataByName[name].texsName.Add(nm);
+                 MapTextureForm.DataByName[name].texsName.Add(form.name);
              }
          });
 
@@ -83,15 +88,18 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportMaskTex(string name, int id)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+
             if (MapMaskForm.DataByName[name].texsName.Count > id)
             {
-                MapMaskForm.DataByName[name].texsName[id] = nm;
+                MapMaskForm.DataByName[name].texsName[id] = form.name;
             }
             else
             {
-                MapMaskForm.DataByName[name].texsName.Add(nm);
+                MapMaskForm.DataByName[name].texsName.Add(form.name);
             }
         });
 
@@ -148,15 +156,17 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportObjectTex(string name, int id)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
             if (MapObjectForm.DataByName[name].model.subUnitTexsName.Count > id)
             {
-                MapObjectForm.DataByName[name].model.subUnitTexsName[id] = nm;
+                MapObjectForm.DataByName[name].model.subUnitTexsName[id] = form.name;
             }
             else
             {
-                MapObjectForm.DataByName[name].model.subUnitTexsName.Add(nm);
+                MapObjectForm.DataByName[name].model.subUnitTexsName.Add(form.name);
             }
         });
 
@@ -218,9 +228,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportCharacterAvatar(string name)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            CharacterProductForm.DataByNameIsproto[(name, true)].avatarTexName = nm;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+
+            CharacterProductForm.DataByNameIsproto[(name, true)].avatarTexName = form.name;
         });
 
     }
@@ -274,17 +287,20 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportCharacterAnim(string characterName, string animNm, int part, int id)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+
             var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
             var anim = data.animDic[animNm];
             if (anim.partAnimTexsName[part].Count > id)
             {
-                anim.partAnimTexsName[part][id] = nm;
+                anim.partAnimTexsName[part][id] = form.name;
             }
             else
             {
-                anim.partAnimTexsName[part].Add(nm);
+                anim.partAnimTexsName[part].Add(form.name);
             }
         });
     }
@@ -340,9 +356,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportClipTex(Action<string> callback)
     {
-        AssetManager.instance.SelectTex(callback:(v, nm) =>
+        AssetManager.instance.SelectTex(callback:(form) =>
         {
-            callback?.Invoke(nm);
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+
+            callback?.Invoke(form.name);
         });
 
     }
@@ -397,9 +416,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportItemIcon(string name)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            ItemProductForm.DataByNameIsproto[(name, true)].iconTexName = nm;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+
+            ItemProductForm.DataByNameIsproto[(name, true)].iconTexName = form.name;
         });
 
     }
@@ -416,7 +438,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var model = MapModelForm.defaultData;
         model.isObstacle = false;
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", dic, true, model,1));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", dic, true, model,"",1,1,default));
     }
     public void DeleteItem(string name)
     {
@@ -443,16 +465,19 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportItemModelUnitTex(string name, int id)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (v, nm) =>
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+
             var data = ItemProductForm.DataByNameIsproto[(name, true)];
             if (data.model.subUnitTexsName.Count > id)
             {
-                data.model.subUnitTexsName[id] = nm;
+                data.model.subUnitTexsName[id] = form.name;
             }
             else
             {
-                data.model.subUnitTexsName.Add(nm);
+                data.model.subUnitTexsName.Add(form.name);
             }
         });
 

@@ -38,7 +38,7 @@ public interface ExternalPlaySceneController
     public void SetPlayerPos(Vector3 pos);
     public void SetPlayerMove(Vector3 dir);
     public void SetPlayerRotation(Vector3 dir, float speed);
-
+    public void AddMessage(string content);
     public void ForceUpdate();
 
     public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data);
@@ -218,5 +218,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         _playerM.unit.ins.transform.rotation= Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
+    }
+    public void AddMessage(string content)
+    {
+        var ctrl = UiManager.instance.GetUi<UiPlaySceneMainCtrl>();
+        if(ctrl!=null)
+        {
+            ctrl.view.page_PlaySceneMessage.AddMessage(content);
+        }
     }
 }

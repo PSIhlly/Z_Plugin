@@ -58,7 +58,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         enable = true;
         foreach(var uid in _super.data.progress.bag)
         {
-            GainItem(ItemProductForm.DataByUid[uid].name,false);
+            GainItem(ItemProductForm.DataByUid[uid].name,false,false);
         }    
     }
     public void End()
@@ -72,21 +72,42 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             return;
 
     }
-    public void GainItem(string itemName, bool toast = true)
+    public void GainItem(string itemName, bool toast = true, bool message = true)
     {
-        var newItem=ItemProductForm.DataByNameIsproto[(itemName, true)].Copy();
+        var newItem=ItemProductForm.DataByNameIsproto[(itemName, true)].Copy(false);
         newItem.ToProduct();
-        GainItem(newItem, toast);
+        GainItem(newItem, toast, message);
     }
-    public void GainItem(ItemProductForm.Data data, bool toast = true)
+    public void GainItem(ItemProductForm.Data data, bool toast = true, bool message = true)
     {
         if (!bagName2UidDic.ContainsKey(data.name))
             bagName2UidDic[data.name] = new List<int>();
+        foreach(var uid in bagName2UidDic[data.name])
+        {
+            var old = ItemProductForm.DataByUid[uid];
+            if (old.amount< old.maxAmountPer)
+            {
+                int addition = Mathf.Min(old.maxAmountPer - old.amount, data.amount);
+                data.amount -= addition;
+                old.amount += addition;
+            }
+        }
+        if(data.amount==0)
+        {
+            data.DestroyProduct();
+            return;
+        }
 
         bagName2UidDic[data.name].Add(data.uid);
+        _super.data.progress.bag.Add(data.uid);
+        var content = TextManager.instance.GetTxt("gain") + " " + data.name + " x" + data.amount;
         if (toast)
         {
-            NotifyManager.instance.AddTip(TextManager.instance.GetTxt("gain") + " " + data.name + " x" + data.amount);
+            NotifyManager.instance.AddTip(content);
+        }
+        if (toast)
+        {
+            _super.sceneCtrl.AddMessage(content);
         }
     }
 

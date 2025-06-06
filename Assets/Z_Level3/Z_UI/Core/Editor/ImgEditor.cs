@@ -17,6 +17,7 @@ namespace Z_Ui_Editor
         protected override void OnEnable()
         {
             base.OnEnable();
+
             cn = serializedObject.FindProperty("cn");
             en = serializedObject.FindProperty("en");
         }

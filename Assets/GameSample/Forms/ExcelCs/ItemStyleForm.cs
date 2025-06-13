@@ -17,9 +17,9 @@ using Z_Ui.Form;
 namespace Form
 {
 
-    public static partial class MapBaseForm
+    public static partial class ItemStyleForm
     {
-public static readonly int autoIdCnt=10000;
+public static readonly int autoUidCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
@@ -38,52 +38,48 @@ public static readonly int autoIdCnt=10000;
         
         private static bool inited;
 
-        public static Z_Chain.Chain idChain ;
+        public static Z_Chain.Chain uidChain ;
 
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
-        public static Action<Data,int,int> changeIdAction;
+        public static Action<Data,int,int> changeUidAction;
                 
         public static Action<Data,string,string> changeNameAction;
-                
-        public static Action<Data,string,string> changeIconAction;
-                
-        public static Action<Data,string,string> changeLabelAction;
                 
 
 
         public partial class Data
         {
 
-                    private int  _id;
+                    private int  _uid;
                     /// <summary>
                     ///
                     ///</summary>
-                    public int  id{
-                                get{return _id;}
+                    public int  uid{
+                                get{return _uid;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeId(this,_id,value); 
+                       ChangeUid(this,_uid,value); 
                     }
         
-                _id = value;
+                _uid = value;
                 }
                  
                      }
                     
                     private string  _name;
                     /// <summary>
-                    ///名字
+                    ///名称
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -93,70 +89,42 @@ public static readonly int autoIdCnt=10000;
                  
                      }
                     
-                    private string  _icon;
-                    /// <summary>
-                    ///图标
-                    ///</summary>
-                    public string  icon{
-                                get{return _icon;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeIcon(this,_icon,value); 
-                    }
-        
-                _icon = value;
-                }
-                 
-                     }
-                    
-                    private string  _label;
-                    /// <summary>
-                    ///标签
-                    ///</summary>
-                    public string  label{
-                                get{return _label;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeLabel(this,_label,value); 
-                    }
-        
-                _label = value;
-                }
-                 
-                     }
-                    
-            public Data(int id,string name,string icon,string label)
+            public Data(int uid,string name)
             {
 
-             this.id = id;
+             this.uid = uid;
              this.name = name;
-             this.icon = icon;
-             this.label = label;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,label);
+        return new Data(sameId? uid:uidChain.GetId(),name);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
-            static Dictionary<int, Data> _DataById;
-            public static Dictionary<int, Data> DataById
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
                 get
                 {
                     Init();
-                    return _DataById;
+                    return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
                 }
             }
     
@@ -171,16 +139,32 @@ public static readonly int autoIdCnt=10000;
             if(inited)
                 return;
             inited=true;  
-idChain=new Z_Chain.Chain (autoIdCnt);
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
-                _DataById = new Dictionary<int, Data>() {
+                _DataByUid = new Dictionary<int, Data>() {
+
+                {1,new Data(1,"verticalView")},
+
+                {2,new Data(2,"leftView")},
+
+                {3,new Data(3,"frontView")},
 
                 };
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"verticalView",_DataByUid[1]},
+    
+                        {"leftView",_DataByUid[2]},
+    
+                        {"frontView",_DataByUid[3]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
 
-foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -191,7 +175,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             List<Data> lst=new List<Data>();
             foreach(JObject jo in ja)
             {
-                if(jo.Get<int>("id")==0)
+                if(jo.Get<int>("uid")==0)
                     continue;
                 lst.Add(GetDataByJo(jo));
             }
@@ -202,9 +186,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         {
             Init();
             JArray ja=new JArray();
-            foreach(Data data in _DataById.Values)
+            foreach(Data data in _DataByUid.Values)
             {
-                if(data.id==0)
+                if(data.uid==0)
                     continue;
                 ja.Add(GetJoByData(data));
             }
@@ -217,13 +201,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
-
-                jo.Get<string>("icon"),
-
-                jo.Get<string>("label")
+                jo.Get<string>("name")
                     );
 
             return data;
@@ -235,13 +215,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             JObject jo=new JObject();
 
-            jo.Set<int>("id",data.id);
+            jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
-
-            jo.Set<string>("icon",data.icon);
-
-            jo.Set<string>("label",data.label);
 
             return jo;
         }
@@ -250,53 +226,59 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static int AddData(Data data)
         {
             Init();
-            if(DataById.ContainsKey(data.id))
-                return data.id;
-            if(data.id==-1)
+            if(DataByUid.ContainsKey(data.uid))
+                return data.uid;
+            if(data.uid==-1)
             { 
-                int id=idChain.GetId();
-                if(id==-1)
+                int uid=uidChain.GetId();
+                if(uid==-1)
                     return -1;
-                data.id=id;  
+                data.uid=uid;  
             }
-            idChain.PopId(data.id);
+            uidChain.PopId(data.uid);
 
-        DataById[data.id]=data;
+        DataByUid[data.uid]=data;
+    
+                    DataByName[data.name]=data;
     
 
             childAddAction?.Invoke(data);
-            return data.id;
+            return data.uid;
         }
-        public static void RemoveData(int id)
+        public static void RemoveData(int uid)
         {            
             Init();
-            if(!DataById.ContainsKey(id))
+            if(!DataByUid.ContainsKey(uid))
                 return;
                
-            var data=DataById[id];
+            var data=DataByUid[uid];
 
-                    DataById.Remove(data.id);
+                    DataByUid.Remove(data.uid);
+    
+                    DataByName.Remove(data.name);
     
 
-            idChain.PushId(data.id);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
 
-                    DataById.Clear();
+                    DataByUid.Clear();
     
-            idChain.Clear();
+                    DataByName.Clear();
+    
+            uidChain.Clear();
         }
         
         public static void ClearAuto()
         {
             Init();
-            var keys = new List<int>(DataById.Keys);
+            var keys = new List<int>(DataByUid.Keys);
             foreach(var key in keys)
             {
-                if(key < idChain.cnt)
+                if(key < uidChain.cnt)
                     RemoveData(key);
             }
         }
@@ -305,7 +287,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         {
             Init();
             if(data is Data)
-               RemoveData(data.id);      
+               RemoveData(data.uid);      
         }
          private static void AddChildren(Data superData)
         {
@@ -318,12 +300,12 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
 
 
-            public static void ChangeId(Data superData,int oldV,int newV)
+            public static void ChangeUid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIdAction?.Invoke(data,oldV,newV);
+                changeUidAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -333,27 +315,10 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 if(superData is Data data)
                 {
 
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
                 changeNameAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeIcon(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeIconAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeLabel(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

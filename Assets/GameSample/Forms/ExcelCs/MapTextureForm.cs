@@ -39,6 +39,8 @@ namespace Form
 
             MapBaseForm.changeIconAction+=ChangeIcon;
 
+            MapBaseForm.changeLabelAction+=ChangeLabel;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -65,6 +67,8 @@ namespace Form
         public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
         public static Action<Data,List<string>,List<string>> changeTexsnameAction;
+                
+        public static Action<Data,string,string> changeLabelAction;
                 
 
 
@@ -107,7 +111,7 @@ namespace Form
                  
                      }
                     
-            public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName):base(id,name,icon)
+            public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName,string label):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -115,17 +119,18 @@ namespace Form
              this.icon = icon;
              this.animTimeInterval = animTimeInterval;
              this.texsName = texsName;
+             this.label = label;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,new List<string>(texsName));
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,new List<string>(texsName),label);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",0f,null);
+                   private static Data _defaultData=new Data(0,"","",0f,null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -166,11 +171,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","",0f,new List<string>(){"z_map_b$floor$0",})},
+                {200001,new Data(200001,"floor","",0f,new List<string>(){"z_map_b$floor$0",},"")},
 
-                {200002,new Data(200002,"grass","",0f,new List<string>(){"z_map_b$grass$0",})},
+                {200002,new Data(200002,"grass","",0f,new List<string>(){"z_map_b$grass$0",},"")},
 
-                {200003,new Data(200003,"road","",0f,new List<string>(){"z_map_b$road$0",})},
+                {200003,new Data(200003,"road","",0f,new List<string>(){"z_map_b$road$0",},"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -238,7 +243,9 @@ namespace Form
 
                 jo.Get<float>("animTimeInterval"),
 
-                jo.Get<List<string>>("texsName")
+                jo.Get<List<string>>("texsName"),
+
+                jo.Get<string>("label")
                     );
 
             return data;
@@ -259,6 +266,8 @@ namespace Form
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
             jo.Set<List<string>>("texsName",data.texsName);
+
+            jo.Set<string>("label",data.label);
 
             return jo;
         }
@@ -390,6 +399,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeTexsnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLabel(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

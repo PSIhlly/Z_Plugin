@@ -273,7 +273,7 @@ namespace Ui.ModSceneMain
                 {
                     if (data.uid > ProductForm.autoUidCnt)
                         continue;
-                    model.itemModels.Add(new MapObjectForm.Data(-1, data.name, data.iconTexName, data.model,true));
+                    model.itemModels.Add(new MapObjectForm.Data(-1, data.name, data.iconTexName, data.model,true, ""));
                 }
             }
             

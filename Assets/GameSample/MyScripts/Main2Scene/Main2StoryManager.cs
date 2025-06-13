@@ -58,7 +58,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, 0f, 5f, 5f, 0);
             CharacterParamForm.AddData(hpParamData);
             CharacterParamForm.AddData(speedParamData);
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","",new Dictionary<string, CharacterParamForm.Data>() { {"Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } },true,new Dictionary<string, CharacterAnimForm.Data>(),"","","Speed","Hp"));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","","",new Dictionary<string, CharacterParamForm.Data>() { {"Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } },true,new Dictionary<string, CharacterAnimForm.Data>(),"","","Speed","Hp"));
             ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500), "Player",new List<int>()));
             
             var data = new GameMapData();

@@ -39,6 +39,8 @@ namespace Form
 
             MapBaseForm.changeIconAction+=ChangeIcon;
 
+            MapBaseForm.changeLabelAction+=ChangeLabel;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -65,6 +67,8 @@ namespace Form
         public static Action<Data,MapModelForm.Data,MapModelForm.Data> changeModelAction;
                 
         public static Action<Data,bool,bool> changeIsitemAction;
+                
+        public static Action<Data,string,string> changeLabelAction;
                 
 
 
@@ -107,7 +111,7 @@ namespace Form
                  
                      }
                     
-            public Data(int id,string name,string icon,MapModelForm.Data model,bool isItem):base(id,name,icon)
+            public Data(int id,string name,string icon,MapModelForm.Data model,bool isItem,string label):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -115,17 +119,18 @@ namespace Form
              this.icon = icon;
              this.model = model;
              this.isItem = isItem;
+             this.label = label;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,isItem);
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,isItem,label);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,false);
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,false,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -166,7 +171,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","",MapModelForm.defaultData,false)},
+                {400001,new Data(400001,"wall","",MapModelForm.defaultData,false,"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -230,7 +235,9 @@ namespace Form
 
                 jo.Get<MapModelForm.Data>("model"),
 
-                jo.Get<bool>("isItem")
+                jo.Get<bool>("isItem"),
+
+                jo.Get<string>("label")
                     );
 
             return data;
@@ -251,6 +258,8 @@ namespace Form
             jo.Set<MapModelForm.Data>("model",data.model);
 
             jo.Set<bool>("isItem",data.isItem);
+
+            jo.Set<string>("label",data.label);
 
             return jo;
         }
@@ -382,6 +391,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeIsitemAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLabel(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

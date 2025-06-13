@@ -1,0 +1,16 @@
+{
+    "name": "Z_Code",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2d1239519ce422640a889b8b1e189d61"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

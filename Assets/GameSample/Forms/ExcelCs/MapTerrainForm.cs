@@ -39,6 +39,8 @@ namespace Form
 
             MapBaseForm.changeIconAction+=ChangeIcon;
 
+            MapBaseForm.changeLabelAction+=ChangeLabel;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -63,6 +65,8 @@ namespace Form
         public static Action<Data,string,string> changePrefabnameAction;
                 
         public static Action<Data,string,string> changeIconAction;
+                
+        public static Action<Data,string,string> changeLabelAction;
                 
 
 
@@ -100,7 +104,7 @@ private set{
                  
                      }
                     
-            public Data(int id,string name,string prefabName,string icon,float step):base(id,name,icon)
+            public Data(int id,string name,string prefabName,string icon,float step,string label):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -108,17 +112,18 @@ private set{
              this.prefabName = prefabName;
              this.icon = icon;
              this.step = step;
+             this.label = label;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,prefabName,icon,step);
+        return new Data(sameId? id:idChain.GetId(),name,prefabName,icon,step,label);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",0f);
+                   private static Data _defaultData=new Data(0,"","","",0f,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -159,13 +164,13 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"plain","map","",0f)},
+                {100001,new Data(100001,"plain","map","",0f,"")},
 
-                {100002,new Data(100002,"3slope","map3Slope","",3f)},
+                {100002,new Data(100002,"3slope","map3Slope","",3f,"")},
 
-                {100003,new Data(100003,"4slope","map4Slope","",4f)},
+                {100003,new Data(100003,"4slope","map4Slope","",4f,"")},
 
-                {100004,new Data(100004,"5slope","map5Slope","",5f)},
+                {100004,new Data(100004,"5slope","map5Slope","",5f,"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -235,7 +240,9 @@ private set{
 
                 jo.Get<string>("icon"),
 
-                    _defaultData.step
+                    _defaultData.step,
+
+                jo.Get<string>("label")
                     );
 
             return data;
@@ -254,6 +261,8 @@ private set{
             jo.Set<string>("prefabName",data.prefabName);
 
             jo.Set<string>("icon",data.icon);
+
+            jo.Set<string>("label",data.label);
 
             return jo;
         }
@@ -375,6 +384,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLabel(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

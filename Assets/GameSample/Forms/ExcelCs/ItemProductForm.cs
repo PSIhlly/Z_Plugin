@@ -37,6 +37,8 @@ namespace Form
 
             ProductForm.changeNameAction+=ChangeName;
 
+            ProductForm.changeLabelAction+=ChangeLabel;
+
             ProductForm.changeIsprotoAction+=ChangeIsproto;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
@@ -59,6 +61,8 @@ namespace Form
         public static Action<Data,int,int> changeUidAction;
                 
         public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,string,string> changeLabelAction;
                 
         public static Action<Data,string,string> changeIcontexnameAction;
                 
@@ -207,11 +211,12 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipType equip):base(uid,name,isProto)
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipType equip):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
              this.name = name;
+             this.label = label;
              this.iconTexName = iconTexName;
              this.paramDic = paramDic;
              this.isProto = isProto;
@@ -225,12 +230,12 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default);
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -241,6 +246,16 @@ namespace Form
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLabel;
+            public static Dictionary<string, List<Data>> DatasByLabel
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabel;
                 }
             }
     
@@ -286,6 +301,10 @@ namespace Form
     
                     };
     
+                    _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                };
+
                     _DatasByIsproto = new Dictionary<bool, List<Data>>() {
     
                 };
@@ -341,6 +360,8 @@ namespace Form
 
                 jo.Get<string>("name"),
 
+                jo.Get<string>("label"),
+
                 jo.Get<string>("iconTexName"),
 
                 jo.Get<Dictionary<string,ItemParamForm.Data>>("paramDic"),
@@ -370,6 +391,8 @@ namespace Form
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<string>("label",data.label);
 
             jo.Set<string>("iconTexName",data.iconTexName);
 
@@ -409,6 +432,10 @@ namespace Form
     
                     DataByNameIsproto[(data.name,data.isProto)]=data;
     
+                    if(!DatasByLabel.ContainsKey(data.label))
+                        DatasByLabel[data.label]=new List<Data>();
+                    DatasByLabel[data.label].Add(data);
+    
                     if(!DatasByIsproto.ContainsKey(data.isProto))
                         DatasByIsproto[data.isProto]=new List<Data>();
                     DatasByIsproto[data.isProto].Add(data);
@@ -429,6 +456,10 @@ ProductForm.AddData(data);
     
                     DataByNameIsproto.Remove((data.name,data.isProto));
     
+                    DatasByLabel[data.label].Remove(data);
+                    if(DatasByLabel[data.label].Count==0)
+                        DatasByLabel.Remove(data.label);
+    
                     DatasByIsproto[data.isProto].Remove(data);
                     if(DatasByIsproto[data.isProto].Count==0)
                         DatasByIsproto.Remove(data.isProto);
@@ -444,6 +475,8 @@ ProductForm.RemoveData(uid);
                     DataByUid.Clear();
     
                     DataByNameIsproto.Clear();
+    
+                    DatasByLabel.Clear();
     
                     DatasByIsproto.Clear();
     
@@ -497,6 +530,23 @@ ProductForm.RemoveData(uid);
                     DataByNameIsproto[(newV,data.isProto)]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLabel(ProductForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByLabel[oldV].Remove(data);
+                    if(DatasByLabel[oldV].Count==0)
+                        DatasByLabel.Remove(oldV);
+                    if(!DatasByLabel.ContainsKey(newV))
+                        DatasByLabel[newV]=new List<Data>();
+                    DatasByLabel[newV].Add(data);
+ 
+                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

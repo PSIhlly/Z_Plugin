@@ -39,6 +39,8 @@ namespace Form
 
             MapBaseForm.changeIconAction+=ChangeIcon;
 
+            MapBaseForm.changeLabelAction+=ChangeLabel;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -61,6 +63,8 @@ namespace Form
         public static Action<Data,string,string> changeNameAction;
                 
         public static Action<Data,string,string> changeIconAction;
+                
+        public static Action<Data,string,string> changeLabelAction;
                 
 
 
@@ -119,12 +123,13 @@ private set{
                  
                      }
                     
-            public Data(int id,string name,string icon,bool terrain,bool item,bool character,bool texture):base(id,name,icon)
+            public Data(int id,string name,string icon,string label,bool terrain,bool item,bool character,bool texture):base(id,name,icon,label)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
+             this.label = label;
              this.terrain = terrain;
              this.item = item;
              this.character = character;
@@ -134,12 +139,12 @@ private set{
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,terrain,item,character,texture);
+        return new Data(sameId? id:idChain.GetId(),name,icon,label,terrain,item,character,texture);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",false,false,false,false);
+                   private static Data _defaultData=new Data(0,"","","",false,false,false,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -180,11 +185,11 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {10000001,new Data(10000001,"all erase","",true,true,true,false)},
+                {10000001,new Data(10000001,"all erase","","",true,true,true,false)},
 
-                {10000002,new Data(10000002,"texture only","",false,false,false,true)},
+                {10000002,new Data(10000002,"texture only","","",false,false,false,true)},
 
-                {10000003,new Data(10000003,"remain terrain","",false,true,true,false)},
+                {10000003,new Data(10000003,"remain terrain","","",false,true,true,false)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -250,6 +255,8 @@ private set{
 
                 jo.Get<string>("icon"),
 
+                jo.Get<string>("label"),
+
                     _defaultData.terrain,
 
                     _defaultData.item,
@@ -273,6 +280,8 @@ private set{
             jo.Set<string>("name",data.name);
 
             jo.Set<string>("icon",data.icon);
+
+            jo.Set<string>("label",data.label);
 
             return jo;
         }
@@ -384,6 +393,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLabel(MapBaseForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

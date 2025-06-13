@@ -42,6 +42,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
+        public static Action<Data,string,string> changeLabelAction;
+                
         public static Action<Data,bool,bool> changeIsprotoAction;
                 
 
@@ -85,6 +87,24 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
+                    private string  _label;
+                    /// <summary>
+                    ///标签
+                    ///</summary>
+                    public string  label{
+                                get{return _label;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeLabel(this,_label,value); 
+                    }
+        
+                _label = value;
+                }
+                 
+                     }
+                    
                     private bool  _isProto;
                     /// <summary>
                     ///是原型
@@ -103,23 +123,24 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,bool isProto)
+            public Data(int uid,string name,string label,bool isProto)
             {
 
              this.uid = uid;
              this.name = name;
+             this.label = label;
              this.isProto = isProto;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,isProto);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,isProto);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",false);
+                   private static Data _defaultData=new Data(0,"","",false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -194,6 +215,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
+                jo.Get<string>("label"),
+
                 jo.Get<bool>("isProto")
                     );
 
@@ -209,6 +232,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<string>("label",data.label);
 
             jo.Set<bool>("isProto",data.isProto);
 
@@ -303,6 +328,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLabel(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using Z_DesignStyle;
 namespace Z_Debug
@@ -7,17 +8,65 @@ namespace Z_Debug
     public static class Z_Log
     {
         const int maxLength = 5000;
-        public static void Log(ICollection col)
+        public static void Log(ICollection col,string[] fields=null)
         {
             int i = 0;
-            string res = col.GetType().Name+":\n";
+            var type = col.GetType();
+            string res = type.Name+":\n";
             foreach(var o in col)
             {
                 ++i;
-                res += i +" : " + o + "\n";
+                res += i + " : \n"+ Get(o, fields)+"\n";
             }
             Log(res);
         }
+        public static string Get(object obj, string[] fields=null)
+        {
+            string res = "";
+            if (fields != null)
+            {
+                for (int j = 0; j < fields.Length; j++)
+                {
+                    string[] addresses = fields[j].Split(".");
+                    var tmp = obj;
+                    foreach(var ad in addresses)
+                    {
+                        PropertyInfo property = tmp.GetType().GetProperty(ad);
+                        object value = property.GetValue(tmp);  // 获取值
+                        tmp = value;
+                    }
+                   
+                    res += fields[j] + ":" + (string)tmp + " ;";
+                }
+            }
+            else
+            {
+                res += obj;
+            }
+            return res;
+        }
+        public static void LogTree(object obj,string subName,string[] fields = null)
+        {
+            var type = obj.GetType();
+            string res = type.Name + ":\n" + TreeDfs(obj,subName,fields,0);
+            Log(res);
+        }
+        private static string TreeDfs(object obj, string subName, string[] fields, int depth)
+        {
+            string res = new string(' ',depth)+ Get(obj,fields) + "\n";
+            PropertyInfo property = obj.GetType().GetProperty(subName);
+            object value = property.GetValue(obj);  // 获取值
+            if(value is ICollection col)
+            {
+                foreach(var o in col)
+                {
+                    res+=TreeDfs(o, subName, fields, depth + 1);
+                }
+            }
+            return res;
+        }
+
+
         public static void Log(int str)
         {
             Log(str.ToString());

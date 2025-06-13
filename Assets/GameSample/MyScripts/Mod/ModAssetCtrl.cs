@@ -37,7 +37,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     break;
             }
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" }));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" },""));
     }
     public void ImportAnimTex(string name, int id)
     {
@@ -84,7 +84,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     break;
             }
         }
-        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }));
+        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }, ""));
     }
     public void ImportMaskTex(string name, int id)
     {
@@ -134,7 +134,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         }
 
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData,false));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData,false, ""));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -252,7 +252,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             dic[prm.name] = prm.Copy();
 
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } }, "", "", "", ""));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", "", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } }, "", "", "", ""));
     }
     public void DeleteCharacter(string name)
     {
@@ -438,7 +438,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var model = MapModelForm.defaultData;
         model.isObstacle = false;
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", dic, true, model,"",1,1,default));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default));
     }
     public void DeleteItem(string name)
     {

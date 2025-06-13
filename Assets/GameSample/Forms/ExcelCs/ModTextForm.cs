@@ -88,7 +88,7 @@ namespace Form
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"frontView","frontView","前视图");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -173,15 +173,27 @@ namespace Form
 
                 {1110010,new Data(1110010,"character","Character","人物")},
 
-                {1110012,new Data(1110012,"mapObject","Map object","地图元素")},
+                {1110011,new Data(1110011,"mapObject","Map object","地图元素")},
 
-                {1110013,new Data(1110013,"event","Event","事件")},
+                {1110012,new Data(1110012,"globalParameter","Global parameter","全局参数")},
 
-                {1110014,new Data(1110014,"scene","Scene","场景")},
+                {1110013,new Data(1110013,"characterParameter","Character parameter","人物参数")},
 
-                {1110015,new Data(1110015,"name","Name","名称")},
+                {1110014,new Data(1110014,"itemParameter","Item parameter","道具参数")},
 
-                {1110016,new Data(1110016,"introduction","Introduction","介绍")},
+                {1110015,new Data(1110015,"config","Config","设定")},
+
+                {1110016,new Data(1110016,"event","Event","事件")},
+
+                {1110017,new Data(1110017,"scene","Scene","场景")},
+
+                {1110018,new Data(1110018,"name","Name","名称")},
+
+                {1110019,new Data(1110019,"introduction","Introduction","介绍")},
+
+                {1110020,new Data(1110020,"mainCharacter","Main character","主角")},
+
+                {1110021,new Data(1110021,"appearance","Appearance ","外观")},
 
                 {1210001,new Data(1210001,"dialog","dialog","对话")},
 
@@ -212,6 +224,52 @@ namespace Form
                 {1210014,new Data(1210014,"logic","logic","逻辑")},
 
                 {1210015,new Data(1210015,"window","window","窗体")},
+
+                {1210016,new Data(1210016,"min","Min","最小")},
+
+                {1210017,new Data(1210017,"max","Max","最大")},
+
+                {1210018,new Data(1210018,"hpParameter","Hp parameter","血量参数")},
+
+                {1210019,new Data(1210019,"moveSpeedParameter","Move speed parameter","移速参数")},
+
+                {1210020,new Data(1210020,"idleAnim","Idle anim","待机动画")},
+
+                {1210021,new Data(1210021,"moveAnim","Move anim","移动动画")},
+
+                {1210022,new Data(1210022,"interval(s)","Interval(s)","间隔(秒)")},
+
+                {1210023,new Data(1210023,"import","Import","导入")},
+
+                {1210024,new Data(1210024,"upperPart","Upper part","上半身")},
+
+                {1210025,new Data(1210025,"lowerPart","Lower part","下半身")},
+
+                {1210026,new Data(1210026,"partPosition","Part position","部位位置")},
+
+                {1210027,new Data(1210027,"layer","Layer","层级")},
+
+                {1210028,new Data(1210028,"scale","Scale","缩放")},
+
+                {1210029,new Data(1210029,"height","Height","高")},
+
+                {1210030,new Data(1210030,"width","Width","宽")},
+
+                {1210031,new Data(1210031,"length","Length","长")},
+
+                {1210032,new Data(1210032,"model","Model","模型")},
+
+                {1210033,new Data(1210033,"style","Style","样式")},
+
+                {1210034,new Data(1210034,"onUseEvent","On use event","使用事件")},
+
+                {1210035,new Data(1210035,"price(coins)","Price(Coins)","价格(货币数)")},
+
+                {1210036,new Data(1210036,"canEquipped","Can equipped","可装备")},
+
+                {1210036,new Data(1210036,"onEquipEvent","onEquipEvent","装备事件")},
+
+                {1210036,new Data(1210036,"onDIsequipEvent","onDisequipEvent","卸下事件")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -260,15 +318,27 @@ namespace Form
     
                         {"character",_DataById[1110010]},
     
-                        {"mapObject",_DataById[1110012]},
+                        {"mapObject",_DataById[1110011]},
     
-                        {"event",_DataById[1110013]},
+                        {"globalParameter",_DataById[1110012]},
     
-                        {"scene",_DataById[1110014]},
+                        {"characterParameter",_DataById[1110013]},
     
-                        {"name",_DataById[1110015]},
+                        {"itemParameter",_DataById[1110014]},
     
-                        {"introduction",_DataById[1110016]},
+                        {"config",_DataById[1110015]},
+    
+                        {"event",_DataById[1110016]},
+    
+                        {"scene",_DataById[1110017]},
+    
+                        {"name",_DataById[1110018]},
+    
+                        {"introduction",_DataById[1110019]},
+    
+                        {"mainCharacter",_DataById[1110020]},
+    
+                        {"appearance",_DataById[1110021]},
     
                         {"dialog",_DataById[1210001]},
     
@@ -299,6 +369,52 @@ namespace Form
                         {"logic",_DataById[1210014]},
     
                         {"window",_DataById[1210015]},
+    
+                        {"min",_DataById[1210016]},
+    
+                        {"max",_DataById[1210017]},
+    
+                        {"hpParameter",_DataById[1210018]},
+    
+                        {"moveSpeedParameter",_DataById[1210019]},
+    
+                        {"idleAnim",_DataById[1210020]},
+    
+                        {"moveAnim",_DataById[1210021]},
+    
+                        {"interval(s)",_DataById[1210022]},
+    
+                        {"import",_DataById[1210023]},
+    
+                        {"upperPart",_DataById[1210024]},
+    
+                        {"lowerPart",_DataById[1210025]},
+    
+                        {"partPosition",_DataById[1210026]},
+    
+                        {"layer",_DataById[1210027]},
+    
+                        {"scale",_DataById[1210028]},
+    
+                        {"height",_DataById[1210029]},
+    
+                        {"width",_DataById[1210030]},
+    
+                        {"length",_DataById[1210031]},
+    
+                        {"model",_DataById[1210032]},
+    
+                        {"style",_DataById[1210033]},
+    
+                        {"onUseEvent",_DataById[1210034]},
+    
+                        {"price(coins)",_DataById[1210035]},
+    
+                        {"canEquipped",_DataById[1210036]},
+    
+                        {"onEquipEvent",_DataById[1210036]},
+    
+                        {"onDIsequipEvent",_DataById[1210036]},
     
                     };
     

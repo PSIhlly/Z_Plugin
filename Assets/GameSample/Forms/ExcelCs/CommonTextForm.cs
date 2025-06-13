@@ -171,6 +171,20 @@ namespace Form
 
                 {20013,new Data(20013,"basicInformation","Basic Information","基础信息")},
 
+                {20014,new Data(20014,"all","All","全部")},
+
+                {20015,new Data(20015,"label","Label","标签")},
+
+                {20016,new Data(20016,"leftHand","Left hand","左手")},
+
+                {20017,new Data(20017,"rightHand","Right hand","右手")},
+
+                {20018,new Data(20018,"head","Head","头")},
+
+                {20019,new Data(20019,"body","Body","身体")},
+
+                {20020,new Data(20020,"reset","Reset","重置")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -215,6 +229,20 @@ namespace Form
                         {"character",_DataById[20012]},
     
                         {"basicInformation",_DataById[20013]},
+    
+                        {"all",_DataById[20014]},
+    
+                        {"label",_DataById[20015]},
+    
+                        {"leftHand",_DataById[20016]},
+    
+                        {"rightHand",_DataById[20017]},
+    
+                        {"head",_DataById[20018]},
+    
+                        {"body",_DataById[20019]},
+    
+                        {"reset",_DataById[20020]},
     
                     };
     

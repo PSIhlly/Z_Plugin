@@ -33,7 +33,6 @@ RectTransform:
   - {fileID: 662838744454411805}
   - {fileID: 3379788994292663929}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -83,7 +82,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 5176627344122325823}
     m_Modifications:
     - target: {fileID: 416721945803821440, guid: 26b585afdf29c454191f7914ae00c192, type: 3}
@@ -92,7 +91,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 416721945803821440, guid: 26b585afdf29c454191f7914ae00c192, type: 3}
       propertyPath: m_fontSize
-      value: 50.05
+      value: 45.35
       objectReference: {fileID: 0}
     - target: {fileID: 416721945803821440, guid: 26b585afdf29c454191f7914ae00c192, type: 3}
       propertyPath: m_fontColor.b
@@ -196,10 +195,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 416721945803821442, guid: 26b585afdf29c454191f7914ae00c192, type: 3}
       propertyPath: m_Name
-      value: txt_name
+      value: txt
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26b585afdf29c454191f7914ae00c192, type: 3}
 --- !u!224 &662838744454411805 stripped
 RectTransform:
@@ -211,7 +212,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 5176627344122325823}
     m_Modifications:
     - target: {fileID: 5352303070905497977, guid: df782fa336df14442878c8c032e90667, type: 3}
@@ -228,7 +229,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5352303072137653715, guid: df782fa336df14442878c8c032e90667, type: 3}
       propertyPath: m_fontSize
-      value: 47.85
+      value: 42.05
       objectReference: {fileID: 0}
     - target: {fileID: 5352303072137653715, guid: df782fa336df14442878c8c032e90667, type: 3}
       propertyPath: m_HorizontalAlignment
@@ -335,7 +336,9 @@ PrefabInstance:
       value: 0.8867924
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df782fa336df14442878c8c032e90667, type: 3}
 --- !u!224 &3379788994292663929 stripped
 RectTransform:

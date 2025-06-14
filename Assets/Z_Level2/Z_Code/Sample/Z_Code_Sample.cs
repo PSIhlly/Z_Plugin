@@ -11,17 +11,18 @@ public class Z_Code_Sample : MonoBehaviour
     {
         var cpr = new Compiler();
 
-        var itp = new Interpreter();
 
         var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
         var res=cpr.Compile(code);
-        itp.Interpret(res);
+
+        var itp = new Interpreter(res);
+        itp.Interpret();
 
         gameObject.GetComponentInChildren<Button>().onClick.AddListener(()=>
         {
             var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
             var res = cpr.Compile(code);
-            itp.Interpret(res);
+            itp.Interpret();
         });
 
     }

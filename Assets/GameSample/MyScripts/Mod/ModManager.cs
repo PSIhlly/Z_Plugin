@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ui.Loading;
 using Ui.ModSceneMain;
+using Ui.ModStory;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map;
@@ -45,7 +46,7 @@ public class ModManager : Z_MonoManager<ModManager>
     public void BeginStory(string storyName)
     {
         this._folderName = storyName;
-        //UiManager.instance.ShowUi<UiModStoryCtrl>();
+        UiManager.instance.ShowUi<UiModStoryCtrl>();
     }
     public void EndStory()
     {

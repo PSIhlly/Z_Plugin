@@ -6,7 +6,6 @@ using Ui;
 using Ui.ModSceneBehaviourUnit;
 using Ui.ModSceneMain;
 using Ui.ModSceneUnit;
-using Ui.ModStory;
 using UnityEditor;
 using UnityEngine;
 using Z_Debug;
@@ -111,7 +110,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         MapManager.instance.End();
         UiManager.instance.CloseAll();
         GameManager.instance.RegisterInputDefault();
-        UiManager.instance.ShowUi<UiModStoryCtrl>();
+        //UiManager.instance.ShowUi<UiModStoryCtrl>();
 
     }
     public T TryGetUnit<T>(List<RaycastHit> hits)

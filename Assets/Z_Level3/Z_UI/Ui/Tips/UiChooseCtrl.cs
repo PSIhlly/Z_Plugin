@@ -69,7 +69,7 @@ namespace Ui.Notify
                 con.Add(new UiItemParam()
                 {
                     name = model.info.words[i],
-                    sprite = model.info.sprites[i],
+                    sprite = model.info.sprites?[i],
                     id = i
                 });
             }

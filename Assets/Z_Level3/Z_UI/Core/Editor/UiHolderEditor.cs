@@ -12,8 +12,9 @@ namespace Z_Ui_Editor
     [CustomEditor(typeof(UiHolder))]
     public class UiHolderEditor : Editor
     {
-        
-        public string GetQuickCode() {
+
+        public string GetQuickCode()
+        {
             string modelCode = "";
             string showCode = "";
             string paramCode = "";
@@ -24,7 +25,7 @@ namespace Z_Ui_Editor
 
             string subCode = "";
 
-            if (uiHolder.subUiHolderLst.Find(x=>x.uiType== UiType.Panel)!=null)
+            if (uiHolder.subUiHolderLst.Find(x => x.uiType == UiType.Panel) != null)
             {
                 modelCode += $@"
             public int selPage;";
@@ -44,15 +45,17 @@ namespace Z_Ui_Editor
                 exist.Add(o);
                 if (o.TryGetComponent<UiHolder>(out var subHolder))
                 {
-                    if(subHolder.uiType == UiType.Sub)
+                    if (subHolder != uiHolder)
                     {
-                        string scrCode = "view."+( o.transform.GetComponentInParent<ScrView>() == null ? "" : o.transform.GetComponentInParent<ScrView>().transform.name);
+                        if (subHolder.uiType == UiType.Sub)
+                        {
+                            string scrCode = "view." + (o.transform.GetComponentInParent<ScrView>() == null ? "" : o.transform.GetComponentInParent<ScrView>().transform.name);
 
-                        declareCode += $@"
+                            declareCode += $@"
             UiScrViewContainer<Ui{subHolder.uiName}Ctrl> {subHolder.uiName.FirstToLower()}Con;";
-                        initCode += $@"
+                            initCode += $@"
             {subHolder.uiName.FirstToLower()}Con = new UiScrViewContainer<Ui{subHolder.uiName}Ctrl>(view.go_{o.gameObject.name.Split("_")[1]},{scrCode});";
-                        refreshCode += $@"
+                            refreshCode += $@"
             {subHolder.uiName.FirstToLower()}Con.Clear();
             for(int i=0,icnt= ;i<icnt;i++)
             {{
@@ -62,43 +65,61 @@ namespace Z_Ui_Editor
                 }});
             }}
             {subHolder.uiName.FirstToLower()}Con.Refresh();";
-                        if(subHolder!=uiHolder)
-                            subCode += ((UiHolderEditor)CreateEditor(subHolder)).GetQuickCode();
-                    }
-                    else if (subHolder.uiType == UiType.Panel)
-                    {
-                        refreshCode+= $@"
+                            if (subHolder != uiHolder)
+                                subCode += ((UiHolderEditor)CreateEditor(subHolder)).GetQuickCode();
+                        }
+                        else if (subHolder.uiType == UiType.Panel)
+                        {
+                            refreshCode += $@"
             view.page_{subHolder.uiName}.SetActive(model.selPage == 0);";
+                        }
                     }
-                }else if (o.name.Split("_")[0].Split("|").Contains("btn"))
+                }
+                else if (o.name.Split("_")[0].Split("|").Contains("btn"))
                 {
                     initCode += $@"
             view.btn_{o.name.Split("_")[1]}.onClick.AddListener(() =>
             {{
 
             }});";
-                }else if (o.name.Split("_")[0].Split("|").Contains("sta"))
+                }
+                else if (o.name.Split("_")[0].Split("|").Contains("sta"))
                 {
                     refreshCode += $@"
             view.sta_{o.name.Split("_")[1]}.ChangeState(0);";
-                }else if (o.name.Split("_")[0].Split("|").Contains("img"))
+                }
+                else if (o.name.Split("_")[0].Split("|").Contains("img"))
                 {
                     refreshCode += $@"
             view.img_{o.name.Split("_")[1]}.sprite=TextureHelper.transparentSprite;";
-                }else if (o.name.Split("_")[0].Split("|").Contains("txt"))
+                }
+                else if (o.name.Split("_")[0].Split("|").Contains("txt"))
                 {
                     refreshCode += $@"
             view.txt_{o.name.Split("_")[1]}.text="""" ;";
                 }
+                else if (o.name.Split("_")[0].Split("|").Contains("ipt"))
+                {
+                    initCode += $@"
+            view.ipt_{o.name.Split("_")[1]}.onEndEdit.AddListener((s)=>
+            {{
+
+            }});";
+                    refreshCode += $@"
+            view.ipt_{o.name.Split("_")[1]}.Set("""") ;";
+                }
             }
 
-            
+            var tmp = uiHolder;
+            string namespaceStr = uiHolder.uiName;
+            while (tmp.parent != null && uiHolder.uiType == UiType.Panel)
+            {
+                tmp = tmp.parent;
+                namespaceStr = tmp.uiName + "." + namespaceStr;
+            }
+            namespaceStr = "namespace Ui." + namespaceStr;
 
-
-
-            return $@"
-{(uiHolder.uiType == UiType.Sub ? "": $@"
-using Form;
+            return $@"{(uiHolder.uiType == UiType.Sub ? "" : $@"using Form;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,7 +128,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 {namespaceContent}
-namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolder.parent.uiName+".":"" )+uiHolder.uiName)}
+{namespaceStr}
 {{
 ")}
     public partial class Ui{uiHolder.uiName}Param
@@ -137,10 +158,10 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
         }}
     }}
 {subCode}
-{(uiHolder.uiType == UiType.Sub ? "":"}")}";
+{(uiHolder.uiType == UiType.Sub ? "" : "}")}";
         }
         public bool binded;
-        UiHolder uiHolder=> (UiHolder)target;
+        UiHolder uiHolder => (UiHolder)target;
         public override void OnInspectorGUI()
         {
 
@@ -150,7 +171,7 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
             {
                 GUIUtility.systemCopyBuffer = GetQuickCode();
             }
-            if (uiHolder.uiType == UiType.Panel&&uiHolder.GetComponentsInParent<UiHolder>(true).Length==1)
+            if (uiHolder.uiType == UiType.Panel && uiHolder.GetComponentsInParent<UiHolder>(true).Length == 1)
             {
                 uiHolder.path = EditorGUILayout.TextField("Path: ", uiHolder.path);
                 // 绘制按钮
@@ -161,7 +182,7 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
 
 
             }
-            
+
 
 
             // 如果需要，绘制默认的 Inspector
@@ -174,6 +195,7 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
         string bindContent = "";
         string subContent = "";
         string namespaceContent = "";
+        string subNamespaceContent = "";
 
 
         public void RefreshPanelElementContent()
@@ -189,11 +211,11 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
             Queue<Transform> queue = new Queue<Transform>();
 
             queue.Enqueue(uiHolder.gameObject.transform);
-            while(queue.Count>0)
+            while (queue.Count > 0)
             {
                 var o = queue.Dequeue();
                 AddBasicElement(o);
-                if (o!= uiHolder.gameObject.transform&&o.TryGetComponent<UiHolder>(out var subHolder))
+                if (o != uiHolder.gameObject.transform && o.TryGetComponent<UiHolder>(out var subHolder))
                 {
                     uiHolder.subUiHolderLst.Add(subHolder);
                     subHolder.parent = uiHolder;
@@ -214,6 +236,7 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
                             subContent += subEditor.GetCode(uiHolder.uiName);
                             break;
                         case UiType.Model:
+                            namespaceContent += $"using Ui.{subHolder.uiName}\n";
                             bindContent += $@"
             view.model_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
             view.model_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
@@ -241,19 +264,20 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
                             Debug.LogError("can't analysis uiType " + subHolder.uiType);
                             break;
                     }
-                }else
+                }
+                else
                 {
                     foreach (Transform ch in o)
                     {
                         queue.Enqueue(ch);
                     }
                 }
-               
+
             }
-            
+
         }
 
-        
+
 
         private void AddBasicElement(Transform o)
         {
@@ -287,7 +311,7 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
                             initContent += $@"
             ipt_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Ipt>();";
                             break;
-                            
+
                         case "go":
                             declareContent += $@"
             public GameObject go_{realName};";
@@ -315,15 +339,22 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
                             initContent += $@"
             sta_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Sta>();";
                             break;
+
+                        case "rtf":
+                            declareContent += $@"
+            public RectTransform rtf_{realName};";
+                            initContent += $@"
+            rtf_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<RectTransform>();";
+                            break;
                         default:
-                            Debug.LogError("can't analysis type " + tp);
+                            Debug.LogError(uiHolder.uiName + " can't analysis type " + tp);
                             break;
                     }
                 }
 
 
             }
-            
+
         }
 
         public void GenerateFile()
@@ -335,26 +366,26 @@ namespace Ui.{((uiHolder.uiType == UiType.Panel&& uiHolder.parent!=null? uiHolde
             Debug.Log(fullPath + " Generate Success!");
         }
 
-        string GetCode(string parentClass="")
+        string GetCode(string parentClass = "")
         {
             RefreshPanelElementContent();
 
             var res = "";
-            if(string.IsNullOrEmpty(parentClass))
+            if (string.IsNullOrEmpty(parentClass))
             {
-                
-                res=$@"
+
+                res = $@"
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-{namespaceContent}
 namespace Ui.{uiHolder.uiName}
 ";
-            }else
+            }
+            else
             {
-                res= $@"
+                res = $@"
 namespace {uiHolder.uiName}
 ";
             }
@@ -364,8 +395,8 @@ namespace {uiHolder.uiName}
                 case UiType.Panel:
                 case UiType.Model:
 
-                    
-                    return res+$@"
+
+                    return res + $@"
 {{
 {GetCoreCode(parentClass)}
 }}
@@ -374,7 +405,7 @@ namespace {uiHolder.uiName}
                     return GetCoreCode(parentClass);
             }
             return null;
-            
+
         }
 
         string GetCoreCode(string parent)
@@ -399,7 +430,7 @@ namespace {uiHolder.uiName}
         public Ui{uiHolder.uiName}View view;
         public Ui{uiHolder.uiName}Model model;
         public Ui{uiHolder.uiName}Param param;
-        {(string.IsNullOrEmpty(parent)?"":$"public Ui{parent}Ctrl parent=>(Ui{parent}Ctrl)uiHolder.parent.ctrl;")}
+        {(string.IsNullOrEmpty(parent) ? "" : $"public Ui{parent}Ctrl parent=>(Ui{parent}Ctrl)uiHolder.parent.ctrl;")}
 
         public override void SetParam(UiParam param)
         {{
@@ -424,7 +455,7 @@ namespace {uiHolder.uiName}
     }}";
         }
 
-     
+
 
 
     }

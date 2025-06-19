@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Form;
@@ -36,18 +36,41 @@ namespace Ui.ModStory
 
             view.btn_overview.onClick.AddListener(() =>
             {
-                //model.curUi = ;
+                model.curUi = view.page_ModStoryOverview;
                 Refresh();
             });
-            view.btn_scene.onClick.AddListener(() =>
+            view.btn_parameter.onClick.AddListener(() =>
             {
-                model.curUi = view.sub_ModStoryScenePanel;
+                model.curUi = view.page_ModStoryParameter;
                 Refresh();
             });
-            
+            view.btn_character.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStoryCharacter;
+                Refresh();
+            }); 
+            view.btn_item.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStoryItem;
+                Refresh();
+            });
+            view.btn_mapObject.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStoryMapObject;
+                Refresh();
+            });
+            view.btn_event.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStoryEvent;
+                Refresh();
+            });
+            view.btn_map.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStoryMap;
+                Refresh();
+            });
+
         }
-
-
 
         public override void OnShow()
         {
@@ -56,9 +79,15 @@ namespace Ui.ModStory
         }
         public void Refresh()
         {
-
+            view.page_ModStoryOverview.SetActive(model.curUi == view.page_ModStoryOverview);
+            view.page_ModStoryParameter.SetActive(model.curUi == view.page_ModStoryParameter);
+            view.page_ModStoryCharacter.SetActive(model.curUi == view.page_ModStoryCharacter);
+            view.page_ModStoryItem.SetActive(model.curUi == view.page_ModStoryItem);
+            view.page_ModStoryMapObject.SetActive(model.curUi == view.page_ModStoryMapObject);
+            view.page_ModStoryMap.SetActive(model.curUi == view.page_ModStoryMap);
         }
 
     }
 
 }
+*/

@@ -80,23 +80,21 @@ namespace Z_Code
                         {
                             valName = nm
                         });
-                        
                         break;
                     case Op.Call:
                         p++;
-                        var cmd = BaseData.cmdDic[zl[p]];
+                        var cmd = BaseData.cmdDic[zl[p]].GetNew();
                         var prm = new Box[cmd.GetPrmCnt()];
                         for(int i=0;i< cmd.GetPrmCnt();i++)
                         {
                             prm[i] = Pop();
                         }
-                        var ret=cmd.Execute(prm);
+                        var ret=cmd.Execute(prm,heap);
                         for (int i = 0; i < cmd.GetRetCnt(); i++)
                         {
                             Push(ret[i]);
                         }
                         break;
-
                     case Op.Equal:
                         Push(new Box()
                         {
@@ -130,8 +128,22 @@ namespace Z_Code
                             num = GetNum(Pop()) / GetNum(Pop())
                         });
                         break;
-                  
-
+                    case Op.Jump:
+                        p++;
+                        p = int.Parse(zl[p]) - 1;
+                        break;
+                    case Op.IfFalseJump:
+                        p++;
+                        if (GetNum(Pop())==0)
+                        {
+                            p = int.Parse(zl[p]) - 1;
+                        }
+                        break;
+                   /* case Op.Sub:
+                        p++;
+                        heap[Pop().valName]
+                        
+                        break;*/
 
 
                 }

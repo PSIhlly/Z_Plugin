@@ -14,8 +14,8 @@ public static partial class GlobalMaxSettings
 {
     public const int CHARACTER_AVATA_MAX = 10;
     public const int CHARACTER_ANIM_MAX = 10;
-    public const int CHARACTER_PART_MAX = 2;
     public const int CHARACTER_PARAM_MAX = 100000;
+    public const int GLOBAL_PARAM_MAX = 100000;
     public const int ITEM_PARAM_MAX = 100000;
 
 }
@@ -24,12 +24,19 @@ public static partial class GlobalDataHelper
     
 
 }
-
-public enum EquipType
+public enum BodyPartType
 {
     None=0,
-    LeftHand=1,
+    UpperPart = 1,
+    LowerPart = 2
+}
+public enum EquipPartType
+{
+    None = 0,
+    LeftHand =1,
     RightHand=2,
+    Head=3,
+    Body=4,
 }
 
 public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
@@ -56,24 +63,24 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         public CharacterAnimForm.Data idleAnim;
         public CharacterAnimForm.Data moveAnim;
 
-        public Dictionary<int, State> stateCur = new Dictionary<int, State>();
-        public Dictionary<int, State> stateTar = new Dictionary<int, State>();
-        public Dictionary<int, int> stateCd = new Dictionary<int, int>();
-        public Dictionary<int, string> animCurCache = new Dictionary<int, string>();
-        public Dictionary<int, Timer> animTimer = new Dictionary<int, Timer>();
+        public Dictionary<BodyPartType, State> stateCur = new Dictionary<BodyPartType, State>();
+        public Dictionary<BodyPartType, State> stateTar = new Dictionary<BodyPartType, State>();
+        public Dictionary<BodyPartType, int> stateCd = new Dictionary<BodyPartType, int>();
+        public Dictionary<BodyPartType, string> animCurCache = new Dictionary<BodyPartType, string>();
+        public Dictionary<BodyPartType, Timer> animTimer = new Dictionary<BodyPartType, Timer>();
         public void Reset()
         {
-            for (int i = 0; i < GlobalMaxSettings.CHARACTER_PART_MAX; i++)
+            foreach(BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
             {
-                stateCur[i] = State.None;
-                stateTar[i] = State.None;
-                stateCd[i] = 0;
-                animCurCache[i] = "";
-                animTimer[i] = null;
+                stateCur[part] = State.None;
+                stateTar[part] = State.None;
+                stateCd[part] = 0;
+                animCurCache[part] = "";
+                animTimer[part] = null;
             }
         }
 
-        public void TryChangeState(State tar, int part, bool forceReplay = false)
+        public void TryChangeState(State tar, BodyPartType part, bool forceReplay = false)
         {
             if (stateTar[part] != tar && stateCur[part] != State.None)
             {
@@ -99,11 +106,11 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                     anim = idleAnim;
                     break;
             }
-            UpdateAnim(part, ins.renderers[part], ins.unit.data, anim, forceReplay);
+            UpdateAnim(part, ins.renderers[(int)part-1], ins.unit.data, anim, forceReplay);
         }
 
 
-        private void UpdateAnim(int part, Renderer render, CharacterUnitForm.Data data, CharacterAnimForm.Data anim, bool forceReplay = false)
+        private void UpdateAnim(BodyPartType part, Renderer render, CharacterUnitForm.Data data, CharacterAnimForm.Data anim, bool forceReplay = false)
         {
             if (forceReplay)
             {
@@ -115,34 +122,34 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             }
 
             MaterialPropertyBlock propBlock;
-            if (anim != null && anim.partAnimTexsName[part].Count > 0)
+            if (anim != null && anim.animClip.Count > 0)
             {
                 propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 TimeManager.instance.CancelTimer(animTimer[part]);
                 if (anim.animTimeInterval > 0)
                 {
-                    float all = anim.animTimeInterval * anim.partAnimTexsName[part].Count;
+                    float all = anim.animTimeInterval * anim.animClip.Count;
                     int cur = (int)((Time.time % all) / anim.animTimeInterval-0.0001f);
                  
                     float timeProgress = (Time.time % anim.animTimeInterval);
                     render.GetPropertyBlock(propBlock);
                     animCurCache[part] = anim.name;
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.partAnimTexsName[part][cur]].tex);
-                    int renderId = part;
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[part]].tex);
+                    var renderPart = part;
                     animTimer[part] = TimeManager.instance.StartTimer(timeProgress, anim.animTimeInterval, () =>
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         render.GetPropertyBlock(propBlock);
-                        cur = (cur + 1) % anim.partAnimTexsName[renderId].Count;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.partAnimTexsName[renderId][cur]].tex);
+                        cur = (cur + 1) % anim.animClip.Count;
+                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[renderPart]].tex);
                         render.SetPropertyBlock(propBlock);
                         return false;
                     }, data.unit.ins);
                 }
                 else
                 {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.partAnimTexsName[part][0]].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[0].partTex[part]].tex);
                 }
                 render.SetPropertyBlock(propBlock);
             }
@@ -194,16 +201,16 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
         if (ins.step != Vector3.zero)
         {
-            for (int i = 0; i < GlobalMaxSettings.CHARACTER_PART_MAX; i++)
+            foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
             {
-                status.TryChangeState(AnimController.State.Move, i);
+                status.TryChangeState(AnimController.State.Move, part);
             }
         }
         else
         {
-            for (int i = 0; i < GlobalMaxSettings.CHARACTER_PART_MAX; i++)
+            foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
             {
-                status.TryChangeState(AnimController.State.Idle, i);
+                status.TryChangeState(AnimController.State.Idle, part);
             }
         }
 

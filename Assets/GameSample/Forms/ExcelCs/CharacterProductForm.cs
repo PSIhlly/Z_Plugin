@@ -80,6 +80,12 @@ namespace Form
                 
         public static Action<Data,string,string> changeHpparamnameAction;
                 
+        public static Action<Data,string,string> changeOntoucheventAction;
+                
+        public static Action<Data,string,string> changeOnleaveeventAction;
+                
+        public static Action<Data,string,string> changeOnshoweventAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -211,7 +217,61 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName):base(uid,name,label,isProto)
+                    private string  _onTouchEvent;
+                    /// <summary>
+                    ///接触事件名
+                    ///</summary>
+                    public string  onTouchEvent{
+                                get{return _onTouchEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOntouchevent(this,_onTouchEvent,value); 
+                    }
+        
+                _onTouchEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onLeaveEvent;
+                    /// <summary>
+                    ///离开事件名
+                    ///</summary>
+                    public string  onLeaveEvent{
+                                get{return _onLeaveEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnleaveevent(this,_onLeaveEvent,value); 
+                    }
+        
+                _onLeaveEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onShowEvent;
+                    /// <summary>
+                    ///出现事件名
+                    ///</summary>
+                    public string  onShowEvent{
+                                get{return _onShowEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnshowevent(this,_onShowEvent,value); 
+                    }
+        
+                _onShowEvent = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -225,17 +285,20 @@ namespace Form
              this.moveAnimName = moveAnimName;
              this.speedParamName = speedParamName;
              this.hpParamName = hpParamName;
+             this.onTouchEvent = onTouchEvent;
+             this.onLeaveEvent = onLeaveEvent;
+             this.onShowEvent = onShowEvent;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,onTouchEvent,onLeaveEvent,onShowEvent);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","");
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -246,6 +309,16 @@ namespace Form
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<(string,bool), List<Data>> _DatasByLabelIsproto;
+            public static Dictionary<(string,bool), List<Data>> DatasByLabelIsproto
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabelIsproto;
                 }
             }
     
@@ -301,6 +374,10 @@ namespace Form
     
                     };
     
+                    _DatasByLabelIsproto = new Dictionary<(string,bool), List<Data>>() {
+    
+                };
+
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
                 };
@@ -376,7 +453,13 @@ namespace Form
 
                 jo.Get<string>("speedParamName"),
 
-                jo.Get<string>("hpParamName")
+                jo.Get<string>("hpParamName"),
+
+                jo.Get<string>("onTouchEvent"),
+
+                jo.Get<string>("onLeaveEvent"),
+
+                jo.Get<string>("onShowEvent")
                     );
 
             return data;
@@ -410,6 +493,12 @@ namespace Form
 
             jo.Set<string>("hpParamName",data.hpParamName);
 
+            jo.Set<string>("onTouchEvent",data.onTouchEvent);
+
+            jo.Set<string>("onLeaveEvent",data.onLeaveEvent);
+
+            jo.Set<string>("onShowEvent",data.onShowEvent);
+
             return jo;
         }
 
@@ -431,6 +520,10 @@ namespace Form
         DataByUid[data.uid]=data;
     
                     DataByNameIsproto[(data.name,data.isProto)]=data;
+    
+                    if(!DatasByLabelIsproto.ContainsKey((data.label,data.isProto)))
+                        DatasByLabelIsproto[(data.label,data.isProto)]=new List<Data>();
+                    DatasByLabelIsproto[(data.label,data.isProto)].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
@@ -456,6 +549,10 @@ ProductForm.AddData(data);
     
                     DataByNameIsproto.Remove((data.name,data.isProto));
     
+                    DatasByLabelIsproto[(data.label,data.isProto)].Remove(data);
+                    if(DatasByLabelIsproto[(data.label,data.isProto)].Count==0)
+                        DatasByLabelIsproto.Remove((data.label,data.isProto));
+    
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
                         DatasByLabel.Remove(data.label);
@@ -475,6 +572,8 @@ ProductForm.RemoveData(uid);
                     DataByUid.Clear();
     
                     DataByNameIsproto.Clear();
+    
+                    DatasByLabelIsproto.Clear();
     
                     DatasByLabel.Clear();
     
@@ -546,6 +645,13 @@ ProductForm.RemoveData(uid);
                         DatasByLabel[newV]=new List<Data>();
                     DatasByLabel[newV].Add(data);
  
+                    DatasByLabelIsproto[(oldV,data.isProto)].Remove(data);
+                    if(DatasByLabelIsproto[(oldV,data.isProto)].Count==0)
+                        DatasByLabelIsproto.Remove((oldV,data.isProto));
+                    if(!DatasByLabelIsproto.ContainsKey((newV,data.isProto)))
+                        DatasByLabelIsproto[(newV,data.isProto)]=new List<Data>();
+                    DatasByLabelIsproto[(newV,data.isProto)].Add(data);
+ 
                 changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
@@ -585,6 +691,13 @@ ProductForm.RemoveData(uid);
  
                     DataByNameIsproto.Remove((data.name,oldV));
                     DataByNameIsproto[(data.name,newV)]=data;
+ 
+                    DatasByLabelIsproto[(data.label,oldV)].Remove(data);
+                    if(DatasByLabelIsproto[(data.label,oldV)].Count==0)
+                        DatasByLabelIsproto.Remove((data.label,oldV));
+                    if(!DatasByLabelIsproto.ContainsKey((data.label,newV)))
+                        DatasByLabelIsproto[(data.label,newV)]=new List<Data>();
+                    DatasByLabelIsproto[(data.label,newV)].Add(data);
  
                 changeIsprotoAction?.Invoke(data,oldV,newV);
                 }
@@ -637,6 +750,36 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeHpparamnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOntouchevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOntoucheventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnleaveevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnleaveeventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnshowevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnshoweventAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -5,12 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
-
+using Z_String;
+namespace Form
+{
+    public  static partial class StoryTexAssetForm
+    {
+        public static void AddData(TexAssetForm.Data data)
+        {
+            AddData((Data)data);
+        }
+    }
+}
 
 public class ModAssetCtrl : Z_Controller<ModManager>
 {
@@ -19,10 +30,98 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     }
     public int modId;
-    #region main
+
+   
+
+    #region story
+    public void ImportStoryTex()
+    {
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        {
+            StoryTexAssetForm.AddData(form);
+            StoryForm.DataById[1].icon = form.name;
+            Z_EventHelper.Invoke(new AssetEvent()
+            {
+                importAssetName = form.name
+            });
+        });
+
+    }
+
+    #endregion
+
+    #region param
+    public void CreateGlobalArg(string name)
+    {
+        if (GlobalParamForm.DataByName.Keys.Count > GlobalMaxSettings.GLOBAL_PARAM_MAX)
+            return;
+
+        if (string.IsNullOrEmpty(name))
+        {
+            name=StringHelper.GetUniqueName(GlobalParamForm.DataByName.Keys);
+        }
+        GlobalParamForm.AddData(new GlobalParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
+    }
+    public void DeleteGlobalArg(string name)
+    {
+        
+        GlobalParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
+    }
+    public void CreateCharacterArg(string name)
+    {
+        if (CharacterParamForm.DataByName.Keys.Count > GlobalMaxSettings.CHARACTER_PARAM_MAX)
+            return;
+
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
+        }
+        
+        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            character.paramDic[name] = new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
+        }
+    }
+    public void DeleteCharacterArg(string name)
+    {
+        CharacterParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            character.paramDic.Remove(name);
+        }
+    }
+
+
+    public void CreateItemArg(string name)
+    {
+        if (ItemParamForm.DataByName.Keys.Count > GlobalMaxSettings.ITEM_PARAM_MAX)
+            return;
+
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(ItemParamForm.DataByName.Keys);
+        }
+       
+        ItemParamForm.AddData(new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
+        foreach (var item in ItemProductForm.DataByUid.Values)
+        {
+            item.paramDic[name] = new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
+        }
+    }
+    public void DeleteItemArg(string name)
+    {
+        ItemParamForm.RemoveData(ItemParamForm.DataByName[name].uid);
+        foreach (var item in ItemProductForm.DataByUid.Values)
+        {
+            item.paramDic.Remove(name);
+        }
+    }
+
 
 
     #endregion
+
 
     #region anim
 
@@ -199,32 +298,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
     }
 
-    public void CreateCharacterArg(string name)
-    {
-        if (string.IsNullOrEmpty(name))
-        {
-            for (int i = 0; i < GlobalMaxSettings.CHARACTER_PARAM_MAX; i++)
-            {
-                name = "new arg" + i;
-                if (!CharacterParamForm.DataByName.ContainsKey(name))
-                    break;
-            }
-        }
-        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
-        foreach (var character in CharacterProductForm.DataByUid.Values)
-        {
-            character.paramDic[name] = new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
-        }
-    }
-    public void DeleteCharacterArg(string name)
-    {
-        CharacterParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
-        foreach (var character in CharacterProductForm.DataByUid.Values)
-        {
-            character.paramDic.Remove(name);
-        }
-    }
-
+    
     public void ImportCharacterAvatar(string name)
     {
 
@@ -237,22 +311,33 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
-    private CharacterAnimForm.Data CreateCharacterAnim(string name = "new anim1")
+    private CharacterAnimForm.Data CreateCharacterAnim(string name)
     {
-        return new CharacterAnimForm.Data(0, name, new List<(float, float)>() { (0, 0) }, 0.2f, new List<List<string>>() { new List<string> { "" }, new List<string> { "" } });
+        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f);
+    }
+    private CharacterAnimClipForm.Data CreateCharacterAnimClip()
+    {
+       return new CharacterAnimClipForm.Data(0,
+            new Dictionary<EquipPartType,ItemStyle>(), 
+            new Dictionary<EquipPartType, (float, float,int,float)>(),
+            new Dictionary<BodyPartType, bool>() { { BodyPartType.UpperPart,true },{ BodyPartType.LowerPart, false } },
+            new Dictionary<BodyPartType, string>() { { BodyPartType.UpperPart, "" }, { BodyPartType.LowerPart, "" } });
     }
 
 
-    public void CreateCharacter(string name)
+    public void CreateCharacter(string name=null)
     {
-        var tmpAnimNm = "new anim1";
-        var dic = new Dictionary<string, CharacterParamForm.Data>();
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
+        }
+        var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "new1", CreateCharacterAnim("new1") } } ;
+        var paramDic = new Dictionary<string, CharacterParamForm.Data>();
         foreach (var prm in CharacterParamForm.DataByName.Values)
         {
-            dic[prm.name] = prm.Copy();
-
+            paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", "", dic, true, new Dictionary<string, CharacterAnimForm.Data>() { { tmpAnimNm, CreateCharacterAnim(tmpAnimNm) } }, "", "", "", ""));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", "", paramDic, true, animDic, "", "", "", "","","",""));
     }
     public void DeleteCharacter(string name)
     {
@@ -264,11 +349,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         CharacterProductForm.DataByNameIsproto[(oldName, true)].name = newName;
     }
 
-    public bool DeleteCharacterAnimId(string name, string animNm, int part, int id)
+    public bool DeleteCharacterAnimId(string name, string animNm, int id)
     {
         var data = CharacterProductForm.DataByNameIsproto[(name, true)];
         var anim = data.animDic[animNm];
-        anim.partAnimTexsName[part].RemoveAt(id);
+
+        anim.animClip.RemoveAt(id);
+
         return false;
     }
     public void DeleteCharacterAnim(string name, string animNm)
@@ -284,7 +371,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         anim.name = newName;
         data.animDic[newName] = anim;
     }
-    public void ImportCharacterAnim(string characterName, string animNm, int part, int id)
+    public void ImportCharacterAnim(string characterName, string animNm, BodyPartType part, int id)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
@@ -294,37 +381,29 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
             var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
             var anim = data.animDic[animNm];
-            if (anim.partAnimTexsName[part].Count > id)
+            if (anim.animClip.Count > id)
             {
-                anim.partAnimTexsName[part][id] = form.name;
-            }
-            else
-            {
-                anim.partAnimTexsName[part].Add(form.name);
+                anim.animClip[id].partTex[part] = form.name;
             }
         });
     }
-    public void CreateCharacterAnim(string name, string animName)
+    public void CreateCharacterAnim(string name, string animName=null)
     {
         var data = CharacterProductForm.DataByNameIsproto[(name, true)];
-        for (int i = 0; i < GlobalMaxSettings.CHARACTER_ANIM_MAX; i++)
+        if (data.animDic.Keys.Count > GlobalMaxSettings.CHARACTER_ANIM_MAX)
+            return;
+        if (string.IsNullOrEmpty(animName))
         {
-            name = "new anim" + i;
-            if (!data.animDic.ContainsKey(name))
-                break;
+            animName = StringHelper.GetUniqueName(data.animDic.Keys);
         }
-
         data.animDic[animName] = CreateCharacterAnim(animName);
 
     }
-    public void CreateCharacterAnimId(string name, string animNm, int part, int id)
+    public void CreateCharacterAnimId(string name, string animNm)
     {
         var data = CharacterProductForm.DataByNameIsproto[(name,true)];
         var anim = data.animDic[animNm];
-        anim.animPos.Add((0, 0));
-        anim.partAnimTexsName[0].Add("");
-        anim.partAnimTexsName[1].Add("");
-
+        anim.animClip.Add(CreateCharacterAnimClip());
     }
     #endregion
 
@@ -387,31 +466,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
     }
 
-    public void CreateItemArg(string name)
-    {
-        if (string.IsNullOrEmpty(name))
-        {
-            for (int i = 0; i < GlobalMaxSettings.ITEM_PARAM_MAX; i++)
-            {
-                name = "new arg" + i;
-                if (!ItemParamForm.DataByName.ContainsKey(name))
-                    break;
-            }
-        }
-        ItemParamForm.AddData(new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
-        foreach (var item in ItemProductForm.DataByUid.Values)
-        {
-            item.paramDic[name] = new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0);
-        }
-    }
-    public void DeleteItemArg(string name)
-    {
-        ItemParamForm.RemoveData(ItemParamForm.DataByName[name].uid);
-        foreach (var item in ItemProductForm.DataByUid.Values)
-        {
-            item.paramDic.Remove(name);
-        }
-    }
+   
 
     public void ImportItemIcon(string name)
     {
@@ -438,7 +493,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var model = MapModelForm.defaultData;
         model.isObstacle = false;
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default,new Dictionary<ItemStyle,string>()));
     }
     public void DeleteItem(string name)
     {

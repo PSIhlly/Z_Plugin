@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Ui;
 using Ui.ModSceneUnit;
-using Ui.ModStory;
 using Ui.PlaySceneMain;
 using UnityEditor;
 using UnityEngine;
@@ -91,7 +90,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         MapManager.instance.End();
         UiManager.instance.CloseAll();
         GameManager.instance.RegisterInputDefault();
-        UiManager.instance.ShowUi<UiModStoryCtrl>();
+        //UiManager.instance.ShowUi<UiModStoryCtrl>();
 
     }
     public T TryGetUnit<T>(RaycastHit[] hits)

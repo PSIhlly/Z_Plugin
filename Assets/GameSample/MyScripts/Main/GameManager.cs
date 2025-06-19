@@ -45,7 +45,7 @@ public class GameManager : Z_MonoManager<GameManager>
     public GameEventController evtCtrl;
     public GameMapController mapCtrl; 
     public GameCharacterController characterCtrl;
-    public GameObjectController objectCtrl;
+    public GameItemController objectCtrl;
     public Vector2 downPos;
     public float dragDis2 => InputManager.instance.screenSize.x / 25;
 
@@ -60,7 +60,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
         mapCtrl = new GameMapController(this);
         characterCtrl = new GameCharacterController(this);
-        objectCtrl = new GameObjectController(this);
+        objectCtrl = new GameItemController(this);
 
         Application.targetFrameRate = 100;//先锁100帧
         //default Assets

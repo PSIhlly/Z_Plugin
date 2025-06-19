@@ -143,24 +143,16 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"leftHand")},
+                {1,new Data(1,"upperPart")},
 
-                {2,new Data(2,"rightHand")},
-
-                {3,new Data(3,"head")},
-
-                {4,new Data(4,"body")},
+                {2,new Data(2,"lowerPart")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
-                        {"leftHand",_DataByUid[1]},
+                        {"upperPart",_DataByUid[1]},
     
-                        {"rightHand",_DataByUid[2]},
-    
-                        {"head",_DataByUid[3]},
-    
-                        {"body",_DataByUid[4]},
+                        {"lowerPart",_DataByUid[2]},
     
                     };
     

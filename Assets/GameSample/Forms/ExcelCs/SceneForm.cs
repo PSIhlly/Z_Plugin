@@ -48,9 +48,11 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,string,string> changeMapAction;
                 
         public static Action<Data,string,string> changeContentAction;
+                
+        public static Action<Data,(float,float),(float,float)> changePosAction;
                 
 
 
@@ -93,20 +95,20 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-                    private string  _icon;
+                    private string  _map;
                     /// <summary>
-                    ///封面
+                    ///地图
                     ///</summary>
-                    public string  icon{
-                                get{return _icon;}
+                    public string  map{
+                                get{return _map;}
  set{
 
                     if(_DataById!=null&&_DataById.ContainsValue(this))
                     {
-                       ChangeIcon(this,_icon,value); 
+                       ChangeMap(this,_map,value); 
                     }
         
-                _icon = value;
+                _map = value;
                 }
                  
                      }
@@ -129,24 +131,43 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-            public Data(int id,string name,string icon,string content)
+                    private (float,float)  _pos;
+                    /// <summary>
+                    ///相对位置
+                    ///</summary>
+                    public (float,float)  pos{
+                                get{return _pos;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangePos(this,_pos,value); 
+                    }
+        
+                _pos = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string map,string content,(float,float) pos)
             {
 
              this.id = id;
              this.name = name;
-             this.icon = icon;
+             this.map = map;
              this.content = content;
+             this.pos = pos;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,content);
+        return new Data(sameId? id:idChain.GetId(),name,map,content,pos);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"","","",(0f,0f));
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -221,9 +242,11 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("icon"),
+                jo.Get<string>("map"),
 
-                jo.Get<string>("content")
+                jo.Get<string>("content"),
+
+                jo.Get<(float,float)>("pos")
                     );
 
             return data;
@@ -239,9 +262,11 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<string>("map",data.map);
 
             jo.Set<string>("content",data.content);
+
+            jo.Set<(float,float)>("pos",data.pos);
 
             return jo;
         }
@@ -338,12 +363,12 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     
             }
             
-            public static void ChangeIcon(Data superData,string oldV,string newV)
+            public static void ChangeMap(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIconAction?.Invoke(data,oldV,newV);
+                changeMapAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -354,6 +379,16 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 {
 
                 changeContentAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(Data superData,(float,float) oldV,(float,float) newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
                 }
                     
             }

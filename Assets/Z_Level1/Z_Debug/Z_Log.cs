@@ -29,14 +29,14 @@ namespace Z_Debug
                 {
                     string[] addresses = fields[j].Split(".");
                     var tmp = obj;
-                    foreach(var ad in addresses)
+                    foreach (var ad in addresses)
                     {
-                        PropertyInfo property = tmp.GetType().GetProperty(ad);
-                        object value = property.GetValue(tmp);  // 获取值
+                        FieldInfo field = tmp.GetType().GetField(ad);
+                        object value = field.GetValue(tmp);  // 获取值
                         tmp = value;
                     }
                    
-                    res += fields[j] + ":" + (string)tmp + " ;";
+                    res += fields[j] + ":" + tmp.ToString() + " ;";
                 }
             }
             else
@@ -54,8 +54,8 @@ namespace Z_Debug
         private static string TreeDfs(object obj, string subName, string[] fields, int depth)
         {
             string res = new string(' ',depth)+ Get(obj,fields) + "\n";
-            PropertyInfo property = obj.GetType().GetProperty(subName);
-            object value = property.GetValue(obj);  // 获取值
+            FieldInfo field = obj.GetType().GetField(subName);
+            object value = field.GetValue(obj);  // 获取值
             if(value is ICollection col)
             {
                 foreach(var o in col)

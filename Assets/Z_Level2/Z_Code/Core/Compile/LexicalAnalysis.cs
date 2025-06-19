@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Z_Debug;
 
 namespace Z_Code
@@ -35,7 +37,6 @@ namespace Z_Code
         {
             var lst=ManageString(code);
             ManageDesc(lst);
-
             if (DEBUG)
             {
                 Z_Log.Log(lst, new[] { "desc.code", "desc.type" });
@@ -53,8 +54,15 @@ namespace Z_Code
                 if (IsString(code[i]))
                 {
                     isStringNow = !isStringNow;
-                    End(lst, sb);
-                    sb.Append(code[i]);
+                    if(!isStringNow)
+                    {
+                        sb.Append(code[i]);
+                        End(lst, sb);
+                    }else
+                    {
+                        End(lst, sb);
+                        sb.Append(code[i]);
+                    }
                 }
                 else if(isStringNow)
                 {
@@ -67,16 +75,23 @@ namespace Z_Code
                 else if (IsSplit(code[i]))
                 {
                     End(lst, sb);
-                    sb.Append(";");
-                    End(lst, sb);
+                    if (code[i]==';')
+                    {
+                        sb.Append(code[i]);
+                        End(lst, sb);
+                    }
                 }
                 else if (IsNum(code[i]))
                 {
+                    if (IsOperator(sb.ToString()))
+                    {
+                        End(lst, sb);
+                    }
                     sb.Append(code[i]);
                 }
                 else if (IsOperator(code[i]))
                 {
-                    if(!IsFirstOperator(sb.ToString()))
+                    if(!IsOperator(sb.ToString()+ code[i]))
                     {
                         End(lst, sb);
                     }
@@ -84,7 +99,7 @@ namespace Z_Code
                 }
                 else
                 {
-                    if (IsNum(sb.ToString()))
+                    if (IsNum(sb.ToString())||IsOperator(sb.ToString()))
                     {
                         End(lst, sb);
                         sb.Append(code[i]);
@@ -116,7 +131,11 @@ namespace Z_Code
                 }
                 else
                 {
-                    if (IsOperator(nodes[i].rawCode))
+                    if (IsSplit(nodes[i].rawCode))
+                    {
+                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Split);
+                    }
+                    else if (IsOperator(nodes[i].rawCode))
                     {
                         nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Operator);
                     }
@@ -162,7 +181,9 @@ namespace Z_Code
         {
             switch (ch)
             {
-                case ' ': 
+                case ' ':
+                case '\n':
+                case '\0':
                     return true;
                 default:
                     return false;
@@ -172,8 +193,17 @@ namespace Z_Code
         {
             switch (ch)
             {
-                case '\n':
-                case '\r':
+                case ';':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        public static bool IsSplit(string str)
+        {
+            switch (str)
+            {
+                case ";":
                     return true;
                 default:
                     return false;

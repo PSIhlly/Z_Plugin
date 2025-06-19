@@ -74,7 +74,7 @@ namespace Z_Ui.Notify
                 }) ;
             }
        }
-        public void AddChoose(string title, bool canClose, Func<int, bool> func, List<string> words, List<Sprite> sprites)
+        public void AddChoose(string title, bool canClose, Func<int, bool> func, List<string> words, List<Sprite> sprites=null)
         {
             var info = new ChooseInfo()
             {

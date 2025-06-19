@@ -22,6 +22,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string mapTextureFormFileName => "mtf";
     public string mapMaskFormFileName => "mmf";
     public string mapObjectFormFileName => "mof";
+    public string storyFormFileName => "sf";
     public string characterParamFormFileName => "cpaf";
     public string characterProductFormFileName => "cprf";
     public string eventFormFileName => "ef";
@@ -33,12 +34,20 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     #region save
 
-    public void RemoveTexUse(string startSign)
+    public void SaveOverview(string storyCoreFolder)
     {
 
-
+        SaveAndLoad.Save(storyCoreFolder + "/" + storyFormFileName, StoryForm.GetJaByDatas().ToString());
+        foreach (var data in StoryForm.DataById.Values)
+        {
+                var nm = data.icon;
+                if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
+                {
+                    var tex = TexAssetForm.DataByName[nm];
+                    SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
+                }
+        }
     }
-
 
     public void SaveMaterial(string storyCoreFolder)
     {
@@ -105,16 +114,20 @@ public class GameSaveController : Z_Controller<GameManager>
             }
             foreach (var anim in data.animDic.Values)
             {
-                for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
-                    for (int i = 0; i < anim.partAnimTexsName[j].Count; i++)
+               
+                    for (int i = 0; i < anim.animClip.Count; i++)
+                {
+                    foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
                     {
-                        var nm = anim.partAnimTexsName[j][i];
+
+                        var nm = anim.animClip[i].partTex[part];
                         if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
                         {
                             var tex = TexAssetForm.DataByName[nm];
                             SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
                         }
                     }
+                }
 
             }
         }
@@ -213,6 +226,26 @@ public class GameSaveController : Z_Controller<GameManager>
             StoryTexAssetForm.RemoveData(oldData.id);
         }
         StoryTexAssetForm.AddData(data);
+    }
+    public void LoadOverview(string storyCoreFolder)
+    {
+        var pathForm = storyCoreFolder + "/" + mapTextureFormFileName;
+        StoryForm.Clear();
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in StoryForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                StoryForm.AddData(form);
+                var nm = form.icon;
+                var path = storyCoreFolder + "/" + nm;
+                if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
+                {
+                    AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
+                }
+            }
+        }
+
+      
     }
     public void LoadMaterial(string storyCoreFolder)
     {
@@ -319,15 +352,18 @@ public class GameSaveController : Z_Controller<GameManager>
             }
             foreach (var anim in data.animDic.Values)
             {
-                for (int j = 0; j < GlobalMaxSettings.CHARACTER_PART_MAX; j++)
-                    for (int i = 0; i < anim.partAnimTexsName[j].Count; i++)
+               
+                    for (int i = 0; i < anim.animClip.Count; i++)
                     {
-                        var nm = anim.partAnimTexsName[j][i];
+                    foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+                    {
+                        var nm = anim.animClip[i].partTex[part];
                         path = storyCoreFolder + "/" + nm;
                         if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
                         {
                             AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
                         }
+                    }
                     }
             }
         }

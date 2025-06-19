@@ -20,6 +20,10 @@ namespace Z_Code
             {
                 BuildZl(cmds, node);
             }
+            if(DEBUG)
+            {
+                Z_Log.Log(cmds);
+            }
             return cmds;
         }
         private void BuildZl(List<string> cmds, SyntaxNode node)
@@ -38,6 +42,12 @@ namespace Z_Code
                     cmds.Add(GetOpName(Op.Get));
                     cmds.Add(node.desc.code);
                     break;
+                case CodeType.Action:
+                    for(int i = 0;i<node.subNodes.Count;i++)
+                    {
+                        BuildZl(cmds, node.subNodes[i]);
+                    }
+                    break;
                 case CodeType.Reserved:
                     switch (node.desc.code)
                     {
@@ -53,7 +63,7 @@ namespace Z_Code
                             cmds[ifFalseJumpCmdId] = (cmds.Count).ToString();
 
                             int ifTrueJumpCmdId = cmds.Count - 1;
-                            if (node.subNodes.Count > 1)
+                            if (node.subNodes.Count > 2)
                             {
                                 BuildZl(cmds, node.subNodes[2]);
                             }

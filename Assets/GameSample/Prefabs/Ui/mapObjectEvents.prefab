@@ -33,6 +33,7 @@ RectTransform:
   - {fileID: 5174323238093218394}
   - {fileID: 5413981368328261273}
   m_Father: {fileID: 0}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -52,12 +53,12 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
+    serializedVersion: 2
     m_TransformParent: {fileID: 1419500911983117880}
     m_Modifications:
     - target: {fileID: 3337931127744374141, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
-      value: btn_onTouch
+      value: btn_onTouchEvent
       objectReference: {fileID: 0}
     - target: {fileID: 3395524700711038822, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
@@ -73,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6661603313824853413, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
-      value: txt_onUseEvent
+      value: txt_onTouchEvent
       objectReference: {fileID: 0}
     - target: {fileID: 6661603313824853415, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_text
@@ -168,9 +169,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
 --- !u!224 &5022765651959900043 stripped
 RectTransform:
@@ -182,12 +181,12 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
+    serializedVersion: 2
     m_TransformParent: {fileID: 1419500911983117880}
     m_Modifications:
     - target: {fileID: 3337931127744374141, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
-      value: btn_onLeave
+      value: btn_onLeaveEvent
       objectReference: {fileID: 0}
     - target: {fileID: 3395524700711038822, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
@@ -203,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6661603313824853413, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
-      value: txt_onUseEvent
+      value: txt_onLeaveEvent
       objectReference: {fileID: 0}
     - target: {fileID: 6661603313824853415, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_text
@@ -298,9 +297,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
 --- !u!224 &5174323238093218394 stripped
 RectTransform:
@@ -312,12 +309,12 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
+    serializedVersion: 2
     m_TransformParent: {fileID: 1419500911983117880}
     m_Modifications:
     - target: {fileID: 3337931127744374141, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
-      value: btn_onShow
+      value: btn_onShowEvent
       objectReference: {fileID: 0}
     - target: {fileID: 3395524700711038822, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
@@ -333,7 +330,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6661603313824853413, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_Name
-      value: txt_onUseEvent
+      value: txt_onShowEvent
       objectReference: {fileID: 0}
     - target: {fileID: 6661603313824853415, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
       propertyPath: m_text
@@ -428,9 +425,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a1d8d36d8366244aac44cec0c92a25a, type: 3}
 --- !u!224 &5413981368328261273 stripped
 RectTransform:

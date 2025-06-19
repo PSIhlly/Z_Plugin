@@ -15,6 +15,7 @@ namespace Z_Code
         Action,
         Reserved,
         Operator,
+        Split,
     }
 
     public abstract class Node
@@ -23,6 +24,8 @@ namespace Z_Code
     }
     public static class BaseData
     {
+  
+
         public static Dictionary<string, CmdBase> cmdDic = new Dictionary<string, CmdBase>();
         public static HashSet<string> reserved = new HashSet<string>()
         {

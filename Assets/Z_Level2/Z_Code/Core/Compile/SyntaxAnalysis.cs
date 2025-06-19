@@ -18,7 +18,7 @@ namespace Z_Code
             {
                 this.subNodes = subNodes;
             }
-            foreach (var node in subNodes)
+            foreach (var node in this.subNodes)
             {
                 node.parentNode = parentNode;
             }
@@ -50,7 +50,7 @@ namespace Z_Code
             {
                 if (nodes[i].desc.type == CodeType.Reserved)
                 {
-
+                    int oriPos = i;
                     List<SyntaxNode> subStatements = new List<SyntaxNode>();
                     switch (nodes[i].desc.code)
                     {
@@ -68,8 +68,6 @@ namespace Z_Code
                                 subStatements.Add(new SyntaxNode(new Desc("else", CodeType.Action), BuildBlock(nodes, endThenIf + 3, endElseIf - 1)));
                                 i = endElseIf;
                             }
-
-
                             break;
                         case "for":
                             int endForIf = GetFirstDepth0(nodes, i + 1, r, ")");
@@ -81,14 +79,17 @@ namespace Z_Code
                             i = endForDo;
                             break;
                     }
-                    statements.Add(new SyntaxNode(nodes[i].desc, subStatements));
+                    statements.Add(new SyntaxNode(nodes[oriPos].desc, subStatements));
 
                 }
                 else
                 {
                     int split = GetFirstDepth0(nodes, i, r, ";");
-                    statements.AddRange(BuildStatement(nodes, i, split - 1));
-                    i = split;
+                    if(split>0)
+                    {
+                        statements.AddRange(BuildStatement(nodes, i, split - 1));
+                        i = split;
+                    }
                 }
             }
             return statements;
@@ -96,13 +97,14 @@ namespace Z_Code
 
         private List<SyntaxNode> BuildStatement(List<LexicalNode> nodes, int l, int r)
         {
-
+            
             //ignore extern small bracket
-            while (GetFirstDepth0(nodes, l, r, ")") == r && l <= r)
+            while (GetFirstDepth0(nodes, l, r, ")") == r&& GetFirstDepth0(nodes, l, r, "(")==l && l <= r)
             {
                 l++;
                 r--;
             }
+
             List<SyntaxNode> res = new List<SyntaxNode>();
             if (l <= r)
             {
@@ -110,6 +112,7 @@ namespace Z_Code
                 //level1
                 for (int i = l; i <= r; i++)
                 {
+
                     if (nodes[i].desc.type == CodeType.FuncName)
                     {
                         int endBkt = GetFirstDepth0(nodes, i + 1, r, ")");
@@ -133,11 +136,10 @@ namespace Z_Code
                         cache.Add(nodes[i]);
                     }
                 }
-
                 //level2
                 for (int i = 0; i < cache.Count; i++)
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.FuncName)
+                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                     {
                         switch (lex.desc.code)
                         {
@@ -151,7 +153,7 @@ namespace Z_Code
                 //level3
                 for (int i = 0; i < cache.Count; i++)
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.FuncName)
+                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                     {
                         switch (lex.desc.code)
                         {
@@ -162,10 +164,11 @@ namespace Z_Code
                         }
                     }
                 }
+
                 //level4
                 for (int i = 0; i < cache.Count; i++)
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.FuncName)
+                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                     {
                         switch (lex.desc.code)
                         {
@@ -179,12 +182,27 @@ namespace Z_Code
                 //level5
                 for (int i = 0; i < cache.Count; i++)
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.FuncName)
+                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                     {
                         switch (lex.desc.code)
                         {
                             case "=":
                                 SetSub(cache, lex, ref i, 1, 1);
+                                break;
+                        }
+                    }
+                }
+                //level6
+                for (int i = 0; i < cache.Count; i++)
+                {
+                    if (cache[i] is LexicalNode lex)
+                    {
+                        switch(lex.desc.type)
+                        {
+                            case CodeType.Num:
+                            case CodeType.Str:
+                            case CodeType.VarName:
+                                cache[i] = new SyntaxNode(lex.desc);
                                 break;
                         }
                     }
@@ -241,17 +259,18 @@ namespace Z_Code
             int depth = 0;
             for (int i = start; i <= end; i++)
             {
-                if (nodes[i].desc.code == "{")
-                {
-                    depth++;
-                }
-                if (nodes[i].desc.code == "}")
+                
+                if (nodes[i].desc.code == "}" || nodes[i].desc.code == ")")
                 {
                     depth--;
                 }
                 if (depth == 0 && nodes[i].desc.code == content)
                 {
                     return i;
+                }
+                if (nodes[i].desc.code == "{"|| nodes[i].desc.code =="(")
+                {
+                    depth++;
                 }
             }
             return 0;

@@ -78,7 +78,9 @@ namespace Form
                 
         public static Action<Data,int,int> changeMaxamountperAction;
                 
-        public static Action<Data,EquipType,EquipType> changeEquipAction;
+        public static Action<Data,EquipPartType,EquipPartType> changeEquipAction;
+                
+        public static Action<Data,Dictionary<ItemStyle,string>,Dictionary<ItemStyle,string>> changeStyletexAction;
                 
 
 
@@ -193,11 +195,11 @@ namespace Form
                  
                      }
                     
-                    private EquipType  _equip;
+                    private EquipPartType  _equip;
                     /// <summary>
                     ///装备位置
                     ///</summary>
-                    public EquipType  equip{
+                    public EquipPartType  equip{
                                 get{return _equip;}
  set{
 
@@ -211,7 +213,25 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipType equip):base(uid,name,label,isProto)
+                    private Dictionary<ItemStyle,string>  _styleTex;
+                    /// <summary>
+                    ///装备位置
+                    ///</summary>
+                    public Dictionary<ItemStyle,string>  styleTex{
+                                get{return _styleTex;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeStyletex(this,_styleTex,value); 
+                    }
+        
+                _styleTex = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -225,17 +245,18 @@ namespace Form
              this.amount = amount;
              this.maxAmountPer = maxAmountPer;
              this.equip = equip;
+             this.styleTex = styleTex;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default);
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -246,6 +267,16 @@ namespace Form
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<(string,bool), List<Data>> _DatasByLabelIsproto;
+            public static Dictionary<(string,bool), List<Data>> DatasByLabelIsproto
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabelIsproto;
                 }
             }
     
@@ -301,6 +332,10 @@ namespace Form
     
                     };
     
+                    _DatasByLabelIsproto = new Dictionary<(string,bool), List<Data>>() {
+    
+                };
+
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
                 };
@@ -376,7 +411,9 @@ namespace Form
 
                 jo.Get<int>("maxAmountPer"),
 
-                jo.Get<EquipType>("equip")
+                jo.Get<EquipPartType>("equip"),
+
+                jo.Get<Dictionary<ItemStyle,string>>("styleTex")
                     );
 
             return data;
@@ -408,7 +445,9 @@ namespace Form
 
             jo.Set<int>("maxAmountPer",data.maxAmountPer);
 
-            jo.Set<EquipType>("equip",data.equip);
+            jo.Set<EquipPartType>("equip",data.equip);
+
+            jo.Set<Dictionary<ItemStyle,string>>("styleTex",data.styleTex);
 
             return jo;
         }
@@ -431,6 +470,10 @@ namespace Form
         DataByUid[data.uid]=data;
     
                     DataByNameIsproto[(data.name,data.isProto)]=data;
+    
+                    if(!DatasByLabelIsproto.ContainsKey((data.label,data.isProto)))
+                        DatasByLabelIsproto[(data.label,data.isProto)]=new List<Data>();
+                    DatasByLabelIsproto[(data.label,data.isProto)].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
@@ -456,6 +499,10 @@ ProductForm.AddData(data);
     
                     DataByNameIsproto.Remove((data.name,data.isProto));
     
+                    DatasByLabelIsproto[(data.label,data.isProto)].Remove(data);
+                    if(DatasByLabelIsproto[(data.label,data.isProto)].Count==0)
+                        DatasByLabelIsproto.Remove((data.label,data.isProto));
+    
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
                         DatasByLabel.Remove(data.label);
@@ -475,6 +522,8 @@ ProductForm.RemoveData(uid);
                     DataByUid.Clear();
     
                     DataByNameIsproto.Clear();
+    
+                    DatasByLabelIsproto.Clear();
     
                     DatasByLabel.Clear();
     
@@ -546,6 +595,13 @@ ProductForm.RemoveData(uid);
                         DatasByLabel[newV]=new List<Data>();
                     DatasByLabel[newV].Add(data);
  
+                    DatasByLabelIsproto[(oldV,data.isProto)].Remove(data);
+                    if(DatasByLabelIsproto[(oldV,data.isProto)].Count==0)
+                        DatasByLabelIsproto.Remove((oldV,data.isProto));
+                    if(!DatasByLabelIsproto.ContainsKey((newV,data.isProto)))
+                        DatasByLabelIsproto[(newV,data.isProto)]=new List<Data>();
+                    DatasByLabelIsproto[(newV,data.isProto)].Add(data);
+ 
                 changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     
@@ -585,6 +641,13 @@ ProductForm.RemoveData(uid);
  
                     DataByNameIsproto.Remove((data.name,oldV));
                     DataByNameIsproto[(data.name,newV)]=data;
+ 
+                    DatasByLabelIsproto[(data.label,oldV)].Remove(data);
+                    if(DatasByLabelIsproto[(data.label,oldV)].Count==0)
+                        DatasByLabelIsproto.Remove((data.label,oldV));
+                    if(!DatasByLabelIsproto.ContainsKey((data.label,newV)))
+                        DatasByLabelIsproto[(data.label,newV)]=new List<Data>();
+                    DatasByLabelIsproto[(data.label,newV)].Add(data);
  
                 changeIsprotoAction?.Invoke(data,oldV,newV);
                 }
@@ -631,12 +694,22 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeEquip(Data superData,EquipType oldV,EquipType newV)
+            public static void ChangeEquip(Data superData,EquipPartType oldV,EquipPartType newV)
             {
                 if(superData is Data data)
                 {
 
                 changeEquipAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeStyletex(Data superData,Dictionary<ItemStyle,string> oldV,Dictionary<ItemStyle,string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeStyletexAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -88,7 +88,7 @@ namespace Form
             
         }
 
-                   private static Data _defaultData=new Data(0,"frontView","frontView","前视图");
+                   private static Data _defaultData=new Data(0,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -133,9 +133,9 @@ namespace Form
 
                 {1000002,new Data(1000002,"texture","Texture","贴图")},
 
-                {1000003,new Data(1000003,"transition mask","Transition mask","过渡遮罩")},
+                {1000003,new Data(1000003,"transitionMask","Transition mask","过渡遮罩")},
 
-                {1000004,new Data(1000004,"obstacle","Obstacle","障碍物")},
+                {1000004,new Data(1000004,"object","Object","物体")},
 
                 {1000005,new Data(1000005,"item","item","道具")},
 
@@ -153,9 +153,9 @@ namespace Form
 
                 {1100001,new Data(1100001,"Choose main character","Choose main character","选择主角")},
 
-                {1110001,new Data(1110001,"Choose Hp Param","Choose Hp Param","选择血量参数")},
+                {1110001,new Data(1110001,"Choose Hp param","Choose Hp param","选择血量参数")},
 
-                {1110002,new Data(1110002,"Choose Speed Param","Choose Speed Param","选择移速参数")},
+                {1110002,new Data(1110002,"Choose Speed param","Choose Speed param","选择移速参数")},
 
                 {1110003,new Data(1110003,"Choose Idle anim","Choose Idle anim","选择闲置动画")},
 
@@ -245,7 +245,7 @@ namespace Form
 
                 {1210025,new Data(1210025,"lowerPart","Lower part","下半身")},
 
-                {1210026,new Data(1210026,"partPosition","Part position","部位位置")},
+                {1210026,new Data(1210026,"equipSetting","Equip setting","装备设置")},
 
                 {1210027,new Data(1210027,"layer","Layer","层级")},
 
@@ -267,9 +267,61 @@ namespace Form
 
                 {1210036,new Data(1210036,"canEquipped","Can equipped","可装备")},
 
-                {1210036,new Data(1210036,"onEquipEvent","onEquipEvent","装备事件")},
+                {1210037,new Data(1210037,"onEquipEvent","On equip event","装备事件")},
 
-                {1210036,new Data(1210036,"onDIsequipEvent","onDisequipEvent","卸下事件")},
+                {1210038,new Data(1210038,"onDIsequipEvent","On disequip event","卸下事件")},
+
+                {1210039,new Data(1210039,"part_1","Part","部位")},
+
+                {1210040,new Data(1210040,"cube","Cube","方块")},
+
+                {1210041,new Data(1210041,"sphere","Sphere","球")},
+
+                {1210042,new Data(1210042,"verticalView","vertical view","俯视图")},
+
+                {1210043,new Data(1210043,"leftView","leftView","左视图")},
+
+                {1210044,new Data(1210044,"frontView","frontView","前视图")},
+
+                {1210045,new Data(1210045,"condition","Condition","条件")},
+
+                {1210046,new Data(1210046,"fixed","Fixed","固定")},
+
+                {1210047,new Data(1210047,"onTouchEvent","On touch event","接触事件")},
+
+                {1210048,new Data(1210048,"onLeaveEvent","On leave event","离开事件")},
+
+                {1210049,new Data(1210049,"onShowEvent","OnShow","出现事件")},
+
+                {1210050,new Data(1210050,"customEvent","Custom event","自定义事件")},
+
+                {1210051,new Data(1210051,"globalEvent","Global event","全局事件")},
+
+                {1210052,new Data(1210052,"category","Category","一级分类")},
+
+                {1210053,new Data(1210053,"type","Type","二级分类")},
+
+                {1210054,new Data(1210054,"edit","Edit","编辑")},
+
+                {1210055,new Data(1210055,"onBeginEvent","On begin event","开幕事件")},
+
+                {1210056,new Data(1210056,"onEndEvent","On end event","结局事件")},
+
+                {1210057,new Data(1210057,"skillEvent","Skill event","技能事件")},
+
+                {1210058,new Data(1210058,"map","Map","地图")},
+
+                {1210059,new Data(1210059,"scene","Scene","场景")},
+
+                {1210060,new Data(1210060,"import","Import","导入")},
+
+                {1210061,new Data(1210061,"setPos","Set position","设置位置")},
+
+                {1210062,new Data(1210062,"partSetting","Part setting","部位设置")},
+
+                {1210063,new Data(1210063,"enablePart","Enable part","启用部位")},
+
+                {1210064,new Data(1210064,"itemStyle","Item style","道具样式")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -278,9 +330,9 @@ namespace Form
     
                         {"texture",_DataById[1000002]},
     
-                        {"transition mask",_DataById[1000003]},
+                        {"transitionMask",_DataById[1000003]},
     
-                        {"obstacle",_DataById[1000004]},
+                        {"object",_DataById[1000004]},
     
                         {"item",_DataById[1000005]},
     
@@ -298,9 +350,9 @@ namespace Form
     
                         {"Choose main character",_DataById[1100001]},
     
-                        {"Choose Hp Param",_DataById[1110001]},
+                        {"Choose Hp param",_DataById[1110001]},
     
-                        {"Choose Speed Param",_DataById[1110002]},
+                        {"Choose Speed param",_DataById[1110002]},
     
                         {"Choose Idle anim",_DataById[1110003]},
     
@@ -390,7 +442,7 @@ namespace Form
     
                         {"lowerPart",_DataById[1210025]},
     
-                        {"partPosition",_DataById[1210026]},
+                        {"equipSetting",_DataById[1210026]},
     
                         {"layer",_DataById[1210027]},
     
@@ -412,9 +464,61 @@ namespace Form
     
                         {"canEquipped",_DataById[1210036]},
     
-                        {"onEquipEvent",_DataById[1210036]},
+                        {"onEquipEvent",_DataById[1210037]},
     
-                        {"onDIsequipEvent",_DataById[1210036]},
+                        {"onDIsequipEvent",_DataById[1210038]},
+    
+                        {"part_1",_DataById[1210039]},
+    
+                        {"cube",_DataById[1210040]},
+    
+                        {"sphere",_DataById[1210041]},
+    
+                        {"verticalView",_DataById[1210042]},
+    
+                        {"leftView",_DataById[1210043]},
+    
+                        {"frontView",_DataById[1210044]},
+    
+                        {"condition",_DataById[1210045]},
+    
+                        {"fixed",_DataById[1210046]},
+    
+                        {"onTouchEvent",_DataById[1210047]},
+    
+                        {"onLeaveEvent",_DataById[1210048]},
+    
+                        {"onShowEvent",_DataById[1210049]},
+    
+                        {"customEvent",_DataById[1210050]},
+    
+                        {"globalEvent",_DataById[1210051]},
+    
+                        {"category",_DataById[1210052]},
+    
+                        {"type",_DataById[1210053]},
+    
+                        {"edit",_DataById[1210054]},
+    
+                        {"onBeginEvent",_DataById[1210055]},
+    
+                        {"onEndEvent",_DataById[1210056]},
+    
+                        {"skillEvent",_DataById[1210057]},
+    
+                        {"map",_DataById[1210058]},
+    
+                        {"scene",_DataById[1210059]},
+    
+                        {"import",_DataById[1210060]},
+    
+                        {"setPos",_DataById[1210061]},
+    
+                        {"partSetting",_DataById[1210062]},
+    
+                        {"enablePart",_DataById[1210063]},
+    
+                        {"itemStyle",_DataById[1210064]},
     
                     };
     

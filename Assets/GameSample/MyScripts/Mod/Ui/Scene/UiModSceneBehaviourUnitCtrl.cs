@@ -43,15 +43,15 @@ namespace Ui.ModSceneBehaviourUnit
             view.btn_evt.onClick.AddListener(() =>
             {
                 var unit = (MapUnit)model.data.unit;
-                
-                UiManager.instance.ShowUi<UiModStoryEventTriggerCtrl>(new UiModStoryEventTriggerParam()
+                //TODO:
+                /*UiManager.instance.ShowUi<UiModStoryEventTriggerCtrl>(new UiModStoryEventTriggerParam()
                 {
                     dic= unit.evtDic,
                     act = (dic) =>
                     {
                         unit.evtDic = dic;
                     }
-                });
+                });*/
                 Close();
             });
         }

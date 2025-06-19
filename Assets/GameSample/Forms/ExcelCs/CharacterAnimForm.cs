@@ -48,11 +48,11 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,List<(float,float)>,List<(float,float)>> changeAnimposAction;
+        public static Action<Data,List<CharacterAnimClipForm.Data>,List<CharacterAnimClipForm.Data>> changeAnimclipAction;
                 
         public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
-        public static Action<Data,List<List<string>>,List<List<string>>> changePartanimtexsnameAction;
+        public static Action<Data,float,float> changeScaleAction;
                 
 
 
@@ -95,20 +95,20 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private List<(float,float)>  _animPos;
+                    private List<CharacterAnimClipForm.Data>  _animClip;
                     /// <summary>
-                    ///动画关键位置
+                    ///装备
                     ///</summary>
-                    public List<(float,float)>  animPos{
-                                get{return _animPos;}
+                    public List<CharacterAnimClipForm.Data>  animClip{
+                                get{return _animClip;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeAnimpos(this,_animPos,value); 
+                       ChangeAnimclip(this,_animClip,value); 
                     }
         
-                _animPos = value;
+                _animClip = value;
                 }
                  
                      }
@@ -131,43 +131,43 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private List<List<string>>  _partAnimTexsName;
+                    private float  _scale;
                     /// <summary>
-                    ///贴图名称
+                    ///缩放
                     ///</summary>
-                    public List<List<string>>  partAnimTexsName{
-                                get{return _partAnimTexsName;}
+                    public float  scale{
+                                get{return _scale;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangePartanimtexsname(this,_partAnimTexsName,value); 
+                       ChangeScale(this,_scale,value); 
                     }
         
-                _partAnimTexsName = value;
+                _scale = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,List<(float,float)> animPos,float animTimeInterval,List<List<string>> partAnimTexsName)
+            public Data(int uid,string name,List<CharacterAnimClipForm.Data> animClip,float animTimeInterval,float scale)
             {
 
              this.uid = uid;
              this.name = name;
-             this.animPos = animPos;
+             this.animClip = animClip;
              this.animTimeInterval = animTimeInterval;
-             this.partAnimTexsName = partAnimTexsName;
+             this.scale = scale;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<(float,float)>(animPos),animTimeInterval,new List<List<string>>(partAnimTexsName));
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<CharacterAnimClipForm.Data>(animClip),animTimeInterval,scale);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,0f,null);
+                   private static Data _defaultData=new Data(0,"",null,0f,0f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -242,11 +242,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<List<(float,float)>>("animPos"),
+                jo.Get<List<CharacterAnimClipForm.Data>>("animClip"),
 
                 jo.Get<float>("animTimeInterval"),
 
-                jo.Get<List<List<string>>>("partAnimTexsName")
+                jo.Get<float>("scale")
                     );
 
             return data;
@@ -262,11 +262,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<List<(float,float)>>("animPos",data.animPos);
+            jo.Set<List<CharacterAnimClipForm.Data>>("animClip",data.animClip);
 
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
-            jo.Set<List<List<string>>>("partAnimTexsName",data.partAnimTexsName);
+            jo.Set<float>("scale",data.scale);
 
             return jo;
         }
@@ -363,12 +363,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeAnimpos(Data superData,List<(float,float)> oldV,List<(float,float)> newV)
+            public static void ChangeAnimclip(Data superData,List<CharacterAnimClipForm.Data> oldV,List<CharacterAnimClipForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeAnimposAction?.Invoke(data,oldV,newV);
+                changeAnimclipAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -383,12 +383,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangePartanimtexsname(Data superData,List<List<string>> oldV,List<List<string>> newV)
+            public static void ChangeScale(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changePartanimtexsnameAction?.Invoke(data,oldV,newV);
+                changeScaleAction?.Invoke(data,oldV,newV);
                 }
                     
             }

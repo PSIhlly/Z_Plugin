@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Ui;
 using Ui.ModSceneUnit;
-using Ui.ModStory;
 using Ui.PlaySceneMain;
 using UnityEditor;
 using UnityEngine;

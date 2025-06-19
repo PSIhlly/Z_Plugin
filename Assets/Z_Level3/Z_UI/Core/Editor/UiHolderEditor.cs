@@ -236,7 +236,7 @@ using Z_Texture;
                             subContent += subEditor.GetCode(uiHolder.uiName);
                             break;
                         case UiType.Model:
-                            namespaceContent += $"using Ui.{subHolder.uiName}\n";
+                            namespaceContent += $"using Ui.{subHolder.uiName};\n";
                             bindContent += $@"
             view.model_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
             view.model_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
@@ -411,6 +411,7 @@ namespace {uiHolder.uiName}
         string GetCoreCode(string parent)
         {
             return $@"
+{StringHelper.RemoveMultiLine(namespaceContent)}
 {subContent}
     public partial class Ui{uiHolder.uiName}Param:UiParam
     {{

@@ -9,9 +9,13 @@ namespace Ui.ModStory
 {
 
 
+
+
 namespace ModStoryOverview
 
 {
+
+
 
 
     public partial class UiModStoryOverviewParam:UiParam
@@ -70,9 +74,15 @@ namespace ModStoryParameter
 {
 
 
+
+
 namespace ModStoryGlobalParameter
 
 {
+
+
+
+
 
 
 
@@ -188,6 +198,10 @@ namespace ModStoryCharacterParameter
 
 
 
+
+
+
+
     public partial class UiArgParam:UiParam
     {
     }
@@ -300,6 +314,10 @@ namespace ModStoryItemParameter
 
 
 
+
+
+
+
     public partial class UiArgParam:UiParam
     {
     }
@@ -409,6 +427,8 @@ namespace ModStoryItemParameter
 namespace ModStoryConfig
 
 {
+
+
 
 
     public partial class UiModStoryConfigParam:UiParam
@@ -538,9 +558,15 @@ namespace ModStoryCharacter
 {
 
 
+
+
 namespace ModStoryCharacterList
 
 {
+
+
+
+
 
 
 
@@ -595,6 +621,8 @@ namespace ModStoryCharacterList
     {
         
     }
+
+
 
     public partial class UiArgParam:UiParam
     {
@@ -715,9 +743,13 @@ namespace ModStoryCharacterUnit
 {
 
 
+
+
 namespace ModStoryCharacterUnitOverview
 
 {
+
+
 
 
     public partial class UiModStoryCharacterUnitOverviewParam:UiParam
@@ -776,6 +808,10 @@ namespace ModStoryCharacterUnitOverview
 namespace ModStoryCharacterUnitParameter
 
 {
+
+
+
+
 
 
 
@@ -886,9 +922,15 @@ namespace ModStoryCharacterUnitAppearance
 {
 
 
+
+
 namespace ModStoryCharacterUnitAppearanceList
 
 {
+
+
+
+
 
 
 
@@ -1001,7 +1043,12 @@ namespace ModStoryCharacterUnitAppearanceList
 namespace ModStoryCharacterUnitAppearanceUnit
 
 {
-                    using Ui.Axis;
+
+using Ui.Axis;
+
+
+
+
 
 
     public partial class UiArgParam:UiParam
@@ -1058,6 +1105,8 @@ namespace ModStoryCharacterUnitAppearanceUnit
         
     }
 
+
+
     public partial class UiEquipPartParam:UiParam
     {
     }
@@ -1107,6 +1156,8 @@ namespace ModStoryCharacterUnitAppearanceUnit
     {
         
     }
+
+
 
     public partial class UiPartParam:UiParam
     {
@@ -1324,6 +1375,8 @@ namespace ModStoryCharacterUnitConfig
 {
 
 
+
+
     public partial class UiModStoryCharacterUnitConfigParam:UiParam
     {
     }
@@ -1528,9 +1581,15 @@ namespace ModStoryItem
 {
 
 
+
+
 namespace ModStoryItemList
 
 {
+
+
+
+
 
 
 
@@ -1585,6 +1644,8 @@ namespace ModStoryItemList
     {
         
     }
+
+
 
     public partial class UiArgParam:UiParam
     {
@@ -1705,9 +1766,13 @@ namespace ModStoryItemUnit
 {
 
 
+
+
 namespace ModStoryItemUnitOverview
 
 {
+
+
 
 
     public partial class UiModStoryItemUnitOverviewParam:UiParam
@@ -1766,6 +1831,10 @@ namespace ModStoryItemUnitOverview
 namespace ModStoryItemUnitParameter
 
 {
+
+
+
+
 
 
 
@@ -1877,6 +1946,10 @@ namespace ModStoryItemUnitAppearance
 
 
 
+
+
+
+
     public partial class UiStyleParam:UiParam
     {
     }
@@ -1926,6 +1999,8 @@ namespace ModStoryItemUnitAppearance
     {
         
     }
+
+
 
     public partial class UiArgParam:UiParam
     {
@@ -1983,6 +2058,8 @@ namespace ModStoryItemUnitAppearance
 namespace Axis
 
 {
+
+
 
 
     public partial class UiAxisParam:UiParam
@@ -2126,6 +2203,8 @@ namespace Axis
 namespace ModStoryItemUnitConfig
 
 {
+
+
 
 
     public partial class UiModStoryItemUnitConfigParam:UiParam
@@ -2340,9 +2419,13 @@ namespace ModStoryMapObject
 {
 
 
+
+
 namespace ModStoryMapObjectType
 
 {
+
+
 
 
     public partial class UiModStoryMapObjectTypeParam:UiParam
@@ -2400,6 +2483,10 @@ namespace ModStoryMapObjectList
 
 
 
+
+
+
+
     public partial class UiLabParam:UiParam
     {
     }
@@ -2451,6 +2538,8 @@ namespace ModStoryMapObjectList
     {
         
     }
+
+
 
     public partial class UiArgParam:UiParam
     {
@@ -2573,9 +2662,15 @@ namespace ModStoryMapObjectTexture
 {
 
 
+
+
 namespace ModStoryMapObjectTextureAppearance
 
 {
+
+
+
+
 
 
 
@@ -2708,6 +2803,8 @@ namespace ModStoryMapObjectTextureConfig
 {
 
 
+
+
     public partial class UiModStoryMapObjectTextureConfigParam:UiParam
     {
     }
@@ -2831,6 +2928,10 @@ namespace ModStoryMapObjectTextureConfig
 namespace ModStoryMapObjectMask
 
 {
+
+
+
+
 
 
 
@@ -2975,9 +3076,15 @@ namespace ModStoryMapObjectObject
 {
 
 
+
+
 namespace ModStoryMapObjectObjectAppearance
 
 {
+
+
+
+
 
 
 
@@ -3037,6 +3144,8 @@ namespace ModStoryMapObjectObjectAppearance
 namespace Axis
 
 {
+
+
 
 
     public partial class UiAxisParam:UiParam
@@ -3176,6 +3285,8 @@ namespace Axis
 namespace ModStoryMapObjectObjectConfig
 
 {
+
+
 
 
     public partial class UiModStoryMapObjectObjectConfigParam:UiParam
@@ -3366,9 +3477,15 @@ namespace ModStoryEvent
 {
 
 
+
+
 namespace ModStoryEventCustom
 
 {
+
+
+
+
 
 
 
@@ -3424,6 +3541,8 @@ namespace ModStoryEventCustom
         
     }
 
+
+
     public partial class UiTypeParam:UiParam
     {
     }
@@ -3475,6 +3594,8 @@ namespace ModStoryEventCustom
     {
         
     }
+
+
 
     public partial class UiNameParam:UiParam
     {
@@ -3609,6 +3730,8 @@ namespace ModStoryEventGlobal
 {
 
 
+
+
     public partial class UiModStoryEventGlobalParam:UiParam
     {
     }
@@ -3728,14 +3851,20 @@ namespace ModStoryMap
 {
 
 
+
+
 namespace ModStoryMapMap
 
 {
 
 
+
+
 namespace Axis
 
 {
+
+
 
 
     public partial class UiAxisParam:UiParam
@@ -3788,6 +3917,8 @@ namespace Axis
         
     }
 }
+
+
 
 
     public partial class UiMapSceneParam:UiParam
@@ -3903,9 +4034,15 @@ namespace ModStoryMapScene
 {
 
 
+
+
 namespace ModStoryMapSceneList
 
 {
+
+
+
+
 
 
 
@@ -3960,6 +4097,8 @@ namespace ModStoryMapSceneList
     {
         
     }
+
+
 
     public partial class UiArgParam:UiParam
     {
@@ -4080,6 +4219,8 @@ namespace ModStoryMapSceneUnit
 {
 
 
+
+
     public partial class UiModStoryMapSceneUnitParam:UiParam
     {
     }
@@ -4187,6 +4328,8 @@ namespace ModStoryMapSceneUnit
 namespace ModStoryMapConfig
 
 {
+
+
 
 
     public partial class UiModStoryMapConfigParam:UiParam

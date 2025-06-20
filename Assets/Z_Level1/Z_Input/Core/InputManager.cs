@@ -202,6 +202,9 @@ namespace Z_Input
                 cur?.onMouseMove?.Invoke(lastMousePos);
             }
 
+            //save
+            id2Pos.Clear();
+            id2Pos[0] = Input.mousePosition;
         }
 
         /// <summary>
@@ -230,7 +233,21 @@ namespace Z_Input
 
             return null;
         }
-
+        public int GetClosedId(Vector2 pos)
+        {
+            float min = float.MaxValue;
+            int id = 0;
+            foreach(var pair in id2Pos)
+            {
+                var dis2 = (pair.Value - pos).sqrMagnitude;
+                if (dis2 < min)
+                {
+                    min = dis2;
+                    id = pair.Key;
+                }
+            }
+            return id;
+        }
         public void Update()
         {
             if (!enabled)

@@ -167,6 +167,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 if(model.equipPart != EquipPartType.None)
                 {
                     view.txt_layer.text = model.data.animClip[model.id].equipTrs[model.equipPart].Item3.ToString();
+                    
                 }
 
 

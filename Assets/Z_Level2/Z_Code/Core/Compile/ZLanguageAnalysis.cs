@@ -79,7 +79,7 @@ namespace Z_Code
                             int forFalseJumpCmdId = cmds.Count - 1;
 
 
-                            BuildZl(cmds, node.subNodes[4]);
+                            BuildZl(cmds, node.subNodes[3]);
                             BuildZl(cmds, node.subNodes[2]);
 
                             cmds.Add(GetOpName(Op.Jump));
@@ -129,6 +129,16 @@ namespace Z_Code
                             BuildZl(cmds, node.subNodes[0]);
                             BuildZl(cmds, node.subNodes[1]);
                             cmds.Add(GetOpName(Op.Sub));
+                            break;
+                        case "==":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.Equal));
+                            break;
+                        case "!=":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.NotEqual));
                             break;
                     }
                     break;

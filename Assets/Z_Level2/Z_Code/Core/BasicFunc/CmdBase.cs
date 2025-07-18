@@ -1,20 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using Z_Code.Form;
 namespace Z_Code
 {
 
     public abstract class CmdBase
     {
-        public abstract int GetPrmCnt();
-        public abstract int GetRetCnt();
-        public abstract string GetName();
-
-        public static void Register<T>(T cmd) where T : CmdBase
+        protected static void Register(CmdBase cmd)
         {
             BaseData.cmdDic[cmd.GetName()] = cmd;
         }
+        
+        public abstract string GetName();
+
         public abstract CmdBase GetNew();
         protected abstract Box[] ExecuteInternal(Box[] prm);
         public Box[] Execute(Box[] prm, Dictionary<string, Box> heap)

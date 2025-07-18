@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Z_Code.Form;
 
 namespace Z_Code
 {
@@ -24,14 +25,17 @@ namespace Z_Code
     }
     public static class BaseData
     {
-  
+        public static CmdDataForm.Data GetForm(this CmdBase cmd)
+        {
+            return CmdDataForm.DataByName[cmd.GetName()];
+        }
 
         public static Dictionary<string, CmdBase> cmdDic = new Dictionary<string, CmdBase>();
         public static HashSet<string> reserved = new HashSet<string>()
         {
             "if",
             "for",
-
+            "else"
         };
         public static HashSet<string> operators = new HashSet<string>()
         {
@@ -47,6 +51,9 @@ namespace Z_Code
             "}",
             ".",
             ",",
+            "==",
+            "!=",
+            "!"
         };
     }
     public class Compiler
@@ -55,12 +62,13 @@ namespace Z_Code
         SyntaxAnalysis syntaxAnalysis = new SyntaxAnalysis();
         ZLanguageAnalysis zLanguageAnalysis = new ZLanguageAnalysis();
 
-        public List<string> Compile(string code)
+        public List<string> Compile(string code,out List<SyntaxNode> syntaxs)
         {
             var lexicals = lexicalAnalysis.Execute(code);
-            var syntaxs = syntaxAnalysis.Execute(lexicals);
+            syntaxs = syntaxAnalysis.Execute(lexicals);
             var zl = zLanguageAnalysis.Execute(syntaxs);
             return zl;
         }
+        
     }
 }

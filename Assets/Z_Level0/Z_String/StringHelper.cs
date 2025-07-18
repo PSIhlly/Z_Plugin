@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 namespace Z_String
 {
@@ -72,5 +73,16 @@ namespace Z_String
             }
             return res;
         }
+
+        public static string Repeat(this string str,int times)
+        {
+            StringBuilder sb = new StringBuilder();
+            for(int i= 0; i < times; i++)
+            {
+                sb.Append(str);
+            }
+            return sb.ToString();
+        }
+
             }
 }

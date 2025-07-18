@@ -235,6 +235,7 @@ namespace Z_Code
                 case "*":
                 case "/":
                 case "=":
+                case "!":
                     return true;
                 default:
                     return false;

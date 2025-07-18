@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using Z_Code.Form;
+using Z_Debug;
 namespace Z_Code
 {
     public enum Op
@@ -15,6 +17,7 @@ namespace Z_Code
         Div,
         Assign,
         Equal,
+        NotEqual,
         Sub,
         Get,
         IfFalseJump,
@@ -36,7 +39,7 @@ namespace Z_Code
     }
     public class Interpreter
     {
-
+        public const bool DEBUG = false;
         List<Box> stack = new List<Box>();
         int top=-1;
         Dictionary<string, Box> heap = new Dictionary<string, Box>();
@@ -53,6 +56,10 @@ namespace Z_Code
             int cnt = zl.Count;
             for(; p<cnt;p++)
             {
+                if(DEBUG)
+                {
+                    Z_Log.Log(p+":"+ (zl[p]));
+                }
                 switch((Op)(int.Parse(zl[p])))
                 {
                     case Op.PushNum:
@@ -84,13 +91,14 @@ namespace Z_Code
                     case Op.Call:
                         p++;
                         var cmd = BaseData.cmdDic[zl[p]].GetNew();
-                        var prm = new Box[cmd.GetPrmCnt()];
-                        for(int i=0;i< cmd.GetPrmCnt();i++)
+                        var form = cmd.GetForm();
+                        var prm = new Box[form.prmNames==null?0:form.prmNames.Count];
+                        for(int i=0;i< prm.Length; i++)
                         {
                             prm[i] = Pop();
                         }
                         var ret=cmd.Execute(prm,heap);
-                        for (int i = 0; i < cmd.GetRetCnt(); i++)
+                        for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
                         {
                             Push(ret[i]);
                         }
@@ -99,6 +107,12 @@ namespace Z_Code
                         Push(new Box()
                         {
                             num = GetNum(Pop()) == GetNum(Pop()) ? 1 : 0
+                        });
+                        break;
+                    case Op.NotEqual:
+                        Push(new Box()
+                        {
+                            num = GetNum(Pop()) != GetNum(Pop()) ? 1 : 0
                         });
                         break;
                     case Op.Assign:
@@ -139,12 +153,14 @@ namespace Z_Code
                             p = int.Parse(zl[p]) - 1;
                         }
                         break;
-                   /* case Op.Sub:
-                        p++;
-                        heap[Pop().valName]
-                        
-                        break;*/
+                    /* case Op.Sub:
+                         p++;
+                         heap[Pop().valName]
 
+                         break;*/
+                    default:
+                        Z_Log.Log($"op:{int.Parse(zl[p])} not found£¡£¡");
+                        break;
 
                 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Z_Debug;
 
 namespace Z_Code
@@ -61,8 +62,7 @@ namespace Z_Code
                             int endThenIf = GetFirstDepth0(nodes, endConditionIf + 1, r, "}");
                             subStatements.Add(new SyntaxNode(new Desc("then", CodeType.Action), BuildBlock(nodes, endConditionIf + 2, endThenIf - 1)));
                             i = endThenIf;
-
-                            if (endThenIf < r && (nodes[i].desc.type == CodeType.Reserved && nodes[i].desc.code == "else"))
+                            if (endThenIf < r && (nodes[i+1].desc.type == CodeType.Reserved && nodes[i+1].desc.code == "else"))
                             {
                                 int endElseIf = GetFirstDepth0(nodes, endThenIf + 2, r, "}");
                                 subStatements.Add(new SyntaxNode(new Desc("else", CodeType.Action), BuildBlock(nodes, endThenIf + 3, endElseIf - 1)));
@@ -71,10 +71,17 @@ namespace Z_Code
                             break;
                         case "for":
                             int endForIf = GetFirstDepth0(nodes, i + 1, r, ")");
-                            subStatements.AddRange(BuildStatement(nodes, i + 2, endForIf - 1));
+
+                            int split = GetFirstDepth0(nodes, i+2, endForIf-1, ";");
+                            subStatements.Add(BuildStatement(nodes, i+2, split - 1)[0]);
+                            i = split+1;
+                            split = GetFirstDepth0(nodes, i, endForIf - 1, ";");
+                            subStatements.Add(BuildStatement(nodes, i, split - 1)[0]);
+                            i = split + 1;
+                            subStatements.Add(BuildStatement(nodes, i, endForIf - 1)[0]);
 
                             int endForDo = GetFirstDepth0(nodes, endForIf + 1, r, "}");
-                            subStatements.Add(new SyntaxNode(new Desc("do", CodeType.Action), BuildBlock(nodes, i, endForDo)));
+                            subStatements.Add(new SyntaxNode(new Desc("do", CodeType.Action), BuildBlock(nodes, endForIf+2, endForDo)));
 
                             i = endForDo;
                             break;
@@ -136,6 +143,7 @@ namespace Z_Code
                         cache.Add(nodes[i]);
                     }
                 }
+               
                 //level2
                 for (int i = 0; i < cache.Count; i++)
                 {
@@ -187,6 +195,8 @@ namespace Z_Code
                         switch (lex.desc.code)
                         {
                             case "=":
+                            case "==":
+                            case "!=":
                                 SetSub(cache, lex, ref i, 1, 1);
                                 break;
                         }

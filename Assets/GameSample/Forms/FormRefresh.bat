@@ -30,5 +30,5 @@ call "%current_dir%Assets\Z_Level3\Z_Fight\Core\Form\run.bat"
 call "%current_dir%Assets\Z_Level3\Z_Map\Core\Form\run.bat"
 call "%current_dir%Assets\Z_Level3\Z_Text\Core\Form\run.bat"
 call "%current_dir%Assets\Z_Level3\Z_UI\Core\Form\run.bat"
-
+call "%current_dir%Assets\Z_Level2\Z_Code\Core\Form\run.bat"
 pause

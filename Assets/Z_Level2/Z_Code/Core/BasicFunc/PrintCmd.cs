@@ -2,21 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_Code.Form;
 
 namespace Z_Code
 {
     public class PrintCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-        static void Register()
+        static void Init()
         {
-            Register(new PrintCmd());
+           Register(new PrintCmd());
         }
         public override string GetName()=> "Print";
-
-        public override int GetPrmCnt() => 1;
-
-        public override int GetRetCnt() => 0;
         public override CmdBase GetNew()=>new PrintCmd();
         protected override Box[] ExecuteInternal(Box[] prm)
         {

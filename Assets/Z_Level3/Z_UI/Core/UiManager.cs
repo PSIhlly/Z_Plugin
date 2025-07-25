@@ -6,6 +6,7 @@ using Z_DesignStyle;
 using Z_Ui.Base;
 namespace Z_Ui
 {
+    [DefaultExecutionOrder(-1)]
     public class UiManager : Z_MonoManager<UiManager>
     {
         public List<GameObject> preloadUis;

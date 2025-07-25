@@ -169,6 +169,7 @@ namespace Z_Ui.Base
                     curRowId++;
                 }
                 UpdateDic();
+
                 foreach (var id in needs)
                 {
                     int row = id / columnCnt;

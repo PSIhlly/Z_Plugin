@@ -40,8 +40,10 @@ namespace Z_Ui.Base
 
         private void Refresh()
         {
-            text = TextManager.instance.GetTxt(oriTxt);
-
+            if(languageTranslatable)
+            {
+                text = TextManager.instance.GetTxt(oriTxt);
+            }
         }
     }
 }

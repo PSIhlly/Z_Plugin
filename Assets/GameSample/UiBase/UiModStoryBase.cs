@@ -1601,16 +1601,16 @@ namespace ModStoryItemList
     {
 
             public GameObject go_lab;
-            public Btn btn_globalParameter;
-            public Sta sta_globalParameter;
+            public Btn btn_;
+            public Sta sta_;
             public Sta sta_isEmpty;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_globalParameter = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_globalParameter = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
             sta_isEmpty = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
@@ -1647,11 +1647,11 @@ namespace ModStoryItemList
 
 
 
-    public partial class UiArgParam:UiParam
+    public partial class UiItemParam:UiParam
     {
     }
 
-    public partial class UiArgView:UiView
+    public partial class UiItemView:UiView
     {
 
             public GameObject go_item;
@@ -1660,7 +1660,7 @@ namespace ModStoryItemList
             public Btn btn_;
             public Txt txt_;
             public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
@@ -1672,16 +1672,16 @@ namespace ModStoryItemList
         }
 
     }
-    public partial class UiArgCtrl:UiCtrl
+    public partial class UiItemCtrl:UiCtrl
     {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
         public UiModStoryItemListCtrl parent=>(UiModStoryItemListCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiArgParam)param;
+            this.param = (UiItemParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -1689,14 +1689,14 @@ namespace ModStoryItemList
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
 
 
         }
 
     }
-    public partial class UiArgModel:UiModel
+    public partial class UiItemModel:UiModel
     {
         
     }
@@ -1713,7 +1713,7 @@ namespace ModStoryItemList
             public UiLabCtrl sub_Lab;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
+            public UiItemCtrl sub_Item;
         public UiModStoryItemListView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -1723,7 +1723,7 @@ namespace ModStoryItemList
             sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             go_item = uiHolder.elementTrsLst[4].gameObject;
             sta_item = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -1750,8 +1750,8 @@ namespace ModStoryItemList
 
             view.sub_Lab = new UiLabCtrl();
             view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_Item = new UiItemCtrl();
+            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -1838,11 +1838,11 @@ namespace ModStoryItemUnitParameter
 
 
 
-    public partial class UiitemParam:UiParam
+    public partial class UiItemParam:UiParam
     {
     }
 
-    public partial class UiitemView:UiView
+    public partial class UiItemView:UiView
     {
 
             public GameObject go_item;
@@ -1850,7 +1850,7 @@ namespace ModStoryItemUnitParameter
             public Ipt ipt_min;
             public Ipt ipt_value;
             public Ipt ipt_max;
-        public UiitemView(UiHolder uiHolder):base(uiHolder)
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
@@ -1861,16 +1861,16 @@ namespace ModStoryItemUnitParameter
         }
 
     }
-    public partial class UiitemCtrl:UiCtrl
+    public partial class UiItemCtrl:UiCtrl
     {
-        public UiitemView view;
-        public UiitemModel model;
-        public UiitemParam param;
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
         public UiModStoryItemUnitParameterCtrl parent=>(UiModStoryItemUnitParameterCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiitemParam)param;
+            this.param = (UiItemParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -1878,14 +1878,14 @@ namespace ModStoryItemUnitParameter
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiitemView(uiHolder);
-            model=new UiitemModel();
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
 
 
         }
 
     }
-    public partial class UiitemModel:UiModel
+    public partial class UiItemModel:UiModel
     {
         
     }
@@ -1898,13 +1898,13 @@ namespace ModStoryItemUnitParameter
 
             public ScrView scr_items;
             public GameObject go_item;
-            public UiitemCtrl sub_item;
+            public UiItemCtrl sub_Item;
         public UiModStoryItemUnitParameterView(UiHolder uiHolder):base(uiHolder)
         {
 
             scr_items = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             go_item = uiHolder.elementTrsLst[1].gameObject;
-            sub_item = (UiitemCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -1929,8 +1929,8 @@ namespace ModStoryItemUnitParameter
             model=new UiModStoryItemUnitParameterModel();
 
 
-            view.sub_item = new UiitemCtrl();
-            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_Item = new UiItemCtrl();
+            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -1996,62 +1996,6 @@ namespace ModStoryItemUnitAppearance
 
     }
     public partial class UiStyleModel:UiModel
-    {
-        
-    }
-
-
-
-    public partial class UiArgParam:UiParam
-    {
-    }
-
-    public partial class UiArgView:UiView
-    {
-
-            public GameObject go_item;
-            public Sta sta_item;
-            public Btn btn_new;
-            public Btn btn_;
-            public Txt txt_;
-            public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
-        }
-
-    }
-    public partial class UiArgCtrl:UiCtrl
-    {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
-        public UiModStoryItemUnitAppearanceCtrl parent=>(UiModStoryItemUnitAppearanceCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiArgParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
-
-
-        }
-
-    }
-    public partial class UiArgModel:UiModel
     {
         
     }
@@ -2135,10 +2079,13 @@ namespace Axis
             public Img img_image;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
             public Txt txt_model;
             public RectTransform rtf_axis;
             public Axis.UiAxisCtrl page_Axis;
+            public Btn btn_new;
+            public Btn btn_;
+            public Txt txt_;
+            public Img img_;
         public UiModStoryItemUnitAppearanceView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -2157,10 +2104,13 @@ namespace Axis
             img_image = uiHolder.elementTrsLst[12].GetComponent<Img>();
             go_item = uiHolder.elementTrsLst[13].gameObject;
             sta_item = uiHolder.elementTrsLst[14].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
-            txt_model = uiHolder.elementTrsLst[16].GetComponent<Txt>();
-            rtf_axis = uiHolder.elementTrsLst[17].GetComponent<RectTransform>();
-            page_Axis = (Axis.UiAxisCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            txt_model = uiHolder.elementTrsLst[15].GetComponent<Txt>();
+            rtf_axis = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
+            page_Axis = (Axis.UiAxisCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            btn_new = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[21].GetComponent<Img>();
         }
 
     }
@@ -2187,10 +2137,8 @@ namespace Axis
 
             view.sub_Style = new UiStyleCtrl();
             view.sub_Style.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.page_Axis = new Axis.UiAxisCtrl();
-            view.page_Axis.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.page_Axis.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -2538,14 +2486,18 @@ namespace ModStoryMapObjectList
     {
         
     }
+namespace Item
+
+{
 
 
 
-    public partial class UiArgParam:UiParam
+
+    public partial class UiItemParam:UiParam
     {
     }
 
-    public partial class UiArgView:UiView
+    public partial class UiItemView:UiView
     {
 
             public GameObject go_item;
@@ -2554,7 +2506,7 @@ namespace ModStoryMapObjectList
             public Btn btn_;
             public Txt txt_;
             public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
@@ -2566,16 +2518,16 @@ namespace ModStoryMapObjectList
         }
 
     }
-    public partial class UiArgCtrl:UiCtrl
+    public partial class UiItemCtrl:UiCtrl
     {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
         public UiModStoryMapObjectListCtrl parent=>(UiModStoryMapObjectListCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiArgParam)param;
+            this.param = (UiItemParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -2583,17 +2535,19 @@ namespace ModStoryMapObjectList
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
 
 
         }
 
     }
-    public partial class UiArgModel:UiModel
+    public partial class UiItemModel:UiModel
     {
         
     }
+}
+
     public partial class UiModStoryMapObjectListParam:UiParam
     {
     }
@@ -2608,7 +2562,7 @@ namespace ModStoryMapObjectList
             public UiLabCtrl sub_Lab;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
+            public Item.UiItemCtrl page_Item;
         public UiModStoryMapObjectListView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -2619,7 +2573,7 @@ namespace ModStoryMapObjectList
             sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             go_item = uiHolder.elementTrsLst[5].gameObject;
             sta_item = uiHolder.elementTrsLst[6].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            page_Item = (Item.UiItemCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -2646,8 +2600,8 @@ namespace ModStoryMapObjectList
 
             view.sub_Lab = new UiLabCtrl();
             view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_Item = new Item.UiItemCtrl();
+            view.page_Item.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -2671,62 +2625,6 @@ namespace ModStoryMapObjectTextureAppearance
 
 
 
-
-
-
-    public partial class UiArgParam:UiParam
-    {
-    }
-
-    public partial class UiArgView:UiView
-    {
-
-            public GameObject go_item;
-            public Sta sta_item;
-            public Btn btn_new;
-            public Btn btn_;
-            public Txt txt_;
-            public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
-        }
-
-    }
-    public partial class UiArgCtrl:UiCtrl
-    {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
-        public UiModStoryMapObjectTextureAppearanceCtrl parent=>(UiModStoryMapObjectTextureAppearanceCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiArgParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
-
-
-        }
-
-    }
-    public partial class UiArgModel:UiModel
-    {
-        
-    }
     public partial class UiModStoryMapObjectTextureAppearanceParam:UiParam
     {
     }
@@ -2746,7 +2644,10 @@ namespace ModStoryMapObjectTextureAppearance
             public Img img_image;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
+            public Btn btn_new;
+            public Btn btn_;
+            public Txt txt_;
+            public Img img_;
         public UiModStoryMapObjectTextureAppearanceView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -2762,7 +2663,10 @@ namespace ModStoryMapObjectTextureAppearance
             img_image = uiHolder.elementTrsLst[9].GetComponent<Img>();
             go_item = uiHolder.elementTrsLst[10].gameObject;
             sta_item = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            btn_new = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[15].GetComponent<Img>();
         }
 
     }
@@ -2787,8 +2691,6 @@ namespace ModStoryMapObjectTextureAppearance
             model=new UiModStoryMapObjectTextureAppearanceModel();
 
 
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -2932,62 +2834,6 @@ namespace ModStoryMapObjectMask
 
 
 
-
-
-
-    public partial class UiArgParam:UiParam
-    {
-    }
-
-    public partial class UiArgView:UiView
-    {
-
-            public GameObject go_item;
-            public Sta sta_item;
-            public Btn btn_new;
-            public Btn btn_;
-            public Txt txt_;
-            public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
-        }
-
-    }
-    public partial class UiArgCtrl:UiCtrl
-    {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
-        public UiModStoryMapObjectMaskCtrl parent=>(UiModStoryMapObjectMaskCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiArgParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
-
-
-        }
-
-    }
-    public partial class UiArgModel:UiModel
-    {
-        
-    }
     public partial class UiModStoryMapObjectMaskParam:UiParam
     {
     }
@@ -3013,7 +2859,10 @@ namespace ModStoryMapObjectMask
             public Img img_9;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
+            public Btn btn_new;
+            public Btn btn_;
+            public Txt txt_;
+            public Img img_;
         public UiModStoryMapObjectMaskView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3035,7 +2884,10 @@ namespace ModStoryMapObjectMask
             img_9 = uiHolder.elementTrsLst[15].GetComponent<Img>();
             go_item = uiHolder.elementTrsLst[16].gameObject;
             sta_item = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            btn_new = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[21].GetComponent<Img>();
         }
 
     }
@@ -3060,8 +2912,6 @@ namespace ModStoryMapObjectMask
             model=new UiModStoryMapObjectMaskModel();
 
 
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -3085,62 +2935,6 @@ namespace ModStoryMapObjectObjectAppearance
 
 
 
-
-
-
-    public partial class UiArgParam:UiParam
-    {
-    }
-
-    public partial class UiArgView:UiView
-    {
-
-            public GameObject go_item;
-            public Sta sta_item;
-            public Btn btn_new;
-            public Btn btn_;
-            public Txt txt_;
-            public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
-        }
-
-    }
-    public partial class UiArgCtrl:UiCtrl
-    {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
-        public UiModStoryMapObjectObjectAppearanceCtrl parent=>(UiModStoryMapObjectObjectAppearanceCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiArgParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
-
-
-        }
-
-    }
-    public partial class UiArgModel:UiModel
-    {
-        
-    }
 namespace Axis
 
 {
@@ -3220,10 +3014,13 @@ namespace Axis
             public Img img_image;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
             public Txt txt_model;
             public RectTransform rtf_axis;
             public Axis.UiAxisCtrl page_Axis;
+            public Btn btn_new;
+            public Btn btn_;
+            public Txt txt_;
+            public Img img_;
         public UiModStoryMapObjectObjectAppearanceView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3241,10 +3038,13 @@ namespace Axis
             img_image = uiHolder.elementTrsLst[11].GetComponent<Img>();
             go_item = uiHolder.elementTrsLst[12].gameObject;
             sta_item = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
-            txt_model = uiHolder.elementTrsLst[15].GetComponent<Txt>();
-            rtf_axis = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
-            page_Axis = (Axis.UiAxisCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            txt_model = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            rtf_axis = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
+            page_Axis = (Axis.UiAxisCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
+            btn_new = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[20].GetComponent<Img>();
         }
 
     }
@@ -3269,10 +3069,8 @@ namespace Axis
             model=new UiModStoryMapObjectObjectAppearanceModel();
 
 
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.page_Axis = new Axis.UiAxisCtrl();
-            view.page_Axis.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_Axis.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -3597,22 +3395,22 @@ namespace ModStoryEventCustom
 
 
 
-    public partial class UiNameParam:UiParam
+    public partial class UiItemParam:UiParam
     {
     }
 
-    public partial class UiNameView:UiView
+    public partial class UiItemView:UiView
     {
 
-            public GameObject go_name;
+            public GameObject go_item;
             public Btn btn_;
             public Sta sta_;
             public Sta sta_isEmpty;
             public Txt txt_;
-        public UiNameView(UiHolder uiHolder):base(uiHolder)
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_name = uiHolder.elementTrsLst[0].gameObject;
+            go_item = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
             sta_isEmpty = uiHolder.elementTrsLst[3].GetComponent<Sta>();
@@ -3620,16 +3418,16 @@ namespace ModStoryEventCustom
         }
 
     }
-    public partial class UiNameCtrl:UiCtrl
+    public partial class UiItemCtrl:UiCtrl
     {
-        public UiNameView view;
-        public UiNameModel model;
-        public UiNameParam param;
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
         public UiModStoryEventCustomCtrl parent=>(UiModStoryEventCustomCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiNameParam)param;
+            this.param = (UiItemParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -3637,14 +3435,14 @@ namespace ModStoryEventCustom
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiNameView(uiHolder);
-            model=new UiNameModel();
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
 
 
         }
 
     }
-    public partial class UiNameModel:UiModel
+    public partial class UiItemModel:UiModel
     {
         
     }
@@ -3657,7 +3455,7 @@ namespace ModStoryEventCustom
 
             public ScrView scr_categorys;
             public ScrView scr_types;
-            public ScrView scr_names;
+            public ScrView scr_items;
             public Ipt ipt_name;
             public Ipt ipt_category;
             public Ipt ipt_type;
@@ -3667,14 +3465,14 @@ namespace ModStoryEventCustom
             public UiCategoryCtrl sub_Category;
             public GameObject go_type;
             public UiTypeCtrl sub_Type;
-            public GameObject go_name;
-            public UiNameCtrl sub_Name;
+            public GameObject go_item;
+            public UiItemCtrl sub_Item;
         public UiModStoryEventCustomView(UiHolder uiHolder):base(uiHolder)
         {
 
             scr_categorys = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             scr_types = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            scr_names = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
             ipt_category = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             ipt_type = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
@@ -3684,8 +3482,8 @@ namespace ModStoryEventCustom
             sub_Category = (UiCategoryCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
             go_type = uiHolder.elementTrsLst[10].gameObject;
             sub_Type = (UiTypeCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            go_name = uiHolder.elementTrsLst[12].gameObject;
-            sub_Name = (UiNameCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[12].gameObject;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -3714,8 +3512,8 @@ namespace ModStoryEventCustom
             view.sub_Category.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_Type = new UiTypeCtrl();
             view.sub_Type.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
-            view.sub_Name = new UiNameCtrl();
-            view.sub_Name.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.sub_Item = new UiItemCtrl();
+            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }
@@ -4097,62 +3895,6 @@ namespace ModStoryMapSceneList
     {
         
     }
-
-
-
-    public partial class UiArgParam:UiParam
-    {
-    }
-
-    public partial class UiArgView:UiView
-    {
-
-            public GameObject go_item;
-            public Sta sta_item;
-            public Btn btn_new;
-            public Btn btn_;
-            public Txt txt_;
-            public Img img_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
-        }
-
-    }
-    public partial class UiArgCtrl:UiCtrl
-    {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
-        public UiModStoryMapSceneListCtrl parent=>(UiModStoryMapSceneListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiArgParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
-
-
-        }
-
-    }
-    public partial class UiArgModel:UiModel
-    {
-        
-    }
     public partial class UiModStoryMapSceneListParam:UiParam
     {
     }
@@ -4166,7 +3908,10 @@ namespace ModStoryMapSceneList
             public UiLabCtrl sub_Lab;
             public GameObject go_item;
             public Sta sta_item;
-            public UiArgCtrl sub_Arg;
+            public Btn btn_new;
+            public Btn btn_;
+            public Txt txt_;
+            public Img img_;
         public UiModStoryMapSceneListView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -4176,7 +3921,10 @@ namespace ModStoryMapSceneList
             sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             go_item = uiHolder.elementTrsLst[4].gameObject;
             sta_item = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            btn_new = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[9].GetComponent<Img>();
         }
 
     }
@@ -4203,8 +3951,6 @@ namespace ModStoryMapSceneList
 
             view.sub_Lab = new UiLabCtrl();
             view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -4465,6 +4211,8 @@ namespace ModStoryMapConfig
             public Sta sta_parameter;
             public Btn btn_character;
             public Sta sta_character;
+            public Btn btn_skill;
+            public Sta sta_skill;
             public Btn btn_item;
             public Sta sta_item;
             public Btn btn_mapObject;
@@ -4493,15 +4241,17 @@ namespace ModStoryMapConfig
             sta_parameter = uiHolder.elementTrsLst[13].GetComponent<Sta>();
             btn_character = uiHolder.elementTrsLst[14].GetComponent<Btn>();
             sta_character = uiHolder.elementTrsLst[15].GetComponent<Sta>();
-            btn_item = uiHolder.elementTrsLst[16].GetComponent<Btn>();
-            sta_item = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            btn_mapObject = uiHolder.elementTrsLst[18].GetComponent<Btn>();
-            sta_mapObject = uiHolder.elementTrsLst[19].GetComponent<Sta>();
-            btn_event = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            sta_event = uiHolder.elementTrsLst[21].GetComponent<Sta>();
-            btn_map = uiHolder.elementTrsLst[22].GetComponent<Btn>();
-            sta_map = uiHolder.elementTrsLst[23].GetComponent<Sta>();
-            txt_overview = uiHolder.elementTrsLst[24].GetComponent<Txt>();
+            btn_skill = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            sta_skill = uiHolder.elementTrsLst[17].GetComponent<Sta>();
+            btn_item = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            sta_item = uiHolder.elementTrsLst[19].GetComponent<Sta>();
+            btn_mapObject = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            sta_mapObject = uiHolder.elementTrsLst[21].GetComponent<Sta>();
+            btn_event = uiHolder.elementTrsLst[22].GetComponent<Btn>();
+            sta_event = uiHolder.elementTrsLst[23].GetComponent<Sta>();
+            btn_map = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            sta_map = uiHolder.elementTrsLst[25].GetComponent<Sta>();
+            txt_overview = uiHolder.elementTrsLst[26].GetComponent<Txt>();
         }
 
     }

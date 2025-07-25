@@ -408,17 +408,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region event
-    public void RenameEvent(string oldName, string newName = null, string newLabel = null, string newSubLabel = null)
-    {
-        var data = EventForm.DataByName[oldName];
-        if (newName != null && data.name != newName)
-            data.name = newName;
-        if (newLabel != null && data.lab != newLabel)
-            data.lab = newLabel;
-        if (newSubLabel != null && data.subLab != newSubLabel)
-            data.subLab = newSubLabel;
-
-    }
 
     public void CreateEvent(string name = "", string label = "", string subLabel = "")
     {
@@ -427,11 +416,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             for (int i = 0; i < GlobalMaxSettings.CUSTOM_EVENT_MAX; i++)
             {
                 name = "new event" + i;
-                if (!EventForm.DataByName.ContainsKey((name)))
+                if (!EventProgramDataForm.DataByName.ContainsKey((name)))
                     break;
             }
         }
-        EventForm.AddData(new EventForm.Data(-1, name, new List<CmdForm.Data>() { CmdForm.defaultData }, label, subLabel));
+        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "",new List<string>(), label, subLabel));
     }
     public void ImportClipTex(Action<string> callback)
     {
@@ -483,17 +472,25 @@ public class ModAssetCtrl : Z_Controller<ModManager>
    
 
 
-    public void CreateItem(string name)
+    public void CreateItem(string name=null)
     {
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(ItemParamForm.DataByName.Keys);
+        }
         var dic = new Dictionary<string, ItemParamForm.Data>();
         foreach (var prm in ItemParamForm.DataByName.Values)
         {
             dic[prm.name] = prm.Copy();
-
         }
         var model = MapModelForm.defaultData;
         model.isObstacle = false;
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default,new Dictionary<ItemStyle,string>()));
+        var styleTex = new Dictionary<ItemStyle, string>();
+        foreach (ItemStyle style in Enum.GetValues(typeof(ItemStyle)))
+        { 
+            styleTex[style] = ""; 
+        }
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default, styleTex, "", "", ""));
     }
     public void DeleteItem(string name)
     {
@@ -534,6 +531,19 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 data.model.subUnitTexsName.Add(form.name);
             }
+        });
+
+    }
+    public void ImportItemStyleTex(string name, ItemStyle style)
+    {
+
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        {
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+            var data = ItemProductForm.DataByNameIsproto[(name, true)];
+
+            data.styleTex[style] = form.name;
         });
 
     }

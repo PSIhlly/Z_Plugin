@@ -283,7 +283,6 @@ GameObject:
   - component: {fileID: 7650528117709218964}
   - component: {fileID: 8325118328456109038}
   - component: {fileID: 7136259660389976107}
-  - component: {fileID: 4025034670731592075}
   - component: {fileID: 3893080015277856414}
   m_Layer: 5
   m_Name: go|sta_item
@@ -354,35 +353,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4025034670731592075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6429803608199806368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiName: Arg
-  path: \Z_Level3\Z_UI\Sample\Ui\UiBase
-  parent: {fileID: 0}
-  elementTrsLst:
-  - {fileID: 7650528117709218964}
-  - {fileID: 7650528117709218964}
-  - {fileID: 6617457045948234323}
-  - {fileID: 0}
-  - {fileID: 8010312857010020214}
-  - {fileID: 9212973772610603229}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 8160009101062028909}
-  - {fileID: 0}
-  subUiHolderLst: []
-  uiType: 1
-  layer: 0
 --- !u!114 &3893080015277856414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -764,11 +734,6 @@ PrefabInstance:
 --- !u!224 &8010312857010020214 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5946800934235649759, guid: 89cbb9183d2dd074f9e5f13b20eef36c, type: 3}
-  m_PrefabInstance: {fileID: 4444242403808782761}
-  m_PrefabAsset: {fileID: 0}
---- !u!224 &8160009101062028909 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5517811007067625412, guid: 89cbb9183d2dd074f9e5f13b20eef36c, type: 3}
   m_PrefabInstance: {fileID: 4444242403808782761}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4878105843782079112

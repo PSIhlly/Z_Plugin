@@ -66,7 +66,10 @@ namespace Z_Debug
             return res;
         }
 
-
+        public static void Log(float flt)
+        {
+            Log(flt.ToString());
+        }
         public static void Log(int str)
         {
             Log(str.ToString());

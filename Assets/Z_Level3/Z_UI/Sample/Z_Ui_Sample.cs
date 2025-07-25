@@ -33,7 +33,7 @@ public class Z_Ui_Sample : MonoBehaviour
                 contentLst.Add(v.text);
                 nameLst.Add(Sample_NpcForm.Datas[v.speaker_npcId].name);
                 var bgForm = Sample_ImgForm.Datas[v.background_imgId];
-                TexAssetForm.AddData( AssetManager.instance.LoadTexPath(Application.dataPath + bgForm.path, bgForm.id+"bg"));
+                TexAssetForm.AddData(AssetManager.instance.LoadTexPath(Application.dataPath + bgForm.path, bgForm.id + "bg"));
                 bgLst.Add(bgForm.id + "bg");
 
                 var avatarForm = Sample_ImgForm.Datas[Sample_NpcForm.Datas[v.speaker_npcId].avatar_imgId];
@@ -55,11 +55,49 @@ public class Z_Ui_Sample : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.W))
         {
-            NotifyManager.instance.AddPopup("tips","tips",false,new List<string>() { "ok", "cancel" }, new List<Func<bool>>() { ()=> { Debug.Log("ok"); return false; }, () => { Debug.Log("close"); return true; } });
+            NotifyManager.instance.AddPopup("tips", "tips", false, new List<string>() { "ok", "cancel" }, new List<Func<bool>>() { () => { Debug.Log("ok"); return false; }, () => { Debug.Log("close"); return true; } });
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
             StartDialog();
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            var sub = new Dictionary<string, (Sprite,object)>()
+            {
+                { "AAAA", (null,new Dictionary<string, (Sprite,object)>(){
+                    { "AAA", (null,new Dictionary<string, (Sprite,object)>()
+                        {
+                        { "AA",(null,null)},
+                        { "BB",(null,null) },
+                        }) },
+                    { "AAB", (null,new Dictionary<string, (Sprite,object)>()
+                        {
+                        { "AB",(null,null) },
+                        { "BC",(null,null)},
+                        }) }
+                } 
+                )},
+                { "BBBB",(null, new Dictionary<string, (Sprite,object)>(){
+                    { "BBB",(null, new Dictionary<string, (Sprite,object)>()
+                        {
+                        { "DD",(null,null) },
+                            { "EE",(null,null) },
+                        })},
+                    { "BBC", (null,new Dictionary<string, (Sprite,object)>()
+                        {
+                        { "FF",(null,null)},
+                        { "GG",(null,null)},
+                        })}
+                }
+                ) }
+            };
+           
+            NotifyManager.instance.AddMultipleChoose("Ch", false, 2, (lst) =>
+            {
+                return true;
+            }, sub);
+
         }
     }
 

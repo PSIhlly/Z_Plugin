@@ -42,12 +42,6 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,List<string>,List<string>> changePrmnamesAction;
-                
-        public static Action<Data,List<string>,List<string>> changeRetnamesAction;
-                
-        public static Action<Data,string,string> changeDescAction;
-                
 
 
         public partial class Data
@@ -89,79 +83,22 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private List<string>  _prmNames;
-                    /// <summary>
-                    ///参数名称
-                    ///</summary>
-                    public List<string>  prmNames{
-                                get{return _prmNames;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangePrmnames(this,_prmNames,value); 
-                    }
-        
-                _prmNames = value;
-                }
-                 
-                     }
-                    
-                    private List<string>  _retNames;
-                    /// <summary>
-                    ///返回值名称
-                    ///</summary>
-                    public List<string>  retNames{
-                                get{return _retNames;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeRetnames(this,_retNames,value); 
-                    }
-        
-                _retNames = value;
-                }
-                 
-                     }
-                    
-                    private string  _desc;
-                    /// <summary>
-                    ///描述
-                    ///</summary>
-                    public string  desc{
-                                get{return _desc;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeDesc(this,_desc,value); 
-                    }
-        
-                _desc = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,string name,List<string> prmNames,List<string> retNames,string desc)
+            public Data(int uid,string name)
             {
 
              this.uid = uid;
              this.name = name;
-             this.prmNames = prmNames;
-             this.retNames = retNames;
-             this.desc = desc;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(retNames),desc);
+        return new Data(sameId? uid:uidChain.GetId(),name);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,null,"");
+                   private static Data _defaultData=new Data(0,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -200,64 +137,20 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"Print",new List<string>(){"content",},null,"Print {0}")},
+                {1,new Data(1,"num")},
 
-                {2,new Data(2,"+",new List<string>(){"a","b",},new List<string>(){"result",},"{1} + {0}")},
+                {2,new Data(2,"string")},
 
-                {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"result",},"{1} - {0}")},
-
-                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"result",},"（{1}）*（{0}）")},
-
-                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"result",},"（{1}）/（{0}）")},
-
-                {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"result",},"{1} = {0}")},
-
-                {7,new Data(7,"==",new List<string>(){"a","b",},new List<string>(){"result",},"{1} equal {0}")},
-
-                {8,new Data(8,">",new List<string>(){"a","b",},new List<string>(){"result",},"{1} bigger than {0}")},
-
-                {9,new Data(9,"<",new List<string>(){"a","b",},new List<string>(){"result",},"{1} smaller than {0}")},
-
-                {10,new Data(10,"!=",new List<string>(){"a","b",},new List<string>(){"result",},"{1} not equal {0}")},
-
-                {11,new Data(11,"if",new List<string>(){"condition",},new List<string>(){"result",},"if {0}")},
-
-                {12,new Data(12,"else",null,null,"else")},
-
-                {13,new Data(13,"then",null,null,"then")},
-
-                {14,new Data(14,"for",new List<string>(){"init","condition","turnOver",},null,"{0}, if {1} keep do, after every times do{2}")},
+                {3,new Data(3,"bool")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
-                        {"Print",_DataByUid[1]},
+                        {"num",_DataByUid[1]},
     
-                        {"+",_DataByUid[2]},
+                        {"string",_DataByUid[2]},
     
-                        {"-",_DataByUid[3]},
-    
-                        {"*",_DataByUid[4]},
-    
-                        {"/",_DataByUid[5]},
-    
-                        {"=",_DataByUid[6]},
-    
-                        {"==",_DataByUid[7]},
-    
-                        {">",_DataByUid[8]},
-    
-                        {"<",_DataByUid[9]},
-    
-                        {"!=",_DataByUid[10]},
-    
-                        {"if",_DataByUid[11]},
-    
-                        {"else",_DataByUid[12]},
-    
-                        {"then",_DataByUid[13]},
-    
-                        {"for",_DataByUid[14]},
+                        {"bool",_DataByUid[3]},
     
                     };
     
@@ -304,13 +197,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
-
-                jo.Get<List<string>>("prmNames"),
-
-                jo.Get<List<string>>("retNames"),
-
-                jo.Get<string>("desc")
+                jo.Get<string>("name")
                     );
 
             return data;
@@ -325,12 +212,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
-
-            jo.Set<List<string>>("prmNames",data.prmNames);
-
-            jo.Set<List<string>>("retNames",data.retNames);
-
-            jo.Set<string>("desc",data.desc);
 
             return jo;
         }
@@ -432,36 +313,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByName[newV]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangePrmnames(Data superData,List<string> oldV,List<string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changePrmnamesAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeRetnames(Data superData,List<string> oldV,List<string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeRetnamesAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeDesc(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeDescAction?.Invoke(data,oldV,newV);
                 }
                     
             }

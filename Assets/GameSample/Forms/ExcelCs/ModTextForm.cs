@@ -13,6 +13,7 @@ using Z_DataSystem.Form;
 using Z_Map.Form;
 using Z_Map;
 using Z_Ui.Form;
+using Z_Code.Form;
 
 namespace Form
 {
@@ -311,17 +312,19 @@ namespace Form
 
                 {1210058,new Data(1210058,"map","Map","地图")},
 
-                {1210059,new Data(1210059,"scene","Scene","场景")},
+                {1210059,new Data(1210059,"setPos","Set position","设置位置")},
 
-                {1210060,new Data(1210060,"import","Import","导入")},
+                {1210060,new Data(1210060,"partSetting","Part setting","部位设置")},
 
-                {1210061,new Data(1210061,"setPos","Set position","设置位置")},
+                {1210061,new Data(1210061,"enablePart","Enable part","启用部位")},
 
-                {1210062,new Data(1210062,"partSetting","Part setting","部位设置")},
+                {1210062,new Data(1210062,"itemStyle","Item style","道具样式")},
 
-                {1210063,new Data(1210063,"enablePart","Enable part","启用部位")},
+                {1210063,new Data(1210063,"code","Code","代码")},
 
-                {1210064,new Data(1210064,"itemStyle","Item style","道具样式")},
+                {1210064,new Data(1210064,"entry","Entry","列表")},
+
+                {1210065,new Data(1210065,"skillEvent","Skill event","技能事件")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -508,17 +511,19 @@ namespace Form
     
                         {"map",_DataById[1210058]},
     
-                        {"scene",_DataById[1210059]},
+                        {"setPos",_DataById[1210059]},
     
-                        {"import",_DataById[1210060]},
+                        {"partSetting",_DataById[1210060]},
     
-                        {"setPos",_DataById[1210061]},
+                        {"enablePart",_DataById[1210061]},
     
-                        {"partSetting",_DataById[1210062]},
+                        {"itemStyle",_DataById[1210062]},
     
-                        {"enablePart",_DataById[1210063]},
+                        {"code",_DataById[1210063]},
     
-                        {"itemStyle",_DataById[1210064]},
+                        {"entry",_DataById[1210064]},
+    
+                        {"skillEvent",_DataById[1210065]},
     
                     };
     

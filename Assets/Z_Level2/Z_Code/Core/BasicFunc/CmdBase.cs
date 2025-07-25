@@ -17,8 +17,8 @@ namespace Z_Code
         public abstract string GetName();
 
         public abstract CmdBase GetNew();
-        protected abstract Box[] ExecuteInternal(Box[] prm);
-        public Box[] Execute(Box[] prm, Dictionary<string, Box> heap)
+        protected abstract BoxDataForm.Data[] ExecuteInternal(BoxDataForm.Data[] prm);
+        public BoxDataForm.Data[] Execute(BoxDataForm.Data[] prm, Dictionary<string, BoxDataForm.Data> heap)
         {
             try
             {

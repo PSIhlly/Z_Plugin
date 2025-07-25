@@ -13,6 +13,7 @@ using Z_DataSystem.Form;
 using Z_Map.Form;
 using Z_Map;
 using Z_Ui.Form;
+using Z_Code.Form;
 
 namespace Form
 {
@@ -81,6 +82,12 @@ namespace Form
         public static Action<Data,EquipPartType,EquipPartType> changeEquipAction;
                 
         public static Action<Data,Dictionary<ItemStyle,string>,Dictionary<ItemStyle,string>> changeStyletexAction;
+                
+        public static Action<Data,string,string> changeOntoucheventAction;
+                
+        public static Action<Data,string,string> changeOnleaveeventAction;
+                
+        public static Action<Data,string,string> changeOnshoweventAction;
                 
 
 
@@ -231,7 +238,61 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex):base(uid,name,label,isProto)
+                    private string  _onTouchEvent;
+                    /// <summary>
+                    ///接触事件名
+                    ///</summary>
+                    public string  onTouchEvent{
+                                get{return _onTouchEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOntouchevent(this,_onTouchEvent,value); 
+                    }
+        
+                _onTouchEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onLeaveEvent;
+                    /// <summary>
+                    ///离开事件名
+                    ///</summary>
+                    public string  onLeaveEvent{
+                                get{return _onLeaveEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnleaveevent(this,_onLeaveEvent,value); 
+                    }
+        
+                _onLeaveEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onShowEvent;
+                    /// <summary>
+                    ///出现事件名
+                    ///</summary>
+                    public string  onShowEvent{
+                                get{return _onShowEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnshowevent(this,_onShowEvent,value); 
+                    }
+        
+                _onShowEvent = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -246,17 +307,20 @@ namespace Form
              this.maxAmountPer = maxAmountPer;
              this.equip = equip;
              this.styleTex = styleTex;
+             this.onTouchEvent = onTouchEvent;
+             this.onLeaveEvent = onLeaveEvent;
+             this.onShowEvent = onShowEvent;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),onTouchEvent,onLeaveEvent,onShowEvent);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){});
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -413,7 +477,13 @@ namespace Form
 
                 jo.Get<EquipPartType>("equip"),
 
-                jo.Get<Dictionary<ItemStyle,string>>("styleTex")
+                jo.Get<Dictionary<ItemStyle,string>>("styleTex"),
+
+                jo.Get<string>("onTouchEvent"),
+
+                jo.Get<string>("onLeaveEvent"),
+
+                jo.Get<string>("onShowEvent")
                     );
 
             return data;
@@ -448,6 +518,12 @@ namespace Form
             jo.Set<EquipPartType>("equip",data.equip);
 
             jo.Set<Dictionary<ItemStyle,string>>("styleTex",data.styleTex);
+
+            jo.Set<string>("onTouchEvent",data.onTouchEvent);
+
+            jo.Set<string>("onLeaveEvent",data.onLeaveEvent);
+
+            jo.Set<string>("onShowEvent",data.onShowEvent);
 
             return jo;
         }
@@ -710,6 +786,36 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeStyletexAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOntouchevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOntoucheventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnleaveevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnleaveeventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnshowevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnshoweventAction?.Invoke(data,oldV,newV);
                 }
                     
             }

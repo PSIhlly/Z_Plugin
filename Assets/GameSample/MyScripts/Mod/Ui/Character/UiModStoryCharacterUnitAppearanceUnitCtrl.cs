@@ -101,8 +101,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             view.btn_itemStyle.onClick.AddListener(() =>
             {
-                var lst=new List<string>();
-                lst.AddRange(Enum.GetValues(typeof(ItemStyle)));
+                var lst=new List<(string, Sprite)>();
+                foreach(var e in Enum.GetValues(typeof(ItemStyle)))
+                {
+                    lst.Add(((string)e,null));
+                }
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
                    true, (id) =>
                    {

@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Z_Code;
+using Z_Code.Form;
 
 public class Z_Code_Sample : MonoBehaviour
 {
@@ -16,15 +17,14 @@ public class Z_Code_Sample : MonoBehaviour
 
         var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
         var res=cpr.Compile(code, out var syntaxs);
-
-        var itp = new Interpreter(res);
+        var program = new ProgramDataForm.Data(-1,"",code,res);
+        var itp = new InterpretDataForm.Data(-1,new List<BoxDataForm.Data>(),new Dictionary<string, BoxDataForm.Data>(), program,0,-1);
         itp.Interpret();
 
         runBtn.onClick.AddListener(()=>
         {
-            var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
-            var res = cpr.Compile(code,out var syntaxs);
-            var itp = new Interpreter(res);
+            itp.program.code= gameObject.GetComponentInChildren<TMP_InputField>().text;
+            itp.program.zCode = cpr.Compile(code,out var syntaxs);
             itp.Interpret();
         });
         rebuildBtn.onClick.AddListener(() =>

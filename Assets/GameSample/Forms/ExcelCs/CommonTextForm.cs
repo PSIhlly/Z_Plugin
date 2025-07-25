@@ -13,6 +13,7 @@ using Z_DataSystem.Form;
 using Z_Map.Form;
 using Z_Map;
 using Z_Ui.Form;
+using Z_Code.Form;
 
 namespace Form
 {
@@ -185,6 +186,8 @@ namespace Form
 
                 {20020,new Data(20020,"reset","Reset","÷ÿ÷√")},
 
+                {20021,new Data(20021,"apply","Apply","”¶”√")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -243,6 +246,8 @@ namespace Form
                         {"body",_DataById[20019]},
     
                         {"reset",_DataById[20020]},
+    
+                        {"apply",_DataById[20021]},
     
                     };
     

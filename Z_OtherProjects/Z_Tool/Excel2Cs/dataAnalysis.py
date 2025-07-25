@@ -40,7 +40,7 @@ def get_naked_subs(content):
      return values
 
 def get_default_form(type):
-    if type == 'int' or type == 'float' or type == 'bool':
+    if type == 'int' or type == 'float'or type == 'uint' or type == 'long'or type == 'ulong'or type == 'bool':
         return '0'
     if type == 'string':
         return ''

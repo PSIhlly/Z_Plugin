@@ -34,6 +34,7 @@ namespace Z_Ui.Base
             }
         }
         List<GameObject> curUis;
+        int curRenderId;
         public UiContainer(GameObject ori,bool cycle=true)
         {
             ori.SetActive(false);
@@ -98,10 +99,18 @@ namespace Z_Ui.Base
             curUis.Add(holder.gameObject);
             return holder.gameObject;
         }
-        public virtual void Add(UiParam param=null)
+        public virtual void Add(UiParam param=null,int id=-1)
         {
-            paramLst.Add(param);
+            if(id==-1)
+                paramLst.Add(param);
+            else
+                paramLst.Insert(id, param);
         }
+        public virtual int GetNowRenderId()
+        {
+            return curRenderId;
+        }
+
         public virtual void Del(int id)
         {
             paramLst.RemoveAt(id);
@@ -110,10 +119,11 @@ namespace Z_Ui.Base
         {
             if (offsets == null)
                 offsets = new List<Vector3>();
-            for(int i=0;i< paramLst.Count;i++)
+            for(curRenderId = 0; curRenderId < paramLst.Count; curRenderId++)
             {
-                var go=AddReal(paramLst[i]);
+                var go=AddReal(paramLst[curRenderId]);
             }
+            curRenderId = 0;
         }
     }
 }

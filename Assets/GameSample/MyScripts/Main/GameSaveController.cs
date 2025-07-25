@@ -156,34 +156,14 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
-    public void SaveEvent(string storyCoreFolder, EventForm.Data data = null)
+    public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
         if (data != null)
         {
-            foreach (var cmd in data.cmds)
+            /*foreach (var cmd in data.cmds)//获取常量图片
             {
-                if (cmd.isValue && cmd.resTypes[0] == EvtValType.Clips && !string.IsNullOrEmpty(cmd.constV))
-                {
-                    var jo = JObject.Parse(cmd.constV);
-                    var lst = jo.Get<List<ClipForm.Data>>(EvtValType.Clips.ToString());
-                    foreach (var clip in lst)
-                    {
-                        var nm = clip.profilePicture;
-                        if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
-                        {
-                            var tex = TexAssetForm.DataByName[nm];
-                            SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
-                        }
-                        nm = clip.mainPicture;
-                        if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
-                        {
-                            var tex = TexAssetForm.DataByName[nm];
-                            SaveAndLoad.Save(storyCoreFolder + "/" + nm, TextureHelper.GetTextureByte((Texture2D)tex.tex));
-                        }
-                    }
-                }
-            }
+            }*/
         }
 
     }
@@ -411,38 +391,16 @@ public class GameSaveController : Z_Controller<GameManager>
     public void LoadEvent(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + eventFormFileName;
-        EventForm.ClearAuto();
+        EventProgramDataForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in EventForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            foreach (var form in EventProgramDataForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
-                EventForm.AddData(form);
-                foreach (var cmd in form.cmds)
+                EventProgramDataForm.AddData(form);
+/*                foreach (var cmd in form.cmds)//导入图片
                 {
-                    if (cmd.isValue && cmd.resTypes[0] == EvtValType.Clips && !string.IsNullOrEmpty(cmd.constV))
-                    {
-                        var jo = JObject.Parse(cmd.constV);
-                        var lst = jo.Get<List<ClipForm.Data>>(EvtValType.Clips.ToString());
-                        foreach (var clip in lst)
-                        {
-                            var nm = clip.profilePicture;
-                            var path = storyCoreFolder + "/" + nm;
-                            if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
-                            {
-                                AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
-                            }
-                            nm = clip.mainPicture;
-                            path = storyCoreFolder + "/" + nm;
-                            if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(nm))
-                            {
-                                AddStoryTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path), nm));
-                            }
-                        }
-                    }
 
-
-
-                }
+                }*/
             }
         }
 

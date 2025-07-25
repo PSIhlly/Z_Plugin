@@ -24,6 +24,7 @@ namespace Z_Ui.Base
         public static string defaultPath = "\\GameSample\\UiBase";
 
         [HideInInspector]
+        [SerializeField]
         public string uiName;
         [HideInInspector]
         public string path = defaultPath;

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Z_Code.Form;
 using Z_Debug;
 namespace Z_Code
@@ -23,134 +24,111 @@ namespace Z_Code
         IfFalseJump,
         Jump
     }
-    public class Box
+    namespace Form
     {
-        public long num;
-        public string str;
-        public string valName;
-        public Box Copy()
+
+        public static partial class InterpretDataForm
         {
-            return new Box()
+            public partial class Data
             {
-                num = num,
-                str = str
-            };
+                Interpreter _interpreter;
+                public bool Interpret()
+                {
+                    if(_interpreter==null)
+                    {
+                        _interpreter = new Interpreter(program);
+                    }
+                   return _interpreter.Interpret();
+                }
+            }
+
         }
     }
+
     public class Interpreter
     {
+        InterpretDataForm.Data data;
         public const bool DEBUG = false;
-        List<Box> stack = new List<Box>();
-        int top=-1;
-        Dictionary<string, Box> heap = new Dictionary<string, Box>();
-        List<string> zl;
-        int p = 0;
 
-        public Interpreter(List<string> zl)
+
+        public Interpreter(ProgramDataForm.Data program)
         {
-            this.zl = zl;
+            data = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1);
         }
 
         public bool Interpret()
         {
-            int cnt = zl.Count;
-            for(; p<cnt;p++)
+            int cnt = data.program.zCode.Count;
+            for (; data.p < cnt; data.p++)
             {
-                if(DEBUG)
+                if (DEBUG)
                 {
-                    Z_Log.Log(p+":"+ (zl[p]));
+                    Z_Log.Log(data.p + ":" + (data.program.zCode[data.p]));
                 }
-                switch((Op)(int.Parse(zl[p])))
+                switch ((Op)(int.Parse(data.program.zCode[data.p])))
                 {
                     case Op.PushNum:
-                        p++;
-                        Push(new Box()
-                        {
-                            num = long.Parse(zl[p])
-                        });
+                        data.p++;
+                        Push(new BoxDataForm.Data(-1, "", "", long.Parse(data.program.zCode[data.p])));
                         break;
                     case Op.PushStr:
-                        p++;
-                        Push(new Box()
-                        {
-                            str = zl[p]
-                        });
+                        data.p++;
+                        Push(new BoxDataForm.Data(-1, data.program.zCode[data.p], "", 0));
                         break;
                     case Op.Get:
-                        p++;
-                        var nm = zl[p];
-                        if (!heap.ContainsKey(nm))
+                        data.p++;
+                        var nm = data.program.zCode[data.p];
+                        if (!data.heap.ContainsKey(nm))
                         {
-                            heap[nm] = new Box();
+                            data.heap[nm] = new BoxDataForm.Data(-1, "", "", 0);
                         }
-                        Push(new Box()
-                        {
-                            valName = nm
-                        });
+                        Push(new BoxDataForm.Data(-1, "", nm, 0));
                         break;
                     case Op.Call:
-                        p++;
-                        var cmd = BaseData.cmdDic[zl[p]].GetNew();
+                        data.p++;
+                        var cmd = BaseData.cmdDic[data.program.zCode[data.p]].GetNew();
                         var form = cmd.GetForm();
-                        var prm = new Box[form.prmNames==null?0:form.prmNames.Count];
-                        for(int i=0;i< prm.Length; i++)
+                        var prm = new BoxDataForm.Data[form.prmNames == null ? 0 : form.prmNames.Count];
+                        for (int i = 0; i < prm.Length; i++)
                         {
                             prm[i] = Pop();
                         }
-                        var ret=cmd.Execute(prm,heap);
+                        var ret = cmd.Execute(prm, data.heap);
                         for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
                         {
                             Push(ret[i]);
                         }
                         break;
                     case Op.Equal:
-                        Push(new Box()
-                        {
-                            num = GetNum(Pop()) == GetNum(Pop()) ? 1 : 0
-                        });
+                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
                         break;
                     case Op.NotEqual:
-                        Push(new Box()
-                        {
-                            num = GetNum(Pop()) != GetNum(Pop()) ? 1 : 0
-                        });
+                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) != GetNum(Pop()) ? 1 : 0));
                         break;
                     case Op.Assign:
-                        heap[Pop().valName] = Pop().Copy();
+                        data.heap[Pop().valName] = Pop().Copy();
                         break;
                     case Op.Plus:
-                        Push(new Box()
-                        {
-                            num = GetNum(Pop()) + GetNum(Pop())
-                        });
+                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) + GetNum(Pop())));
                         break;
                     case Op.Minus:
-                        Push(new Box()
-                        {
-                            num = GetNum(Pop()) - GetNum(Pop())
-                        });
+                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) - GetNum(Pop())));
                         break;
                     case Op.Mul:
-                        Push(new Box()
-                        {
-                            num = GetNum(Pop()) * GetNum(Pop())
-                        });
+                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) * GetNum(Pop())));
                         break;
                     case Op.Div:
-                        Push(new Box()
-                        {
-                            num = GetNum(Pop()) / GetNum(Pop())
-                        });
+                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) / GetNum(Pop())));
                         break;
                     case Op.Jump:
-                        p++;
-                        p = int.Parse(zl[p]) - 1;
+                        data.p++;
+                        data.p = int.Parse(data.program.zCode[data.p]) - 1;
                         break;
                     case Op.IfFalseJump:
-                        p++;
-                        if (GetNum(Pop())==0)
+                        data.p++;
+                        if (GetNum(Pop()) == 0)
                         {
-                            p = int.Parse(zl[p]) - 1;
+                            data.p = int.Parse(data.program.zCode[data.p]) - 1;
                         }
                         break;
                     /* case Op.Sub:
@@ -159,7 +137,7 @@ namespace Z_Code
 
                          break;*/
                     default:
-                        Z_Log.Log($"op:{int.Parse(zl[p])} not found£¡£¡");
+                        Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not found£¡£¡");
                         break;
 
                 }
@@ -168,31 +146,31 @@ namespace Z_Code
             }
             return true;
         }
-        private Box Pop()
+        private BoxDataForm.Data Pop()
         {
-           var res= stack[top];
-            stack.RemoveAt(top);
-            top--;
+            var res = data.stack[data.top];
+            data.stack.RemoveAt(data.top);
+            data.top--;
             return res;
         }
-        private void Push(Box box)
+        private void Push(BoxDataForm.Data box)
         {
-            stack.Add(box);
-            top++;
+            data.stack.Add(box);
+            data.top++;
         }
-        private long GetNum(Box box)
+        private long GetNum(BoxDataForm.Data box)
         {
-            if(box.valName!=null)
+            if (!string.IsNullOrEmpty(box.valName))
             {
-                return heap[box.valName].num;
+                return data.heap[box.valName].num;
             }
             return box.num;
         }
-        private string GetStr(Box box)
+        private string GetStr(BoxDataForm.Data box)
         {
-            if (box.valName != null)
+            if (!string.IsNullOrEmpty(box.valName))
             {
-                return heap[box.valName].str;
+                return data.heap[box.valName].str;
             }
             return box.str;
         }

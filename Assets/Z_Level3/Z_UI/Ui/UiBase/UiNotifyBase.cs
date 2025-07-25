@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-
 namespace Ui.Notify
 
 {
+
+
+
+
 
 
 
@@ -54,6 +57,10 @@ namespace Ui.Notify
     {
         
     }
+
+
+
+
 
 
     public partial class UiItemParam:UiParam
@@ -170,6 +177,13 @@ namespace Ui.Notify
     }
 
 
+
+
+
+
+
+
+
     public partial class UiLabelParam:UiParam
     {
     }
@@ -198,7 +212,7 @@ namespace Ui.Notify
         public UiLabelView view;
         public UiLabelModel model;
         public UiLabelParam param;
-        public UiMultipleChooseCtrl parent=>(UiMultipleChooseCtrl)uiHolder.parent.ctrl;
+        public UiColumnCtrl parent=>(UiColumnCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -221,6 +235,61 @@ namespace Ui.Notify
     {
         
     }
+    public partial class UiColumnParam:UiParam
+    {
+    }
+
+    public partial class UiColumnView:UiView
+    {
+
+            public GameObject go_column;
+            public GameObject go_labels;
+            public ScrView scr_labels;
+            public GameObject go_label;
+            public UiLabelCtrl sub_Label;
+        public UiColumnView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_column = uiHolder.elementTrsLst[0].gameObject;
+            go_labels = uiHolder.elementTrsLst[1].gameObject;
+            scr_labels = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            go_label = uiHolder.elementTrsLst[3].gameObject;
+            sub_Label = (UiLabelCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiColumnCtrl:UiCtrl
+    {
+        public UiColumnView view;
+        public UiColumnModel model;
+        public UiColumnParam param;
+        public UiMultipleChooseCtrl parent=>(UiMultipleChooseCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiColumnParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiColumnView(uiHolder);
+            model=new UiColumnModel();
+
+
+            view.sub_Label = new UiLabelCtrl();
+            view.sub_Label.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiColumnModel:UiModel
+    {
+        
+    }
+
+
 
     public partial class UiSubItemParam:UiParam
     {
@@ -280,35 +349,33 @@ namespace Ui.Notify
     public partial class UiMultipleChooseView:UiView
     {
 
-            public GameObject go_labels;
-            public ScrView scr_labels;
-            public GameObject go_subItems;
-            public ScrView scr_subItems;
-            public GameObject go_choose;
-            public Btn btn_choose;
+            public RectTransform rtf_root;
             public Txt txt_title;
             public GameObject go_close;
             public Btn btn_close;
-            public GameObject go_label;
-            public UiLabelCtrl sub_Label;
+            public GameObject go_column;
+            public UiColumnCtrl sub_Column;
+            public GameObject go_choose;
+            public Btn btn_choose;
+            public GameObject go_subItems;
+            public ScrView scr_subItems;
             public GameObject go_subItem;
             public UiSubItemCtrl sub_SubItem;
         public UiMultipleChooseView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_labels = uiHolder.elementTrsLst[0].gameObject;
-            scr_labels = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            go_subItems = uiHolder.elementTrsLst[2].gameObject;
-            scr_subItems = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
-            go_choose = uiHolder.elementTrsLst[4].gameObject;
-            btn_choose = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            txt_title = uiHolder.elementTrsLst[6].GetComponent<Txt>();
-            go_close = uiHolder.elementTrsLst[7].gameObject;
-            btn_close = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            go_label = uiHolder.elementTrsLst[9].gameObject;
-            sub_Label = (UiLabelCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            go_subItem = uiHolder.elementTrsLst[11].gameObject;
-            sub_SubItem = (UiSubItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            rtf_root = uiHolder.elementTrsLst[0].GetComponent<RectTransform>();
+            txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            go_close = uiHolder.elementTrsLst[2].gameObject;
+            btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            go_column = uiHolder.elementTrsLst[4].gameObject;
+            sub_Column = (UiColumnCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            go_choose = uiHolder.elementTrsLst[6].gameObject;
+            btn_choose = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            go_subItems = uiHolder.elementTrsLst[8].gameObject;
+            scr_subItems = uiHolder.elementTrsLst[9].GetComponent<ScrView>();
+            go_subItem = uiHolder.elementTrsLst[10].gameObject;
+            sub_SubItem = (UiSubItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -333,8 +400,8 @@ namespace Ui.Notify
             model=new UiMultipleChooseModel();
 
 
-            view.sub_Label = new UiLabelCtrl();
-            view.sub_Label.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_Column = new UiColumnCtrl();
+            view.sub_Column.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_SubItem = new UiSubItemCtrl();
             view.sub_SubItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
@@ -344,6 +411,10 @@ namespace Ui.Notify
     {
         
     }
+
+
+
+
 
 
     public partial class UiSelectionParam:UiParam
@@ -444,6 +515,8 @@ namespace Ui.Notify
     {
         
     }
+
+
 
     public partial class UiInputAreaParam:UiParam
     {

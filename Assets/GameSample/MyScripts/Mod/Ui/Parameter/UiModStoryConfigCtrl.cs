@@ -31,23 +31,21 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         {
             view.btn_mainCharacter.onClick.AddListener(() =>
             {
-                List<string> lst = new List<string>();
-                List<Sprite> spriteLst = new List<Sprite>();
+                List<(string,Sprite)> lst = new List<(string, Sprite)>();
                 if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
                 {
                     foreach (var data in CharacterProductForm.DatasByIsproto[true])
                     {
-                        lst.Add(data.name);
-                        spriteLst.Add(TexAssetForm.DataByName[data.avatarTexName].sprite);
+                        lst.Add((data.name, TexAssetForm.DataByName[data.avatarTexName].sprite));
                     }
                 }
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
                     true, (id) =>
                     {
-                        ConfigForm.DataByUid[1].mainCharacterName = lst[id];
+                        ConfigForm.DataByUid[1].mainCharacterName = lst[id].Item1;
                         Refresh();
                         return true;
-                    }, lst, spriteLst);
+                    }, lst);
             });
 
         }

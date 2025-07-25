@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Security.Policy;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,26 +18,26 @@ namespace Ui.Notify
     public partial class UiMultipleChooseModel
     {
         public MultipleChooseInfo info;
-        public int curLab;
-        public int curItem;
+        public List<string> sel;
     }
 
     public partial class UiMultipleChooseCtrl
     {
 
-        UiScrViewContainer<UiLabelCtrl> lableCon;
-        UiScrViewContainer<UiSubItemCtrl> con;
+        UiContainer<UiColumnCtrl> colCon;
+        UiScrViewContainer<UiSubItemCtrl> itemCon;
         public override void OnCreate()
         {
-            lableCon = new UiScrViewContainer<UiLabelCtrl>(view.go_label,view.scr_labels);
-            con = new UiScrViewContainer<UiSubItemCtrl>(view.go_subItem, view.scr_subItems);
+            model.sel = new List<string>();
+            colCon = new UiContainer<UiColumnCtrl>(view.go_column);
+            itemCon = new UiScrViewContainer<UiSubItemCtrl>(view.go_subItem, view.scr_subItems);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();
             });
             view.btn_choose.onClick.AddListener(() =>
             {
-                if(model.info.func((model.curLab, model.curItem)))
+                if(model.info.func(model.sel))
                 {
                     Close();
                 }
@@ -49,8 +50,7 @@ namespace Ui.Notify
         }
         public override void OnShow()
         {
-            model.curLab = -1;
-            model.curItem = -1;
+            model.sel.Clear();
 
             if (param != null)
             {
@@ -58,7 +58,6 @@ namespace Ui.Notify
             }
             Refresh();
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
 
         }
         public void Refresh()
@@ -66,56 +65,118 @@ namespace Ui.Notify
             
             view.txt_title.text = model.info.title;
             view.go_close.SetActive(model.info.canClose);
-            view.go_choose.SetActive(model.curItem != -1&&model.curLab!=-1);
+            view.go_choose.SetActive(model.sel.Count==model.info.labCnt+1);
             
+            colCon.Clear();
+            for (int i = model.info.labCnt-1; i >=0 ; i--)
+            {
+                GetInfo(i,out var sub);
+                colCon.Add(new UiColumnParam()
+                {
+                    id=i,
+                     sub= sub
+                });
+            }
+            colCon.Refresh();
+
+            itemCon.Clear();
+            if (model.sel.Count >= model.info.labCnt)
+            {
+                GetInfo(model.info.labCnt, out var sub);
+                foreach (var kv in sub)
+                {
+                    itemCon.Add(new UiSubItemParam()
+                    {
+                        name = kv.Key,
+                        sprite = kv.Value.Item1
+                    });
+                }
+            }
+            itemCon.Refresh();
+
+            TimeManager.instance.StartTimer(0.001f, 0, () =>
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                return true;
+            }, uiHolder);
+        }
+
+        public void GetInfo(int id,out Dictionary<string, (Sprite,object)> sub)
+        {
+            if(id > model.sel.Count)
+            {
+                sub = new Dictionary<string, (Sprite, object)>();
+                return;
+            }
+            sub = model.info.sub;
+            for (int i=0;i<id;i++)
+            {
+                sub = sub[model.sel[i]].Item2 as Dictionary<string, (Sprite, object)>;
+            }
+        }
+
+    }
+    public partial class UiColumnParam
+    {
+        public int id;
+        public Dictionary<string, (Sprite, object)> sub;
+    }
+    public partial class UiColumnModel
+    {
+        public int id;
+        public Dictionary<string, (Sprite, object)> sub;
+    }
+    public partial class UiColumnCtrl
+    {
+        UiScrViewContainer<UiLabelCtrl> lableCon;
+        public override void OnCreate()
+        {
+            lableCon = new UiScrViewContainer<UiLabelCtrl>(view.go_label, view.scr_labels);
+        }
+
+        public override void OnShow()
+        {
+            model.sub = param.sub;
+            model.id=param.id;
+
+            Refresh();
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+
+        }
+        public void Refresh()
+        {
+
             lableCon.Clear();
-            for (int i = 0; i < model.info.words.Count; i++)
+            foreach (var kv in model.sub)
             {
                 lableCon.Add(new UiLabelParam()
                 {
-                    name = model.info.words[i].Item1,
-                    sprite = model.info.sprites[i].Item1,
-                    id = i
+                    name = kv.Key,
+                    sprite = kv.Value.Item1,
+                    columnId = model.id
                 });
             }
             lableCon.Refresh();
 
-            con.Clear();
-            if (model.curLab!=-1)
-            {
-                for (int i = 0; i < model.info.words[model.curLab].Item2.Count; i++)
-                {
-                    con.Add(new UiSubItemParam()
-                    {
-                        name = model.info.words[model.curLab].Item2[i],
-                        sprite = model.info.sprites[model.curLab].Item2[i],
-                        id = i
-                    });
-                }
-            }
-            con.Refresh();
         }
-        public void SetCur(int lab,int item)
-        {
-            model.curLab = lab;
-            model.curItem = item;
-            Refresh();
-        }
-
-
-
     }
+
+
+
     public partial class UiLabelParam
     {
         public Sprite sprite;
         public string name;
         public int id;
+        public int columnId;
     }
     public partial class UiLabelModel
     {
         public Sprite sprite;
         public string name;
         public int id;
+        public int columnId;
     }
     public partial class UiLabelCtrl
     {
@@ -123,7 +184,13 @@ namespace Ui.Notify
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCur(model.id,-1);
+                while (parent.parent.model.sel.Count > model.columnId )
+                {
+                    parent.parent.model.sel.RemoveAt(model.columnId);
+                }
+                parent.parent.model.sel.Add(model.name);
+                
+                parent.parent.Refresh();
             });
         }
         public override void OnShow()
@@ -133,6 +200,7 @@ namespace Ui.Notify
                 model.sprite = param.sprite;
                 model.name = param.name;
                 model.id = param.id;
+                model.columnId=param.columnId;
             }
             Refresh();
         }
@@ -140,7 +208,7 @@ namespace Ui.Notify
         {
             view.txt_.text = model.name;
             view.img_.sprite = model.sprite;
-            view.sta_sel.ChangeState(parent.model.curLab == model.id ? 1 : 0);
+            view.sta_sel.ChangeState(parent.parent.model.sel.Count> model.columnId&& parent.parent.model.sel[model.columnId]==model.name?1:0);
         }
     }
 
@@ -155,7 +223,6 @@ namespace Ui.Notify
     {
         public Sprite sprite;
         public string name;
-        public int id;
     }
     public partial class UiSubItemCtrl
     {
@@ -163,7 +230,12 @@ namespace Ui.Notify
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCur(parent.model.curLab,model.id);
+                while (parent.model.sel.Count > parent.model.info.labCnt)
+                {
+                    parent.model.sel.RemoveAt(parent.model.info.labCnt);
+                }
+                parent.model.sel.Add(model.name);
+                parent.Refresh();
             });
         }
         public override void OnShow()
@@ -172,7 +244,6 @@ namespace Ui.Notify
             {
                 model.sprite = param.sprite;
                 model.name = param.name;
-                model.id = param.id;
             }
             Refresh();
         }
@@ -180,7 +251,7 @@ namespace Ui.Notify
         {
             view.txt_.text= model.name;
             view.img_.sprite = model.sprite;
-            view.sta_sel.ChangeState(parent.model.curItem == model.id ? 1 : 0);
+            view.sta_sel.ChangeState(parent.model.sel.Count > parent.model.info.labCnt && parent.model.sel[parent.model.info.labCnt] == model.name ? 1 : 0);
         }
     }
 

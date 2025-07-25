@@ -64,12 +64,12 @@ namespace Ui.Notify
             view.go_close.SetActive(model.info.canClose);
             view.go_choose.SetActive(model.cur!=-1);
 
-            for (int i = 0; i < model.info.words.Count; i++)
+            for (int i = 0; i < model.info.items.Count; i++)
             {
                 con.Add(new UiItemParam()
                 {
-                    name = model.info.words[i],
-                    sprite = model.info.sprites?[i],
+                    name = model.info.items[i].Item1,
+                    sprite = model.info.items[i].Item2,
                     id = i
                 });
             }

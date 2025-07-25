@@ -18,17 +18,16 @@ namespace Z_Ui.Notify
     {
         public string title;
         public Func<int, bool> func;
-        public List<string> words;
-        public List<Sprite> sprites;
+        public List<(string,Sprite)> items;
         public bool canClose;
         public int id;
     }
     public class MultipleChooseInfo
     {
         public string title;
-        public Func<(int,int), bool> func;
-        public List<(string,List<string>)> words;
-        public List<(Sprite, List<Sprite>)> sprites;
+        public int labCnt;
+        public Func<List<string>, bool> func;
+        public Dictionary<string,(Sprite,object)> sub;
         public bool canClose;
         public int id;
     }
@@ -74,14 +73,13 @@ namespace Z_Ui.Notify
                 }) ;
             }
        }
-        public void AddChoose(string title, bool canClose, Func<int, bool> func, List<string> words, List<Sprite> sprites=null)
+        public void AddChoose(string title, bool canClose, Func<int, bool> func, List<(string, Sprite)> items)
         {
             var info = new ChooseInfo()
             {
                 title = title,
-                words = words,
+                items = items,
                 func = func,
-                sprites= sprites,
                 canClose= canClose,
                 id = popupIdCnt++
             };
@@ -98,14 +96,14 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddMultipleChoose(string title, bool canClose, Func<(int,int), bool> func, List<(string,List<string>)> words, List<(Sprite,List<Sprite>)> sprites)
+        public void AddMultipleChoose(string title, bool canClose,int labCnt, Func<List<string>, bool> func, Dictionary<string, (Sprite, object)> sub)
         {
             var info = new MultipleChooseInfo()
             {
+                labCnt= labCnt,
                 title = title,
-                words = words,
+                sub = sub,
                 func = func,
-                sprites = sprites,
                 canClose = canClose,
                 id = popupIdCnt++
             };

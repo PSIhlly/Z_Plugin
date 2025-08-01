@@ -35,6 +35,11 @@ namespace Z_Map
         Show,
         AfterUpdate,
     }
+    public class ItemEvent : Z_Event
+    {
+        public ItemUnit unit;
+        public MapEventType type;
+    }
     public class ObjectEvent : Z_Event
     {
         public ObjectUnit unit;
@@ -184,7 +189,7 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         return data.AddTile(mapPos, prms);
     }
-    public ObjectUnitForm.Data AddItem(Vector3 realPos, string prefabName, object[] prms = null)
+    public ObjectUnitForm.Data AddObject(Vector3 realPos, string prefabName, object[] prms = null)
     {
         var mapPos = utilCtrl.RealPos2MapPos(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
@@ -192,6 +197,18 @@ public class MapManager : Z_MonoManager<MapManager>
             return null;
         }
         var data = this.data.AddObject(prefabName, prms);
+        data.pos = realPos;
+        this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
+        return data;
+    }
+    public ItemUnitForm.Data AddItem(Vector3 realPos, string prefabName, object[] prms = null)
+    {
+        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+        {
+            return null;
+        }
+        var data = this.data.AddItem(prefabName, prms);
         data.pos = realPos;
         this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
         return data;
@@ -215,6 +232,10 @@ public class MapManager : Z_MonoManager<MapManager>
     public void RemoveCharacter(CharacterUnitForm.Data form)
     {
         data.RemoveCharacter(form);
+    }
+    public void RemoveItem(ItemUnitForm.Data form)
+    {
+        data.RemoveItem(form);
     }
     public void RemoveObject(ObjectUnitForm.Data form)
     {

@@ -37,6 +37,7 @@ namespace Z_Map
                 new Vector3Int(30, 5, 15),
                "",
                "",
+               "",
                ""
            );
             maps = new Dictionary<(int, int, int), TileUnitForm.Data>();
@@ -67,6 +68,11 @@ namespace Z_Map
             {
                 RegisterNewTile(mapDatas[i]);
                 RegisterMap(mapDatas[i]);
+            }
+            var itemDatas = GetItemDatasByJa(mainData.itemJa);
+            for (int i = 0; i < itemDatas.Count; i++)
+            {
+                RegisterNewItem(itemDatas[i]);
             }
 
             var objectDatas = GetObjectDatasByJa(mainData.objectJa);
@@ -115,6 +121,12 @@ namespace Z_Map
 
             return data;
         }
+        public ItemUnitForm.Data AddItem(string prefabName = "", object[] prms = null)
+        {
+            var data = GetNewItem(prefabName, prms);
+            RegisterNewItem(data);
+            return data;
+        }
         public ObjectUnitForm.Data AddObject(string prefabName = "", object[] prms = null)
         {
             var data = GetNewObject(prefabName, prms);
@@ -129,7 +141,11 @@ namespace Z_Map
         }
         public void RemoveTile(TileUnitForm.Data data)
         {
-            UnregisterObject(data);
+            UnregisterTile(data);
+        }
+        public void RemoveItem(ItemUnitForm.Data data)
+        {
+            UnregisterItem(data);
         }
         public void RemoveObject(ObjectUnitForm.Data data)
         {
@@ -162,20 +178,41 @@ namespace Z_Map
         {
             return CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
         }
+        
+        public virtual ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
+        {
+            return new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
+        }
+        public virtual void RegisterNewItem(ItemUnitForm.Data data)
+        {
+            ItemUnitForm.AddData(data);
+        }
+        public virtual List<ItemUnitForm.Data> GetItemDatasByJa(string ja)
+        {
+            return ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.itemJa));
+        }
+
 
         public virtual ObjectUnitForm.Data GetNewObject(string prefabName = "",  object[] prms = null)
         {
             return new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
         }
+        
+
         public virtual void RegisterNewObject(ObjectUnitForm.Data data)
         {
             ObjectUnitForm.AddData(data);
         }
+
         public virtual List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
         {
             return ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
         }
-        public virtual void UnregisterObject(TileUnitForm.Data data)
+        public virtual void UnregisterItem(ItemUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+        public virtual void UnregisterTile(TileUnitForm.Data data)
         {
             data.unit.Remove();
         }

@@ -32,7 +32,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
                 parent.parent.SelPage(0);
 
             });
-            view.ipt_name.onEndEdit.AddListener((s) =>
+            view.ipt_name.onFinishInput+=(s)=>
             {
                 var lst = new List<string>();
                 foreach(var data in ItemProductForm.DataByNameIsproto.Values)
@@ -40,11 +40,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
 
                 if(StringHelper.IsUniqueName(lst, s))
                     model.data.name = s;
-            });
-            view.ipt_label.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_label.onFinishInput+=(s)=>
             {
                 model.data.label = s;
-            });
+            };
             view.btn_image.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportItemIcon(model.data.name);

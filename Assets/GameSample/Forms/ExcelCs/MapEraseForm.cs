@@ -85,6 +85,19 @@ private set{
                  
                      }
                     
+                    private bool  _mObject;
+                    /// <summary>
+                    ///清理景物
+                    ///</summary>
+                    public bool  mObject{
+                                get{return _mObject;}
+private set{
+        
+                _mObject = value;
+                }
+                 
+                     }
+                    
                     private bool  _item;
                     /// <summary>
                     ///清理物品
@@ -124,7 +137,7 @@ private set{
                  
                      }
                     
-            public Data(int id,string name,string icon,string label,bool terrain,bool item,bool character,bool texture):base(id,name,icon,label)
+            public Data(int id,string name,string icon,string label,bool terrain,bool mObject,bool item,bool character,bool texture):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -132,6 +145,7 @@ private set{
              this.icon = icon;
              this.label = label;
              this.terrain = terrain;
+             this.mObject = mObject;
              this.item = item;
              this.character = character;
              this.texture = texture;
@@ -140,12 +154,12 @@ private set{
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,label,terrain,item,character,texture);
+        return new Data(sameId? id:idChain.GetId(),name,icon,label,terrain,mObject,item,character,texture);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",false,false,false,false);
+                   private static Data _defaultData=new Data(0,"","","",false,false,false,false,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -156,6 +170,16 @@ private set{
                 {
                     Init();
                     return _DataById;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLabel;
+            public static Dictionary<string, List<Data>> DatasByLabel
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabel;
                 }
             }
     
@@ -186,11 +210,11 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {10000001,new Data(10000001,"all erase","","",true,true,true,false)},
+                {10000001,new Data(10000001,"all erase","","",true,true,true,true,false)},
 
-                {10000002,new Data(10000002,"texture only","","",false,false,false,true)},
+                {10000002,new Data(10000002,"texture only","","",false,false,false,false,true)},
 
-                {10000003,new Data(10000003,"remain terrain","","",false,true,true,false)},
+                {10000003,new Data(10000003,"remain terrain","","",false,true,true,true,false)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -203,6 +227,18 @@ private set{
     
                     };
     
+                    _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                            {"",new List<Data>()},
+        
+                };
+
+                    _DatasByLabel[""].Add(_DataById[10000001]);
+
+                    _DatasByLabel[""].Add(_DataById[10000002]);
+
+                    _DatasByLabel[""].Add(_DataById[10000003]);
+
 
             childInitAction?.Invoke();
             
@@ -260,6 +296,8 @@ private set{
 
                     _defaultData.terrain,
 
+                    _defaultData.mObject,
+
                     _defaultData.item,
 
                     _defaultData.character,
@@ -306,6 +344,10 @@ private set{
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByLabel.ContainsKey(data.label))
+                        DatasByLabel[data.label]=new List<Data>();
+                    DatasByLabel[data.label].Add(data);
+    
 MapBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -322,6 +364,10 @@ MapBaseForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
+                    DatasByLabel[data.label].Remove(data);
+                    if(DatasByLabel[data.label].Count==0)
+                        DatasByLabel.Remove(data.label);
+    
 MapBaseForm.RemoveData(id);
             idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
@@ -333,6 +379,8 @@ MapBaseForm.RemoveData(id);
                     DataById.Clear();
     
                     DataByName.Clear();
+    
+                    DatasByLabel.Clear();
     
             idChain.Clear();
         }
@@ -403,6 +451,13 @@ MapBaseForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
+                    DatasByLabel[oldV].Remove(data);
+                    if(DatasByLabel[oldV].Count==0)
+                        DatasByLabel.Remove(oldV);
+                    if(!DatasByLabel.ContainsKey(newV))
+                        DatasByLabel[newV]=new List<Data>();
+                    DatasByLabel[newV].Add(data);
+ 
                 changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     

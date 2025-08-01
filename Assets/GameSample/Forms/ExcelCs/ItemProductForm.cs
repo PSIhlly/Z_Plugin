@@ -83,6 +83,16 @@ namespace Form
                 
         public static Action<Data,Dictionary<ItemStyle,string>,Dictionary<ItemStyle,string>> changeStyletexAction;
                 
+        public static Action<Data,int,int> changePriceAction;
+                
+        public static Action<Data,bool,bool> changeCanequipeAction;
+                
+        public static Action<Data,string,string> changeOnuseeventAction;
+                
+        public static Action<Data,string,string> changeOnequipeventAction;
+                
+        public static Action<Data,string,string> changeOndisequipeventAction;
+                
         public static Action<Data,string,string> changeOntoucheventAction;
                 
         public static Action<Data,string,string> changeOnleaveeventAction;
@@ -238,6 +248,96 @@ namespace Form
                  
                      }
                     
+                    private int  _price;
+                    /// <summary>
+                    ///价格
+                    ///</summary>
+                    public int  price{
+                                get{return _price;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePrice(this,_price,value); 
+                    }
+        
+                _price = value;
+                }
+                 
+                     }
+                    
+                    private bool  _canEquipe;
+                    /// <summary>
+                    ///可装备
+                    ///</summary>
+                    public bool  canEquipe{
+                                get{return _canEquipe;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCanequipe(this,_canEquipe,value); 
+                    }
+        
+                _canEquipe = value;
+                }
+                 
+                     }
+                    
+                    private string  _onUseEvent;
+                    /// <summary>
+                    ///使用事件名
+                    ///</summary>
+                    public string  onUseEvent{
+                                get{return _onUseEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnuseevent(this,_onUseEvent,value); 
+                    }
+        
+                _onUseEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onEquipEvent;
+                    /// <summary>
+                    ///装备事件名
+                    ///</summary>
+                    public string  onEquipEvent{
+                                get{return _onEquipEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnequipevent(this,_onEquipEvent,value); 
+                    }
+        
+                _onEquipEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onDisequipEvent;
+                    /// <summary>
+                    ///卸下事件名
+                    ///</summary>
+                    public string  onDisequipEvent{
+                                get{return _onDisequipEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOndisequipevent(this,_onDisequipEvent,value); 
+                    }
+        
+                _onDisequipEvent = value;
+                }
+                 
+                     }
+                    
                     private string  _onTouchEvent;
                     /// <summary>
                     ///接触事件名
@@ -292,7 +392,7 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(uid,name,label,isProto)
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,string onUseEvent,string onEquipEvent,string onDisequipEvent,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -307,6 +407,11 @@ namespace Form
              this.maxAmountPer = maxAmountPer;
              this.equip = equip;
              this.styleTex = styleTex;
+             this.price = price;
+             this.canEquipe = canEquipe;
+             this.onUseEvent = onUseEvent;
+             this.onEquipEvent = onEquipEvent;
+             this.onDisequipEvent = onDisequipEvent;
              this.onTouchEvent = onTouchEvent;
              this.onLeaveEvent = onLeaveEvent;
              this.onShowEvent = onShowEvent;
@@ -315,12 +420,12 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),onTouchEvent,onLeaveEvent,onShowEvent);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,onUseEvent,onEquipEvent,onDisequipEvent,onTouchEvent,onLeaveEvent,onShowEvent);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},"","","");
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,"","","","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -479,6 +584,16 @@ namespace Form
 
                 jo.Get<Dictionary<ItemStyle,string>>("styleTex"),
 
+                jo.Get<int>("price"),
+
+                jo.Get<bool>("canEquipe"),
+
+                jo.Get<string>("onUseEvent"),
+
+                jo.Get<string>("onEquipEvent"),
+
+                jo.Get<string>("onDisequipEvent"),
+
                 jo.Get<string>("onTouchEvent"),
 
                 jo.Get<string>("onLeaveEvent"),
@@ -518,6 +633,16 @@ namespace Form
             jo.Set<EquipPartType>("equip",data.equip);
 
             jo.Set<Dictionary<ItemStyle,string>>("styleTex",data.styleTex);
+
+            jo.Set<int>("price",data.price);
+
+            jo.Set<bool>("canEquipe",data.canEquipe);
+
+            jo.Set<string>("onUseEvent",data.onUseEvent);
+
+            jo.Set<string>("onEquipEvent",data.onEquipEvent);
+
+            jo.Set<string>("onDisequipEvent",data.onDisequipEvent);
 
             jo.Set<string>("onTouchEvent",data.onTouchEvent);
 
@@ -786,6 +911,56 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeStyletexAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePrice(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePriceAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCanequipe(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCanequipeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnuseevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnuseeventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnequipevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnequipeventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOndisequipevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOndisequipeventAction?.Invoke(data,oldV,newV);
                 }
                     
             }

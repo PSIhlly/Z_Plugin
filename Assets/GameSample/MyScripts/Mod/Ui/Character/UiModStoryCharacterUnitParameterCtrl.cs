@@ -1,4 +1,4 @@
-using Form;
+/*using Form;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,20 +59,20 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public override void OnCreate()
         {
 
-            view.ipt_min.onEndEdit.AddListener((s) =>
+            view.ipt_min.onFinishInput+=(s) =>
             {
                 model.data.min = StringHelper.ToFloat(s, 0);
-            });
-            view.ipt_value.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_value.onFinishInput+=(s)=>
             {
                 model.data.v = StringHelper.ToFloat(s, 0);
 
-            });
-            view.ipt_max.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_max.onFinishInput+=(s)=>
             {
                 model.data.max = StringHelper.ToFloat(s, 0);
 
-            });
+            };
 
         }
         public override void OnShow()
@@ -91,4 +91,4 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
 
 
-}
+}*/

@@ -248,6 +248,42 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 mapData.texNameDic[GlobalMaxSettings.TERRAIN_LAYER_MAX + layer] = maskData.name;
                             }
                     }
+                    else if (curData is MapObjectForm.Data objectData)
+                    {
+                        for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
+                            for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+                            {
+                                var finalX = posX + x;
+                                var finalZ = posZ + z;
+                                var finalY = posY + worldPosition.y;
+                                var finalPos = new Vector3(finalX, finalY, finalZ);
+                                var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(finalPos);
+                                if (MapManager.instance.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                                {
+                                    var mapData = MapManager.instance.data.maps[(mapPos.x, mapPos.y, mapPos.z)];
+                                    bool allow = true;
+                                    //放置去重
+                                    foreach (var subUnit in mapData.unit.subUnits)
+                                    {
+                                        if (subUnit.data is ObjectUnitForm.Data otherObjectData)
+                                        {
+                                            if (otherObjectData.prefabName == objectData.name && (otherObjectData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(otherObjectData.euler.y - angle) < 1f)
+                                            {
+                                                allow = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (allow)
+                                    {
+                                        object[] prms = null;
+                                        var newObjectData = MapManager.instance.AddObject(finalPos, objectData.name, prms);
+                                        newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
+                                        newObjectData.name = objectData.name;
+                                    }
+                                }
+                            }
+                    }
                     else if (curData is MapObjectForm.Data itemData)
                     {
                         for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
@@ -265,9 +301,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     //放置去重
                                     foreach (var subUnit in mapData.unit.subUnits)
                                     {
-                                        if (subUnit.data is ObjectUnitForm.Data otherItemData)
+                                        if (subUnit.data is ItemUnitForm.Data otherObjectData)
                                         {
-                                            if (otherItemData.prefabName == itemData.name && (otherItemData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(otherItemData.euler.y - angle) < 1f)
+                                            if (otherObjectData.prefabName == itemData.name && (otherObjectData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(otherObjectData.euler.y - angle) < 1f)
                                             {
                                                 allow = false;
                                                 break;
@@ -277,12 +313,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     if (allow)
                                     {
                                         object[] prms = null;
-                                        if(itemData.isItem)
-                                        {
-                                            prms = new object[] { (itemData.name,-1) };
-                                        }
+                                         prms = new object[] { (itemData.name, -1) };
                                         var newItemData = MapManager.instance.AddItem(finalPos, itemData.name, prms);
-                                        newItemData.isObstacle = true;
                                         newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
                                         newItemData.name = itemData.name;
                                     }
@@ -302,6 +334,16 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     MapManager.instance.RemoveTile(mapData);
                                 }
                                 else if (eraseData.item)
+                                {
+                                    foreach (var sub in mapData.unit.GetAllSubUnits())
+                                    {
+                                        if (sub is ItemUnit item)
+                                        {
+                                            MapManager.instance.RemoveItem(item.data);
+                                        }
+                                    }
+                                }
+                                else if (eraseData.mObject)
                                 {
                                     foreach (var sub in mapData.unit.GetAllSubUnits())
                                     {

@@ -53,6 +53,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeCharacterjaAction;
                 
+        public static Action<Data,string,string> changeItemjaAction;
+                
 
 
         public partial class Data
@@ -150,7 +152,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _objectJa;
                     /// <summary>
-                    ///物体数据
+                    ///景物数据
                     ///</summary>
                     public string  objectJa{
                                 get{return _objectJa;}
@@ -184,7 +186,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string objectJa,string characterJa)
+                    private string  _itemJa;
+                    /// <summary>
+                    ///道具数据
+                    ///</summary>
+                    public string  itemJa{
+                                get{return _itemJa;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeItemja(this,_itemJa,value); 
+                    }
+        
+                _itemJa = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string objectJa,string characterJa,string itemJa)
             {
 
              this.uid = uid;
@@ -194,17 +214,18 @@ public static readonly int autoUidCnt=1000000;
              this.mapJa = mapJa;
              this.objectJa = objectJa;
              this.characterJa = characterJa;
+             this.itemJa = itemJa;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),mapUnitSize,logicSize,viewSize,mapJa,objectJa,characterJa);
+        return new Data(sameId? uid:uidChain.GetId(),mapUnitSize,logicSize,viewSize,mapJa,objectJa,characterJa,itemJa);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","");
+                   private static Data _defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -287,7 +308,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("objectJa"),
 
-                jo.Get<string>("characterJa")
+                jo.Get<string>("characterJa"),
+
+                jo.Get<string>("itemJa")
                     );
 
             return data;
@@ -312,6 +335,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("objectJa",data.objectJa);
 
             jo.Set<string>("characterJa",data.characterJa);
+
+            jo.Set<string>("itemJa",data.itemJa);
 
             return jo;
         }
@@ -454,6 +479,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeCharacterjaAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeItemja(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeItemjaAction?.Invoke(data,oldV,newV);
                 }
                     
             }

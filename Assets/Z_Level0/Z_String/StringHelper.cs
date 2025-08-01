@@ -11,18 +11,22 @@ namespace Z_String
         {
             return char.ToLower(s[0]) + s.Substring(1);
         }
-        public static float ToFloat(string str,float defaultV)
+        public static float ToFloat(string str,float defaultV,bool onlyPositive=false)
         {
             if (float.TryParse(str, out var f))
             {
+                if (onlyPositive&&f < 0)
+                    f = 0;
                 return f;
             }
             return defaultV;
         }
-        public static int ToInt(string str, int defaultV)
+        public static int ToInt(string str, int defaultV, bool onlyPositive = false)
         {
             if (int.TryParse(str, out var i))
             {
+                if (onlyPositive && i < 0)
+                    i = 0;
                 return i;
             }
             return defaultV;

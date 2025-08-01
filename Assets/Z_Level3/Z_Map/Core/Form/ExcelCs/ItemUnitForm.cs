@@ -8,25 +8,41 @@ using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
-using Z_Text.Form;
-using Z_DataSystem.Form;
-using Z_Map.Form;
-using Z_Map;
-using Z_Ui.Form;
-using Z_Code.Form;
 
-namespace Form
+namespace Z_Map.Form
 {
 
-    public static partial class PrefabModelForm
+    public static partial class ItemUnitForm
     {
-public static readonly int autoUidCnt=100;
+
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
+                UnitForm.childInitAction+=InitInternal;
 
+
+                UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
+            
+
+            UnitForm.changeUidAction+=ChangeUid;
+
+            UnitForm.changeNameAction+=ChangeName;
+
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
+
+            UnitForm.changePosAction+=ChangePos;
+
+            UnitForm.changeEulerAction+=ChangeEuler;
+
+            UnitForm.changeScaleAction+=ChangeScale;
+
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
+
+            UnitForm.changeExtraAction+=ChangeExtra;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -39,7 +55,7 @@ public static readonly int autoUidCnt=100;
         
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain ;
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
 
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
@@ -49,84 +65,58 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeKeyAction;
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
                 
 
 
-        public partial class Data
+        public partial class Data : UnitForm.Data
         {
 
-                    private int  _uid;
-                    /// <summary>
-                    ///
-                    ///</summary>
-                    public int  uid{
-                                get{return _uid;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                /// <summary>
+                ///单位逻辑
+                ///</summary>
+                public ItemUnit unit
+                {
+                    get
                     {
-                       ChangeUid(this,_uid,value); 
+                        return (ItemUnit) _unit;
                     }
-        
-                _uid = value;
                 }
-                 
-                     }
-                    
-                    private string  _name;
-                    /// <summary>
-                    ///名称
-                    ///</summary>
-                    public string  name{
-                                get{return _name;}
- set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeName(this,_name,value); 
-                    }
-        
-                _name = value;
-                }
-                 
-                     }
-                    
-                    private string  _key;
-                    /// <summary>
-                    ///对应key
-                    ///</summary>
-                    public string  key{
-                                get{return _key;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeKey(this,_key,value); 
-                    }
-        
-                _key = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,string name,string key)
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
              this.name = name;
-             this.key = key;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
+             this.extra = extra;
+
+                    _unit=new ItemUnit(this);
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,key);
+        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,extra);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -140,49 +130,35 @@ public static readonly int autoUidCnt=100;
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
-                }
-            }
-    
 
         static public void Init()
         {
 
-            InitInternal();
+            UnitForm.Init();
+
         }
         public static void InitInternal()
         {
             if(inited)
                 return;
             inited=true;  
-uidChain=new Z_Chain.Chain (autoUidCnt);
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"cube","cube")},
-
-                {2,new Data(2,"sphere","sphere")},
-
                 };
-                    _DataByName = new Dictionary<string, Data>() {
-    
-                        {"cube",_DataByUid[1]},
-    
-                        {"sphere",_DataByUid[2]},
-    
-                    };
-    
 
             childInitAction?.Invoke();
             
 
-foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+            foreach(var data in DataByUid.Values)
+            {
+                UnitForm.AddData(data);
+            }
+
+
+        
              
         }
 
@@ -223,7 +199,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("key")
+                jo.Get<string>("prefabName"),
+
+                jo.Get<Vector3>("pos"),
+
+                jo.Get<Vector3>("euler"),
+
+                jo.Get<Vector3>("scale"),
+
+                jo.Get<UpdateType>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -239,7 +225,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("key",data.key);
+            jo.Set<string>("prefabName",data.prefabName);
+
+            jo.Set<Vector3>("pos",data.pos);
+
+            jo.Set<Vector3>("euler",data.euler);
+
+            jo.Set<Vector3>("scale",data.scale);
+
+            jo.Set<UpdateType>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -261,9 +257,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
-                    DataByName[data.name]=data;
-    
-
+UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
         }
@@ -277,9 +271,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                     DataByUid.Remove(data.uid);
     
-                    DataByName.Remove(data.name);
-    
-
+UnitForm.RemoveData(uid);
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
@@ -288,8 +280,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             Init();
 
                     DataByUid.Clear();
-    
-                    DataByName.Clear();
     
             uidChain.Clear();
         }
@@ -305,13 +295,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             }
         }
 
-         private static void RemoveChildren(Data data)
+         private static void RemoveChildren(UnitForm.Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.uid);      
         }
-         private static void AddChildren(Data superData)
+         private static void AddChildren(UnitForm.Data superData)
         {
             Init();
             if(superData is Data data)
@@ -322,7 +312,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
 
 
-            public static void ChangeUid(Data superData,int oldV,int newV)
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -332,25 +322,72 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeName(Data superData,string oldV,string newV)
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
- 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeKey(Data superData,string oldV,string newV)
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeKeyAction?.Invoke(data,oldV,newV);
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,UpdateType oldV,UpdateType newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

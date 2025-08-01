@@ -15,6 +15,7 @@ public enum EventType
     Global = 0,
     Tile = 1,
     Object = 2,
+    Item = 2,
     Character = 3
 }
 namespace Z_Map
@@ -54,6 +55,10 @@ namespace Z_Map
                         else if (this is ObjectUnit)
                         {
                             _evtSet = GameEventController.GetEventTriggerDic(EventType.Object);
+                        }
+                        else if (this is ItemUnit)
+                        {
+                            _evtSet = GameEventController.GetEventTriggerDic(EventType.Item);
                         }
                         else if (this is TileUnit)
                         {
@@ -97,7 +102,7 @@ public static partial class GlobalMaxSettings
 {
     public static int CUSTOM_EVENT_MAX => 1000000;
 }
-public class GameEventController : Z_Controller<GameManager>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
+public class GameEventController : Z_Controller<GameManager>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ItemEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
 {
 
 
@@ -105,6 +110,7 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
     {
         Z_EventHelper.Register<CollideEvent>(this);
         Z_EventHelper.Register<TileEvent>(this);
+        Z_EventHelper.Register<ItemEvent>(this);
         Z_EventHelper.Register<ObjectEvent>(this);
         Z_EventHelper.Register<CharacterEvent>(this);
     }
@@ -201,6 +207,19 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
     {
         if (evt.unit is MapUnit mapUnit)
         {
+            switch (evt.type)
+            {
+                case MapEventType.Show:
+                    mapUnit.ExecuteEvt("OnShow");
+                    break;
+            }
+        }
+    }
+    public void OnEvent(ItemEvent evt)
+    {
+        if (evt.unit is MapUnit mapUnit)
+        {
+
             switch (evt.type)
             {
                 case MapEventType.Show:

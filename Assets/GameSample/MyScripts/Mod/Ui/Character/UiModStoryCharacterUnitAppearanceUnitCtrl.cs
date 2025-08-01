@@ -42,22 +42,22 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 ModManager.instance.assetCtrl.DeleteCharacterAnim(parent.model.data.name, model.data.name);
                 parent.SelPage(0);
             });
-            view.ipt_name.onEndEdit.AddListener((s) =>
+            view.ipt_name.onFinishInput+=(s)=>
             {
                 if (StringHelper.IsUniqueName(parent.model.data.animDic.Keys, s))
                     ModManager.instance.assetCtrl.RenameCharacterAnim(parent.model.data.name, model.data.name, s);
                 Refresh();
-            });
-            view.ipt_scale.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_scale.onFinishInput+=(s)=>
             {
-                model.data.scale = StringHelper.ToFloat(s, 1);
+                model.data.scale = StringHelper.ToFloat(s, 1,true);
                 Refresh();
-            });
-            view.ipt_interval.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_interval.onFinishInput+=(s)=>
             {
-                model.data.animTimeInterval = StringHelper.ToFloat(s, 0.2f);
+                model.data.animTimeInterval = StringHelper.ToFloat(s, 0.2f, true);
                 Refresh();
-            });
+            };
 
             view.btn_addTex.onClick.AddListener(() =>
             {

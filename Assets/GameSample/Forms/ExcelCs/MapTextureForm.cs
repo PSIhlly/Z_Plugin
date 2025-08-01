@@ -71,6 +71,12 @@ namespace Form
                 
         public static Action<Data,string,string> changeLabelAction;
                 
+        public static Action<Data,string,string> changeOntoucheventAction;
+                
+        public static Action<Data,string,string> changeOnleaveeventAction;
+                
+        public static Action<Data,string,string> changeOnshoweventAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -112,7 +118,61 @@ namespace Form
                  
                      }
                     
-            public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName,string label):base(id,name,icon,label)
+                    private string  _onTouchEvent;
+                    /// <summary>
+                    ///接触事件名
+                    ///</summary>
+                    public string  onTouchEvent{
+                                get{return _onTouchEvent;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeOntouchevent(this,_onTouchEvent,value); 
+                    }
+        
+                _onTouchEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onLeaveEvent;
+                    /// <summary>
+                    ///离开事件名
+                    ///</summary>
+                    public string  onLeaveEvent{
+                                get{return _onLeaveEvent;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeOnleaveevent(this,_onLeaveEvent,value); 
+                    }
+        
+                _onLeaveEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onShowEvent;
+                    /// <summary>
+                    ///出现事件名
+                    ///</summary>
+                    public string  onShowEvent{
+                                get{return _onShowEvent;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeOnshowevent(this,_onShowEvent,value); 
+                    }
+        
+                _onShowEvent = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName,string label,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -121,17 +181,20 @@ namespace Form
              this.animTimeInterval = animTimeInterval;
              this.texsName = texsName;
              this.label = label;
+             this.onTouchEvent = onTouchEvent;
+             this.onLeaveEvent = onLeaveEvent;
+             this.onShowEvent = onShowEvent;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,new List<string>(texsName),label);
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,new List<string>(texsName),label,onTouchEvent,onLeaveEvent,onShowEvent);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",0f,null,"");
+                   private static Data _defaultData=new Data(0,"","",0f,null,"","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -142,6 +205,16 @@ namespace Form
                 {
                     Init();
                     return _DataById;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLabel;
+            public static Dictionary<string, List<Data>> DatasByLabel
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabel;
                 }
             }
     
@@ -172,11 +245,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","",0f,new List<string>(){"z_map_b$floor$0",},"")},
+                {200001,new Data(200001,"floor","",0f,new List<string>(){"z_map_b$floor$0",},"","","","")},
 
-                {200002,new Data(200002,"grass","",0f,new List<string>(){"z_map_b$grass$0",},"")},
+                {200002,new Data(200002,"grass","",0f,new List<string>(){"z_map_b$grass$0",},"","","","")},
 
-                {200003,new Data(200003,"road","",0f,new List<string>(){"z_map_b$road$0",},"")},
+                {200003,new Data(200003,"road","",0f,new List<string>(){"z_map_b$road$0",},"","","","")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -189,6 +262,18 @@ namespace Form
     
                     };
     
+                    _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                            {"",new List<Data>()},
+        
+                };
+
+                    _DatasByLabel[""].Add(_DataById[200001]);
+
+                    _DatasByLabel[""].Add(_DataById[200002]);
+
+                    _DatasByLabel[""].Add(_DataById[200003]);
+
 
             childInitAction?.Invoke();
             
@@ -246,7 +331,13 @@ namespace Form
 
                 jo.Get<List<string>>("texsName"),
 
-                jo.Get<string>("label")
+                jo.Get<string>("label"),
+
+                jo.Get<string>("onTouchEvent"),
+
+                jo.Get<string>("onLeaveEvent"),
+
+                jo.Get<string>("onShowEvent")
                     );
 
             return data;
@@ -270,6 +361,12 @@ namespace Form
 
             jo.Set<string>("label",data.label);
 
+            jo.Set<string>("onTouchEvent",data.onTouchEvent);
+
+            jo.Set<string>("onLeaveEvent",data.onLeaveEvent);
+
+            jo.Set<string>("onShowEvent",data.onShowEvent);
+
             return jo;
         }
 
@@ -292,6 +389,10 @@ namespace Form
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByLabel.ContainsKey(data.label))
+                        DatasByLabel[data.label]=new List<Data>();
+                    DatasByLabel[data.label].Add(data);
+    
 MapBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -308,6 +409,10 @@ MapBaseForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
+                    DatasByLabel[data.label].Remove(data);
+                    if(DatasByLabel[data.label].Count==0)
+                        DatasByLabel.Remove(data.label);
+    
 MapBaseForm.RemoveData(id);
             idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
@@ -319,6 +424,8 @@ MapBaseForm.RemoveData(id);
                     DataById.Clear();
     
                     DataByName.Clear();
+    
+                    DatasByLabel.Clear();
     
             idChain.Clear();
         }
@@ -409,7 +516,44 @@ MapBaseForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
+                    DatasByLabel[oldV].Remove(data);
+                    if(DatasByLabel[oldV].Count==0)
+                        DatasByLabel.Remove(oldV);
+                    if(!DatasByLabel.ContainsKey(newV))
+                        DatasByLabel[newV]=new List<Data>();
+                    DatasByLabel[newV].Add(data);
+ 
                 changeLabelAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOntouchevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOntoucheventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnleaveevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnleaveeventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnshowevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnshoweventAction?.Invoke(data,oldV,newV);
                 }
                     
             }

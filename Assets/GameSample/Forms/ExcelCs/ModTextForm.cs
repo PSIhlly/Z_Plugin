@@ -326,6 +326,22 @@ namespace Form
 
                 {1210065,new Data(1210065,"skillEvent","Skill event","技能事件")},
 
+                {1210066,new Data(1210066,"chooseModel","Choose model","选择模型")},
+
+                {1210067,new Data(1210067,"chooseEquipPart","Choose equip part","选择装备部位")},
+
+                {1210068,new Data(1210068,"","","无")},
+
+                {1210069,new Data(1210069,"LeftHand","Left hand","左手")},
+
+                {1210070,new Data(1210070,"RightHand","Right hand","右手")},
+
+                {1210071,new Data(1210071,"Head","Head","头")},
+
+                {1210072,new Data(1210072,"Body","Body","身体")},
+
+                {1210073,new Data(1210073,"label","Label","标签")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -524,6 +540,22 @@ namespace Form
                         {"entry",_DataById[1210064]},
     
                         {"skillEvent",_DataById[1210065]},
+    
+                        {"chooseModel",_DataById[1210066]},
+    
+                        {"chooseEquipPart",_DataById[1210067]},
+    
+                        {"",_DataById[1210068]},
+    
+                        {"LeftHand",_DataById[1210069]},
+    
+                        {"RightHand",_DataById[1210070]},
+    
+                        {"Head",_DataById[1210071]},
+    
+                        {"Body",_DataById[1210072]},
+    
+                        {"label",_DataById[1210073]},
     
                     };
     

@@ -77,19 +77,19 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryGlobalParameter
                 ModManager.instance.assetCtrl.DeleteGlobalArg(model.data.name);
                 parent.Refresh();
             });
-            view.ipt_value.onEndEdit.AddListener((s) =>
+            view.ipt_value.onFinishInput+=(s)=>
             {
                 model.data.v = StringHelper.ToFloat(s,0f);
                 Refresh();
-            });
-            view.ipt_name.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_name.onFinishInput+=(s)=>
             {
                 if(StringHelper.IsUniqueName(GlobalParamForm.DataByName.Keys, s))
                 {
                    model.data.name = s;
                 }
                 Refresh();
-            });
+            };
 
         }
         public override void OnShow()

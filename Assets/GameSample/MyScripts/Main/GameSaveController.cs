@@ -70,7 +70,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyCoreFolder + "/" + mapMaskFormFileName, MapMaskForm.GetJaByDatas().ToString());
         foreach (var data in MapMaskForm.DataById.Values)
         {
-            for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
+            for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic6)).Length; i++)
             {
                 var nm = data.texsName[i];
                 if (TexAssetForm.DataByName.ContainsKey(nm) && nm != "")
@@ -263,7 +263,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
         foreach (var data in MapMaskForm.DataById.Values)
         {
-            for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic5)).Length; i++)
+            for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic6)).Length; i++)
             {
                 var nm = data.texsName[i];
                 var path = storyCoreFolder + "/" + nm;

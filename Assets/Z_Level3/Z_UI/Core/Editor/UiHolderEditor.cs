@@ -1,3 +1,4 @@
+using NUnit.Framework.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -101,10 +102,10 @@ namespace Z_Ui_Editor
                 else if (o.name.Split("_")[0].Split("|").Contains("ipt"))
                 {
                     initCode += $@"
-            view.ipt_{o.name.Split("_")[1]}.onEndEdit.AddListener((s)=>
+            view.ipt_{o.name.Split("_")[1]}.onFinishInput+=(s)=>
             {{
 
-            }});";
+            }};";
                     refreshCode += $@"
             view.ipt_{o.name.Split("_")[1]}.Set("""") ;";
                 }
@@ -166,14 +167,26 @@ using Z_Texture;
         {
 
             //绘制输入框
-            uiHolder.uiName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
+            var newName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
+            if (newName!= uiHolder.uiName)
+            {
+                Undo.RecordObject(uiHolder, "modify test value");
+                uiHolder.uiName = newName;
+                EditorUtility.SetDirty(uiHolder);
+            }
             if (GUILayout.Button("CopyQuickCode"))
             {
                 GUIUtility.systemCopyBuffer = GetQuickCode();
             }
             if (uiHolder.uiType == UiType.Panel && uiHolder.GetComponentsInParent<UiHolder>(true).Length == 1)
             {
-                uiHolder.path = EditorGUILayout.TextField("Path: ", uiHolder.path);
+                var newPath = EditorGUILayout.TextField("Path: ", uiHolder.path);
+                if(newPath!= uiHolder.path)
+                {
+                    Undo.RecordObject(uiHolder, "modify test value");
+                    uiHolder.path = newPath;
+                    EditorUtility.SetDirty(uiHolder);
+                }
                 // 绘制按钮
                 if (GUILayout.Button("Generate"))
                 {

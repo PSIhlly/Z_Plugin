@@ -73,7 +73,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit
             });
             view.page_ModStoryCharacterUnitParameter.SetActive(model.selPage == 1, new UiModStoryCharacterUnitParameterParam()
             {
-                data = model.data
+                //data = model.data
             });
             view.page_ModStoryCharacterUnitAppearance.SetActive(model.selPage == 2, new UiModStoryCharacterUnitAppearanceParam()
             {

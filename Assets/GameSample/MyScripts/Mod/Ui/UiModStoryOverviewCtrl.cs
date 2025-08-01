@@ -29,14 +29,14 @@ namespace Ui.ModStory.ModStoryOverview
             {
                 ModManager.instance.assetCtrl.ImportStoryTex();
             });
-            view.ipt_name.onEndEdit.AddListener((s)=>
+            view.ipt_name.onFinishInput += (s)=>
             {
                 StoryForm.DataById[1].name = s;
-            });
-            view.ipt_introduction.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_introduction.onFinishInput+=(s)=>
             {
                 StoryForm.DataById[1].desc = s;
-            });
+            };
 
         }
 

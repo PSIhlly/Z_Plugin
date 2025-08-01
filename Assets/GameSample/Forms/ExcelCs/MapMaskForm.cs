@@ -124,6 +124,16 @@ namespace Form
                 }
             }
     
+            static Dictionary<string, List<Data>> _DatasByLabel;
+            public static Dictionary<string, List<Data>> DatasByLabel
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabel;
+                }
+            }
+    
             static Dictionary<string, Data> _DataByName;
             public static Dictionary<string, Data> DataByName
             {
@@ -160,6 +170,14 @@ namespace Form
     
                     };
     
+                    _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                            {"",new List<Data>()},
+        
+                };
+
+                    _DatasByLabel[""].Add(_DataById[300001]);
+
 
             childInitAction?.Invoke();
             
@@ -259,6 +277,10 @@ namespace Form
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByLabel.ContainsKey(data.label))
+                        DatasByLabel[data.label]=new List<Data>();
+                    DatasByLabel[data.label].Add(data);
+    
 MapBaseForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.id;
@@ -275,6 +297,10 @@ MapBaseForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
+                    DatasByLabel[data.label].Remove(data);
+                    if(DatasByLabel[data.label].Count==0)
+                        DatasByLabel.Remove(data.label);
+    
 MapBaseForm.RemoveData(id);
             idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
@@ -286,6 +312,8 @@ MapBaseForm.RemoveData(id);
                     DataById.Clear();
     
                     DataByName.Clear();
+    
+                    DatasByLabel.Clear();
     
             idChain.Clear();
         }
@@ -366,6 +394,13 @@ MapBaseForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
+                    DatasByLabel[oldV].Remove(data);
+                    if(DatasByLabel[oldV].Count==0)
+                        DatasByLabel.Remove(oldV);
+                    if(!DatasByLabel.ContainsKey(newV))
+                        DatasByLabel[newV]=new List<Data>();
+                    DatasByLabel[newV].Add(data);
+ 
                 changeLabelAction?.Invoke(data,oldV,newV);
                 }
                     

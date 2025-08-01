@@ -27,7 +27,7 @@ public class CameraMoveEvent : Z_Event
 public static partial class GlobalMaxSettings
 {
     public static int TERRAIN_LAYER_MAX => 3;
-    public static int TEXTURE_ANIM_MAX = 100000;
+    public static int TEXTURE_MAX = 100000;
     public static int TEXTURE_MASK_MAX = 100000;
     public static int OBJECT_MAX = 100000;
 }

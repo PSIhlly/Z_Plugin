@@ -123,28 +123,28 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
 
-    #region anim
+    #region texture
 
-    public void CreateAnimTex(string name)
+    public void CreateTex(string lab="",string name=null)
     {
         if (string.IsNullOrEmpty(name))
         {
-            for (int i = 0; i < GlobalMaxSettings.TEXTURE_ANIM_MAX; i++)
+            for (int i = 0; i < GlobalMaxSettings.TEXTURE_MAX; i++)
             {
                 name = "new tex" + i;
                 if (!MapTextureForm.DataByName.ContainsKey(name))
                     break;
             }
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" },""));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" }, lab,"","",""));
     }
-    public void ImportAnimTex(string name, int id)
+    public void ImportTex(string name, int id=-1)
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
          {
              GameManager.instance.saveCtrl.AddStoryTex(form);
 
-             if (MapTextureForm.DataByName[name].texsName.Count > id)
+             if (id!=-1&&MapTextureForm.DataByName[name].texsName.Count > id)
              {
                  MapTextureForm.DataByName[name].texsName[id] = form.name;
              }
@@ -156,36 +156,32 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     }
 
-    public void RenameAnimTex(string oldName, string newName)
+
+    public void DeleteTexId(string name, int id)
     {
-        MapTextureForm.DataByName[oldName].name = newName;
+        MapTextureForm.DataByName[name].texsName.RemoveAt(id);
     }
 
-    public void DeleteAnimTexId(string name, int animId)
-    {
-        MapTextureForm.DataByName[name].texsName.RemoveAt(animId);
-    }
-
-    public void DeleteAnimTex(string name)
+    public void DeleteTex(string name)
     {
         MapTextureForm.RemoveData(MapTextureForm.DataByName[name].id);
     }
     #endregion
     #region mask
-    public void CreateMaskTex(string name)
+    public void CreateMask(string lab="",string name=null)
     {
         if (string.IsNullOrEmpty(name))
         {
-            for (int i = 0; i < GlobalMaxSettings.TEXTURE_ANIM_MAX; i++)
+            for (int i = 0; i < GlobalMaxSettings.TEXTURE_MASK_MAX; i++)
             {
                 name = "new mask" + i;
                 if (!MapMaskForm.DataByName.ContainsKey(name))
                     break;
             }
         }
-        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }, ""));
+        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }, lab));
     }
-    public void ImportMaskTex(string name, int id)
+    public void ImportMask(string name, int id)
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
@@ -204,12 +200,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     }
 
-    public void RenameMaskTex(string oldName, string newName)
-    {
-        MapMaskForm.DataByName[oldName].name = newName;
-    }
-
-    public void DeleteMaskTex(string name)
+    public void DeleteMask(string name)
     {
         MapMaskForm.RemoveData(MapMaskForm.DataByName[name].id);
     }
@@ -221,7 +212,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
     }
     
-    public void CreateObject(string name)
+    public void CreateObject(string lab="",string name=null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -233,7 +224,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         }
 
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData,false, ""));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData, lab,"","",""));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -490,7 +481,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         { 
             styleTex[style] = ""; 
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default, styleTex, "", "", ""));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default, styleTex, 0,false,"", "", "","","",""));
     }
     public void DeleteItem(string name)
     {

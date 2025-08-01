@@ -32,7 +32,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 parent.parent.SelPage(0);
 
             });
-            view.ipt_name.onEndEdit.AddListener((s) =>
+            view.ipt_name.onFinishInput+=(s)=>
             {
                 var lst = new List<string>();
                 foreach(var data in CharacterProductForm.DataByNameIsproto.Values)
@@ -40,11 +40,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
                 if(StringHelper.IsUniqueName(lst, s))
                     model.data.name = s;
-            });
-            view.ipt_label.onEndEdit.AddListener((s) =>
+            };
+            view.ipt_label.onFinishInput+=(s)=>
             {
                 model.data.label = s;
-            });
+            };
             view.btn_image.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportCharacterAvatar(model.data.name);

@@ -58,7 +58,8 @@ namespace Z_Map
     }
 }
 
-public enum AlphaTexBasic5
+//×óÏÂÎª0
+public enum AlphaTexBasic6
 {
     OOOOXOOOO,
     OOOXXOOOO,
@@ -82,37 +83,37 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         animCurCache.Clear();
     }
    
-    public void CreateAlphaVariantsByBasic5(string name, Texture2D[] rawAlphaTex)
+    public void CreateAlphaVariantsByBasic6(string name, Texture2D[] rawAlphaTex)
     {
         if (rawAlphaTex == null || rawAlphaTex.Length == 0 || rawAlphaTex[0] == null)
             return;
-        Dictionary<(AlphaTexBasic5, int), Texture2D> basicRotate = new Dictionary<(AlphaTexBasic5, int), Texture2D>();
+        Dictionary<(AlphaTexBasic6, int), Texture2D> basicRotate = new Dictionary<(AlphaTexBasic6, int), Texture2D>();
 
         TextureTransform.GetTargetSize(rawAlphaTex, rawAlphaTex[0].width, rawAlphaTex[1].height);
 
         for (int i = 0; i < 4; i++)
         {
-            basicRotate[(AlphaTexBasic5.OOOOXOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic5.OOOOXOOOO], i);
-            basicRotate[(AlphaTexBasic5.OOOXXOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic5.OOOXXOOOO], i);
-            basicRotate[(AlphaTexBasic5.OOXOOXXXX, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic5.OOXOOXXXX], i);
-            basicRotate[(AlphaTexBasic5.OXOXXOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic5.OXOXXOOOO], i);
-            basicRotate[(AlphaTexBasic5.XXXOOOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic5.XXXOOOOOO], i);
+            basicRotate[(AlphaTexBasic6.OOOOXOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic6.OOOOXOOOO], i);
+            basicRotate[(AlphaTexBasic6.OOOXXOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic6.OOOXXOOOO], i);
+            basicRotate[(AlphaTexBasic6.OOXOOXXXX, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic6.OOXOOXXXX], i);
+            basicRotate[(AlphaTexBasic6.OXOXXOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic6.OXOXXOOOO], i);
+            basicRotate[(AlphaTexBasic6.XXXOOOOOO, i)] = TextureTransform.RotateTextureClockwise90(rawAlphaTex[(int)AlphaTexBasic6.XXXOOOOOO], i);
         }
 
         int[] slash4 = new int[] { 1, 3, 7, 9 };
         int[] straight4 = new int[] { 2, 4, 6, 8 };
 
-        alphaTextureDic[(name, 0)] = basicRotate[(AlphaTexBasic5.OOOOXOOOO, 0)];
+        alphaTextureDic[(name, 0)] = basicRotate[(AlphaTexBasic6.OOOOXOOOO, 0)];
         //1*
         foreach (var t in slash4)
         {
-            alphaTextureDic[(name, (1 << t))] = basicRotate[(AlphaTexBasic5.OOOOXOOOO, 0)];
+            alphaTextureDic[(name, (1 << t))] = basicRotate[(AlphaTexBasic6.OOOOXOOOO, 0)];
         }
 
-        alphaTextureDic[(name, (1 << 4))] = basicRotate[(AlphaTexBasic5.OOOXXOOOO, 0)];
-        alphaTextureDic[(name, (1 << 8))] = basicRotate[(AlphaTexBasic5.OOOXXOOOO, 1)];
-        alphaTextureDic[(name, (1 << 6))] = basicRotate[(AlphaTexBasic5.OOOXXOOOO, 2)];
-        alphaTextureDic[(name, (1 << 2))] = basicRotate[(AlphaTexBasic5.OOOXXOOOO, 3)];
+        alphaTextureDic[(name, (1 << 4))] = basicRotate[(AlphaTexBasic6.OOOXXOOOO, 0)];
+        alphaTextureDic[(name, (1 << 8))] = basicRotate[(AlphaTexBasic6.OOOXXOOOO, 1)];
+        alphaTextureDic[(name, (1 << 6))] = basicRotate[(AlphaTexBasic6.OOOXXOOOO, 2)];
+        alphaTextureDic[(name, (1 << 2))] = basicRotate[(AlphaTexBasic6.OOOXXOOOO, 3)];
 
         //2*
 
@@ -133,31 +134,31 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
 
         alphaTextureDic[(name, (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO,0)],
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)]
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO,0)],
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)]
             });
 
         alphaTextureDic[(name, (1 << 2) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)]
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)]
             });
 
 
         alphaTextureDic[(name, (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                basicRotate[(AlphaTexBasic5.OOXOOXXXX,0)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                basicRotate[(AlphaTexBasic6.OOXOOXXXX,0)]
             });
         alphaTextureDic[(name, (1 << 8) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.OOXOOXXXX, 1)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.OOXOOXXXX, 1)]
             });
         alphaTextureDic[(name, (1 << 6) | (1 << 2))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                basicRotate[(AlphaTexBasic5.OOXOOXXXX, 2)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                basicRotate[(AlphaTexBasic6.OOXOOXXXX, 2)]
             });
         alphaTextureDic[(name, (1 << 2) | (1 << 4))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)],
-                basicRotate[(AlphaTexBasic5.OOXOOXXXX, 3)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)],
+                basicRotate[(AlphaTexBasic6.OOXOOXXXX, 3)]
             });
 
         //3*
@@ -191,7 +192,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
             if (t1 == 7)
             {
-                alphaTextureDic[(name, cur | (1 << 4) | (1 << 8))] = rawAlphaTex[(int)AlphaTexBasic5.OOXOOXXXX];
+                alphaTextureDic[(name, cur | (1 << 4) | (1 << 8))] = rawAlphaTex[(int)AlphaTexBasic6.OOXOOXXXX];
             }
             else
             {
@@ -199,7 +200,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             }
             if (t1 == 9)
             {
-                alphaTextureDic[(name, cur | (1 << 8) | (1 << 6))] = basicRotate[(AlphaTexBasic5.OOXOOXXXX, 1)];
+                alphaTextureDic[(name, cur | (1 << 8) | (1 << 6))] = basicRotate[(AlphaTexBasic6.OOXOOXXXX, 1)];
             }
             else
             {
@@ -207,7 +208,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             }
             if (t1 == 3)
             {
-                alphaTextureDic[(name, cur | (1 << 2) | (1 << 6))] = basicRotate[(AlphaTexBasic5.OOXOOXXXX, 2)];
+                alphaTextureDic[(name, cur | (1 << 2) | (1 << 6))] = basicRotate[(AlphaTexBasic6.OOXOOXXXX, 2)];
             }
             else
             {
@@ -215,7 +216,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             }
             if (t1 == 1)
             {
-                alphaTextureDic[(name, cur | (1 << 2) | (1 << 4))] = basicRotate[(AlphaTexBasic5.OOXOOXXXX, 3)];
+                alphaTextureDic[(name, cur | (1 << 2) | (1 << 4))] = basicRotate[(AlphaTexBasic6.OOXOOXXXX, 3)];
             }
             else
             {
@@ -226,24 +227,24 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
 
         alphaTextureDic[(name, (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)]
             });
         alphaTextureDic[(name, (1 << 6) | (1 << 8) | (1 << 2))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)]
             });
         alphaTextureDic[(name, (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)],
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO,0)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)],
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO,0)]
             });
         alphaTextureDic[(name, (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)],
-                basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)],
+                basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)]
             });
 
         //4*
@@ -314,15 +315,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             if ((cur & (1 << 7)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)]
                     });
             }
             else if ((cur & (1 << 9)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)]
                     });
             }
             else
@@ -333,15 +334,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             if ((cur & (1 << 9)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)]
                     });
             }
             else if ((cur & (1 << 3)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)]
                     });
             }
             else
@@ -352,15 +353,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             if ((cur & (1 << 1)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO,0)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO,0)]
                     });
             }
             else if ((cur & (1 << 3)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO,0)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO,0)]
                     });
             }
             else
@@ -371,15 +372,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             if ((cur & (1 << 1)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)]
                     });
             }
             else if ((cur & (1 << 7)) > 0)
             {
                 alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)]
                     });
             }
             else
@@ -390,31 +391,31 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
         cur = (1 << 2) | (1 << 4) | (1 << 6) | (1 << 8);
         alphaTextureDic[(name, cur)] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)]
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)]
             });
         //5*
         alphaTextureDic[(name, cur | (1 << 1))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-               basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)]
+               basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)]
             });
         alphaTextureDic[(name, cur | (1 << 3))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-               basicRotate[(AlphaTexBasic5.OXOXXOOOO,0)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)]
+               basicRotate[(AlphaTexBasic6.OXOXXOOOO,0)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)]
             });
         alphaTextureDic[(name, cur | (1 << 7))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-               basicRotate[(AlphaTexBasic5.OXOXXOOOO,1)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)]
+               basicRotate[(AlphaTexBasic6.OXOXXOOOO,1)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)]
             });
         alphaTextureDic[(name, cur | (1 << 9))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-               basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)],
-                basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)]
+               basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)],
+                basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)]
             });
         cur = 0;
         foreach (var t1 in slash4)
@@ -477,29 +478,29 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 if ((cur & ((1 << 7) | (1 << 9))) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2 )]
                     });
                 }
                 else if ((cur & (1 << 7)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2 )]
                         });
                 }
                 else if ((cur & (1 << 9)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2 )]
                         });
                 }
                 else
                 {
                     alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2 )]
                         });
                 }
 
@@ -507,87 +508,87 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 if ((cur & ((1 << 3) | (1 << 9))) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3 )]
                     });
                 }
                 else if ((cur & (1 << 3)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3 )]
                         });
                 }
                 else if ((cur & (1 << 9)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3 )]
                         });
                 }
                 else
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3 )]
                         });
                 }
 
                 if ((cur & ((1 << 3) | (1 << 1))) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0 )]
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0 )]
                     });
                 }
                 else if ((cur & (1 << 3)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0 )]
                         });
                 }
                 else if ((cur & (1 << 1)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0 )]
                         });
                 }
                 else
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0 )]
                         });
                 }
 
                 if ((cur & ((1 << 7) | (1 << 1))) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1 )]
                     });
                 }
                 else if ((cur & (1 << 7)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1 )]
                         });
                 }
                 else if ((cur & (1 << 1)) > 0)
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1 )]
                         });
                 }
                 else
                 {
                     alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1 )]
                         });
                 }
 
@@ -613,94 +614,94 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         alphaTextureDic[(name, cur | (1 << 2) | (1 << 8))] = alphaTextureDic[(name, (1 << 2) | (1 << 8))];
         alphaTextureDic[(name, cur | (1 << 4) | (1 << 6))] = alphaTextureDic[(name, (1 << 4) | (1 << 6))];
 
-        alphaTextureDic[(name, (1 << 1) | (1 << 7) | (1 << 9) | (1 << 4) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)];
-        alphaTextureDic[(name, (1 << 3) | (1 << 7) | (1 << 9) | (1 << 4) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)];
+        alphaTextureDic[(name, (1 << 1) | (1 << 7) | (1 << 9) | (1 << 4) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)];
+        alphaTextureDic[(name, (1 << 3) | (1 << 7) | (1 << 9) | (1 << 4) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)];
         alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 7) | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2 )]
                         });
         alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 9) | (1 << 4) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2 )]
                         });
 
 
-        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 9) | (1 << 2) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)];
-        alphaTextureDic[(name, (1 << 3) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)];
+        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 9) | (1 << 2) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)];
+        alphaTextureDic[(name, (1 << 3) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)];
         alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 7) | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3 )]
                         });
         alphaTextureDic[(name, (1 << 1) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 6) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3 )]
                         });
 
 
-        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 7) | (1 << 2) | (1 << 4) | (1 << 6))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0)];
-        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 6))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0)];
+        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 7) | (1 << 2) | (1 << 4) | (1 << 6))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0)];
+        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 6))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0)];
         alphaTextureDic[(name, (1 << 1) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0 )]
                         });
         alphaTextureDic[(name, (1 << 3) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 6))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0 )]
                         });
 
-        alphaTextureDic[(name, (1 << 1) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)];
-        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 7) | (1 << 2) | (1 << 4) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)];
+        alphaTextureDic[(name, (1 << 1) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)];
+        alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 7) | (1 << 2) | (1 << 4) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)];
         alphaTextureDic[(name, (1 << 1) | (1 << 3) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1 )]
                         });
         alphaTextureDic[(name, (1 << 3) | (1 << 7) | (1 << 9) | (1 << 2) | (1 << 4) | (1 << 8))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )],
-                        basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )],
+                        basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1 )]
                         });
 
 
         cur = (1 << 2) | (1 << 4) | (1 << 6) | (1 << 8);
         alphaTextureDic[(name, cur | (1 << 1) | (1 << 9))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )]
                         });
         alphaTextureDic[(name, cur | (1 << 3) | (1 << 7))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )]
                         });
         alphaTextureDic[(name, cur | (1 << 1) | (1 << 7))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )]
                         });
         alphaTextureDic[(name, cur | (1 << 7) | (1 << 9))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )]
                         });
         alphaTextureDic[(name, cur | (1 << 3) | (1 << 9))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3 )]
                         });
         alphaTextureDic[(name, cur | (1 << 1) | (1 << 3))] = TextureCombine.OverlayTexture2DsToTexture2DByMinR(new Texture2D[] {
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0 )],
-                        basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1 )]
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0 )],
+                        basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1 )]
                         });
 
         //7*
         cur = (1 << 2) | (1 << 4) | (1 << 6) | (1 << 8);
-        alphaTextureDic[(name, cur | (1 << 1) | (1 << 3) | (1 << 7))] = basicRotate[(AlphaTexBasic5.OXOXXOOOO, 1)];
-        alphaTextureDic[(name, cur | (1 << 1) | (1 << 7) | (1 << 9))] = basicRotate[(AlphaTexBasic5.OXOXXOOOO, 2)];
-        alphaTextureDic[(name, cur | (1 << 3) | (1 << 7) | (1 << 9))] = basicRotate[(AlphaTexBasic5.OXOXXOOOO, 3)];
-        alphaTextureDic[(name, cur | (1 << 1) | (1 << 3) | (1 << 9))] = basicRotate[(AlphaTexBasic5.OXOXXOOOO, 0)];
+        alphaTextureDic[(name, cur | (1 << 1) | (1 << 3) | (1 << 7))] = basicRotate[(AlphaTexBasic6.OXOXXOOOO, 1)];
+        alphaTextureDic[(name, cur | (1 << 1) | (1 << 7) | (1 << 9))] = basicRotate[(AlphaTexBasic6.OXOXXOOOO, 2)];
+        alphaTextureDic[(name, cur | (1 << 3) | (1 << 7) | (1 << 9))] = basicRotate[(AlphaTexBasic6.OXOXXOOOO, 3)];
+        alphaTextureDic[(name, cur | (1 << 1) | (1 << 3) | (1 << 9))] = basicRotate[(AlphaTexBasic6.OXOXXOOOO, 0)];
 
         cur = (1 << 1) | (1 << 3) | (1 << 7) | (1 << 9);
-        alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 2)];
-        alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 3)];
-        alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 0)];
-        alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = basicRotate[(AlphaTexBasic5.XXXOOOOOO, 1)];
+        alphaTextureDic[(name, cur | (1 << 4) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 2)];
+        alphaTextureDic[(name, cur | (1 << 2) | (1 << 6) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 3)];
+        alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 6))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 0)];
+        alphaTextureDic[(name, cur | (1 << 2) | (1 << 4) | (1 << 8))] = basicRotate[(AlphaTexBasic6.XXXOOOOOO, 1)];
 
         //8*
-        alphaTextureDic[(name, (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9))] = rawAlphaTex[(int)AlphaTexBasic5.XXXXOXXXX];
+        alphaTextureDic[(name, (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9))] = rawAlphaTex[(int)AlphaTexBasic6.XXXXOXXXX];
 
     }
     public void ShowFinalMat(TileInstance ins)

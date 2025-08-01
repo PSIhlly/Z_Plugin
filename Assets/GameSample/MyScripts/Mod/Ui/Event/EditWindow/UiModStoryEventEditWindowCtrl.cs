@@ -44,21 +44,21 @@ namespace Ui.ModStoryEventEditWindow
             model.dcpr = new Decompiler();
             model.curEntry = new List<SyntaxNode>();
            
-            view.ipt_name.onEndEdit.AddListener((v) =>
+            view.ipt_name.onFinishInput+=(v) =>
             {
                 model.data.name = v;
                 Refresh();
-            });
-            view.ipt_category.onEndEdit.AddListener((v) =>
+            };
+            view.ipt_category.onFinishInput += (v) =>
             {
                 model.data.category = v;
                 Refresh();
-            });
-            view.ipt_type.onEndEdit.AddListener((v) =>
+            };
+            view.ipt_type.onFinishInput += (v) =>
             {
                 model.data.type = v;
                 Refresh();
-            });
+            };
             view.btn_switchMod.onClick.AddListener(() =>
             {
                 model.codeEditMode = !model.codeEditMode;

@@ -31,7 +31,17 @@ using Z_UnitSystem.Form;
         return CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
         
     }
-
+    public override ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
+    {
+        var form = new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
+        //init
+        var dic = form.unit.evtDic;
+        if (prms != null && prms[0] is (string, int))
+        {
+            form.unit.productInfo = ((string, int))prms[0];
+        }
+        return form;
+    }
     public override ObjectUnitForm.Data GetNewObject(string prefabName = "", object[] prms = null)
     {
         var form= new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");

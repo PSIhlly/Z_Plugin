@@ -188,6 +188,8 @@ namespace Form
 
                 {20021,new Data(20021,"apply","Apply","Ó¦ÓÃ")},
 
+                {20022,new Data(20022,"delete","Delete","É¾³ý")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -248,6 +250,8 @@ namespace Form
                         {"reset",_DataById[20020]},
     
                         {"apply",_DataById[20021]},
+    
+                        {"delete",_DataById[20022]},
     
                     };
     

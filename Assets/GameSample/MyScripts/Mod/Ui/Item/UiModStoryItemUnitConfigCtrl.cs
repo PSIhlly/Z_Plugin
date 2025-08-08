@@ -38,6 +38,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onTouchEvent"), false, 2, (lst) =>
                 {
                     model.data.onTouchEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -47,6 +48,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onLeaveEvent"), false, 2, (lst) =>
                 {
                     model.data.onLeaveEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -56,6 +58,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onShowEvent"), false, 2, (lst) =>
                 {
                     model.data.onShowEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -75,6 +78,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onUseEvent"), false, 2, (lst) =>
                 {
                     model.data.onUseEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -84,6 +88,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onEquipEvent"), false, 2, (lst) =>
                 {
                     model.data.onEquipEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -93,6 +98,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onDisequipEvent"), false, 2, (lst) =>
                 {
                     model.data.onDisequipEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -102,6 +108,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onTouchEvent"), false, 2, (lst) =>
                 {
                     model.data.onTouchEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -111,6 +118,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onLeaveEvent"), false, 2, (lst) =>
                 {
                     model.data.onLeaveEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -120,6 +128,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onShowEvent"), false, 2, (lst) =>
                 {
                     model.data.onShowEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -133,6 +142,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("chooseEquipPart"), false, (res) =>
                 {
                     model.data.equip = (EquipPartType)res;
+                    Refresh();
                     return true;
                 }, lst);
             });

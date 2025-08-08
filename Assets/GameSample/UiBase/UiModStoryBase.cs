@@ -3290,8 +3290,8 @@ namespace ModStoryMapObjectObjectConfig
     public partial class UiModStoryMapObjectObjectConfigView:UiView
     {
 
-            public Btn btn_;
-            public Sta sta_;
+            public Btn btn_fixed;
+            public Sta sta_fixed;
             public Btn btn_onTouchEvent;
             public Btn btn_onLeaveEvent;
             public Btn btn_onShowEvent;
@@ -3301,8 +3301,8 @@ namespace ModStoryMapObjectObjectConfig
         public UiModStoryMapObjectObjectConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_ = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_fixed = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            sta_fixed = uiHolder.elementTrsLst[1].GetComponent<Sta>();
             btn_onTouchEvent = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_onLeaveEvent = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             btn_onShowEvent = uiHolder.elementTrsLst[4].GetComponent<Btn>();
@@ -3652,11 +3652,13 @@ namespace ModStoryEventCustom
             public ScrView scr_categorys;
             public ScrView scr_types;
             public ScrView scr_items;
-            public Ipt ipt_name;
-            public Ipt ipt_category;
-            public Ipt ipt_type;
+            public GameObject go_show;
+            public Txt txt_name;
+            public Txt txt_desc;
             public Btn btn_edit;
             public Sta sta_edit;
+            public Btn btn_delete;
+            public Sta sta_delete;
             public GameObject go_category;
             public UiCategoryCtrl sub_Category;
             public GameObject go_type;
@@ -3669,17 +3671,19 @@ namespace ModStoryEventCustom
             scr_categorys = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             scr_types = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
             scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_category = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_type = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            go_show = uiHolder.elementTrsLst[3].gameObject;
+            txt_name = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+            txt_desc = uiHolder.elementTrsLst[5].GetComponent<Txt>();
             btn_edit = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             sta_edit = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            go_category = uiHolder.elementTrsLst[8].gameObject;
-            sub_Category = (UiCategoryCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            go_type = uiHolder.elementTrsLst[10].gameObject;
-            sub_Type = (UiTypeCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[12].gameObject;
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            btn_delete = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_delete = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            go_category = uiHolder.elementTrsLst[10].gameObject;
+            sub_Category = (UiCategoryCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            go_type = uiHolder.elementTrsLst[12].gameObject;
+            sub_Type = (UiTypeCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[14].gameObject;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -3719,25 +3723,25 @@ namespace ModStoryEventCustom
     }
 }
 
-namespace ModStoryEventGlobal
+namespace ModStoryEventConfig
 
 {
 
 
 
 
-    public partial class UiModStoryEventGlobalParam:UiParam
+    public partial class UiModStoryEventConfigParam:UiParam
     {
     }
 
-    public partial class UiModStoryEventGlobalView:UiView
+    public partial class UiModStoryEventConfigView:UiView
     {
 
             public Btn btn_onBeginEvent;
             public Btn btn_onEndEvent;
             public Txt txt_onBeginEvent;
             public Txt txt_onEndEvent;
-        public UiModStoryEventGlobalView(UiHolder uiHolder):base(uiHolder)
+        public UiModStoryEventConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_onBeginEvent = uiHolder.elementTrsLst[0].GetComponent<Btn>();
@@ -3747,16 +3751,16 @@ namespace ModStoryEventGlobal
         }
 
     }
-    public partial class UiModStoryEventGlobalCtrl:UiCtrl
+    public partial class UiModStoryEventConfigCtrl:UiCtrl
     {
-        public UiModStoryEventGlobalView view;
-        public UiModStoryEventGlobalModel model;
-        public UiModStoryEventGlobalParam param;
+        public UiModStoryEventConfigView view;
+        public UiModStoryEventConfigModel model;
+        public UiModStoryEventConfigParam param;
         public UiModStoryEventCtrl parent=>(UiModStoryEventCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiModStoryEventGlobalParam)param;
+            this.param = (UiModStoryEventConfigParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -3764,14 +3768,14 @@ namespace ModStoryEventGlobal
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiModStoryEventGlobalView(uiHolder);
-            model=new UiModStoryEventGlobalModel();
+            view = new UiModStoryEventConfigView(uiHolder);
+            model=new UiModStoryEventConfigModel();
 
 
         }
 
     }
-    public partial class UiModStoryEventGlobalModel:UiModel
+    public partial class UiModStoryEventConfigModel:UiModel
     {
         
     }
@@ -3785,24 +3789,20 @@ namespace ModStoryEventGlobal
     {
 
             public ModStoryEventCustom.UiModStoryEventCustomCtrl page_ModStoryEventCustom;
-            public ModStoryEventGlobal.UiModStoryEventGlobalCtrl page_ModStoryEventGlobal;
+            public ModStoryEventConfig.UiModStoryEventConfigCtrl page_ModStoryEventConfig;
             public Btn btn_customEvent;
             public Sta sta_customEvent;
             public Btn btn_globalEvent;
             public Sta sta_globalEvent;
-            public Btn btn_skillEvent;
-            public Sta sta_skillEvent;
         public UiModStoryEventView(UiHolder uiHolder):base(uiHolder)
         {
 
             page_ModStoryEventCustom = (ModStoryEventCustom.UiModStoryEventCustomCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
-            page_ModStoryEventGlobal = (ModStoryEventGlobal.UiModStoryEventGlobalCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            page_ModStoryEventConfig = (ModStoryEventConfig.UiModStoryEventConfigCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
             btn_customEvent = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             sta_customEvent = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             btn_globalEvent = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             sta_globalEvent = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_skillEvent = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_skillEvent = uiHolder.elementTrsLst[7].GetComponent<Sta>();
         }
 
     }
@@ -3829,8 +3829,8 @@ namespace ModStoryEventGlobal
 
             view.page_ModStoryEventCustom = new ModStoryEventCustom.UiModStoryEventCustomCtrl();
             view.page_ModStoryEventCustom.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.page_ModStoryEventGlobal = new ModStoryEventGlobal.UiModStoryEventGlobalCtrl();
-            view.page_ModStoryEventGlobal.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_ModStoryEventConfig = new ModStoryEventConfig.UiModStoryEventConfigCtrl();
+            view.page_ModStoryEventConfig.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

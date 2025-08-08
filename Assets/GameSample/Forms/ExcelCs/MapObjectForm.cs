@@ -69,6 +69,8 @@ namespace Form
                 
         public static Action<Data,string,string> changeLabelAction;
                 
+        public static Action<Data,bool,bool> changeIsfixedAction;
+                
         public static Action<Data,string,string> changeOntoucheventAction;
                 
         public static Action<Data,string,string> changeOnleaveeventAction;
@@ -94,6 +96,24 @@ namespace Form
                     }
         
                 _model = value;
+                }
+                 
+                     }
+                    
+                    private bool  _isFixed;
+                    /// <summary>
+                    ///¹Ì¶¨
+                    ///</summary>
+                    public bool  isFixed{
+                                get{return _isFixed;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeIsfixed(this,_isFixed,value); 
+                    }
+        
+                _isFixed = value;
                 }
                  
                      }
@@ -152,7 +172,7 @@ namespace Form
                  
                      }
                     
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(id,name,icon,label)
+            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool isFixed,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -160,6 +180,7 @@ namespace Form
              this.icon = icon;
              this.model = model;
              this.label = label;
+             this.isFixed = isFixed;
              this.onTouchEvent = onTouchEvent;
              this.onLeaveEvent = onLeaveEvent;
              this.onShowEvent = onShowEvent;
@@ -168,12 +189,12 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,onTouchEvent,onLeaveEvent,onShowEvent);
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,isFixed,onTouchEvent,onLeaveEvent,onShowEvent);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"","","","");
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",false,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -224,7 +245,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","",MapModelForm.defaultData,"","","","")},
+                {400001,new Data(400001,"wall","",MapModelForm.defaultData,"",false,"","","")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -298,6 +319,8 @@ namespace Form
 
                 jo.Get<string>("label"),
 
+                jo.Get<bool>("isFixed"),
+
                 jo.Get<string>("onTouchEvent"),
 
                 jo.Get<string>("onLeaveEvent"),
@@ -323,6 +346,8 @@ namespace Form
             jo.Set<MapModelForm.Data>("model",data.model);
 
             jo.Set<string>("label",data.label);
+
+            jo.Set<bool>("isFixed",data.isFixed);
 
             jo.Set<string>("onTouchEvent",data.onTouchEvent);
 
@@ -477,6 +502,16 @@ MapBaseForm.RemoveData(id);
                     DatasByLabel[newV].Add(data);
  
                 changeLabelAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsfixed(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsfixedAction?.Invoke(data,oldV,newV);
                 }
                     
             }

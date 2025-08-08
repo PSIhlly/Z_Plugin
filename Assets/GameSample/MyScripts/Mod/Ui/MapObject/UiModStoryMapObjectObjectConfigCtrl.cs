@@ -32,13 +32,18 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public override void OnCreate()
         {
 
-
+            view.btn_onShowEvent.onClick.AddListener(() =>
+            {
+                model.data.isFixed = !model.data.isFixed;
+                Refresh();
+            });
             view.btn_onTouchEvent.onClick.AddListener(() =>
             {
                 GameManager.instance.evtCtrl.GetEvents(EventType.Object, CmdTypeDataForm.defaultData, out var sub);
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onTouchEvent"), false, 2, (lst) =>
                 {
                     model.data.onTouchEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -48,6 +53,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onLeaveEvent"), false, 2, (lst) =>
                 {
                     model.data.onLeaveEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -57,10 +63,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onShowEvent"), false, 2, (lst) =>
                 {
                     model.data.onShowEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
-           
+
+
         }
         public override void OnShow()
         {
@@ -68,6 +76,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         }
         public void Refresh()
         {
+            view.sta_fixed.ChangeState(model.data.isFixed?1:0);
             view.txt_onTouchEvent.text = model.data.onTouchEvent;
             view.txt_onLeaveEvent.text = model.data.onLeaveEvent;
             view.txt_onShowEvent.text = model.data.onShowEvent;

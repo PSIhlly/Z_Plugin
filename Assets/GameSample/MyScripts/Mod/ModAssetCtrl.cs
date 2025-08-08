@@ -224,7 +224,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         }
 
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData, lab,"","",""));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData, lab,false,"","",""));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -400,7 +400,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     #region event
 
-    public void CreateEvent(string name = "", string label = "", string subLabel = "")
+    public void CreateEvent(string name = "", string category = "", string type = "")
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -411,7 +411,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     break;
             }
         }
-        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "",new List<string>(), label, subLabel));
+        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "",new List<string>(), category, type));
+    }
+    public void DeleteEvent(string name)
+    {
+        EventProgramDataForm.RemoveData(EventProgramDataForm.DataByName[name].uid);
     }
     public void ImportClipTex(Action<string> callback)
     {

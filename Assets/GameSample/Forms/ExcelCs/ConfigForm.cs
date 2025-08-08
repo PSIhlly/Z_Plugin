@@ -55,6 +55,10 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<int>,List<int>> changeDefaultbagAction;
                 
+        public static Action<Data,string,string> changeOnbegineventAction;
+                
+        public static Action<Data,string,string> changeOnendeventAction;
+                
 
 
         public partial class Data
@@ -150,7 +154,43 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultBag)
+                    private string  _onBeginEvent;
+                    /// <summary>
+                    ///开始事件
+                    ///</summary>
+                    public string  onBeginEvent{
+                                get{return _onBeginEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnbeginevent(this,_onBeginEvent,value); 
+                    }
+        
+                _onBeginEvent = value;
+                }
+                 
+                     }
+                    
+                    private string  _onEndEvent;
+                    /// <summary>
+                    ///结束事件
+                    ///</summary>
+                    public string  onEndEvent{
+                                get{return _onEndEvent;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeOnendevent(this,_onEndEvent,value); 
+                    }
+        
+                _onEndEvent = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultBag,string onBeginEvent,string onEndEvent)
             {
 
              this.uid = uid;
@@ -158,17 +198,19 @@ public static readonly int autoUidCnt=100;
              this.startpos = startpos;
              this.mainCharacterName = mainCharacterName;
              this.defaultBag = defaultBag;
+             this.onBeginEvent = onBeginEvent;
+             this.onEndEvent = onEndEvent;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultBag));
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultBag),onBeginEvent,onEndEvent);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null);
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,"","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -247,7 +289,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("mainCharacterName"),
 
-                jo.Get<List<int>>("defaultBag")
+                jo.Get<List<int>>("defaultBag"),
+
+                jo.Get<string>("onBeginEvent"),
+
+                jo.Get<string>("onEndEvent")
                     );
 
             return data;
@@ -268,6 +314,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("mainCharacterName",data.mainCharacterName);
 
             jo.Set<List<int>>("defaultBag",data.defaultBag);
+
+            jo.Set<string>("onBeginEvent",data.onBeginEvent);
+
+            jo.Set<string>("onEndEvent",data.onEndEvent);
 
             return jo;
         }
@@ -390,6 +440,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeDefaultbagAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnbeginevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnbegineventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeOnendevent(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeOnendeventAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -95,6 +95,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onTouchEvent"), false, 2, (lst) =>
                 {
                     model.data.onTouchEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -104,6 +105,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onLeaveEvent"), false, 2, (lst) =>
                 {
                     model.data.onLeaveEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -113,6 +115,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onShowEvent"), false, 2, (lst) =>
                 {
                     model.data.onShowEvent = lst[2];
+                    Refresh();
                     return true;
                 }, sub);
             });
@@ -120,12 +123,10 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public override void OnShow()
         {
-
             Refresh();
         }
         public void Refresh()
         {
-
             view.txt_hpArgument.text = model.data.hpParamName;
             view.txt_moveSpeedParameter.text = model.data.speedParamName;
             view.txt_idleAnim.text = model.data.idleAnimName;

@@ -49,6 +49,10 @@ public class GameManager : Z_MonoManager<GameManager>
     public Vector2 downPos;
     public float dragDis2 => InputManager.instance.screenSize.x / 25;
 
+    public StoryForm.Data curStory;
+    public SceneForm.Data curScene;
+    public ConfigForm.Data curConfig => ConfigForm.DataByUid[1];
+
     public override void Init()
     {
 
@@ -85,6 +89,7 @@ public class GameManager : Z_MonoManager<GameManager>
             }
         }
 
+        saveCtrl.LoadOverview();
 
         RegisterInputDefault();
     }

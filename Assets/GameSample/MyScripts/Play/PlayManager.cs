@@ -100,7 +100,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     public static PlayData GetInitPlayDataByConfig()
     {
-        var config = ConfigForm.DataByUid[1];
+        var config = GameManager.instance.curConfig;
         return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName,config.defaultBag));
     }
 

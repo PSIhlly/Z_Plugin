@@ -9,6 +9,7 @@ using Z_Ui;
 using Ui.Start;
 using Ui.EnterMain;
 using Z_Text;
+using Z_DataSystem.Form;
 
 namespace Ui.Mod
 {
@@ -34,18 +35,16 @@ namespace Ui.Mod
         {
             con.Clear();
             int i = 0;
-            for (; i < 8; i++)
+            foreach (var data in StoryForm.DataById.Values)
             {
                 con.Add(new UiStoryItemParam()
                 {
-                    name="mod1",
-                    id= i
+                    data= data
                 });
             }
             con.Add(new UiStoryItemParam()
             {
-                name = null,
-                id= i
+                data = null
             });
             con.Refresh();
         }
@@ -55,13 +54,11 @@ namespace Ui.Mod
     }
     public partial class UiStoryItemParam
     {
-        public string name;
-        public int id;
+        public StoryForm.Data data;
     }
     public partial class UiStoryItemModel
     {
-        public string name;
-        public int id;
+        public StoryForm.Data data;
     }
     public partial class UiStoryItemCtrl
     {
@@ -69,33 +66,30 @@ namespace Ui.Mod
         {
             view.btn_mod.onClick.AddListener(() =>
             {
-                if(model.name!=null)
+                if(model.data!=null)
                 {
-
-                    Main2StoryManager.instance.StartLoadStoryUgc(model.name);
+                    Main2StoryManager.instance.StartLoadStoryUgc(model.data.id);
                 }else
                 {
-                    Main2StoryManager.instance.StartLoadStoryUgc("newStory"+ model.id);
+                    Main2StoryManager.instance.StartLoadStoryUgc(StoryForm.idChain.PeekId());
                 }
                 parent.Close();
             });
         }
         public override void OnShow()
         {
-            model.name = param.name;
-            model.id = param.id;
-            if(model.name==null)
-            {
-                TextManager.instance.GetTxt("new");
-            }
-            else
-            {
-                view.txt_modName.text = model.name;
-            }
+            model.data = param.data;
+            
             Refresh();
         }
         public void Refresh()
         {
+            view.sta_.ChangeState(model.data != null ? 1 : 0);
+            if (model.data != null)
+            { 
+                view.txt_.text = model.data.name;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
+            }
         }
 
 

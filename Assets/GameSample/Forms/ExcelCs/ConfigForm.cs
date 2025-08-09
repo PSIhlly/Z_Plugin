@@ -59,6 +59,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeOnendeventAction;
                 
+        public static Action<Data,string,string> changeMinimapAction;
+                
 
 
         public partial class Data
@@ -190,7 +192,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultBag,string onBeginEvent,string onEndEvent)
+                    private string  _miniMap;
+                    /// <summary>
+                    ///Ð¡µØÍ¼
+                    ///</summary>
+                    public string  miniMap{
+                                get{return _miniMap;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMinimap(this,_miniMap,value); 
+                    }
+        
+                _miniMap = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap)
             {
 
              this.uid = uid;
@@ -200,17 +220,18 @@ public static readonly int autoUidCnt=100;
              this.defaultBag = defaultBag;
              this.onBeginEvent = onBeginEvent;
              this.onEndEvent = onEndEvent;
+             this.miniMap = miniMap;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultBag),onBeginEvent,onEndEvent);
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,"","");
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -293,7 +314,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("onBeginEvent"),
 
-                jo.Get<string>("onEndEvent")
+                jo.Get<string>("onEndEvent"),
+
+                jo.Get<string>("miniMap")
                     );
 
             return data;
@@ -318,6 +341,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("onBeginEvent",data.onBeginEvent);
 
             jo.Set<string>("onEndEvent",data.onEndEvent);
+
+            jo.Set<string>("miniMap",data.miniMap);
 
             return jo;
         }
@@ -460,6 +485,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeOnendeventAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMinimap(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMinimapAction?.Invoke(data,oldV,newV);
                 }
                     
             }

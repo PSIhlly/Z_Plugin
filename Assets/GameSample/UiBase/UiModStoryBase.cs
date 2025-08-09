@@ -3924,11 +3924,15 @@ namespace Axis
 
             public GameObject go_mapScene;
             public Btn btn_import;
+            public Img img_;
+            public Txt txt_;
         public UiMapSceneView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_mapScene = uiHolder.elementTrsLst[0].gameObject;
             btn_import = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            img_ = uiHolder.elementTrsLst[2].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
         }
 
     }
@@ -3973,8 +3977,6 @@ namespace Axis
             public GameObject go_mapScene;
             public UiMapSceneCtrl sub_MapScene;
             public Btn btn_import;
-            public Btn btn_setPos;
-            public Sta sta_setPos;
         public UiModStoryMapMapView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3984,8 +3986,6 @@ namespace Axis
             go_mapScene = uiHolder.elementTrsLst[3].gameObject;
             sub_MapScene = (UiMapSceneCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             btn_import = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            btn_setPos = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_setPos = uiHolder.elementTrsLst[7].GetComponent<Sta>();
         }
 
     }
@@ -4091,6 +4091,62 @@ namespace ModStoryMapSceneList
     {
         
     }
+
+
+
+    public partial class UiItemParam:UiParam
+    {
+    }
+
+    public partial class UiItemView:UiView
+    {
+
+            public GameObject go_item;
+            public Sta sta_item;
+            public Btn btn_new;
+            public Btn btn_;
+            public Txt txt_;
+            public Img img_;
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_item = uiHolder.elementTrsLst[0].gameObject;
+            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
+        }
+
+    }
+    public partial class UiItemCtrl:UiCtrl
+    {
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
+        public UiModStoryMapSceneListCtrl parent=>(UiModStoryMapSceneListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
+
+
+        }
+
+    }
+    public partial class UiItemModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryMapSceneListParam:UiParam
     {
     }
@@ -4104,10 +4160,7 @@ namespace ModStoryMapSceneList
             public UiLabCtrl sub_Lab;
             public GameObject go_item;
             public Sta sta_item;
-            public Btn btn_new;
-            public Btn btn_;
-            public Txt txt_;
-            public Img img_;
+            public UiItemCtrl sub_Item;
         public UiModStoryMapSceneListView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -4117,10 +4170,7 @@ namespace ModStoryMapSceneList
             sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             go_item = uiHolder.elementTrsLst[4].gameObject;
             sta_item = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            txt_ = uiHolder.elementTrsLst[8].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[9].GetComponent<Img>();
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -4147,6 +4197,8 @@ namespace ModStoryMapSceneList
 
             view.sub_Lab = new UiLabCtrl();
             view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_Item = new UiItemCtrl();
+            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

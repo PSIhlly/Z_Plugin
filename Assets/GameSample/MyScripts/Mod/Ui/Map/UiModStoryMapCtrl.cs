@@ -51,10 +51,9 @@ namespace Ui.ModStory.ModStoryMap
         }
         public void Refresh()
         {
-            view.page_ModStoryGlobalParameter.SetActive(model.selPage == 0);
-            view.page_ModStoryCharacterParameter.SetActive(model.selPage == 1);
-            view.page_ModStoryItemParameter.SetActive(model.selPage == 2);
-            view.page_ModStoryConfig.SetActive(model.selPage == 3);
+            view.page_ModStoryMapMap.SetActive(model.selPage == 0);
+            view.page_ModStoryMapScene.SetActive(model.selPage == 1);
+            view.page_ModStoryMapConfig.SetActive(model.selPage == 2);
         }
     }
 

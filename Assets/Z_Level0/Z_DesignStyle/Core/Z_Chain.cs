@@ -33,7 +33,12 @@ namespace Z_DesignStyle
             }
             private Dictionary<int, IdChainItem> id2ChainItem;
             private IdChainItem chainHead;
-            
+            public int PeekId()
+            {
+                if (chainHead == null)
+                    return -1;
+                return chainHead.v;
+            }
             public int GetId()
             {
                 if (chainHead == null)

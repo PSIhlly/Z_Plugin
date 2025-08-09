@@ -62,15 +62,16 @@ namespace Ui.PlaySceneMenu
         public void Save()
         {
             model.lastSaveTime = Time.time;
-            GameManager.instance.saveCtrl.SaveScene(ModManager.instance.GetSceneFileName());
+            GameManager.instance.saveCtrl.SaveSceneMap(ModManager.instance.GetSceneFileName());
         }
         public void Exit()
         {
+            int curId = GameManager.instance.curStory.id;
             Main2StoryManager.instance.UnloadScenePlay();
             Main2StoryManager.instance.UnloadStoryPlay(); 
             if(PlayManager.instance.boxPlay)
             {
-                Main2StoryManager.instance.StartLoadStoryUgc(ModManager.instance.GetFolderName());
+                Main2StoryManager.instance.StartLoadStoryUgc(curId);
             }else
             {
                 UiManager.instance.ShowUi<UiStartCtrl>();

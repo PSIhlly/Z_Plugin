@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem;
+using Z_DataSystem.Form;
 
 namespace Ui.ModStory.ModStoryOverview
 {
@@ -31,11 +32,11 @@ namespace Ui.ModStory.ModStoryOverview
             });
             view.ipt_name.onFinishInput += (s)=>
             {
-                StoryForm.DataById[1].name = s;
+                GameManager.instance.curStory.name = s;
             };
             view.ipt_introduction.onFinishInput+=(s)=>
             {
-                StoryForm.DataById[1].desc = s;
+                GameManager.instance.curStory.desc = s;
             };
 
         }
@@ -52,15 +53,15 @@ namespace Ui.ModStory.ModStoryOverview
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveOverview(ModManager.instance.GetStoryCoreFolder());
+            GameManager.instance.saveCtrl.SaveOverview(GameManager.instance.curStory.id);
             base.Close();
 
         }
         public void Refresh()
         {
-            view.img_image.sprite = StoryTexAssetForm.DataByName[StoryForm.DataById[1].icon].sprite;
-            view.ipt_introduction.Set(StoryForm.DataById[1].desc);
-            view.ipt_name.Set(StoryForm.DataById[1].name);
+            view.img_image.sprite = TexAssetForm.DataByName[GameManager.instance.curStory.icon].sprite;
+            view.ipt_introduction.Set(GameManager.instance.curStory.desc);
+            view.ipt_name.Set(GameManager.instance.curStory.name);
         }
     }
 

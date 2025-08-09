@@ -53,8 +53,6 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,string,string> changeIconAction;
                 
-        public static Action<Data,string,string> changeMapAction;
-                
 
 
         public partial class Data
@@ -132,43 +130,24 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-                    private string  _map;
-                    /// <summary>
-                    ///µØÍ¼
-                    ///</summary>
-                    public string  map{
-                                get{return _map;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeMap(this,_map,value); 
-                    }
-        
-                _map = value;
-                }
-                 
-                     }
-                    
-            public Data(int id,string name,string desc,string icon,string map)
+            public Data(int id,string name,string desc,string icon)
             {
 
              this.id = id;
              this.name = name;
              this.desc = desc;
              this.icon = icon;
-             this.map = map;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,desc,icon,map);
+        return new Data(sameId? id:idChain.GetId(),name,desc,icon);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","","");
+                   private static Data _defaultData=new Data(0,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -245,9 +224,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.Get<string>("desc"),
 
-                jo.Get<string>("icon"),
-
-                jo.Get<string>("map")
+                jo.Get<string>("icon")
                     );
 
             return data;
@@ -266,8 +243,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             jo.Set<string>("desc",data.desc);
 
             jo.Set<string>("icon",data.icon);
-
-            jo.Set<string>("map",data.map);
 
             return jo;
         }
@@ -380,16 +355,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 {
 
                 changeIconAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeMap(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeMapAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -65,15 +65,19 @@ public class ModManager : Z_MonoManager<ModManager>
     #endregion
     public string GetSceneFileName()
     {
-        return  _folderName + "/Core/"+ _sceneCtrl.fileName;
+        return GetStoryCoreFolder(_folderName) + _sceneCtrl.fileName;
     }
    
     public string GetStoryCoreFolder()
     {
-        return _folderName+"/Core/";
+        return GetStoryCoreFolder(_folderName);
     }
     public string GetFolderName()
     {
         return _folderName;
+    }
+    public static string GetStoryCoreFolder(string folderName)
+    {
+        return folderName + "/Core/";
     }
 }

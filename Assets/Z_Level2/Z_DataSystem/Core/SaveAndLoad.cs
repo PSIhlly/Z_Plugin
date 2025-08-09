@@ -7,10 +7,9 @@ namespace Z_UnitSystem
 {
 public static class SaveAndLoad
     {
-        static string perPath;
+        public static string perPath=> Application.persistentDataPath;
         static SaveAndLoad()
         {
-            perPath= Application.persistentDataPath;
         }
         public static void Save(string key, byte[] content)
         {

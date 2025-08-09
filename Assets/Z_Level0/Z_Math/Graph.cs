@@ -196,5 +196,16 @@ namespace Z_Math
             if (v.z > max.z) v.z = max.z;
             return v;
         }
+        /// <summary>
+        /// 左下后角 0 0 0
+        /// </summary>
+        /// <param name="relativePos"></param>
+        /// <param name="area"></param>
+        public static Vector2 GetRelativePos(Vector2 relativePos,RectTransform area)
+        {
+            Vector3[] cor = new Vector3[4];
+            area.GetWorldCorners(cor);
+            return new Vector2(cor[0].x + (cor[3].x - cor[0].x) * relativePos.x, cor[0].y + (cor[1].y - cor[0].y) * relativePos.y);
+        }
     }
 }

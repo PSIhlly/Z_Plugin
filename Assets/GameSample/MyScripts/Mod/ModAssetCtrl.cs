@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
 using UnityEngine;
 using Z_DataSystem;
@@ -12,6 +13,7 @@ using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
 using Z_String;
+using static UnityEngine.Rendering.DebugUI.MessageBox;
 namespace Form
 {
     public  static partial class StoryTexAssetForm
@@ -38,12 +40,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            StoryTexAssetForm.AddData(form);
-            StoryForm.DataById[1].icon = form.name;
-            Z_EventHelper.Invoke(new AssetEvent()
-            {
-                importAssetName = form.name
-            });
+            GameManager.instance.curStory.icon = form.name;
+            GameManager.instance.saveCtrl.AddTex(form);
         });
 
     }
@@ -129,12 +127,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            for (int i = 0; i < GlobalMaxSettings.TEXTURE_MAX; i++)
-            {
-                name = "new tex" + i;
-                if (!MapTextureForm.DataByName.ContainsKey(name))
-                    break;
-            }
+            name = StringHelper.GetUniqueName(MapTextureForm.DataByName.Keys);
         }
         MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" }, lab,"","",""));
     }
@@ -142,8 +135,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
          {
-             GameManager.instance.saveCtrl.AddStoryTex(form);
-
              if (id!=-1&&MapTextureForm.DataByName[name].texsName.Count > id)
              {
                  MapTextureForm.DataByName[name].texsName[id] = form.name;
@@ -152,6 +143,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
              {
                  MapTextureForm.DataByName[name].texsName.Add(form.name);
              }
+             GameManager.instance.saveCtrl.AddStoryTex(form);
+
          });
 
     }
@@ -172,12 +165,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            for (int i = 0; i < GlobalMaxSettings.TEXTURE_MASK_MAX; i++)
-            {
-                name = "new mask" + i;
-                if (!MapMaskForm.DataByName.ContainsKey(name))
-                    break;
-            }
+            name = StringHelper.GetUniqueName(MapMaskForm.DataByName.Keys);
         }
         MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }, lab));
     }
@@ -185,7 +173,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
 
 
             if (MapMaskForm.DataByName[name].texsName.Count > id)
@@ -196,6 +183,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 MapMaskForm.DataByName[name].texsName.Add(form.name);
             }
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
@@ -216,12 +204,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            for (int i = 0; i < GlobalMaxSettings.OBJECT_MAX; i++)
-            {
-                name = "new object" + i;
-                if (!MapObjectForm.DataByName.ContainsKey(name))
-                    break;
-            }
+            name = StringHelper.GetUniqueName(MapObjectForm.DataByName.Keys);
         }
 
         MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData, lab,false,"","",""));
@@ -248,7 +231,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
 
             if (MapObjectForm.DataByName[name].model.subUnitTexsName.Count > id)
             {
@@ -258,6 +240,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 MapObjectForm.DataByName[name].model.subUnitTexsName.Add(form.name);
             }
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
@@ -295,10 +278,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
-
             CharacterProductForm.DataByNameIsproto[(name, true)].avatarTexName = form.name;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
@@ -367,15 +348,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
-
             var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
             var anim = data.animDic[animNm];
             if (anim.animClip.Count > id)
             {
                 anim.animClip[id].partTex[part] = form.name;
             }
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
     }
     public void CreateCharacterAnim(string name, string animName=null)
@@ -404,12 +383,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            for (int i = 0; i < GlobalMaxSettings.CUSTOM_EVENT_MAX; i++)
-            {
-                name = "new event" + i;
-                if (!EventProgramDataForm.DataByName.ContainsKey((name)))
-                    break;
-            }
+            name = StringHelper.GetUniqueName(EventProgramDataForm.DataByName.Keys);
         }
         EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "",new List<string>(), category, type));
     }
@@ -421,10 +395,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         AssetManager.instance.SelectTex(callback:(form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
-
             callback?.Invoke(form.name);
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
@@ -457,10 +429,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
-
             ItemProductForm.DataByNameIsproto[(name, true)].iconTexName = form.name;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
@@ -511,12 +481,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportItemModelUnitTex(string name, int id)
     {
-
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
-
             var data = ItemProductForm.DataByNameIsproto[(name, true)];
             if (data.model.subUnitTexsName.Count > id)
             {
@@ -526,6 +492,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 data.model.subUnitTexsName.Add(form.name);
             }
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
         });
 
     }
@@ -534,11 +502,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
             var data = ItemProductForm.DataByNameIsproto[(name, true)];
-
             data.styleTex[style] = form.name;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
@@ -548,7 +514,45 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         ItemProductForm.DataByNameIsproto[(oldName, true)].name = newName;
     }
 
-   
-   
+
+
     #endregion
+
+    #region scene
+    public void ImportMapMiniMap()
+    {
+        AssetManager.instance.SelectTex(new Vector2Int(1000, 1000), (form) =>
+        {
+            GameManager.instance.curConfig.miniMap = form.name;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+        });
+
+    }
+
+    public void CreateScene(string name = "")
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(SceneForm.DataByName.Keys);
+        }
+        SceneForm.AddData(new SceneForm.Data(-1, name, "",(0.5f,0.5f)));
+    }
+
+    public void ImportSceneMiniMap(string name)
+    {
+        AssetManager.instance.SelectTex(new Vector2Int(1000, 1000), (form) =>
+        {
+            var data = SceneForm.DataByName[name].miniMap = form.name;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+
+        });
+
+    }
+    public void DeleteScene(string name)
+    {
+
+        SceneForm.RemoveData(SceneForm.DataByName[name].uid);
+    }
+    #endregion
+
 }

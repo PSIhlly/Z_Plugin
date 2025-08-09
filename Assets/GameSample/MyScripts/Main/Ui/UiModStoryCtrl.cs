@@ -1,4 +1,4 @@
-/*using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Form;
@@ -28,8 +28,9 @@ namespace Ui.ModStory
             });
             view.btn_play.onClick.AddListener(() =>
             {
+                int curId = GameManager.instance.curStory.id;
                 Main2StoryManager.instance.UnloadStoryUgc();
-                Main2StoryManager.instance.StartLoadStoryPlay(ModManager.instance.GetFolderName(), true);
+                Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
                 Close();
             });
 
@@ -48,7 +49,7 @@ namespace Ui.ModStory
             {
                 model.curUi = view.page_ModStoryCharacter;
                 Refresh();
-            }); 
+            });
             view.btn_item.onClick.AddListener(() =>
             {
                 model.curUi = view.page_ModStoryItem;
@@ -84,10 +85,10 @@ namespace Ui.ModStory
             view.page_ModStoryCharacter.SetActive(model.curUi == view.page_ModStoryCharacter);
             view.page_ModStoryItem.SetActive(model.curUi == view.page_ModStoryItem);
             view.page_ModStoryMapObject.SetActive(model.curUi == view.page_ModStoryMapObject);
+            view.page_ModStoryEvent.SetActive(model.curUi == view.page_ModStoryEvent);
             view.page_ModStoryMap.SetActive(model.curUi == view.page_ModStoryMap);
         }
 
     }
 
 }
-*/

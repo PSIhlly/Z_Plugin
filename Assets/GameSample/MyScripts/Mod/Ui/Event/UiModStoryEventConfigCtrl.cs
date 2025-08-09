@@ -33,7 +33,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
                 GameManager.instance.evtCtrl.GetEvents(EventType.Global, CmdTypeDataForm.defaultData, out var sub);
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onBeginEvent"), false, 2, (lst) =>
                 {
-                    ConfigForm.DataByUid[1].onBeginEvent = lst[2];
+                    GameManager.instance.curConfig.onBeginEvent = lst[2];
                     Refresh();
                     return true;
                 }, sub);
@@ -43,7 +43,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
                 GameManager.instance.evtCtrl.GetEvents(EventType.Global, CmdTypeDataForm.defaultData, out var sub);
                 NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onEndEvent"), false, 2, (lst) =>
                 {
-                    ConfigForm.DataByUid[1].onEndEvent = lst[2];
+                    GameManager.instance.curConfig.onEndEvent = lst[2];
                     Refresh();
                     return true;
                 }, sub);
@@ -56,8 +56,8 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
         }
         public void Refresh()
         {
-            view.txt_onBeginEvent.text = ConfigForm.DataByUid[1].onBeginEvent;
-            view.txt_onEndEvent.text = ConfigForm.DataByUid[1].onEndEvent;
+            view.txt_onBeginEvent.text = GameManager.instance.curConfig.onBeginEvent;
+            view.txt_onEndEvent.text = GameManager.instance.curConfig.onEndEvent;
         }
     }
 

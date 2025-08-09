@@ -42,7 +42,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
                     true, (id) =>
                     {
-                        ConfigForm.DataByUid[1].mainCharacterName = lst[id].Item1;
+                        GameManager.instance.curConfig.mainCharacterName = lst[id].Item1;
                         Refresh();
                         return true;
                     }, lst);
@@ -57,7 +57,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         public void Refresh()
         {
 
-            view.txt_mainCharacter.text = ConfigForm.DataByUid[1].mainCharacterName;
+            view.txt_mainCharacter.text = GameManager.instance.curConfig.mainCharacterName;
         }
     }
 

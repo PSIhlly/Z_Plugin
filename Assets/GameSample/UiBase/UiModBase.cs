@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-
 namespace Ui.Mod
 
 {
+
+
+
+
 
 
 
@@ -20,13 +23,17 @@ namespace Ui.Mod
 
             public GameObject go_storyItem;
             public Btn btn_mod;
-            public Txt txt_modName;
+            public Sta sta_;
+            public Img img_;
+            public Txt txt_;
         public UiStoryItemView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_storyItem = uiHolder.elementTrsLst[0].gameObject;
             btn_mod = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            txt_modName = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
     }

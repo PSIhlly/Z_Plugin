@@ -25,7 +25,7 @@ namespace Z_Map
     public static class GlobalHelper
     {
 
-        public static string GetInternalPrefabName(string name)
+        public static string GetInternalPrefabName(string name="")
         {
             return "z_map$" + name;
         }

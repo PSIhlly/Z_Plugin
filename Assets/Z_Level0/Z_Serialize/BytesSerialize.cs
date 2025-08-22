@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Z_ByteSerialize
 {
-    public class BytesSerialize : MonoBehaviour
+    public class BytesSerialize
     {
 
     public static byte[] SetInHeadBytes(object src,ref byte[] tar)

@@ -11,6 +11,8 @@ using Unity.VisualScripting;
 using Z_Text;
 using Z_Ui.Notify;
 using UnityEngine;
+using Z_DataSystem.Form;
+using Z_DataSystem;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitAppearance.ModStoryCharacterUnitAppearanceUnit
 {
@@ -28,7 +30,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public EquipPartType equipPart;
         public int id;
     }
-    public partial class UiModStoryCharacterUnitAppearanceUnitCtrl
+    public partial class UiModStoryCharacterUnitAppearanceUnitCtrl:IZ_Listener<AssetEvent>
     {
 
         UiScrViewContainer<UiItemCtrl> itemCon;
@@ -36,24 +38,24 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         UiScrViewContainer<UiEquipPartCtrl> equipPartCon;
         public override void OnCreate()
         {
-
+            Z_EventHelper.Register(this);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteCharacterAnim(parent.model.data.name, model.data.name);
                 parent.SelPage(0);
             });
-            view.ipt_name.onFinishInput+=(s)=>
+            view.ipt_name.onFinishInput += (s) =>
             {
                 if (StringHelper.IsUniqueName(parent.model.data.animDic.Keys, s))
                     ModManager.instance.assetCtrl.RenameCharacterAnim(parent.model.data.name, model.data.name, s);
                 Refresh();
             };
-            view.ipt_scale.onFinishInput+=(s)=>
+            view.ipt_scale.onFinishInput += (s) =>
             {
-                model.data.scale = StringHelper.ToFloat(s, 1,true);
+                model.data.scale = StringHelper.ToFloat(s, 1, true);
                 Refresh();
             };
-            view.ipt_interval.onFinishInput+=(s)=>
+            view.ipt_interval.onFinishInput += (s) =>
             {
                 model.data.animTimeInterval = StringHelper.ToFloat(s, 0.2f, true);
                 Refresh();
@@ -66,7 +68,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             view.btn_deleteTex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.name, model.data.name,model.id);
+                ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.name, model.data.name, model.id);
                 Refresh();
             });
             view.btn_resetTex.onClick.AddListener(() =>
@@ -79,18 +81,17 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 if (model.equipPart == EquipPartType.None)
                 {
                     ModManager.instance.assetCtrl.ImportCharacterAnim(parent.model.data.name, model.data.name, model.part, model.id);
-                    Refresh();
                 }
             });
             itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
-            
+
 
             partCon = new UiScrViewContainer<UiPartCtrl>(view.go_part, view.scr_parts);
             equipPartCon = new UiScrViewContainer<UiEquipPartCtrl>(view.go_equipPart, view.scr_equipParts);
             view.btn_plus.onClick.AddListener(() =>
             {
                 var o = model.data.animClip[model.id].equipTrs[model.equipPart];
-                model.data.animClip[model.id].equipTrs[model.equipPart] = (o.Item1+1, o.Item2, o.Item3,o.Item4);
+                model.data.animClip[model.id].equipTrs[model.equipPart] = (o.Item1 + 1, o.Item2, o.Item3, o.Item4);
                 Refresh();
             });
             view.btn_minus.onClick.AddListener(() =>
@@ -101,12 +102,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             view.btn_itemStyle.onClick.AddListener(() =>
             {
-                var lst=new List<(string, Sprite)>();
-                foreach(var e in Enum.GetValues(typeof(ItemStyle)))
+                var lst = new List<(string, Sprite)>();
+                foreach (var e in Enum.GetValues(typeof(ItemStyle)))
                 {
-                    lst.Add(((string)e,null));
+                    lst.Add(((string)e, null));
                 }
-                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
+                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose show equipped item style"),
                    true, (id) =>
                    {
 
@@ -115,20 +116,22 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                        return true;
                    }, lst);
             });
-            view.btn_enablePart.onClick.AddListener(() => {
+            view.btn_enablePart.onClick.AddListener(() =>
+            {
                 model.data.animClip[model.id].partEnable[model.part] = !model.data.animClip[model.id].partEnable[model.part];
                 Refresh();
-             });
+            });
         }
         public override void OnShow()
         {
+            model.data = param.data;
             DisplayCameraAreaManager.instance.Show();
             model.id = -1;
             model.part = BodyPartType.UpperPart;
             model.equipPart = EquipPartType.None;
             Refresh();
         }
-        public override void OnDisable()
+        public override void OnHide()
         {
             DisplayCameraAreaManager.instance.Hide();
         }
@@ -139,43 +142,53 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.ipt_interval.Set(model.data.animTimeInterval.ToString());
 
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
-            view.sta_equip.ChangeState(model.equipPart ==  EquipPartType.None ? 0 : 1);
+            view.sta_equip.ChangeState(model.equipPart == EquipPartType.None ? 0 : 1);
 
             equipPartCon.Clear();
             partCon.Clear();
 
             DisplayCameraAreaManager.instance.Clear();
+
+            view.sta_equip.ChangeState(model.id > -1 && model.equipPart != EquipPartType.None?1:0);
             if (model.id > -1)
             {
-                view.sta_enablePart.ChangeState(model.data.animClip[model.id].partEnable[model.part]?1:0);
+                view.sta_enablePart.ChangeState(model.data.animClip[model.id].partEnable[model.part] ? 1 : 0);
 
                 view.sta_equip.ChangeState(0);
 
-                foreach(EquipPartType equipPart in Enum.GetValues(typeof(EquipPartType)))
+                foreach (EquipPartType equipPart in Enum.GetValues(typeof(EquipPartType)))
                 {
-                    equipPartCon.Add(new UiEquipPartParam()
-                    {
-                        tp= equipPart
-                    });
+                    if (equipPart != EquipPartType.None)
+                        equipPartCon.Add(new UiEquipPartParam()
+                        {
+                            tp = equipPart
+                        });
                 }
 
                 foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
                 {
-                    partCon.Add(new UiPartParam()
-                    {
-                        tp= part
-                    });
+                    if (part != BodyPartType.None)
+                        partCon.Add(new UiPartParam()
+                        {
+                            tp = part
+                        });
                 }
 
-                if(model.equipPart != EquipPartType.None)
+                if (model.equipPart != EquipPartType.None)
                 {
                     view.txt_layer.text = model.data.animClip[model.id].equipTrs[model.equipPart].Item3.ToString();
+                    view.model_Axis.SetActive(true);
                     
                 }
 
 
                 RefreshView();
             }
+            else
+            {
+                view.model_Axis.SetActive(false);
+            }
+
             equipPartCon.Refresh();
             partCon.Refresh();
 
@@ -185,12 +198,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             {
                 itemCon.Add(new UiItemParam()
                 {
-                    id=i
+                    id = i
                 });
             }
             itemCon.Add(new UiItemParam()
             {
-                id=-1
+                id = -1
             });
             itemCon.Refresh();
 
@@ -201,14 +214,19 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             List<string> texNameLst = new List<string>() {
                 model.data.animClip[model.id].partTex[BodyPartType.UpperPart],
                 model.data.animClip[model.id].partTex[BodyPartType.LowerPart],
-                ""
+                GlobalNameHelper.GetDefaultTexName()
                 };
             var showGo = GameManager.instance.utilCtrl.CombineNewCharacterByPrefabs("fakeChara", texNameLst, false);
             showGo.SetActive(true);
             DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
         }
+
+        public void OnEvent(AssetEvent evt)
+        {
+            Refresh();
+        }
     }
-    
+
 
     public partial class UiItemParam
     {
@@ -232,23 +250,24 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.btn_.onClick.AddListener(() =>
             {
                 parent.model.id = model.id;
+                parent.Refresh();
             });
 
         }
         public override void OnShow()
         {
-            model.id=param.id;
+            model.id = param.id;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.id == -1 ? 0 : 1);
-            if(model.id!=-1)
+            view.sta_exist.ChangeState(model.id == -1 ? 0 : 1);
+            if (model.id != -1)
             {
                 view.txt_.text = "";
-                view.img_.sprite = StoryTexAssetForm.DataByName[parent.model.data.animClip[model.id].partTex[BodyPartType.UpperPart]].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.animClip[model.id].partTex[BodyPartType.UpperPart]].sprite;
             }
-           
+
         }
     }
 
@@ -277,12 +296,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public override void OnShow()
         {
-
+            model.tp = param.tp;
             Refresh();
         }
         public void Refresh()
         {
-            view.txt_.text=model.tp.ToString();
+            view.txt_.text = model.tp.ToString();
             view.sta_.ChangeState(model.tp != parent.model.part ? 0 : 1);
 
         }
@@ -311,7 +330,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 {
                     parent.model.equipPart = model.tp;
                 }
-                
+
                 parent.Refresh();
             });
         }
@@ -323,7 +342,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public void Refresh()
         {
             view.txt_.text = model.tp.ToString();
-            view.sta_.ChangeState(model.tp!=parent.model.equipPart?0:1);
+            view.sta_.ChangeState(model.tp != parent.model.equipPart ? 0 : 1);
         }
     }
 

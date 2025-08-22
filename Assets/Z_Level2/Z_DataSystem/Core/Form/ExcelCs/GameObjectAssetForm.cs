@@ -253,12 +253,12 @@ AssetForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

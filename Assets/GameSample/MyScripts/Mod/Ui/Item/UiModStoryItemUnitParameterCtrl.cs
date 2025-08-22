@@ -21,39 +21,40 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
     }
     public partial class UiModStoryItemUnitParameterCtrl
     {
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiArgIptCtrl> argIptCon;
         public override void OnCreate()
         {
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            argIptCon = new UiScrViewContainer<UiArgIptCtrl>(view.go_argIpt, view.scr_argIpts);
         }
         public override void OnShow()
         {
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
 
-            itemCon.Clear();
+            argIptCon.Clear();
             foreach (var data in model.data.paramDic.Values)
             {
-                itemCon.Add(new UiItemParam()
+                argIptCon.Add(new UiArgIptParam()
                 {
                     data = data
                 });
             }
-            itemCon.Refresh();
+            argIptCon.Refresh();
         }
     }
 
-    public partial class UiItemParam
+    public partial class UiArgIptParam
     {
         public ItemParamForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiArgIptModel
     {
         public ItemParamForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiArgIptCtrl
     {
 
         public override void OnCreate()

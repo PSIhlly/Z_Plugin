@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_String;
+using Z_DataSystem.Form;
+using UnityEngine;
+using Z_DataSystem;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitOverview
 {
@@ -20,12 +23,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public CharacterProductForm.Data data;
 
     }
-    public partial class UiModStoryCharacterUnitOverviewCtrl
+    public partial class UiModStoryCharacterUnitOverviewCtrl:IZ_Listener<AssetEvent>
     {
 
         public override void OnCreate()
         {
-
+            Z_EventHelper.Register(this);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteCharacter(model.data.name);
@@ -51,6 +54,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
 
         }
+
         public override void OnShow()
         {
             if (param != null)
@@ -61,8 +65,13 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
-            view.img_image.sprite = StoryTexAssetForm.DataByName[model.data.avatarTexName].sprite;
+            view.img_image.sprite = TexAssetForm.DataByName[model.data.avatarTexName].sprite;
         }
+        public void OnEvent(AssetEvent evt)
+        {
+            Refresh();
+        }
+
     }
 
 }

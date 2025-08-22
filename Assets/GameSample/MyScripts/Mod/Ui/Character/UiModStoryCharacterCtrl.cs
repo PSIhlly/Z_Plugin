@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryCharacter
 {
@@ -36,6 +37,10 @@ namespace Ui.ModStory.ModStoryCharacter
             if (param != null)
                 model.selPage = param.selPage;
             Refresh();
+        }
+        public override void OnHide()
+        {
+            GameManager.instance.saveCtrl.SaveCharacter(ModManager.instance.GetStoryCoreFolder());
         }
         public void SelPage(int id, CharacterProductForm.Data data=null)
         {

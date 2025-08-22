@@ -27,7 +27,6 @@ class FormInfo:
         self.add_str = f""""""
         self.default_content_str = f""""""
         self.remove_str = f""""""
-        self.clear_str = f""""""
         self.content_str = f""""""
         self.extend_data_str = ''
         self.change_op_str = ''
@@ -125,8 +124,12 @@ namespace {self.file_namespace}
         public static void Clear()
         {{
             Init();
-{self.clear_str}
-            {self.id_str}Chain.Clear();
+            var keys = new List<int>(DataBy{self.id_str.capitalize()}.Keys);
+            foreach(var key in keys)
+            {{
+                    RemoveData(key);
+            }}
+
         }}
         
         public static void ClearAuto()

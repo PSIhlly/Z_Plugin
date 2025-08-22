@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
+using Z_DataSystem.Form;
+using Z_DataSystem;
+using Z_Map.Form;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
 {
@@ -18,16 +22,22 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
     {
         public SceneForm.Data data;
     }
-    public partial class UiModStoryMapSceneListCtrl
+    public partial class UiModStoryMapSceneListCtrl:IZ_Listener<AssetEvent>
     {
 
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiBigItemCtrl> itemCon;
         public override void OnCreate()
         {
-
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            Z_EventHelper.Register(this);
+            itemCon = new UiScrViewContainer<UiBigItemCtrl>(view.go_bigItem, view.scr_bigItems);
 
         }
+
+        public void OnEvent(AssetEvent evt)
+        {
+            Refresh();
+        }
+
         public override void OnShow()
         {
 
@@ -40,12 +50,12 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
             itemCon.Clear();
             foreach (var data in SceneForm.DataByName.Values)
             {
-                itemCon.Add(new UiItemParam()
+                itemCon.Add(new UiBigItemParam()
                 {
                     data= data
                 });
             }
-            itemCon.Add(new UiItemParam()
+            itemCon.Add(new UiBigItemParam()
             {
                 data=null
             });
@@ -56,15 +66,15 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
         }
     }
 
-    public partial class UiItemParam
+    public partial class UiBigItemParam
     {
         public SceneForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiBigItemModel
     {
         public SceneForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiBigItemCtrl
     {
 
         public override void OnCreate()
@@ -73,6 +83,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
             view.btn_new.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.CreateScene();
+                parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
             {
@@ -82,16 +93,17 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
         }
         public override void OnShow()
         {
-
+            Debug.Log(TileUnitForm.GetJaByDatas());
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.data == null ? 0 : 1);
+            view.sta_exist.ChangeState(model.data == null ? 0 : 1);
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = StoryTexAssetForm.DataByName[model.data.miniMap].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.miniMap].sprite;
             }
         }
     }

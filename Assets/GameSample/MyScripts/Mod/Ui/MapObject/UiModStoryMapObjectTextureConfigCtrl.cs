@@ -64,6 +64,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         }
         public override void OnShow()
         {
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()

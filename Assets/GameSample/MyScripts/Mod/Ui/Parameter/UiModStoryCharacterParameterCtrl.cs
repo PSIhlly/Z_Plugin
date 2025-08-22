@@ -21,11 +21,11 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
     public partial class UiModStoryCharacterParameterCtrl
     {
 
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiArgCtrl> argCon;
         public override void OnCreate()
         {
 
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            argCon = new UiScrViewContainer<UiArgCtrl>(view.go_arg, view.scr_args);
 
         }
         public override void OnShow()
@@ -33,35 +33,37 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
 
             Refresh();
         }
+
+
         public void Refresh()
         {
 
-            itemCon.Clear();
+            argCon.Clear();
             foreach (var data in CharacterParamForm.DataByName.Values)
             {
-                itemCon.Add(new UiItemParam()
+                argCon.Add(new UiArgParam()
                 {
                     data = data
                 });
             }
-            itemCon.Add(new UiItemParam()
+            argCon.Add(new UiArgParam()
             {
                 data = null
             });
-            itemCon.Refresh();
+            argCon.Refresh();
         }
     }
 
 
-    public partial class UiItemParam
+    public partial class UiArgParam
     {
         public CharacterParamForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiArgModel
     {
         public CharacterParamForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiArgCtrl
     {
 
         public override void OnCreate()
@@ -94,12 +96,13 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
         }
         public override void OnShow()
         {
-
+            model.data=param.data;
             Refresh();
         }
+
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.data == null ? 0 : 1);
+            view.sta_exist.ChangeState(model.data == null ? 0 : 1);
 
             if (model.data != null)
             {

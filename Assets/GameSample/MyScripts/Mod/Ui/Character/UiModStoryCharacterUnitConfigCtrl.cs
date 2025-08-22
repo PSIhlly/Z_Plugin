@@ -54,7 +54,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose Speed param"),
                     true, (id) =>
                     {
-                        model.data.hpParamName = lst[id].Item1;
+                        model.data.speedParamName = lst[id].Item1;
                         Refresh();
                         return true;
                     }, lst);
@@ -69,7 +69,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose Idle anim"),
                     true, (id) =>
                     {
-                        model.data.hpParamName = lst[id].Item1;
+                        model.data.idleAnimName = lst[id].Item1;
                         Refresh();
                         return true;
                     }, lst);
@@ -84,7 +84,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose Move anim"),
                     true, (id) =>
                     {
-                        model.data.hpParamName = lst[id].Item1;
+                        model.data.moveAnimName = lst[id].Item1;
                         Refresh();
                         return true;
                     }, lst);
@@ -123,6 +123,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public override void OnShow()
         {
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()

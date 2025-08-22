@@ -1,4 +1,3 @@
-using Form;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using UnityEngine;
-using Z_Text;
 using Z_Ui.Notify;
 using Z_Time;
 using Z_Input;
@@ -106,10 +104,10 @@ namespace Ui.Axis
                 return false;
             });
         }
-        public override void OnDisable()
+        public override void OnHide()
         {
             TimeManager.instance.CancelTimer(model.timer);
-            base.OnDisable();
+            base.OnHide();
         }
     }
 

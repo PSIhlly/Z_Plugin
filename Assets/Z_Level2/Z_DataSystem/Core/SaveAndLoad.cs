@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Z_UnitSystem
 {
-public static class SaveAndLoad
+    public static class SaveAndLoad
     {
-        public static string perPath=> Application.persistentDataPath;
+        public static string perPath = Application.persistentDataPath;
         static SaveAndLoad()
         {
         }
@@ -17,7 +17,7 @@ public static class SaveAndLoad
             Build(path);
             File.WriteAllBytes(path, content);
         }
-        public static void Save(string key,string content)
+        public static void Save(string key, string content)
         {
             var path = GetRealPath(key);
             Build(path);
@@ -48,15 +48,15 @@ public static class SaveAndLoad
         public static T Load<T>(string key)
         {
             var path = GetRealPath(key);
-            if(Exist(path))
+            if (Exist(path))
             {
-            if (typeof(T) == typeof(byte[]))
-            {
-                return (T)(object)File.ReadAllBytes(path);
-            }
-            else
-            {
-                return (T)(object)File.ReadAllText(path);
+                if (typeof(T) == typeof(byte[]))
+                {
+                    return (T)(object)File.ReadAllBytes(path);
+                }
+                else
+                {
+                    return (T)(object)File.ReadAllText(path);
                 }
 
             }

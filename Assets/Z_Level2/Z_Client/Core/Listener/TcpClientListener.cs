@@ -29,8 +29,12 @@ namespace Z_Client
                 int received = 0;
                 while (true)
                 {
-                    Debug.Log("wating");
                     int bytesRead = stream.Read(rawMsg, 0, rawMsg.Length);
+
+                    if (bytesRead == 0)
+                    {
+                        break;
+                    }
                     int p = 0;
                     while (true)
                     {
@@ -38,10 +42,10 @@ namespace Z_Client
                         int remain = length - received;
                         if (remain > 0)
                         {
-                            if (rawMsg.Length - p < remain)
+                            if (bytesRead - p < remain)
                             {
-                                Buffer.BlockCopy(rawMsg, 0, realMsg, received, rawMsg.Length);
-                                received += rawMsg.Length - p;
+                                Buffer.BlockCopy(rawMsg, p, realMsg, received, bytesRead - p);
+                                received += bytesRead - p;
                                 break;
                             }
                             else
@@ -58,7 +62,6 @@ namespace Z_Client
                         }
 
                         int realDataRemain = bytesRead - p;
-                        Debug.Log(realDataRemain);
                         if (realDataRemain == 0)
                             break;
                         //length
@@ -78,6 +81,7 @@ namespace Z_Client
                         }
 
                         length = BitConverter.ToInt32(lengthBytes.ToArray());
+                        lengthBytes.Clear();
                         realMsg = new byte[length];
                     }
 

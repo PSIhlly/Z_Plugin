@@ -39,18 +39,22 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit
             view.btn_overview.onClick.AddListener(() =>
             {
                 model.selPage = 0;
+                Refresh();
             });
             view.btn_parameter.onClick.AddListener(() =>
             {
                 model.selPage = 1;
+                Refresh();
             });
             view.btn_appearance.onClick.AddListener(() =>
             {
                 model.selPage = 2;
+                Refresh();
             });
             view.btn_config.onClick.AddListener(() =>
             {
                 model.selPage = 3;
+                Refresh();
             });
 
         }
@@ -71,18 +75,26 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit
             {
                 data=model.data
             });
+            view.sta_overview.ChangeState(model.selPage == 0?1:0);
+
             view.page_ModStoryCharacterUnitParameter.SetActive(model.selPage == 1, new UiModStoryCharacterUnitParameterParam()
             {
-                //data = model.data
+                data = model.data
             });
+            view.sta_parameter.ChangeState(model.selPage == 1 ? 1 : 0);
+
             view.page_ModStoryCharacterUnitAppearance.SetActive(model.selPage == 2, new UiModStoryCharacterUnitAppearanceParam()
             {
                 data = model.data
             });
+            view.sta_appearance.ChangeState(model.selPage == 2 ? 1 : 0);
+
             view.page_ModStoryCharacterUnitConfig.SetActive(model.selPage == 3, new UiModStoryCharacterUnitConfigParam() 
             {
                 data = model.data 
             });
+            view.sta_config.ChangeState(model.selPage == 3 ? 1 : 0);
+
         }
     }
 

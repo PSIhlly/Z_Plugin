@@ -26,7 +26,18 @@ namespace Ui.ModStory.ModStoryEvent
 
         public override void OnCreate()
         {
+            view.btn_customEvent.onClick.AddListener(() =>
+            {
+                model.selPage = 0;
+                Refresh();
 
+            });
+            view.btn_globalEvent.onClick.AddListener(() =>
+            {
+                model.selPage = 1;
+                Refresh();
+
+            });
 
         }
         public override void OnShow()
@@ -36,6 +47,10 @@ namespace Ui.ModStory.ModStoryEvent
                 model.selPage = param.selPage;
             Refresh();
         }
+        public override void OnHide()
+        {
+            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder());
+        }
         public void SelPage(int id)
         {
             model.selPage = id;
@@ -44,7 +59,10 @@ namespace Ui.ModStory.ModStoryEvent
         public void Refresh()
         {
             view.page_ModStoryEventCustom.SetActive(model.selPage == 0);
+            view.sta_customEvent.ChangeState(model.selPage == 0 ? 1 : 0);
             view.page_ModStoryEventConfig.SetActive(model.selPage == 1);
+            view.sta_globalEvent.ChangeState(model.selPage == 1 ? 1 : 0);
+
         }
     }
 

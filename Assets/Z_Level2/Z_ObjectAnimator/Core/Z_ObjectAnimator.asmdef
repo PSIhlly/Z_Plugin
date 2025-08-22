@@ -2,7 +2,8 @@
     "name": "Z_ObjectAnimator",
     "rootNamespace": "",
     "references": [
-        "GUID:cd2d21075ab370e4db10316c4adf7b4e"
+        "GUID:cd2d21075ab370e4db10316c4adf7b4e",
+        "GUID:2d1239519ce422640a889b8b1e189d61"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

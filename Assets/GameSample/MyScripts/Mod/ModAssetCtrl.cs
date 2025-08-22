@@ -129,7 +129,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(MapTextureForm.DataByName.Keys);
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, "", 1, new List<string>() { "" }, lab,"","",""));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), 1, new List<string>() { GlobalNameHelper.GetDefaultTexName() }, lab,"","",""));
     }
     public void ImportTex(string name, int id=-1)
     {
@@ -167,7 +167,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(MapMaskForm.DataByName.Keys);
         }
-        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, "", new List<string>() { "", "", "", "", "", "" }, lab));
+        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), new List<string>() { GlobalNameHelper.GetDefaultTexName(), GlobalNameHelper.GetDefaultTexName(), GlobalNameHelper.GetDefaultTexName(), GlobalNameHelper.GetDefaultTexName(), GlobalNameHelper.GetDefaultTexName(), GlobalNameHelper.GetDefaultTexName() }, lab));
     }
     public void ImportMask(string name, int id)
     {
@@ -207,7 +207,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             name = StringHelper.GetUniqueName(MapObjectForm.DataByName.Keys);
         }
 
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, "", MapModelForm.defaultData, lab,false,"","",""));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab,false,"","",""));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -289,11 +289,16 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     private CharacterAnimClipForm.Data CreateCharacterAnimClip()
     {
+        var trs = new Dictionary<EquipPartType, (float, float, int, float)>();
+        foreach(EquipPartType tp in Enum.GetValues(typeof(EquipPartType)))
+      {
+            trs[tp] = (0.5f, 0.5f, 1, 0.5f);
+        }
        return new CharacterAnimClipForm.Data(0,
-            new Dictionary<EquipPartType,ItemStyle>(), 
-            new Dictionary<EquipPartType, (float, float,int,float)>(),
-            new Dictionary<BodyPartType, bool>() { { BodyPartType.UpperPart,true },{ BodyPartType.LowerPart, false } },
-            new Dictionary<BodyPartType, string>() { { BodyPartType.UpperPart, "" }, { BodyPartType.LowerPart, "" } });
+            new Dictionary<EquipPartType,ItemStyle>(),
+            trs,
+            new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart,true },{ BodyPartType.LowerPart, false } },
+            new Dictionary<BodyPartType, string>() { { BodyPartType.None, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.UpperPart, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.LowerPart, GlobalNameHelper.GetDefaultTexName() } });
     }
 
 
@@ -309,7 +314,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", "", paramDic, true, animDic, "", "", "", "","","",""));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), paramDic, true, animDic, "", "", "", "","","",""));
     }
     public void DeleteCharacter(string name)
     {
@@ -385,6 +390,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(EventProgramDataForm.DataByName.Keys);
         }
+        if (category == null)
+            category = "";
+        if (type == null)
+            type = "";
+
         EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "",new List<string>(), category, type));
     }
     public void DeleteEvent(string name)
@@ -448,14 +458,14 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             dic[prm.name] = prm.Copy();
         }
-        var model = MapModelForm.defaultData;
+        var model = MapModelForm.defaultData.Copy();
         model.isObstacle = false;
         var styleTex = new Dictionary<ItemStyle, string>();
         foreach (ItemStyle style in Enum.GetValues(typeof(ItemStyle)))
         { 
-            styleTex[style] = ""; 
+            styleTex[style] = GlobalNameHelper.GetDefaultTexName(); 
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", "", dic, true, model,"",1,1,default, styleTex, 0,false,"", "", "","","",""));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, true, model,"",1,1,default, styleTex, 0,false,"", "", "","","",""));
     }
     public void DeleteItem(string name)
     {
@@ -535,7 +545,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(SceneForm.DataByName.Keys);
         }
-        SceneForm.AddData(new SceneForm.Data(-1, name, "",(0.5f,0.5f)));
+        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), (0.5f,0.5f)));
     }
 
     public void ImportSceneMiniMap(string name)

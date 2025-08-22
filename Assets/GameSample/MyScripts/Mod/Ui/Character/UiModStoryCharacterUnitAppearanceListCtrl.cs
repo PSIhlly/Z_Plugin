@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
+using Z_DataSystem.Form;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitAppearance.ModStoryCharacterUnitAppearanceList
 {
@@ -21,16 +23,16 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     public partial class UiModStoryCharacterUnitAppearanceListCtrl
     {
 
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiBigItemCtrl> itemCon;
         public override void OnCreate()
         {
 
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            itemCon = new UiScrViewContainer<UiBigItemCtrl>(view.go_bigItem, view.scr_bigItems);
 
         }
         public override void OnShow()
         {
-
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
@@ -39,24 +41,28 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             itemCon.Clear();
             foreach (var data in model.data.animDic.Values)
             {
-                itemCon.Add(new UiItemParam()
+                itemCon.Add(new UiBigItemParam()
                 {
                     data= data
                 });
             }
+            itemCon.Add(new UiBigItemParam()
+            {
+                data = null
+            });
             itemCon.Refresh();
         }
     }
 
-    public partial class UiItemParam
+    public partial class UiBigItemParam
     {
         public CharacterAnimForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiBigItemModel
     {
         public CharacterAnimForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiBigItemCtrl
     {
 
         public override void OnCreate()
@@ -75,15 +81,22 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public override void OnShow()
         {
-
+            model.data=param.data;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.data == null ? 0 : 1);
+            view.sta_exist.ChangeState(model.data == null ? 0 : 1);
             if (model.data != null) {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = StoryTexAssetForm.DataByName[model.data.animClip.Count>0? model.data.animClip[0].partTex[0] : ""].sprite;
+                if(model.data.animClip.Count > 0&& model.data.animClip[0].partTex.ContainsKey(BodyPartType.UpperPart))
+                {
+                    view.img_.sprite = TexAssetForm.DataByName[model.data.animClip[0].partTex[BodyPartType.UpperPart]].sprite;
+                }
+                else
+                {
+                    view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetDefaultTexName()].sprite;
+                }
             }
         }
     }

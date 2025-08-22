@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-
 namespace Ui.Axis
 
 {
+
+
 
 
     public partial class UiAxisParam:UiParam

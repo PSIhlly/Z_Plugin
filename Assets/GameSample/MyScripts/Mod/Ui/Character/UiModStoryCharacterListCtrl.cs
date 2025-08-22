@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
+using Z_DataSystem.Form;
+using Z_Text;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 {
@@ -23,12 +26,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
     {
 
         UiScrViewContainer<UiLabCtrl> labCon;
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiBigItemCtrl> itemCon;
         public override void OnCreate()
         {
 
             labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            itemCon = new UiScrViewContainer<UiBigItemCtrl>(view.go_bigItem, view.scr_bigItems);
 
         }
         public override void OnShow()
@@ -46,22 +49,26 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             });
             foreach (var lab in CharacterProductForm.DatasByLabel.Keys)
             {
-                labCon.Add(new UiLabParam()
+                if(lab!="")
                 {
-                    lab=lab
-                });
+                    labCon.Add(new UiLabParam()
+                    {
+                        lab = lab
+                    });
+                }
             }
             labCon.Refresh();
+
             itemCon.Clear();
             var datas = model.lab == null || !CharacterProductForm.DatasByLabelIsproto.ContainsKey((model.lab, true)) ? CharacterProductForm.DatasByIsproto[true] : CharacterProductForm.DatasByLabelIsproto[(model.lab, true)];
             foreach (var data in datas)
             {
-                itemCon.Add(new UiItemParam()
+                itemCon.Add(new UiBigItemParam()
                 {
                     data= data
                 });
             }
-            itemCon.Add(new UiItemParam()
+            itemCon.Add(new UiBigItemParam()
             {
                 data=null
             });
@@ -89,19 +96,21 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             view.btn_.onClick.AddListener(() =>
             {
                 parent.model.lab = model.lab;
+                parent.Refresh();
             });
 
         }
         public override void OnShow()
         {
-
+            model.lab = param.lab;
             Refresh();
         }
         public void Refresh()
         {
 
-            view.sta_isEmpty.ChangeState(model.lab==null?0:1);
-            if(model.lab != null)
+            view.sta_valid.ChangeState(model.lab==null?0:1);
+            view.sta_.ChangeState(parent.model.lab == model.lab ? 1 : 0);
+            if (model.lab != null)
             {
                 view.txt_.text = model.lab;
             }
@@ -109,15 +118,15 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
     }
 
 
-    public partial class UiItemParam
+    public partial class UiBigItemParam
     {
         public CharacterProductForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiBigItemModel
     {
         public CharacterProductForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiBigItemCtrl
     {
 
         public override void OnCreate()
@@ -126,6 +135,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             view.btn_new.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.CreateCharacter();
+                parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
             {
@@ -135,16 +145,16 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
         }
         public override void OnShow()
         {
-
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.data == null ? 0 : 1);
+            view.sta_exist.ChangeState(model.data == null ? 0 : 1);
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = StoryTexAssetForm.DataByName[model.data.avatarTexName].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.avatarTexName].sprite;
             }
         }
     }

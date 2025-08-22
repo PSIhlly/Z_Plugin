@@ -390,12 +390,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-                    DataByName.Clear();
-    
-            uidChain.Clear();
         }
         
         public static void ClearAuto()

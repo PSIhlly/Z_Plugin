@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_String;
+using Z_DataSystem.Form;
+using Z_DataSystem;
 
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
 {
@@ -20,12 +22,12 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
         public ItemProductForm.Data data;
 
     }
-    public partial class UiModStoryItemUnitOverviewCtrl
+    public partial class UiModStoryItemUnitOverviewCtrl:IZ_Listener<AssetEvent>
     {
 
         public override void OnCreate()
         {
-
+            Z_EventHelper.Register(this);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteItem(model.data.name);
@@ -51,6 +53,12 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             });
 
         }
+
+        public void OnEvent(AssetEvent evt)
+        {
+            Refresh();
+        }
+
         public override void OnShow()
         {
             if (param != null)
@@ -61,7 +69,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
         {
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
-            view.img_image.sprite = StoryTexAssetForm.DataByName[model.data.iconTexName].sprite;
+            view.img_image.sprite = TexAssetForm.DataByName[model.data.iconTexName].sprite;
         }
     }
 

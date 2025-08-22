@@ -8,6 +8,7 @@ using Z_Ui.Base;
 using Z_Ui;
 using Z_DataSystem;
 using Ui.Mod;
+using Ui.Loading;
 
 namespace Ui.ModStory
 {
@@ -22,16 +23,17 @@ namespace Ui.ModStory
         {
             view.btn_back.onClick.AddListener(() =>
             {
+                Close();
                 Main2StoryManager.instance.UnloadStoryUgc();
                 UiManager.instance.ShowUi<UiModCtrl>();
-                Close();
             });
             view.btn_play.onClick.AddListener(() =>
             {
+                Close();
                 int curId = GameManager.instance.curStory.id;
                 Main2StoryManager.instance.UnloadStoryUgc();
                 Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
-                Close();
+
             });
 
 
@@ -81,12 +83,26 @@ namespace Ui.ModStory
         public void Refresh()
         {
             view.page_ModStoryOverview.SetActive(model.curUi == view.page_ModStoryOverview);
+            view.sta_overview.ChangeState(model.curUi == view.page_ModStoryOverview ? 1 : 0);
+
             view.page_ModStoryParameter.SetActive(model.curUi == view.page_ModStoryParameter);
+            view.sta_parameter.ChangeState(model.curUi == view.page_ModStoryParameter ? 1 : 0);
+
             view.page_ModStoryCharacter.SetActive(model.curUi == view.page_ModStoryCharacter);
+            view.sta_character.ChangeState(model.curUi == view.page_ModStoryCharacter ? 1 : 0);
+
             view.page_ModStoryItem.SetActive(model.curUi == view.page_ModStoryItem);
+            view.sta_item.ChangeState(model.curUi == view.page_ModStoryItem ? 1 : 0);
+
             view.page_ModStoryMapObject.SetActive(model.curUi == view.page_ModStoryMapObject);
+            view.sta_mapObject.ChangeState(model.curUi == view.page_ModStoryMapObject ? 1 : 0);
+
             view.page_ModStoryEvent.SetActive(model.curUi == view.page_ModStoryEvent);
+            view.sta_event.ChangeState(model.curUi == view.page_ModStoryEvent ? 1 : 0);
+
             view.page_ModStoryMap.SetActive(model.curUi == view.page_ModStoryMap);
+            view.sta_map.ChangeState(model.curUi == view.page_ModStoryMap ? 1 : 0);
+
         }
 
     }

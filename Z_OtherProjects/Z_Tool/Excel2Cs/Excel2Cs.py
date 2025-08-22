@@ -306,9 +306,7 @@ def add_remove_handle():
         formInfo.remove_str+=f'''
                     DataBy{formInfo.id_str.capitalize()}.Remove(data.{formInfo.id_str});
     '''
-        formInfo.clear_str+=f'''
-                    DataBy{formInfo.id_str.capitalize()}.Clear();
-    '''
+
            
 
 def dic_index_handle():
@@ -341,9 +339,7 @@ def dic_index_handle():
             formInfo.remove_str+=f'''
                     DataBy{name}.Remove({prm});
     '''                   
-            formInfo.clear_str+=f'''
-                    DataBy{name}.Clear();
-    '''
+
             for data in formInfo.data_list:
                     if data[formInfo.id_str]=='0':
                         continue
@@ -375,9 +371,7 @@ def dic_index_handle():
                     if(DatasBy{name}[{prm}].Count==0)
                         DatasBy{name}.Remove({prm});
     '''
-            formInfo.clear_str+=f'''
-                    DatasBy{name}.Clear();
-    '''
+
                 #登记list
             exist_list = []
             for data in formInfo.data_list:

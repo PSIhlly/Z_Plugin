@@ -9,6 +9,8 @@ using Z_Texture;
 using Ui.ModStory.ModStoryOverview;
 using Z_String;
 using System.Drawing;
+using Z_DataSystem.Form;
+using Z_DataSystem;
 
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObjectTextureAppearance
 {
@@ -24,12 +26,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
         public int id;
     }
-    public partial class UiModStoryMapObjectTextureAppearanceCtrl
+    public partial class UiModStoryMapObjectTextureAppearanceCtrl:IZ_Listener<AssetEvent>
     {
         UiScrViewContainer<UiItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item,view.scr_items);
+            Z_EventHelper.Register(this);
+            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTex(model.data.name);
@@ -37,24 +40,34 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             view.ipt_label.onFinishInput += (s) =>
             {
                 model.data.label = s;
+                Refresh();
             };
             view.ipt_name.onFinishInput += (s) =>
             {
                 model.data.name = s;
+                Refresh();
             };
             view.ipt_interval.onFinishInput += (s) =>
             {
                 model.data.animTimeInterval = StringHelper.ToFloat(s, 0, true);
+                Refresh();
             };
             view.btn_deleteTex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteTexId(model.data.name,model.id);
+                ModManager.instance.assetCtrl.DeleteTexId(model.data.name, model.id);
+                Refresh();
             });
             view.btn_image.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportTex(model.data.name, model.id);
             });
         }
+
+        public void OnEvent(AssetEvent evt)
+        {
+            Refresh();
+        }
+
         public override void OnShow()
         {
             model.id = -1;
@@ -67,14 +80,14 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         }
         public void Refresh()
         {
-            view.sta_show.ChangeState(model.id >= 0?1:0);
+            view.sta_show.ChangeState(model.id >= 0 ? 1 : 0);
 
             con.Clear();
-            for(int i=0;i<model.data.texsName.Count;i++)
+            for (int i = 0; i < model.data.texsName.Count; i++)
             {
                 con.Add(new UiItemParam()
                 {
-                   id=i
+                    id = i
                 });
             }
             con.Add(new UiItemParam()
@@ -85,8 +98,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
             if (model.id >= 0)
             {
-                view.img_image.sprite = StoryTexAssetForm.DataByName[model.data.texsName[model.id]].sprite;
+                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].sprite;
             }
+            view.ipt_name.Set(model.data.name);
+            view.ipt_label.Set(model.data.label);
+            view.ipt_interval.Set(model.data.animTimeInterval.ToString("0.##"));
         }
     }
 
@@ -106,7 +122,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
             view.btn_new.onClick.AddListener(() =>
             {
-                parent.model.data.texsName.Add("");
+                parent.model.data.texsName.Add(GlobalNameHelper.GetDefaultTexName());
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
@@ -123,8 +139,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.id != -1&&model.id==parent.model.id ?1 : 0);
-            view.img_.sprite = StoryTexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
+            view.sta_exist.ChangeState(model.id != -1 && model.id == parent.model.id ? 1 : 0);
+            if (model.id != -1)
+            {
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
+            }
         }
     }
 

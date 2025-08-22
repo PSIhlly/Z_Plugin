@@ -192,30 +192,18 @@ namespace Form
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"","",null,"","")},
-
                 };
                     _DataByName = new Dictionary<string, Data>() {
-    
-                        {"",_DataByUid[1]},
     
                     };
     
                     _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
     
-                            {("",""),new List<Data>()},
-        
                 };
-
-                    _DatasByCategoryType[("","")].Add(_DataByUid[1]);
 
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
-                            {"",new List<Data>()},
-        
                 };
-
-                    _DatasByCategory[""].Add(_DataByUid[1]);
 
 
             childInitAction?.Invoke();
@@ -359,16 +347,12 @@ ProgramDataForm.RemoveData(uid);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-                    DataByName.Clear();
-    
-                    DatasByCategoryType.Clear();
-    
-                    DatasByCategory.Clear();
-    
-            uidChain.Clear();
         }
         
         public static void ClearAuto()

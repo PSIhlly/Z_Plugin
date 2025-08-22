@@ -145,7 +145,7 @@ namespace Z_DataSystem
                     var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
-                    var nm = tex.imageContentsHash.GetHashCode().ToString();
+                    var nm = tex.GetHashCode().ToString();
                     var form=instance.LoadTex(tex, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
@@ -201,6 +201,7 @@ namespace Z_DataSystem
         public TexAssetForm.Data LoadTexBytes(byte[] data, string name)
         {
             var tex = TextureHelper.GetTextureByByte(data);
+            
             return new TexAssetForm.Data(-1, name, tex);
         }
         public TexAssetForm.Data LoadTexPath(string path, string name)

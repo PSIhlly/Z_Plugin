@@ -23,6 +23,7 @@ namespace Z_Ui.Base
         public RectTransform viewPort;
         public Func<int, GameObject> ContainerAdd;
         public Action<GameObject> ContainerDel;
+        public float spacing; 
 
         private int cnt;
         private bool inited;
@@ -37,7 +38,7 @@ namespace Z_Ui.Base
         {
             get
             {
-                int v = (int)((height) / cell.rect.height);
+                int v = (int)((height) / (cell.rect.height+ (dir == Direction.Vertical ? spacing : 0)));
                 if (v == 0)
                     return 1;
                 return v;
@@ -47,7 +48,7 @@ namespace Z_Ui.Base
         {
             get
             {
-                int v = (int)((width) / cell.rect.width);
+                int v = (int)((width) / (cell.rect.width+ (dir== Direction.Horizon? spacing:0)));
                 if (v == 0)
                     return 1;
                 return v;
@@ -200,7 +201,6 @@ namespace Z_Ui.Base
                     int column = id / rowCnt;
                     int row = id % rowCnt;
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
-
                     
                     Add(id, contentCorners[1] + relaPos);
                 }

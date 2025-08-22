@@ -161,7 +161,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {300001,new Data(300001,"alpha","",new List<string>(){"z_map_a$alpha$0","z_map_a$alpha$1","z_map_a$alpha$2","z_map_a$alpha$3","z_map_a$alpha$4","z_map_a$alpha$5",},"")},
+                {300001,new Data(300001,"alpha","z_map_a$alpha$0",new List<string>(){"z_map_a$alpha$0","z_map_a$alpha$1","z_map_a$alpha$2","z_map_a$alpha$3","z_map_a$alpha$4","z_map_a$alpha$5",},"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -308,14 +308,12 @@ MapBaseForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-                    DatasByLabel.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

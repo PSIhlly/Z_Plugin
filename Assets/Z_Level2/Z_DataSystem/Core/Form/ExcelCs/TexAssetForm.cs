@@ -144,22 +144,14 @@ namespace Z_DataSystem.Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"",Texture2D.blackTexture)},
-
                 };
                     _DataByName = new Dictionary<string, Data>() {
-    
-                        {"",_DataById[100001]},
     
                     };
     
                     _DatasByTex = new Dictionary<Texture, List<Data>>() {
     
-                            {Texture2D.blackTexture,new List<Data>()},
-        
                 };
-
-                    _DatasByTex[Texture2D.blackTexture].Add(_DataById[100001]);
 
 
             childInitAction?.Invoke();
@@ -281,14 +273,12 @@ AssetForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-                    DatasByTex.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

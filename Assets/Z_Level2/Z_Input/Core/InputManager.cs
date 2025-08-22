@@ -5,6 +5,7 @@ using System.Drawing;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Z_DesignStyle;
+using Z_Debug;
 namespace Z_Input
 {
 
@@ -175,7 +176,11 @@ namespace Z_Input
                 if (Input.GetMouseButtonDown(i))
                 {
                     mousePos[i] = Input.mousePosition;
-                    cur?.onMouseDown?.Invoke(i, Input.mousePosition,UICheck(mousePos[i]));
+                    var ui = UICheck(mousePos[i]);
+#if UNITY_EDITOR
+                    Z_Log.Log(ui);
+#endif
+                    cur?.onMouseDown?.Invoke(i, Input.mousePosition, ui);
                     tmpHash.Add(i);
 
                 }

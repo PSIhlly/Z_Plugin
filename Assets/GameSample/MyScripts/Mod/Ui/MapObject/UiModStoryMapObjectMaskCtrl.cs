@@ -10,6 +10,7 @@ using Ui.ModStory.ModStoryOverview;
 using Z_String;
 using System.Drawing;
 using UnityEngine;
+using Z_DataSystem.Form;
 
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
 {
@@ -50,6 +51,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
             {
                 ModManager.instance.assetCtrl.ImportMask(model.data.name, model.id);
             });
+            view.btn_back.onClick.AddListener(() =>
+            {
+                parent.SelData(null);
+            });
         }
         public override void OnShow()
         {
@@ -77,7 +82,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
 
             if (model.id >= 0)
             {
-                view.img_image.sprite = StoryTexAssetForm.DataByName[model.data.texsName[model.id]].sprite;
+                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].sprite;
                 for(int i = 0;i< conditions.Length;i++)
                 {
                     conditions[i].SetActive(i == model.id);
@@ -120,8 +125,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.id != -1 && model.id == parent.model.id ? 1 : 0);
-            view.img_.sprite = StoryTexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
+            view.sta_exist.ChangeState(model.id != -1 ? 1 : 0);
+            if(model.id >= 0)
+            {
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
+            }
 
         }
     }

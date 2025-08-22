@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Unity.VisualScripting;
+using Z_DataSystem.Form;
 
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
 {
@@ -18,7 +19,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
     }
     public partial class UiModStoryMapObjectListModel
     {
-        public Dictionary<string,List<MapBaseForm.Data>> datas;
+        public Dictionary<string, List<MapBaseForm.Data>> datas;
         public Action<string> createAct;
         public string lab;
     }
@@ -26,13 +27,16 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
     {
 
         UiScrViewContainer<UiLabCtrl> labCon;
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiBigItemCtrl> itemCon;
         public override void OnCreate()
         {
-            model.datas=new Dictionary<string, List<MapBaseForm.Data>>();
+            model.datas = new Dictionary<string, List<MapBaseForm.Data>>();
             labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
-
+            itemCon = new UiScrViewContainer<UiBigItemCtrl>(view.go_bigItem, view.scr_bigItems);
+            view.btn_back.onClick.AddListener(() =>
+            {
+                parent.SelType(0);
+            });
         }
         public override void OnShow()
         {
@@ -56,6 +60,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                     }
                     model.createAct = (lab) =>
                     {
+                        if (lab == null)
+                        {
+                            lab = "";
+                        }
                         ModManager.instance.assetCtrl.CreateTex(lab);
                     };
                     break;
@@ -70,6 +78,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                     }
                     model.createAct = (lab) =>
                     {
+                        if (lab == null)
+                        {
+                            lab = "";
+                        }
                         ModManager.instance.assetCtrl.CreateMask(lab);
                     };
                     break;
@@ -84,6 +96,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                     }
                     model.createAct = (lab) =>
                     {
+                        if (lab == null)
+                        {
+                            lab = "";
+                        }
                         ModManager.instance.assetCtrl.CreateObject(lab);
                     };
                     break;
@@ -100,29 +116,40 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             });
             foreach (var lab in model.datas.Keys)
             {
-                labCon.Add(new UiLabParam()
-                {
-                    lab = lab
-                });
+                if (lab != "")
+                    labCon.Add(new UiLabParam()
+                    {
+                        lab = lab
+                    });
             }
             labCon.Refresh();
             itemCon.Clear();
-            
-            if(model.lab!=null)
+
+            List<MapBaseForm.Data> datas = null;
+            if (model.lab == null)
             {
-                foreach (var data in model.datas[model.lab])
+                datas=new List<MapBaseForm.Data>();
+                foreach(var v in model.datas.Values)
                 {
-                    itemCon.Add(new UiItemParam()
-                    {
-                        data = data
-                    });
+                    datas.AddRange(v);
                 }
-                itemCon.Add(new UiItemParam()
+            }
+            else
+            {
+                datas= model.datas[model.lab];
+            }
+
+            foreach (var data in datas)
+            {
+                itemCon.Add(new UiBigItemParam()
                 {
-                    data = null
+                    data = data
                 });
             }
-            
+            itemCon.Add(new UiBigItemParam()
+            {
+                data = null
+            });
             itemCon.Refresh();
 
 
@@ -147,18 +174,20 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             view.btn_.onClick.AddListener(() =>
             {
                 parent.model.lab = model.lab;
+                parent.Refresh();
             });
 
         }
         public override void OnShow()
         {
-
+            model.lab = param.lab;
             Refresh();
         }
         public void Refresh()
         {
 
-            view.sta_isEmpty.ChangeState(model.lab == null ? 0 : 1);
+            view.sta_valid.ChangeState(model.lab == null ? 0 : 1);
+            view.sta_.ChangeState(model.lab == parent.model.lab ? 1 : 0);
             if (model.lab != null)
             {
                 view.txt_.text = model.lab;
@@ -167,15 +196,15 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
     }
 
 
-    public partial class UiItemParam
+    public partial class UiBigItemParam
     {
         public MapBaseForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiBigItemModel
     {
         public MapBaseForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiBigItemCtrl
     {
 
         public override void OnCreate()
@@ -195,16 +224,16 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         }
         public override void OnShow()
         {
-
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.data == null ? 0 : 1);
+            view.sta_exist.ChangeState(model.data == null ? 0 : 1);
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = StoryTexAssetForm.DataByName[model.data.icon].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
             }
         }
     }

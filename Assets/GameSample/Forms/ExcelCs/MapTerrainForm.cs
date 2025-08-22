@@ -175,13 +175,13 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"plain","map","",0f,"")},
+                {100001,new Data(100001,"plain","map","z_map_a$alpha$0",0f,"")},
 
-                {100002,new Data(100002,"3slope","map3Slope","",3f,"")},
+                {100002,new Data(100002,"3slope","map3Slope","z_map_a$alpha$0",3f,"")},
 
-                {100003,new Data(100003,"4slope","map4Slope","",4f,"")},
+                {100003,new Data(100003,"4slope","map4Slope","z_map_a$alpha$0",4f,"")},
 
-                {100004,new Data(100004,"5slope","map5Slope","",5f,"")},
+                {100004,new Data(100004,"5slope","map5Slope","z_map_a$alpha$0",5f,"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -342,14 +342,12 @@ MapBaseForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-                    DatasByLabel.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

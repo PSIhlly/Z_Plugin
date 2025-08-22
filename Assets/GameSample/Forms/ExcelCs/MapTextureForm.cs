@@ -245,11 +245,11 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","",0f,new List<string>(){"z_map_b$floor$0",},"","","","")},
+                {200001,new Data(200001,"floor","z_map_b$floor$0",0f,new List<string>(){"z_map_b$floor$0",},"","","","")},
 
-                {200002,new Data(200002,"grass","",0f,new List<string>(){"z_map_b$grass$0",},"","","","")},
+                {200002,new Data(200002,"grass","z_map_b$grass$0",0f,new List<string>(){"z_map_b$grass$0",},"","","","")},
 
-                {200003,new Data(200003,"road","",0f,new List<string>(){"z_map_b$road$0",},"","","","")},
+                {200003,new Data(200003,"road","z_map_b$road$0",0f,new List<string>(){"z_map_b$road$0",},"","","","")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -420,14 +420,12 @@ MapBaseForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-                    DatasByLabel.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

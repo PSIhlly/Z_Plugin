@@ -313,7 +313,7 @@ namespace Z_Map.Form
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
-                if(uid==-1)
+                if (uid==-1)
                     return -1;
                 data.uid=uid;  
             }
@@ -346,12 +346,12 @@ UnitForm.RemoveData(uid);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-                    DataByMappos.Clear();
-    
-            uidChain.Clear();
         }
         
         public static void ClearAuto()

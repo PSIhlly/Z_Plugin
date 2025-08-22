@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 namespace Z_Texture
 {
@@ -115,7 +118,47 @@ namespace Z_Texture
             File.Move(oldPath, newPath);
         }
 
+        #region tool
+        /// <summary>
+        /// 计算Texture2D的SHA1哈希值（基于像素数据+纹理信息）
+        /// </summary>
+        public static string GetSHA1Hash(this Texture2D texture)
+        {
+            if (texture == null)
+                return string.Empty;
+
+            // 创建一个内存流，包含纹理的关键信息（尺寸、格式、像素）
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            using (System.IO.BinaryWriter writer = new System.IO.BinaryWriter(ms))
+            {
+                // 写入纹理基本信息（影响哈希值的关键参数）
+                writer.Write(texture.width);
+                writer.Write(texture.height);
+                writer.Write(texture.format.ToString());
+                writer.Write(texture.mipmapCount);
+
+                // 写入像素数据
+                byte[] pixelData = ToByteArray(texture.GetPixels32());
+                byte[] byteData = new byte[pixelData.Length * 4];
+                System.Buffer.BlockCopy(pixelData, 0, byteData, 0, byteData.Length);
+                writer.Write(byteData);
+
+                // 计算SHA1哈希
+                using (SHA1 sha1 = SHA1.Create())
+                {
+                    byte[] hashBytes = sha1.ComputeHash(ms.ToArray());
+                    return ByteArrayToHexString(hashBytes);
+                }
+            }
+        }
+
+
+        #endregion
+
+
+
         #region util
+
         private static Texture InternalGetTextureByPath(string path)
         {
             // 尝试获取文件的字节数组
@@ -144,7 +187,33 @@ namespace Z_Texture
             return Texture2D.whiteTexture;
         }
 
+        private static byte[] ToByteArray(Color32[] colors)
+        {
+            if (colors == null || colors.Length == 0)
+                return Array.Empty<byte>();
 
+            // 每个Color32包含4个字节（r, g, b, a）
+            int byteCount = colors.Length * 4;
+            byte[] bytes = new byte[byteCount];
+
+            // 直接复制内存块（高效转换）
+            Buffer.BlockCopy(colors, 0, bytes, 0, byteCount);
+
+            return bytes;
+        }
+        private static string ByteArrayToHexString(byte[] bytes)
+        {
+            if (bytes == null || bytes.Length == 0)
+                return string.Empty;
+
+            StringBuilder sb = new StringBuilder(bytes.Length * 2);
+            foreach (byte b in bytes)
+            {
+                // 将每个字节转换为两位十六进制字符（小写）
+                sb.AppendFormat("{0:x2}", b);
+            }
+            return sb.ToString();
+        }
 
         #endregion
     }

@@ -26,7 +26,13 @@ namespace Z_Map
 
         public void Init()
         {
+            TileUnitForm.Init();
+            TileUnitForm.uidChain.Debug();
+
             TileUnitForm.Clear();
+
+            TileUnitForm.uidChain.Debug();
+
             ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
             var unitSize = new Vector3(1, 2, 1);
@@ -64,11 +70,13 @@ namespace Z_Map
             mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
             var mapDatas = GetTileDatasByJa(mainData.mapJa);
 
+
             for (int i = 0; i < mapDatas.Count; i++)
             {
                 RegisterNewTile(mapDatas[i]);
                 RegisterMap(mapDatas[i]);
             }
+
             var itemDatas = GetItemDatasByJa(mainData.itemJa);
             for (int i = 0; i < itemDatas.Count; i++)
             {
@@ -162,6 +170,7 @@ namespace Z_Map
             mainData.mapJa = JsonConvert.SerializeObject(TileUnitForm.GetJaByDatas());
             mainData.objectJa = JsonConvert.SerializeObject(ObjectUnitForm.GetJaByDatas());
             mainData.characterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
+            mainData.itemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
             return MapMainForm.GetJoByData(mainData);
         }
 

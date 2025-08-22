@@ -67,11 +67,16 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                     return true;
                 }, sub);
             });
-
+            view.btn_fixed.onClick.AddListener(() =>
+            {
+                model.data.isFixed = !model.data.isFixed;
+                Refresh();
+            });
 
         }
         public override void OnShow()
         {
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()

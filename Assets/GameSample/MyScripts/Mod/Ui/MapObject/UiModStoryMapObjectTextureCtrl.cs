@@ -56,6 +56,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture
             }
             Refresh();
         }
+        public override void OnHide()
+        {
+            GameManager.instance.saveCtrl.SaveMaterial(ModManager.instance.GetStoryCoreFolder());
+        }
         public void Refresh()
         {
 

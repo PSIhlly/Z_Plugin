@@ -116,6 +116,20 @@ namespace Z_DesignStyle
 
                 chainHead = id2ChainItem[1];
             }
+            public void Debug(int limit=200)
+            {
+                var cur = chainHead;
+                int cnt = 0;
+                string res = "";
+                while(cur!=null&& cnt<limit)
+                {
+                    cnt++;
+                    cur= cur.nxt;
+
+                    res += cnt+"  :"+cur.v+" "+ (id2ChainItem[cur.v] ==cur)+" \n";
+                }
+                UnityEngine.Debug.Log(res);
+            }
 
         }
       

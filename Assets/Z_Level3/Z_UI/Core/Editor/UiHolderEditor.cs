@@ -94,6 +94,11 @@ namespace Z_Ui_Editor
                     refreshCode += $@"
             view.img_{o.name.Split("_")[1]}.sprite=TextureHelper.transparentSprite;";
                 }
+                else if (o.name.Split("_")[0].Split("|").Contains("rimg"))
+                {
+                    refreshCode += $@"
+            view.rimg_{o.name.Split("_")[1]}.sprite=TextureHelper.transparentSprite;";
+                }
                 else if (o.name.Split("_")[0].Split("|").Contains("txt"))
                 {
                     refreshCode += $@"
@@ -178,7 +183,7 @@ using Z_Texture;
             {
                 GUIUtility.systemCopyBuffer = GetQuickCode();
             }
-            if (uiHolder.uiType == UiType.Panel && uiHolder.GetComponentsInParent<UiHolder>(true).Length == 1)
+            if (uiHolder.uiType != UiType.Sub && uiHolder.GetComponentsInParent<UiHolder>(true).Length == 1)
             {
                 var newPath = EditorGUILayout.TextField("Path: ", uiHolder.path);
                 if(newPath!= uiHolder.path)
@@ -338,7 +343,12 @@ using Z_Texture;
                             initContent += $@"
             img_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Img>();";
                             break;
-
+                        case "rimg":
+                            declareContent += $@"
+            public RImg rimg_{realName};";
+                            initContent += $@"
+            rimg_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<RImg>();";
+                            break;
                         case "scr":
                             declareContent += $@"
             public ScrView scr_{realName};";
@@ -381,7 +391,9 @@ using Z_Texture;
 
         string GetCode(string parentClass = "")
         {
+            Undo.RecordObject(uiHolder, "modify test value");
             RefreshPanelElementContent();
+            EditorUtility.SetDirty(uiHolder);
 
             var res = "";
             if (string.IsNullOrEmpty(parentClass))

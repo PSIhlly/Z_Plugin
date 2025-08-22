@@ -14,6 +14,7 @@ using Z_UnitSystem;
 using Z_Ui.Notify;
 using Z_String;
 using Z_Math;
+using Z_DataSystem;
 
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 {
@@ -27,12 +28,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
         public ItemProductForm.Data data;
         public int id;
     }
-    public partial class UiModStoryItemUnitAppearanceCtrl
+    public partial class UiModStoryItemUnitAppearanceCtrl : IZ_Listener<AssetEvent>
     {
         UiScrViewContainer<UiStyleCtrl> styleCon;
         UiScrViewContainer<UiItemCtrl> itemCon;
         public override void OnCreate()
         {
+            Z_EventHelper.Register(this);
             styleCon = new UiScrViewContainer<UiStyleCtrl>(view.go_style, view.scr_styles);
             itemCon = new UiScrViewContainer<UiItemCtrl> ( view.go_item,view.scr_items);
             view.btn_reset.onClick.AddListener(() =>
@@ -53,6 +55,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("chooseModel"), false, (res) =>
                 {
                     model.data.model.subPrefabUnitName[model.id] = lst[res].Item1;
+                    Refresh();
                     return true;
                 }, lst);
             });
@@ -85,11 +88,16 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
                 model.data = param.data;
             }
             model.id = -1;
+            DisplayCameraAreaManager.instance.Show();
             Refresh();
+        }
+        public override void OnHide()
+        {
+            DisplayCameraAreaManager.instance.Hide();
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveItem(ModManager.instance.GetStoryCoreFolder());
+           
             base.Close();
         }
 
@@ -106,12 +114,14 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             styleCon.Refresh();
             
             view.sta_show.ChangeState(model.id == -1?0:1);
-            if(model.id != -1)
+            DisplayCameraAreaManager.instance.Clear();
+            view.model_Axis.SetActive(model.id != -1);
+            if (model.id != -1)
             {
-                view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("#0.0"));
-                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("#0.0"));
-                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("#0.0"));
-                
+                view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
+                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
+                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("0.##"));
+                RefreshView();
             }
             itemCon.Clear();
             for(int i=0; i<model.data.model.subPrefabUnitName.Count;i++)
@@ -127,6 +137,18 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             });
             itemCon.Refresh();
             
+        }
+
+        private void RefreshView()
+        {
+            var showGo = GameManager.instance.utilCtrl.CombineNewObjectByPrefabs("fakeObj", model.data.model, false);
+            showGo.SetActive(true);
+            DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
+        }
+
+        public void OnEvent(AssetEvent evt)
+        {
+            Refresh();
         }
     }
     public partial class UiStyleParam
@@ -160,7 +182,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
         public void Refresh()
         {
             view.txt_.text = TextManager.instance.GetTxt(model.style.ToString());
-            view.img_.sprite = StoryTexAssetForm.DataByName[parent.model.data.styleTex[model.style]].sprite;
+            view.img_.sprite = TexAssetForm.DataByName[parent.model.data.styleTex[model.style]].sprite;
         }
     }
 
@@ -193,11 +215,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.id>=0?1:0);
+            view.sta_exist.ChangeState(model.id>=0?1:0);
             if (model.id>=0)
             {
                 view.txt_.text = TextManager.instance.GetTxt(parent.model.data.model.subPrefabUnitName[model.id].ToString());
-                view.sta_exist.ChangeState(model.id == parent.model.id ? 1 : 0);
+                view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
             }
         }
     }

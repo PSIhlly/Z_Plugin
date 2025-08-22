@@ -36,10 +36,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
             view.btn_appearance.onClick.AddListener(() =>
             {
                 model.selPage = 0;
+                Refresh();
             });
             view.btn_config.onClick.AddListener(() =>
             {
                 model.selPage = 1;
+                Refresh();
             });
             
 
@@ -60,10 +62,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
             {
                 data = model.data
             });
+            view.sta_appearance.ChangeState(model.selPage == 0 ? 1 : 0);
             view.page_ModStoryMapObjectObjectConfig.SetActive(model.selPage == 1, new UiModStoryMapObjectObjectConfigParam()
             {
                 data = model.data
             });
+            view.sta_config.ChangeState(model.selPage == 1 ? 1 : 0);
+
         }
     }
 

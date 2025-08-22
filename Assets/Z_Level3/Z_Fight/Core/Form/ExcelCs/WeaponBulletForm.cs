@@ -529,10 +529,12 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

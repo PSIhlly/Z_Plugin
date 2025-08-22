@@ -40,12 +40,13 @@ namespace Z_Ui.Base
         public bool binded => ctrl != null;
         private bool oriInited;
         private bool firstEnter=true;
+        private bool quiting=false;
         public void OriInit()
         {
             if (oriInited)
                 return; 
             var uiCtrlName = "Ui" + uiName + "Ctrl";
-            if (uiType != UiType.Sub && UiManager.instance.uiCtrlName2OriUi.ContainsKey(uiCtrlName) && UiManager.instance.uiCtrlName2OriUi[uiCtrlName] != this)
+            if (uiType == UiType.Panel && UiManager.instance.uiCtrlName2OriUi.ContainsKey(uiCtrlName) && UiManager.instance.uiCtrlName2OriUi[uiCtrlName] != this)
                 Debug.LogError(uiName + " has exist!");
 
             UiManager.instance.uiCtrlName2OriUi[uiCtrlName] = this;
@@ -106,10 +107,17 @@ namespace Z_Ui.Base
         {
             if (binded)
             {
+                if(!quiting)
+                {
+                    ctrl.OnHide();
+                }
                 ctrl.OnDisable();
             }
         }
-        
+        protected void OnApplicationQuit()
+        {
+            quiting= true;
+        }
     }
 
 }

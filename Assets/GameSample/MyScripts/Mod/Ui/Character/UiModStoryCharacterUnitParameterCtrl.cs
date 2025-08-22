@@ -1,4 +1,4 @@
-/*using Form;
+using Form;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,63 +21,65 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
     public partial class UiModStoryCharacterUnitParameterCtrl
     {
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiArgIptCtrl> argIptCon;
         public override void OnCreate()
         {
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            argIptCon = new UiScrViewContainer<UiArgIptCtrl>(view.go_argIpt, view.scr_argIpts);
         }
         public override void OnShow()
         {
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
 
-            itemCon.Clear();
+            argIptCon.Clear();
             foreach (var data in model.data.paramDic.Values)
             {
-                itemCon.Add(new UiItemParam()
+                argIptCon.Add(new UiArgIptParam()
                 {
                     data = data
                 });
             }
-            itemCon.Refresh();
+            argIptCon.Refresh();
         }
     }
 
-    public partial class UiItemParam
+    public partial class UiArgIptParam
     {
         public CharacterParamForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiArgIptModel
     {
         public CharacterParamForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiArgIptCtrl
     {
 
         public override void OnCreate()
         {
 
-            view.ipt_min.onFinishInput+=(s) =>
+            view.ipt_min.onFinishInput += (s) =>
             {
                 model.data.min = StringHelper.ToFloat(s, 0);
+                Refresh();
             };
-            view.ipt_value.onFinishInput+=(s)=>
+            view.ipt_value.onFinishInput += (s) =>
             {
                 model.data.v = StringHelper.ToFloat(s, 0);
-
+                Refresh();
             };
-            view.ipt_max.onFinishInput+=(s)=>
+            view.ipt_max.onFinishInput += (s) =>
             {
                 model.data.max = StringHelper.ToFloat(s, 0);
-
+                Refresh();
             };
 
         }
         public override void OnShow()
         {
-
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
@@ -91,4 +93,4 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
 
 
-}*/
+}

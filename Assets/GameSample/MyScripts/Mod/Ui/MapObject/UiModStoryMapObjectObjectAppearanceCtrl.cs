@@ -95,26 +95,30 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data = param.data;
             }
             model.id = -1;
+            DisplayCameraAreaManager.instance.Show();
             Refresh();
         }
-        public override void Close()
+        public override void OnHide()
         {
+            DisplayCameraAreaManager.instance.Hide();
             GameManager.instance.saveCtrl.SaveItem(ModManager.instance.GetStoryCoreFolder());
-            base.Close();
         }
-
         public void Refresh()
         {
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
 
             view.ipt_width.Set(model.data.name);
 
+            DisplayCameraAreaManager.instance.Clear();
+
+            view.model_Axis.SetActive(model.id != -1);
             if (model.id != -1)
             {
-                view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("#0.0"));
-                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("#0.0"));
-                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("#0.0"));
+                view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
+                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
+                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("0.##"));
 
+                RefreshView();
             }
             itemCon.Clear();
             for (int i = 0; i < model.data.model.subPrefabUnitName.Count; i++)
@@ -130,6 +134,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             });
             itemCon.Refresh();
 
+        }
+        private void RefreshView()
+        {
+            var showGo = GameManager.instance.utilCtrl.CombineNewObjectByPrefabs("fakeObj", model.data.model, false);
+            showGo.SetActive(true);
+            DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
         }
     }
 
@@ -163,11 +173,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
         public void Refresh()
         {
-            view.sta_item.ChangeState(model.id >= 0 ? 1 : 0);
+            view.sta_exist.ChangeState(model.id >= 0 ? 1 : 0);
             if (model.id >= 0)
             {
                 view.txt_.text = TextManager.instance.GetTxt(parent.model.data.model.subPrefabUnitName[model.id].ToString());
-                view.sta_item.ChangeState(model.id == parent.model.id ? 1 : 0);
+                view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
             }
         }
     }

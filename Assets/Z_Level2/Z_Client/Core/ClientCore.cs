@@ -49,15 +49,21 @@ namespace Z_Client
         internal static float timeNow;
 
         private List<ReceiveMsg> receiveList = new List<ReceiveMsg>();
+
+        private static string ListLock = "lock";
         
         public void Update()
         {
             timeNow = Time.time;
+            lock(ListLock)
+            {
             foreach(var rec in receiveList)
             {
                 rec.onReceive.Invoke(rec.localPort, rec.msg);
             }
             receiveList.Clear();
+
+            }
         }
 
 
@@ -110,8 +116,10 @@ namespace Z_Client
 
         public void OnReceive(ReceiveMsg msg)
         {
-            Debug.Log(msg.localPort);
-            receiveList.Add(msg);
+            lock (ListLock)
+            {
+                receiveList.Add(msg);
+            }
         }
 
         public void Send(int localPort, byte[] msg)

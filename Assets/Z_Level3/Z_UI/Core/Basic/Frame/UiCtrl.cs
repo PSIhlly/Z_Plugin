@@ -35,6 +35,10 @@ namespace Z_Ui.Base
 
         }
        
+        public virtual void OnHide()
+        {
+
+        }
         public virtual void OnDisable()
         {
 

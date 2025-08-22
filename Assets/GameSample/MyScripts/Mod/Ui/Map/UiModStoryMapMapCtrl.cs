@@ -8,6 +8,7 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem;
 using UnityEngine;
+using Z_DataSystem.Form;
 
 namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
 {
@@ -51,7 +52,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         }
         public void Refresh()
         {
-            view.img_map.sprite = StoryTexAssetForm.DataByName[GameManager.instance.curConfig.miniMap].sprite;
+            view.img_map.sprite = TexAssetForm.DataByName[GameManager.instance.curConfig.miniMap].sprite;
             con.Clear();
             foreach (var data in SceneForm.DataByUid.Values)
             {
@@ -77,7 +78,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
 
         public override void OnCreate()
         {
-            
+            Z_EventHelper.Register(this);
         }
 
         public void OnEvent(AssetEvent evt)
@@ -92,9 +93,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveConfig(ModManager.instance.GetStoryCoreFolder());
             base.Close();
-
         }
         public void Refresh()
         {

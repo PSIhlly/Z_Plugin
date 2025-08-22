@@ -52,7 +52,7 @@ public class GameUtilController : Z_Controller<GameManager>
             res.AddComponent<ObjectInstance>();
         return res;
     }
-    public GameObject CombineNewGoByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow)
+    private GameObject CombineNewGoByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow)
     {
         var res = new GameObject(name);
         for (int i = 0; i < prefabKeys.Count; i++)
@@ -64,8 +64,11 @@ public class GameUtilController : Z_Controller<GameManager>
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             var render = go.GetComponent<Renderer>();
             render.GetPropertyBlock(propBlock);
-
-            if (texRealName[i]==null)
+            if(texRealName[i] !=null&& !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
+            {
+                Debug.LogError(name+" miss tex " + texRealName[i]);
+            }
+            if (texRealName[i]==null|| !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
             {
                 propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])

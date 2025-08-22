@@ -34,7 +34,7 @@ namespace Ui.Mod
         public void Refresh()
         {
             con.Clear();
-            int i = 0;
+            Debug.Log(StoryForm.GetJaByDatas());
             foreach (var data in StoryForm.DataById.Values)
             {
                 con.Add(new UiStoryItemParam()
@@ -86,7 +86,7 @@ namespace Ui.Mod
         {
             view.sta_.ChangeState(model.data != null ? 1 : 0);
             if (model.data != null)
-            { 
+            {
                 view.txt_.text = model.data.name;
                 view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
             }

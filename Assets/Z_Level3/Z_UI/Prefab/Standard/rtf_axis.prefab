@@ -93,11 +93,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiName: Axis
-  path: \GameSample\UiBase
+  path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 0}
-  elementTrsLst: []
+  elementTrsLst:
+  - {fileID: 3245533228548699684}
+  - {fileID: 9146729270640439784}
+  - {fileID: 9146729270226630999}
+  - {fileID: 9146729270660452401}
   subUiHolderLst: []
-  uiType: 0
+  uiType: 2
   layer: 0
 --- !u!1001 &3245533228235737042
 PrefabInstance:

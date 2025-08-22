@@ -54,6 +54,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
 
             Refresh();
         }
+      
         public void Refresh()
         {
 

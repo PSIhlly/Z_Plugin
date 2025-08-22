@@ -37,6 +37,10 @@ namespace Ui.ModStory.ModStoryItem
                 model.selPage = param.selPage;
             Refresh();
         }
+        public override void OnHide()
+        {
+            GameManager.instance.saveCtrl.SaveItem(ModManager.instance.GetStoryCoreFolder());
+        }
         public void SelPage(int id, ItemProductForm.Data data = null)
         {
             model.selPage = id;

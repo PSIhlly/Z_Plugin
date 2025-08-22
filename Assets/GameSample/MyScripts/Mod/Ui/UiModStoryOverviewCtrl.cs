@@ -8,6 +8,7 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem;
 using Z_DataSystem.Form;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryOverview
 {
@@ -25,7 +26,7 @@ namespace Ui.ModStory.ModStoryOverview
 
         public override void OnCreate()
         {
-
+            Z_EventHelper.Register(this);
             view.btn_image.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportStoryTex();
@@ -33,10 +34,12 @@ namespace Ui.ModStory.ModStoryOverview
             view.ipt_name.onFinishInput += (s)=>
             {
                 GameManager.instance.curStory.name = s;
+                Refresh();
             };
             view.ipt_introduction.onFinishInput+=(s)=>
             {
                 GameManager.instance.curStory.desc = s;
+                Refresh();
             };
 
         }
@@ -53,9 +56,13 @@ namespace Ui.ModStory.ModStoryOverview
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveOverview(GameManager.instance.curStory.id);
+            
             base.Close();
 
+        }
+        public override void OnHide()
+        {
+            GameManager.instance.saveCtrl.SaveOverview(GameManager.instance.curStory.id);
         }
         public void Refresh()
         {

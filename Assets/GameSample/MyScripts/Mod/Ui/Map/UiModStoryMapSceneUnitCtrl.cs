@@ -9,6 +9,7 @@ using Z_Texture;
 using Z_DataSystem;
 using UnityEngine;
 using Z_Ui;
+using Z_DataSystem.Form;
 
 namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
 {
@@ -26,7 +27,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
 
         public override void OnCreate()
         {
-
+            Z_EventHelper.Register(this);
             view.btn_map.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportSceneMiniMap(model.data.name);
@@ -55,7 +56,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
 
         public override void OnShow()
         {
-
+            model.data = param.data;
             Refresh();
         }
         public override void Close()
@@ -66,7 +67,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
         }
         public void Refresh()
         {
-            view.img_map.sprite = StoryTexAssetForm.DataByName[model.data.miniMap].sprite;
+            view.img_map.sprite = TexAssetForm.DataByName[model.data.miniMap].sprite;
             view.ipt_name.Set(model.data.name);
         }
     }

@@ -274,9 +274,9 @@ namespace Form
 
                 {1210039,new Data(1210039,"part_1","Part","部位")},
 
-                {1210040,new Data(1210040,"cube","Cube","方块")},
+                {1210040,new Data(1210040,"Cube","Cube","方块")},
 
-                {1210041,new Data(1210041,"sphere","Sphere","球")},
+                {1210041,new Data(1210041,"Sphere","Sphere","球")},
 
                 {1210042,new Data(1210042,"verticalView","vertical view","俯视图")},
 
@@ -318,29 +318,35 @@ namespace Form
 
                 {1210061,new Data(1210061,"enablePart","Enable part","启用部位")},
 
-                {1210062,new Data(1210062,"itemStyle","Item style","道具样式")},
+                {1210062,new Data(1210062,"itemStyle","Item style","道具外观样式")},
 
                 {1210063,new Data(1210063,"code","Code","代码")},
 
                 {1210064,new Data(1210064,"entry","Entry","列表")},
 
-                {1210065,new Data(1210065,"skillEvent","Skill event","技能事件")},
+                {1210065,new Data(1210065,"chooseModel","Choose model","选择模型")},
 
-                {1210066,new Data(1210066,"chooseModel","Choose model","选择模型")},
+                {1210066,new Data(1210066,"chooseEquipPart","Choose equip part","选择装备部位")},
 
-                {1210067,new Data(1210067,"chooseEquipPart","Choose equip part","选择装备部位")},
+                {1210067,new Data(1210067,"","","无")},
 
-                {1210068,new Data(1210068,"","","无")},
+                {1210068,new Data(1210068,"LeftHand","Left hand","左手")},
 
-                {1210069,new Data(1210069,"LeftHand","Left hand","左手")},
+                {1210069,new Data(1210069,"RightHand","Right hand","右手")},
 
-                {1210070,new Data(1210070,"RightHand","Right hand","右手")},
+                {1210070,new Data(1210070,"Head","Head","头")},
 
-                {1210071,new Data(1210071,"Head","Head","头")},
+                {1210071,new Data(1210071,"Body","Body","身体")},
 
-                {1210072,new Data(1210072,"Body","Body","身体")},
+                {1210072,new Data(1210072,"label","Label","标签")},
 
-                {1210073,new Data(1210073,"label","Label","标签")},
+                {1210073,new Data(1210073,"Choose show equipped item style","Choose show equipped item style","选择装备的道具外观样式")},
+
+                {1210074,new Data(1210074,"Quad","Quad","面")},
+
+                {1210075,new Data(1210075,"Capsule","Capsule","胶囊")},
+
+                {1210076,new Data(1210076,"unclassified","Unclassified","未分类")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -489,9 +495,9 @@ namespace Form
     
                         {"part_1",_DataById[1210039]},
     
-                        {"cube",_DataById[1210040]},
+                        {"Cube",_DataById[1210040]},
     
-                        {"sphere",_DataById[1210041]},
+                        {"Sphere",_DataById[1210041]},
     
                         {"verticalView",_DataById[1210042]},
     
@@ -539,23 +545,29 @@ namespace Form
     
                         {"entry",_DataById[1210064]},
     
-                        {"skillEvent",_DataById[1210065]},
+                        {"chooseModel",_DataById[1210065]},
     
-                        {"chooseModel",_DataById[1210066]},
+                        {"chooseEquipPart",_DataById[1210066]},
     
-                        {"chooseEquipPart",_DataById[1210067]},
+                        {"",_DataById[1210067]},
     
-                        {"",_DataById[1210068]},
+                        {"LeftHand",_DataById[1210068]},
     
-                        {"LeftHand",_DataById[1210069]},
+                        {"RightHand",_DataById[1210069]},
     
-                        {"RightHand",_DataById[1210070]},
+                        {"Head",_DataById[1210070]},
     
-                        {"Head",_DataById[1210071]},
+                        {"Body",_DataById[1210071]},
     
-                        {"Body",_DataById[1210072]},
+                        {"label",_DataById[1210072]},
     
-                        {"label",_DataById[1210073]},
+                        {"Choose show equipped item style",_DataById[1210073]},
+    
+                        {"Quad",_DataById[1210074]},
+    
+                        {"Capsule",_DataById[1210075]},
+    
+                        {"unclassified",_DataById[1210076]},
     
                     };
     
@@ -677,12 +689,12 @@ TextBaseForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByKey.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

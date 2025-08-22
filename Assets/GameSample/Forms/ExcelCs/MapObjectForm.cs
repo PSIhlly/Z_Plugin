@@ -245,7 +245,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","",MapModelForm.defaultData,"",false,"","","")},
+                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",false,"","","")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -408,14 +408,12 @@ MapBaseForm.RemoveData(id);
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-                    DatasByLabel.Clear();
-    
-            idChain.Clear();
         }
         
         public static void ClearAuto()

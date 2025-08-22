@@ -8,6 +8,21 @@ namespace Z_Debug
     public static class Z_Log
     {
         const int maxLength = 5000;
+        public static void Log(GameObject go)
+        {
+            string res = "";
+            if (go!= null)
+            {
+                var trs = go.transform;
+                while (trs != null)
+                {
+                    res =  trs.name + "/" + res;
+                    trs = trs.parent;
+                }
+            }
+            
+            Log(res);
+        }
         public static void Log(ICollection col,string[] fields=null)
         {
             int i = 0;
@@ -96,13 +111,13 @@ namespace Z_Debug
                 for (int j = 0; j < Mathf.Min(100, tex.height); j++)
                 {
                     if(tex.GetPixel(i, j).r> tex.GetPixel(i, j).g&& tex.GetPixel(i, j).r > tex.GetPixel(i, j).b)
-                        t += "<color=red>" + ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + "</color> ";
+                        t += "<color=red>" + ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("0.##") + "</color> ";
                     else if (tex.GetPixel(i, j).g > tex.GetPixel(i, j).r && tex.GetPixel(i, j).g > tex.GetPixel(i, j).b)
-                        t += "<color=green>" + ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + "</color> ";
+                        t += "<color=green>" + ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("0.##") + "</color> ";
                     else if (tex.GetPixel(i, j).b > tex.GetPixel(i, j).r && tex.GetPixel(i, j).b > tex.GetPixel(i, j).g)
-                        t += "<color=blue>"+((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + "</color> ";
+                        t += "<color=blue>"+((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("0.##") + "</color> ";
                     else
-                        t +=  ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("#0.0") + " ";
+                        t +=  ((tex.GetPixel(i, j).r + tex.GetPixel(i, j).g + tex.GetPixel(i, j).b) / 3f * 10).ToString("0.##") + " ";
 
                 }
                 t += "\n";

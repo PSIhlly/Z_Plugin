@@ -53,17 +53,18 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadObject(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadCharacter(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadItem(ModManager.GetStoryCoreFolder(storyFolder));
-            
-            GameManager.instance.saveCtrl.LoadEvent(ModManager.GetStoryCoreFolder(storyFolder)); 
+
+            GameManager.instance.saveCtrl.LoadEvent(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadConfig(ModManager.GetStoryCoreFolder(storyFolder));
 
         }
         else //初始化
         {
-            StoryForm.AddData(new StoryForm.Data(storyId, "new"+ storyId, "empty", GlobalNameHelper.GetDefaultTexName()));
+            StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", GlobalNameHelper.GetDefaultTexName()));
 
             SceneForm.Clear();
-            SceneForm.AddData(new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(), (0.5f, 0.5f)));
+            var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(), (0.5f, 0.5f));
+            SceneForm.AddData(sceneData);
 
             CharacterParamForm.Clear();
             var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0);
@@ -72,20 +73,21 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterParamForm.AddData(speedParamData);
 
             CharacterProductForm.Clear();
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1,"Player","", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { {"Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } },true,new Dictionary<string, CharacterAnimForm.Data>(),"","","Speed","Hp","","",""));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, new Dictionary<string, CharacterAnimForm.Data>(), "", "", "Speed", "Hp", "", "", ""));
 
             ConfigForm.Clear();
-            ConfigForm.AddData(new ConfigForm.Data(1,1,new Vector3(500,1000,500), "Player",new List<int>(),"","", GlobalNameHelper.GetDefaultTexName()));
-            
+            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), "Player", new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
+
             var data = new GameMapData();
             data.Init();
             GameManager.instance.saveCtrl.SaveOverview(storyId);
 
-            GameManager.instance.saveCtrl.SaveSceneMap(ModManager.GetStoryCoreFolder(storyFolder) + "scene1",data);
+            GameManager.instance.saveCtrl.SaveSceneMap(ModManager.GetStoryCoreFolder(storyFolder) + sceneData.uid, data);
+            GameManager.instance.saveCtrl.SaveScene(ModManager.GetStoryCoreFolder(storyFolder));
 
             GameManager.instance.saveCtrl.SaveCharacter(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.SaveEvent(ModManager.GetStoryCoreFolder(storyFolder));
-            GameManager.instance.saveCtrl.SaveConfig(ModManager.GetStoryCoreFolder(storyFolder)); 
+            GameManager.instance.saveCtrl.SaveConfig(ModManager.GetStoryCoreFolder(storyFolder));
         }
 
         GameManager.instance.curStory = StoryForm.DataById[storyId];
@@ -117,59 +119,60 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     #endregion
 
     #region scene
-    public async void StartLoadSceneUgc(string sceneName)
+    public async void StartLoadSceneUgc(int sceneId)
     {
-        bool ok=await StartLoadScene(ModManager.instance.GetStoryCoreFolder()+"/"+ sceneName);
-        ModManager.instance.BeginScene(sceneName);
+        bool ok = await StartLoadScene(ModManager.instance.GetStoryCoreFolder(), sceneId);
+        ModManager.instance.BeginScene(sceneId);
     }
-    public async void StartLoadScenePlay(string sceneName)
+    public async void StartLoadScenePlay(int sceneId)
     {
         bool ok = await StartLoadScene(
-            PlayManager.instance.boxPlay?
-                (PlayManager.instance.GetStoryCoreFolder() + "/" + sceneName)
-                : (PlayManager.instance.GetStorySaveFolder() + "/" + sceneName));
+            PlayManager.instance.boxPlay ?
+                PlayManager.instance.GetStoryCoreFolder()
+                : PlayManager.instance.GetStorySaveFolder(), sceneId);
 
-        PlayManager.instance.BeginScene(sceneName);
+        PlayManager.instance.BeginScene(sceneId);
     }
 
-    private async Task<bool> StartLoadScene(string fileName)
+    private async Task<bool> StartLoadScene(string storyCoreFolder, int id)
     {
-        GameManager.instance.curScene=SceneForm.DataByName[Path.GetFileName(fileName)];
+        if (!SaveAndLoad.Exist(storyCoreFolder + "/" + GetSceneFileNameById(id)))
+        {
+            Debug.LogError(storyCoreFolder + "/" + GetSceneFileNameById(id) + " scene file not exist");
+        }
+        GameManager.instance.curScene = SceneForm.DataByUid[id];
 
         GameManager.instance.saveCtrl.ResetPrefabPool();
 
         UiManager.instance.ShowUi<UiLoadingCtrl>();
         MapData data;
-        Debug.Log(fileName);
-        if (SaveAndLoad.Exist(fileName))
+
+        data = await Task.Run(() =>
         {
-            data = await Task.Run(() =>
-            {
-                return GameManager.instance.saveCtrl.LoadSceneMap(fileName);
-            });
-        }
-        else
-        {
-            //new
-            data = await Task.Run(() =>
-            {
-                var data = new GameMapData();
-                data.Init();
-                return data;
-            });
-        }
-        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x/2)+2, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y/2)+2);
+            return GameManager.instance.saveCtrl.LoadSceneMap(storyCoreFolder + "/" + GetSceneFileNameById(id));
+        });
+
+        /* {
+             //new
+             data = await Task.Run(() =>
+             {
+                 var data = new GameMapData();
+                 data.Init();
+                 return data;
+             });
+         }*/
+        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 2, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y / 2) + 2);
 
         MapManager.instance.Begin(data);
 
 
-       
+
 
         foreach (var maskData in MapMaskForm.DataById.Values)
         {
-                var raws = new Texture2D[6];
+            var raws = new Texture2D[6];
 
-            for(int i=0;i< maskData.texsName.Count;i++)
+            for (int i = 0; i < maskData.texsName.Count; i++)
             {
                 raws[i] = (Texture2D)TexAssetForm.DataByName[maskData.texsName[i]].tex;
             }
@@ -182,11 +185,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterAnimForm.Data moveAnim = null;
             foreach (var anim in character.animDic.Values)
             {
-                if(anim.name== character.idleAnimName)
+                if (anim.name == character.idleAnimName)
                 {
                     idleAnim = anim;
                 }
-                else if(anim.name == character.moveAnimName)
+                if (anim.name == character.moveAnimName)
                 {
                     moveAnim = anim;
                 }
@@ -225,6 +228,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     {
         return id.ToString();
     }
-
+    public static string GetSceneFileNameById(int id)
+    {
+        return id.ToString();
+    }
     #endregion
 }

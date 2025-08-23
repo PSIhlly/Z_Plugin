@@ -9,16 +9,23 @@ using UnityEngine;
 using Z_Ui.Notify;
 using Z_Time;
 using Z_Input;
+using static UnityEngine.UI.GridLayoutGroup;
+using UnityEngine.UIElements;
 
 namespace Ui.Axis
 {
 
     public partial class UiAxisParam
     {
+        public bool noRotate;
+        public Vector2 pos;
+        public RectTransform limitRtf;
+        public Action<(Vector2,float)> onTrsChange;
     }
     public partial class UiAxisModel
     {
         public RectTransform limitRtf;
+        public Action<(Vector2,float)> onTrsChange;
         public Timer timer;
         public int oriId;
         public Vector2 oriPos;
@@ -57,7 +64,6 @@ namespace Ui.Axis
 
             view.btn_y.onClickDown += () =>
             {
-                
                 OnClickDown(() =>
                 {
                     var cur = InputManager.instance.id2Pos[model.oriId];
@@ -89,10 +95,20 @@ namespace Ui.Axis
                 TimeManager.instance.CancelTimer(model.timer);
             };
         }
-        public void Show(Vector2 pos, RectTransform limitRtf)
+        public override void OnShow()
         {
-            view.rtf_axis.transform.position = pos;
-            model.limitRtf = limitRtf;
+            if(param==null)
+            {
+                Close();
+                return;
+            }
+            view.btn_rot.gameObject.SetActive(!param.noRotate);
+            model.limitRtf = param.limitRtf;
+            Vector3[] corners = new Vector3[4];
+            model.limitRtf.GetWorldCorners(corners);
+            Debug.Log(param.pos);
+            view.rtf_axis.transform.position = new Vector3(corners[0].x + param.pos.x * (corners[2].x - corners[0].x), corners[0].y + param.pos.y * (corners[1].y - corners[0].y), model.limitRtf.position. z) ;
+            model.onTrsChange = param.onTrsChange;
         }
         private void OnClickDown(Action act)
         {
@@ -101,6 +117,9 @@ namespace Ui.Axis
             model.timer = TimeManager.instance.StartTimer(0, 0.1f, () =>
             {
                 act?.Invoke();
+                Vector3[] corners= new Vector3[4];
+                model.limitRtf.GetWorldCorners(corners);
+                model.onTrsChange?.Invoke((new Vector2((view.rtf_axis.position.x - corners[0].x) / (corners[2].x - corners[0].x), (view.rtf_axis.position.y-corners[0].y) /(corners[1].y- corners[0].y)), view.rtf_axis.eulerAngles.z));
                 return false;
             });
         }

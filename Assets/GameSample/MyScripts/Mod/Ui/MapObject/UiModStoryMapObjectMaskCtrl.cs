@@ -126,8 +126,9 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
         public void Refresh()
         {
             view.sta_exist.ChangeState(model.id != -1 ? 1 : 0);
-            if(model.id >= 0)
+            if (model.id >= 0)
             {
+                view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
                 view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
             }
 

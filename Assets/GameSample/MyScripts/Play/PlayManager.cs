@@ -94,7 +94,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
 
 
-        Main2StoryManager.instance.StartLoadScenePlay("scene1");
+        Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curConfig.startSceneId);
 
     }
 
@@ -108,9 +108,9 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
 
     }
-    public async void BeginScene(string fileName)
+    public async void BeginScene(int id)
     {
-        _sceneCtrl.Begin(fileName);
+        _sceneCtrl.Begin(id);
         _infoCtrl.Begin();
     }
 

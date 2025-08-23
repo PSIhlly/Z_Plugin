@@ -7,6 +7,7 @@ public class DisplayCameraAreaManager : Z_MonoManager<DisplayCameraAreaManager>
 {
     public Camera displayCamera;
     public List<GameObject> shows=new List<GameObject>();
+    public float normalized2scene=>displayCamera.orthographicSize*2;
     public Vector3 pos=> transform.position;
     public override void Init()
     {

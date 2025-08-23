@@ -26,6 +26,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         UiContainer<UiMapSceneCtrl> con;
         public override void OnCreate()
         {
+            Z_EventHelper.Register(this);
             con = new UiContainer<UiMapSceneCtrl>(view.go_mapScene);
             view.btn_import.onClick.AddListener(() =>
             {
@@ -36,7 +37,8 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
 
         public void OnEvent(AssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
 
         public override void OnShow()
@@ -73,18 +75,8 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         public SceneForm.Data data;
 
     }
-    public partial class UiMapSceneCtrl : IZ_Listener<AssetEvent>
-    {
-
-        public override void OnCreate()
-        {
-            Z_EventHelper.Register(this);
-        }
-
-        public void OnEvent(AssetEvent evt)
-        {
-            Refresh();
-        }
+    public partial class UiMapSceneCtrl
+    { 
 
         public override void OnShow()
         {

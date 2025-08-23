@@ -49,7 +49,9 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public override void OnShow()
         {
-
+            model.cat = null ;
+            model.type = null;
+            model.data = null ;
             Refresh();
         }
         public void Refresh()

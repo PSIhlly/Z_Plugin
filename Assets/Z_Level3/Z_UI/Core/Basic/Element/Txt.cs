@@ -41,7 +41,7 @@ namespace Z_Ui.Base
 
         private void Refresh()
         {
-            if(languageTranslatable)
+            if (languageTranslatable)
             {
                 text = TextManager.instance.GetTxt(oriTxt);
             }

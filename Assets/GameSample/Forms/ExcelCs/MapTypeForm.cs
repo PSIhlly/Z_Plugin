@@ -148,17 +148,17 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"terrain","",false)},
+                {1,new Data(1,"terrain","z_map_b$floor$0",false)},
 
-                {2,new Data(2,"texture","",true)},
+                {2,new Data(2,"texture","z_map_b$floor$0",true)},
 
-                {3,new Data(3,"transition mask","",true)},
+                {3,new Data(3,"transitionMask","z_map_b$floor$0",true)},
 
-                {4,new Data(4,"obstacle","",false)},
+                {4,new Data(4,"object","z_map_b$floor$0",false)},
 
-                {5,new Data(5,"item","",false)},
+                {5,new Data(5,"item","z_map_b$floor$0",false)},
 
-                {100,new Data(100,"erase","",false)},
+                {100,new Data(100,"erase","z_map_b$floor$0",false)},
 
                 };
 

@@ -55,6 +55,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,float,float> changeScaleAction;
                 
+        public static Action<Data,Dictionary<BodyPartType,bool>,Dictionary<BodyPartType,bool>> changePartenableAction;
+                
 
 
         public partial class Data
@@ -150,7 +152,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,List<CharacterAnimClipForm.Data> animClip,float animTimeInterval,float scale)
+                    private Dictionary<BodyPartType,bool>  _partEnable;
+                    /// <summary>
+                    ///≤øŒª∆Ù”√
+                    ///</summary>
+                    public Dictionary<BodyPartType,bool>  partEnable{
+                                get{return _partEnable;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePartenable(this,_partEnable,value); 
+                    }
+        
+                _partEnable = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<CharacterAnimClipForm.Data> animClip,float animTimeInterval,float scale,Dictionary<BodyPartType,bool> partEnable)
             {
 
              this.uid = uid;
@@ -158,17 +178,18 @@ public static readonly int autoUidCnt=100;
              this.animClip = animClip;
              this.animTimeInterval = animTimeInterval;
              this.scale = scale;
+             this.partEnable = partEnable;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<CharacterAnimClipForm.Data>(animClip),animTimeInterval,scale);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<CharacterAnimClipForm.Data>(animClip),animTimeInterval,scale,new Dictionary<BodyPartType,bool>(partEnable));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,0f,0f);
+                   private static Data _defaultData=new Data(0,"",null,0f,0f,new Dictionary<BodyPartType,bool>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -247,7 +268,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<float>("animTimeInterval"),
 
-                jo.Get<float>("scale")
+                jo.Get<float>("scale"),
+
+                jo.Get<Dictionary<BodyPartType,bool>>("partEnable")
                     );
 
             return data;
@@ -268,6 +291,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
             jo.Set<float>("scale",data.scale);
+
+            jo.Set<Dictionary<BodyPartType,bool>>("partEnable",data.partEnable);
 
             return jo;
         }
@@ -392,6 +417,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePartenable(Data superData,Dictionary<BodyPartType,bool> oldV,Dictionary<BodyPartType,bool> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePartenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -52,9 +52,9 @@ public class ModManager : Z_MonoManager<ModManager>
     {
 
     }
-    public async void BeginScene(string fileName)
+    public async void BeginScene(int id)
     {
-        _sceneCtrl.Begin(fileName);
+        _sceneCtrl.Begin(id);
     }
 
     public void EndScene()

@@ -15,6 +15,7 @@ using Z_Ui.Notify;
 using Z_String;
 using Z_Math;
 using Z_DataSystem;
+using Ui.Axis;
 
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 {
@@ -67,17 +68,17 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             });
             view.ipt_height.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[model.id].SetY(StringHelper.ToFloat(s,1,true));
+                model.data.model.subPrefabUnitScale[model.id]=model.data.model.subPrefabUnitScale[model.id].NewSetY(StringHelper.ToFloat(s,1,true));
                 Refresh();
             };
             view.ipt_length.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[model.id].SetX(StringHelper.ToFloat(s, 1, true));
+                model.data.model.subPrefabUnitScale[model.id]=model.data.model.subPrefabUnitScale[model.id].NewSetZ(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
             view.ipt_width.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[model.id].SetZ(StringHelper.ToFloat(s, 1, true));
+                model.data.model.subPrefabUnitScale[model.id] = model.data.model.subPrefabUnitScale[model.id].NewSetX(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
         }
@@ -114,13 +115,28 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             styleCon.Refresh();
             
             view.sta_show.ChangeState(model.id == -1?0:1);
+
             DisplayCameraAreaManager.instance.Clear();
-            view.model_Axis.SetActive(model.id != -1);
+            view.model_Axis.SetActive(false);
+
             if (model.id != -1)
             {
                 view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
-                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
-                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("0.##"));
+                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("0.##"));
+                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
+
+                float rate = DisplayCameraAreaManager.instance.normalized2scene;
+                view.model_Axis.SetActive(true, new UiAxisParam()
+                {
+                    pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[model.id].z + rate / 2) / rate),
+                    limitRtf = view.rtf_image,
+                    onTrsChange = (tp) => {
+                        model.data.model.subPrefabUnitPos[model.id] = new Vector3((tp.Item1.x * 2 - 1) * rate / 2, 0, (tp.Item1.y * 2 - 1) * rate / 2);
+
+                        RefreshView();
+                    }
+                });
+
                 RefreshView();
             }
             itemCon.Clear();
@@ -141,6 +157,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 
         private void RefreshView()
         {
+            DisplayCameraAreaManager.instance.Clear();
             var showGo = GameManager.instance.utilCtrl.CombineNewObjectByPrefabs("fakeObj", model.data.model, false);
             showGo.SetActive(true);
             DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
@@ -148,7 +165,8 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 
         public void OnEvent(AssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
     }
     public partial class UiStyleParam
@@ -167,7 +185,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
         {
             view.btn_.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.name,model.style);
+                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.name, model.style);
+            }); 
+            view.btn_new.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.name, model.style);
             });
         }
         public override void OnShow()
@@ -181,6 +203,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 
         public void Refresh()
         {
+            view.sta_exist.ChangeState(GlobalNameHelper.IsInnerAssetName(parent.model.data.styleTex[model.style])?0:1);
             view.txt_.text = TextManager.instance.GetTxt(model.style.ToString());
             view.img_.sprite = TexAssetForm.DataByName[parent.model.data.styleTex[model.style]].sprite;
         }

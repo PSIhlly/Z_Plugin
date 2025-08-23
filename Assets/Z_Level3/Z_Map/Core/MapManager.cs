@@ -20,6 +20,7 @@ namespace Z_Map
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
         public const bool OVERLAY_HIDE = true;
+        public const bool UPDATE_TILE_ALWAYS = true;
     }
 
     public static class GlobalHelper
@@ -163,7 +164,14 @@ public class MapManager : Z_MonoManager<MapManager>
         this.data = dataCtrl;
 
         viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
-
+        foreach (var itemData in ItemUnitForm.DataByUid.Values)
+        {
+            var mapPos = utilCtrl.RealPos2MapPos(itemData.pos);
+            if (utilCtrl.InArea(mapPos))
+            {
+                TileUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(itemData.unit);
+            }
+        }
         foreach (var objectData in ObjectUnitForm.DataByUid.Values)
         {
             var mapPos = utilCtrl.RealPos2MapPos(objectData.pos);
@@ -354,10 +362,14 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         //return;
         //update
-        foreach (var map in curMapLst)
+        if(GlobalSettings.UPDATE_TILE_ALWAYS)
         {
-            map.unit.UpdateInfo();
+            foreach (var map in curMapLst)
+            {
+                map.unit.UpdateInfo();
+            }
         }
+       
 
     }
     (int, int)[] dir9 = new[] {

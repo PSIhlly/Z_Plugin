@@ -15,10 +15,10 @@ namespace Ui.Mod
 {
     public partial class UiModCtrl
     {
-        UiScrViewContainer<UiStoryItemCtrl> con;
+        UiScrViewContainer<UiItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiStoryItemCtrl>(view.go_storyItem, view.scr_tt);
+            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
             view.btn_back.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiEnterMainCtrl>();
@@ -26,7 +26,7 @@ namespace Ui.Mod
             });
         }
 
-        
+
         public override void OnShow()
         {
             Refresh();
@@ -34,57 +34,57 @@ namespace Ui.Mod
         public void Refresh()
         {
             con.Clear();
-            Debug.Log(StoryForm.GetJaByDatas());
             foreach (var data in StoryForm.DataById.Values)
             {
-                con.Add(new UiStoryItemParam()
+                con.Add(new UiItemParam()
                 {
-                    data= data
+                    data = data
                 });
             }
-            con.Add(new UiStoryItemParam()
+            con.Add(new UiItemParam()
             {
                 data = null
             });
             con.Refresh();
         }
 
-       
+
 
     }
-    public partial class UiStoryItemParam
+    public partial class UiItemParam
     {
         public StoryForm.Data data;
     }
-    public partial class UiStoryItemModel
+    public partial class UiItemModel
     {
         public StoryForm.Data data;
     }
-    public partial class UiStoryItemCtrl
+    public partial class UiItemCtrl
     {
-       public override void OnCreate()
+        public override void OnCreate()
         {
-            view.btn_mod.onClick.AddListener(() =>
+            view.btn_new.onClick.AddListener(() =>
             {
-                if(model.data!=null)
-                {
-                    Main2StoryManager.instance.StartLoadStoryUgc(model.data.id);
-                }else
-                {
-                    Main2StoryManager.instance.StartLoadStoryUgc(StoryForm.idChain.PeekId());
-                }
+                Main2StoryManager.instance.StartLoadStoryUgc(StoryForm.idChain.PeekId());
+                parent.Close();
+            });
+            view.btn_.onClick.AddListener(() =>
+            {
+
+                Main2StoryManager.instance.StartLoadStoryUgc(model.data.id);
+
                 parent.Close();
             });
         }
         public override void OnShow()
         {
             model.data = param.data;
-            
+
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_.ChangeState(model.data != null ? 1 : 0);
+            view.sta_exist.ChangeState(model.data != null ? 1 : 0);
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;

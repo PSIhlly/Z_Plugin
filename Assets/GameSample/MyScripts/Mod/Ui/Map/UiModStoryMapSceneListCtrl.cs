@@ -35,7 +35,8 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
 
         public void OnEvent(AssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
 
         public override void OnShow()
@@ -93,7 +94,6 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
         }
         public override void OnShow()
         {
-            Debug.Log(TileUnitForm.GetJaByDatas());
             model.data = param.data;
             Refresh();
         }

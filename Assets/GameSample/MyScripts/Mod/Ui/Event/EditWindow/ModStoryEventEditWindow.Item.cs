@@ -35,9 +35,15 @@ namespace Ui.ModStoryEventEditWindow
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SelItem(model.node);
-            });
+                if(model.node==null)
+                {
 
+                }else
+                {
+                    parent.SelItem(model.node);
+                }
+            });
+           
         }
         public override void OnShow()
         {
@@ -50,35 +56,44 @@ namespace Ui.ModStoryEventEditWindow
 
         public void Refresh()
         {
-            int curRender = model.con.GetNowRenderId();
-            foreach (var sub in model.node.subNodes)
+            view.sta_isEmpty.ChangeState(model.node == null?0:1);
+            if (model.node == null)
             {
-                if (sub.desc.type == CodeType.Action)
-                {
-                    model.con.Add(new UiItemParam()
-                    {
-                        con = model.con,
-                        node = sub,
-                        deepth = model.deepth + 1,
-                    }, ++curRender);
-                }
 
-            }
-
-            if (model.node.desc.type == CodeType.Action)
+            }else
             {
+                int curRender = model.con.GetNowRenderId();
                 foreach (var sub in model.node.subNodes)
                 {
-                    model.con.Add(new UiItemParam()
+                    if (sub.desc.type == CodeType.Action)
                     {
-                        con = model.con,
-                        node = sub,
-                        deepth = model.deepth + 1,
-                    }, ++curRender);
+                        model.con.Add(new UiItemParam()
+                        {
+                            con = model.con,
+                            node = sub,
+                            deepth = model.deepth + 1,
+                        }, ++curRender);
+                    }
+
                 }
+
+                if (model.node.desc.type == CodeType.Action)
+                {
+                    foreach (var sub in model.node.subNodes)
+                    {
+                        model.con.Add(new UiItemParam()
+                        {
+                            con = model.con,
+                            node = sub,
+                            deepth = model.deepth + 1,
+                        }, ++curRender);
+                    }
+                }
+
+                view.txt_.text = " ".Repeat(model.deepth) + GetNodeDesc(model.node);
             }
 
-            view.txt_.text = " ".Repeat(model.deepth) + GetNodeDesc(model.node);
+            
 
         }
 

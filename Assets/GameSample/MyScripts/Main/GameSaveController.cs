@@ -8,7 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ui.ModSceneMain.ModTool;
 using UnityEngine;
+using UnityEngine.UI;
 using Z_ByteSerialize;
 using Z_DataSystem;
 using Z_DataSystem.Form;
@@ -494,9 +496,20 @@ public class GameSaveController : Z_Controller<GameManager>
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }
+
+        //item生成mapItem
+        MapItemForm.Clear();
+        if (ItemProductForm.DatasByIsproto.ContainsKey(true))
+        {
+            foreach (var itemData in ItemProductForm.DatasByIsproto[true])
+            {
+                MapItemForm.AddData( new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.onTouchEvent, itemData.onLeaveEvent, itemData.onShowEvent));
+            }
+        }
+
         foreach (var form in ItemProductForm.DataByUid.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(form.name, form.model, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(form.name, form.model, true,true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }

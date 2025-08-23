@@ -142,7 +142,7 @@ namespace Ui.ModSceneUnit
                 Close();
             });
 
-            view.btn_pos.onClick.AddListener(() =>
+            view.btn_aligh.onClick.AddListener(() =>
             {
                 TileUnitForm.Data mapData= (TileUnitForm.Data)model.data.unit.superUnit.data;
                 model.posX = (mapData.mapPos.x- ModManager.instance.sceneCtrl.offset).ToString();

@@ -78,7 +78,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
         }
         public override void OnShow()
         {
-
+            model.data=param.data;
             Refresh();
         }
         public void Refresh()

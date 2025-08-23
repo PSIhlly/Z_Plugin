@@ -95,14 +95,14 @@ namespace Ui.ModSceneMain
                 model.viewZ = v;
                 Refresh();
             };
-            view.btn_model.onClick.AddListener(() =>
+            view.btn_mapObject.onClick.AddListener(() =>
             {
-                model.designType = DesignType.Model;
+                model.designType = DesignType.MapObject;
                 Refresh();
             });
-            view.btn_behaviour.onClick.AddListener(() =>
+            view.btn_event.onClick.AddListener(() =>
             {
-                model.designType = DesignType.Behaviour;
+                model.designType = DesignType.Event;
                 Refresh();
             });
             Refresh();
@@ -121,8 +121,8 @@ namespace Ui.ModSceneMain
                 view.ipt_viewPosSetY.Set(model.viewY);
 
                 view.ipt_viewPosSetZ.Set(model.viewZ);
-            view.sta_selModel.ChangeState(model.designType == DesignType.Model?1:0);
-            view.sta_selBehaviour.ChangeState(model.designType == DesignType.Behaviour?1:0);
+            view.sta_mapObject.ChangeState(model.designType == DesignType.MapObject?1:0);
+            view.sta_event.ChangeState(model.designType == DesignType.Event?1:0);
         }
     }
    

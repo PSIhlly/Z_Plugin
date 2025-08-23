@@ -65,7 +65,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
         public void OnEvent(AssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
 
         public override void OnShow()

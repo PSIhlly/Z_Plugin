@@ -62,6 +62,7 @@ namespace Ui.ModSceneMenu
         {
             model.lastSaveTime = Time.time;
             GameManager.instance.saveCtrl.SaveSceneMap(ModManager.instance.GetSceneFileName());
+            NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
         }
         public void Exit()
         {

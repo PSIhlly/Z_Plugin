@@ -14,6 +14,7 @@ using Z_UnitSystem;
 
 public class GameUtilController : Z_Controller<GameManager>
 {
+    public string emptyTexName => GlobalNameHelper.GetDefaultTexName();
     public GameUtilController(GameManager super) : base(super)
     {
     }
@@ -30,7 +31,13 @@ public class GameUtilController : Z_Controller<GameManager>
         var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.2f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
         if (forGame)
         {
-            res.AddComponent<CharacterInstance>();
+            //default disable
+            var ins=res.AddComponent<CharacterInstance>();
+            foreach(var r in ins.renderers)
+            {
+                r.enabled = false;
+            }
+
             res.transform.GetChild(0).gameObject.GetComponent<MeshCollider>().enabled=false;
             res.transform.GetChild(1).gameObject.GetComponent<MeshCollider>().enabled=false;
             var rb=res.AddComponent<Rigidbody>();
@@ -38,7 +45,7 @@ public class GameUtilController : Z_Controller<GameManager>
         }
         return res;
     }
-    public GameObject CombineNewObjectByPrefabs(string name, MapModelForm.Data model, bool forGame)
+    public GameObject CombineNewObjectByPrefabs(string name, MapModelForm.Data model, bool forGame,bool isItem=false)
     {
         if (model == null)
             return new GameObject(name);
@@ -49,7 +56,13 @@ public class GameUtilController : Z_Controller<GameManager>
 
         var res = CombineNewGoByPrefabs(name, model.subPrefabUnitName, model.subUnitTexsName, model.subPrefabUnitPos, model.subPrefabUnitScale, showShadow);
         if (forGame)
-            res.AddComponent<ObjectInstance>();
+        {
+            if (isItem)
+                res.AddComponent<ItemInstance>();
+            else
+                res.AddComponent<ObjectInstance>();
+        }
+            
         return res;
     }
     private GameObject CombineNewGoByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow)
@@ -68,7 +81,7 @@ public class GameUtilController : Z_Controller<GameManager>
             {
                 Debug.LogError(name+" miss tex " + texRealName[i]);
             }
-            if (texRealName[i]==null|| !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
+            if (texRealName[i]==null|| texRealName[i] == emptyTexName ||!TexAssetForm.DataByName.ContainsKey(texRealName[i]))
             {
                 propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])

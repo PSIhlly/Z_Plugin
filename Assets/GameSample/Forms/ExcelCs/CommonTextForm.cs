@@ -190,6 +190,16 @@ namespace Form
 
                 {20022,new Data(20022,"delete","Delete","删除")},
 
+                {20023,new Data(20023,"map","Map","地图")},
+
+                {20024,new Data(20024,"menu","Menu","菜单")},
+
+                {20025,new Data(20025,"count","Count","数量")},
+
+                {20026,new Data(20026,"save","Save","保存")},
+
+                {20027,new Data(20027,"save success","Save success!","保存成功")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -252,6 +262,16 @@ namespace Form
                         {"apply",_DataById[20021]},
     
                         {"delete",_DataById[20022]},
+    
+                        {"map",_DataById[20023]},
+    
+                        {"menu",_DataById[20024]},
+    
+                        {"count",_DataById[20025]},
+    
+                        {"save",_DataById[20026]},
+    
+                        {"save success",_DataById[20027]},
     
                     };
     

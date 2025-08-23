@@ -242,9 +242,9 @@ namespace Form
 
                 {1210023,new Data(1210023,"import","Import","导入")},
 
-                {1210024,new Data(1210024,"upperPart","Upper part","上半身")},
+                {1210024,new Data(1210024,"UpperPart","Upper part","上半身")},
 
-                {1210025,new Data(1210025,"lowerPart","Lower part","下半身")},
+                {1210025,new Data(1210025,"LowerPart","Lower part","下半身")},
 
                 {1210026,new Data(1210026,"equipSetting","Equip setting","装备设置")},
 
@@ -266,11 +266,11 @@ namespace Form
 
                 {1210035,new Data(1210035,"price(coins)","Price(Coins)","价格(货币数)")},
 
-                {1210036,new Data(1210036,"canEquipped","Can equipped","可装备")},
+                {1210036,new Data(1210036,"canEquip","Can equipped","可装备")},
 
                 {1210037,new Data(1210037,"onEquipEvent","On equip event","装备事件")},
 
-                {1210038,new Data(1210038,"onDIsequipEvent","On disequip event","卸下事件")},
+                {1210038,new Data(1210038,"onDisequipEvent","On disequip event","卸下事件")},
 
                 {1210039,new Data(1210039,"part_1","Part","部位")},
 
@@ -347,6 +347,26 @@ namespace Form
                 {1210075,new Data(1210075,"Capsule","Capsule","胶囊")},
 
                 {1210076,new Data(1210076,"unclassified","Unclassified","未分类")},
+
+                {1210077,new Data(1210077,"Please create a new one or select one from the following","Please create a new one or select one from the following.","请从下方新建或选择一项")},
+
+                {1210078,new Data(1210078,"center_1","Center","居中")},
+
+                {1210079,new Data(1210079,"Texture Layer Set","Texture layer set","贴图层级设置")},
+
+                {1210080,new Data(1210080,"view position","View position","当前位置")},
+
+                {1210081,new Data(1210081,"tool","Tool","工具")},
+
+                {1210082,new Data(1210082,"rotation","Rotation","旋转")},
+
+                {1210083,new Data(1210083,"position","Position","位置")},
+
+                {1210084,new Data(1210084,"rotate 90°","Rotate 90°","旋转90°")},
+
+                {1210085,new Data(1210085,"align","Align","对齐")},
+
+                {1210086,new Data(1210086,"resetCount","Reset count","重置数量")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -463,9 +483,9 @@ namespace Form
     
                         {"import",_DataById[1210023]},
     
-                        {"upperPart",_DataById[1210024]},
+                        {"UpperPart",_DataById[1210024]},
     
-                        {"lowerPart",_DataById[1210025]},
+                        {"LowerPart",_DataById[1210025]},
     
                         {"equipSetting",_DataById[1210026]},
     
@@ -487,11 +507,11 @@ namespace Form
     
                         {"price(coins)",_DataById[1210035]},
     
-                        {"canEquipped",_DataById[1210036]},
+                        {"canEquip",_DataById[1210036]},
     
                         {"onEquipEvent",_DataById[1210037]},
     
-                        {"onDIsequipEvent",_DataById[1210038]},
+                        {"onDisequipEvent",_DataById[1210038]},
     
                         {"part_1",_DataById[1210039]},
     
@@ -568,6 +588,26 @@ namespace Form
                         {"Capsule",_DataById[1210075]},
     
                         {"unclassified",_DataById[1210076]},
+    
+                        {"Please create a new one or select one from the following",_DataById[1210077]},
+    
+                        {"center_1",_DataById[1210078]},
+    
+                        {"Texture Layer Set",_DataById[1210079]},
+    
+                        {"view position",_DataById[1210080]},
+    
+                        {"tool",_DataById[1210081]},
+    
+                        {"rotation",_DataById[1210082]},
+    
+                        {"position",_DataById[1210083]},
+    
+                        {"rotate 90°",_DataById[1210084]},
+    
+                        {"align",_DataById[1210085]},
+    
+                        {"resetCount",_DataById[1210086]},
     
                     };
     

@@ -50,13 +50,12 @@ public class TextureCombine
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float max = 0;
+                    float min = 1;
                     for(int i=0;i<texs.Length;i++)
                     {
-                        if(texs[i].GetPixel(x, y).r>0.1f)
-                        max = Mathf.Max(texs[i].GetPixel(x,y).r, max);
+                       min = Mathf.Min(texs[i].GetPixel(x,y).r, min);
                     }
-                    newTex.SetPixel(x,y, new Color(max, 0,0));
+                    newTex.SetPixel(x,y, new Color(min, 0,0));
                 }
             }
             newTex.Apply();

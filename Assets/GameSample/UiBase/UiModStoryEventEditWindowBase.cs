@@ -135,15 +135,14 @@ namespace Ui.ModStoryEventEditWindow
             public GameObject go_close;
             public Btn btn_close;
             public Btn btn_apply;
-            public Ipt ipt_name;
-            public Ipt ipt_category;
-            public Ipt ipt_type;
             public GameObject go_items;
             public ScrView scr_items;
             public Ipt ipt_code;
             public Btn btn_switchMod;
             public Sta sta_switchMod;
-            public Txt txt_name;
+            public Ipt ipt_name;
+            public Ipt ipt_category;
+            public Ipt ipt_type;
             public RectTransform rtf_itemRoot;
             public RectTransform rtf_unitRoot;
             public GameObject go_item;
@@ -159,22 +158,21 @@ namespace Ui.ModStoryEventEditWindow
             go_close = uiHolder.elementTrsLst[2].gameObject;
             btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             btn_apply = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            ipt_name = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            ipt_category = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
-            ipt_type = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
-            go_items = uiHolder.elementTrsLst[8].gameObject;
-            scr_items = uiHolder.elementTrsLst[9].GetComponent<ScrView>();
-            ipt_code = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            btn_switchMod = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            sta_switchMod = uiHolder.elementTrsLst[12].GetComponent<Sta>();
-            txt_name = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            rtf_itemRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
-            rtf_unitRoot = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
-            go_item = uiHolder.elementTrsLst[16].gameObject;
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
-            go_unit = uiHolder.elementTrsLst[18].gameObject;
-            rtf_unit = uiHolder.elementTrsLst[19].GetComponent<RectTransform>();
-            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[20].GetComponent<UiHolder>().ctrl;
+            go_items = uiHolder.elementTrsLst[5].gameObject;
+            scr_items = uiHolder.elementTrsLst[6].GetComponent<ScrView>();
+            ipt_code = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
+            btn_switchMod = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_switchMod = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            ipt_name = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_category = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            ipt_type = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
+            rtf_itemRoot = uiHolder.elementTrsLst[13].GetComponent<RectTransform>();
+            rtf_unitRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
+            go_item = uiHolder.elementTrsLst[15].gameObject;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
+            go_unit = uiHolder.elementTrsLst[17].gameObject;
+            rtf_unit = uiHolder.elementTrsLst[18].GetComponent<RectTransform>();
+            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
         }
 
     }

@@ -52,7 +52,6 @@ namespace Z_UnitSystem
                 var go = InstancePoolManager.instance.CreateInstance(prefab);
                 ins = (Instance)go.GetComponent(GetInsType());
             }
-
             if (_data.scale==Vector3.zero)
             {
                 foreach (var bc in ins.boxColliders)

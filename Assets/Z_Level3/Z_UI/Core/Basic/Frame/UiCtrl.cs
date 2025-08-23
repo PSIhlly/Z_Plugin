@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,27 @@ namespace Z_Ui.Base
         public static string name = "Ui";
         public UiHolder uiHolder;
         public GameObject gameObject => uiHolder?.gameObject;
+        public bool active
+        {
+            get
+            {
+                try
+                {
+                    if(uiHolder==null)
+                    {
+                        Debug.LogError(name+"aaaaaa??");
+                    }
+                    return gameObject != null && gameObject.activeInHierarchy;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    return false;
+                }
+            }
+        }
+
+
         public RectTransform rect => uiHolder?.gameObject?.GetComponent<RectTransform>();
         public virtual void BindHolderRecursively(UiHolder uiHolder)
         {
@@ -34,7 +56,7 @@ namespace Z_Ui.Base
         {
 
         }
-       
+
         public virtual void OnHide()
         {
 
@@ -47,14 +69,14 @@ namespace Z_Ui.Base
         {
             gameObject.SetActive(false);
         }
-        public void SetActive(bool active,UiParam param=null)
+        public void SetActive(bool active, UiParam param = null)
         {
-            if(uiHolder!=null&&uiHolder.gameObject!=null)
+            if (uiHolder != null && uiHolder.gameObject != null)
             {
                 SetParam(param);
                 uiHolder.gameObject.SetActive(active);
             }
         }
-        public bool isActive => (uiHolder != null && uiHolder.gameObject != null)?uiHolder.gameObject.activeSelf:false;
+        public bool isActive => (uiHolder != null && uiHolder.gameObject != null) ? uiHolder.gameObject.activeSelf : false;
     }
 }

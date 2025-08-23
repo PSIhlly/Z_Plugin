@@ -61,9 +61,11 @@ namespace Ui.ModStoryEventEditWindow
             };
             view.btn_switchMod.onClick.AddListener(() =>
             {
+                view.btn_apply.onClick.Invoke();//auto apply
                 model.codeEditMode = !model.codeEditMode;
                 model.selItem = null;
                 model.selUnit = null;
+
                 Refresh();
             });
             view.btn_apply.onClick.AddListener(() =>
@@ -77,6 +79,7 @@ namespace Ui.ModStoryEventEditWindow
                 {
                     model.data.code = model.dcpr.Decompile(model.curEntry);
                     model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+                    view.ipt_code.Set(model.data.code);
                 }
 
                 Refresh();
@@ -115,6 +118,12 @@ namespace Ui.ModStoryEventEditWindow
                     deepth = 0,
                 });
             }
+            itemCon.Add(new UiItemParam()
+            {
+                con = itemCon,
+                node = null,
+                deepth = 0,
+            });
             itemCon.Refresh();
             RefreshUnit();
 
@@ -156,6 +165,7 @@ namespace Ui.ModStoryEventEditWindow
             model.selItem = node;
             Refresh();
         }
+        
         public void SelUnit(SyntaxNode node)
         {
             model.selUnit = node;

@@ -285,7 +285,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     private CharacterAnimForm.Data CreateCharacterAnim(string name)
     {
-        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f);
+        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } });
     }
     private CharacterAnimClipForm.Data CreateCharacterAnimClip()
     {
@@ -297,7 +297,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
        return new CharacterAnimClipForm.Data(0,
             new Dictionary<EquipPartType,ItemStyle>(),
             trs,
-            new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart,true },{ BodyPartType.LowerPart, false } },
             new Dictionary<BodyPartType, string>() { { BodyPartType.None, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.UpperPart, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.LowerPart, GlobalNameHelper.GetDefaultTexName() } });
     }
 
@@ -558,10 +557,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
-    public void DeleteScene(string name)
+    public void DeleteScene(int uid)
     {
 
-        SceneForm.RemoveData(SceneForm.DataByName[name].uid);
+        SceneForm.RemoveData(uid);
     }
     #endregion
 

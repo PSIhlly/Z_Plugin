@@ -385,7 +385,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             var data=DataByUid[uid];
 
                     DataByUid.Remove(data.uid);
-    
+
 
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);

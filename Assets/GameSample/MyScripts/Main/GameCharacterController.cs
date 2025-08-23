@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -46,6 +47,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         Z_EventHelper.Register(this);
     }
     public Dictionary<CharacterProductForm.Data, AnimController> animControllerDic = new Dictionary<CharacterProductForm.Data, AnimController>();
+
     public class AnimController
     {
         public enum State
@@ -68,6 +70,18 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         public Dictionary<BodyPartType, int> stateCd = new Dictionary<BodyPartType, int>();
         public Dictionary<BodyPartType, string> animCurCache = new Dictionary<BodyPartType, string>();
         public Dictionary<BodyPartType, Timer> animTimer = new Dictionary<BodyPartType, Timer>();
+
+        public CharacterAnimForm.Data GetAnim(State state)
+        {
+            switch (state)
+            {
+                case State.Move:
+                    return moveAnim;
+                default:
+                    return idleAnim;
+            }
+        }
+
         public void Reset()
         {
             foreach(BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
@@ -79,13 +93,39 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 animTimer[part] = null;
             }
         }
-
+        public void CloseHideRenderer()
+        {
+            foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+            {
+                if (part == BodyPartType.None)
+                    continue;
+                var anim = GetAnim(stateCur[part]);
+                if (anim.partEnable.ContainsKey(part)&&anim.partEnable[part])
+                {
+                    ins.renderers[(int)part - 1].enabled = true;
+                }else
+                {
+                    ins.renderers[(int)part - 1].enabled = false;
+                }
+            }
+        }
         public void TryChangeState(State tar, BodyPartType part, bool forceReplay = false)
         {
+            if (part == BodyPartType.None)
+                return;
+            CharacterAnimForm.Data anim=GetAnim(tar);
+            //Debug.Log((anim == null) + " " + tar);
+            if (!anim.partEnable.ContainsKey(part) || !anim.partEnable[part])
+            {
+                return;
+            }
+
+
             if (stateTar[part] != tar && stateCur[part] != State.None)
             {
                 stateCd[part] = 10;//10frames trans
             }
+
             stateTar[part] = tar;
             if (stateCur[part] != tar)
             {
@@ -96,17 +136,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 return;
             }
             stateCur[part] = tar;
-            CharacterAnimForm.Data anim;
-            switch (tar)
-            {
-                case State.Move:
-                    anim = moveAnim;
-                    break;
-                default:
-                    anim = idleAnim;
-                    break;
-            }
-            UpdateAnim(part, ins.renderers[(int)part-1], ins.unit.data, anim, forceReplay);
+            
+            UpdateAnim(part, ins.renderers[(int)part - 1], ins.unit.data, anim, forceReplay);
         }
 
 
@@ -124,17 +155,21 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             MaterialPropertyBlock propBlock;
             if (anim != null && anim.animClip.Count > 0)
             {
+
                 propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 TimeManager.instance.CancelTimer(animTimer[part]);
+
+
                 if (anim.animTimeInterval > 0)
                 {
                     float all = anim.animTimeInterval * anim.animClip.Count;
-                    int cur = (int)((Time.time % all) / anim.animTimeInterval-0.0001f);
-                 
-                    float timeProgress = (Time.time % anim.animTimeInterval);
+                    int cur = 0;//(int)((Time.time % all) / anim.animTimeInterval-0.0001f);
+
+                    float timeProgress = 0;// (Time.time % anim.animTimeInterval);
                     render.GetPropertyBlock(propBlock);
                     animCurCache[part] = anim.name;
+
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[part]].tex);
                     var renderPart = part;
                     animTimer[part] = TimeManager.instance.StartTimer(timeProgress, anim.animTimeInterval, () =>
@@ -213,7 +248,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 status.TryChangeState(AnimController.State.Idle, part);
             }
         }
-
+        status.CloseHideRenderer();
     }
 
 

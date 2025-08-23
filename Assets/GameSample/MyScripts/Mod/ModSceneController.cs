@@ -19,13 +19,13 @@ using Z_Ui;
 using Z_UnitSystem;
 public enum DesignType
 {
-    Model,
-    Behaviour
+    MapObject,
+    Event
 }
 public interface InternalModSceneController
 {
     public string fileName { get;  }
-    public void Begin(string fileName);
+    public void Begin(int id);
     public void End();
     public void Update();
     public void OnMouse(bool click, Vector3 pos, Vector3 dir);
@@ -95,9 +95,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     #endregion
 
 
-    public void Begin(string fileName)
+    public void Begin(int id)
     {
-        this._fileName = fileName;
+        this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         GameManager.instance.RegisterInputByUgc();
         CameraInstance.instance.Register(Vector3.zero,Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize),5,15);
         CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500),MapManager.instance.data.mainData.mapUnitSize);
@@ -146,7 +146,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         //manage
         switch (designType)
         {
-            case DesignType.Model:
+            case DesignType.MapObject:
                 if (curData != null)
                 {
                     if (curData is MapTerrainForm.Data terrainData)
@@ -284,7 +284,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 }
                             }
                     }
-                    else if (curData is MapObjectForm.Data itemData)
+                    else if (curData is MapItemForm.Data itemData)
                     {
                         for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                             for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
@@ -392,7 +392,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                 }
                 break;
-            case DesignType.Behaviour:
+            case DesignType.Event:
                     //click
                     if (click)
                     {

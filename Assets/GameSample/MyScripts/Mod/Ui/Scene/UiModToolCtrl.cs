@@ -13,7 +13,7 @@ using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
-namespace Ui.ModSceneMain
+namespace Ui.ModSceneMain.ModTool
 {
     public partial class UiModToolModel
     {
@@ -189,14 +189,14 @@ namespace Ui.ModSceneMain
                 }
             });
 
-            view.btn_cnt.onClick.AddListener(() =>
+            view.btn_resetCount.onClick.AddListener(() =>
             {
                 model.cntX = "1";
                 model.cntY = "1";
                 Refresh();
 
             });
-            view.btn_pos.onClick.AddListener(() =>
+            view.btn_align.onClick.AddListener(() =>
             {
                 model.posX = "0";
                 model.posY = "0";
@@ -327,9 +327,11 @@ namespace Ui.ModSceneMain
                                 data = data
                             });
                         }
+                        
+                        
                     }
                     break;
-                    
+
                 case 100:
                     {
                         foreach (var data in MapEraseForm.DataById.Values)
@@ -356,7 +358,7 @@ namespace Ui.ModSceneMain
             }
 
             conData.Refresh();
-            view.sta_pos.ChangeState(model.posing ? 1 : 0);
+            view.sta_align.ChangeState(model.posing ? 1 : 0);
             view.ipt_cntSetX.Set(model.cntX);
             view.ipt_cntSetY.Set(model.cntY);
             view.ipt_posSetX.Set(model.posX);
@@ -364,8 +366,8 @@ namespace Ui.ModSceneMain
             view.ipt_posSetZ.Set(model.posZ);
             view.ipt_rotateSet.Set(model.angle);
 
-            view.txt_textureLayerSet.gameObject.SetActive(model.curType.needLayer
-                ||(model.curData!=null&& model.curData is MapEraseForm.Data erase&&erase.texture));
+            view.go_layer.SetActive(model.curType.needLayer
+                || (model.curData != null && model.curData is MapEraseForm.Data erase && erase.texture));
 
             view.sta_layer0.ChangeState(model.layer == 0 ? 1 : 0);
             view.sta_layer1.ChangeState(model.layer == 1 ? 1 : 0);
@@ -395,7 +397,7 @@ namespace Ui.ModSceneMain
     {
         public override void OnCreate()
         {
-            view.btn_tool.onClick.AddListener(() =>
+            view.btn_.onClick.AddListener(() =>
             {
                 if (parent.model.curData == model.data)
                 {
@@ -412,18 +414,13 @@ namespace Ui.ModSceneMain
         public override void OnShow()
         {
             model.data = param.data;
+            view.sta_exist.ChangeState(1);
 
-            view.txt_name.text = model.data.name;
-            view.img_.sprite = TextureHelper.GetSpriteByPath(model.data.icon);
-            
-            if (parent.model.curData == model.data)
-            {
-                view.sta_tool.ChangeState(1);
-            }
-            else
-            {
-                view.sta_tool.ChangeState(0);
-            }
+            view.txt_.text = model.data.name;
+            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
+
+            view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
+
         }
 
 
@@ -443,7 +440,7 @@ namespace Ui.ModSceneMain
     {
         public override void OnCreate()
         {
-            view.btn_tool.onClick.AddListener(() =>
+            view.btn_.onClick.AddListener(() =>
             {
                 parent.SetCurType(model.data);
             });
@@ -451,18 +448,12 @@ namespace Ui.ModSceneMain
         public override void OnShow()
         {
             model.data = param.data;
+            view.sta_exist.ChangeState(1);
+            view.txt_.text = TextManager.instance.GetTxt(model.data.NameKey);
+            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
 
-            view.txt_name.text = TextManager.instance.GetTxt(model.data.NameKey);
-            view.img_.sprite = TextureHelper.GetSpriteByPath(model.data.icon);
 
-            if (parent.model.curType == model.data)
-            {
-                view.sta_tool.ChangeState(1);
-            }
-            else
-            {
-                view.sta_tool.ChangeState(0);
-            }
+            view.sta_.ChangeState(parent.model.curType == model.data ? 1 : 0);
         }
 
 

@@ -13,6 +13,7 @@ using Z_Ui.Notify;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DataSystem;
+using Ui.Axis;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitAppearance.ModStoryCharacterUnitAppearanceUnit
 {
@@ -35,7 +36,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
         UiScrViewContainer<UiItemCtrl> itemCon;
         UiScrViewContainer<UiPartCtrl> partCon;
-        UiScrViewContainer<UiEquipPartCtrl> equipPartCon;
+        UiScrViewContainer<UiEquipPartCtrl> equipPartCon; 
+        UiScrViewContainer<UiToggleCtrl> enablePartCon; 
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
@@ -61,19 +63,17 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 Refresh();
             };
 
-            view.btn_addTex.onClick.AddListener(() =>
-            {
-                ModManager.instance.assetCtrl.CreateCharacterAnimId(parent.model.data.name, model.data.name);
-                Refresh();
-            });
+
             view.btn_deleteTex.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.name, model.data.name, model.id);
+                model.id = -1;
+                model.part = BodyPartType.None;
                 Refresh();
             });
             view.btn_resetTex.onClick.AddListener(() =>
             {
-                model.data.animClip[model.id].partTex[model.part] = "";
+                model.data.animClip[model.id].partTex[model.part] = GlobalNameHelper.GetDefaultTexName();
                 Refresh();
             });
             view.btn_image.onClick.AddListener(() =>
@@ -85,7 +85,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
 
-
+            enablePartCon = new UiScrViewContainer<UiToggleCtrl>(view.go_toggle, view.scr_enableParts);
             partCon = new UiScrViewContainer<UiPartCtrl>(view.go_part, view.scr_parts);
             equipPartCon = new UiScrViewContainer<UiEquipPartCtrl>(view.go_equipPart, view.scr_equipParts);
             view.btn_plus.onClick.AddListener(() =>
@@ -116,11 +116,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                        return true;
                    }, lst);
             });
-            view.btn_enablePart.onClick.AddListener(() =>
-            {
-                model.data.animClip[model.id].partEnable[model.part] = !model.data.animClip[model.id].partEnable[model.part];
-                Refresh();
-            });
+            
         }
         public override void OnShow()
         {
@@ -144,16 +140,27 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
             view.sta_equip.ChangeState(model.equipPart == EquipPartType.None ? 0 : 1);
 
+            enablePartCon.Clear();
+            foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+            {
+                if (part != BodyPartType.None)
+                    enablePartCon.Add(new UiToggleParam()
+                    {
+                        tp = part
+                    });
+            }
+            enablePartCon.Refresh();
+
             equipPartCon.Clear();
             partCon.Clear();
 
             DisplayCameraAreaManager.instance.Clear();
 
             view.sta_equip.ChangeState(model.id > -1 && model.equipPart != EquipPartType.None?1:0);
+            view.model_Axis.SetActive(false);
             if (model.id > -1)
             {
-                view.sta_enablePart.ChangeState(model.data.animClip[model.id].partEnable[model.part] ? 1 : 0);
-
+               
                 view.sta_equip.ChangeState(0);
 
                 foreach (EquipPartType equipPart in Enum.GetValues(typeof(EquipPartType)))
@@ -165,9 +172,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                         });
                 }
 
-                foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+                foreach (BodyPartType part in model.data.partEnable.Keys)
                 {
-                    if (part != BodyPartType.None)
+                    if (part != BodyPartType.None&& model.data.partEnable[part])
                         partCon.Add(new UiPartParam()
                         {
                             tp = part
@@ -177,16 +184,21 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 if (model.equipPart != EquipPartType.None)
                 {
                     view.txt_layer.text = model.data.animClip[model.id].equipTrs[model.equipPart].Item3.ToString();
-                    view.model_Axis.SetActive(true);
                     
+  /*                  view.model_Axis.SetActive(true, new UiAxisParam()
+                    {
+                        pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[model.id].z + rate / 2) / rate),
+                        limitRtf = view.rtf_image,
+                        onTrsChange = (tp) => {
+                            model.data.model.subPrefabUnitPos[model.id] = new Vector3((tp.Item1.x * 2 - 1) * rate / 2, 0, (tp.Item1.y * 2 - 1) * rate / 2);
+
+                            RefreshView();
+                        }
+                    });*/
                 }
 
 
                 RefreshView();
-            }
-            else
-            {
-                view.model_Axis.SetActive(false);
             }
 
             equipPartCon.Refresh();
@@ -213,7 +225,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
             List<string> texNameLst = new List<string>() {
                 model.data.animClip[model.id].partTex[BodyPartType.UpperPart],
-                model.data.animClip[model.id].partTex[BodyPartType.LowerPart],
+                null,
                 GlobalNameHelper.GetDefaultTexName()
                 };
             var showGo = GameManager.instance.utilCtrl.CombineNewCharacterByPrefabs("fakeChara", texNameLst, false);
@@ -223,12 +235,51 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
         public void OnEvent(AssetEvent evt)
         {
+            if (active)
+                Refresh();
+        }
+    }
+    public partial class UiToggleParam
+    {
+        public BodyPartType tp;
+    }
+    public partial class UiToggleModel
+    {
+        public BodyPartType tp;
+
+    }
+    public partial class UiToggleCtrl
+    {
+
+        public override void OnCreate()
+        {
+
+            view.btn_enablePart.onClick.AddListener(() =>
+            {
+                if(!parent.model.data.partEnable.ContainsKey(model.tp))
+                {
+                    parent.model.data.partEnable[model.tp] = false;
+                }
+                parent.model.data.partEnable[model.tp] = !parent.model.data.partEnable[model.tp];
+                parent.Refresh();
+            });
+
+        }
+        public override void OnShow()
+        {
+            model.tp = param.tp;
             Refresh();
+        }
+        public void Refresh()
+        {
+            view.txt_.text = TextManager.instance.GetTxt(model.tp.ToString());
+            view.sta_enablePart.ChangeState(parent.model.data.partEnable.ContainsKey(model.tp)&&parent.model.data.partEnable[model.tp] ? 1 : 0);
+
         }
     }
 
 
-    public partial class UiItemParam
+public partial class UiItemParam
     {
         public int id;
     }
@@ -301,7 +352,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public void Refresh()
         {
-            view.txt_.text = model.tp.ToString();
+            view.txt_.text = TextManager.instance.GetTxt(model.tp.ToString());
             view.sta_.ChangeState(model.tp != parent.model.part ? 0 : 1);
 
         }
@@ -341,7 +392,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public void Refresh()
         {
-            view.txt_.text = model.tp.ToString();
+            view.txt_.text = TextManager.instance.GetTxt(model.tp.ToString());
             view.sta_.ChangeState(model.tp != parent.model.equipPart ? 0 : 1);
         }
     }

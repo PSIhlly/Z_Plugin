@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-
 namespace Ui.ModSceneBehaviourUnit
 
 {
+
+
 
 
     public partial class UiModSceneBehaviourUnitParam:UiParam
@@ -18,24 +19,18 @@ namespace Ui.ModSceneBehaviourUnit
     {
 
             public Btn btn_bbg;
+            public Img img_;
             public Txt txt_name;
             public Btn btn_close;
             public Btn btn_evt;
-            public Img img_close;
-            public Txt txt_close;
-            public Img img_evt;
-            public Txt txt_evt;
         public UiModSceneBehaviourUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_bbg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            txt_name = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            btn_close = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_evt = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            img_close = uiHolder.elementTrsLst[4].GetComponent<Img>();
-            txt_close = uiHolder.elementTrsLst[5].GetComponent<Txt>();
-            img_evt = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            txt_evt = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            txt_name = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_evt = uiHolder.elementTrsLst[4].GetComponent<Btn>();
         }
 
     }

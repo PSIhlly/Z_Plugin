@@ -122,7 +122,7 @@ namespace Z_Debug
                 }
                 t += "\n";
             }
-                Debug.Log(t);
+                Log(t);
             
         }
         public static void LogErr(string str)

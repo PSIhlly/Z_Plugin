@@ -14,39 +14,45 @@ namespace Ui.Mod
 
 
 
-    public partial class UiStoryItemParam:UiParam
+    public partial class UiItemParam:UiParam
     {
     }
 
-    public partial class UiStoryItemView:UiView
+    public partial class UiItemView:UiView
     {
 
-            public GameObject go_storyItem;
-            public Btn btn_mod;
+            public GameObject go_item;
+            public Sta sta_item;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
             public Sta sta_;
             public Img img_;
             public Txt txt_;
-        public UiStoryItemView(UiHolder uiHolder):base(uiHolder)
+        public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_storyItem = uiHolder.elementTrsLst[0].gameObject;
-            btn_mod = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+            go_item = uiHolder.elementTrsLst[0].gameObject;
+            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            sta_exist = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
-    public partial class UiStoryItemCtrl:UiCtrl
+    public partial class UiItemCtrl:UiCtrl
     {
-        public UiStoryItemView view;
-        public UiStoryItemModel model;
-        public UiStoryItemParam param;
+        public UiItemView view;
+        public UiItemModel model;
+        public UiItemParam param;
         public UiModCtrl parent=>(UiModCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiStoryItemParam)param;
+            this.param = (UiItemParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -54,14 +60,14 @@ namespace Ui.Mod
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiStoryItemView(uiHolder);
-            model=new UiStoryItemModel();
+            view = new UiItemView(uiHolder);
+            model=new UiItemModel();
 
 
         }
 
     }
-    public partial class UiStoryItemModel:UiModel
+    public partial class UiItemModel:UiModel
     {
         
     }
@@ -74,17 +80,19 @@ namespace Ui.Mod
 
             public Btn btn_back;
             public Txt txt_title;
-            public ScrView scr_tt;
-            public GameObject go_storyItem;
-            public UiStoryItemCtrl sub_StoryItem;
+            public ScrView scr_items;
+            public GameObject go_item;
+            public Sta sta_item;
+            public UiItemCtrl sub_Item;
         public UiModView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            scr_tt = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            go_storyItem = uiHolder.elementTrsLst[3].gameObject;
-            sub_StoryItem = (UiStoryItemCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            go_item = uiHolder.elementTrsLst[3].gameObject;
+            sta_item = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -109,8 +117,8 @@ namespace Ui.Mod
             model=new UiModModel();
 
 
-            view.sub_StoryItem = new UiStoryItemCtrl();
-            view.sub_StoryItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_Item = new UiItemCtrl();
+            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }

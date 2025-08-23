@@ -20,7 +20,7 @@ using Z_UnitSystem;
 public interface InternalPlaySceneController
 {
     public string fileName { get; }
-    public void Begin(string fileName);
+    public void Begin(int id);
     public void End();
     public void Update();
     public void OnMouse(bool click, Vector3 pos, Vector3 dir);
@@ -70,9 +70,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     #endregion
 
 
-    public void Begin(string fileName)
+    public void Begin(int id)
     {
-        this._fileName = fileName;
+        this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         GameManager.instance.RegisterInputByPlay();
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 5, 15);
         //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);

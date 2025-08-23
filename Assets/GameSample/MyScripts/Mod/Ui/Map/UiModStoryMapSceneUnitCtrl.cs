@@ -39,19 +39,20 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
             };
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteScene(model.data.name);
+                ModManager.instance.assetCtrl.DeleteScene(model.data.uid);
                 parent.SelPage(0);
             });
             view.btn_edit.onClick.AddListener(() =>
             {
-                Main2StoryManager.instance.StartLoadSceneUgc(model.data.name);
+                Main2StoryManager.instance.StartLoadSceneUgc(model.data.uid);
                 UiManager.instance.CloseUi<UiModStoryCtrl>();
             });
         }
 
         public void OnEvent(AssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
 
         public override void OnShow()

@@ -17,6 +17,7 @@ using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Input;
+using Z_Language;
 using Z_Map;
 using Z_Texture;
 using Z_Ui;
@@ -69,6 +70,7 @@ public class GameManager : Z_MonoManager<GameManager>
     public override void Init()
     {
         base.Init();
+        LanguageManager.instance.SetLanguage(Language.Cn);
 
         utilCtrl = new GameUtilController(this);
         saveCtrl = new GameSaveController(this);

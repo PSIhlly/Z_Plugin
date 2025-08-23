@@ -117,12 +117,12 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         switch (evt.type)
         {
             case CollideEventType.TriggerEnter:
-                if (evt.b == _super.sceneCtrl.playerM.unit.ins && evt.a is ObjectInstance obj)
+                if (evt.b == _super.sceneCtrl.playerM.unit.ins && evt.a is ItemInstance obj)
                 {
                     if (!string.IsNullOrEmpty(obj.unit.productInfo.Item1))
                     {
                         GainItem(obj.unit.productInfo.Item1);
-                        MapManager.instance.RemoveObject(obj.unit.data);
+                        MapManager.instance.RemoveItem(obj.unit.data);
                     }
                 }
                 break;

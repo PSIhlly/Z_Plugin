@@ -46,7 +46,8 @@ namespace Ui.ModStory.ModStoryOverview
 
         public void OnEvent(AssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
 
         public override void OnShow()

@@ -22,7 +22,7 @@ namespace Ui.PlayData.PlayDataBackpack
     public partial class UiPlayDataBackpackCtrl
     {
 
-        UiScrViewContainer<UiItemCtrl> itemCon;
+        UiScrViewContainer<UiGameItemCtrl> itemCon;
         public override void OnCreate()
         {
 
@@ -42,7 +42,7 @@ namespace Ui.PlayData.PlayDataBackpack
             {
 
             });
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_);
+            itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameItems);
 
         }
         public override void OnShow()
@@ -56,7 +56,7 @@ namespace Ui.PlayData.PlayDataBackpack
             itemCon.Clear();
             for (int i = 0, icnt = PlayManager.instance.data.progress.bag.Count; i < icnt; i++)
             {
-                itemCon.Add(new UiItemParam()
+                itemCon.Add(new UiGameItemParam()
                 {
                     data = ItemProductForm.DataByUid[PlayManager.instance.data.progress.bag[i]]
                 }) ;
@@ -66,7 +66,7 @@ namespace Ui.PlayData.PlayDataBackpack
             if (model.sel!=null)
             {
                 view.img_.sprite = TexAssetForm.DataByName[model.sel.iconTexName].sprite;
-                view.txt_amount.text = model.sel.amount.ToString();
+                
                 view.txt_desc.text = model.sel.desc;
             }
         }
@@ -78,17 +78,17 @@ namespace Ui.PlayData.PlayDataBackpack
     }
 
 
-    public partial class UiItemParam
+    public partial class UiGameItemParam
     {
 
         public ItemProductForm.Data data;
     }
-    public partial class UiItemModel
+    public partial class UiGameItemModel
     {
 
         public ItemProductForm.Data data;
     }
-    public partial class UiItemCtrl
+    public partial class UiGameItemCtrl
     {
 
         public override void OnCreate()
@@ -110,9 +110,11 @@ namespace Ui.PlayData.PlayDataBackpack
         }
         public void Refresh()
         {
-            view.txt_amount.text = model.data.amount.ToString();
+            view.sta_exist.ChangeState(1);
+            view.txt_.text = model.data.name;
+            view.txt_count.text = model.data.amount.ToString();
             view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].sprite;
-            view.sta_item.ChangeState(parent.model.sel == model.data ? 1 : 0);
+            view.sta_.ChangeState(parent.model.sel == model.data ? 1 : 0);
         }
     }
 

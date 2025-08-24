@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using Z_String;
 using Z_Ui.Base;
 
@@ -114,8 +115,13 @@ namespace Z_Ui_Editor
                     refreshCode += $@"
             view.ipt_{o.name.Split("_")[1]}.Set("""") ;";
                 }
+                else if (o.name.Split("_")[0].Split("|").Contains("sld"))
+                {
+                   
+                    refreshCode += $@"
+            view.sld{o.name.Split("_")[1]}.value = 0;";
+                }
             }
-
             var tmp = uiHolder;
             string namespaceStr = uiHolder.uiName;
             while (tmp.parent != null && uiHolder.uiType == UiType.Panel)
@@ -355,7 +361,12 @@ using Z_Texture;
                             initContent += $@"
             scr_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<ScrView>();";
                             break;
-
+                        case "sld":
+                            declareContent += $@"
+            public Sld sld_{realName};";
+                            initContent += $@"
+            sld_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Sld>();";
+                            break;
                         case "sta":
                             declareContent += $@"
             public Sta sta_{realName};";

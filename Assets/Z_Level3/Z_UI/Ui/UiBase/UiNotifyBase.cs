@@ -474,6 +474,7 @@ namespace Ui.Notify
             public GameObject go_close;
             public Btn btn_close;
             public UiSelectionCtrl sub_Selection;
+            public Txt txt_;
         public UiPopupView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -482,6 +483,7 @@ namespace Ui.Notify
             go_close = uiHolder.elementTrsLst[2].gameObject;
             btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             sub_Selection = (UiSelectionCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            txt_ = uiHolder.elementTrsLst[5].GetComponent<Txt>();
         }
 
     }

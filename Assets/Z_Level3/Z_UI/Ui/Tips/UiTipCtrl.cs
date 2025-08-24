@@ -35,11 +35,12 @@ namespace Ui.Notify
                 parent.RemoveTip(model.info.id);
                 return true;
             }, uiHolder);
-            TimeManager.instance.AddNextBigFrameAction(()=>
+            LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            /*TimeManager.instance.AddNextBigFrameAction(()=>
             {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            }, gameObject);
+
+            }, gameObject);*/
             
         }
 

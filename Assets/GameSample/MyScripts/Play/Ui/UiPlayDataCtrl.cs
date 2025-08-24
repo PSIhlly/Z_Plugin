@@ -51,8 +51,6 @@ namespace Ui.PlayData
         {
 
             view.page_PlayDataBackpack.SetActive(model.selPage == 0);
-            view.img_backpack.sprite = TextureHelper.transparentSprite;
-            view.img_character.sprite = TextureHelper.transparentSprite;
         }
     }
 

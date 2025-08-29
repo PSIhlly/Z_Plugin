@@ -44,7 +44,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeValnameAction;
                 
-        public static Action<Data,long,long> changeNumAction;
+        public static Action<Data,float,float> changeNumAction;
                 
 
 
@@ -105,11 +105,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private long  _num;
+                    private float  _num;
                     /// <summary>
                     ///ÊýÖµ
                     ///</summary>
-                    public long  num{
+                    public float  num{
                                 get{return _num;}
  set{
 
@@ -123,7 +123,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string str,string valName,long num)
+            public Data(int uid,string str,string valName,float num)
             {
 
              this.uid = uid;
@@ -140,7 +140,7 @@ public static readonly int autoUidCnt=100;
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",0);
+                   private static Data _defaultData=new Data(0,"","",0f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -217,7 +217,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("valName"),
 
-                jo.Get<long>("num")
+                jo.Get<float>("num")
                     );
 
             return data;
@@ -235,7 +235,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("valName",data.valName);
 
-            jo.Set<long>("num",data.num);
+            jo.Set<float>("num",data.num);
 
             return jo;
         }
@@ -344,7 +344,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeNum(Data superData,long oldV,long newV)
+            public static void ChangeNum(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {

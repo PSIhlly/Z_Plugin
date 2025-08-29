@@ -368,6 +368,12 @@ namespace Form
 
                 {1210086,new Data(1210086,"resetCount","Reset count","重置数量")},
 
+                {1210087,new Data(1210087,"ui","UI","界面")},
+
+                {1210088,new Data(1210088,"notice","Notice","通知")},
+
+                {1210089,new Data(1210089,"Choose command","Choose command","选择命令")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -608,6 +614,12 @@ namespace Form
                         {"align",_DataById[1210085]},
     
                         {"resetCount",_DataById[1210086]},
+    
+                        {"ui",_DataById[1210087]},
+    
+                        {"notice",_DataById[1210088]},
+    
+                        {"Choose command",_DataById[1210089]},
     
                     };
     

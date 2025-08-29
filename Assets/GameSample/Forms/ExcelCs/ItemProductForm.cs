@@ -87,17 +87,7 @@ namespace Form
                 
         public static Action<Data,bool,bool> changeCanequipeAction;
                 
-        public static Action<Data,string,string> changeOnuseeventAction;
-                
-        public static Action<Data,string,string> changeOnequipeventAction;
-                
-        public static Action<Data,string,string> changeOndisequipeventAction;
-                
-        public static Action<Data,string,string> changeOntoucheventAction;
-                
-        public static Action<Data,string,string> changeOnleaveeventAction;
-                
-        public static Action<Data,string,string> changeOnshoweventAction;
+        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
 
 
@@ -284,115 +274,25 @@ namespace Form
                  
                      }
                     
-                    private string  _onUseEvent;
+                    private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    ///使用事件名
+                    ///事件
                     ///</summary>
-                    public string  onUseEvent{
-                                get{return _onUseEvent;}
+                    public Dictionary<string,EventTriggerForm.Data>  events{
+                                get{return _events;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeOnuseevent(this,_onUseEvent,value); 
+                       ChangeEvents(this,_events,value); 
                     }
         
-                _onUseEvent = value;
+                _events = value;
                 }
                  
                      }
                     
-                    private string  _onEquipEvent;
-                    /// <summary>
-                    ///装备事件名
-                    ///</summary>
-                    public string  onEquipEvent{
-                                get{return _onEquipEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOnequipevent(this,_onEquipEvent,value); 
-                    }
-        
-                _onEquipEvent = value;
-                }
-                 
-                     }
-                    
-                    private string  _onDisequipEvent;
-                    /// <summary>
-                    ///卸下事件名
-                    ///</summary>
-                    public string  onDisequipEvent{
-                                get{return _onDisequipEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOndisequipevent(this,_onDisequipEvent,value); 
-                    }
-        
-                _onDisequipEvent = value;
-                }
-                 
-                     }
-                    
-                    private string  _onTouchEvent;
-                    /// <summary>
-                    ///接触事件名
-                    ///</summary>
-                    public string  onTouchEvent{
-                                get{return _onTouchEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOntouchevent(this,_onTouchEvent,value); 
-                    }
-        
-                _onTouchEvent = value;
-                }
-                 
-                     }
-                    
-                    private string  _onLeaveEvent;
-                    /// <summary>
-                    ///离开事件名
-                    ///</summary>
-                    public string  onLeaveEvent{
-                                get{return _onLeaveEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOnleaveevent(this,_onLeaveEvent,value); 
-                    }
-        
-                _onLeaveEvent = value;
-                }
-                 
-                     }
-                    
-                    private string  _onShowEvent;
-                    /// <summary>
-                    ///出现事件名
-                    ///</summary>
-                    public string  onShowEvent{
-                                get{return _onShowEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOnshowevent(this,_onShowEvent,value); 
-                    }
-        
-                _onShowEvent = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,string onUseEvent,string onEquipEvent,string onDisequipEvent,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(uid,name,label,isProto)
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -409,23 +309,18 @@ namespace Form
              this.styleTex = styleTex;
              this.price = price;
              this.canEquipe = canEquipe;
-             this.onUseEvent = onUseEvent;
-             this.onEquipEvent = onEquipEvent;
-             this.onDisequipEvent = onDisequipEvent;
-             this.onTouchEvent = onTouchEvent;
-             this.onLeaveEvent = onLeaveEvent;
-             this.onShowEvent = onShowEvent;
+             this.events = events;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,onUseEvent,onEquipEvent,onDisequipEvent,onTouchEvent,onLeaveEvent,onShowEvent);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),isProto,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,new Dictionary<string,EventTriggerForm.Data>(events));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,"","","","","","");
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},false,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -588,17 +483,7 @@ namespace Form
 
                 jo.Get<bool>("canEquipe"),
 
-                jo.Get<string>("onUseEvent"),
-
-                jo.Get<string>("onEquipEvent"),
-
-                jo.Get<string>("onDisequipEvent"),
-
-                jo.Get<string>("onTouchEvent"),
-
-                jo.Get<string>("onLeaveEvent"),
-
-                jo.Get<string>("onShowEvent")
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
                     );
 
             return data;
@@ -638,17 +523,7 @@ namespace Form
 
             jo.Set<bool>("canEquipe",data.canEquipe);
 
-            jo.Set<string>("onUseEvent",data.onUseEvent);
-
-            jo.Set<string>("onEquipEvent",data.onEquipEvent);
-
-            jo.Set<string>("onDisequipEvent",data.onDisequipEvent);
-
-            jo.Set<string>("onTouchEvent",data.onTouchEvent);
-
-            jo.Set<string>("onLeaveEvent",data.onLeaveEvent);
-
-            jo.Set<string>("onShowEvent",data.onShowEvent);
+            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             return jo;
         }
@@ -929,62 +804,12 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeOnuseevent(Data superData,string oldV,string newV)
+            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeOnuseeventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOnequipevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOnequipeventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOndisequipevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOndisequipeventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOntouchevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOntoucheventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOnleaveevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOnleaveeventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOnshowevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOnshoweventAction?.Invoke(data,oldV,newV);
+                changeEventsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

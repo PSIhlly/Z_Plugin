@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Z_Code.Form;
+using Z_Debug;
 
 namespace Z_Code
 {
@@ -58,17 +59,22 @@ namespace Z_Code
     }
     public class Compiler
     {
+        public static bool DEBUG;
         LexicalAnalysis lexicalAnalysis = new LexicalAnalysis();
         SyntaxAnalysis syntaxAnalysis = new SyntaxAnalysis();
         ZLanguageAnalysis zLanguageAnalysis = new ZLanguageAnalysis();
 
-        public List<string> Compile(string code,out List<SyntaxNode> syntaxs)
+        public List<string> Compile(string code, out List<SyntaxNode> syntaxs)
         {
             var lexicals = lexicalAnalysis.Execute(code);
             syntaxs = syntaxAnalysis.Execute(lexicals);
             var zl = zLanguageAnalysis.Execute(syntaxs);
+            if (DEBUG)
+            {
+                Z_Log.Log(zl);
+            }
             return zl;
         }
-        
+
     }
 }

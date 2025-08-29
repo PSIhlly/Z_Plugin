@@ -81,11 +81,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeHpparamnameAction;
                 
-        public static Action<Data,string,string> changeOntoucheventAction;
-                
-        public static Action<Data,string,string> changeOnleaveeventAction;
-                
-        public static Action<Data,string,string> changeOnshoweventAction;
+        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
 
 
@@ -218,61 +214,25 @@ namespace Form
                  
                      }
                     
-                    private string  _onTouchEvent;
+                    private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    ///接触事件名
+                    ///事件
                     ///</summary>
-                    public string  onTouchEvent{
-                                get{return _onTouchEvent;}
+                    public Dictionary<string,EventTriggerForm.Data>  events{
+                                get{return _events;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeOntouchevent(this,_onTouchEvent,value); 
+                       ChangeEvents(this,_events,value); 
                     }
         
-                _onTouchEvent = value;
+                _events = value;
                 }
                  
                      }
                     
-                    private string  _onLeaveEvent;
-                    /// <summary>
-                    ///离开事件名
-                    ///</summary>
-                    public string  onLeaveEvent{
-                                get{return _onLeaveEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOnleaveevent(this,_onLeaveEvent,value); 
-                    }
-        
-                _onLeaveEvent = value;
-                }
-                 
-                     }
-                    
-                    private string  _onShowEvent;
-                    /// <summary>
-                    ///出现事件名
-                    ///</summary>
-                    public string  onShowEvent{
-                                get{return _onShowEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOnshowevent(this,_onShowEvent,value); 
-                    }
-        
-                _onShowEvent = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,string onTouchEvent,string onLeaveEvent,string onShowEvent):base(uid,name,label,isProto)
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -286,20 +246,18 @@ namespace Form
              this.moveAnimName = moveAnimName;
              this.speedParamName = speedParamName;
              this.hpParamName = hpParamName;
-             this.onTouchEvent = onTouchEvent;
-             this.onLeaveEvent = onLeaveEvent;
-             this.onShowEvent = onShowEvent;
+             this.events = events;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,onTouchEvent,onLeaveEvent,onShowEvent);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","","","","");
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","",new Dictionary<string,EventTriggerForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -456,11 +414,7 @@ namespace Form
 
                 jo.Get<string>("hpParamName"),
 
-                jo.Get<string>("onTouchEvent"),
-
-                jo.Get<string>("onLeaveEvent"),
-
-                jo.Get<string>("onShowEvent")
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
                     );
 
             return data;
@@ -494,11 +448,7 @@ namespace Form
 
             jo.Set<string>("hpParamName",data.hpParamName);
 
-            jo.Set<string>("onTouchEvent",data.onTouchEvent);
-
-            jo.Set<string>("onLeaveEvent",data.onLeaveEvent);
-
-            jo.Set<string>("onShowEvent",data.onShowEvent);
+            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             return jo;
         }
@@ -749,32 +699,12 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeOntouchevent(Data superData,string oldV,string newV)
+            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeOntoucheventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOnleaveevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOnleaveeventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOnshowevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOnshoweventAction?.Invoke(data,oldV,newV);
+                changeEventsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -63,40 +63,18 @@ public class Z_Ui_Sample : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            var sub = new Dictionary<string, (Sprite,object)>()
-            {
-                { "AAAA", (null,new Dictionary<string, (Sprite,object)>(){
-                    { "AAA", (null,new Dictionary<string, (Sprite,object)>()
-                        {
-                        { "AA",(null,null)},
-                        { "BB",(null,null) },
-                        }) },
-                    { "AAB", (null,new Dictionary<string, (Sprite,object)>()
-                        {
-                        { "AB",(null,null) },
-                        { "BC",(null,null)},
-                        }) }
-                } 
-                )},
-                { "BBBB",(null, new Dictionary<string, (Sprite,object)>(){
-                    { "BBB",(null, new Dictionary<string, (Sprite,object)>()
-                        {
-                        { "DD",(null,null) },
-                            { "EE",(null,null) },
-                        })},
-                    { "BBC", (null,new Dictionary<string, (Sprite,object)>()
-                        {
-                        { "FF",(null,null)},
-                        { "GG",(null,null)},
-                        })}
-                }
-                ) }
-            };
-           
-            NotifyManager.instance.AddMultipleChoose("Ch", false, 2, (lst) =>
+            var items = new EntryItem();
+            items.Add("a");
+            items.subs["a"].Add("b");
+            items.subs["a"].subs["b"].Add("bb");
+            items.subs["a"].subs["b"].Add("cc");
+            items.Add("c");
+            items.subs["c"].Add("d");
+
+            NotifyManager.instance.AddMultipleChoose("Ch", false, (item) =>
             {
                 return true;
-            }, sub);
+            }, items);
 
         }
     }

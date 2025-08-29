@@ -8,15 +8,19 @@ using System.Threading.Tasks;
 using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
 using UnityEngine;
+using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
 using Z_String;
+using Z_Text;
+using Z_Ui.Notify;
+using static UnityEditor.Progress;
 using static UnityEngine.Rendering.DebugUI.MessageBox;
 namespace Form
 {
-    public  static partial class StoryTexAssetForm
+    public static partial class StoryTexAssetForm
     {
         public static void AddData(TexAssetForm.Data data)
         {
@@ -33,7 +37,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public int modId;
 
-   
+
 
     #region story
     public void ImportStoryTex()
@@ -56,13 +60,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         if (string.IsNullOrEmpty(name))
         {
-            name=StringHelper.GetUniqueName(GlobalParamForm.DataByName.Keys);
+            name = StringHelper.GetUniqueName(GlobalParamForm.DataByName.Keys);
         }
         GlobalParamForm.AddData(new GlobalParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
     }
     public void DeleteGlobalArg(string name)
     {
-        
+
         GlobalParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
     }
     public void CreateCharacterArg(string name)
@@ -74,7 +78,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
         }
-        
+
         CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
@@ -100,7 +104,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(ItemParamForm.DataByName.Keys);
         }
-       
+
         ItemParamForm.AddData(new ItemParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
         foreach (var item in ItemProductForm.DataByUid.Values)
         {
@@ -123,19 +127,19 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     #region texture
 
-    public void CreateTex(string lab="",string name=null)
+    public void CreateTex(string lab = "", string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(MapTextureForm.DataByName.Keys);
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), 1, new List<string>() { GlobalNameHelper.GetDefaultTexName() }, lab,"","",""));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), 1, new List<string>() { GlobalNameHelper.GetDefaultTexName() }, lab, new Dictionary<string, EventTriggerForm.Data>()));
     }
-    public void ImportTex(string name, int id=-1)
+    public void ImportTex(string name, int id = -1)
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
          {
-             if (id!=-1&&MapTextureForm.DataByName[name].texsName.Count > id)
+             if (id != -1 && MapTextureForm.DataByName[name].texsName.Count > id)
              {
                  MapTextureForm.DataByName[name].texsName[id] = form.name;
              }
@@ -161,7 +165,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     #endregion
     #region mask
-    public void CreateMask(string lab="",string name=null)
+    public void CreateMask(string lab = "", string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -195,19 +199,36 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region object
+    public void ChooseModel(string title, Action<EntryItem> act)
+    {
+        var items = new EntryItem();
+        foreach (var form in GameObjectAssetForm.DataById.Values)
+        {
+            if (!form.name.StartsWith(GlobalNameHelper.GetInternalPrefabName("")))
+            {
+                items.Add(form.name);
+            }
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
     public void DeleteObject(string name)
     {
         MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
     }
-    
-    public void CreateObject(string lab="",string name=null)
+
+    public void CreateObject(string lab = "", string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(MapObjectForm.DataByName.Keys);
         }
 
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab,false,"","",""));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab, false, new Dictionary<string, EventTriggerForm.Data>()));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -253,7 +274,51 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region character
-
+    public void ChooseCharacterParam(string title, Action<EntryItem> act)
+    {
+        var items = new EntryItem();
+        foreach (var data in CharacterParamForm.DataByName.Values)
+        {
+            items.Add(data.name);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
+    public void ChooseCharacterAnim(Dictionary<string, CharacterAnimForm.Data> animDic, string title, Action<EntryItem> act)
+    {
+        var items = new EntryItem();
+        foreach (var key in animDic.Keys)
+        {
+            items.Add(key);
+        }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose Idle anim"),
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
+    public void ChooseCharacter(string title, Action<EntryItem> act)
+    {
+        var items = new EntryItem();
+        if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
+        {
+            foreach (var data in CharacterProductForm.DatasByIsproto[true])
+            {
+                items.Add(data.name, TexAssetForm.DataByName[data.avatarTexName].sprite);
+            }
+        }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
     public void RenameCharacterParam(string oldName, string newName)
     {
         CharacterParamForm.DataByName[oldName].name = newName;
@@ -272,7 +337,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
     }
 
-    
+
     public void ImportCharacterAvatar(string name)
     {
 
@@ -290,30 +355,30 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     private CharacterAnimClipForm.Data CreateCharacterAnimClip()
     {
         var trs = new Dictionary<EquipPartType, (float, float, int, float)>();
-        foreach(EquipPartType tp in Enum.GetValues(typeof(EquipPartType)))
-      {
+        foreach (EquipPartType tp in Enum.GetValues(typeof(EquipPartType)))
+        {
             trs[tp] = (0.5f, 0.5f, 1, 0.5f);
         }
-       return new CharacterAnimClipForm.Data(0,
-            new Dictionary<EquipPartType,ItemStyle>(),
-            trs,
-            new Dictionary<BodyPartType, string>() { { BodyPartType.None, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.UpperPart, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.LowerPart, GlobalNameHelper.GetDefaultTexName() } });
+        return new CharacterAnimClipForm.Data(0,
+             new Dictionary<EquipPartType, ItemStyle>(),
+             trs,
+             new Dictionary<BodyPartType, string>() { { BodyPartType.None, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.UpperPart, GlobalNameHelper.GetDefaultTexName() }, { BodyPartType.LowerPart, GlobalNameHelper.GetDefaultTexName() } });
     }
 
 
-    public void CreateCharacter(string name=null)
+    public void CreateCharacter(string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
         }
-        var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "new1", CreateCharacterAnim("new1") } } ;
+        var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "new1", CreateCharacterAnim("new1") } };
         var paramDic = new Dictionary<string, CharacterParamForm.Data>();
         foreach (var prm in CharacterParamForm.DataByName.Values)
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), paramDic, true, animDic, "", "", "", "","","",""));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), paramDic, true, animDic, "", "", "", "", new Dictionary<string, EventTriggerForm.Data>()));
     }
     public void DeleteCharacter(string name)
     {
@@ -361,7 +426,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
     }
-    public void CreateCharacterAnim(string name, string animName=null)
+    public void CreateCharacterAnim(string name, string animName = null)
     {
         var data = CharacterProductForm.DataByNameIsproto[(name, true)];
         if (data.animDic.Keys.Count > GlobalMaxSettings.CHARACTER_ANIM_MAX)
@@ -375,13 +440,49 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateCharacterAnimId(string name, string animNm)
     {
-        var data = CharacterProductForm.DataByNameIsproto[(name,true)];
+        var data = CharacterProductForm.DataByNameIsproto[(name, true)];
         var anim = data.animDic[animNm];
         anim.animClip.Add(CreateCharacterAnimClip());
     }
     #endregion
 
     #region event
+    public void ImportImage(Action<TexAssetForm.Data> act)
+    {
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        {
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+            act?.Invoke(form);
+        });
+    }
+    public void ChooseEvent(Dictionary<string, EventTriggerForm.Data>  dic,string key,EventType type, string retType, string title, Action<EntryItem> act)
+    {
+        var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
+        NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
+        {
+            dic[key] = new EventTriggerForm.Data(-1, key, res.content);
+            act?.Invoke(res);
+            return true;
+        }, items);
+    }
+    public void ChooseEvent(EventType type, string retType, string title, Action<EntryItem> act)
+    {
+        var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
+        NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
+        {
+            act?.Invoke(res);
+            return true;
+        }, items);
+    }
+    public void ChooseCmd(EventType type, string retType, Action<EntryItem> act)
+    {
+        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType);
+        NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>
+        {
+            act?.Invoke(res);
+            return true;
+        }, items);
+    }
 
     public void CreateEvent(string name = "", string category = "", string type = "")
     {
@@ -394,7 +495,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         if (type == null)
             type = "";
 
-        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "",new List<string>(), category, type));
+        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "", new List<string>(), category, type));
     }
     public void DeleteEvent(string name)
     {
@@ -402,7 +503,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportClipTex(Action<string> callback)
     {
-        AssetManager.instance.SelectTex(callback:(form) =>
+        AssetManager.instance.SelectTex(callback: (form) =>
         {
             callback?.Invoke(form.name);
             GameManager.instance.saveCtrl.AddStoryTex(form);
@@ -412,6 +513,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region item
+    public void ChooseItemStyle(string title, Action<EntryItem> act)
+    {
+        var items = new EntryItem();
+        foreach (var e in Enum.GetValues(typeof(ItemStyle)))
+        {
+            items.Add((string)e);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
+
 
     public void RenameItemParam(string oldName, string newName)
     {
@@ -431,7 +547,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
     }
 
-   
+
 
     public void ImportItemIcon(string name)
     {
@@ -443,10 +559,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
-   
 
 
-    public void CreateItem(string name=null)
+
+    public void CreateItem(string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -461,10 +577,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         model.isObstacle = false;
         var styleTex = new Dictionary<ItemStyle, string>();
         foreach (ItemStyle style in Enum.GetValues(typeof(ItemStyle)))
-        { 
-            styleTex[style] = GlobalNameHelper.GetDefaultTexName(); 
+        {
+            styleTex[style] = GlobalNameHelper.GetDefaultTexName();
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, true, model,"",1,1,default, styleTex, 0,false,"", "", "","","",""));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, true, model, "", 1, 1, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>()));
     }
     public void DeleteItem(string name)
     {
@@ -544,7 +660,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(SceneForm.DataByName.Keys);
         }
-        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), (0.5f,0.5f)));
+        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), (0.5f, 0.5f)));
     }
 
     public void ImportSceneMiniMap(string name)
@@ -559,8 +675,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void DeleteScene(int uid)
     {
-
         SceneForm.RemoveData(uid);
+        GameManager.instance.saveCtrl.DeleteSceneMap(ModManager.instance.GetStoryCoreFolder(), uid);
     }
     #endregion
 

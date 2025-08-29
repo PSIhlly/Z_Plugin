@@ -12,11 +12,13 @@ using Z_Time;
 using Z_Code.Form;
 using Form;
 using UnityEditor.Experimental.GraphView;
+using System;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiModStoryEventEditWindowParam
     {
         public EventProgramDataForm.Data data;
+        public Action onClose;
     }
     public partial class UiModStoryEventEditWindowModel
     {
@@ -28,6 +30,8 @@ namespace Ui.ModStoryEventEditWindow
         public bool codeEditMode;
         public SyntaxNode selItem;
         public SyntaxNode selUnit;
+        public Action onClose;
+
     }
     public partial class UiModStoryEventEditWindowCtrl
     {
@@ -43,8 +47,8 @@ namespace Ui.ModStoryEventEditWindow
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();
             model.curEntry = new List<SyntaxNode>();
-           
-            view.ipt_name.onFinishInput+=(v) =>
+
+            view.ipt_name.onFinishInput += (v) =>
             {
                 model.data.name = v;
                 Refresh();
@@ -70,43 +74,68 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_apply.onClick.AddListener(() =>
             {
-                if(model.codeEditMode)
+                if (model.codeEditMode)
                 {
-                    model.data.code = view.ipt_code.text;
-                    model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+                    ApplyCode();
+
                 }
                 else
                 {
-                    model.data.code = model.dcpr.Decompile(model.curEntry);
-                    model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
-                    view.ipt_code.Set(model.data.code);
+                    ApplyEntry();
+
                 }
 
-                Refresh();
             });
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();
             });
+            view.btn_edit.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseCmd(EventType.All, GlobalEventHelper.GetGameRetType(model.selUnit.desc), (item) =>
+                {
+                    BaseData.cmdDic[item.content].GetUnitChooseCode((code) =>
+                    {
+                        model.cpr.Compile(code, out var res);
+                        ReplaceNode(model.selUnit, res[0]);
+                        ApplyEntry();
+                    });
+                });
+                
+            });
+        }
+        public void ApplyEntry()
+        {
+            model.data.code = model.dcpr.Decompile(model.curEntry);
+            model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+            view.ipt_code.Set(model.data.code);
+            Refresh();
+        }
+        public void ApplyCode()
+        {
+            model.data.code = view.ipt_code.text;
+            model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+            Refresh();
         }
         public override void OnShow()
         {
             model.codeEditMode = false;
             model.data = param.data;
+            model.onClose = param.onClose;
+            model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+            view.ipt_code.Set(model.data.code);
 
             model.selItem = null;
             model.selUnit = null;
             Refresh();
         }
-        public override void Close()
+        public override void OnDisable()
         {
-            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder(),model.data);
-            base.Close();
+            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder(), model.data);
+            model.onClose?.Invoke();
         }
         public void Refresh()
         {
-            model.curEntry.Clear();
-            model.cpr.Compile(model.data.code, out model.curEntry);
 
             itemCon.Clear();
             foreach (var node in model.curEntry)
@@ -135,11 +164,12 @@ namespace Ui.ModStoryEventEditWindow
 
             view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
             view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
+            RefreshUnitDetail();
         }
         public void RefreshUnit()
         {
             unitCon.Clear();
-            if(model.selItem!=null)
+            if (model.selItem != null)
             {
                 unitCon.Add(new UiUnitParam()
                 {
@@ -149,27 +179,67 @@ namespace Ui.ModStoryEventEditWindow
                     deepth = 0,
                 });
             }
-            
+
             unitCon.Refresh();
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unitRoot);
-            TimeManager.instance.StartTimer(0.5f, 0, () =>
+
+            TimeManager.instance.AddCurLateUpdateAction(() =>
             {
                 LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unitRoot);
-                return true;
-            }, uiHolder);
+            }, gameObject);
 
+        }
+        public void RefreshUnitDetail()
+        {
+            view.sta_unit.ChangeState(model.selUnit == null ? 0 : 1);
+
+            if (model.selUnit != null)
+            {
+
+            }
         }
         public void SelItem(SyntaxNode node)
         {
             model.selItem = node;
             Refresh();
         }
-        
+
         public void SelUnit(SyntaxNode node)
         {
             model.selUnit = node;
             Refresh();
+        }
+        public void ReplaceNode(SyntaxNode nodeNow, SyntaxNode nodeNew)
+        {
+            if (nodeNow.parentNode != null)
+            {
+                for (int i = 0, icnt = nodeNow.parentNode.subNodes.Count; i < icnt; i++)
+                {
+                    if (nodeNow.parentNode.subNodes[i] == nodeNow)
+                    {
+                        nodeNow.parentNode.subNodes[i] = nodeNew;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0, icnt = model.curEntry.Count; i < icnt; i++)
+                {
+                    if (model.curEntry[i] == nodeNow)
+                    {
+                        model.curEntry[i] = nodeNew;
+                    }
+                }
+            }
+
+            if (nodeNow == model.selItem)
+            {
+                model.selItem = nodeNew;
+            }
+            if (nodeNow == model.selUnit)
+            {
+                model.selUnit = nodeNew;
+            }
         }
     }
 }

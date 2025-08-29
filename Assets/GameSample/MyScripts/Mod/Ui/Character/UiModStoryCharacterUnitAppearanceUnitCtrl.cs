@@ -102,19 +102,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             view.btn_itemStyle.onClick.AddListener(() =>
             {
-                var lst = new List<(string, Sprite)>();
-                foreach (var e in Enum.GetValues(typeof(ItemStyle)))
+                ModManager.instance.assetCtrl.ChooseItemStyle(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    lst.Add(((string)e, null));
-                }
-                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose show equipped item style"),
-                   true, (id) =>
-                   {
-
-                       model.data.animClip[model.id].equipStyle[model.equipPart] = (ItemStyle)id;
-                       Refresh();
-                       return true;
-                   }, lst);
+                    model.data.animClip[model.id].equipStyle[model.equipPart] =(ItemStyle)Enum.Parse(typeof(ItemStyle), item.content);
+                    Refresh();
+                });
             });
             
         }

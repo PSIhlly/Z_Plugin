@@ -31,21 +31,11 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         {
             view.btn_mainCharacter.onClick.AddListener(() =>
             {
-                List<(string,Sprite)> lst = new List<(string, Sprite)>();
-                if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
+                ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose main character"), (item) =>
                 {
-                    foreach (var data in CharacterProductForm.DatasByIsproto[true])
-                    {
-                        lst.Add((data.name, TexAssetForm.DataByName[data.avatarTexName].sprite));
-                    }
-                }
-                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
-                    true, (id) =>
-                    {
-                        GameManager.instance.curConfig.mainCharacterName = lst[id].Item1;
-                        Refresh();
-                        return true;
-                    }, lst);
+                    GameManager.instance.curConfig.mainCharacterName = item.content;
+                    Refresh();
+                });
             });
 
         }
@@ -54,7 +44,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
 
             Refresh();
         }
-      
+
         public void Refresh()
         {
 

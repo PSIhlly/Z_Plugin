@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -34,30 +35,58 @@ namespace Z_Code
                 Interpreter _interpreter;
                 public bool Interpret()
                 {
-                    if(_interpreter==null)
+                    if (_interpreter == null)
                     {
                         _interpreter = new Interpreter(program);
                     }
-                   return _interpreter.Interpret();
+                    return _interpreter.Interpret();
                 }
             }
 
         }
     }
+    public class InterpretLock
+    {
+        Interpreter interpreter;
+        public InterpretLock(Interpreter interpreter)
+        {
+            this.interpreter = interpreter;
+        }
+        private bool isLocked;
+        public bool IsLocked()
+        {
+            return isLocked;
+        }
+        public void Lock()
+        {
+            isLocked = true;
+        }
+        public void Unlock()
+        {
+            isLocked = false;
+            interpreter.data.p++;
+        }
+    }
 
     public class Interpreter
     {
-        InterpretDataForm.Data data;
+        public InterpretDataForm.Data data;
         public const bool DEBUG = false;
-
+        InterpretLock localLock;
 
         public Interpreter(ProgramDataForm.Data program)
         {
             data = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1);
+            localLock = new InterpretLock(this);
         }
 
         public bool Interpret()
         {
+            if (localLock.IsLocked())
+            {
+                return false;
+            }
+
             int cnt = data.program.zCode.Count;
             for (; data.p < cnt; data.p++)
             {
@@ -69,7 +98,7 @@ namespace Z_Code
                 {
                     case Op.PushNum:
                         data.p++;
-                        Push(new BoxDataForm.Data(-1, "", "", long.Parse(data.program.zCode[data.p])));
+                        Push(new BoxDataForm.Data(-1, "", "", float.Parse(data.program.zCode[data.p])));
                         break;
                     case Op.PushStr:
                         data.p++;
@@ -93,10 +122,15 @@ namespace Z_Code
                         {
                             prm[i] = Pop();
                         }
-                        var ret = cmd.Execute(prm, data.heap);
+                        var ret = cmd.Execute(prm, data.heap, localLock);
+ 
                         for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
                         {
                             Push(ret[i]);
+                        }
+                        if (localLock.IsLocked())
+                        {
+                            return false;
                         }
                         break;
                     case Op.Equal:
@@ -158,7 +192,7 @@ namespace Z_Code
             data.stack.Add(box);
             data.top++;
         }
-        private long GetNum(BoxDataForm.Data box)
+        private float GetNum(BoxDataForm.Data box)
         {
             if (!string.IsNullOrEmpty(box.valName))
             {

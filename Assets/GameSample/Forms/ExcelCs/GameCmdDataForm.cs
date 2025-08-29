@@ -40,13 +40,15 @@ namespace Form
 
             CmdDataForm.changePrmnamesAction+=ChangePrmnames;
 
+            CmdDataForm.changePrmtypesAction+=ChangePrmtypes;
+
             CmdDataForm.changeRetnamesAction+=ChangeRetnames;
+
+            CmdDataForm.changeRettypesAction+=ChangeRettypes;
 
             CmdDataForm.changeDescAction+=ChangeDesc;
 
-            CmdDataForm.changePrmtypesAction+=ChangePrmtypes;
-
-            CmdDataForm.changeRettypesAction+=ChangeRettypes;
+            CmdDataForm.changeDefaultcodeAction+=ChangeDefaultcode;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -71,40 +73,85 @@ namespace Form
                 
         public static Action<Data,List<string>,List<string>> changePrmnamesAction;
                 
+        public static Action<Data,List<string>,List<string>> changePrmtypesAction;
+                
         public static Action<Data,List<string>,List<string>> changeRetnamesAction;
+                
+        public static Action<Data,List<string>,List<string>> changeRettypesAction;
                 
         public static Action<Data,string,string> changeDescAction;
                 
-        public static Action<Data,List<string>,List<string>> changePrmtypesAction;
+        public static Action<Data,string,string> changeDefaultcodeAction;
                 
-        public static Action<Data,List<string>,List<string>> changeRettypesAction;
+        public static Action<Data,string,string> changeCategoryAction;
+                
+        public static Action<Data,string,string> changeTypeAction;
                 
 
 
         public partial class Data : CmdDataForm.Data
         {
 
-            public Data(int uid,string name,List<string> prmNames,List<string> retNames,string desc,List<string> prmTypes,List<string> retTypes):base(uid,name,prmNames,retNames,desc,prmTypes,retTypes)
+                    private string  _category;
+                    /// <summary>
+                    ///一级标签
+                    ///</summary>
+                    public string  category{
+                                get{return _category;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCategory(this,_category,value); 
+                    }
+        
+                _category = value;
+                }
+                 
+                     }
+                    
+                    private string  _type;
+                    /// <summary>
+                    ///二级标签
+                    ///</summary>
+                    public string  type{
+                                get{return _type;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeType(this,_type,value); 
+                    }
+        
+                _type = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode,string category,string type):base(uid,name,prmNames,prmTypes,retNames,retTypes,desc,defaultCode)
             {
 
              this.uid = uid;
              this.name = name;
              this.prmNames = prmNames;
-             this.retNames = retNames;
-             this.desc = desc;
              this.prmTypes = prmTypes;
+             this.retNames = retNames;
              this.retTypes = retTypes;
+             this.desc = desc;
+             this.defaultCode = defaultCode;
+             this.category = category;
+             this.type = type;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(retNames),desc,new List<string>(prmTypes),new List<string>(retTypes));
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode,category,type);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,null,"",null,null);
+                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -115,6 +162,26 @@ namespace Form
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<(string,string), List<Data>> _DatasByCategoryType;
+            public static Dictionary<(string,string), List<Data>> DatasByCategoryType
+            {
+                get
+                {
+                    Init();
+                    return _DatasByCategoryType;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByCategory;
+            public static Dictionary<string, List<Data>> DatasByCategory
+            {
+                get
+                {
+                    Init();
+                    return _DatasByCategory;
                 }
             }
     
@@ -145,15 +212,71 @@ namespace Form
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"ShowTip",new List<string>(){"content",},null,"Show Tip: {0}",new List<string>(){"string",},null)},
+                {100001,new Data(100001,"ShowTip",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Show Tip: {0}","ShowTip(\"empty\");","ui","notice")},
+
+                {100002,new Data(100002,"Text",null,null,null,new List<string>(){"string",},"","\"\"","basic","const")},
+
+                {100003,new Data(100003,"Num",null,null,null,new List<string>(){"num",},"","1","basic","const")},
+
+                {100004,new Data(100004,"Image",null,null,null,new List<string>(){"img",},"","\"$img$$img$\"","basic","comst")},
+
+                {100005,new Data(100005,"ShowDialog",new List<string>(){"backGround","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$img$$img$\",\"$img$$img$\",\"empty\",\"empty\");","ui","dialog")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"ShowTip",_DataByUid[100001]},
     
+                        {"Text",_DataByUid[100002]},
+    
+                        {"Num",_DataByUid[100003]},
+    
+                        {"Image",_DataByUid[100004]},
+    
+                        {"ShowDialog",_DataByUid[100005]},
+    
                     };
     
+                    _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
+    
+                            {("ui","notice"),new List<Data>()},
+        
+                            {("basic","const"),new List<Data>()},
+        
+                            {("basic","comst"),new List<Data>()},
+        
+                            {("ui","dialog"),new List<Data>()},
+        
+                };
+
+                    _DatasByCategoryType[("ui","notice")].Add(_DataByUid[100001]);
+
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100002]);
+
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100003]);
+
+                    _DatasByCategoryType[("basic","comst")].Add(_DataByUid[100004]);
+
+                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100005]);
+
+                    _DatasByCategory = new Dictionary<string, List<Data>>() {
+    
+                            {"ui",new List<Data>()},
+        
+                            {"basic",new List<Data>()},
+        
+                };
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100001]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100002]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100003]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100004]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100005]);
+
 
             childInitAction?.Invoke();
             
@@ -207,13 +330,19 @@ namespace Form
 
                 jo.Get<List<string>>("prmNames"),
 
+                jo.Get<List<string>>("prmTypes"),
+
                 jo.Get<List<string>>("retNames"),
+
+                jo.Get<List<string>>("retTypes"),
 
                 jo.Get<string>("desc"),
 
-                jo.Get<List<string>>("prmTypes"),
+                jo.Get<string>("defaultCode"),
 
-                jo.Get<List<string>>("retTypes")
+                jo.Get<string>("category"),
+
+                jo.Get<string>("type")
                     );
 
             return data;
@@ -231,13 +360,19 @@ namespace Form
 
             jo.Set<List<string>>("prmNames",data.prmNames);
 
+            jo.Set<List<string>>("prmTypes",data.prmTypes);
+
             jo.Set<List<string>>("retNames",data.retNames);
+
+            jo.Set<List<string>>("retTypes",data.retTypes);
 
             jo.Set<string>("desc",data.desc);
 
-            jo.Set<List<string>>("prmTypes",data.prmTypes);
+            jo.Set<string>("defaultCode",data.defaultCode);
 
-            jo.Set<List<string>>("retTypes",data.retTypes);
+            jo.Set<string>("category",data.category);
+
+            jo.Set<string>("type",data.type);
 
             return jo;
         }
@@ -261,6 +396,14 @@ namespace Form
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByCategoryType.ContainsKey((data.category,data.type)))
+                        DatasByCategoryType[(data.category,data.type)]=new List<Data>();
+                    DatasByCategoryType[(data.category,data.type)].Add(data);
+    
+                    if(!DatasByCategory.ContainsKey(data.category))
+                        DatasByCategory[data.category]=new List<Data>();
+                    DatasByCategory[data.category].Add(data);
+    
 CmdDataForm.AddData(data);
             childAddAction?.Invoke(data);
             return data.uid;
@@ -276,6 +419,14 @@ CmdDataForm.AddData(data);
                     DataByUid.Remove(data.uid);
     
                     DataByName.Remove(data.name);
+    
+                    DatasByCategoryType[(data.category,data.type)].Remove(data);
+                    if(DatasByCategoryType[(data.category,data.type)].Count==0)
+                        DatasByCategoryType.Remove((data.category,data.type));
+    
+                    DatasByCategory[data.category].Remove(data);
+                    if(DatasByCategory[data.category].Count==0)
+                        DatasByCategory.Remove(data.category);
     
 CmdDataForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -353,12 +504,32 @@ CmdDataForm.RemoveData(uid);
                     
             }
             
+            public static void ChangePrmtypes(CmdDataForm.Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrmtypesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
             public static void ChangeRetnames(CmdDataForm.Data superData,List<string> oldV,List<string> newV)
             {
                 if(superData is Data data)
                 {
 
                 changeRetnamesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRettypes(CmdDataForm.Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRettypesAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -373,22 +544,53 @@ CmdDataForm.RemoveData(uid);
                     
             }
             
-            public static void ChangePrmtypes(CmdDataForm.Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeDefaultcode(CmdDataForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changePrmtypesAction?.Invoke(data,oldV,newV);
+                changeDefaultcodeAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeRettypes(CmdDataForm.Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeCategory(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeRettypesAction?.Invoke(data,oldV,newV);
+                    DatasByCategory[oldV].Remove(data);
+                    if(DatasByCategory[oldV].Count==0)
+                        DatasByCategory.Remove(oldV);
+                    if(!DatasByCategory.ContainsKey(newV))
+                        DatasByCategory[newV]=new List<Data>();
+                    DatasByCategory[newV].Add(data);
+ 
+                    DatasByCategoryType[(oldV,data.type)].Remove(data);
+                    if(DatasByCategoryType[(oldV,data.type)].Count==0)
+                        DatasByCategoryType.Remove((oldV,data.type));
+                    if(!DatasByCategoryType.ContainsKey((newV,data.type)))
+                        DatasByCategoryType[(newV,data.type)]=new List<Data>();
+                    DatasByCategoryType[(newV,data.type)].Add(data);
+ 
+                changeCategoryAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeType(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByCategoryType[(data.category,oldV)].Remove(data);
+                    if(DatasByCategoryType[(data.category,oldV)].Count==0)
+                        DatasByCategoryType.Remove((data.category,oldV));
+                    if(!DatasByCategoryType.ContainsKey((data.category,newV)))
+                        DatasByCategoryType[(data.category,newV)]=new List<Data>();
+                    DatasByCategoryType[(data.category,newV)].Add(data);
+ 
+                changeTypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -4,17 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Z_Debug;
 
 namespace Z_Code
 {
     public class Decompiler
     {
+        public static bool DEBUG = true;
         public string Decompile(List<SyntaxNode> syntaxNodes)
         {
             string code = "";
             foreach (var node in syntaxNodes)
             {
                 code += ResetStatement(node)+ ";\n";
+            }
+            if (DEBUG)
+            {
+                Z_Log.Log(code);
             }
             return code;
         }
@@ -47,9 +53,13 @@ namespace Z_Code
             //level1
             if (node.desc.type == CodeType.FuncName)
             {
-                for (int i = node.subNodes.Count - 1; i >= 0; i--)
+                for (int i = 0; i < node.subNodes.Count; i++)
                 {
                     code += ResetStatement(node.subNodes[i]);
+                    if(i< node.subNodes.Count-1)
+                    {
+                        code += ",";
+                    }
                 }
                 code = $"{node.desc.code}({code})";
             }

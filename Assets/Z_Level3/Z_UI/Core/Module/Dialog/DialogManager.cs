@@ -43,9 +43,13 @@ namespace Z_Ui.Dialog
         private Action onComplete;
 
         public bool enabled;
+        bool inited;
 
         public override void Init()
         {
+            if (inited)
+                return;
+            inited = true;
             this.Register<ClipPlayEvent>();
             
             settings = new Settings()

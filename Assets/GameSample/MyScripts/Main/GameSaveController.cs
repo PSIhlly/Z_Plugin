@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Ui.ModSceneMain.ModTool;
 using UnityEngine;
 using UnityEngine.UI;
@@ -137,9 +138,11 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
         if (data != null)
         {
-            /*foreach (var cmd in data.cmds)//获取常量图片
+            var imgs = data.code.Split(GlobalEventHelper.eventTexSign);//获取常量图片
+            for (int i = 1; i < imgs.Length; i += 2)
             {
-            }*/
+                SaveStoryTex(imgs[i], storyCoreFolder);
+            }
         }
 
     }
@@ -184,7 +187,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     private void SaveStoryTex(string texName, string path)
     {
-        if (TexAssetForm.DataByName.ContainsKey(texName) &&  !GlobalNameHelper.IsInnerAssetName(texName))
+        if (!string.IsNullOrEmpty(texName) && TexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = StoryTexAssetForm.DataByName[texName];
             SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.tex));
@@ -195,22 +198,23 @@ public class GameSaveController : Z_Controller<GameManager>
     #region load
     public void LoadStoryTex(string texName, string path)
     {
-        if (SaveAndLoad.Exist(path) && !StoryTexAssetForm.DataByName.ContainsKey(texName)&&!GlobalNameHelper.IsInnerAssetName(texName))
+        if (!string.IsNullOrEmpty(texName) && SaveAndLoad.Exist(path) && !StoryTexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var res = SaveAndLoad.Load<byte[]>(path + "/" + texName);
-            if(res!=null)
+            if (res != null)
             {
                 AddStoryTex(AssetManager.instance.LoadTexBytes(res, texName));
-            }else if(!GameTexAssetForm.DataByName.ContainsKey(texName))
+            }
+            else if (!GameTexAssetForm.DataByName.ContainsKey(texName))
             {
-                Debug.LogError(texName+"贴图丢失！");
+                Debug.LogError(texName + "贴图丢失！");
                 AddStoryTex(new TexAssetForm.Data(-1, texName, TextureHelper.transparentTexture));
             }
         }
     }
     public void AddStoryTex(TexAssetForm.Data rawData)
     {
-        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id,rawData.name,rawData.tex);
+        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id, rawData.name, rawData.tex);
         if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
         {
             var oldData = StoryTexAssetForm.DataByName[data.name];
@@ -359,7 +363,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 {
                     foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
                     {
-                        if(anim.animClip[i].partTex.ContainsKey(part))
+                        if (anim.animClip[i].partTex.ContainsKey(part))
                         {
                             var nm = anim.animClip[i].partTex[part];
                             LoadStoryTex(nm, storyCoreFolder);
@@ -412,10 +416,11 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in EventProgramDataForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
                 EventProgramDataForm.AddData(form);
-                /*                foreach (var cmd in form.cmds)//导入图片
-                                {
-
-                                }*/
+                var imgs = form.code.Split(GlobalEventHelper.eventTexSign);//获取常量图片
+                for (int i = 1; i < imgs.Length; i += 2)
+                {
+                    LoadStoryTex(imgs[i], storyCoreFolder);
+                }
             }
         }
 
@@ -476,6 +481,16 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     #endregion
 
+    #region del
+
+    public void DeleteSceneMap(string storyCoreFolder, int id)
+    {
+
+        SaveAndLoad.Delete(storyCoreFolder + "/" + id);
+    }
+
+    #endregion
+
     public void ResetPrefabPool()
     {
         InstancePoolManager.instance.Clear();
@@ -503,13 +518,13 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var itemData in ItemProductForm.DatasByIsproto[true])
             {
-                MapItemForm.AddData( new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.onTouchEvent, itemData.onLeaveEvent, itemData.onShowEvent));
+                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.events));
             }
         }
 
         foreach (var form in ItemProductForm.DataByUid.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(form.name, form.model, true,true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(form.name, form.model, true, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }

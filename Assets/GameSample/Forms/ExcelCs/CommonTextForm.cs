@@ -200,6 +200,8 @@ namespace Form
 
                 {20027,new Data(20027,"save success","Save success!","保存成功")},
 
+                {20028,new Data(20028,"input value","Input value","输入值")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -272,6 +274,8 @@ namespace Form
                         {"save",_DataById[20026]},
     
                         {"save success",_DataById[20027]},
+    
+                        {"input value",_DataById[20028]},
     
                     };
     

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Time;
@@ -16,7 +17,7 @@ namespace Ui.Notify
     public partial class UiChooseModel
     {
         public ChooseInfo info;
-        public int cur;
+        public EntryItem cur;
     }
 
     public partial class UiChooseCtrl
@@ -45,11 +46,10 @@ namespace Ui.Notify
         }
         public override void OnShow()
         {
-            model.cur = -1;
-
             if (param != null)
             {
                 model.info = param.info;
+                model.cur = param.info.items;
             }
             Refresh();
 
@@ -61,22 +61,20 @@ namespace Ui.Notify
             con.Clear();
             view.txt_title.text = model.info.title;
             view.go_close.SetActive(model.info.canClose);
-            view.go_choose.SetActive(model.cur!=-1);
+            view.go_choose.SetActive(model.cur.deepth == 1);
 
-            for (int i = 0; i < model.info.items.Count; i++)
+            foreach (var item in model.info.items.subs.Values)
             {
                 con.Add(new UiItemParam()
                 {
-                    name = model.info.items[i].Item1,
-                    sprite = model.info.items[i].Item2,
-                    id = i
+                    cur= item
                 });
             }
             con.Refresh();
         }
-        public void SetCur(int id)
+        public void SetCur(EntryItem item)
         {
-            model.cur = id;
+            model.cur = item;
             Refresh();
         }
 
@@ -86,15 +84,11 @@ namespace Ui.Notify
 
     public partial class UiItemParam
     {
-        public Sprite sprite;
-        public string name;
-        public int id;
+        public EntryItem cur;
     }
     public partial class UiItemModel
     {
-        public Sprite sprite;
-        public string name;
-        public int id;
+        public EntryItem cur;
     }
     public partial class UiItemCtrl
     {
@@ -102,24 +96,22 @@ namespace Ui.Notify
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCur(model.id);
+                parent.SetCur(model.cur);
             });
         }
         public override void OnShow()
         {
             if (param != null)
             {
-                model.sprite = param.sprite;
-                model.name = param.name;
-                model.id = param.id;
+                model.cur = param.cur;
             }
             Refresh();
         }
         public void Refresh()
         {
-            view.txt_.text= model.name;
-            view.img_.sprite = model.sprite;
-            view.sta_sel.ChangeState(parent.model.cur == model.id ? 1 : 0);
+            view.txt_.text= model.cur.content;
+            view.img_.sprite = model.cur.sprite;
+            view.sta_sel.ChangeState(parent.model.cur == model.cur ? 1 : 0);
         }
     }
 

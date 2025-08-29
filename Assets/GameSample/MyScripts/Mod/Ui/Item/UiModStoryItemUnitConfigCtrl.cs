@@ -12,7 +12,7 @@ using Z_Ui.Notify;
 using Z_Code.Form;
 using Z_String;
 using Z_DataSystem.Form;
-
+using Z_DesignStyle;
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
 {
 
@@ -34,33 +34,29 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
            
             view.btn_onTouchEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onTouchEvent"), false, 2, (lst) =>
+                var key = "onTouchEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    model.data.onTouchEvent = lst[2];
                     Refresh();
-                    return true;
-                }, sub);
+                });
+               
+                
             });
             view.btn_onLeaveEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onLeaveEvent"), false, 2, (lst) =>
+                var key = "onLeaveEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    model.data.onLeaveEvent = lst[2];
                     Refresh();
-                    return true;
-                }, sub);
+                });
             });
             view.btn_onShowEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onShowEvent"), false, 2, (lst) =>
+                var key = "onShowEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    model.data.onShowEvent = lst[2];
                     Refresh();
-                    return true;
-                }, sub);
+                });
             });
             view.btn_canEquipped.onClick.AddListener(() =>
             {
@@ -74,77 +70,42 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             };
             view.btn_onUseEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onUseEvent"), false, 2, (lst) =>
+                var key = "onUseEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    model.data.onUseEvent = lst[2];
                     Refresh();
-                    return true;
-                }, sub);
+                });
+                
             });
             view.btn_onEquipEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onEquipEvent"), false, 2, (lst) =>
+                var key = "onEquipEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    model.data.onEquipEvent = lst[2];
                     Refresh();
-                    return true;
-                }, sub);
+                });
             });
             view.btn_onDisequipEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onDisequipEvent"), false, 2, (lst) =>
+                var key = "onDisequipEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    model.data.onDisequipEvent = lst[2];
                     Refresh();
-                    return true;
-                }, sub);
-            });
-            view.btn_onTouchEvent.onClick.AddListener(() =>
-            {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onTouchEvent"), false, 2, (lst) =>
-                {
-                    model.data.onTouchEvent = lst[2];
-                    Refresh();
-                    return true;
-                }, sub);
-            });
-            view.btn_onLeaveEvent.onClick.AddListener(() =>
-            {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onLeaveEvent"), false, 2, (lst) =>
-                {
-                    model.data.onLeaveEvent = lst[2];
-                    Refresh();
-                    return true;
-                }, sub);
-            });
-            view.btn_onShowEvent.onClick.AddListener(() =>
-            {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Item, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onShowEvent"), false, 2, (lst) =>
-                {
-                    model.data.onShowEvent = lst[2];
-                    Refresh();
-                    return true;
-                }, sub);
+                });
             });
             view.btn_part.onClick.AddListener(() =>
             {
-                var lst = new List<(string, Sprite)>();
+                var items = new EntryItem();
                 foreach (EquipPartType part in Enum.GetValues(typeof(EquipPartType)))
                 {
-                    lst.Add((TextManager.instance.GetTxt(part.ToString()), null));
+                    items.Add(TextManager.instance.GetTxt(part.ToString()));
                 }
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("chooseEquipPart"), false, (res) =>
                 {
-                    model.data.equip = (EquipPartType)res;
+                    model.data.equip = (EquipPartType)Enum.Parse(typeof(EquipPartType),res.content);
                     Refresh();
                     return true;
-                }, lst);
+                }, items);
             });
         }
         public override void OnShow()
@@ -155,13 +116,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         public void Refresh()
         {
             view.sta_canEquipped.ChangeState(model.data.canEquipe?1:0);
-            view.txt_onUseEvent.text = model.data.onUseEvent;
-            view.txt_onEquipEvent.text = model.data.onEquipEvent;
-            view.txt_onDisequipEvent.text = model.data.onDisequipEvent;
+            view.txt_onUseEvent.text = model.data.events.Get("onUseEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onEquipEvent.text = model.data.events.Get("onEquipEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onDisequipEvent.text = model.data.events.Get("onDisequipEvent", EventTriggerForm.defaultData).evt;
             view.ipt_price.Set(model.data.price.ToString());
-            view.txt_onTouchEvent.text = model.data.onTouchEvent;
-            view.txt_onLeaveEvent.text = model.data.onLeaveEvent;
-            view.txt_onShowEvent.text = model.data.onShowEvent;
+            view.txt_onTouchEvent.text = model.data.events.Get("onTouchEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onLeaveEvent.text = model.data.events.Get("onLeaveEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onShowEvent.text = model.data.events.Get("onShowEvent", EventTriggerForm.defaultData).evt;
         }
     }
 

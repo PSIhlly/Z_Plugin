@@ -143,10 +143,12 @@ namespace Ui.ModStoryEventEditWindow
             public Ipt ipt_name;
             public Ipt ipt_category;
             public Ipt ipt_type;
+            public Sta sta_unit;
             public RectTransform rtf_itemRoot;
             public RectTransform rtf_unitRoot;
             public GameObject go_item;
             public UiItemCtrl sub_Item;
+            public Btn btn_edit;
             public GameObject go_unit;
             public RectTransform rtf_unit;
             public UiUnitCtrl sub_Unit;
@@ -166,13 +168,15 @@ namespace Ui.ModStoryEventEditWindow
             ipt_name = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
             ipt_category = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
             ipt_type = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
-            rtf_itemRoot = uiHolder.elementTrsLst[13].GetComponent<RectTransform>();
-            rtf_unitRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
-            go_item = uiHolder.elementTrsLst[15].gameObject;
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
-            go_unit = uiHolder.elementTrsLst[17].gameObject;
-            rtf_unit = uiHolder.elementTrsLst[18].GetComponent<RectTransform>();
-            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
+            sta_unit = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            rtf_itemRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
+            rtf_unitRoot = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
+            go_item = uiHolder.elementTrsLst[16].gameObject;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            btn_edit = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            go_unit = uiHolder.elementTrsLst[19].gameObject;
+            rtf_unit = uiHolder.elementTrsLst[20].GetComponent<RectTransform>();
+            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
         }
 
     }

@@ -12,6 +12,11 @@ using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using Z_Code.Form;
 using System;
+using Z_Ui.Notify;
+using Z_Text;
+using UnityEditor.Hardware;
+using Form;
+using System.Numerics;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiItemParam
@@ -37,8 +42,15 @@ namespace Ui.ModStoryEventEditWindow
             {
                 if(model.node==null)
                 {
-
-                }else
+                    ModManager.instance.assetCtrl.ChooseCmd( EventType.All, CmdTypeDataForm.defaultData.name, (item) =>
+                    {
+                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[item.content];
+                        parent.model.cpr.Compile(sel.defaultCode, out var res);
+                        parent.model.curEntry.AddRange(res);
+                        parent.ApplyEntry();
+                    });
+                }
+                else
                 {
                     parent.SelItem(model.node);
                 }

@@ -62,6 +62,14 @@ namespace Z_UnitSystem
             }
             return (T)(object)null;
         }
+        public static void Delete(string path)
+        {
+            path=GetRealPath(path);
+            if(Exist(path))
+            {
+                File.Delete(path);
+            }
+        }
         private static string GetRealPath(string key)
         {
             return Path.GetFullPath((key.Contains("HlZy") ? "" : (perPath + "/")) + key);

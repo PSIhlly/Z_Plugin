@@ -51,14 +51,6 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeEvtAction;
                 
-        public static Action<Data,bool,bool> changeGlobalenableAction;
-                
-        public static Action<Data,bool,bool> changeTerrainenableAction;
-                
-        public static Action<Data,bool,bool> changeObjectenableAction;
-                
-        public static Action<Data,bool,bool> changeCharacterenableAction;
-                
 
 
         public partial class Data
@@ -118,99 +110,23 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private bool  _globalEnable;
-                    /// <summary>
-                    ///允许全局
-                    ///</summary>
-                    public bool  globalEnable{
-                                get{return _globalEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeGlobalenable(this,_globalEnable,value); 
-                    }
-        
-                _globalEnable = value;
-                }
-                 
-                     }
-                    
-                    private bool  _terrainEnable;
-                    /// <summary>
-                    ///允许地形用
-                    ///</summary>
-                    public bool  terrainEnable{
-                                get{return _terrainEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeTerrainenable(this,_terrainEnable,value); 
-                    }
-        
-                _terrainEnable = value;
-                }
-                 
-                     }
-                    
-                    private bool  _objectEnable;
-                    /// <summary>
-                    ///允许物体用
-                    ///</summary>
-                    public bool  objectEnable{
-                                get{return _objectEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeObjectenable(this,_objectEnable,value); 
-                    }
-        
-                _objectEnable = value;
-                }
-                 
-                     }
-                    
-                    private bool  _characterEnable;
-                    /// <summary>
-                    ///允许角色用
-                    ///</summary>
-                    public bool  characterEnable{
-                                get{return _characterEnable;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeCharacterenable(this,_characterEnable,value); 
-                    }
-        
-                _characterEnable = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,string name,string evt,bool globalEnable,bool terrainEnable,bool objectEnable,bool characterEnable)
+            public Data(int uid,string name,string evt)
             {
 
              this.uid = uid;
              this.name = name;
              this.evt = evt;
-             this.globalEnable = globalEnable;
-             this.terrainEnable = terrainEnable;
-             this.objectEnable = objectEnable;
-             this.characterEnable = characterEnable;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,evt,globalEnable,terrainEnable,objectEnable,characterEnable);
+        return new Data(sameId? uid:uidChain.GetId(),name,evt);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",false,false,false,false);
+                   private static Data _defaultData=new Data(0,"","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -249,20 +165,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"OnTouch","",false,true,true,true)},
-
-                {2,new Data(2,"OnLeave","",false,true,true,true)},
-
-                {3,new Data(3,"OnShow","",false,true,true,true)},
-
                 };
                     _DataByName = new Dictionary<string, Data>() {
-    
-                        {"OnTouch",_DataByUid[1]},
-    
-                        {"OnLeave",_DataByUid[2]},
-    
-                        {"OnShow",_DataByUid[3]},
     
                     };
     
@@ -311,15 +215,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("evt"),
-
-                jo.Get<bool>("globalEnable"),
-
-                jo.Get<bool>("terrainEnable"),
-
-                jo.Get<bool>("objectEnable"),
-
-                jo.Get<bool>("characterEnable")
+                jo.Get<string>("evt")
                     );
 
             return data;
@@ -336,14 +232,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("name",data.name);
 
             jo.Set<string>("evt",data.evt);
-
-            jo.Set<bool>("globalEnable",data.globalEnable);
-
-            jo.Set<bool>("terrainEnable",data.terrainEnable);
-
-            jo.Set<bool>("objectEnable",data.objectEnable);
-
-            jo.Set<bool>("characterEnable",data.characterEnable);
 
             return jo;
         }
@@ -455,46 +343,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeEvtAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeGlobalenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeGlobalenableAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeTerrainenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeTerrainenableAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeObjectenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeObjectenableAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeCharacterenable(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeCharacterenableAction?.Invoke(data,oldV,newV);
                 }
                     
             }

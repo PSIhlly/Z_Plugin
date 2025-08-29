@@ -6,6 +6,7 @@ namespace Z_UnitSystem
     public class ColliderEventSender : MonoBehaviour
     {
         Instance _superIns;
+        HashSet<Instance> touchList = new HashSet<Instance>();
         public Instance superIns
         {
             get
@@ -22,8 +23,9 @@ namespace Z_UnitSystem
             if (superIns != null)
             {
                 var tar = other.GetComponentInParent<Instance>();
-                if (tar!=null)
+                if (tar!=null&& !touchList.Contains(tar))
                 {
+                    touchList.Add(tar);
                     superIns.OnInstanceEnter(tar);
                 }
             }
@@ -34,8 +36,9 @@ namespace Z_UnitSystem
             if (superIns != null)
             {
                 var tar = other.GetComponentInParent<Instance>();
-                if (tar != null)
+                if (tar != null&& touchList.Contains(tar))
                 {
+                    touchList.Remove(tar);
                     superIns.OnInstanceExit(tar);
                 }
             }

@@ -24,6 +24,11 @@ public static class Z_EventHelper
         {
             type2Listener[type] = new List<object>(); 
         }
+        if(type2Listener[type].Contains(listener))
+        {
+            Debug.LogError("double rigister");
+            return;
+        }
         type2Listener[type].Add(listener);
     }
 

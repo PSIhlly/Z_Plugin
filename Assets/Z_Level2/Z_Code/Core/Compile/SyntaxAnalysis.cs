@@ -21,7 +21,7 @@ namespace Z_Code
             }
             foreach (var node in this.subNodes)
             {
-                node.parentNode = parentNode;
+                node.parentNode = this;
             }
         }
         public Desc desc;
@@ -35,6 +35,10 @@ namespace Z_Code
         public List<SyntaxNode> Execute(List<LexicalNode> nodes)
         {
             var res = BuildBlock(nodes, 0, nodes.Count - 1);
+            if(res.Count == 0)//not a block
+            {
+                res = BuildStatement(nodes, 0, nodes.Count - 1);
+            }
             if (DEBUG)
             {
                 var test = new SyntaxNode(new Desc("test", CodeType.Action), res);
@@ -106,7 +110,7 @@ namespace Z_Code
         {
             
             //ignore extern small bracket
-            while (GetFirstDepth0(nodes, l, r, ")") == r&& GetFirstDepth0(nodes, l, r, "(")==l && l <= r)
+            while (GetFirstDepth0(nodes, l, r, ")") == r&& GetFirstDepth0(nodes, l, r, "(")==l && l < r)
             {
                 l++;
                 r--;

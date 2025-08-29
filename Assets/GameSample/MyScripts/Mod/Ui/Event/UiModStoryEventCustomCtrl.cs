@@ -38,7 +38,11 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             {
                 UiManager.instance.ShowUi<UiModStoryEventEditWindowCtrl>(new UiModStoryEventEditWindowParam()
                 {
-                    data = model.data
+                    data = model.data,
+                    onClose = () =>
+                    {
+                        Refresh();
+                    }
                 });
             });
             view.btn_delete.onClick.AddListener(() =>
@@ -49,9 +53,9 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public override void OnShow()
         {
-            model.cat = null ;
+            model.cat = null;
             model.type = null;
-            model.data = null ;
+            model.data = null;
             Refresh();
         }
         public void Refresh()
@@ -93,11 +97,11 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
                     });
                 foreach (var type in exist)
                 {
-                    if(type!="")
-                    typeCon.Add(new UiTypeParam()
-                    {
-                        type = type
-                    });
+                    if (type != "")
+                        typeCon.Add(new UiTypeParam()
+                        {
+                            type = type
+                        });
                 }
             }
             typeCon.Refresh();
@@ -169,7 +173,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public override void OnShow()
         {
-            model.cat =param.cat;
+            model.cat = param.cat;
             Refresh();
         }
         public void Refresh()
@@ -206,7 +210,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public override void OnShow()
         {
-            model.type =param.type;
+            model.type = param.type;
             Refresh();
         }
         public void Refresh()

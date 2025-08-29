@@ -27,6 +27,8 @@ namespace Ui.Dialog
             });
             view.btn_skip.onClick.AddListener(() =>
             {
+                Debug.Log("BBBBB");
+
                 Z_EventHelper.Invoke(new ClipPlayEvent()
                 {
                     playType = PlayType.clipsOver
@@ -240,6 +242,7 @@ namespace Ui.Dialog
             model.curClipId++;
             if (model.curClipId >= model.clips.Count)
             {
+
                 Z_EventHelper.Invoke(new ClipPlayEvent()
                 {
                     playType = PlayType.clipsOver

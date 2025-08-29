@@ -73,7 +73,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterParamForm.AddData(speedParamData);
 
             CharacterProductForm.Clear();
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, new Dictionary<string, CharacterAnimForm.Data>(), "", "", "Speed", "Hp", "", "", ""));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, new Dictionary<string, CharacterAnimForm.Data>(), "", "", "Speed", "Hp",new Dictionary<string,EventTriggerForm.Data>()));
 
             ConfigForm.Clear();
             ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), "Player", new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
@@ -81,7 +81,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var data = new GameMapData();
             data.Init();
             GameManager.instance.saveCtrl.SaveOverview(storyId);
-
+            
             GameManager.instance.saveCtrl.SaveSceneMap(ModManager.GetStoryCoreFolder(storyFolder) + sceneData.uid, data);
             GameManager.instance.saveCtrl.SaveScene(ModManager.GetStoryCoreFolder(storyFolder));
 

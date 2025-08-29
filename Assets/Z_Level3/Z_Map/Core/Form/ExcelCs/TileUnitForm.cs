@@ -313,8 +313,7 @@ namespace Z_Map.Form
             if(data.uid==-1)
             { 
                 int uid=uidChain.GetId();
-
-                if (uid==-1)
+                if(uid==-1)
                     return -1;
                 data.uid=uid;  
             }

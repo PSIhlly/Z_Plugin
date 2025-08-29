@@ -106,7 +106,6 @@ namespace Ui.Axis
             model.limitRtf = param.limitRtf;
             Vector3[] corners = new Vector3[4];
             model.limitRtf.GetWorldCorners(corners);
-            Debug.Log(param.pos);
             view.rtf_axis.transform.position = new Vector3(corners[0].x + param.pos.x * (corners[2].x - corners[0].x), corners[0].y + param.pos.y * (corners[1].y - corners[0].y), model.limitRtf.position. z) ;
             model.onTrsChange = param.onTrsChange;
         }

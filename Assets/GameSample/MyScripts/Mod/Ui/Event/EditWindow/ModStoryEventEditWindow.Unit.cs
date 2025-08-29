@@ -10,6 +10,7 @@ using Z_Ui.Base;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.UI;
 using Z_Code.Form;
+using Z_DataSystem.Form;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiUnitParam
@@ -52,6 +53,7 @@ namespace Ui.ModStoryEventEditWindow
 
         public void Refresh()
         {
+            view.sta_.ChangeState(parent.model.selUnit!=null&& parent.model.selUnit == model.node?1:0) ;
             gameObject.transform.parent = model.parent;
             float height = 200f - 20 * model.deepth;
             if (model.node == null)
@@ -106,11 +108,20 @@ namespace Ui.ModStoryEventEditWindow
                         view.txt_.text = model.node.desc.code;
                         break;
                 }
+                view.img_.gameObject.SetActive(GlobalEventHelper.IsEventTex(model.node.desc.code));
+                view.txt_.gameObject.SetActive(!GlobalEventHelper.IsEventTex(model.node.desc.code));
+
+                if (GlobalEventHelper.IsEventTex(model.node.desc.code))
+                {
+                    view.img_.sprite = TexAssetForm.DataByName[string.IsNullOrEmpty(model.node.desc.code)?GlobalNameHelper.GetDefaultTexName():GlobalEventHelper.GetEventAssetTexName(model.node.desc.code)].sprite;
+                }
             }
 
             var size = view.rtf_root.sizeDelta;
             size.y = height;
             view.rtf_root.sizeDelta = size;
+            view.img_.rectTransform.sizeDelta = new Vector2(height,height);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(view.img_.rectTransform);
             LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unit);
         }
 

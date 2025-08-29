@@ -44,13 +44,15 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,List<string>,List<string>> changePrmnamesAction;
                 
+        public static Action<Data,List<string>,List<string>> changePrmtypesAction;
+                
         public static Action<Data,List<string>,List<string>> changeRetnamesAction;
+                
+        public static Action<Data,List<string>,List<string>> changeRettypesAction;
                 
         public static Action<Data,string,string> changeDescAction;
                 
-        public static Action<Data,List<string>,List<string>> changePrmtypesAction;
-                
-        public static Action<Data,List<string>,List<string>> changeRettypesAction;
+        public static Action<Data,string,string> changeDefaultcodeAction;
                 
 
 
@@ -111,42 +113,6 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private List<string>  _retNames;
-                    /// <summary>
-                    ///返回值名称
-                    ///</summary>
-                    public List<string>  retNames{
-                                get{return _retNames;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeRetnames(this,_retNames,value); 
-                    }
-        
-                _retNames = value;
-                }
-                 
-                     }
-                    
-                    private string  _desc;
-                    /// <summary>
-                    ///描述
-                    ///</summary>
-                    public string  desc{
-                                get{return _desc;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeDesc(this,_desc,value); 
-                    }
-        
-                _desc = value;
-                }
-                 
-                     }
-                    
                     private List<string>  _prmTypes;
                     /// <summary>
                     ///参数类型
@@ -161,6 +127,24 @@ public static readonly int autoUidCnt=1000000;
                     }
         
                 _prmTypes = value;
+                }
+                 
+                     }
+                    
+                    private List<string>  _retNames;
+                    /// <summary>
+                    ///返回值名称
+                    ///</summary>
+                    public List<string>  retNames{
+                                get{return _retNames;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeRetnames(this,_retNames,value); 
+                    }
+        
+                _retNames = value;
                 }
                  
                      }
@@ -183,27 +167,64 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,List<string> prmNames,List<string> retNames,string desc,List<string> prmTypes,List<string> retTypes)
+                    private string  _desc;
+                    /// <summary>
+                    ///描述
+                    ///</summary>
+                    public string  desc{
+                                get{return _desc;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDesc(this,_desc,value); 
+                    }
+        
+                _desc = value;
+                }
+                 
+                     }
+                    
+                    private string  _defaultCode;
+                    /// <summary>
+                    ///默认代码
+                    ///</summary>
+                    public string  defaultCode{
+                                get{return _defaultCode;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDefaultcode(this,_defaultCode,value); 
+                    }
+        
+                _defaultCode = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode)
             {
 
              this.uid = uid;
              this.name = name;
              this.prmNames = prmNames;
-             this.retNames = retNames;
-             this.desc = desc;
              this.prmTypes = prmTypes;
+             this.retNames = retNames;
              this.retTypes = retTypes;
+             this.desc = desc;
+             this.defaultCode = defaultCode;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(retNames),desc,new List<string>(prmTypes),new List<string>(retTypes));
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,null,"",null,null);
+                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -242,33 +263,33 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"Print",new List<string>(){"content",},null,"Print {0}",new List<string>(){"string",},null)},
+                {1,new Data(1,"Print",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Print {0}","Print(\"\");")},
 
-                {2,new Data(2,"+",new List<string>(){"a","b",},new List<string>(){"result",},"{1} + {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {2,new Data(2,"+",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} + {0}","1+1")},
 
-                {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"result",},"{1} - {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} - {0}","1-1")},
 
-                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"result",},"（{1}）*（{0}）",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"（{1}）*（{0}）","1*1")},
 
-                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"result",},"（{1}）/（{0}）",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"（{1}）/（{0}）","1/1")},
 
-                {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"result",},"{1} = {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} = {0}","var=1;")},
 
-                {7,new Data(7,"==",new List<string>(){"a","b",},new List<string>(){"result",},"{1} equal {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {7,new Data(7,"==",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} equal {0}","1==1")},
 
-                {8,new Data(8,">",new List<string>(){"a","b",},new List<string>(){"result",},"{1} bigger than {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {8,new Data(8,">",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} bigger than {0}","2>1")},
 
-                {9,new Data(9,"<",new List<string>(){"a","b",},new List<string>(){"result",},"{1} smaller than {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {9,new Data(9,"<",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} smaller than {0}","1<2")},
 
-                {10,new Data(10,"!=",new List<string>(){"a","b",},new List<string>(){"result",},"{1} not equal {0}",new List<string>(){"num","num",},new List<string>(){"num",})},
+                {10,new Data(10,"!=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} not equal {0}","1!=2")},
 
-                {11,new Data(11,"if",new List<string>(){"condition",},new List<string>(){"result",},"if {0}",null,new List<string>(){"bool",})},
+                {11,new Data(11,"if",new List<string>(){"condition",},null,new List<string>(){"result",},new List<string>(){"bool",},"if {0}","if(1){ }else{ }")},
 
-                {12,new Data(12,"else",null,null,"else",null,null)},
+                {12,new Data(12,"else",null,null,null,new List<string>(){"void",},"else","")},
 
-                {13,new Data(13,"then",null,null,"then",null,null)},
+                {13,new Data(13,"then",null,null,null,new List<string>(){"void",},"then","")},
 
-                {14,new Data(14,"for",new List<string>(){"init","condition","turnOver",},null,"{0}, if {1} keep do, after every times do{2}",null,null)},
+                {14,new Data(14,"for",new List<string>(){"init","condition","turnOver",},null,null,new List<string>(){"void",},"{0}, if {1} keep do, after every times do{2}","for(id=0;id<3;id=id+1){ }")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -350,13 +371,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<string>>("prmNames"),
 
+                jo.Get<List<string>>("prmTypes"),
+
                 jo.Get<List<string>>("retNames"),
+
+                jo.Get<List<string>>("retTypes"),
 
                 jo.Get<string>("desc"),
 
-                jo.Get<List<string>>("prmTypes"),
-
-                jo.Get<List<string>>("retTypes")
+                jo.Get<string>("defaultCode")
                     );
 
             return data;
@@ -374,13 +397,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<List<string>>("prmNames",data.prmNames);
 
+            jo.Set<List<string>>("prmTypes",data.prmTypes);
+
             jo.Set<List<string>>("retNames",data.retNames);
+
+            jo.Set<List<string>>("retTypes",data.retTypes);
 
             jo.Set<string>("desc",data.desc);
 
-            jo.Set<List<string>>("prmTypes",data.prmTypes);
-
-            jo.Set<List<string>>("retTypes",data.retTypes);
+            jo.Set<string>("defaultCode",data.defaultCode);
 
             return jo;
         }
@@ -496,12 +521,32 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
+            public static void ChangePrmtypes(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePrmtypesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
             public static void ChangeRetnames(Data superData,List<string> oldV,List<string> newV)
             {
                 if(superData is Data data)
                 {
 
                 changeRetnamesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRettypes(Data superData,List<string> oldV,List<string> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRettypesAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -516,22 +561,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangePrmtypes(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeDefaultcode(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changePrmtypesAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeRettypes(Data superData,List<string> oldV,List<string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeRettypesAction?.Invoke(data,oldV,newV);
+                changeDefaultcodeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

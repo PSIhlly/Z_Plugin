@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Z_Code.Form;
 using Z_Debug;
 
 namespace Z_Code
@@ -28,6 +29,27 @@ namespace Z_Code
         }
         public string code;
         public CodeType type;
+        public string retType
+        {
+            get
+            {
+                switch(type)
+                {
+                    case CodeType.Num:
+                        return "num";
+                    case CodeType.VarName:
+                        return "var";
+                    case CodeType.FuncName:
+                    case CodeType.Operator:
+                        return CmdDataForm.DataByName[code].retTypes[0];
+                    case CodeType.Str:
+                        return "string";
+                    default:
+                        return "null";
+                }
+            }
+
+        }
     }
     public class LexicalAnalysis
     {
@@ -91,7 +113,11 @@ namespace Z_Code
                 }
                 else if (IsOperator(code[i]))
                 {
-                    if(!IsOperator(sb.ToString()+ code[i]))
+                    if (IsNum(sb.ToString())&& !IsNum (sb.ToString()+code[i]))
+                    {
+                        End(lst, sb);
+                    }
+                    else if(!IsOperator(sb.ToString()+ code[i]))
                     {
                         End(lst, sb);
                     }
@@ -211,10 +237,20 @@ namespace Z_Code
         }
         public static bool IsNum(string str)
         {
+            bool hasDot = false;
             foreach (var ch in str)
             {
                 if (!IsNum(ch))
+                {
+                    if(hasDot)
+                        return false;
+                    if (ch == '.')
+                    {
+                        hasDot = true;
+                        continue;
+                    }
                     return false;
+                }
             }
             return true;
         }

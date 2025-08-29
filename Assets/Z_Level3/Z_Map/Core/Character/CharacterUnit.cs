@@ -109,7 +109,7 @@ namespace Z_Map
             if (ins != null)
             {
                 var selfLength = ins.capsuleColliders[0].radius * ins.capsuleColliders[0].transform.localScale.x;
-                if (Physics.Raycast(ins.transform.position + Vector3.up * 0.5f, dir, out var res, selfLength+dir.magnitude))
+                if (Physics.Raycast(ins.transform.position + Vector3.up * 0.5f, dir, out var res, selfLength+dir.magnitude+0.01f,1, QueryTriggerInteraction.Ignore))
                 {
                     
                     var dis = res.distance - selfLength;

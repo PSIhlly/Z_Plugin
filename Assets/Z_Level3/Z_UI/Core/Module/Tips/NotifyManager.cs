@@ -8,6 +8,35 @@ using Z_DesignStyle;
 
 namespace Z_Ui.Notify
 {
+    public class EntryItem
+    {
+        public string content;
+        public Sprite sprite;
+        public EntryItem parent;
+        public int deepth;
+        public Dictionary<string, EntryItem> subs=new Dictionary<string, EntryItem>();
+        public void Add(string name,Sprite icon=null)
+        {
+            subs[name] = new EntryItem()
+            {
+                content = name,
+                sprite = icon,
+                parent= this,
+                deepth= deepth+1
+            };
+        }
+        public bool IsChildOf(EntryItem item)
+        {
+            var tmp = this;
+            while(tmp!=null)
+            {
+                if (tmp == item)
+                    return true;
+                tmp = tmp.parent;
+            }
+            return false;
+        }
+    }
     public class TipInfo
     {
         public float time;
@@ -17,17 +46,16 @@ namespace Z_Ui.Notify
     public class ChooseInfo
     {
         public string title;
-        public Func<int, bool> func;
-        public List<(string,Sprite)> items;
+        public Func<EntryItem, bool> func;
+        public EntryItem items;
         public bool canClose;
         public int id;
     }
     public class MultipleChooseInfo
     {
         public string title;
-        public int labCnt;
-        public Func<List<string>, bool> func;
-        public Dictionary<string,(Sprite,object)> sub;
+        public Func<EntryItem, bool> func;
+        public EntryItem item;
         public bool canClose;
         public int id;
     }
@@ -73,7 +101,7 @@ namespace Z_Ui.Notify
                 }) ;
             }
        }
-        public void AddChoose(string title, bool canClose, Func<int, bool> func, List<(string, Sprite)> items)
+        public void AddChoose(string title, bool canClose, Func<EntryItem, bool> func, EntryItem items)
         {
             var info = new ChooseInfo()
             {
@@ -96,13 +124,12 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddMultipleChoose(string title, bool canClose,int labCnt, Func<List<string>, bool> func, Dictionary<string, (Sprite, object)> sub)
+        public void AddMultipleChoose(string title, bool canClose,Func<EntryItem, bool> func, EntryItem items)
         {
             var info = new MultipleChooseInfo()
             {
-                labCnt= labCnt,
                 title = title,
-                sub = sub,
+                item = items,
                 func = func,
                 canClose = canClose,
                 id = popupIdCnt++

@@ -30,23 +30,19 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
 
             view.btn_onBeginEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Global, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onBeginEvent"), false, 2, (lst) =>
+                ModManager.instance.assetCtrl.ChooseEvent(EventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt("onBeginEvent"), (item) =>
                 {
-                    GameManager.instance.curConfig.onBeginEvent = lst[2];
+                    GameManager.instance.curConfig.onBeginEvent = item.content;
                     Refresh();
-                    return true;
-                }, sub);
+                });
             });
             view.btn_onEndEvent.onClick.AddListener(() =>
             {
-                GameManager.instance.evtCtrl.GetEvents(EventType.Global, CmdTypeDataForm.defaultData, out var sub);
-                NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("onEndEvent"), false, 2, (lst) =>
+                ModManager.instance.assetCtrl.ChooseEvent(EventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt("onEndEvent"), (item) =>
                 {
-                    GameManager.instance.curConfig.onEndEvent = lst[2];
+                    GameManager.instance.curConfig.onEndEvent = item.content;
                     Refresh();
-                    return true;
-                }, sub);
+                });
             });
 
         }

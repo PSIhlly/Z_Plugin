@@ -80,7 +80,7 @@ namespace Ui.Notify
                 });
             }
             tipCon.Refresh();
-
+            Debug.Log("À¢¡À");
             //choose
             chooseCon.Clear();
             if (model.chooseInfos.Count > 0)
@@ -173,6 +173,7 @@ namespace Ui.Notify
                     break;
                 }
             }
+            Debug.Log("Ω· ¯¡À" + model.tipInfos.Count);
             Refresh();
         }
         public void RemoveChoose(int id)

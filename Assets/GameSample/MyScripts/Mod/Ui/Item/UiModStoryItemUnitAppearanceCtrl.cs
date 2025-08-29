@@ -45,20 +45,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
                 Refresh();
             });
             view.btn_model.onClick.AddListener(() => {
-                var lst = new List < (string, Sprite) > ();
-                foreach (var form in GameObjectAssetForm.DataById.Values)
+                ModManager.instance.assetCtrl.ChooseModel(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    if (!form.name.StartsWith(GlobalNameHelper.GetInternalPrefabName("")))
-                    {
-                        lst.Add((form.name,null));
-                    }
-                }
-                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("chooseModel"), false, (res) =>
-                {
-                    model.data.model.subPrefabUnitName[model.id] = lst[res].Item1;
+                    model.data.model.subPrefabUnitName[model.id] = item.content;
                     Refresh();
-                    return true;
-                }, lst);
+                });
             });
 
             view.btn_delete.onClick.AddListener(() => {

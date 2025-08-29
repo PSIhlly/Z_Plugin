@@ -79,7 +79,7 @@ namespace Form
             
         }
 
-                   private static Data _defaultData=new Data(0,"");
+                   private static Data _defaultData=new Data(0,"void");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -120,8 +120,12 @@ namespace Form
 
                 _DataByUid = new Dictionary<int, Data>() {
 
+                {10001,new Data(10001,"img")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
+    
+                        {"img",_DataByUid[10001]},
     
                     };
     

@@ -98,7 +98,7 @@ public static readonly int autoUidCnt=1000000;
             
         }
 
-                   private static Data _defaultData=new Data(0,"");
+                   private static Data _defaultData=new Data(0,"void");
                    public static Data defaultData=>_defaultData.Copy();
 
 

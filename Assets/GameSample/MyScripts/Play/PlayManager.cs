@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ui.Loading;
 using Ui.ModSceneMain;
+using Unity.VisualScripting;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map;
@@ -51,10 +52,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         _sceneCtrl.OnMouseMove(pos);
     }
-    
+    public void FixedUpdate()
+    {
+    }
     public void Update()
     {
         _sceneCtrl.Update();
+
         _infoCtrl.Update();
     }
     public void LateUpdate()

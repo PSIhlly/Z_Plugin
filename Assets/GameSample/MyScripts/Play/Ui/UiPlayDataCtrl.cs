@@ -32,17 +32,19 @@ namespace Ui.PlayData
             });
             view.btn_backpack.onClick.AddListener(() =>
             {
-                model.selPage = 0;
+                model.selPage = 1;
+                Refresh();
             });
             view.btn_character.onClick.AddListener(() =>
             {
-                model.selPage = 1;
+                model.selPage = 2;
+                Refresh();
             });
 
         }
         public override void OnShow()
         {
-            model.selPage = 0;
+            model.selPage = 1;
             if (param != null)
                 model.selPage = param.selPage;
             Refresh();
@@ -50,7 +52,11 @@ namespace Ui.PlayData
         public void Refresh()
         {
 
-            view.page_PlayDataBackpack.SetActive(model.selPage == 0);
+            view.page_PlayDataBackpack.SetActive(model.selPage == 1);
+            view.sta_backpack.ChangeState(model.selPage == 1 ? 1 : 0);
+            view.page_PlayDataCharacter.SetActive(model.selPage == 2);
+            view.sta_character.ChangeState(model.selPage == 2 ? 1 : 0);
+
         }
     }
 

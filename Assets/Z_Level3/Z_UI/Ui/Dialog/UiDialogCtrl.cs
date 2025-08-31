@@ -24,16 +24,29 @@ namespace Ui.Dialog
             {
                 view.sta_autoPlay.ChangeState();
                 DialogManager.instance.settings.autoPlaySpeed = view.sta_autoPlay.state;
+                DialogManager.instance.settings.textDisplaySpeed = 5;
+                UiMainTextCtrl.autoPlaydelay = 5f;
+                parent.view.sub_MainText.Display();
             });
-            view.btn_skip.onClick.AddListener(() =>
+            view.btn_skip.onClickDown=() =>
             {
-                Debug.Log("BBBBB");
+                view.sta_autoPlay.ChangeState(0);
+                view.sta_skip.ChangeState(1);
+                UiMainTextCtrl.autoPlaydelay = 0.1f;
+                DialogManager.instance.settings.autoPlaySpeed = 5;
+                DialogManager.instance.settings.textDisplaySpeed = 60;
+                parent.view.sub_MainText.Display();
 
-                Z_EventHelper.Invoke(new ClipPlayEvent()
-                {
-                    playType = PlayType.clipsOver
-                });
-            });
+            };
+            view.btn_skip.onClickUp = () =>
+            {
+                view.sta_skip.ChangeState(0);
+                DialogManager.instance.settings.autoPlaySpeed = view.sta_autoPlay.state;
+                DialogManager.instance.settings.textDisplaySpeed = 5;
+                UiMainTextCtrl.autoPlaydelay = 5f;
+                Debug.Log("danle");
+
+            };
             view.btn_hide.onClick.AddListener(() =>
             {
                 Z_EventHelper.Invoke(new ShowTypeEvent()
@@ -49,9 +62,28 @@ namespace Ui.Dialog
                 });
             });
         }
+        public override void OnHide()
+        {
+            TimeManager.instance.AddNextUpdateWithoutCheckList(() =>
+            {
+                if(!active)
+                {
+                    if (view.sta_skip.state == 1)
+                    {
+                        view.sta_skip.ChangeState(0);
+                        DialogManager.instance.settings.autoPlaySpeed = 0;
+                        DialogManager.instance.settings.textDisplaySpeed = 5;
+                        UiMainTextCtrl.autoPlaydelay = 5f;
+                    }
+                }
+                
+
+            });
+
+        }
         public override void OnShow()
         {
-            view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed);
+            view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed>0?1:0);
         }
     }
     #endregion

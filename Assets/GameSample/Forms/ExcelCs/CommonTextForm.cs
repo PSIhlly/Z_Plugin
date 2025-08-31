@@ -202,6 +202,14 @@ namespace Form
 
                 {20028,new Data(20028,"input value","Input value","输入值")},
 
+                {20029,new Data(20029,"auto play","Auto play","自动播放")},
+
+                {20030,new Data(20030,"skip","Skip","跳过")},
+
+                {20031,new Data(20031,"hide","Hide","隐藏")},
+
+                {20032,new Data(20032,"history","History","历史记录")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -276,6 +284,14 @@ namespace Form
                         {"save success",_DataById[20027]},
     
                         {"input value",_DataById[20028]},
+    
+                        {"auto play",_DataById[20029]},
+    
+                        {"skip",_DataById[20030]},
+    
+                        {"hide",_DataById[20031]},
+    
+                        {"history",_DataById[20032]},
     
                     };
     

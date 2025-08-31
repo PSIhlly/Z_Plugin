@@ -54,7 +54,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteObject(model.data.name);
-                model.id = -1;
+                parent.parent.SelType(3);
                 Refresh();
             });
             view.btn_deleteUnit.onClick.AddListener(() =>

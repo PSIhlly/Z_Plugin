@@ -36,6 +36,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTex(model.data.name);
+                parent.parent.SelType(1);
             });
             view.ipt_label.onFinishInput += (s) =>
             {
@@ -55,6 +56,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             view.btn_deleteTex.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTexId(model.data.name, model.id);
+                model.id = -1;
                 Refresh();
             });
             view.btn_image.onClick.AddListener(() =>
@@ -140,9 +142,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         }
         public void Refresh()
         {
-            view.sta_exist.ChangeState(model.id != -1 && model.id == parent.model.id ? 1 : 0);
+            view.sta_exist.ChangeState(model.id != -1 ? 1 : 0);
             if (model.id != -1)
             {
+                view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
                 view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
             }
         }

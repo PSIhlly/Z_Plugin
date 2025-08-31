@@ -38,7 +38,7 @@ namespace Z_Ui.Base
         {
             get
             {
-                int v = (int)((height) / (cell.rect.height+ (dir == Direction.Vertical ? spacing : 0)));
+                int v = (int)((height) / (cell.rect.height+  spacing ));
                 if (v == 0)
                     return 1;
                 return v;
@@ -48,7 +48,7 @@ namespace Z_Ui.Base
         {
             get
             {
-                int v = (int)((width) / (cell.rect.width+ (dir== Direction.Horizon? spacing:0)));
+                int v = (int)((width) / (cell.rect.width+ spacing));
                 if (v == 0)
                     return 1;
                 return v;

@@ -18,11 +18,13 @@ namespace Ui.PlayData.PlayDataBackpack
     public partial class UiPlayDataBackpackModel
     {
         public ItemProductForm.Data sel;
+        public string lab;
     }
     public partial class UiPlayDataBackpackCtrl
     {
 
         UiScrViewContainer<UiGameItemCtrl> itemCon;
+        UiScrViewContainer<UiLabCtrl> labCon;
         public override void OnCreate()
         {
 
@@ -43,7 +45,7 @@ namespace Ui.PlayData.PlayDataBackpack
 
             });
             itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameItems);
-
+            labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
         }
         public override void OnShow()
         {
@@ -53,20 +55,46 @@ namespace Ui.PlayData.PlayDataBackpack
         public void Refresh()
         {
 
+
+
+            labCon.Clear();
+            labCon.Add(new UiLabParam()
+            {
+                lab = null
+            });
+            foreach (var lab in ItemProductForm.DatasByLabel.Keys)
+            {
+                if (lab != "")
+                {
+                    labCon.Add(new UiLabParam()
+                    {
+                        lab = lab
+                    });
+                }
+            }
+            labCon.Refresh();
+
             itemCon.Clear();
             for (int i = 0, icnt = PlayManager.instance.data.progress.bag.Count; i < icnt; i++)
             {
-                itemCon.Add(new UiGameItemParam()
+                var data = ItemProductForm.DataByUid[PlayManager.instance.data.progress.bag[i]];
+                if (model.lab == null || data.label == model.lab)
                 {
-                    data = ItemProductForm.DataByUid[PlayManager.instance.data.progress.bag[i]]
-                }) ;
+                    itemCon.Add(new UiGameItemParam()
+                    {
+                        data = data
+                    });
+                }
+
             }
             itemCon.Refresh();
-            view.sta_show.ChangeState(model.sel != null?1:0);
-            if (model.sel!=null)
+
+
+            view.sta_show.ChangeState(model.sel != null ? 1 : 0);
+            if (model.sel != null)
             {
                 view.img_.sprite = TexAssetForm.DataByName[model.sel.iconTexName].sprite;
-                
+
                 view.txt_desc.text = model.sel.desc;
             }
         }
@@ -77,7 +105,43 @@ namespace Ui.PlayData.PlayDataBackpack
         }
     }
 
+    public partial class UiLabParam
+    {
+        public string lab;
+    }
+    public partial class UiLabModel
+    {
+        public string lab;
+    }
+    public partial class UiLabCtrl
+    {
 
+        public override void OnCreate()
+        {
+
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.model.lab = model.lab;
+                parent.Refresh();
+            });
+
+        }
+        public override void OnShow()
+        {
+            model.lab = param.lab;
+            Refresh();
+        }
+        public void Refresh()
+        {
+
+            view.sta_valid.ChangeState(model.lab == null ? 0 : 1);
+            view.sta_.ChangeState(parent.model.lab == model.lab ? 1 : 0);
+            if (model.lab != null)
+            {
+                view.txt_.text = model.lab;
+            }
+        }
+    }
     public partial class UiGameItemParam
     {
 
@@ -102,7 +166,7 @@ namespace Ui.PlayData.PlayDataBackpack
         }
         public override void OnShow()
         {
-            if(param!=null)
+            if (param != null)
             {
                 model.data = param.data;
             }

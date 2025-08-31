@@ -28,7 +28,7 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false,true
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.2f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.35f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
         if (forGame)
         {
             //default disable
@@ -71,7 +71,7 @@ public class GameUtilController : Z_Controller<GameManager>
         for (int i = 0; i < prefabKeys.Count; i++)
         {
             var go = GameObject.Instantiate(AssetManager.instance.GetGameObject(prefabKeys[i]), res.transform);
-            go.transform.localPosition = poss[i] + Vector3.up * scales[i].y / 2f;
+            go.transform.localPosition = poss[i] + Vector3.up * scales[i].y / 8f;
             go.transform.localScale = scales[i];
 
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();

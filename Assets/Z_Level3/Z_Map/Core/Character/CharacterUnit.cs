@@ -58,7 +58,6 @@ namespace Z_Map
                     }
 
                 }
-
                 var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
                 if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
@@ -89,12 +88,12 @@ namespace Z_Map
 
                 //fix
                 newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
-
                 ins.transform.position = newPos;
                 ins.step =   newPos - data.pos;
                 
                 data.pos = ins.transform.position;
                 data.euler = ins.transform.eulerAngles;
+
 
             }
 
@@ -117,7 +116,6 @@ namespace Z_Map
                         return;
                     dir *= dis / dir.magnitude;
                 }
-
                 ins.transform.position += dir;
             }
         }

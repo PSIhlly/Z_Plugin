@@ -37,6 +37,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteMask(model.data.name);
+                parent.SelType(2);
             });
             view.ipt_label.onFinishInput += (s) =>
             {

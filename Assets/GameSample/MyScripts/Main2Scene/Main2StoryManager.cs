@@ -67,16 +67,22 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             SceneForm.AddData(sceneData);
 
             CharacterParamForm.Clear();
-            var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0);
-            var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, 0f, 5f, 5f, 0);
+            var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0,default);
+            var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, 0f, 5f, 5f, 0, default);
             CharacterParamForm.AddData(hpParamData);
             CharacterParamForm.AddData(speedParamData);
 
+
+            var animDic = new Dictionary<string, CharacterAnimForm.Data>()
+            {
+                {"anim",ModManager.instance.assetCtrl.CreateCharacterAnim("anim") }
+            };
+            animDic["anim"].animClip.Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
             CharacterProductForm.Clear();
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, new Dictionary<string, CharacterAnimForm.Data>(), "", "", "Speed", "Hp",new Dictionary<string,EventTriggerForm.Data>()));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp",new Dictionary<string,EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName()));
 
             ConfigForm.Clear();
-            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), "Player", new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
+            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), CharacterProductForm.DataByUid[1].name, new List<int>() { 1}, new List<int>() { 1}, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
 
             var data = new GameMapData();
             data.Init();

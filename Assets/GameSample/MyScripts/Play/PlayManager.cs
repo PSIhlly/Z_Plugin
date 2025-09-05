@@ -105,7 +105,31 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public static PlayData GetInitPlayDataByConfig()
     {
         var config = GameManager.instance.curConfig;
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName,config.defaultBag));
+        //get instance by proto
+        var items=new List<int>();
+        foreach(var uid in config.defaultBag)
+        {
+            var newItem = ItemProductForm.DataByUid[uid].Copy(false);
+            newItem.ToProduct();
+            items.Add(newItem.uid);
+        }
+        var characters = new List<int>();
+        var charactersActive = new List<int>();
+        foreach (var uid in config.defaultTeam)
+        {
+            var newCharacter = CharacterProductForm.DataByUid[uid].Copy(false);
+            newCharacter.ToProduct();
+            characters.Add(newCharacter.uid);
+            foreach (var uidActive in config.defaultTeamActive)
+            {
+                if(uidActive == uid)
+                {
+                    charactersActive.Add(newCharacter.uid);
+                    break;
+                }
+            }
+        }
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName, items, characters, charactersActive));
     }
 
     public void EndStory()

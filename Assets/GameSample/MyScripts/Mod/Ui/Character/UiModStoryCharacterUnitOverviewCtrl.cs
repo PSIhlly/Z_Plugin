@@ -43,10 +43,22 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
                 if(StringHelper.IsUniqueName(lst, s))
                     model.data.name = s;
+                Refresh();
+
             };
             view.ipt_label.onFinishInput+=(s)=>
             {
                 model.data.label = s;
+                Refresh();
+            };
+            view.btn_tachie.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportCharacterTachie(model.data.name);
+            });
+            view.ipt_desc.onFinishInput += (s) =>
+            {
+                model.data.desc = s;
+                Refresh();
             };
             view.btn_image.onClick.AddListener(() =>
             {
@@ -66,6 +78,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
             view.img_image.sprite = TexAssetForm.DataByName[model.data.avatarTexName].sprite;
+            view.img_tachie.sprite = TexAssetForm.DataByName[model.data.tachie].sprite;
+            view.ipt_desc.Set(model.data.desc);
         }
         public void OnEvent(AssetEvent evt)
         {

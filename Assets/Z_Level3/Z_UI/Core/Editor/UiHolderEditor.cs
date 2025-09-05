@@ -117,9 +117,23 @@ namespace Z_Ui_Editor
                 }
                 else if (o.name.Split("_")[0].Split("|").Contains("sld"))
                 {
-                   
+
                     refreshCode += $@"
             view.sld{o.name.Split("_")[1]}.value = 0;";
+                }
+                else if (o.name.Split("_")[0].Split("|").Contains("dp"))
+                {
+                    initCode += $@"
+            view.dp_{o.name.Split("_")[1]}.onFinishSelect=(v) => 
+            {{
+
+            }};";
+                    refreshCode += $@"
+            view.dp_{o.name.Split("_")[1]}.ClearOptions();
+            for(int i=0,icnt= ;i<icnt;i++)
+            {{
+                view.dp_{o.name.Split("_")[1]}.options.Add(new TMPro.TMP_Dropdown.OptionData( ));
+            }}";
                 }
             }
             var tmp = uiHolder;
@@ -179,7 +193,7 @@ using Z_Texture;
 
             //绘制输入框
             var newName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
-            if (newName!= uiHolder.uiName)
+            if (newName != uiHolder.uiName)
             {
                 Undo.RecordObject(uiHolder, "modify test value");
                 uiHolder.uiName = newName;
@@ -192,7 +206,7 @@ using Z_Texture;
             if (uiHolder.uiType != UiType.Sub && uiHolder.GetComponentsInParent<UiHolder>(true).Length == 1)
             {
                 var newPath = EditorGUILayout.TextField("Path: ", uiHolder.path);
-                if(newPath!= uiHolder.path)
+                if (newPath != uiHolder.path)
                 {
                     Undo.RecordObject(uiHolder, "modify test value");
                     uiHolder.path = newPath;
@@ -379,6 +393,12 @@ using Z_Texture;
             public RectTransform rtf_{realName};";
                             initContent += $@"
             rtf_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<RectTransform>();";
+                            break;
+                        case "dp":
+                            declareContent += $@"
+            public Dp dp_{realName};";
+                            initContent += $@"
+            dp_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Dp>();";
                             break;
                         default:
                             Debug.LogError(uiHolder.uiName + " can't analysis type " + tp);

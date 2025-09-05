@@ -55,6 +55,10 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<int>,List<int>> changeBagAction;
                 
+        public static Action<Data,List<int>,List<int>> changeTeamAction;
+                
+        public static Action<Data,List<int>,List<int>> changeTeamactiveAction;
+                
 
 
         public partial class Data
@@ -150,7 +154,43 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,string characterName,List<int> bag)
+                    private List<int>  _team;
+                    /// <summary>
+                    ///队伍（人物uid）
+                    ///</summary>
+                    public List<int>  team{
+                                get{return _team;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTeam(this,_team,value); 
+                    }
+        
+                _team = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _teamActive;
+                    /// <summary>
+                    ///出战队伍（人物uid）
+                    ///</summary>
+                    public List<int>  teamActive{
+                                get{return _teamActive;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTeamactive(this,_teamActive,value); 
+                    }
+        
+                _teamActive = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,string characterName,List<int> bag,List<int> team,List<int> teamActive)
             {
 
              this.uid = uid;
@@ -158,17 +198,19 @@ public static readonly int autoUidCnt=100;
              this.pos = pos;
              this.characterName = characterName;
              this.bag = bag;
+             this.team = team;
+             this.teamActive = teamActive;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterName,new List<int>(bag));
+        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterName,new List<int>(bag),new List<int>(team),new List<int>(teamActive));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null);
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,null,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -247,7 +289,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("characterName"),
 
-                jo.Get<List<int>>("bag")
+                jo.Get<List<int>>("bag"),
+
+                jo.Get<List<int>>("team"),
+
+                jo.Get<List<int>>("teamActive")
                     );
 
             return data;
@@ -268,6 +314,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("characterName",data.characterName);
 
             jo.Set<List<int>>("bag",data.bag);
+
+            jo.Set<List<int>>("team",data.team);
+
+            jo.Set<List<int>>("teamActive",data.teamActive);
 
             return jo;
         }
@@ -392,6 +442,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeBagAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTeam(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTeamAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTeamactive(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTeamactiveAction?.Invoke(data,oldV,newV);
                 }
                     
             }

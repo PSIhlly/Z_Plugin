@@ -374,6 +374,18 @@ namespace Form
 
                 {1210089,new Data(1210089,"Choose command","Choose command","选择命令")},
 
+                {1210090,new Data(1210090,"show type","Show type","显示方式")},
+
+                {1210091,new Data(1210091,"Always","Always","总是")},
+
+                {1210092,new Data(1210092,"OnlyNotZero","Only not zero","非零")},
+
+                {1210093,new Data(1210093,"Hide","Hide","隐藏")},
+
+                {1210094,new Data(1210094,"tachie","Tachie","立绘")},
+
+                {1210095,new Data(1210095,"description","Description","简介")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -620,6 +632,18 @@ namespace Form
                         {"notice",_DataById[1210088]},
     
                         {"Choose command",_DataById[1210089]},
+    
+                        {"show type",_DataById[1210090]},
+    
+                        {"Always",_DataById[1210091]},
+    
+                        {"OnlyNotZero",_DataById[1210092]},
+    
+                        {"Hide",_DataById[1210093]},
+    
+                        {"tachie",_DataById[1210094]},
+    
+                        {"description",_DataById[1210095]},
     
                     };
     

@@ -5,18 +5,21 @@ using Ui.ModSceneMenu;
 using Ui.PlayData;
 using Ui.PlaySceneMenu;
 using UnityEngine;
+using Z_DataSystem.Form;
 using Z_Map;
 using Z_ObjectAnimator.Base;
 using Z_ObjectAnimator.Core;
 using Z_Texture;
 using Z_Ui;
 using Z_Ui.Base;
+using Z_DesignStyle;
 
 namespace Ui.PlaySceneMain
 {
 
     public partial class UiPlaySceneMainCtrl
     {
+        UiContainer<UiTeamerCtrl> teamerCon;
         public override void OnCreate()
         {
             view.btn_menu.onClick.AddListener(() =>
@@ -27,14 +30,62 @@ namespace Ui.PlaySceneMain
             {
                 UiManager.instance.ShowUi<UiPlayDataCtrl>();
             });
+            teamerCon = new UiContainer<UiTeamerCtrl>(view.go_teamer);
 
         }
-
+        public override void OnShow()
+        {
+            Refresh();
+        }
 
         public void Refresh()
         {
+            teamerCon.Clear();
+            foreach(var uid in PlayManager.instance.data.progress.teamActive)
+            {
+                teamerCon.Add(new UiTeamerParam()
+                {
+                    data = CharacterProductForm.DataByUid[uid]
+                });
+            }
+
+                teamerCon.Refresh();
+        }
+
+       
+    }
+    public partial class UiTeamerParam
+    {
+        public CharacterProductForm.Data data;
+    }
+    public partial class UiTeamerModel
+    {
+        public CharacterProductForm.Data data;
+
+    }
+    public partial class UiTeamerCtrl
+    {
+
+        public override void OnCreate()
+        {
+
+
+
+        }
+        public override void OnShow()
+        {
+            model.data = param.data;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            view.txt_.text = model.data.name;
+            var prm = model.data.paramDic[model.data.hpParamName];
+            view.sld_hp.value = prm.v/ prm.max;
+
+            view.sld_sp.gameObject.SetActive(false);
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName,GlobalNameHelper.GetDefaultCharacterTexName()).sprite;
         }
     }
-
 
 }

@@ -39,8 +39,35 @@ public enum EquipPartType
     Head=3,
     Body=4,
 }
+namespace Form
+{
 
-public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
+    public static partial class CharacterProductForm
+    {
+        public partial class Data
+        {
+            public bool CanShow(string prmName)
+            {
+                if(!paramDic.ContainsKey(prmName)|| !CharacterParamForm.DataByName.ContainsKey(prmName))
+                {
+                    return false;
+                }
+                var prmData = CharacterParamForm.DataByName[prmName];
+                switch(prmData.showType)
+                {
+                    case ParamShowType.Always:
+                        return true;
+                    case ParamShowType.OnlyNotZero:
+                        return paramDic[prmName].v != 0;
+                    case ParamShowType.Hide:
+                        return false;
+                }
+                return false;
+            }
+        }
+    }
+}
+        public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
 {
     public GameCharacterController(GameManager super) : base(super)
     {

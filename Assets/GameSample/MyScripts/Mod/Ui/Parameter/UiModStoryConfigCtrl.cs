@@ -34,6 +34,15 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
                 ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose main character"), (item) =>
                 {
                     GameManager.instance.curConfig.mainCharacterName = item.content;
+                    int uid = CharacterProductForm.DataByNameIsproto[(item.content, true)].uid;
+                    if (!GameManager.instance.curConfig.defaultTeam.Contains(uid))
+                    {
+                        GameManager.instance.curConfig.defaultTeam.Add(uid);
+                    }
+                    if (!GameManager.instance.curConfig.defaultTeamActive.Contains(uid))
+                    {
+                        GameManager.instance.curConfig.defaultTeamActive.Add(uid);
+                    }
                     Refresh();
                 });
             });

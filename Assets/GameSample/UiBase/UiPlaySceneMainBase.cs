@@ -179,25 +179,25 @@ namespace PlaySceneMessage
     {
 
             public PlaySceneMessage.UiPlaySceneMessageCtrl page_PlaySceneMessage;
-            public GameObject go_menu;
             public GameObject go_map;
+            public GameObject go_menu;
             public GameObject go_teamer;
             public UiTeamerCtrl sub_Teamer;
             public GameObject go_func;
-            public Btn btn_menu;
             public Btn btn_map;
+            public Btn btn_menu;
             public Btn btn_data;
         public UiPlaySceneMainView(UiHolder uiHolder):base(uiHolder)
         {
 
             page_PlaySceneMessage = (PlaySceneMessage.UiPlaySceneMessageCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
-            go_menu = uiHolder.elementTrsLst[1].gameObject;
-            go_map = uiHolder.elementTrsLst[2].gameObject;
+            go_map = uiHolder.elementTrsLst[1].gameObject;
+            go_menu = uiHolder.elementTrsLst[2].gameObject;
             go_teamer = uiHolder.elementTrsLst[3].gameObject;
             sub_Teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             go_func = uiHolder.elementTrsLst[5].gameObject;
-            btn_menu = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_map = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_map = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[7].GetComponent<Btn>();
             btn_data = uiHolder.elementTrsLst[8].GetComponent<Btn>();
         }
 

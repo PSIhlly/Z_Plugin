@@ -116,13 +116,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         public void Refresh()
         {
             view.sta_canEquipped.ChangeState(model.data.canEquipe?1:0);
-            view.txt_onUseEvent.text = model.data.events.Get("onUseEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onEquipEvent.text = model.data.events.Get("onEquipEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onDisequipEvent.text = model.data.events.Get("onDisequipEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onUseEvent.text = model.data.events.GetDv("onUseEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onEquipEvent.text = model.data.events.GetDv("onEquipEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onDisequipEvent.text = model.data.events.GetDv("onDisequipEvent", EventTriggerForm.defaultData).evt;
             view.ipt_price.Set(model.data.price.ToString());
-            view.txt_onTouchEvent.text = model.data.events.Get("onTouchEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onLeaveEvent.text = model.data.events.Get("onLeaveEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onShowEvent.text = model.data.events.Get("onShowEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onTouchEvent.text = model.data.events.GetDv("onTouchEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onLeaveEvent.text = model.data.events.GetDv("onLeaveEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onShowEvent.text = model.data.events.GetDv("onShowEvent", EventTriggerForm.defaultData).evt;
         }
     }
 

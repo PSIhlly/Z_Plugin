@@ -210,6 +210,14 @@ namespace Form
 
                 {20032,new Data(20032,"history","History","历史记录")},
 
+                {20033,new Data(20033,"data","Data","数据")},
+
+                {20034,new Data(20034,"skill","Skill","技能")},
+
+                {20035,new Data(20035,"Please select one from the following","Please select one from the following","请从下方选择一项")},
+
+                {20036,new Data(20036,"name","Name","名称")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -292,6 +300,14 @@ namespace Form
                         {"hide",_DataById[20031]},
     
                         {"history",_DataById[20032]},
+    
+                        {"data",_DataById[20033]},
+    
+                        {"skill",_DataById[20034]},
+    
+                        {"Please select one from the following",_DataById[20035]},
+    
+                        {"name",_DataById[20036]},
     
                     };
     

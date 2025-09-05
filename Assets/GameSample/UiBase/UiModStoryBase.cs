@@ -99,6 +99,7 @@ namespace ModStoryGlobalParameter
             public Btn btn_delete;
             public Ipt ipt_name;
             public Ipt ipt_value;
+            public Dp dp_;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -108,6 +109,7 @@ namespace ModStoryGlobalParameter
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
         }
 
     }
@@ -213,6 +215,7 @@ namespace ModStoryCharacterParameter
             public Btn btn_delete;
             public Ipt ipt_name;
             public Ipt ipt_value;
+            public Dp dp_;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -222,6 +225,7 @@ namespace ModStoryCharacterParameter
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
         }
 
     }
@@ -327,6 +331,7 @@ namespace ModStoryItemParameter
             public Btn btn_delete;
             public Ipt ipt_name;
             public Ipt ipt_value;
+            public Dp dp_;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -336,6 +341,7 @@ namespace ModStoryItemParameter
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
         }
 
     }
@@ -762,6 +768,9 @@ namespace ModStoryCharacterUnitOverview
             public Ipt ipt_label;
             public Btn btn_image;
             public Img img_image;
+            public Btn btn_tachie;
+            public Img img_tachie;
+            public Ipt ipt_desc;
         public UiModStoryCharacterUnitOverviewView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -770,6 +779,9 @@ namespace ModStoryCharacterUnitOverview
             ipt_label = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
             btn_image = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             img_image = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            btn_tachie = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            img_tachie = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            ipt_desc = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
         }
 
     }
@@ -1844,6 +1856,7 @@ namespace ModStoryItemUnitOverview
     public partial class UiModStoryItemUnitOverviewView:UiView
     {
 
+            public Ipt ipt_desc;
             public Btn btn_delete;
             public Ipt ipt_name;
             public Ipt ipt_label;
@@ -1852,11 +1865,12 @@ namespace ModStoryItemUnitOverview
         public UiModStoryItemUnitOverviewView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            ipt_name = uiHolder.elementTrsLst[1].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            btn_image = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            img_image = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            ipt_desc = uiHolder.elementTrsLst[0].GetComponent<Ipt>();
+            btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            ipt_label = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            btn_image = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[5].GetComponent<Img>();
         }
 
     }

@@ -75,25 +75,45 @@ namespace Form
                 
         public static Action<Data,float,float> changeMaxAction;
                 
+        public static Action<Data,ParamShowType,ParamShowType> changeShowtypeAction;
+                
 
 
         public partial class Data : ParamForm.Data
         {
 
-                    private int  _SpecialType;
+                    private int  _specialType;
                     /// <summary>
                     ///特殊类型
                     ///</summary>
-                    public int  SpecialType{
-                                get{return _SpecialType;}
+                    public int  specialType{
+                                get{return _specialType;}
 private set{
         
-                _SpecialType = value;
+                _specialType = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,ValType valueType,float min,float v,float max,int SpecialType):base(uid,name,valueType,min,v,max)
+                    private ParamShowType  _showType;
+                    /// <summary>
+                    ///显示类型
+                    ///</summary>
+                    public ParamShowType  showType{
+                                get{return _showType;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeShowtype(this,_showType,value); 
+                    }
+        
+                _showType = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,ValType valueType,float min,float v,float max,int specialType,ParamShowType showType):base(uid,name,valueType,min,v,max)
             {
 
              this.uid = uid;
@@ -102,18 +122,19 @@ private set{
              this.min = min;
              this.v = v;
              this.max = max;
-             this.SpecialType = SpecialType;
+             this.specialType = specialType;
+             this.showType = showType;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,valueType,min,v,max,SpecialType);
+        return new Data(sameId? uid:uidChain.GetId(),name,valueType,min,v,max,specialType,showType);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f,0);
+                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f,0,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -232,7 +253,9 @@ private set{
 
                 jo.Get<float>("max"),
 
-                    _defaultData.SpecialType
+                    _defaultData.specialType,
+
+                jo.Get<ParamShowType>("showType")
                     );
 
             return data;
@@ -256,6 +279,8 @@ private set{
 
             jo.Set<float>("max",data.max);
 
+            jo.Set<ParamShowType>("showType",data.showType);
+
             return jo;
         }
 
@@ -278,7 +303,7 @@ private set{
     
                     DataByName[data.name]=data;
     
-                    DataBySpecialtype[data.SpecialType]=data;
+                    DataBySpecialtype[data.specialType]=data;
     
 ParamForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -296,7 +321,7 @@ ParamForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
-                    DataBySpecialtype.Remove(data.SpecialType);
+                    DataBySpecialtype.Remove(data.specialType);
     
 ParamForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -400,6 +425,16 @@ ParamForm.RemoveData(uid);
                 {
 
                 changeMaxAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeShowtype(Data superData,ParamShowType oldV,ParamShowType newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeShowtypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

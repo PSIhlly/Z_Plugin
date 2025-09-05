@@ -40,8 +40,6 @@ public class GameUtilController : Z_Controller<GameManager>
 
             res.transform.GetChild(0).gameObject.GetComponent<MeshCollider>().enabled=false;
             res.transform.GetChild(1).gameObject.GetComponent<MeshCollider>().enabled=false;
-            var rb=res.AddComponent<Rigidbody>();
-            rb.freezeRotation = true;
         }
         return res;
     }

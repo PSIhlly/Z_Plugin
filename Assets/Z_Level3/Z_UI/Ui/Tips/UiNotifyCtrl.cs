@@ -173,7 +173,6 @@ namespace Ui.Notify
                     break;
                 }
             }
-            Debug.Log("ฝแส๘มห" + model.tipInfos.Count);
             Refresh();
         }
         public void RemoveChoose(int id)

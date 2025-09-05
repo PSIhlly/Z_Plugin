@@ -53,6 +53,10 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeMaincharacternameAction;
                 
+        public static Action<Data,List<int>,List<int>> changeDefaultteamAction;
+                
+        public static Action<Data,List<int>,List<int>> changeDefaultteamactiveAction;
+                
         public static Action<Data,List<int>,List<int>> changeDefaultbagAction;
                 
         public static Action<Data,string,string> changeOnbegineventAction;
@@ -138,6 +142,42 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
+                    private List<int>  _defaultTeam;
+                    /// <summary>
+                    ///玩家初始队伍
+                    ///</summary>
+                    public List<int>  defaultTeam{
+                                get{return _defaultTeam;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDefaultteam(this,_defaultTeam,value); 
+                    }
+        
+                _defaultTeam = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _defaultTeamActive;
+                    /// <summary>
+                    ///玩家初始出战队伍
+                    ///</summary>
+                    public List<int>  defaultTeamActive{
+                                get{return _defaultTeamActive;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDefaultteamactive(this,_defaultTeamActive,value); 
+                    }
+        
+                _defaultTeamActive = value;
+                }
+                 
+                     }
+                    
                     private List<int>  _defaultBag;
                     /// <summary>
                     ///玩家初始背包
@@ -210,13 +250,15 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap)
+            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultTeam,List<int> defaultTeamActive,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap)
             {
 
              this.uid = uid;
              this.startSceneId = startSceneId;
              this.startpos = startpos;
              this.mainCharacterName = mainCharacterName;
+             this.defaultTeam = defaultTeam;
+             this.defaultTeamActive = defaultTeamActive;
              this.defaultBag = defaultBag;
              this.onBeginEvent = onBeginEvent;
              this.onEndEvent = onEndEvent;
@@ -226,12 +268,12 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap);
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultTeam),new List<int>(defaultTeamActive),new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,"","","");
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,null,null,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -310,6 +352,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("mainCharacterName"),
 
+                jo.Get<List<int>>("defaultTeam"),
+
+                jo.Get<List<int>>("defaultTeamActive"),
+
                 jo.Get<List<int>>("defaultBag"),
 
                 jo.Get<string>("onBeginEvent"),
@@ -335,6 +381,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<Vector3>("startpos",data.startpos);
 
             jo.Set<string>("mainCharacterName",data.mainCharacterName);
+
+            jo.Set<List<int>>("defaultTeam",data.defaultTeam);
+
+            jo.Set<List<int>>("defaultTeamActive",data.defaultTeamActive);
 
             jo.Set<List<int>>("defaultBag",data.defaultBag);
 
@@ -457,6 +507,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeMaincharacternameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDefaultteam(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDefaultteamAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDefaultteamactive(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDefaultteamactiveAction?.Invoke(data,oldV,newV);
                 }
                     
             }

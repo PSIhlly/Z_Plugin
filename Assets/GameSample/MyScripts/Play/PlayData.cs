@@ -10,7 +10,12 @@ using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_UnitSystem.Form;
-
+public enum ParamShowType
+{
+    Always,
+    OnlyNotZero,
+    Hide
+}
 public class PlayData
 {
     public ProgressForm.Data progress;
@@ -43,7 +48,7 @@ public class PlayData
                 nm = c.name;
             }
         }
-        progress = new ProgressForm.Data(1, 1, Vector3.zero, nm,new List<int>());
+        progress = new ProgressForm.Data(1, 1, Vector3.zero, nm,new List<int>(),new List<int>(), new List<int>());
     }
     public void Unload()
     {

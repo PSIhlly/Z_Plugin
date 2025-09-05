@@ -101,9 +101,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.txt_moveSpeedParameter.text = model.data.speedParamName;
             view.txt_idleAnim.text = model.data.idleAnimName;
             view.txt_moveAnim.text = model.data.moveAnimName;
-            view.txt_onTouchEvent.text = model.data.events.Get("onTouchEvent",EventTriggerForm.defaultData).evt;
-            view.txt_onLeaveEvent.text = model.data.events.Get("onLeaveEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onShowEvent.text = model.data.events.Get("onShowEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onTouchEvent.text = model.data.events.GetDv("onTouchEvent",EventTriggerForm.defaultData).evt;
+            view.txt_onLeaveEvent.text = model.data.events.GetDv("onLeaveEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onShowEvent.text = model.data.events.GetDv("onShowEvent", EventTriggerForm.defaultData).evt;
         }
     }
 

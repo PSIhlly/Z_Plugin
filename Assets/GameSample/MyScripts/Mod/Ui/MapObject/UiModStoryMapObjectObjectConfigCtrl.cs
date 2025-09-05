@@ -76,9 +76,9 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public void Refresh()
         {
             view.sta_fixed.ChangeState(model.data.isFixed?1:0);
-            view.txt_onTouchEvent.text = model.data.events.Get("onTouchEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onLeaveEvent.text = model.data.events.Get("onLeaveEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onShowEvent.text = model.data.events.Get("onShowEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onTouchEvent.text = model.data.events.GetDv("onTouchEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onLeaveEvent.text = model.data.events.GetDv("onLeaveEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onShowEvent.text = model.data.events.GetDv("onShowEvent", EventTriggerForm.defaultData).evt;
         }
     }
 

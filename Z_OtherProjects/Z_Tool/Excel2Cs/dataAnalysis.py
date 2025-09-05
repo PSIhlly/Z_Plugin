@@ -46,7 +46,8 @@ def get_default_form(type):
         return ''
     return 'null'
 def translate_string_to_cs(content):
-    return content.replace('\\','\\\\')
+    content=content.replace('\\','\\\\').replace('"','\\"')
+    return content
 def get_value(type,value,config):
     #拆外壳
     value = get_naked(value)

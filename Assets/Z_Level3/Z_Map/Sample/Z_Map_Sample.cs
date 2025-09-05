@@ -14,7 +14,7 @@ public class Z_Map_Sample : MonoBehaviour
     public void Start()
     {
 
-        var res = AssetManager.instance.LoadAssetsByFolder(Application.dataPath + "/Z_Level3/Z_Map/Sample/Imgs",false);
+        var res = AssetManager.instance.LoadAssetsByFolder(Application.dataPath + "Z_Map/",true);
         foreach (var tex in res.texs)
         {
             TexAssetForm.AddData(new TexAssetForm.Data(-1, tex.Item1, tex.Item2));

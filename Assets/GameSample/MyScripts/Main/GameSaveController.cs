@@ -100,6 +100,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             var icon = data.avatarTexName;
             SaveStoryTex(icon, storyCoreFolder);
+            SaveStoryTex(data.tachie, storyCoreFolder);
             foreach (var anim in data.animDic.Values)
             {
                 for (int i = 0; i < anim.animClip.Count; i++)
@@ -355,6 +356,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             var icon = data.avatarTexName;
             LoadStoryTex(icon, storyCoreFolder);
+            LoadStoryTex(data.tachie, storyCoreFolder);
 
             foreach (var anim in data.animDic.Values)
             {

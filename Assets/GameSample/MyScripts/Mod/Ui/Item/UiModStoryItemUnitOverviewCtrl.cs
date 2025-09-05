@@ -51,6 +51,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             {
                 ModManager.instance.assetCtrl.ImportItemIcon(model.data.name);
             });
+            view.ipt_desc.onFinishInput += (s) =>
+            {
+                model.data.desc = s;
+                Refresh();
+            };
 
         }
 
@@ -71,6 +76,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
             view.img_image.sprite = TexAssetForm.DataByName[model.data.iconTexName].sprite;
+            view.ipt_desc.Set(model.data.desc);
         }
     }
 

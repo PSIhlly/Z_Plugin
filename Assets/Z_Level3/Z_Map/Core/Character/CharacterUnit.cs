@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
@@ -58,10 +59,31 @@ namespace Z_Map
                     }
 
                 }
+
+                var newPos = ins.transform.position;
+                //gravity
+                if (!Physics.Raycast(ins.transform.position + Vector3.up * 0.5f, Vector3.down, out var res, 0.6f, 1, QueryTriggerInteraction.Ignore))
+                    newPos.y -= Time.deltaTime*2f;
+
+
+
+                //collide
+                MapManager.instance.utilCtrl.GetClosestInArea(newPos);
+
+                //fix
+                newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
+
+                ins.transform.position = newPos;
+                ins.step =   newPos - data.pos;
+                
+                data.pos = ins.transform.position;
+                data.euler = ins.transform.eulerAngles;
+
+
+
                 var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
                 if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
-
                     var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
                     if (superUnit != newMap.unit)
                     {
@@ -71,29 +93,6 @@ namespace Z_Map
                     }
 
                 }
-                var newPos = ins.transform.position;
-
-                /*                //模拟重力
-                                var curMap = map;
-                                while (curMap.scale == Vector3.zero)
-                                {
-                                    var down = new Vector3Int(curMap.mapPos.x, curMap.mapPos.y - 1, curMap.mapPos.z);
-                                    if (MapManager.instance.mapUtilController.InArea(down))
-                                        curMap = MapManager.instance.maps[down.x, down.y, down.z];
-                                    else
-                                        break;
-                                }
-                                if (Mathf.Abs(newPos.y- curMap.GetYByPoint(new Vector2(newPos.x-curMap.pos.x,newPos.z-curMap.pos.z))) > 0.05f)
-                                    newPos.y -= Time.deltaTime;*/
-
-                //fix
-                newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
-                ins.transform.position = newPos;
-                ins.step =   newPos - data.pos;
-                
-                data.pos = ins.transform.position;
-                data.euler = ins.transform.eulerAngles;
-
 
             }
 

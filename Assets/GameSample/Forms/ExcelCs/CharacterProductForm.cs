@@ -83,6 +83,12 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
+        public static Action<Data,Dictionary<EquipPartType,int>,Dictionary<EquipPartType,int>> changeEquipsAction;
+                
+        public static Action<Data,string,string> changeDescAction;
+                
+        public static Action<Data,string,string> changeTachieAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -232,7 +238,61 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events):base(uid,name,label,isProto)
+                    private Dictionary<EquipPartType,int>  _equips;
+                    /// <summary>
+                    ///装备（道具uid）
+                    ///</summary>
+                    public Dictionary<EquipPartType,int>  equips{
+                                get{return _equips;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEquips(this,_equips,value); 
+                    }
+        
+                _equips = value;
+                }
+                 
+                     }
+                    
+                    private string  _desc;
+                    /// <summary>
+                    ///描述
+                    ///</summary>
+                    public string  desc{
+                                get{return _desc;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDesc(this,_desc,value); 
+                    }
+        
+                _desc = value;
+                }
+                 
+                     }
+                    
+                    private string  _tachie;
+                    /// <summary>
+                    ///立绘
+                    ///</summary>
+                    public string  tachie{
+                                get{return _tachie;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTachie(this,_tachie,value); 
+                    }
+        
+                _tachie = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -247,17 +307,20 @@ namespace Form
              this.speedParamName = speedParamName;
              this.hpParamName = hpParamName;
              this.events = events;
+             this.equips = equips;
+             this.desc = desc;
+             this.tachie = tachie;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","",new Dictionary<string,EventTriggerForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -414,7 +477,13 @@ namespace Form
 
                 jo.Get<string>("hpParamName"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+
+                jo.Get<Dictionary<EquipPartType,int>>("equips"),
+
+                jo.Get<string>("desc"),
+
+                jo.Get<string>("tachie")
                     );
 
             return data;
@@ -449,6 +518,12 @@ namespace Form
             jo.Set<string>("hpParamName",data.hpParamName);
 
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+
+            jo.Set<Dictionary<EquipPartType,int>>("equips",data.equips);
+
+            jo.Set<string>("desc",data.desc);
+
+            jo.Set<string>("tachie",data.tachie);
 
             return jo;
         }
@@ -705,6 +780,36 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeEventsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEquips(Data superData,Dictionary<EquipPartType,int> oldV,Dictionary<EquipPartType,int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEquipsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDesc(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDescAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTachie(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTachieAction?.Invoke(data,oldV,newV);
                 }
                     
             }

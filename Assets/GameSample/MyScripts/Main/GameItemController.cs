@@ -18,7 +18,34 @@ public enum ItemStyle
     leftView = 1,
     frontView = 2,
 }
+namespace Form
+{
 
+    public static partial class ItemProductForm
+    {
+        public partial class Data
+        {
+            public bool CanShow(string prmName)
+            {
+                if (!paramDic.ContainsKey(prmName) || !ItemParamForm.DataByName.ContainsKey(prmName))
+                {
+                    return false;
+                }
+                var prmData = ItemParamForm.DataByName[prmName];
+                switch (prmData.showType)
+                {
+                    case ParamShowType.Always:
+                        return true;
+                    case ParamShowType.OnlyNotZero:
+                        return paramDic[prmName].v != 0;
+                    case ParamShowType.Hide:
+                        return false;
+                }
+                return false;
+            }
+        }
+    }
+}
 public class GameItemController : Z_Controller<GameManager>
 {
     public GameItemController(GameManager super) : base(super)

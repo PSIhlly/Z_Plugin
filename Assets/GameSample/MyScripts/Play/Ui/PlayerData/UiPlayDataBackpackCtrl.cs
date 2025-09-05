@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem.Form;
+using Z_Text;
 
 namespace Ui.PlayData.PlayDataBackpack
 {
@@ -25,6 +26,7 @@ namespace Ui.PlayData.PlayDataBackpack
 
         UiScrViewContainer<UiGameItemCtrl> itemCon;
         UiScrViewContainer<UiLabCtrl> labCon;
+        UiScrViewContainer<UiGameArgsCtrl> gameArgCon;
         public override void OnCreate()
         {
 
@@ -46,6 +48,7 @@ namespace Ui.PlayData.PlayDataBackpack
             });
             itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameItems);
             labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
+            gameArgCon = new UiScrViewContainer<UiGameArgsCtrl>(view.go_gameArgs, view.scr_gameArgs);
         }
         public override void OnShow()
         {
@@ -54,9 +57,6 @@ namespace Ui.PlayData.PlayDataBackpack
         }
         public void Refresh()
         {
-
-
-
             labCon.Clear();
             labCon.Add(new UiLabParam()
             {
@@ -89,14 +89,26 @@ namespace Ui.PlayData.PlayDataBackpack
             }
             itemCon.Refresh();
 
-
+            gameArgCon.Clear();
             view.sta_show.ChangeState(model.sel != null ? 1 : 0);
             if (model.sel != null)
             {
                 view.img_.sprite = TexAssetForm.DataByName[model.sel.iconTexName].sprite;
-
                 view.txt_desc.text = model.sel.desc;
+                view.txt_name.text = model.sel.name;
+                view.txt_amount.text = TextManager.instance.GetTxt("count")+":"+ model.sel.amount.ToString();
+                foreach(var arg in model.sel.paramDic)
+                {
+                    if(model.sel.CanShow(arg.Key))
+                    gameArgCon.Add(new UiGameArgsParam()
+                    {
+                        content = arg.Key + ":" + arg.Value.v
+                    });
+                }
+
+                
             }
+            gameArgCon.Refresh();
         }
         public void Sel(ItemProductForm.Data data)
         {
@@ -181,6 +193,34 @@ namespace Ui.PlayData.PlayDataBackpack
             view.sta_.ChangeState(parent.model.sel == model.data ? 1 : 0);
         }
     }
+    public partial class UiGameArgsParam
+    {
+        public string content;
+    }
+    public partial class UiGameArgsModel
+    {
+        public string content;
 
+    }
+    public partial class UiGameArgsCtrl
+    {
+
+        public override void OnCreate()
+        {
+
+
+
+        }
+        public override void OnShow()
+        {
+            model.content = param.content;
+            Refresh();
+        }
+        public void Refresh()
+        {
+
+            view.txt_.text = model.content;
+        }
+    }
 
 }

@@ -84,14 +84,9 @@ namespace Z_Map
                 var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
                 if (MapManager.instance.utilCtrl.InArea(newMapPos))
                 {
-                    var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
-                    if (superUnit != newMap.unit)
-                    {
-                        superUnit.Unbind(this);
-                        newMap.unit.Bind(this);
-                        SubUpdateActive();
-                    }
-
+                    var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)].unit;
+                    MapManager.instance.characterTileDic.Del(this);
+                    MapManager.instance.characterTileDic.Add(this, newMap);
                 }
 
             }

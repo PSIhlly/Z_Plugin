@@ -10,6 +10,7 @@ using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
+using static Z_DesignStyle.Z_DoubleDictionary;
 
 namespace Z_Map
 {
@@ -25,7 +26,6 @@ namespace Z_Map
 
     public static class GlobalHelper
     {
-
         public static string GetInternalPrefabName(string name="")
         {
             return "z_map$" + name;
@@ -145,6 +145,10 @@ public class MapManager : Z_MonoManager<MapManager>
     }
     = new List<TileUnitForm.Data>();
 
+    public DoubleDictionary<ObjectUnit, TileUnit> objectTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
+    public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
+    public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
+
     public override void Init()
     {
         base.Init();
@@ -169,12 +173,13 @@ public class MapManager : Z_MonoManager<MapManager>
             var mapPos = utilCtrl.RealPos2MapPos(itemData.pos);
             if (utilCtrl.InArea(mapPos))
             {
-                TileUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(itemData.unit);
+                itemTileDic.Add(itemData.unit, dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
             }
         }
         foreach (var objectData in ObjectUnitForm.DataByUid.Values)
         {
-            var mapPos = utilCtrl.RealPos2MapPos(objectData.pos);
+            var mapPos = utilCtrl.RealPos2MapPos(objectData.pos); 
+            var overlapMaps = Z_Math.Graph.GetRoughOverlapIntPos(points);
             if (utilCtrl.InArea(mapPos))
             {
                 TileUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(objectData.unit);
@@ -185,7 +190,7 @@ public class MapManager : Z_MonoManager<MapManager>
             var mapPos = utilCtrl.RealPos2MapPos(characterData.pos);
             if (utilCtrl.InArea(mapPos))
             {
-                TileUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(characterData.unit);
+                characterTileDic.Add(characterData.unit, dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
             }
         }
 
@@ -267,6 +272,10 @@ public class MapManager : Z_MonoManager<MapManager>
         }
         lastView = (0, 0, 0, 0, 0, 0);
         lastCenterPos = Vector3.one * -9999999;
+
+        objectTileDic.Clear();
+        characterTileDic.Clear();
+        itemTileDic.Clear();
     }
 
 

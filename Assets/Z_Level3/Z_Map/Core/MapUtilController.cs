@@ -37,10 +37,7 @@ namespace Z_Map
         {
             return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
         }
-        public Vector3 GetCollideResult(Vector3 pos,float radius)
-        {
 
-        }
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {
             var newPos = SearchClosedValid(pos);

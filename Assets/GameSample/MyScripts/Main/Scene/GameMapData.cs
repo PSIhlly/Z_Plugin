@@ -12,7 +12,9 @@ using Z_Debug;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
+using Z_UnitSystem;
 using Z_UnitSystem.Form;
+using static UnityEditor.Progress;
 
     public class GameMapData:MapData
     {
@@ -60,6 +62,30 @@ using Z_UnitSystem.Form;
     public override List<TileUnitForm.Data> GetTileDatasByJa(string ja)
     {
         return TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
+    }
+    public override bool CheckItemUnit(ItemUnitForm.Data item)
+    {
+        int id = AssetManager.GetKeyId(item.name);
+        if(ItemProductForm.DataByUid.ContainsKey(id))
+        {
+            if(ItemProductForm.DataByUid[id].name== AssetManager.GetKeyName(item.name))
+                return base.CheckItemUnit(item);
+        }
+        return false;
+    }
+    public override bool CheckObjectUnit(ObjectUnitForm.Data obj)
+    {
+        return base.CheckObjectUnit(obj);
+    }
+    public override bool CheckCharacterUnit(CharacterUnitForm.Data ch)
+    {
+        int id = AssetManager.GetKeyId(ch.name);
+        if (CharacterProductForm.DataByUid.ContainsKey(id))
+        {
+            if (CharacterProductForm.DataByUid[id].name == AssetManager.GetKeyName(ch.name))
+                return base.CheckCharacterUnit(ch);
+        }
+        return false;
     }
 
 }

@@ -12,6 +12,7 @@ using UnityEngine;
 using Z_DataSystem.Form;
 using Z_Text;
 using Z_Ui.Notify;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
 {
@@ -31,17 +32,16 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         {
             view.btn_mainCharacter.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose main character"), (item) =>
+                ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose main character"), (data) =>
                 {
-                    GameManager.instance.curConfig.mainCharacterName = item.content;
-                    int uid = CharacterProductForm.DataByNameIsproto[(item.content, true)].uid;
-                    if (!GameManager.instance.curConfig.defaultTeam.Contains(uid))
+                    GameManager.instance.curConfig.mainCharacterUid = data.uid;
+                    if (!GameManager.instance.curConfig.defaultTeam.Contains(data.uid))
                     {
-                        GameManager.instance.curConfig.defaultTeam.Add(uid);
+                        GameManager.instance.curConfig.defaultTeam.Add(data.uid);
                     }
-                    if (!GameManager.instance.curConfig.defaultTeamActive.Contains(uid))
+                    if (!GameManager.instance.curConfig.defaultTeamActive.Contains(data.uid))
                     {
-                        GameManager.instance.curConfig.defaultTeamActive.Add(uid);
+                        GameManager.instance.curConfig.defaultTeamActive.Add(data.uid);
                     }
                     Refresh();
                 });
@@ -57,7 +57,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         public void Refresh()
         {
 
-            view.txt_mainCharacter.text = GameManager.instance.curConfig.mainCharacterName;
+            view.txt_mainCharacter.text = CharacterProductForm.DataByUid[GameManager.instance.curConfig.mainCharacterUid].name;
         }
     }
 

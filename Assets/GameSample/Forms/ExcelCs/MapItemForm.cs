@@ -69,7 +69,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeLabelAction;
                 
-        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
+        public static Action<Data,int,int> changeItemuidAction;
                 
 
 
@@ -94,25 +94,25 @@ namespace Form
                  
                      }
                     
-                    private Dictionary<string,EventTriggerForm.Data>  _events;
+                    private int  _itemUid;
                     /// <summary>
-                    ///事件
+                    ///道具id
                     ///</summary>
-                    public Dictionary<string,EventTriggerForm.Data>  events{
-                                get{return _events;}
+                    public int  itemUid{
+                                get{return _itemUid;}
  set{
 
                     if(_DataById!=null&&_DataById.ContainsValue(this))
                     {
-                       ChangeEvents(this,_events,value); 
+                       ChangeItemuid(this,_itemUid,value); 
                     }
         
-                _events = value;
+                _itemUid = value;
                 }
                  
                      }
                     
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,Dictionary<string,EventTriggerForm.Data> events):base(id,name,icon,label)
+            public Data(int id,string name,string icon,MapModelForm.Data model,string label,int itemUid):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -120,18 +120,18 @@ namespace Form
              this.icon = icon;
              this.model = model;
              this.label = label;
-             this.events = events;
+             this.itemUid = itemUid;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,itemUid);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",new Dictionary<string,EventTriggerForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -182,7 +182,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",new Dictionary<string,EventTriggerForm.Data>(){})},
+                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",0)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -256,7 +256,7 @@ namespace Form
 
                 jo.Get<string>("label"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
+                jo.Get<int>("itemUid")
                     );
 
             return data;
@@ -278,7 +278,7 @@ namespace Form
 
             jo.Set<string>("label",data.label);
 
-            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+            jo.Set<int>("itemUid",data.itemUid);
 
             return jo;
         }
@@ -429,12 +429,12 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
+            public static void ChangeItemuid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeEventsAction?.Invoke(data,oldV,newV);
+                changeItemuidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

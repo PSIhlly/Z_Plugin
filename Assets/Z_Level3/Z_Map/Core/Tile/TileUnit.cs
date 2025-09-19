@@ -31,6 +31,8 @@ namespace Z_Map
         public override void Show()
         {
             base.Show();
+
+
             Z_EventHelper.Invoke(new TileEvent()
             {
                 type = MapEventType.Show,

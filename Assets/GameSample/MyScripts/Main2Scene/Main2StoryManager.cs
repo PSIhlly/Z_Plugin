@@ -79,10 +79,10 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             };
             animDic["anim"].animClip.Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
             CharacterProductForm.Clear();
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp",new Dictionary<string,EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName()));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp",new Dictionary<string,EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
 
             ConfigForm.Clear();
-            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), CharacterProductForm.DataByUid[1].name, new List<int>() { 1}, new List<int>() { 1}, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
+            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1}, new List<int>() { 1}, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
 
             var data = new GameMapData();
             data.Init();
@@ -167,7 +167,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                  return data;
              });
          }*/
-        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 2, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y / 2) + 2);
+        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
 
         MapManager.instance.Begin(data);
 
@@ -187,21 +187,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            CharacterAnimForm.Data idleAnim = null;
-            CharacterAnimForm.Data moveAnim = null;
-            foreach (var anim in character.animDic.Values)
-            {
-                if (anim.name == character.idleAnimName)
-                {
-                    idleAnim = anim;
-                }
-                if (anim.name == character.moveAnimName)
-                {
-                    moveAnim = anim;
-                }
-            }
-            GameManager.instance.characterCtrl.CreateAnim(character, idleAnim, moveAnim);
-
+            GameManager.instance.characterCtrl.RegisterAnim(character);
         }
 
         Z_EventHelper.Invoke(new LoadingEvent()

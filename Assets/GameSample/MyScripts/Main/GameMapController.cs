@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -19,20 +20,20 @@ namespace Z_Map
     public partial class MapUnit
     {
         public static string productKey = "pdt";
-        private (string,int) _productInfo;
-        public (string, int) productInfo
+        private (int,int) _productInfo;
+        public (int, int) productInfo
         {
             get
             {
                 if (_productInfo == default)
                 {
-                    _productInfo = ("",-1);
+                    _productInfo = (0,0);
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
                         if (jo != null && jo[productKey] != null)
                         {
-                            _productInfo.Item1 = (string)jo[productKey][0];
+                            _productInfo.Item1 = (int)jo[productKey][0];
                             _productInfo.Item2 = (int)jo[productKey][1];
                         }
                     }
@@ -722,7 +723,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             if (data.texNameDic.ContainsKey(i)&& MapTextureForm.DataByName.ContainsKey(data.texNameDic[i]))
             {
 
-                int maskId = i + GlobalMaxSettings.TERRAIN_LAYER_MAX;
+                int maskId = i + GlobalSettings.TERRAIN_LAYER_MAX;
                 if (data.texNameDic.ContainsKey(maskId) && MapMaskForm.DataByName.ContainsKey(data.texNameDic[maskId]))
                 {
                     var maskForm = MapMaskForm.DataByName[data.texNameDic[maskId]];
@@ -756,6 +757,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 ins.renderers[i].enabled = true;
 
                 var texForm = MapTextureForm.DataByName[data.texNameDic[i]];
+
+                TimeManager.instance.CancelTimer(ins.animTimer[i]);
+
                 if (texForm.animTimeInterval > 0)
                 {
                     float all = texForm.animTimeInterval * texForm.texsName.Count;
@@ -767,7 +771,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     animCurCache[data][i] = cur;
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].tex);
                     int renderId = i;
-                    TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
+                    ins.animTimer[i] =TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         ins.renderers[renderId].GetPropertyBlock(propBlock);

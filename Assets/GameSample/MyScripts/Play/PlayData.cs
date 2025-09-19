@@ -48,7 +48,7 @@ public class PlayData
                 nm = c.name;
             }
         }
-        progress = new ProgressForm.Data(1, 1, Vector3.zero, nm,new List<int>(),new List<int>(), new List<int>());
+        progress = new ProgressForm.Data(1, 1, Vector3.zero, 0,new List<int>(),new List<int>(), new List<int>());
     }
     public void Unload()
     {

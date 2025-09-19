@@ -12,6 +12,12 @@ namespace Z_Map
             set { base.unit = value; }
             get { return (CharacterUnit)base.unit; }
         }
+        public Vector3 oldPos;
         public Vector3 step;
+        public void UpdatePos()
+        {
+            step = unit.data.pos - oldPos;
+            oldPos = unit.data.pos;
+        }
     }
 }

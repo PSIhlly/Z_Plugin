@@ -90,7 +90,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         public void Refresh()
         {
             view.txt_.text = model.data.name;
-            gameObject.transform.position = Z_Math.Graph.GetRelativePos(new Vector2(model.data.pos.Item1, model.data.pos.Item2),parent.rect);
+            gameObject.transform.position = Z_Math.Graph.GetRealPos(new Vector2(model.data.pos.Item1, model.data.pos.Item2),parent.rect);
         }
     }
 }

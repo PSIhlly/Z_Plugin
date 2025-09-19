@@ -158,6 +158,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 {5,new Data(5,"item","z_map_b$floor$0",false)},
 
+                {6,new Data(6,"character","z_map_b$floor$0",false)},
+
                 {100,new Data(100,"erase","z_map_b$floor$0",false)},
 
                 };

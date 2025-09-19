@@ -1,5 +1,6 @@
 using Form;
 using Microsoft.Win32;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Ui;
@@ -7,16 +8,20 @@ using Ui.ModSceneBehaviourUnit;
 using Ui.ModSceneMain;
 using Ui.ModSceneUnit;
 using Ui.ModStory;
+using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
 using UnityEngine;
+using Z_DataSystem;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
+using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_Time;
 using Z_Ui;
 using Z_UnitSystem;
+using static UnityEditor.PlayerSettings;
 public enum DesignType
 {
     MapObject,
@@ -24,7 +29,7 @@ public enum DesignType
 }
 public interface InternalModSceneController
 {
-    public string fileName { get;  }
+    public string fileName { get; }
     public void Begin(int id);
     public void End();
     public void Update();
@@ -50,15 +55,21 @@ public interface ExternalModSceneController
 
     public void ForceUpdate();
 }
-public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController
+public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>
 {
-    public ModSceneController(ModManager super) :base(super)
+    MapManager mapMgr => MapManager.instance;
+    public ModSceneController(ModManager super) : base(super)
     {
-
+        this.Register<InputKeyEvent>();
+        this.Register<InputMouseEvent>();
+        this.Register<InputMouseDownEvent>();
+        this.Register<InputMouseUpEvent>();
+        this.Register<InputMouseScrollEvent>();
     }
 
     bool enable = false;
     bool waitForActive = false;
+    Vector2 downPos;
     #region internal Var
     private string _fileName;
     public string fileName { get => _fileName; }
@@ -69,22 +80,22 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     private int _offset = 500;
 
     private int _layer = 0;
-    private int _cntX=1;
-    private int _cntY=1;
-    private int _angle=0;
-    private float _posX=0;
-    private float _posZ=0;
-    private float _posY=0;
+    private int _cntX = 1;
+    private int _cntY = 1;
+    private int _angle = 0;
+    private float _posX = 0;
+    private float _posZ = 0;
+    private float _posY = 0;
 
     private bool _posing;
     private MapBaseForm.Data _curData;
     public DesignType designType { get => _designType; set => _designType = value; }
 
     public int offset { get => _offset; set => _offset = value; }
-   
+
 
     public int layer { get => _layer; set => _layer = value; }
-    public int cntX { get => _cntX; set => _cntX=value; }
+    public int cntX { get => _cntX; set => _cntX = value; }
     public int cntY { get => _cntY; set => _cntY = value; }
     public int angle { get => _angle; set => _angle = value; }
     public float posX { get => _posX; set => _posX = value; }
@@ -97,10 +108,11 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     public void Begin(int id)
     {
+        downPos = Vector2.zero;
+
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
-        GameManager.instance.RegisterInputByUgc();
-        CameraInstance.instance.Register(Vector3.zero,Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize),5,15);
-        CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500),MapManager.instance.data.mainData.mapUnitSize);
+        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 5, 15);
+        CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), mapMgr.data.mainData.mapUnitSize);
         enable = true;
         waitForActive = false;
         UiManager.instance.ShowUi<UiModSceneMainCtrl>();
@@ -108,7 +120,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public void End()
     {
         enable = false;
-        MapManager.instance.End();
+        mapMgr.End();
         UiManager.instance.CloseAll();
         GameManager.instance.RegisterInputDefault();
         UiManager.instance.ShowUi<UiModStoryCtrl>();
@@ -126,10 +138,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         }
         return default(T);
     }
-    public void OnMouse(bool click,Vector3 pos,Vector3 dir)
+    public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
 
-        if (waitForActive||!enable)
+        if (waitForActive || !enable)
             return;
         // set z
         pos.z = CameraInstance.instance.cam.nearClipPlane;
@@ -142,7 +154,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             return a.distance.CompareTo(b.distance);
         });
 
-        var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
+        var hitPos = mapMgr.utilCtrl.RealPos2MapPos(worldPosition);
         //manage
         switch (designType)
         {
@@ -155,24 +167,24 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                             for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
                             {
-                                if (!MapManager.instance.data.maps.ContainsKey((x, hitPos.y, z)))
+                                if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                 {
                                     var newMapPos = new Vector3Int(x, hitPos.y, z);
-                                    if (MapManager.instance.utilCtrl.InLimit(newMapPos))
+                                    if (mapMgr.utilCtrl.InLimit(newMapPos))
                                     {
-                                        MapManager.instance.AddTile(newMapPos);
+                                        mapMgr.AddTile(newMapPos);
                                     }
                                     else
                                     {
                                         continue;
                                     }
                                 }
-                                var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
+                                var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
 
                                 if (terrainData.step == 0)
                                 {
                                     mapData.prefabName = GlobalNameHelper.GetInternalPrefabName(terrainData.prefabName);
-                                    mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), MapManager.instance.data.mainData.mapUnitSize);
+                                    mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), mapMgr.data.mainData.mapUnitSize);
 
                                 }
                                 else
@@ -197,9 +209,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                                 break;
                                         }
 
-                                        if (MapManager.instance.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
+                                        if (mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                         {
-                                            var cur = MapManager.instance.data.maps[(stepX, mapData.mapPos.y, stepZ)];
+                                            var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
                                             cur.prefabName = GlobalNameHelper.GetInternalPrefabName(terrainData.prefabName);
                                             switch (Z_Math.Graph.GetFourDirByEuler(angle))
                                             {
@@ -229,9 +241,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                             for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
                             {
-                                if (!MapManager.instance.data.maps.ContainsKey((x, hitPos.y, z)))
+                                if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                     continue;
-                                var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
+                                var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
                                 mapData.texNameDic[layer] = textureData.name;
 
                             }
@@ -241,127 +253,132 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
                             for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
                             {
-                                if (!MapManager.instance.data.maps.ContainsKey((x, hitPos.y, z)))
+                                if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                     continue;
 
-                                var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
-                                mapData.texNameDic[GlobalMaxSettings.TERRAIN_LAYER_MAX + layer] = maskData.name;
+                                var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
+                                mapData.texNameDic[GlobalSettings.TERRAIN_LAYER_MAX + layer] = maskData.name;
                             }
                     }
                     else if (curData is MapObjectForm.Data objectData)
                     {
-                        for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
-                            for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        {
+                            bool allow = true;
+                            var key = AssetManager.GetIdNameKey(objectData.id, objectData.name);
+                            //放置去重
+                            foreach (var cur in mapMgr.updateCtrl.objectTileDic.Get(mapData.unit))
                             {
-                                var finalX = posX + x;
-                                var finalZ = posZ + z;
-                                var finalY = posY + worldPosition.y;
-                                var finalPos = new Vector3(finalX, finalY, finalZ);
-                                var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(finalPos);
-                                if (MapManager.instance.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                                var curData = cur.data;
+                                if (curData.name == key && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
                                 {
-                                    var mapData = MapManager.instance.data.maps[(mapPos.x, mapPos.y, mapPos.z)];
-                                    bool allow = true;
-                                    //放置去重
-                                    foreach (var subUnit in mapData.unit.subUnits)
-                                    {
-                                        if (subUnit.data is ObjectUnitForm.Data otherObjectData)
-                                        {
-                                            if (otherObjectData.prefabName == objectData.name && (otherObjectData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(otherObjectData.euler.y - angle) < 1f)
-                                            {
-                                                allow = false;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (allow)
-                                    {
-                                        object[] prms = null;
-                                        var newObjectData = MapManager.instance.AddObject(finalPos, objectData.name, prms);
-                                        newObjectData.unit.evtDic = objectData.events;
-                                        newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
-                                        newObjectData.name = objectData.name;
-                                    }
+                                    allow = false;
+                                    break;
                                 }
                             }
+                            if (allow)
+                            {
+                                object[] prms = null;
+                                var newObjectData = mapMgr.AddObject(key, finalPos, objectData.name, prms);
+                                newObjectData.unit.evtDic = objectData.events;
+                                newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
+                            }
+
+                        });
+
                     }
                     else if (curData is MapItemForm.Data itemData)
                     {
-                        for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
-                            for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+                        var data = ItemProductForm.DataByUid[AssetManager.GetKeyId(itemData.name)];
+
+                        var key = AssetManager.GetIdNameKey(data.uid, data.name);
+                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        {
+                            bool allow = true;
+
+                            //放置去重
+                            foreach (var cur in mapMgr.updateCtrl.itemTileDic.Get(mapData.unit))
                             {
-                                var finalX = posX + x;
-                                var finalZ = posZ + z;
-                                var finalY = posY + worldPosition.y;
-                                var finalPos = new Vector3(finalX, finalY, finalZ);
-                                var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(finalPos);
-                                if (MapManager.instance.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                                var curData = cur.data;
+                                if (curData.name == key && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
                                 {
-                                    var mapData = MapManager.instance.data.maps[(mapPos.x, mapPos.y, mapPos.z)];
-                                    bool allow = true;
-                                    //放置去重
-                                    foreach (var subUnit in mapData.unit.subUnits)
-                                    {
-                                        if (subUnit.data is ItemUnitForm.Data otherObjectData)
-                                        {
-                                            if (otherObjectData.prefabName == itemData.name && (otherObjectData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(otherObjectData.euler.y - angle) < 1f)
-                                            {
-                                                allow = false;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (allow)
-                                    {
-                                        object[] prms = null;
-                                        var newItemData = MapManager.instance.AddItem(finalPos, itemData.name, prms);
-                                        newItemData.unit.productInfo = (itemData.name, -1);
-                                        newItemData.unit.evtDic = itemData.events;
-                                        newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
-                                        newItemData.name = itemData.name;
-                                    }
+                                    allow = false;
+                                    break;
                                 }
                             }
+                            if (allow)
+                            {
+                                object[] prms = null;
+                                var newItemData = mapMgr.AddItem(key,finalPos, data.name, prms);
+                                newItemData.unit.productInfo = (data.uid, -1);
+                                newItemData.unit.evtDic = data.events;
+                                newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
+                            }
+                        });
+                    }
+                    else if (curData is MapCharacterForm.Data characterData)
+                    {
+                        var data = CharacterProductForm.DataByUid[characterData.characterUid];
+
+                        var key = AssetManager.GetIdNameKey(data.uid, data.name);
+                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        {
+                            bool allow = true;
+                            //放置去重
+                            foreach (var cur in mapMgr.updateCtrl.characterTileDic.Get(mapData.unit))
+                            {
+                                var curData = cur.data;
+                                if (curData.name == key && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
+                                {
+                                    allow = false;
+                                    break;
+                                }
+                            }
+                            if (allow)
+                            {
+                                object[] prms = null;
+                                var newCharacerData = mapMgr.AddCharacter(key, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false);
+                                newCharacerData.unit.productInfo = (data.uid, -1);
+                                newCharacerData.unit.evtDic = data.events;
+                                newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
+                            }
+                        });
                     }
                     else if (curData is MapEraseForm.Data eraseData)
                     {
-                        for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
-                            for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        {
+                            if (eraseData.terrain)
                             {
-                                if (!MapManager.instance.data.maps.ContainsKey((x, hitPos.y, z)))
-                                    continue;
-                                var mapData = MapManager.instance.data.maps[(x, hitPos.y, z)];
-                                if (eraseData.terrain)
+                                mapMgr.RemoveTile(mapData);
+                            }
+                            else if (eraseData.item)
+                            {
+                                foreach (var sub in mapData.unit.GetAllSubUnits())
                                 {
-                                    MapManager.instance.RemoveTile(mapData);
-                                }
-                                else if (eraseData.item)
-                                {
-                                    foreach (var sub in mapData.unit.GetAllSubUnits())
+                                    if (sub is ItemUnit item)
                                     {
-                                        if (sub is ItemUnit item)
-                                        {
-                                            MapManager.instance.RemoveItem(item.data);
-                                        }
+                                        mapMgr.RemoveItem(item.data);
                                     }
-                                }
-                                else if (eraseData.mObject)
-                                {
-                                    foreach (var sub in mapData.unit.GetAllSubUnits())
-                                    {
-                                        if (sub is ObjectUnit item)
-                                        {
-                                            MapManager.instance.RemoveObject(item.data);
-                                        }
-                                    }
-                                }
-
-                                if (eraseData.texture)
-                                {
-                                    if (mapData.texNameDic.ContainsKey(layer))
-                                        mapData.texNameDic.Remove(layer);
                                 }
                             }
+                            else if (eraseData.mObject)
+                            {
+                                foreach (var sub in mapData.unit.GetAllSubUnits())
+                                {
+                                    if (sub is ObjectUnit item)
+                                    {
+                                        mapMgr.RemoveObject(item.data);
+                                    }
+                                }
+                            }
+
+                            if (eraseData.texture)
+                            {
+                                if (mapData.texNameDic.ContainsKey(layer))
+                                    mapData.texNameDic.Remove(layer);
+                            }
+                        });
                     }
                     ForceUpdate();
                 }
@@ -373,11 +390,11 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         foreach (var hit in hits)
                         {
                             var ins = hit.transform.parent.GetComponent<Instance>();
-                            if (ins != null && ins is ObjectInstance itemIns)
+                            if (ins != null && (ins is ObjectInstance || ins is ItemInstance||ins is CharacterInstance))
                             {
                                 UiManager.instance.ShowUi<UiModSceneUnitCtrl>(new UiModSceneUnitParam()
                                 {
-                                    data = itemIns.unit.data
+                                    data = ins.unit.data
                                 });
                                 break;
                             }
@@ -395,37 +412,53 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 }
                 break;
             case DesignType.Event:
-                    //click
-                    if (click)
+                //click
+                if (click)
+                {
+                    foreach (var hit in hits)
                     {
-                        foreach (var hit in hits)
+                        var ins = hit.transform.GetComponentInParent<Instance>();
+                        if (ins != null && ins is MapInstance mapIns)
                         {
-                            var ins = hit.transform.GetComponentInParent<Instance>();
-                            if (ins != null && ins is MapInstance mapIns)
+                            UiManager.instance.ShowUi<UiModSceneBehaviourUnitCtrl>(new UiModSceneBehaviourUnitParam()
                             {
-                                UiManager.instance.ShowUi<UiModSceneBehaviourUnitCtrl>(new UiModSceneBehaviourUnitParam()
-                                {
-                                    data = mapIns.unit.data
-                                });
-                                break;
-                            }
+                                data = mapIns.unit.data
+                            });
+                            break;
                         }
-                    }//move
-                    else
-                    {
-                        Vector2 moveDir = -Time.deltaTime * dir * 4;
-                        CameraInstance.instance.tarTrs.position += new Vector3(moveDir.x, 0, moveDir.y);
-                        Z_EventHelper.Invoke(new CameraMoveEvent());
                     }
+                }//move
+                else
+                {
+                    Vector2 moveDir = -Time.deltaTime * dir * 4;
+                    CameraInstance.instance.tarTrs.position += new Vector3(moveDir.x, 0, moveDir.y);
+                    Z_EventHelper.Invoke(new CameraMoveEvent());
+                }
                 break;
 
         }
-        
+
+    }
+    private void ForeachPos(Vector3Int mapCenterPos, Vector3 realPos, Action<TileUnitForm.Data, Vector3> onFind)
+    {
+        for (int x = mapCenterPos.x - cntX / 2; x < mapCenterPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
+            for (int z = mapCenterPos.z - cntY / 2; z < mapCenterPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+            {
+                var finalX = posX + x;
+                var finalZ = posZ + z;
+                var finalY = posY + realPos.y;
+                var finalPos = new Vector3(finalX, finalY, finalZ);
+                var mapPos = mapMgr.utilCtrl.RealPos2MapPos(finalPos);
+                if (mapMgr.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                {
+                    onFind?.Invoke(mapMgr.data.maps[(mapPos.x, mapPos.y, mapPos.z)], finalPos);
+                }
+            }
     }
     public void ForceUpdate()
     {
-        
-        MapManager.instance.ResetInfo();
+
+        mapMgr.updateCtrl.ResetInfo();
         if (waitForActive)
             return;
 
@@ -441,19 +474,85 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             return;
 
         {
-            MapManager.instance.UpdateInfo();
+            mapMgr.updateCtrl.UpdateInfo();
             {
-                MapManager.instance.SetPos(CameraInstance.instance.tarTrs.position);
+                mapMgr.SetPos(CameraInstance.instance.tarTrs.position);
             }
         }
-        
-       
+
+
     }
     public void SetCamera(float x, float y, float z)
     {
         CameraInstance.instance.tarTrs.position = new Vector3(x, y, z);
         Z_EventHelper.Invoke(new CameraMoveEvent());
     }
+    #region op
 
+    public void OnEvent(InputKeyEvent evt)
+    {
+        if (!enable)
+            return;
+        switch (evt.key)
+        {
+            case KeyCode.W:
+                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 4;
+                break;
+            case KeyCode.S:
+                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 4;
+                break;
+
+            case KeyCode.A:
+                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 4;
+                break;
+            case KeyCode.D:
+                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 4;
+                break;
+        }
+    }
+
+    public void OnEvent(InputMouseEvent evt)
+    {
+        if (!enable)
+            return;
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
+        {
+            ModManager.instance.OnMouse(false, evt.pos, evt.delta);
+        }
+    }
+
+    public void OnEvent(InputMouseDownEvent evt)
+    {
+        if (!enable)
+            return;
+        if (evt.ui == null)
+        {
+            downPos = evt.pos;
+        }
+        else
+        {
+            downPos = Vector2.zero;
+        }
+    }
+
+    public void OnEvent(InputMouseUpEvent evt)
+    {
+        if (!enable)
+            return;
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
+        {
+            OnMouse(true, evt.pos, Vector3.zero);
+        }
+        downPos = Vector2.zero;
+    }
+
+    public void OnEvent(InputMouseScrollEvent evt)
+    {
+        if (!enable)
+            return;
+
+            CameraInstance.instance.cam.orthographicSize += evt.delta * -2f;
+    }
+    #endregion
 
 }

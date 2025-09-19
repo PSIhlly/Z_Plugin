@@ -9,9 +9,13 @@ using Ui.ModSceneMain;
 using Unity.VisualScripting;
 using UnityEngine;
 using Z_DesignStyle;
+using Z_Input;
 using Z_Map;
+using Z_Map.Analysis;
+using Z_Map.Form;
 using Z_Ui;
 using Z_UnitSystem;
+using static UnityEditor.PlayerSettings;
 
 public class PlayManager : Z_MonoManager<PlayManager>
 {
@@ -20,7 +24,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     public bool boxPlay;
 
-    
+
 
     #region life
 
@@ -29,11 +33,17 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     private InternalPlayInfoController _infoCtrl;
     public ExternalPlayInfoController infoCtrl;
-    
+
+
+
     // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
         base.Init();
+
+
+
+
         var __sceneCtrl = new PlaySceneController(this);
         _sceneCtrl = __sceneCtrl;
         sceneCtrl = __sceneCtrl;
@@ -44,14 +54,8 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
         //  assetCtrl = new ModAssetCtrl(this);
     }
-    public void OnMouse(bool click, Vector3 pos, Vector3 dir)
-    {
-        _sceneCtrl.OnMouse(click, pos, dir);
-    }
-    public void OnMouseMove(Vector3 pos)
-    {
-        _sceneCtrl.OnMouseMove(pos);
-    }
+
+
     public void FixedUpdate()
     {
     }
@@ -68,7 +72,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public async void BeginStory(string storyName, bool boxPlay)
     {
         this._folderName = storyName;
-        data = null; 
+        data = null;
         this.boxPlay = boxPlay;
         if (!boxPlay)
         {
@@ -106,8 +110,8 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         var config = GameManager.instance.curConfig;
         //get instance by proto
-        var items=new List<int>();
-        foreach(var uid in config.defaultBag)
+        var items = new List<int>();
+        foreach (var uid in config.defaultBag)
         {
             var newItem = ItemProductForm.DataByUid[uid].Copy(false);
             newItem.ToProduct();
@@ -115,21 +119,29 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
         var characters = new List<int>();
         var charactersActive = new List<int>();
+
+
         foreach (var uid in config.defaultTeam)
         {
-            var newCharacter = CharacterProductForm.DataByUid[uid].Copy(false);
-            newCharacter.ToProduct();
-            characters.Add(newCharacter.uid);
-            foreach (var uidActive in config.defaultTeamActive)
+            var ch = CharacterProductForm.DataByUid[uid];
+            if (!ch.unique)
             {
-                if(uidActive == uid)
+                var newCharacter = ch.Copy(false);
+                newCharacter.ToProduct();
+                GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
+
+                characters.Add(newCharacter.uid);
+                foreach (var uidActive in config.defaultTeamActive)
                 {
-                    charactersActive.Add(newCharacter.uid);
-                    break;
+                    if (uidActive == uid)
+                    {
+                        charactersActive.Add(newCharacter.uid);
+                        break;
+                    }
                 }
             }
         }
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterName, items, characters, charactersActive));
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive));
     }
 
     public void EndStory()

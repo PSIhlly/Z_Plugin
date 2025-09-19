@@ -9,6 +9,7 @@ using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Map.Form;
+using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
 namespace Z_Map
@@ -204,6 +205,7 @@ namespace Z_Map
         public virtual void RegisterNewObject(ObjectUnitForm.Data data)
         {
             ObjectUnitForm.AddData(data);
+            
         }
 
         public virtual List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
@@ -238,6 +240,19 @@ namespace Z_Map
         public virtual List<TileUnitForm.Data> GetTileDatasByJa(string ja)
         {
             return TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
+        }
+
+        public virtual bool CheckItemUnit(ItemUnitForm.Data item)
+        {
+            return InstancePoolManager.instance.GetPrefab(item.prefabName)!=null;
+        }
+        public virtual bool CheckObjectUnit(ObjectUnitForm.Data obj)
+        {
+            return InstancePoolManager.instance.GetPrefab(obj.prefabName) != null;
+        }
+        public virtual bool CheckCharacterUnit(CharacterUnitForm.Data ch)
+        {
+            return InstancePoolManager.instance.GetPrefab(ch.prefabName) != null;
         }
     }
 

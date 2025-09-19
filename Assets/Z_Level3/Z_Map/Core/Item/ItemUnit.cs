@@ -41,24 +41,8 @@ namespace Z_Map
         {
             if (isShowing)
             {
-                data.pos = ins.transform.position;
-                data.euler = ins.transform.eulerAngles;
-
-                var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
-                if (MapManager.instance.utilCtrl.InArea(newMapPos))
-                {
-                    var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
-                    if (superUnit != newMap.unit)
-                    {
-                        superUnit.Unbind(this);
-                        newMap.unit.Bind(this);
-                        SubUpdateActive();
-                    }
-                }else
-                {
-                    data.pos = MapManager.instance.utilCtrl.GetClosestInArea(data.pos);
-                    ins.transform.position = data.pos;
-                }
+                if (_data.pos != ins.transform.position || _data.euler != ins.transform.eulerAngles)
+                    MapManager.instance.updateCtrl.ApplyMove(this, ins.transform.position, ins.transform.eulerAngles);
             }
 
             Z_EventHelper.Invoke(new ItemEvent()

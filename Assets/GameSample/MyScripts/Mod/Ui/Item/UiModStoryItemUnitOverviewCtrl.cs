@@ -30,14 +30,14 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             Z_EventHelper.Register(this);
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteItem(model.data.name);
+                ModManager.instance.assetCtrl.DeleteItem(model.data.uid);
                 parent.parent.SelPage(0);
 
             });
             view.ipt_name.onFinishInput+=(s)=>
             {
                 var lst = new List<string>();
-                foreach(var data in ItemProductForm.DataByNameIsproto.Values)
+                foreach(var data in ItemProductForm.DataByName.Values)
                     lst.Add(data.name);
 
                 if(StringHelper.IsUniqueName(lst, s))
@@ -49,7 +49,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             };
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportItemIcon(model.data.name);
+                ModManager.instance.assetCtrl.ImportItemIcon(model.data.uid);
             });
             view.ipt_desc.onFinishInput += (s) =>
             {

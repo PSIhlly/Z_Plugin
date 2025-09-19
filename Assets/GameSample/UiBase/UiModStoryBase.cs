@@ -1458,6 +1458,8 @@ namespace ModStoryCharacterUnitConfig
             public Btn btn_moveSpeedParameter;
             public Btn btn_idleAnim;
             public Btn btn_moveAnim;
+            public Btn btn_unique;
+            public Sta sta_unique;
             public Txt txt_hpArgument;
             public Txt txt_moveSpeedParameter;
             public Txt txt_idleAnim;
@@ -1475,16 +1477,18 @@ namespace ModStoryCharacterUnitConfig
             btn_moveSpeedParameter = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             btn_idleAnim = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_moveAnim = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            txt_hpArgument = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            txt_moveSpeedParameter = uiHolder.elementTrsLst[5].GetComponent<Txt>();
-            txt_idleAnim = uiHolder.elementTrsLst[6].GetComponent<Txt>();
-            txt_moveAnim = uiHolder.elementTrsLst[7].GetComponent<Txt>();
-            btn_onTouchEvent = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_onLeaveEvent = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            btn_onShowEvent = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            txt_onTouchEvent = uiHolder.elementTrsLst[11].GetComponent<Txt>();
-            txt_onLeaveEvent = uiHolder.elementTrsLst[12].GetComponent<Txt>();
-            txt_onShowEvent = uiHolder.elementTrsLst[13].GetComponent<Txt>();
+            btn_unique = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_unique = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            txt_hpArgument = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_moveSpeedParameter = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            txt_idleAnim = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_moveAnim = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            btn_onTouchEvent = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            btn_onLeaveEvent = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            btn_onShowEvent = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            txt_onTouchEvent = uiHolder.elementTrsLst[13].GetComponent<Txt>();
+            txt_onLeaveEvent = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            txt_onShowEvent = uiHolder.elementTrsLst[15].GetComponent<Txt>();
         }
 
     }

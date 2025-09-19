@@ -57,7 +57,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         enable = true;
         foreach(var uid in _super.data.progress.bag)
         {
-            GainItem(ItemProductForm.DataByUid[uid].name,false,false);
+            GainItem(uid,false,false);
         }    
     }
     public void End()
@@ -71,16 +71,27 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             return;
 
     }
-    public void GainItem(string itemName, bool toast = true, bool message = true)
+    public void GainItem(int uid, bool toast = true, bool message = true)
     {
-        var newItem=ItemProductForm.DataByNameIsproto[(itemName, true)].Copy(false);
+        var newItem=ItemProductForm.DataByUid[uid].Copy(false);
         newItem.ToProduct();
         GainItem(newItem, toast, message);
     }
     public void GainItem(ItemProductForm.Data data, bool toast = true, bool message = true)
     {
+        var content = TextManager.instance.GetTxt("gain") + " " + data.name + " x" + data.amount;
+        if (toast)
+        {
+            NotifyManager.instance.AddTip(content);
+        }
+        if(message)
+        { 
+            _super.sceneCtrl.AddMessage(content);
+        }
+
         if (!bagName2UidDic.ContainsKey(data.name))
             bagName2UidDic[data.name] = new List<int>();
+
         foreach(var uid in bagName2UidDic[data.name])
         {
             var old = ItemProductForm.DataByUid[uid];
@@ -99,15 +110,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
         bagName2UidDic[data.name].Add(data.uid);
         _super.data.progress.bag.Add(data.uid);
-        var content = TextManager.instance.GetTxt("gain") + " " + data.name + " x" + data.amount;
-        if (toast)
-        {
-            NotifyManager.instance.AddTip(content);
-        }
-        if (toast)
-        {
-            _super.sceneCtrl.AddMessage(content);
-        }
+
     }
 
     public void OnEvent(CollideEvent evt)
@@ -117,12 +120,12 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         switch (evt.type)
         {
             case CollideEventType.TriggerEnter:
-                if (evt.b == _super.sceneCtrl.playerM.unit.ins && evt.a is ItemInstance obj)
+                if (evt.b == _super.sceneCtrl.playerM.unit && evt.a is ItemUnit obj)
                 {
-                    if (!string.IsNullOrEmpty(obj.unit.productInfo.Item1))
+                    if (obj.productInfo.Item1>0)
                     {
-                        GainItem(obj.unit.productInfo.Item1);
-                        MapManager.instance.RemoveItem(obj.unit.data);
+                        GainItem(obj.productInfo.Item1);
+                        MapManager.instance.RemoveItem(obj.data);
                     }
                 }
                 break;

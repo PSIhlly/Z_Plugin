@@ -53,7 +53,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             });
 
             view.btn_delete.onClick.AddListener(() => {
-                ModManager.instance.assetCtrl.DeleteItemModelUnit(model.data.name, model.id);
+                ModManager.instance.assetCtrl.DeleteItemModelUnit(model.data.uid, model.id);
                 model.id = -1;
                 Refresh();
             });
@@ -176,11 +176,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
         {
             view.btn_.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.name, model.style);
+                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.uid, model.style);
             }); 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.name, model.style);
+                ModManager.instance.assetCtrl.ImportItemStyleTex(parent.model.data.uid, model.style);
             });
         }
         public override void OnShow()

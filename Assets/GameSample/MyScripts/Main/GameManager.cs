@@ -28,8 +28,9 @@ public class CameraMoveEvent : Z_Event
 
 }
 
-public static partial class GlobalMaxSettings
+public static partial class GlobalSettings
 {
+    public static float DRAG_DIS2 => InputManager.instance.screenSize.x / 25;
     public static int TERRAIN_LAYER_MAX => 3;
     public static int TEXTURE_MAX = 100000;
     public static int TEXTURE_MASK_MAX = 100000;
@@ -60,8 +61,7 @@ public class GameManager : Z_MonoManager<GameManager>
     public GameMapController mapCtrl; 
     public GameCharacterController characterCtrl;
     public GameItemController objectCtrl;
-    public Vector2 downPos;
-    public float dragDis2 => InputManager.instance.screenSize.x / 25;
+    
 
     public StoryForm.Data curStory;
     public SceneForm.Data curScene;
@@ -125,8 +125,6 @@ public class GameManager : Z_MonoManager<GameManager>
     public void RegisterInputDefault()
     {
         var ins = InputManager.instance;
-        var config = new InputConfig();
-        downPos = Vector2.zero;
         /*config.onButonW = () =>
         {
             var main = MapManager.instance.unitDic[4].ins.transform;
@@ -149,134 +147,9 @@ public class GameManager : Z_MonoManager<GameManager>
             main.position += Time.deltaTime * Vector3.right * 2;
         };*/
 
-        config.onButtonDownE = () =>
-        {
-            Cmd.instance.Excute("AddItem 1 5");
-        };
-        ins.Register(config);
-    }
-    public void RegisterInputByPlay()
-    {
-        var ins = InputManager.instance;
-        var config = new InputConfig();
-        downPos = Vector2.zero;
 
-        config.onButtonW = () =>
-        {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.forward);
-        };
-        config.onButtonS = () =>
-        {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.back);
-        };
-
-        config.onButtonA = () =>
-        {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.left);
-        };
-        config.onButtonD = () =>
-        {
-            PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * Vector3.right);
-        };
-        config.onMouse = (id, pos, dir, ui) =>
-        {
-
-            if (id == 0 && ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
-            {
-                PlayManager.instance.OnMouse(false, pos, dir);
-            }
-        };
-
-        config.onMouseDown = (id, pos, ui) =>
-        {
-
-            if (ui == null)
-            {
-                downPos = pos;
-            }
-            else
-            {
-                downPos = Vector2.zero;
-            }
-        };
-        config.onMouseUp = (id, pos, ui) =>
-        {
-            if (id == 0 && ui == null && downPos != Vector2.zero && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < dragDis2)
-            {
-                PlayManager.instance.OnMouse(true, pos, Vector3.zero);
-            }
-            downPos = Vector2.zero;
-        };
-        config.onMouseMove = (pos) =>
-        {
-            PlayManager.instance.OnMouseMove(pos);
-        };
-
-        config.onMouseScroll = (v) =>
-        {
-        };
-
-        ins.Register(config);
     }
 
-    public void RegisterInputByUgc()
-    {
-        var ins = InputManager.instance;
-        var config = new InputConfig();
-        downPos = Vector2.zero;
 
-        config.onButtonW = () =>
-        {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 4;
-        };
-        config.onButtonS = () =>
-        {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 4;
-        };
-
-        config.onButtonA = () =>
-        {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 4;
-        };
-        config.onButtonD = () =>
-        {
-            CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 4;
-        };
-        config.onMouse = (id, pos, dir, ui) =>
-        {
-
-            if (id == 0 && ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
-            {
-                ModManager.instance.OnMouse(false, pos, dir);
-            }
-        };
-
-        config.onMouseDown = (id, pos, ui) =>
-        {
-
-            if (ui == null)
-            {
-                downPos = pos;
-            }
-            else
-            {
-                downPos = Vector2.zero;
-            }
-        };
-        config.onMouseUp = (id, pos, ui) =>
-        {
-            if (id == 0 && ui == null && downPos != Vector2.zero && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < dragDis2)
-            {
-                ModManager.instance.OnMouse(true, pos, Vector3.zero);
-            }
-            downPos = Vector2.zero;
-        };
-
-        config.onMouseScroll = (v) =>
-        {
-            CameraInstance.instance.cam.orthographicSize += v * -2f;
-        };
-
-        ins.Register(config);
-    }
+   
 }

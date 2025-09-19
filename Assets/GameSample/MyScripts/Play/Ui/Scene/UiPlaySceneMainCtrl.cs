@@ -13,6 +13,7 @@ using Z_Texture;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_DesignStyle;
+using Z_DataSystem;
 
 namespace Ui.PlaySceneMain
 {
@@ -22,6 +23,13 @@ namespace Ui.PlaySceneMain
         UiContainer<UiTeamerCtrl> teamerCon;
         public override void OnCreate()
         {
+
+#if UNITY_STANDALONE_WIN
+            view.page_PlayerTouchOpt.SetActive(false);
+#else
+            view.page_PlayerTouchOpt.SetActive(true);
+#endif
+
             view.btn_menu.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiPlaySceneMenuCtrl>();

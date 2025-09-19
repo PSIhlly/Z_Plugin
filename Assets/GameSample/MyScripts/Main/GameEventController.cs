@@ -99,7 +99,7 @@ public static partial class GlobalEventHelper
         return res;
     }
 }
-public static partial class GlobalMaxSettings
+public static partial class GlobalSettings
 {
     public static int CUSTOM_EVENT_MAX => 1000000;
 }
@@ -135,15 +135,15 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
 
     public void OnEvent(CollideEvent evt)
     {
-        if (evt.a is MapInstance mapIns)
+        if (evt.a is MapUnit mapUnit)
         {
             switch (evt.type)
             {
                 case CollideEventType.TriggerEnter:
-                    mapIns.unit.ExecuteEvt("onTouchEvent");
+                    mapUnit.ExecuteEvt("onTouchEvent");
                     break;
                 case CollideEventType.TriggerExit:
-                    mapIns.unit.ExecuteEvt("onLeaveEvent");
+                    mapUnit.ExecuteEvt("onLeaveEvent");
                     break;
             }
         }

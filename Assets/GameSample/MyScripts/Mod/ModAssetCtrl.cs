@@ -56,7 +56,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region param
     public void CreateGlobalArg(string name)
     {
-        if (GlobalParamForm.DataByName.Keys.Count > GlobalMaxSettings.GLOBAL_PARAM_MAX)
+        if (GlobalParamForm.DataByName.Keys.Count > GlobalSettings.GLOBAL_PARAM_MAX)
             return;
 
         if (string.IsNullOrEmpty(name))
@@ -72,7 +72,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateCharacterArg(string name)
     {
-        if (CharacterParamForm.DataByName.Keys.Count > GlobalMaxSettings.CHARACTER_PARAM_MAX)
+        if (CharacterParamForm.DataByName.Keys.Count > GlobalSettings.CHARACTER_PARAM_MAX)
             return;
 
         if (string.IsNullOrEmpty(name))
@@ -98,7 +98,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public void CreateItemArg(string name)
     {
-        if (ItemParamForm.DataByName.Keys.Count > GlobalMaxSettings.ITEM_PARAM_MAX)
+        if (ItemParamForm.DataByName.Keys.Count > GlobalSettings.ITEM_PARAM_MAX)
             return;
 
         if (string.IsNullOrEmpty(name))
@@ -266,12 +266,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
-    public void RenameObject(string oldName, string newName)
-    {
-
-        CharacterProductForm.DataByNameIsproto[(oldName, true)].name = newName;
-
-    }
     #endregion
 
     #region character
@@ -303,7 +297,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
-    public void ChooseCharacter(string title, Action<EntryItem> act)
+    public void ChooseCharacter(string title, Action<CharacterProductForm.Data> act)
     {
         var items = new EntryItem();
         if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
@@ -316,7 +310,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
             true, (item) =>
             {
-                act?.Invoke(item);
+                act?.Invoke(CharacterProductForm.DataByName[item.content]);
                 return true;
             }, items);
     }
@@ -336,22 +330,22 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
 
 
-    public void ImportCharacterAvatar(string name)
+    public void ImportCharacterAvatar(int uid)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            CharacterProductForm.DataByNameIsproto[(name, true)].avatarTexName = form.name;
+            CharacterProductForm.DataByUid[uid].avatarTexName = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
     }
-    public void ImportCharacterTachie(string name)
+    public void ImportCharacterTachie(int characterUid)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            CharacterProductForm.DataByNameIsproto[(name, true)].tachie = form.name;
+            CharacterProductForm.DataByUid[characterUid].tachie = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
@@ -386,46 +380,42 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic, "", "", "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName()));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic, "", "", "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
     }
-    public void DeleteCharacter(string name)
+    public void DeleteCharacter(int uid)
     {
-        CharacterProductForm.RemoveData(CharacterProductForm.DataByNameIsproto[(name, true)].uid);
-    }
-    public void RenameCharacter(string oldName, string newName)
-    {
-        //change
-        CharacterProductForm.DataByNameIsproto[(oldName, true)].name = newName;
+        CharacterProductForm.RemoveData(uid);
     }
 
-    public bool DeleteCharacterAnimId(string name, string animNm, int id)
+
+    public bool DeleteCharacterAnimId(int characterUid, string animNm, int id)
     {
-        var data = CharacterProductForm.DataByNameIsproto[(name, true)];
+        var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[animNm];
 
         anim.animClip.RemoveAt(id);
 
         return false;
     }
-    public void DeleteCharacterAnim(string name, string animNm)
+    public void DeleteCharacterAnim(int characterUid, string animNm)
     {
-        CharacterProductForm.DataByNameIsproto[(name, true)].animDic.Remove(animNm);
+        CharacterProductForm.DataByUid[characterUid].animDic.Remove(animNm);
     }
 
-    public void RenameCharacterAnim(string characterName, string oldName, string newName)
+    public void RenameCharacterAnim(int characterUid, string oldName, string newName)
     {
-        var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
+        var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[oldName];
         data.animDic.Remove(oldName);
         anim.name = newName;
         data.animDic[newName] = anim;
     }
-    public void ImportCharacterAnim(string characterName, string animNm, BodyPartType part, int id)
+    public void ImportCharacterAnim(int characterUid, string animNm, BodyPartType part, int id)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            var data = CharacterProductForm.DataByNameIsproto[(characterName, true)];
+            var data = CharacterProductForm.DataByUid[characterUid];
             var anim = data.animDic[animNm];
             if (anim.animClip.Count > id)
             {
@@ -434,10 +424,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
     }
-    public void CreateCharacterAnim(string name, string animName = null)
+    public void CreateCharacterAnim(int characterUid, string animName = null)
     {
-        var data = CharacterProductForm.DataByNameIsproto[(name, true)];
-        if (data.animDic.Keys.Count > GlobalMaxSettings.CHARACTER_ANIM_MAX)
+        var data = CharacterProductForm.DataByUid[characterUid];
+        if (data.animDic.Keys.Count > GlobalSettings.CHARACTER_ANIM_MAX)
             return;
         if (string.IsNullOrEmpty(animName))
         {
@@ -446,9 +436,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         data.animDic[animName] = CreateCharacterAnim(animName);
 
     }
-    public void CreateCharacterAnimId(string name, string animNm)
+    public void CreateCharacterAnimId(int characterUid, string animNm)
     {
-        var data = CharacterProductForm.DataByNameIsproto[(name, true)];
+        var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[animNm];
         anim.animClip.Add(CreateCharacterAnimClip());
     }
@@ -554,12 +544,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
 
 
-    public void ImportItemIcon(string name)
+    public void ImportItemIcon(int itemUid)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            ItemProductForm.DataByNameIsproto[(name, true)].iconTexName = form.name;
+            ItemProductForm.DataByUid[itemUid].iconTexName = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
@@ -587,15 +577,15 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, true, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>()));
     }
-    public void DeleteItem(string name)
+    public void DeleteItem(int itemUid)
     {
-        ItemProductForm.RemoveData(ItemProductForm.DataByNameIsproto[(name, true)].uid);
+        ItemProductForm.RemoveData(ItemProductForm.DataByUid[itemUid].uid);
     }
 
-    public void DeleteItemModelUnit(string name, int id)
+    public void DeleteItemModelUnit(int itemUid, int id)
     {
 
-        var data = ItemProductForm.DataByNameIsproto[(name, true)];
+        var data = ItemProductForm.DataByUid[itemUid];
         data.model.subPrefabUnitName.RemoveAt(id);
         data.model.subPrefabUnitPos.RemoveAt(id);
         data.model.subPrefabUnitScale.RemoveAt(id);
@@ -603,17 +593,17 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateItemModelUnit(ItemProductForm.Data data)
     {
-        ImportItemModelUnitTex(data.name, data.model.subPrefabUnitName.Count);
+        ImportItemModelUnitTex(data.uid, data.model.subPrefabUnitName.Count);
 
         data.model.subPrefabUnitName.Add("Cube");
         data.model.subPrefabUnitPos.Add(Vector3.zero);
         data.model.subPrefabUnitScale.Add(Vector3.one);
     }
-    public void ImportItemModelUnitTex(string name, int id)
+    public void ImportItemModelUnitTex(int itemUid, int id)
     {
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            var data = ItemProductForm.DataByNameIsproto[(name, true)];
+            var data = ItemProductForm.DataByUid[itemUid];
             if (data.model.subUnitTexsName.Count > id)
             {
                 data.model.subUnitTexsName[id] = form.name;
@@ -627,21 +617,16 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
-    public void ImportItemStyleTex(string name, ItemStyle style)
+    public void ImportItemStyleTex(int itemUid, ItemStyle style)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
-            var data = ItemProductForm.DataByNameIsproto[(name, true)];
+            var data = ItemProductForm.DataByUid[itemUid];
             data.styleTex[style] = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
 
-    }
-    public void RenameItem(string oldName, string newName)
-    {
-        //change
-        ItemProductForm.DataByNameIsproto[(oldName, true)].name = newName;
     }
 
 

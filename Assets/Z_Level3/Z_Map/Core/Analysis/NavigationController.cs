@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map.Form;
+using Z_Math;
+
+using Mesh = Z_Mesh.Mesh;
 
 namespace Z_Map.Analysis
 {
@@ -87,7 +90,7 @@ namespace Z_Map.Analysis
 
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
-                        Vector3[] points = Z_Math.Graph.GetCubeEightPoint(bc.center, bc.size, obs.euler, bc.transform.lossyScale, obs.pos);
+                        Vector3[] points = Mesh.GetMesh(bc, obs.pos+Vector3.up * obs.scale.y / 2, obs.euler, obs.scale).positions;
                         var overlapMaps = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),

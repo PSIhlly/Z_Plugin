@@ -28,7 +28,7 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false,true
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Capsule" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.35f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Sphere" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.15f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
         if (forGame)
         {
             //default disable
@@ -38,8 +38,10 @@ public class GameUtilController : Z_Controller<GameManager>
                 r.enabled = false;
             }
 
-            res.transform.GetChild(0).gameObject.GetComponent<MeshCollider>().enabled=false;
-            res.transform.GetChild(1).gameObject.GetComponent<MeshCollider>().enabled=false;
+            GameObject.Destroy(res.transform.GetChild(0).gameObject.GetComponent<MeshCollider>());
+            GameObject.Destroy(res.transform.GetChild(1).gameObject.GetComponent<MeshCollider>()); 
+            GameObject.Destroy(res.transform.GetChild(0).gameObject.GetComponent<BoxCollider>());
+            GameObject.Destroy(res.transform.GetChild(1).gameObject.GetComponent<BoxCollider>());
         }
         return res;
     }

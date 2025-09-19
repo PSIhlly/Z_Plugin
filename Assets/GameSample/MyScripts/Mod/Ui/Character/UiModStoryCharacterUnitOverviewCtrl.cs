@@ -31,14 +31,14 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             Z_EventHelper.Register(this);
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteCharacter(model.data.name);
+                ModManager.instance.assetCtrl.DeleteCharacter(model.data.uid);
                 parent.parent.SelPage(0);
 
             });
             view.ipt_name.onFinishInput+=(s)=>
             {
                 var lst = new List<string>();
-                foreach(var data in CharacterProductForm.DataByNameIsproto.Values)
+                foreach(var data in CharacterProductForm.DataByName.Values)
                     lst.Add(data.name);
 
                 if(StringHelper.IsUniqueName(lst, s))
@@ -53,7 +53,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             };
             view.btn_tachie.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportCharacterTachie(model.data.name);
+                ModManager.instance.assetCtrl.ImportCharacterTachie(model.data.uid);
             });
             view.ipt_desc.onFinishInput += (s) =>
             {
@@ -62,7 +62,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             };
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportCharacterAvatar(model.data.name);
+                ModManager.instance.assetCtrl.ImportCharacterAvatar(model.data.uid);
             });
 
         }

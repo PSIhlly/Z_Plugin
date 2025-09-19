@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Ui.ModStoryEventTrigger;
 using UnityEngine;
+using Z_DataSystem;
 using Z_Map;
 using Z_Map.Form;
 using Z_ObjectAnimator.Base;
@@ -68,8 +69,8 @@ namespace Ui.ModSceneBehaviourUnit
         }
         public void Refresh()
         {
-            view.txt_name.text = model.data.name;
-            
+            view.txt_name.text = AssetManager.GetKeyName(model.data.name);
+
         }
        
     }

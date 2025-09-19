@@ -25,7 +25,7 @@ public class Z_Map_Sample : MonoBehaviour
     }
     public void Update()
     {
-        MapManager.instance.UpdateInfo();
+        MapManager.instance.updateCtrl.UpdateInfo();
         {
             MapManager.instance.SetPos(Camera.main.transform.position);
         }/*

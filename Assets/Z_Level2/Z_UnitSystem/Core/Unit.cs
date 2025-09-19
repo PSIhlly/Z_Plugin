@@ -199,5 +199,25 @@ namespace Z_UnitSystem
             Hide();
             UnitForm.RemoveData(data.uid);
         }
+        public virtual void OnEnter(Unit unit)
+        {
+            Z_EventHelper.Invoke(new CollideEvent()
+            {
+                type = CollideEventType.TriggerEnter,
+                a = this,
+                b = unit
+            });
+        }
+        public virtual void OnExit(Unit unit)
+        {
+            Z_EventHelper.Invoke(new CollideEvent()
+            {
+                type = CollideEventType.TriggerExit,
+                a = this,
+                b = unit
+            });
+        }
     }
+
+    
 }

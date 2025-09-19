@@ -520,7 +520,17 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var itemData in ItemProductForm.DatasByIsproto[true])
             {
-                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.events));
+                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label,itemData.uid));
+            }
+        }
+
+        //character生成mapCharacter
+        MapCharacterForm.Clear();
+        if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
+        {
+            foreach (var characterData in CharacterProductForm.DatasByIsproto[true])
+            {
+                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.label,characterData.avatarTexName, characterData.uid));
             }
         }
 

@@ -1,34 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using Z_Input;
 
-public class Z_Input_Sample : MonoBehaviour
+public class Z_Input_Sample : MonoBehaviour, IZ_Listener<InputKeyEvent>
 {
 
     public Transform tr;
+
+
+
     // Update is called once per frame
     void Start()
     {
-        var config = new InputConfig();
+        this.Register();
+    }
+    public void OnEvent(InputKeyEvent evt)
+    {
+        switch (evt.key)
+        {
+            case KeyCode.W:
+                tr.position += Time.deltaTime * Vector3.forward * 2;
+                break;
+            case KeyCode.S:
+                tr.position += Time.deltaTime * Vector3.back * 2;
+                break;
 
-        config.onButtonW = () =>
-        {
-            tr.position += Time.deltaTime * Vector3.forward * 2;
-        };
-        config.onButtonS = () =>
-        {
-            tr.position += Time.deltaTime * Vector3.back * 2;
-        };
-
-        config.onButtonA = () =>
-        {
-            tr.position += Time.deltaTime * Vector3.left * 2;
-        };
-        config.onButtonD = () =>
-        {
-            tr.position += Time.deltaTime * Vector3.right * 2;
-        };
-        InputManager.instance.Register(config);
+            case KeyCode.A:
+                tr.position += Time.deltaTime * Vector3.left * 2;
+                break;
+            case KeyCode.D:
+                tr.position += Time.deltaTime * Vector3.right * 2;
+                break;
+        }
     }
 }

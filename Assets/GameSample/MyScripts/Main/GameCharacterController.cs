@@ -5,13 +5,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
+using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
 using Z_Texture;
 using Z_Time;
-public static partial class GlobalMaxSettings
+public static partial class GlobalSettings
 {
     public const int CHARACTER_AVATA_MAX = 10;
     public const int CHARACTER_ANIM_MAX = 10;
@@ -108,7 +110,7 @@ namespace Form
                     return idleAnim;
             }
         }
-
+       
         public void Reset()
         {
             foreach(BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
@@ -219,7 +221,23 @@ namespace Form
         }
     }
 
-
+    public void RegisterAnim(CharacterProductForm.Data character)
+    {
+        CharacterAnimForm.Data idleAnim = null;
+        CharacterAnimForm.Data moveAnim = null;
+        foreach (var anim in character.animDic.Values)
+        {
+            if (anim.name == character.idleAnimName)
+            {
+                idleAnim = anim;
+            }
+            if (anim.name == character.moveAnimName)
+            {
+                moveAnim = anim;
+            }
+        }
+        GameManager.instance.characterCtrl.CreateAnim(character, idleAnim, moveAnim);
+    }
     public void Reset()
     {
         animControllerDic.Clear();
@@ -237,7 +255,7 @@ namespace Form
     public void LoadModel(CharacterInstance ins)
     {
         var data = ins.unit.data;
-        var form = PlayManager.instance.sceneCtrl.GetCharacterProduct(ins.unit.data);
+        var form = CharacterProductForm.DataByUid[AssetManager.GetKeyId(data.name)];
         if (form == null)
         {
             Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);
@@ -253,7 +271,7 @@ namespace Form
     public void CheckAnim(CharacterInstance ins)
     {
         var data = ins.unit.data;
-        var form = PlayManager.instance.sceneCtrl.GetCharacterProduct(ins.unit.data);
+        var form = CharacterProductForm.DataByUid[AssetManager.GetKeyId(ins.unit.data.name)];
         if (form == null)
         {
             Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);

@@ -30,7 +30,7 @@ namespace Z_Ui.Base
         public UiHolder parent;
 
         public List<Transform> elementTrsLst = new List<Transform>();
-        
+
         public List<UiHolder> subUiHolderLst = new List<UiHolder>();
 
         public UiCtrl ctrl;
@@ -39,22 +39,22 @@ namespace Z_Ui.Base
 
         public bool binded => ctrl != null;
         private bool oriInited;
-        private bool firstEnter=true;
-        private bool quiting=false;
+        private bool firstEnter = true;
+        private bool quiting = false;
         public void OriInit()
         {
             if (oriInited)
-                return; 
+                return;
             var uiCtrlName = "Ui" + uiName + "Ctrl";
             if (uiType == UiType.Panel && UiManager.instance.uiCtrlName2OriUi.ContainsKey(uiCtrlName) && UiManager.instance.uiCtrlName2OriUi[uiCtrlName] != this)
                 Debug.LogError(uiName + " has exist!");
 
             UiManager.instance.uiCtrlName2OriUi[uiCtrlName] = this;
-            UiManager.instance.uiCtrlName2Uis[uiCtrlName]=new List<UiHolder>();
+            UiManager.instance.uiCtrlName2Uis[uiCtrlName] = new List<UiHolder>();
             //init sub
             foreach (var subUiHolder in subUiHolderLst)
             {
-                if(subUiHolder==null)
+                if (subUiHolder == null)
                     Debug.LogError(uiName + " has empty sub");
                 subUiHolder.OriInit();
             }
@@ -77,7 +77,7 @@ namespace Z_Ui.Base
             ctrl.BindHolderRecursively(this);
         }
 
-       public void RegisterRecursively()
+        public void RegisterRecursively()
         {
             if (uiType == UiType.Panel)
             {
@@ -90,24 +90,31 @@ namespace Z_Ui.Base
                 }
             }
         }
+        protected void Update()
+        {
+            if (binded)
+            {
+                ctrl.OnUpdate();
+            }
+        }
 
         protected void OnEnable()
         {
-            
+
             if (binded)
             {
                 if (firstEnter)
                     ctrl.OnCreate();
                 firstEnter = false;
                 ctrl.OnEnable();
-                ctrl.OnShow(); 
+                ctrl.OnShow();
             }
         }
         protected void OnDisable()
         {
             if (binded)
             {
-                if(!quiting)
+                if (!quiting)
                 {
                     ctrl.OnHide();
                 }
@@ -116,7 +123,7 @@ namespace Z_Ui.Base
         }
         protected void OnApplicationQuit()
         {
-            quiting= true;
+            quiting = true;
         }
     }
 

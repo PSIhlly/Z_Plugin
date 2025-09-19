@@ -1,17 +1,40 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Z_DesignStyle;
-
+using Z_Map.Form;
+using Z_Math;
+using Z_Mesh;
+using static UnityEditor.PlayerSettings;
+using Mesh = Z_Mesh.Mesh;
 namespace Z_Map
 {
+    public enum CollideType
+    {
+        All,
+        TriggerOnly,
+        CollideOnly,
+    }
     public class MapUtilController : Z_Controller<MapManager>
     {
         public MapUtilController(MapManager super) : base(super)
         {
         }
-
+        public List<TileUnit> GetNineTile((int,int,int) mapPos)
+        {
+            List < TileUnit > res= new List < TileUnit >();
+            for (int i = mapPos.Item1 - 1; i <= mapPos.Item1 + 1; i++)
+                for (int j = mapPos.Item3 - 1; j <= mapPos.Item3 + 1; j++)
+                {
+                    if(_super.data.maps.ContainsKey((i,mapPos.Item2,j)))
+                    {
+                        res.Add(_super.data.maps[(i, mapPos.Item2, j)].unit);
+                    }
+                }
+            return res;
+        }
         public bool InArea((int, int, int) pos)
         {
             return _super.data.maps.ContainsKey((pos.Item1, pos.Item2, pos.Item3));
@@ -158,6 +181,49 @@ namespace Z_Map
             if (pos.Item3 < 0 || pos.Item3 > _super.sizeLimit.z)
                 return false;
             return true;
+        }
+        public List<MeshInfo> GetCollidersMesh(GameObject root, Vector3 rootPos,Vector3 rootEuler,Vector3 rootScale, CollideType type= CollideType.All)
+        {
+            UnityEngine.Collider[] cs= root.GetComponentsInChildren<Collider>();
+            var res = new List<MeshInfo>();
+            foreach (var c in cs)
+            {
+                if(type == CollideType.CollideOnly&& c.isTrigger) 
+                    continue;
+                if (type == CollideType.TriggerOnly && !c.isTrigger)
+                    continue;
+                var pos = c.transform.position;
+                if (c is BoxCollider box)
+                {
+                    res.Add(Mesh.GetMesh(box, pos- root.transform.position + rootPos, rootEuler, rootScale));
+                }
+                else if (c is SphereCollider sp)
+                {
+                    res.Add(Mesh.GetMesh(sp, pos - root.transform.position + rootPos, rootEuler, rootScale));
+                }
+            }
+            return res;
+        }
+        public List<TileUnit> GetOverlap(ObjectUnitForm.Data oData)
+        {
+            var all = new List<List<Vector3Int>>(); 
+            foreach(var c in GetCollidersMesh(oData.unit.prefab, oData.pos,oData.euler,oData.scale, CollideType.CollideOnly))
+            {
+                all.Add(Graph.GetRoughOverlapIntPos(c.positions));
+            }
+            var res = Graph.DeduplicateIntPos(all);
+            _super.updateCtrl.objectTileDic.Del(oData.unit);
+            var ans=new List<TileUnit>();
+            foreach (var p in res)
+            {
+                var mp = RealPos2MapPos(p);
+                if (InArea(mp))
+                {
+                    ans.Add(_super.data.maps[(mp.x,mp.y,mp.z)].unit);
+                }
+            }
+
+            return ans;
         }
     }
 }

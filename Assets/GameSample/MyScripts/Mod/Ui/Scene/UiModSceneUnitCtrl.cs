@@ -2,6 +2,7 @@ using Form;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_DataSystem;
 using Z_Map;
 using Z_Map.Form;
 using Z_ObjectAnimator.Base;
@@ -47,9 +48,11 @@ namespace Ui.ModSceneUnit
         {
             set
             {
-                float.TryParse(value, out float v); 
+                float.TryParse(value, out float v);
+
+                TileUnitForm.Data belongMap = ((MapUnit)data.unit).belongTile.data;
                 
-                TileUnitForm.Data belongMap = (TileUnitForm.Data)data.unit.superUnit.data;
+
                 float minV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset;
                 float maxV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset+0.9f;
 
@@ -138,7 +141,18 @@ namespace Ui.ModSceneUnit
             });
             view.btn_delete.onClick.AddListener(() =>
             {
-                model.data.unit.Remove();
+                if(model.data is ItemUnitForm.Data itemData)
+                {
+                    MapManager.instance.RemoveItem(itemData);
+                }
+                else if (model.data is ObjectUnitForm.Data objData)
+                {
+                    MapManager.instance.RemoveObject(objData);
+                }
+                else if (model.data is CharacterUnitForm.Data characterData)
+                {
+                    MapManager.instance.RemoveCharacter(characterData);
+                }
                 Close();
             });
 
@@ -186,7 +200,7 @@ namespace Ui.ModSceneUnit
         }
         public void Refresh()
         {
-            view.txt_name.text = model.data.name;
+            view.txt_name.text = AssetManager.GetKeyName(model.data.name);
             
             view.ipt_posSetX.Set(model.posX);
             view.ipt_posSetY.Set(model.posY);

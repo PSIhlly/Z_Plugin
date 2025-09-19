@@ -56,6 +56,10 @@ namespace Z_Ui.Base
         {
 
         }
+        public virtual void OnUpdate()
+        {
+
+        }
 
         public virtual void OnHide()
         {

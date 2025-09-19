@@ -43,13 +43,13 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             Z_EventHelper.Register(this);
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteCharacterAnim(parent.model.data.name, model.data.name);
+                ModManager.instance.assetCtrl.DeleteCharacterAnim(parent.model.data.uid, model.data.name);
                 parent.SelPage(0);
             });
             view.ipt_name.onFinishInput += (s) =>
             {
                 if (StringHelper.IsUniqueName(parent.model.data.animDic.Keys, s))
-                    ModManager.instance.assetCtrl.RenameCharacterAnim(parent.model.data.name, model.data.name, s);
+                    ModManager.instance.assetCtrl.RenameCharacterAnim(parent.model.data.uid, model.data.name, s);
                 Refresh();
             };
             view.ipt_scale.onFinishInput += (s) =>
@@ -66,7 +66,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.btn_deleteTex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.name, model.data.name, model.id);
+                ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.uid, model.data.name, model.id);
                 model.id = -1;
                 model.part = BodyPartType.None;
                 Refresh();
@@ -80,7 +80,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             {
                 if (model.equipPart == EquipPartType.None)
                 {
-                    ModManager.instance.assetCtrl.ImportCharacterAnim(parent.model.data.name, model.data.name, model.part, model.id);
+                    ModManager.instance.assetCtrl.ImportCharacterAnim(parent.model.data.uid, model.data.name, model.part, model.id);
                 }
             });
             itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
@@ -287,7 +287,7 @@ public partial class UiItemParam
 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateCharacterAnimId(parent.parent.model.data.name, parent.model.data.name);
+                ModManager.instance.assetCtrl.CreateCharacterAnimId(parent.parent.model.data.uid, parent.model.data.name);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>

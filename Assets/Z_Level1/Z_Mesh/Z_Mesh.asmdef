@@ -1,0 +1,16 @@
+{
+    "name": "Z_Mesh",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0e3dd30762c5fe9498f570819b513def"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

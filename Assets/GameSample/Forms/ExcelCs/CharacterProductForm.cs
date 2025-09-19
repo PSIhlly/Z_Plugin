@@ -89,6 +89,8 @@ namespace Form
                 
         public static Action<Data,string,string> changeTachieAction;
                 
+        public static Action<Data,bool,bool> changeUniqueAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -292,7 +294,25 @@ namespace Form
                  
                      }
                     
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie):base(uid,name,label,isProto)
+                    private bool  _unique;
+                    /// <summary>
+                    ///±æ»À
+                    ///</summary>
+                    public bool  unique{
+                                get{return _unique;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUnique(this,_unique,value); 
+                    }
+        
+                _unique = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -310,17 +330,18 @@ namespace Form
              this.equips = equips;
              this.desc = desc;
              this.tachie = tachie;
+             this.unique = unique;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","");
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -364,13 +385,13 @@ namespace Form
                 }
             }
     
-            static Dictionary<(string,bool), Data> _DataByNameIsproto;
-            public static Dictionary<(string,bool), Data> DataByNameIsproto
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
                 get
                 {
                     Init();
-                    return _DataByNameIsproto;
+                    return _DataByName;
                 }
             }
     
@@ -392,7 +413,7 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByNameIsproto = new Dictionary<(string,bool), Data>() {
+                    _DataByName = new Dictionary<string, Data>() {
     
                     };
     
@@ -483,7 +504,9 @@ namespace Form
 
                 jo.Get<string>("desc"),
 
-                jo.Get<string>("tachie")
+                jo.Get<string>("tachie"),
+
+                jo.Get<bool>("unique")
                     );
 
             return data;
@@ -525,6 +548,8 @@ namespace Form
 
             jo.Set<string>("tachie",data.tachie);
 
+            jo.Set<bool>("unique",data.unique);
+
             return jo;
         }
 
@@ -545,7 +570,7 @@ namespace Form
 
         DataByUid[data.uid]=data;
     
-                    DataByNameIsproto[(data.name,data.isProto)]=data;
+                    DataByName[data.name]=data;
     
                     if(!DatasByLabelIsproto.ContainsKey((data.label,data.isProto)))
                         DatasByLabelIsproto[(data.label,data.isProto)]=new List<Data>();
@@ -573,7 +598,7 @@ ProductForm.AddData(data);
 
                     DataByUid.Remove(data.uid);
     
-                    DataByNameIsproto.Remove((data.name,data.isProto));
+                    DataByName.Remove(data.name);
     
                     DatasByLabelIsproto[(data.label,data.isProto)].Remove(data);
                     if(DatasByLabelIsproto[(data.label,data.isProto)].Count==0)
@@ -645,8 +670,8 @@ ProductForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
-                    DataByNameIsproto.Remove((oldV,data.isProto));
-                    DataByNameIsproto[(newV,data.isProto)]=data;
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
@@ -708,9 +733,6 @@ ProductForm.RemoveData(uid);
                     if(!DatasByIsproto.ContainsKey(newV))
                         DatasByIsproto[newV]=new List<Data>();
                     DatasByIsproto[newV].Add(data);
- 
-                    DataByNameIsproto.Remove((data.name,oldV));
-                    DataByNameIsproto[(data.name,newV)]=data;
  
                     DatasByLabelIsproto[(data.label,oldV)].Remove(data);
                     if(DatasByLabelIsproto[(data.label,oldV)].Count==0)
@@ -810,6 +832,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeTachieAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUnique(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUniqueAction?.Invoke(data,oldV,newV);
                 }
                     
             }

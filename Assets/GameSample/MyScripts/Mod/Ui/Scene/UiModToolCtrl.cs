@@ -331,7 +331,19 @@ namespace Ui.ModSceneMain.ModTool
                         
                     }
                     break;
+                case 6:
+                    {
+                        foreach (var data in MapCharacterForm.DataById.Values)
+                        {
+                            conData.Add(new UiToolItemParam()
+                            {
+                                data = data
+                            });
+                        }
 
+
+                    }
+                    break;
                 case 100:
                     {
                         foreach (var data in MapEraseForm.DataById.Values)

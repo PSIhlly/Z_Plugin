@@ -7,6 +7,8 @@ using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
+using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
@@ -23,8 +25,6 @@ public interface InternalPlaySceneController
     public void Begin(int id);
     public void End();
     public void Update();
-    public void OnMouse(bool click, Vector3 pos, Vector3 dir);
-    public void OnMouseMove(Vector3 pos);
 
     
 }
@@ -42,11 +42,15 @@ public interface ExternalPlaySceneController
 
     public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data);
 }
-public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController
+public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController,IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
 {
     public PlaySceneController(PlayManager super) : base(super)
     {
-
+        this.Register<InputKeyEvent>();
+        this.Register<InputMouseEvent>();
+        this.Register<InputMouseDownEvent>();
+        this.Register<InputMouseUpEvent>();
+        this.Register<InputMouseMoveEvent>();
     }
 
     bool enable = false;
@@ -54,6 +58,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     Vector3 lastPlayerPos;
     Vector3 setPlayerMove;
+
+    Vector2 downPos;
     private CharacterUnitForm.Data _playerM;
     private CharacterProductForm.Data _playerG;
     private Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data> _characterDic;
@@ -72,8 +78,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
+        downPos = Vector2.zero;
+
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
-        GameManager.instance.RegisterInputByPlay();
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 5, 15);
         //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
         setPlayerMove = Vector3.zero;
@@ -83,6 +90,21 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
         _playerM = null;
         _playerG = null;
+
+
+        //character Reflect
+
+        foreach (var data in CharacterUnitForm.DataByUid.Values)
+        {
+            var ch = CharacterProductForm.DataByUid[AssetManager.GetKeyId(data.name)];
+            if (ch.isProto&&!ch.unique)
+            {
+                var newCharacter = ch.Copy(false);
+                newCharacter.ToProduct();
+                data.name = AssetManager.GetIdNameKey(newCharacter.uid, newCharacter.name);
+                GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
+            }
+        }
     }
     public void End()
     {
@@ -127,7 +149,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     public void ForceUpdate()
     {
 
-        MapManager.instance.ResetInfo();
+        MapManager.instance.updateCtrl.ResetInfo();
         if (waitForActive)
             return;
 
@@ -144,14 +166,14 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         if (_playerG == null)
         {
-            _playerG = CharacterProductForm.DataByNameIsproto[(_super.data.progress.characterName,true)];
+            _playerG = CharacterProductForm.DataByUid[_super.data.progress.characterUid];
         }
         if (_playerM == null)
         {
             _playerM = CreateCharacter(_playerG); 
         }
         {
-            MapManager.instance.UpdateInfo();
+            MapManager.instance.updateCtrl.UpdateInfo();
             {
                 MapManager.instance.SetPos(CameraInstance.instance.tarTrs.position);
             }
@@ -183,7 +205,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
     {
-        var unitData=  MapManager.instance.AddCharacter(_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
+        var unitData=  MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name),_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
         _characterDic[unitData] = data;
         return unitData;
     }
@@ -226,4 +248,72 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             ctrl.view.page_PlaySceneMessage.AddMessage(content);
         }
     }
+
+
+    #region op
+
+    public void OnEvent(InputKeyEvent evt)
+    {
+        if (!enable)
+            return;
+        switch (evt.key)
+        {
+            case KeyCode.W:
+                SetPlayerMove(Time.deltaTime * Vector3.forward);
+                break;
+            case KeyCode.S:
+                SetPlayerMove(Time.deltaTime * Vector3.back);
+                break;
+
+            case KeyCode.A:
+                SetPlayerMove(Time.deltaTime * Vector3.left);
+                break;
+            case KeyCode.D:
+                SetPlayerMove(Time.deltaTime * Vector3.right);
+                break;
+        }
+    }
+
+    public void OnEvent(InputMouseEvent evt)
+    {
+        if (!enable)
+            return;
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
+        {
+            OnMouse(false, evt.pos, evt.delta);
+        }
+    }
+
+    public void OnEvent(InputMouseDownEvent evt)
+    {
+        if (!enable)
+            return;
+        if (evt.ui == null)
+        {
+            downPos = evt.pos;
+        }
+        else
+        {
+            downPos = Vector2.zero;
+        }
+    }
+
+    public void OnEvent(InputMouseUpEvent evt)
+    {
+        if (!enable)
+            return;
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
+        {
+            OnMouse(true, evt.pos, Vector3.zero);
+        }
+        downPos = Vector2.zero;
+    }
+
+    public void OnEvent(InputMouseMoveEvent evt)
+    {
+        if (!enable)
+            return;
+        OnMouseMove(evt.pos);
+    }
+    #endregion
 }

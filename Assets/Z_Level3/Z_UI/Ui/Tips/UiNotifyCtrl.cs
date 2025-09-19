@@ -80,7 +80,6 @@ namespace Ui.Notify
                 });
             }
             tipCon.Refresh();
-            Debug.Log("к╒ак");
             //choose
             chooseCon.Clear();
             if (model.chooseInfos.Count > 0)

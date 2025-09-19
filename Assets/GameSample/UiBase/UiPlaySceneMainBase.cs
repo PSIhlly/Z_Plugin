@@ -115,6 +115,68 @@ namespace PlaySceneMessage
     }
 }
 
+namespace PlayerTouchOpt
+
+{
+
+
+
+
+    public partial class UiPlayerTouchOptParam:UiParam
+    {
+    }
+
+    public partial class UiPlayerTouchOptView:UiView
+    {
+
+            public GameObject go_move;
+            public RectTransform rtf_move;
+            public GameObject go_attack;
+            public RectTransform rtf_attack;
+            public RectTransform rtf_moveStick;
+            public RectTransform rtf_attackStick;
+        public UiPlayerTouchOptView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_move = uiHolder.elementTrsLst[0].gameObject;
+            rtf_move = uiHolder.elementTrsLst[1].GetComponent<RectTransform>();
+            go_attack = uiHolder.elementTrsLst[2].gameObject;
+            rtf_attack = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
+            rtf_moveStick = uiHolder.elementTrsLst[4].GetComponent<RectTransform>();
+            rtf_attackStick = uiHolder.elementTrsLst[5].GetComponent<RectTransform>();
+        }
+
+    }
+    public partial class UiPlayerTouchOptCtrl:UiCtrl
+    {
+        public UiPlayerTouchOptView view;
+        public UiPlayerTouchOptModel model;
+        public UiPlayerTouchOptParam param;
+        public UiPlaySceneMainCtrl parent=>(UiPlaySceneMainCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiPlayerTouchOptParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiPlayerTouchOptView(uiHolder);
+            model=new UiPlayerTouchOptModel();
+
+
+        }
+
+    }
+    public partial class UiPlayerTouchOptModel:UiModel
+    {
+        
+    }
+}
+
 
 
 
@@ -179,6 +241,7 @@ namespace PlaySceneMessage
     {
 
             public PlaySceneMessage.UiPlaySceneMessageCtrl page_PlaySceneMessage;
+            public PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt;
             public GameObject go_map;
             public GameObject go_menu;
             public GameObject go_teamer;
@@ -191,14 +254,15 @@ namespace PlaySceneMessage
         {
 
             page_PlaySceneMessage = (PlaySceneMessage.UiPlaySceneMessageCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
-            go_map = uiHolder.elementTrsLst[1].gameObject;
-            go_menu = uiHolder.elementTrsLst[2].gameObject;
-            go_teamer = uiHolder.elementTrsLst[3].gameObject;
-            sub_Teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            go_func = uiHolder.elementTrsLst[5].gameObject;
-            btn_map = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_menu = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            btn_data = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            go_map = uiHolder.elementTrsLst[2].gameObject;
+            go_menu = uiHolder.elementTrsLst[3].gameObject;
+            go_teamer = uiHolder.elementTrsLst[4].gameObject;
+            sub_Teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            go_func = uiHolder.elementTrsLst[6].gameObject;
+            btn_map = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_data = uiHolder.elementTrsLst[9].GetComponent<Btn>();
         }
 
     }
@@ -225,8 +289,10 @@ namespace PlaySceneMessage
 
             view.page_PlaySceneMessage = new PlaySceneMessage.UiPlaySceneMessageCtrl();
             view.page_PlaySceneMessage.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_PlayerTouchOpt = new PlayerTouchOpt.UiPlayerTouchOptCtrl();
+            view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.sub_Teamer = new UiTeamerCtrl();
-            view.sub_Teamer.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_Teamer.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }

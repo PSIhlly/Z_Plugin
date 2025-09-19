@@ -51,7 +51,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Vector3,Vector3> changeStartposAction;
                 
-        public static Action<Data,string,string> changeMaincharacternameAction;
+        public static Action<Data,int,int> changeMaincharacteruidAction;
                 
         public static Action<Data,List<int>,List<int>> changeDefaultteamAction;
                 
@@ -124,20 +124,20 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _mainCharacterName;
+                    private int  _mainCharacterUid;
                     /// <summary>
                     ///玩家初始角色名
                     ///</summary>
-                    public string  mainCharacterName{
-                                get{return _mainCharacterName;}
+                    public int  mainCharacterUid{
+                                get{return _mainCharacterUid;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeMaincharactername(this,_mainCharacterName,value); 
+                       ChangeMaincharacteruid(this,_mainCharacterUid,value); 
                     }
         
-                _mainCharacterName = value;
+                _mainCharacterUid = value;
                 }
                  
                      }
@@ -250,13 +250,13 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int startSceneId,Vector3 startpos,string mainCharacterName,List<int> defaultTeam,List<int> defaultTeamActive,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap)
+            public Data(int uid,int startSceneId,Vector3 startpos,int mainCharacterUid,List<int> defaultTeam,List<int> defaultTeamActive,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap)
             {
 
              this.uid = uid;
              this.startSceneId = startSceneId;
              this.startpos = startpos;
-             this.mainCharacterName = mainCharacterName;
+             this.mainCharacterUid = mainCharacterUid;
              this.defaultTeam = defaultTeam;
              this.defaultTeamActive = defaultTeamActive;
              this.defaultBag = defaultBag;
@@ -268,12 +268,12 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterName,new List<int>(defaultTeam),new List<int>(defaultTeamActive),new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap);
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterUid,new List<int>(defaultTeam),new List<int>(defaultTeamActive),new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,"",null,null,null,"","","");
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -350,7 +350,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<Vector3>("startpos"),
 
-                jo.Get<string>("mainCharacterName"),
+                jo.Get<int>("mainCharacterUid"),
 
                 jo.Get<List<int>>("defaultTeam"),
 
@@ -380,7 +380,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<Vector3>("startpos",data.startpos);
 
-            jo.Set<string>("mainCharacterName",data.mainCharacterName);
+            jo.Set<int>("mainCharacterUid",data.mainCharacterUid);
 
             jo.Set<List<int>>("defaultTeam",data.defaultTeam);
 
@@ -501,12 +501,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeMaincharactername(Data superData,string oldV,string newV)
+            public static void ChangeMaincharacteruid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMaincharacternameAction?.Invoke(data,oldV,newV);
+                changeMaincharacteruidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

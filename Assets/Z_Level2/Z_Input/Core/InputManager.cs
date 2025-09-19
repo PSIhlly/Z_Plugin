@@ -8,43 +8,73 @@ using Z_DesignStyle;
 using Z_Debug;
 namespace Z_Input
 {
-
-    public class InputConfig
+    
+    public class InputKeyDownEvent:Z_Event
     {
-        public Action onButtonDownW;
-        public Action onButtonDownS;
-        public Action onButtonDownA;
-        public Action onButtonDownD;
-
-        public Action onButtonDownE;
-
-        public Action onButtonW;
-        public Action onButtonS;
-        public Action onButtonA;
-        public Action onButtonD;
-
-        public Action onButtonUpW;
-        public Action onButtonUpS;
-        public Action onButtonUpA;
-        public Action onButtonUpD;
-
-        public Action<int, Vector3, GameObject> onPointDown;
-        public Action<int, Vector3, Vector3, GameObject> onPoint;
-        public Action<int, Vector3, GameObject> onPointUp;
-
-        public Action<int, Vector3,GameObject> onMouseDown;
-        public Action<int, Vector3, Vector3, GameObject> onMouse;
-        public Action<int, Vector3, GameObject> onMouseUp;
-        public Action<Vector3> onMouseMove;
-
-        public Action<float> onMouseScroll;
-
+        public KeyCode key;
     }
+    public class InputKeyEvent : Z_Event
+    {
+        public KeyCode key;
+    }
+    public class InputKeyUpEvent : Z_Event
+    {
+        public KeyCode key;
+    }
+
+    public class InputPointDownEvent : Z_Event
+    {
+        public int id;
+        public Vector3 pos;
+        public GameObject ui;
+    }
+    public class InputPointUpEvent : Z_Event
+    {
+        public int id;
+        public Vector3 pos;
+        public GameObject ui;
+    }
+    public class InputPointEvent : Z_Event
+    {
+        public int id;
+        public Vector3 pos;
+        public Vector3 delta;
+        public GameObject ui;
+    }
+
+    public class InputMouseDownEvent : Z_Event
+    {
+        public int id;
+        public Vector3 pos;
+        public GameObject ui;
+    }
+    public class InputMouseUpEvent : Z_Event
+    {
+        public int id;
+        public Vector3 pos;
+        public GameObject ui;
+    }
+    public class InputMouseEvent : Z_Event
+    {
+        public int id;
+        public Vector3 pos;
+        public Vector3 delta;
+        public GameObject ui;
+    }
+    public class InputMouseMoveEvent : Z_Event
+    {
+        public Vector3 pos;
+    }
+    public class InputMouseScrollEvent : Z_Event
+    {
+        public float delta;
+    }
+
+
     [DefaultExecutionOrder(-100)]
     public class InputManager : Z_MonoManager<InputManager>
     {
         public bool enabled = true;
-        public InputConfig cur;
         public Vector2 screenSize;
         public Vector2 screenWorldSize;
 
@@ -69,10 +99,9 @@ namespace Z_Input
             float aspect = Camera.main.aspect;
             screenWorldSize = new Vector2(orthographicSize * aspect, orthographicSize);
         }
-        public void Register(InputConfig config)
+        public void Register()
         {
             lastMousePos = Vector3.zero;
-            cur = config;
         }
 
 
@@ -121,8 +150,12 @@ namespace Z_Input
             }
             foreach (var k in tmpList)
             {
-                cur?.onPointUp?.Invoke(k, id2Pos[k], UICheck(id2Pos[k]));
-
+                Z_EventHelper.Invoke(new InputPointUpEvent()
+                {
+                     id = k,
+                      pos = id2Pos[k],
+                       ui = UICheck(id2Pos[k])
+                });
                 id2Pos.Remove(k);
             }
 
@@ -136,7 +169,12 @@ namespace Z_Input
                 {
                     pointCnt = (pointCnt + 1) % 100;
                     id2Pos[pointCnt] = Input.touches[i].position;
-                    cur?.onPointDown?.Invoke(pointCnt, Input.touches[i].position, UICheck(Input.touches[i].position));
+                    Z_EventHelper.Invoke(new InputPointDownEvent()
+                    {
+                        id = pointCnt,
+                        pos = Input.touches[i].position,
+                        ui = UICheck(Input.touches[i].position)
+                    });
                 }
             }
 
@@ -148,7 +186,13 @@ namespace Z_Input
                 if (id != -1)
                 {
                     id2Pos[id] = Input.touches[i].position;
-                    cur?.onPoint?.Invoke(id, id2Pos[id], id2Pos[id] - id2OldPos[id], UICheck(id2Pos[id]));
+                    Z_EventHelper.Invoke(new InputPointEvent()
+                    {
+                        id = id,
+                        pos = id2Pos[id],
+                        delta = id2Pos[id] - id2OldPos[id],
+                        ui = UICheck(Input.touches[i].position)
+                    });
                 }
             }
 
@@ -166,8 +210,12 @@ namespace Z_Input
             {
                 if (Input.GetMouseButtonUp(i))
                 {
-                    cur?.onMouseUp?.Invoke(i, Input.mousePosition, UICheck(Input.mousePosition));
-                    tmpHash.Add(i);
+                    Z_EventHelper.Invoke(new InputMouseUpEvent()
+                    {
+                        id = i,
+                        pos = Input.mousePosition,
+                        ui = UICheck(Input.mousePosition)
+                    });
                 }
             }
 
@@ -180,7 +228,12 @@ namespace Z_Input
 #if UNITY_EDITOR
                     Z_Log.Log(ui);
 #endif
-                    cur?.onMouseDown?.Invoke(i, Input.mousePosition, ui);
+                    Z_EventHelper.Invoke(new InputMouseDownEvent()
+                    {
+                        id = i,
+                        pos = Input.mousePosition,
+                        ui = ui
+                    });
                     tmpHash.Add(i);
 
                 }
@@ -191,7 +244,13 @@ namespace Z_Input
                 if (Input.GetMouseButton(i)&&!tmpHash.Contains(i)&& mouseOldPos.ContainsKey(i))//ignore first frame
                 {
                     mousePos[i] = Input.mousePosition;
-                    cur?.onMouse?.Invoke(i, mousePos[i], mousePos[i] - mouseOldPos[i], UICheck(mousePos[i]));
+                    Z_EventHelper.Invoke(new InputMouseEvent()
+                    {
+                        id = i,
+                        pos = mousePos[i],
+                        delta = mousePos[i] - mouseOldPos[i],
+                        ui = UICheck(Input.mousePosition)
+                    });
 
                 }
             }
@@ -199,12 +258,18 @@ namespace Z_Input
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             if (scroll!=0)
             {
-                cur?.onMouseScroll?.Invoke(scroll);
+                Z_EventHelper.Invoke(new InputMouseScrollEvent()
+                {
+                    delta = scroll
+                });
             }
             if((lastMousePos- Input.mousePosition).sqrMagnitude>0.0001f)
             {
                 lastMousePos = Input.mousePosition;
-                cur?.onMouseMove?.Invoke(lastMousePos);
+                Z_EventHelper.Invoke(new InputMouseMoveEvent()
+                {
+                    pos = lastMousePos
+                });
             }
 
             //save
@@ -266,58 +331,97 @@ namespace Z_Input
             ManageMouse();
             if (Input.GetKeyDown(KeyCode.W))
             {
-                cur?.onButtonDownW?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyDownEvent()
+                {
+                    key = KeyCode.W
+                });
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                cur?.onButtonDownS?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyDownEvent()
+                {
+                    key = KeyCode.S
+                });
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                cur?.onButtonDownA?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyDownEvent()
+                {
+                    key = KeyCode.A
+                });
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                cur?.onButtonDownD?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyDownEvent()
+                {
+                    key = KeyCode.D
+                });
             }
             if (Input.GetKeyDown(KeyCode.E))
             {
-                cur?.onButtonDownE?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyDownEvent()
+                {
+                    key = KeyCode.E
+                });
             }
 
             if (Input.GetKey(KeyCode.W))
             {
-                cur?.onButtonW?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyEvent()
+                {
+                    key = KeyCode.W
+                });
             }
             if (Input.GetKey(KeyCode.S))
             {
-                cur?.onButtonS?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyEvent()
+                {
+                    key = KeyCode.S
+                });
             }
             if (Input.GetKey(KeyCode.A))
             {
-                cur?.onButtonA?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyEvent()
+                {
+                    key = KeyCode.A
+                });
             }
             if (Input.GetKey(KeyCode.D))
             {
-                cur?.onButtonD?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyEvent()
+                {
+                    key = KeyCode.D
+                });
             }
 
 
             if (Input.GetKeyUp(KeyCode.W))
             {
-                cur?.onButtonUpW?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyUpEvent()
+                {
+                    key = KeyCode.W
+                });
             }
             if (Input.GetKeyUp(KeyCode.S))
             {
-                cur?.onButtonUpS?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyUpEvent()
+                {
+                    key = KeyCode.S
+                });
             }
             if (Input.GetKeyUp(KeyCode.A))
             {
-                cur?.onButtonUpA?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyUpEvent()
+                {
+                    key = KeyCode.A
+                });
             }
             if (Input.GetKeyUp(KeyCode.D))
             {
-                cur?.onButtonUpD?.Invoke();
+                Z_EventHelper.Invoke(new InputKeyUpEvent()
+                {
+                    key = KeyCode.D
+                });
             }
 
             

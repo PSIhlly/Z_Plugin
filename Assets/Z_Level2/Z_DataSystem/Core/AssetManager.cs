@@ -25,7 +25,7 @@ namespace Z_DataSystem.Form
             {
                 get
                 {
-                    
+
                     if (_sprite == null)
                     {
                         _sprite = TextureHelper.GetSpriteByTexture(tex);
@@ -78,7 +78,7 @@ namespace Z_DataSystem
             cacheCtrl = new AssetCacheCtroller(this);
         }
         #region all
-       
+
 
         public AssetsRes LoadAssetsByFolder(string path, bool isRes)
         {
@@ -109,7 +109,7 @@ namespace Z_DataSystem
                     if (Array.Exists(SupportedImageExtensions, ext => ext == extension))
                     {
                         var tex = TextureHelper.GetTextureByPath(file);
-                            res.texs.Add((Path.GetFullPath(file), tex));
+                        res.texs.Add((Path.GetFullPath(file), tex));
                     }
                 }
             }
@@ -146,7 +146,7 @@ namespace Z_DataSystem
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
                     var nm = tex.GetHashCode().ToString();
-                    var form=instance.LoadTex(tex, nm);
+                    var form = instance.LoadTex(tex, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {
@@ -183,7 +183,7 @@ namespace Z_DataSystem
             return res;
         }
 
-        public void SelectTex(Vector2Int forceSize=default, Action<TexAssetForm.Data> callback = null)
+        public void SelectTex(Vector2Int forceSize = default, Action<TexAssetForm.Data> callback = null)
         {
             SelectTexTask task = new SelectTexTask();
             task.callback = callback;
@@ -201,7 +201,7 @@ namespace Z_DataSystem
         public TexAssetForm.Data LoadTexBytes(byte[] data, string name)
         {
             var tex = TextureHelper.GetTextureByByte(data);
-            
+
             return new TexAssetForm.Data(-1, name, tex);
         }
         public TexAssetForm.Data LoadTexPath(string path, string name)
@@ -222,8 +222,24 @@ namespace Z_DataSystem
 
         #endregion
 
-       
-        
+
+        public static string GetIdNameKey(int id, string name)
+        {
+            return id + "$￥$" + name;
+        }
+        public static int GetKeyId(string key)
+        {
+            if (int.TryParse(key.Split("$￥$")[0], out int id))
+                return id;
+            return 0;
+        }
+        public static string GetKeyName(string key)
+        {
+            var res = key.Split("$￥$");
+            if (res.Length>1)
+                return res[1];
+            return "";
+        }
 
     }
 }

@@ -35,6 +35,8 @@ public class GameSaveController : Z_Controller<GameManager>
     public string eventFormFileName => "ef";
     public string configFormFileName => "cf";
     public string itemParamFormFileName => "ipaf";
+    public string effectFormFileName => "etf";
+    public string skillFormFileName => "slf";
     public string itemProductFormFileName => "iprf";
     public GameSaveController(GameManager super) : base(super)
     {
@@ -118,6 +120,14 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+    public void SaveSkill(string storyCoreFolder)
+    {
+        SaveAndLoad.Save(storyCoreFolder + "/" + skillFormFileName, SkillForm.GetJaByDatas().ToString());
+        foreach (var data in SkillForm.DataByUid.Values)
+        {
+            SaveStoryTex(data.icon, storyCoreFolder);
+        }
+    }
     public void SaveItem(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + itemParamFormFileName, ItemParamForm.GetJaByDatas().ToString());
@@ -134,6 +144,18 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+    public void SaveEffect(string storyCoreFolder)
+    {
+        SaveAndLoad.Save(storyCoreFolder + "/" + effectFormFileName, EffectForm.GetJaByDatas().ToString());
+        foreach (var data in EffectForm.DataByUid.Values)
+        {
+            foreach (var clip in data.clips)
+            {
+                SaveStoryTex(clip.tex, storyCoreFolder);
+            }
+        }
+    }
+    
     public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
@@ -376,6 +398,23 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+    public void LoadSkill(string storyCoreFolder)
+    {
+        var pathForm = storyCoreFolder + "/" + skillFormFileName;
+        SkillForm.ClearAuto();
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in SkillForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                SkillForm.AddData(form);
+            }
+        }
+
+        foreach (var data in SkillForm.DataByUid.Values)
+        {
+            LoadStoryTex(data.icon, storyCoreFolder);
+        }
+    }
     public void LoadItem(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + itemParamFormFileName;
@@ -409,6 +448,28 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+
+    public void LoadEffect(string storyCoreFolder)
+    {
+        var pathForm = storyCoreFolder + "/" + effectFormFileName;
+        EffectForm.ClearAuto();
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in EffectForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                EffectForm.AddData(form);
+            }
+        }
+
+        foreach (var data in EffectForm.DataByUid.Values)
+        {
+            foreach (var clip in data.clips)
+            {
+                LoadStoryTex(clip.tex, storyCoreFolder);
+            }
+        }
+    }
+  
     public void LoadEvent(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + eventFormFileName;

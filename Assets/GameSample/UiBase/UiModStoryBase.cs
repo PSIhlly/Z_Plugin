@@ -1650,6 +1650,334 @@ namespace ModStoryCharacterUnitConfig
     }
 }
 
+namespace ModStorySkill
+
+{
+
+
+
+
+namespace ModStorySkillList
+
+{
+
+
+
+
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_valid;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStorySkillListCtrl parent=>(UiModStorySkillListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
+
+
+
+    public partial class UiBigItemParam:UiParam
+    {
+    }
+
+    public partial class UiBigItemView:UiView
+    {
+
+            public GameObject go_bigItem;
+            public Sta sta_bigItem;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
+            public Sta sta_;
+            public Txt txt_;
+            public Img img_;
+        public UiBigItemView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_bigItem = uiHolder.elementTrsLst[0].gameObject;
+            sta_bigItem = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            sta_exist = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[7].GetComponent<Img>();
+        }
+
+    }
+    public partial class UiBigItemCtrl:UiCtrl
+    {
+        public UiBigItemView view;
+        public UiBigItemModel model;
+        public UiBigItemParam param;
+        public UiModStorySkillListCtrl parent=>(UiModStorySkillListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiBigItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiBigItemView(uiHolder);
+            model=new UiBigItemModel();
+
+
+        }
+
+    }
+    public partial class UiBigItemModel:UiModel
+    {
+        
+    }
+    public partial class UiModStorySkillListParam:UiParam
+    {
+    }
+
+    public partial class UiModStorySkillListView:UiView
+    {
+
+            public ScrView scr_labs;
+            public ScrView scr_bigItems;
+            public GameObject go_lab;
+            public UiLabCtrl sub_Lab;
+            public GameObject go_bigItem;
+            public Sta sta_bigItem;
+            public UiBigItemCtrl sub_BigItem;
+        public UiModStorySkillListView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            go_lab = uiHolder.elementTrsLst[2].gameObject;
+            sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            go_bigItem = uiHolder.elementTrsLst[4].gameObject;
+            sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            sub_BigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStorySkillListCtrl:UiCtrl
+    {
+        public UiModStorySkillListView view;
+        public UiModStorySkillListModel model;
+        public UiModStorySkillListParam param;
+        public UiModStorySkillCtrl parent=>(UiModStorySkillCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStorySkillListParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStorySkillListView(uiHolder);
+            model=new UiModStorySkillListModel();
+
+
+            view.sub_Lab = new UiLabCtrl();
+            view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_BigItem = new UiBigItemCtrl();
+            view.sub_BigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+        }
+
+    }
+    public partial class UiModStorySkillListModel:UiModel
+    {
+        
+    }
+}
+
+namespace ModStorySkillUnit
+
+{
+
+
+
+
+    public partial class UiModStorySkillUnitParam:UiParam
+    {
+    }
+
+    public partial class UiModStorySkillUnitView:UiView
+    {
+
+            public Btn btn_back;
+            public Btn btn_delete;
+            public Ipt ipt_name;
+            public Ipt ipt_label;
+            public Ipt ipt_cd;
+            public Btn btn_icon;
+            public Img img_icon;
+            public Btn btn_triggerCondition;
+            public Btn btn_onTriggerEvent;
+            public Btn btn_lightAttack;
+            public Sta sta_lightAttack;
+            public Btn btn_heavyAttack;
+            public Sta sta_heavyAttack;
+            public Btn btn_e;
+            public Sta sta_e;
+            public Btn btn_q;
+            public Sta sta_q;
+            public Txt txt_triggerCondition;
+            public Txt txt_onTriggerEvent;
+        public UiModStorySkillUnitView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            ipt_label = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            ipt_cd = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_icon = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            img_icon = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            btn_triggerCondition = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_onTriggerEvent = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            sta_lightAttack = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            btn_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_heavyAttack = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_e = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_e = uiHolder.elementTrsLst[14].GetComponent<Sta>();
+            btn_q = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            sta_q = uiHolder.elementTrsLst[16].GetComponent<Sta>();
+            txt_triggerCondition = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            txt_onTriggerEvent = uiHolder.elementTrsLst[18].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiModStorySkillUnitCtrl:UiCtrl
+    {
+        public UiModStorySkillUnitView view;
+        public UiModStorySkillUnitModel model;
+        public UiModStorySkillUnitParam param;
+        public UiModStorySkillCtrl parent=>(UiModStorySkillCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStorySkillUnitParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStorySkillUnitView(uiHolder);
+            model=new UiModStorySkillUnitModel();
+
+
+        }
+
+    }
+    public partial class UiModStorySkillUnitModel:UiModel
+    {
+        
+    }
+}
+
+    public partial class UiModStorySkillParam:UiParam
+    {
+    }
+
+    public partial class UiModStorySkillView:UiView
+    {
+
+            public ModStorySkillList.UiModStorySkillListCtrl page_ModStorySkillList;
+            public ModStorySkillUnit.UiModStorySkillUnitCtrl page_ModStorySkillUnit;
+        public UiModStorySkillView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            page_ModStorySkillList = (ModStorySkillList.UiModStorySkillListCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
+            page_ModStorySkillUnit = (ModStorySkillUnit.UiModStorySkillUnitCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStorySkillCtrl:UiCtrl
+    {
+        public UiModStorySkillView view;
+        public UiModStorySkillModel model;
+        public UiModStorySkillParam param;
+        public UiModStoryCtrl parent=>(UiModStoryCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStorySkillParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStorySkillView(uiHolder);
+            model=new UiModStorySkillModel();
+
+
+            view.page_ModStorySkillList = new ModStorySkillList.UiModStorySkillListCtrl();
+            view.page_ModStorySkillList.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_ModStorySkillUnit = new ModStorySkillUnit.UiModStorySkillUnitCtrl();
+            view.page_ModStorySkillUnit.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+        }
+
+    }
+    public partial class UiModStorySkillModel:UiModel
+    {
+        
+    }
+}
+
 namespace ModStoryItem
 
 {
@@ -3444,6 +3772,390 @@ namespace ModStoryMapObjectObjectConfig
     }
 }
 
+namespace ModStoryEffect
+
+{
+
+
+
+
+namespace ModStoryEffectList
+
+{
+
+
+
+
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_valid;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryEffectListCtrl parent=>(UiModStoryEffectListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
+
+
+
+    public partial class UiBigItemParam:UiParam
+    {
+    }
+
+    public partial class UiBigItemView:UiView
+    {
+
+            public GameObject go_bigItem;
+            public Sta sta_bigItem;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
+            public Sta sta_;
+            public Txt txt_;
+            public Img img_;
+        public UiBigItemView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_bigItem = uiHolder.elementTrsLst[0].gameObject;
+            sta_bigItem = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            sta_exist = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[7].GetComponent<Img>();
+        }
+
+    }
+    public partial class UiBigItemCtrl:UiCtrl
+    {
+        public UiBigItemView view;
+        public UiBigItemModel model;
+        public UiBigItemParam param;
+        public UiModStoryEffectListCtrl parent=>(UiModStoryEffectListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiBigItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiBigItemView(uiHolder);
+            model=new UiBigItemModel();
+
+
+        }
+
+    }
+    public partial class UiBigItemModel:UiModel
+    {
+        
+    }
+    public partial class UiModStoryEffectListParam:UiParam
+    {
+    }
+
+    public partial class UiModStoryEffectListView:UiView
+    {
+
+            public ScrView scr_labs;
+            public ScrView scr_bigItems;
+            public GameObject go_lab;
+            public UiLabCtrl sub_Lab;
+            public GameObject go_bigItem;
+            public Sta sta_bigItem;
+            public UiBigItemCtrl sub_BigItem;
+        public UiModStoryEffectListView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            go_lab = uiHolder.elementTrsLst[2].gameObject;
+            sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            go_bigItem = uiHolder.elementTrsLst[4].gameObject;
+            sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            sub_BigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStoryEffectListCtrl:UiCtrl
+    {
+        public UiModStoryEffectListView view;
+        public UiModStoryEffectListModel model;
+        public UiModStoryEffectListParam param;
+        public UiModStoryEffectCtrl parent=>(UiModStoryEffectCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStoryEffectListParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStoryEffectListView(uiHolder);
+            model=new UiModStoryEffectListModel();
+
+
+            view.sub_Lab = new UiLabCtrl();
+            view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_BigItem = new UiBigItemCtrl();
+            view.sub_BigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+        }
+
+    }
+    public partial class UiModStoryEffectListModel:UiModel
+    {
+        
+    }
+}
+
+namespace ModStoryEffectUnit
+
+{
+
+
+
+
+
+
+
+    public partial class UiEffectParam:UiParam
+    {
+    }
+
+    public partial class UiEffectView:UiView
+    {
+
+            public GameObject go_effect;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_delete;
+            public Ipt ipt_rotate;
+            public Ipt ipt_opacity;
+            public Ipt ipt_sustain;
+            public Btn btn_transparence;
+            public Sta sta_transparence;
+            public Ipt ipt_posSetX;
+            public Ipt ipt_posSetZ;
+            public Ipt ipt_posSetY;
+            public Ipt ipt_scaleSetX;
+            public Ipt ipt_scaleSetZ;
+            public Ipt ipt_scaleSetY;
+        public UiEffectView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_effect = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            ipt_rotate = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            ipt_opacity = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            ipt_sustain = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
+            btn_transparence = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_transparence = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            ipt_posSetX = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            ipt_posSetZ = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_posSetY = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            ipt_scaleSetX = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
+            ipt_scaleSetZ = uiHolder.elementTrsLst[13].GetComponent<Ipt>();
+            ipt_scaleSetY = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
+        }
+
+    }
+    public partial class UiEffectCtrl:UiCtrl
+    {
+        public UiEffectView view;
+        public UiEffectModel model;
+        public UiEffectParam param;
+        public UiModStoryEffectUnitCtrl parent=>(UiModStoryEffectUnitCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiEffectParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiEffectView(uiHolder);
+            model=new UiEffectModel();
+
+
+        }
+
+    }
+    public partial class UiEffectModel:UiModel
+    {
+        
+    }
+    public partial class UiModStoryEffectUnitParam:UiParam
+    {
+    }
+
+    public partial class UiModStoryEffectUnitView:UiView
+    {
+
+            public Btn btn_back;
+            public Btn btn_delete;
+            public ScrView scr_effects;
+            public Ipt ipt_name;
+            public Ipt ipt_label;
+            public Btn btn_image;
+            public Img img_image;
+            public GameObject go_effect;
+            public UiEffectCtrl sub_Effect;
+        public UiModStoryEffectUnitView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            scr_effects = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            ipt_label = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_image = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            go_effect = uiHolder.elementTrsLst[7].gameObject;
+            sub_Effect = (UiEffectCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStoryEffectUnitCtrl:UiCtrl
+    {
+        public UiModStoryEffectUnitView view;
+        public UiModStoryEffectUnitModel model;
+        public UiModStoryEffectUnitParam param;
+        public UiModStoryEffectCtrl parent=>(UiModStoryEffectCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStoryEffectUnitParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStoryEffectUnitView(uiHolder);
+            model=new UiModStoryEffectUnitModel();
+
+
+            view.sub_Effect = new UiEffectCtrl();
+            view.sub_Effect.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiModStoryEffectUnitModel:UiModel
+    {
+        
+    }
+}
+
+    public partial class UiModStoryEffectParam:UiParam
+    {
+    }
+
+    public partial class UiModStoryEffectView:UiView
+    {
+
+            public ModStoryEffectList.UiModStoryEffectListCtrl page_ModStoryEffectList;
+            public ModStoryEffectUnit.UiModStoryEffectUnitCtrl page_ModStoryEffectUnit;
+        public UiModStoryEffectView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            page_ModStoryEffectList = (ModStoryEffectList.UiModStoryEffectListCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
+            page_ModStoryEffectUnit = (ModStoryEffectUnit.UiModStoryEffectUnitCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStoryEffectCtrl:UiCtrl
+    {
+        public UiModStoryEffectView view;
+        public UiModStoryEffectModel model;
+        public UiModStoryEffectParam param;
+        public UiModStoryCtrl parent=>(UiModStoryCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStoryEffectParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStoryEffectView(uiHolder);
+            model=new UiModStoryEffectModel();
+
+
+            view.page_ModStoryEffectList = new ModStoryEffectList.UiModStoryEffectListCtrl();
+            view.page_ModStoryEffectList.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_ModStoryEffectUnit = new ModStoryEffectUnit.UiModStoryEffectUnitCtrl();
+            view.page_ModStoryEffectUnit.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+        }
+
+    }
+    public partial class UiModStoryEffectModel:UiModel
+    {
+        
+    }
+}
+
 namespace ModStoryEvent
 
 {
@@ -4311,8 +5023,10 @@ namespace ModStoryMapConfig
             public ModStoryOverview.UiModStoryOverviewCtrl page_ModStoryOverview;
             public ModStoryParameter.UiModStoryParameterCtrl page_ModStoryParameter;
             public ModStoryCharacter.UiModStoryCharacterCtrl page_ModStoryCharacter;
+            public ModStorySkill.UiModStorySkillCtrl page_ModStorySkill;
             public ModStoryItem.UiModStoryItemCtrl page_ModStoryItem;
             public ModStoryMapObject.UiModStoryMapObjectCtrl page_ModStoryMapObject;
+            public ModStoryEffect.UiModStoryEffectCtrl page_ModStoryEffect;
             public ModStoryEvent.UiModStoryEventCtrl page_ModStoryEvent;
             public ModStoryMap.UiModStoryMapCtrl page_ModStoryMap;
             public Txt txt_title;
@@ -4328,6 +5042,8 @@ namespace ModStoryMapConfig
             public Sta sta_item;
             public Btn btn_mapObject;
             public Sta sta_mapObject;
+            public Btn btn_effect;
+            public Sta sta_effect;
             public Btn btn_event;
             public Sta sta_event;
             public Btn btn_map;
@@ -4341,28 +5057,32 @@ namespace ModStoryMapConfig
             page_ModStoryOverview = (ModStoryOverview.UiModStoryOverviewCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             page_ModStoryParameter = (ModStoryParameter.UiModStoryParameterCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             page_ModStoryCharacter = (ModStoryCharacter.UiModStoryCharacterCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            page_ModStoryItem = (ModStoryItem.UiModStoryItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMapObject = (ModStoryMapObject.UiModStoryMapObjectCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            page_ModStoryEvent = (ModStoryEvent.UiModStoryEventCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMap = (ModStoryMap.UiModStoryMapCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            txt_title = uiHolder.elementTrsLst[9].GetComponent<Txt>();
-            btn_overview = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            sta_overview = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            btn_parameter = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            sta_parameter = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            btn_character = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            sta_character = uiHolder.elementTrsLst[15].GetComponent<Sta>();
-            btn_skill = uiHolder.elementTrsLst[16].GetComponent<Btn>();
-            sta_skill = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            btn_item = uiHolder.elementTrsLst[18].GetComponent<Btn>();
-            sta_item = uiHolder.elementTrsLst[19].GetComponent<Sta>();
-            btn_mapObject = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            sta_mapObject = uiHolder.elementTrsLst[21].GetComponent<Sta>();
-            btn_event = uiHolder.elementTrsLst[22].GetComponent<Btn>();
-            sta_event = uiHolder.elementTrsLst[23].GetComponent<Sta>();
-            btn_map = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            sta_map = uiHolder.elementTrsLst[25].GetComponent<Sta>();
-            txt_overview = uiHolder.elementTrsLst[26].GetComponent<Txt>();
+            page_ModStorySkill = (ModStorySkill.UiModStorySkillCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            page_ModStoryItem = (ModStoryItem.UiModStoryItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMapObject = (ModStoryMapObject.UiModStoryMapObjectCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            page_ModStoryEffect = (ModStoryEffect.UiModStoryEffectCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            page_ModStoryEvent = (ModStoryEvent.UiModStoryEventCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMap = (ModStoryMap.UiModStoryMapCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            txt_title = uiHolder.elementTrsLst[11].GetComponent<Txt>();
+            btn_overview = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_overview = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            btn_parameter = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            sta_parameter = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            btn_character = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            sta_character = uiHolder.elementTrsLst[17].GetComponent<Sta>();
+            btn_skill = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            sta_skill = uiHolder.elementTrsLst[19].GetComponent<Sta>();
+            btn_item = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            sta_item = uiHolder.elementTrsLst[21].GetComponent<Sta>();
+            btn_mapObject = uiHolder.elementTrsLst[22].GetComponent<Btn>();
+            sta_mapObject = uiHolder.elementTrsLst[23].GetComponent<Sta>();
+            btn_effect = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            sta_effect = uiHolder.elementTrsLst[25].GetComponent<Sta>();
+            btn_event = uiHolder.elementTrsLst[26].GetComponent<Btn>();
+            sta_event = uiHolder.elementTrsLst[27].GetComponent<Sta>();
+            btn_map = uiHolder.elementTrsLst[28].GetComponent<Btn>();
+            sta_map = uiHolder.elementTrsLst[29].GetComponent<Sta>();
+            txt_overview = uiHolder.elementTrsLst[30].GetComponent<Txt>();
         }
 
     }
@@ -4393,14 +5113,18 @@ namespace ModStoryMapConfig
             view.page_ModStoryParameter.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.page_ModStoryCharacter = new ModStoryCharacter.UiModStoryCharacterCtrl();
             view.page_ModStoryCharacter.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.page_ModStorySkill = new ModStorySkill.UiModStorySkillCtrl();
+            view.page_ModStorySkill.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.page_ModStoryItem = new ModStoryItem.UiModStoryItemCtrl();
-            view.page_ModStoryItem.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.page_ModStoryItem.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.page_ModStoryMapObject = new ModStoryMapObject.UiModStoryMapObjectCtrl();
-            view.page_ModStoryMapObject.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.page_ModStoryMapObject.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.page_ModStoryEffect = new ModStoryEffect.UiModStoryEffectCtrl();
+            view.page_ModStoryEffect.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
             view.page_ModStoryEvent = new ModStoryEvent.UiModStoryEventCtrl();
-            view.page_ModStoryEvent.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.page_ModStoryEvent.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
             view.page_ModStoryMap = new ModStoryMap.UiModStoryMapCtrl();
-            view.page_ModStoryMap.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
+            view.page_ModStoryMap.BindHolderRecursively(uiHolder.subUiHolderLst[8]);
         }
 
     }

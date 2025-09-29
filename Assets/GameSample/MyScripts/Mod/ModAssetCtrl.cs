@@ -444,6 +444,66 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     #endregion
 
+    #region effect
+    public EffectClipForm.Data CreateEffectClip(string texName)
+    {
+        return new EffectClipForm.Data(-1, texName, 1,Vector3.zero,0,Vector3.one,1,true);
+    }
+    public void DeleteEffectClip(int effectUid,int id)
+    {
+        EffectForm.DataByUid[effectUid].clips.RemoveAt(id);
+    }
+    public void CreateEffect(string lab = "", string name = null)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(EffectForm.DataByName.Keys);
+        }
+        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) }));
+    }
+    public void DeleteEffect(int effectUid)
+    {
+        EffectForm.RemoveData(effectUid);
+    }
+    public void ImportEffectImage(int effectUid)
+    {
+
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        {
+            var data = EffectForm.DataByUid[effectUid];
+            foreach(var clip in data.clips)
+            {
+                clip.tex = form.name;
+            }
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+        });
+    }
+    #endregion
+    #region skill
+    public void CreateSkill(string lab = "", string name = null)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(SkillForm.DataByName.Keys);
+        }
+        SkillForm.AddData(new SkillForm.Data(-1,name,"",GlobalNameHelper.GetDefaultTexName(),new List<SkillType>(),1,new Dictionary<string, EventTriggerForm.Data>(),0));
+    }
+    public void DeleteSkill(int uid)
+    {
+        SkillForm.RemoveData(uid);
+    }
+    public void ImportSkillIcon(int skillUid)
+    {
+        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        {
+            var data = SkillForm.DataByUid[skillUid];
+            data.icon= form.name;
+            GameManager.instance.saveCtrl.AddStoryTex(form);
+        });
+    }
+    #endregion
+
+
     #region event
     public void ImportImage(Action<TexAssetForm.Data> act)
     {
@@ -466,6 +526,15 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ChooseEvent(EventType type, string retType, string title, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
+        NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
+        {
+            act?.Invoke(res);
+            return true;
+        }, items);
+    }
+    public void ChooseTriggerCondition(string title,Action<EntryItem> act)
+    {
+        var items = GameManager.instance.evtCtrl.GetTriggerConditionEntry();
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
         {
             act?.Invoke(res);

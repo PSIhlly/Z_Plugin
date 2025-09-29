@@ -52,8 +52,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadMaterial(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadObject(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadCharacter(ModManager.GetStoryCoreFolder(storyFolder));
+            GameManager.instance.saveCtrl.LoadSkill(ModManager.GetStoryCoreFolder(storyFolder));
+            
             GameManager.instance.saveCtrl.LoadItem(ModManager.GetStoryCoreFolder(storyFolder));
-
+            GameManager.instance.saveCtrl.LoadEffect(ModManager.GetStoryCoreFolder(storyFolder));
+            
             GameManager.instance.saveCtrl.LoadEvent(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadConfig(ModManager.GetStoryCoreFolder(storyFolder));
 

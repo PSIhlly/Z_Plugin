@@ -386,6 +386,20 @@ namespace Form
 
                 {1210095,new Data(1210095,"description","Description","简介")},
 
+                {1210096,new Data(1210096,"effect","Effect","特效")},
+
+                {1210097,new Data(1210097,"sustain(s)","Sustain(s)","持续(秒)")},
+
+                {1210098,new Data(1210098,"transition","Transition","过渡")},
+
+                {1210099,new Data(1210099,"opacity","Opacity","不透明度")},
+
+                {1210100,new Data(1210100,"image","Image","图片")},
+
+                {1210101,new Data(1210101,"onTriggerEvent","On trigger event","触发事件")},
+
+                {1210102,new Data(1210102,"triggerCondition","Trigger condition","触发条件")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -644,6 +658,20 @@ namespace Form
                         {"tachie",_DataById[1210094]},
     
                         {"description",_DataById[1210095]},
+    
+                        {"effect",_DataById[1210096]},
+    
+                        {"sustain(s)",_DataById[1210097]},
+    
+                        {"transition",_DataById[1210098]},
+    
+                        {"opacity",_DataById[1210099]},
+    
+                        {"image",_DataById[1210100]},
+    
+                        {"onTriggerEvent",_DataById[1210101]},
+    
+                        {"triggerCondition",_DataById[1210102]},
     
                     };
     

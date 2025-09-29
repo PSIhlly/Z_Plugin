@@ -218,6 +218,18 @@ namespace Form
 
                 {20036,new Data(20036,"name","Name","名称")},
 
+                {20037,new Data(20037,"cd(s)","CD(s)","冷却(秒)")},
+
+                {20038,new Data(20038,"LightAttack","Light attack","轻击")},
+
+                {20039,new Data(20039,"HeavyAttack","Heavy attack","重击")},
+
+                {20040,new Data(20040,"E","E button","E技能")},
+
+                {20041,new Data(20041,"Q","Q button","Q技能")},
+
+                {20042,new Data(20042,"Passive","Passive","被动技能")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -308,6 +320,18 @@ namespace Form
                         {"Please select one from the following",_DataById[20035]},
     
                         {"name",_DataById[20036]},
+    
+                        {"cd(s)",_DataById[20037]},
+    
+                        {"LightAttack",_DataById[20038]},
+    
+                        {"HeavyAttack",_DataById[20039]},
+    
+                        {"E",_DataById[20040]},
+    
+                        {"Q",_DataById[20041]},
+    
+                        {"Passive",_DataById[20042]},
     
                     };
     

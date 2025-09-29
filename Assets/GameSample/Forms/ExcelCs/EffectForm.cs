@@ -18,9 +18,9 @@ using Z_Code.Form;
 namespace Form
 {
 
-    public static partial class EventTriggerForm
+    public static partial class EffectForm
     {
-public static readonly int autoUidCnt=1000000;
+public static readonly int autoUidCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
@@ -49,7 +49,9 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeEvtAction;
+        public static Action<Data,string,string> changeLabelAction;
+                
+        public static Action<Data,List<EffectClipForm.Data>,List<EffectClipForm.Data>> changeClipsAction;
                 
 
 
@@ -92,41 +94,60 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private string  _evt;
+                    private string  _label;
                     /// <summary>
-                    ///事件名称
+                    ///标签
                     ///</summary>
-                    public string  evt{
-                                get{return _evt;}
+                    public string  label{
+                                get{return _label;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeEvt(this,_evt,value); 
+                       ChangeLabel(this,_label,value); 
                     }
         
-                _evt = value;
+                _label = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,string evt)
+                    private List<EffectClipForm.Data>  _clips;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public List<EffectClipForm.Data>  clips{
+                                get{return _clips;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeClips(this,_clips,value); 
+                    }
+        
+                _clips = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,List<EffectClipForm.Data> clips)
             {
 
              this.uid = uid;
              this.name = name;
-             this.evt = evt;
+             this.label = label;
+             this.clips = clips;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,evt);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,new List<EffectClipForm.Data>(clips));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","",null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -137,6 +158,16 @@ public static readonly int autoUidCnt=1000000;
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLabel;
+            public static Dictionary<string, List<Data>> DatasByLabel
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabel;
                 }
             }
     
@@ -165,19 +196,15 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"onCharacterParamChange","")},
-
-                {2,new Data(2,"onItemParamChange","")},
-
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
-                        {"onCharacterParamChange",_DataByUid[1]},
-    
-                        {"onItemParamChange",_DataByUid[2]},
-    
                     };
     
+                    _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                };
+
 
             childInitAction?.Invoke();
             
@@ -223,7 +250,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("evt")
+                jo.Get<string>("label"),
+
+                jo.Get<List<EffectClipForm.Data>>("clips")
                     );
 
             return data;
@@ -239,7 +268,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("evt",data.evt);
+            jo.Set<string>("label",data.label);
+
+            jo.Set<List<EffectClipForm.Data>>("clips",data.clips);
 
             return jo;
         }
@@ -263,6 +294,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByLabel.ContainsKey(data.label))
+                        DatasByLabel[data.label]=new List<Data>();
+                    DatasByLabel[data.label].Add(data);
+    
 
             childAddAction?.Invoke(data);
             return data.uid;
@@ -278,6 +313,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
                     DataByName.Remove(data.name);
+    
+                    DatasByLabel[data.label].Remove(data);
+                    if(DatasByLabel[data.label].Count==0)
+                        DatasByLabel.Remove(data.label);
     
 
             uidChain.PushId(data.uid);
@@ -345,12 +384,29 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeEvt(Data superData,string oldV,string newV)
+            public static void ChangeLabel(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeEvtAction?.Invoke(data,oldV,newV);
+                    DatasByLabel[oldV].Remove(data);
+                    if(DatasByLabel[oldV].Count==0)
+                        DatasByLabel.Remove(oldV);
+                    if(!DatasByLabel.ContainsKey(newV))
+                        DatasByLabel[newV]=new List<Data>();
+                    DatasByLabel[newV].Add(data);
+ 
+                changeLabelAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeClips(Data superData,List<EffectClipForm.Data> oldV,List<EffectClipForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeClipsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

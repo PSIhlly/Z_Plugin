@@ -41,6 +41,14 @@ public enum EquipPartType
     Head=3,
     Body=4,
 }
+public enum SkillType
+{
+    LightAttack,
+    HeavyAttack,
+    E,
+    Q,
+    Passive
+}
 namespace Form
 {
 

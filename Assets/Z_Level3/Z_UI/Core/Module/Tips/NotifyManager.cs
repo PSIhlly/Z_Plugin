@@ -14,15 +14,17 @@ namespace Z_Ui.Notify
         public Sprite sprite;
         public EntryItem parent;
         public int deepth;
+        public int id = 1;
         public Dictionary<string, EntryItem> subs=new Dictionary<string, EntryItem>();
-        public void Add(string name,Sprite icon=null)
+        public void Add(string name,Sprite icon=null,int id=0)
         {
             subs[name] = new EntryItem()
             {
                 content = name,
                 sprite = icon,
                 parent= this,
-                deepth= deepth+1
+                deepth= deepth+1,
+                id= id
             };
         }
         public bool IsChildOf(EntryItem item)

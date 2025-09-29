@@ -221,6 +221,16 @@ public class GameEventController : Z_Controller<GameManager>, IZ_Listener<Collid
         }
         return res;
     }
+    public EntryItem GetTriggerConditionEntry()
+    {
+        var res = new EntryItem();
+        foreach (var data in EventTriggerForm.DataByName.Values)
+        {
+            res.Add(TextManager.instance.GetTxt(data.name),id:data.uid);
+          
+        }
+        return res;
+    }
     public EntryItem GetCmdEntry(EventType objectType, string retType)
     {
         var res = new EntryItem();

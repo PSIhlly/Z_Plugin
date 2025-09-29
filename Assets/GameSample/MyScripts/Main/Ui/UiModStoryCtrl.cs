@@ -52,6 +52,11 @@ namespace Ui.ModStory
                 model.curUi = view.page_ModStoryCharacter;
                 Refresh();
             });
+            view.btn_skill.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStorySkill;
+                Refresh();
+            });
             view.btn_item.onClick.AddListener(() =>
             {
                 model.curUi = view.page_ModStoryItem;
@@ -60,6 +65,11 @@ namespace Ui.ModStory
             view.btn_mapObject.onClick.AddListener(() =>
             {
                 model.curUi = view.page_ModStoryMapObject;
+                Refresh();
+            });
+            view.btn_effect.onClick.AddListener(() =>
+            {
+                model.curUi = view.page_ModStoryEffect;
                 Refresh();
             });
             view.btn_event.onClick.AddListener(() =>
@@ -91,11 +101,17 @@ namespace Ui.ModStory
             view.page_ModStoryCharacter.SetActive(model.curUi == view.page_ModStoryCharacter);
             view.sta_character.ChangeState(model.curUi == view.page_ModStoryCharacter ? 1 : 0);
 
+            view.page_ModStorySkill.SetActive(model.curUi == view.page_ModStorySkill);
+            view.sta_skill.ChangeState(model.curUi == view.page_ModStorySkill ? 1 : 0);
+
             view.page_ModStoryItem.SetActive(model.curUi == view.page_ModStoryItem);
             view.sta_item.ChangeState(model.curUi == view.page_ModStoryItem ? 1 : 0);
 
             view.page_ModStoryMapObject.SetActive(model.curUi == view.page_ModStoryMapObject);
             view.sta_mapObject.ChangeState(model.curUi == view.page_ModStoryMapObject ? 1 : 0);
+
+            view.page_ModStoryEffect.SetActive(model.curUi == view.page_ModStoryEffect);
+            view.sta_effect.ChangeState(model.curUi == view.page_ModStoryEffect ? 1 : 0);
 
             view.page_ModStoryEvent.SetActive(model.curUi == view.page_ModStoryEvent);
             view.sta_event.ChangeState(model.curUi == view.page_ModStoryEvent ? 1 : 0);

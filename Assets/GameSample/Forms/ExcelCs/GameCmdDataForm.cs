@@ -222,6 +222,8 @@ namespace Form
 
                 {100005,new Data(100005,"ShowDialog",new List<string>(){"backGround","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$img$$img$\",\"$img$$img$\",\"empty\",\"empty\");","ui","dialog")},
 
+                {100006,new Data(100006,"ShowEffect",new List<string>(){"uid","positionX","positionY","positionZ","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} position({1},{2},{3}) angle{4}","ShowDialog(0,0,0,0,0);","scene","effect")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -235,6 +237,8 @@ namespace Form
     
                         {"ShowDialog",_DataByUid[100005]},
     
+                        {"ShowEffect",_DataByUid[100006]},
+    
                     };
     
                     _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
@@ -246,6 +250,8 @@ namespace Form
                             {("basic","comst"),new List<Data>()},
         
                             {("ui","dialog"),new List<Data>()},
+        
+                            {("scene","effect"),new List<Data>()},
         
                 };
 
@@ -259,11 +265,15 @@ namespace Form
 
                     _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100005]);
 
+                    _DatasByCategoryType[("scene","effect")].Add(_DataByUid[100006]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
         
                             {"basic",new List<Data>()},
+        
+                            {"scene",new List<Data>()},
         
                 };
 
@@ -276,6 +286,8 @@ namespace Form
                     _DatasByCategory["basic"].Add(_DataByUid[100004]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100005]);
+
+                    _DatasByCategory["scene"].Add(_DataByUid[100006]);
 
 
             childInitAction?.Invoke();

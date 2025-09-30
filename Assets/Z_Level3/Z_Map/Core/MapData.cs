@@ -21,6 +21,7 @@ namespace Z_Map
         public Dictionary<(int, int), SortedSet<int>> mapXZ2Y;
 
         protected string mapName => GlobalHelper.GetInternalPrefabName("map");
+        public static string imgName => GlobalHelper.GetInternalPrefabName("img");
         protected string defaultTextureName => "grass";
 
 

@@ -154,7 +154,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
 
             view.ipt_opacity.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].alpha = StringHelper.ToInt(s, 1);
+                parent.model.data.clips[model.id].opacity = StringHelper.ToFloat(s, 1);
                 Refresh();
             };
             view.btn_transparence.onClick.AddListener(() =>
@@ -188,7 +188,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                 view.ipt_posSetZ.Set(clip.pos.z.ToString("0.##"));
 
                 view.ipt_rotate.Set(clip.rot.ToString());
-                view.ipt_opacity.Set(clip.alpha.ToString());
+                view.ipt_opacity.Set(clip.opacity.ToString("0.##"));
 
                 view.ipt_scaleSetX.Set(clip.scale.x.ToString("0.##"));
                 view.ipt_scaleSetY.Set(clip.scale.y.ToString("0.##"));

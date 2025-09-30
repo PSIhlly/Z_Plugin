@@ -57,7 +57,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
-        public static Action<Data,float,float> changeAlphaAction;
+        public static Action<Data,float,float> changeOpacityAction;
                 
         public static Action<Data,bool,bool> changeTransitionAction;
                 
@@ -174,20 +174,20 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private float  _alpha;
+                    private float  _opacity;
                     /// <summary>
                     ///Í¸Ã÷¶È
                     ///</summary>
-                    public float  alpha{
-                                get{return _alpha;}
+                    public float  opacity{
+                                get{return _opacity;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeAlpha(this,_alpha,value); 
+                       ChangeOpacity(this,_opacity,value); 
                     }
         
-                _alpha = value;
+                _opacity = value;
                 }
                  
                      }
@@ -210,7 +210,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string tex,float time,Vector3 pos,float rot,Vector3 scale,float alpha,bool transition)
+            public Data(int uid,string tex,float time,Vector3 pos,float rot,Vector3 scale,float opacity,bool transition)
             {
 
              this.uid = uid;
@@ -219,14 +219,14 @@ public static readonly int autoUidCnt=100;
              this.pos = pos;
              this.rot = rot;
              this.scale = scale;
-             this.alpha = alpha;
+             this.opacity = opacity;
              this.transition = transition;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),tex,time,pos,rot,scale,alpha,transition);
+        return new Data(sameId? uid:uidChain.GetId(),tex,time,pos,rot,scale,opacity,transition);
                 }
             
         }
@@ -314,7 +314,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<float>("alpha"),
+                jo.Get<float>("opacity"),
 
                 jo.Get<bool>("transition")
                     );
@@ -340,7 +340,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<Vector3>("scale",data.scale);
 
-            jo.Set<float>("alpha",data.alpha);
+            jo.Set<float>("opacity",data.opacity);
 
             jo.Set<bool>("transition",data.transition);
 
@@ -481,12 +481,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeAlpha(Data superData,float oldV,float newV)
+            public static void ChangeOpacity(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeAlphaAction?.Invoke(data,oldV,newV);
+                changeOpacityAction?.Invoke(data,oldV,newV);
                 }
                     
             }

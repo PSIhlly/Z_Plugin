@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Ui;
 using Ui.EnterMain;
+using Ui.ModStory.ModStoryEffect.ModStoryEffectUnit;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Z_ByteSerialize;
@@ -60,8 +61,9 @@ public class GameManager : Z_MonoManager<GameManager>
     public GameEventController evtCtrl;
     public GameMapController mapCtrl; 
     public GameCharacterController characterCtrl;
-    public GameItemController objectCtrl;
-    
+    public GameItemController itemCtrl;
+    public GameEffectController effectCtrl;
+
 
     public StoryForm.Data curStory;
     public SceneForm.Data curScene;
@@ -78,7 +80,8 @@ public class GameManager : Z_MonoManager<GameManager>
 
         mapCtrl = new GameMapController(this);
         characterCtrl = new GameCharacterController(this);
-        objectCtrl = new GameItemController(this);
+        itemCtrl = new GameItemController(this);
+        effectCtrl = new GameEffectController(this);
 
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets

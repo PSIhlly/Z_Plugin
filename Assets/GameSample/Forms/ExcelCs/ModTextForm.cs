@@ -400,6 +400,8 @@ namespace Form
 
                 {1210102,new Data(1210102,"triggerCondition","Trigger condition","触发条件")},
 
+                {1210103,new Data(1210103,"Choose effect","Choose effect","选择特效")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -672,6 +674,8 @@ namespace Form
                         {"onTriggerEvent",_DataById[1210101]},
     
                         {"triggerCondition",_DataById[1210102]},
+    
+                        {"Choose effect",_DataById[1210103]},
     
                     };
     

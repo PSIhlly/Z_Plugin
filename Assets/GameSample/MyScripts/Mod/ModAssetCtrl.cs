@@ -290,7 +290,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(key);
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose Idle anim"),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 act?.Invoke(item);
@@ -307,7 +307,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 items.Add(data.name, TexAssetForm.DataByName[data.avatarTexName].sprite);
             }
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose main character"),
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>
             {
                 act?.Invoke(CharacterProductForm.DataByName[item.content]);
@@ -477,6 +477,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
+    }
+    public void ChooseEffectr(string title, Action<EffectForm.Data> act)
+    {
+        var items = new EntryItem();
+        
+            foreach (var data in EffectForm.DataByUid.Values)
+            {
+                items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].sprite);
+            }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+            true, (item) =>
+            {
+                act?.Invoke(EffectForm.DataByName[item.content]);
+                return true;
+            }, items);
     }
     #endregion
     #region skill

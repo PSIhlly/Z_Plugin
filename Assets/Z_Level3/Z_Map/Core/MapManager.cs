@@ -1,13 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
+using Z_Map;
 using Z_Map.Analysis;
 using Z_Map.Form;
+using Z_Math;
+using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
+using static Z_DesignStyle.Z_DoubleDictionary;
+using static Z_Math.Graph;
 
 namespace Z_Map
 {
@@ -18,363 +27,270 @@ namespace Z_Map
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
         public const bool OVERLAY_HIDE = true;
+        public const bool UPDATE_TILE_ALWAYS = false;
     }
 
     public static class GlobalHelper
     {
-        public static string GetTexRealName(string nickName, int animId)
+        public static string GetInternalPrefabName(string name = "")
         {
-            return "b$" + nickName + "$" + animId;
-        }
-        public static string GetTexNickName(string realName)
-        {
-            string[] splt = realName.Split("$");
-            if (splt.Length < 3)
-                return "";
-            return splt[1];
-        }
-        public static string GetMaskRealName(string nickName, int maskId)
-        {
-            return "a$" + nickName + "$" + maskId;
-        }
-
-        public static string GetInternalPrefabName(string name)
-        {
-            return "$" + name;
-        }
-        public static string GetItemTexRealName(string nickName, int prefabId)
-        {
-            return "c$" + nickName + "$" + prefabId;
+            return "z_map$" + name;
         }
     }
-
-
-    public class MapManager : Z_MonoManager<MapManager>
+    public enum MapEventType
     {
-        public Vector3 sizeLimit = new Vector3(1000, 1000, 1000);
-        public MapData data;
-        public GameObject mainGo;
+        Show,
+        AfterUpdate,
+    }
+    public class ItemEvent : Z_Event
+    {
+        public ItemUnit unit;
+        public MapEventType type;
+    }
+    public class ObjectEvent : Z_Event
+    {
+        public ObjectUnit unit;
+        public MapEventType type;
+    }
+    public class TileEvent : Z_Event
+    {
 
+        public TileUnit unit;
+        public MapEventType type;
+    }
 
-        public NavigationController navigationCtrl;
-        public MapUtilController utilCtrl;
-        public MapUnitUtilController unitUtilCtrl;
+    public class CharacterEvent : Z_Event
+    {
+        public CharacterUnit unit;
+        public MapEventType type;
+    }
 
-        private Vector3Int curCenterPos;
-        private Vector3Int viewCenter;
-
-        private List<MapUnitForm.Data> curMapLst = new List<MapUnitForm.Data>();
-
-        public override void Init()
+    public partial class MapUnit : Unit
+    {
+        public MapManager manager => MapManager.instance;
+        public MapUnit(UnitForm.Data data) : base(data)
         {
-            base.Init();
-
-            navigationCtrl = new NavigationController(this);
-
-            utilCtrl = new MapUtilController(this);
-
-            unitUtilCtrl = new MapUnitUtilController(this);
         }
-
-        #region external
-
-        public void Begin(MapData dataCtrl)
+        public TileUnit belongTile
         {
-            End();
-            Init();
-            mainGo.SetActive(true);
-            this.data = dataCtrl;
-
-
-            viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
-
-            foreach (var itemData in ItemUnitForm.DataByUid.Values)
+            get
             {
-                var mapPos = utilCtrl.RealPos2MapPos(itemData.pos);
-                if (utilCtrl.InArea(mapPos))
+                if (this is ObjectUnit obj)
                 {
-                    MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(itemData.unit);
+                    return MapManager.instance.updateCtrl.objectTileDic.Get(obj)[0];
                 }
-            }
-            foreach (var characterData in CharacterUnitForm.DataByUid.Values)
-            {
-                var mapPos = utilCtrl.RealPos2MapPos(characterData.pos);
-                if (utilCtrl.InArea(mapPos))
+                else if (this is ItemUnit item)
                 {
-                    MapUnitForm.DataByUid[dataCtrl.maps[(mapPos.x, mapPos.y, mapPos.z)].uid].unit.Bind(characterData.unit);
+                    return MapManager.instance.updateCtrl.itemTileDic.Get(item)[0];
                 }
-            }
-
-            foreach (var name in dataCtrl.mainData.texsName)
-            {
-                List<Texture2D> lst = new List<Texture2D>();
-                for (int i = 0; i < GlobalSettings.TEX_ANIM_MAX; i++)
+                else if (this is CharacterUnit character)
                 {
-                    var curKey = GlobalHelper.GetTexRealName(name, i);
-                    if (TexAssetForm.DataByName.ContainsKey(curKey))
-                        lst.Add((Texture2D)TexAssetForm.DataByName[curKey].tex);
-                    else
-                        break;
+                    return MapManager.instance.updateCtrl.characterTileDic.Get(character)[0];
                 }
-                unitUtilCtrl.CreateTexAnimVariants(name, lst.ToArray());
-            }
-
-            foreach (var name in dataCtrl.mainData.masksName)
-            {
-                var raws = new Texture2D[] {
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,0)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,1)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,2)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,3)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,4)]?.tex,
-                (Texture2D)TexAssetForm.DataByName[GlobalHelper.GetMaskRealName(name,5)]?.tex
-                };
-                unitUtilCtrl.CreateAlphaVariantsByBasic5(name, raws);
-            }
-
-
-
-            navigationCtrl.Build();
-            mainGo.SetActive(true);
-        }
-        public MapUnitForm.Data AddMap(Vector3Int mapPos)
-        {
-            return data.AddMap(mapPos);
-        }
-        public ItemUnitForm.Data AddItem(Vector3 realPos)
-        {
-            var mapPos = utilCtrl.RealPos2MapPos(realPos);
-            if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
-            {
                 return null;
             }
-            var data = this.data.AddItem();
-            data.pos = realPos;
-            this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit.Bind(data.unit);
-            return data;
-        }
-
-        public void SetPos(Vector3 curCenterPos)
-        {
-            this.curCenterPos = utilCtrl.RealPos2MapPos(curCenterPos);
-        }
-
-        public void End()
-        {
-            if (curMapLst != null)
-                curMapLst.Clear();
-            mainGo.SetActive(false);
-            if (data != null)
-            {
-                data.Unload();
-                data = null;
-            }
-            lastView = (0, 0, 0, 0, 0, 0);
-        }
-
-
-        #endregion
-
-
-        (int, int, int, int, int, int) lastView;
-
-        private void FreshMap()
-        {
-
-            List<MapUnitForm.Data> nowTmp = new List<MapUnitForm.Data>();
-            var viewSize = data.mainData.viewSize;
-            var curView = (viewCenter.x - viewSize.x, viewCenter.x + viewSize.x, viewCenter.y - viewSize.y, viewCenter.y + viewSize.y, viewCenter.z - viewSize.z, viewCenter.z + viewSize.z);
-            (int, int, int, int, int, int) commonView = (Mathf.Max(curView.Item1, lastView.Item1), Mathf.Min(curView.Item2, lastView.Item2),
-                Mathf.Max(curView.Item3, lastView.Item3), Mathf.Min(curView.Item4, lastView.Item4),
-                Mathf.Max(curView.Item5, lastView.Item5), Mathf.Min(curView.Item6, lastView.Item6));
-
-            //old:
-            foreach (var map in curMapLst)
-            {
-                if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
-                    || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
-                     || map.mapPos.z >= curView.Item6 || map.mapPos.z < curView.Item5)
-                {
-                    map.unit.Hide();
-                }
-                else
-                {
-                    nowTmp.Add(map);
-                }
-            }
-            //fill
-            if (curView.Item1 < lastView.Item1)
-            {
-                ShowAndAddLst(nowTmp, curView.Item1, Mathf.Min(lastView.Item1, curView.Item2), curView.Item3, curView.Item4, curView.Item5, curView.Item6);
-            }
-            else if (curView.Item2 > lastView.Item2)
-            {
-                ShowAndAddLst(nowTmp,Mathf.Max(lastView.Item2, curView.Item1),curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
-            }
-
-            if (curView.Item3 < lastView.Item3)
-            {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, curView.Item3, Mathf.Min(lastView.Item3, curView.Item4), curView.Item5, curView.Item6);
-            }
-            else if (curView.Item4 > lastView.Item4)
-            {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, Mathf.Max(lastView.Item4, curView.Item3), curView.Item4, curView.Item5, curView.Item6);
-            }
-
-            if (curView.Item5 < lastView.Item5)
-            {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, curView.Item5, Mathf.Min(lastView.Item5, curView.Item6));
-            }
-            else if (curView.Item6 > lastView.Item6)
-            {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, Mathf.Max(lastView.Item6, curView.Item5), curView.Item6);
-            }
-
-           
-            curMapLst = nowTmp;
-            lastView = curView;
-        }
-        private void ShowAndAddLst(List<MapUnitForm.Data> lst, int minX,int maxX,int minY,int maxY,int minZ,int maxZ)
-        {
-            for (int i = minX; i < maxX; i++)
-            {
-
-                for (int k = minZ; k < maxZ; k++)
-                {
-                    if (!data.mapXZ2Y.ContainsKey((i, k)))
-                        continue;
-                    int yMax = Mathf.Min(data.mapXZ2Y[(i, k)].Max+1, maxY);
-                    int yMin = Mathf.Max(data.mapXZ2Y[(i, k)].Min, minY);
-                    for (int j = yMin; j < yMax; j++)
-                    {
-                        if (!utilCtrl.InArea((i, j, k)))
-                            continue;
-                        var map = data.maps[(i, j, k)];
-                        map.unit.Show();
-                        lst.Add(map);
-                    }
-                }
-            }
-            
-            
-        }
-
-
-        private void UpdateMapInfo()
-        {
-            //update
-            foreach (var map in curMapLst)
-            {
-                map.unit.UpdateInfo();
-            }
-
-        }
-        /// <summary>
-        /// Manage vison
-        /// </summary>
-        private void UpdateVision()
-        {
-            if (GlobalSettings.OVERLAY_HIDE)
-            {
-                var viewSize = data.mainData.viewSize;
-
-                foreach (var curMap in curMapLst)
-                {
-                    curMap.unit.VisOn();
-                }
-                HashSet<(int, int)> visited = new HashSet<(int, int)>();
-                Queue<(int, int)> queue = new Queue<(int, int)>();
-                for (int i = viewCenter.y + 1; i < viewCenter.y + viewSize.y; i++)
-                {
-                    visited.Clear();
-                    queue.Clear();
-                    if (data.maps.ContainsKey((viewCenter.x, i, viewCenter.z)))
-                    {
-                        visited.Add((viewCenter.x, viewCenter.z));
-                        queue.Enqueue((viewCenter.x, viewCenter.z));
-                        while (queue.Count > 0)
-                        {
-                            var cur = queue.Dequeue();
-                            data.maps[(cur.Item1, i, cur.Item2)].unit.VisOff();
-                            for (int x = cur.Item1 - 1; x <= cur.Item1 + 1 && x < viewCenter.x + viewSize.x && x >= viewCenter.x - viewSize.x; x += 2)
-                            {
-                                if (!visited.Contains((x, cur.Item2)) && data.maps.ContainsKey((x, i, cur.Item2)))
-                                {
-                                    visited.Add((x, cur.Item2));
-                                    queue.Enqueue((x, cur.Item2));
-                                }
-                            }
-                            for (int z = cur.Item2 - 1; z <= cur.Item2 + 1 && z < viewCenter.z + viewSize.z && z >= viewCenter.z - viewSize.z; z += 2)
-                            {
-                                if (!visited.Contains((cur.Item1, z)) && data.maps.ContainsKey((cur.Item1, i, z)))
-                                {
-                                    visited.Add((cur.Item1, z));
-                                    queue.Enqueue((cur.Item1, z));
-                                }
-                            }
-
-                        }
-                    }
-                }
-
-            }
-            else
-            {
-                foreach (var curMap in curMapLst)
-                {
-                    if (curMap.mapPos.y <= viewCenter.y)
-                    {
-                        curMap.unit.VisOn();
-                    }
-                    else
-                    {
-                        curMap.unit.VisOff();
-                    }
-                }
-            }
 
         }
 
-
-        public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999)
+        public MapInstance ins
         {
-            return navigationCtrl.GetNextDir(cur, tar, maxStep);
+            set { base.ins = value; }
+            get { return (MapInstance)base.ins; }
         }
-        public void ResetInfo(MapUnit unit = null)
+    }
+    public partial class MapInstance : Instance
+    {
+        public MapUnit unit
         {
-            lastView = (0, 0, 0, 0, 0, 0);
-            foreach (var map in curMapLst)
+            set { base.unit = value; }
+            get { return (MapUnit)base.unit; }
+        }
+        private float degree = 0;
+        public override void VisOn()
+        {
+
+            if (vising)
+                return;
+            vising = true;
+            foreach (var render in renderers)
             {
-                map.unit.Hide();
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                render.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_Show", 1);
+                degree = 1;
+                render.SetPropertyBlock(propBlock);
             }
-            curMapLst.Clear();
-            UpdateInfo(true);
         }
-        public void UpdateInfo(bool forceFresh = false)
+        public override void VisDegree(float degree)
         {
-            UpdateMapInfo();
 
-            if (forceFresh || (curCenterPos - viewCenter).sqrMagnitude > 0.2f)
+            if (degree == this.degree)
+                return;
+            foreach (var render in renderers)
             {
-
-                viewCenter = curCenterPos;
-                if (GlobalSettings.MAP_SHOW_DEBUG)
-                {
-                    Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:" + viewCenter);
-                }
-                FreshMap();
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                render.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_Show", degree);
+                this.degree = degree;
+                render.SetPropertyBlock(propBlock);
             }
-            UpdateVision();
 
         }
-        public void DebugShow()
+        public override void VisOff()
         {
-            foreach (var map in curMapLst)
+            if (!vising)
+                return;
+            vising = false;
+            foreach (var render in renderers)
             {
-                if ((map.unit.ins.transform.GetChild(0).position - map.pos).sqrMagnitude > 0.2)
-                    Debug.Log((map.unit.ins.transform.position - map.pos).sqrMagnitude + "    ->  " + map.pos + " " + map.unit.ins.transform.position);
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                render.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_Show", 0);
+                degree = 0;
+                render.SetPropertyBlock(propBlock);
             }
         }
     }
+}
+
+public class MapManager : Z_MonoManager<MapManager>
+{
+
+    public Vector3 sizeLimit = new Vector3(1000, 1000, 1000);
+    public MapData data;
+    public GameObject mainGo;
+
+
+    public NavigationController navigationCtrl;
+    public MapUtilController utilCtrl;
+    public MapUpdateController updateCtrl;
+
+
+
+
+    public override void Init()
+    {
+        base.Init();
+
+        navigationCtrl = new NavigationController(this);
+
+        utilCtrl = new MapUtilController(this);
+        updateCtrl = new MapUpdateController(this);
+    }
+
+    #region external
+
+    public void Begin(MapData data)
+    {
+        End();
+        Init();
+        mainGo.SetActive(true);
+        this.data = data;
+        updateCtrl.Begin();
+
+
+
+        navigationCtrl.Build();
+        mainGo.SetActive(true);
+    }
+    #region unit
+    public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)
+    {
+        return data.AddTile(mapPos, prms);
+    }
+    public ObjectUnitForm.Data AddObject(string name,Vector3 realPos, string prefabName, object[] prms = null)
+    {
+        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+        {
+            return null;
+        }
+        var data = this.data.AddObject(prefabName, prms);
+        data.name = name;
+        data.pos = realPos;
+        foreach (var m in utilCtrl.GetOverlap(data))
+        {
+            updateCtrl.objectTileDic.Add(data.unit, m);
+        }
+        return data;
+    }
+    public ItemUnitForm.Data AddItem(string name,Vector3 realPos, string prefabName, object[] prms = null)
+    {
+        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+        {
+            return null;
+        }
+        var data = this.data.AddItem(prefabName, prms);
+        data.name= name; ;
+        data.pos = realPos;
+        updateCtrl.itemTileDic.Add(data.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+        return data;
+    }
+    public CharacterUnitForm.Data AddCharacter(string name,Vector3 realPos, string prefabName, bool isMine = false, object[] prms = null)
+    {
+        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+        {
+            return null;
+        }
+        var data = this.data.AddCharacter(prefabName, isMine, prms);
+        data.pos = realPos;
+        updateCtrl.characterTileDic.Add(data.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+        data.name = name;
+        return data;
+    }
+    public void RemoveTile(TileUnitForm.Data form)
+    {
+        data.RemoveTile(form);
+
+        updateCtrl.characterTileDic.Del(form.unit);
+        updateCtrl.itemTileDic.Del(form.unit);
+        updateCtrl.objectTileDic.Del(form.unit);
+    }
+    public void RemoveCharacter(CharacterUnitForm.Data form)
+    {
+        data.RemoveCharacter(form);
+        updateCtrl.characterTileDic.Del(form.unit);
+
+    }
+    public void RemoveItem(ItemUnitForm.Data form)
+    {
+        data.RemoveItem(form);
+        updateCtrl.itemTileDic.Del(form.unit);
+
+    }
+    public void RemoveObject(ObjectUnitForm.Data form)
+    {
+        data.RemoveObject(form);
+        updateCtrl.objectTileDic.Del(form.unit);
+    }
+    #endregion
+    public void SetPos(Vector3 curCenterPos)
+    {
+        updateCtrl.curCenterPos = curCenterPos;
+    }
+
+    public void End()
+    {
+        updateCtrl.End();
+
+        mainGo.SetActive(false);
+        if (data != null)
+        {
+            data.Unload();
+            data = null;
+        }
+
+
+    }
+
+
+    #endregion
+
+
+
+   
+
 }
 

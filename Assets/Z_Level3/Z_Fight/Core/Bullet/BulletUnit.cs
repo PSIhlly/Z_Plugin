@@ -6,16 +6,21 @@ using UnityEngine;
 using Z_ByteSerialize;
 using Z_Fight.Form;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Fight
 {
-    public class BulletUnit : Unit
+    public partial class BulletUnit : Unit
     {
         public BulletUnit(BulletUnitForm.Data data) : base(data)
         {
         }
         public BulletUnitForm.Data data => (BulletUnitForm.Data)_data;
-
+        public BulletInstance ins
+        {
+            set { base.ins = value; }
+            get { return (BulletInstance)base.ins; }
+        }
         public WeaponBulletForm.Data weaponBullet=> WeaponBulletForm.DataById[data.weaponBulletId];
         public Vector3 dir => Quaternion.Euler(data.euler) * Vector3.forward;
 
@@ -38,7 +43,7 @@ namespace Z_Fight
             }
             data.pos = (data.pos + dis * dir);
             data.rangeLast -= dis;
-            if (data.updateType == (int)UpdateType.Always || isShowing)
+            if (data.updateType == UpdateType.Always || isShowing)
             {
                 ins.transform.position = data.pos;
             }

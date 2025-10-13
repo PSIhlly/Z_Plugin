@@ -2,15 +2,22 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Map;
+using Z_Map.Analysis;
 using Z_Map.Form;
+using Z_Math;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
+using static UnityEditor.Progress;
 
 namespace Z_Map
 {
 
-    public class CharacterUnit : Unit
+    public partial class CharacterUnit : MapUnit
     {
         public CharacterUnit(CharacterUnitForm.Data data) : base(data)
         {
@@ -29,62 +36,97 @@ namespace Z_Map
         {
             return typeof(CharacterInstance);
         }
-
+        public override void Show()
+        {
+            base.Show();
+            Z_EventHelper.Invoke(new CharacterEvent()
+            {
+                type = MapEventType.Show,
+                unit = this
+            });
+        }
         public override void UpdateInfo()
         {
-           
+            if (lastUpdateFrame == Time.frameCount)
+                return;
+            lastUpdateFrame = Time.frameCount;
 
-                if (data.updateType== (int)UpdateType.Always||isShowing)
+            if (data.updateType == UpdateType.Always || isShowing)
             {
                 //nav
                 if (data.navEnabled)
                 {
-                    if((data.destination- data.pos).sqrMagnitude< data.alertDis * data.alertDis)
+                    if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
                     {
-                        Vector3 dir = MapManager.instance.GetNavDir(data.pos, data.destination, (int)data.pathDis);
-
-                        ins.transform.position = ins.transform.position + dir * Time.deltaTime * data.speed;
+                        Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis);
+                        Move(data.pos + dir * Time.deltaTime * data.speed);
                     }
-                    
-                }
-                
-                var newMapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
-                if (MapManager.instance.utilCtrl.InArea(newMapPos))
-                {
-                    
-                    var newMap = MapManager.instance.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)];
-                    if(superUnit!=newMap.unit)
-                    {
-                        superUnit.Unbind(this);
-                        newMap.unit.Bind(this);
-                        SubUpdateActive();
-                    }
-                    
-                }
-                var newPos = ins.transform.position;
 
-                /*                //模拟重力
-                                var curMap = map;
-                                while (curMap.scale == Vector3.zero)
-                                {
-                                    var down = new Vector3Int(curMap.mapPos.x, curMap.mapPos.y - 1, curMap.mapPos.z);
-                                    if (MapManager.instance.mapUtilController.InArea(down))
-                                        curMap = MapManager.instance.maps[down.x, down.y, down.z];
-                                    else
-                                        break;
-                                }
-                                if (Mathf.Abs(newPos.y- curMap.GetYByPoint(new Vector2(newPos.x-curMap.pos.x,newPos.z-curMap.pos.z))) > 0.05f)
-                                    newPos.y -= Time.deltaTime;*/
+                }
 
+                //gravity)
+                Move(Vector3.down * Time.deltaTime * 2f);
                 //fix
-                newPos = MapManager.instance.utilCtrl.GetClosestInArea(newPos);
-                ins.transform.position = newPos;
-                
-                data.pos = ins.transform.position;
-                data.euler = ins.transform.eulerAngles;
+                ins?.UpdatePos();
+            }
+
+            Z_EventHelper.Invoke(new CharacterEvent()
+            {
+                type = MapEventType.AfterUpdate,
+                unit = this
+            });
+        }
+        public void Move(Vector3 dir)
+        {
+
+            var selfLength = 0.15f;
+            var offset = Vector3.up * (selfLength);
+
+            var mag = dir.magnitude;
+            HashSet<int> exist = new HashSet<int>() { data.uid };
+            var from = data.pos + offset;
+            var to = from + (mag + selfLength) * (dir / mag);
+
+            float res = mag + selfLength;
+            var floor = manager.updateCtrl.CheckCollide(this, belongTile, from, data.pos - offset, CollideType.CollideOnly);
+
+            if (dir.y < 0 && floor <= selfLength + 0.01f)
+            {
+                dir.y = 0;
+            }
+            else
+            {
+                res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, from, to, CollideType.CollideOnly), res);
 
             }
+            foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
+            {
+                foreach (var obj in manager.updateCtrl.objectTileDic.Get(tile))
+                {
+                    if (exist.Contains(obj.data.uid))
+                        continue;
+                    exist.Add(obj.data.uid);
+                    res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, from, to, CollideType.CollideOnly), res);
+                }
+                foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
+                {
+                    if (exist.Contains(ch.data.uid))
+                        continue;
+                    exist.Add(ch.data.uid);
+
+                    res = Math.Min(manager.updateCtrl.CheckCollide(this, ch, from, to, CollideType.CollideOnly), res);
+
+                }
+            }
+            res -= selfLength;
+            dir *= (res) / mag;
+
+
+            manager.updateCtrl.ApplyMove(this, data.pos + dir, data.euler);
+
+
         }
+
         public override void Remove()
         {
             CharacterUnitForm.RemoveData(data.uid);

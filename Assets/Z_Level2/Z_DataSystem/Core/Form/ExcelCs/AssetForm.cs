@@ -21,6 +21,13 @@ public static readonly int autoIdCnt=10000;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -83,10 +90,16 @@ public static readonly int autoIdCnt=10000;
              this.name = name;
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),name);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"");
+                   private static Data _defaultData=new Data(0,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -190,6 +203,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     return -1;
                 data.id=id;  
             }
+            idChain.PopId(data.id);
 
         DataById[data.id]=data;
     
@@ -208,15 +222,29 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     DataById.Remove(data.id);
     
 
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-            idChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                if(key < idChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(Data data)

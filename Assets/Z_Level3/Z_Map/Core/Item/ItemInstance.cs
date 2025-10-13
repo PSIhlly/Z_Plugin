@@ -5,12 +5,14 @@ using Z_UnitSystem;
 
 namespace Z_Map
 {
-    public class ItemInstance : Instance
+    
+    public class ItemInstance : MapInstance
     {
         public ItemUnit unit
         {
             set { base.unit = value; }
             get { return (ItemUnit)base.unit; }
         }
+
     }
 }

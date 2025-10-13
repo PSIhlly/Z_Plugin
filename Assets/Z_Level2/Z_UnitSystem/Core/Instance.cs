@@ -3,12 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Z_UnitSystem
 {
+    public enum CollideEventType
+    {
+        TriggerEnter,
+        TriggerExit
+    }
+    public class CollideEvent : Z_Event
+    {
+        public CollideEventType type;
+        public Unit a;
+        public Unit b;
+    }
 
     public abstract class Instance: MonoBehaviour
     {
         public Unit unit;
         private BoxCollider[] _boxColliders;
-        protected bool vising;
+        private CapsuleCollider[] _capsuleColliders;
+        public bool vising;
         public BoxCollider[] boxColliders
         {
             get
@@ -16,6 +28,15 @@ namespace Z_UnitSystem
                 if (_boxColliders == null)
                     _boxColliders = GetComponentsInChildren<BoxCollider>();
                 return _boxColliders;
+            }
+        }
+        public CapsuleCollider[] capsuleColliders
+        {
+            get
+            {
+                if (_capsuleColliders == null)
+                    _capsuleColliders = GetComponentsInChildren<CapsuleCollider>();
+                return _capsuleColliders;
             }
         }
         private Renderer[] _renderers;
@@ -48,6 +69,11 @@ namespace Z_UnitSystem
                 render.enabled = false;
             }
         }
+        public virtual void VisDegree(float degree)
+        {
+            if (!vising)
+                return;
+        }
         public virtual void VisOn()
         {
             if (vising)
@@ -58,5 +84,7 @@ namespace Z_UnitSystem
                 render.enabled = true;
             }
         }
+
+       
     }
 }

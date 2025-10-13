@@ -21,6 +21,13 @@ public static readonly int autoUidCnt=1000000;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -43,7 +50,9 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
-        public static Action<Data,int,int> changeUpdatetypeAction;
+        public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
                 
 
 
@@ -171,11 +180,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private int  _updateType;
+                    private UpdateType  _updateType;
                     /// <summary>
                     ///更新方式
                     ///</summary>
-                    public int  updateType{
+                    public UpdateType  updateType{
                                 get{return _updateType;}
  set{
 
@@ -189,7 +198,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType)
+                    private string  _extra;
+                    /// <summary>
+                    ///扩展位
+                    ///</summary>
+                    public string  extra{
+                                get{return _extra;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeExtra(this,_extra,value); 
+                    }
+        
+                _extra = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra)
             {
 
              this.uid = uid;
@@ -199,14 +226,21 @@ public static readonly int autoUidCnt=1000000;
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new Unit(this);
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,extra);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -288,7 +322,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<UpdateType>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -312,7 +348,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<Vector3>("scale",data.scale);
 
-            jo.Set<int>("updateType",data.updateType);
+            jo.Set<UpdateType>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -330,6 +368,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     
@@ -348,15 +387,29 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-            uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                if(key < uidChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(Data data)
@@ -436,12 +489,22 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeUpdatetype(Data superData,int oldV,int newV)
+            public static void ChangeUpdatetype(Data superData,UpdateType oldV,UpdateType newV)
             {
                 if(superData is Data data)
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -42,6 +42,15 @@ namespace Z_Map.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeExtraAction+=ChangeExtra;
+
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -54,8 +63,6 @@ namespace Z_Map.Form
 
         public static Action<Data,int,int> changeUidAction;
                 
-        public static Action<Data,bool,bool> changeIsobstacleAction;
-                
         public static Action<Data,string,string> changeNameAction;
                 
         public static Action<Data,string,string> changePrefabnameAction;
@@ -66,7 +73,9 @@ namespace Z_Map.Form
                 
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
-        public static Action<Data,int,int> changeUpdatetypeAction;
+        public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
                 
 
 
@@ -84,43 +93,31 @@ namespace Z_Map.Form
                     }
                 }
 
-                    private bool  _isObstacle;
-                    /// <summary>
-                    /// «’œ∞≠ŒÔ
-                    ///</summary>
-                    public bool  isObstacle{
-                                get{return _isObstacle;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeIsobstacle(this,_isObstacle,value); 
-                    }
-        
-                _isObstacle = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
-             this.isObstacle = isObstacle;
              this.name = name;
              this.prefabName = prefabName;
              this.pos = pos;
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new ItemUnit(this);
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,extra);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -200,8 +197,6 @@ namespace Z_Map.Form
 
                 jo.Get<int>("uid"),
 
-                jo.Get<bool>("isObstacle"),
-
                 jo.Get<string>("name"),
 
                 jo.Get<string>("prefabName"),
@@ -212,7 +207,9 @@ namespace Z_Map.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<UpdateType>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -226,8 +223,6 @@ namespace Z_Map.Form
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<bool>("isObstacle",data.isObstacle);
-
             jo.Set<string>("name",data.name);
 
             jo.Set<string>("prefabName",data.prefabName);
@@ -238,7 +233,9 @@ namespace Z_Map.Form
 
             jo.Set<Vector3>("scale",data.scale);
 
-            jo.Set<int>("updateType",data.updateType);
+            jo.Set<UpdateType>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -256,6 +253,7 @@ namespace Z_Map.Form
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     
@@ -274,15 +272,29 @@ UnitForm.AddData(data);
                     DataByUid.Remove(data.uid);
     
 UnitForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-            uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                if(key < uidChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(UnitForm.Data data)
@@ -308,16 +320,6 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeUidAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeIsobstacle(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeIsobstacleAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -372,12 +374,22 @@ UnitForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            public static void ChangeUpdatetype(UnitForm.Data superData,UpdateType oldV,UpdateType newV)
             {
                 if(superData is Data data)
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

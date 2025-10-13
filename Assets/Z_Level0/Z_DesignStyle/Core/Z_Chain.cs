@@ -7,7 +7,7 @@ namespace Z_DesignStyle
     {
         public class Chain
         {
-            int cnt;
+            public int cnt;
             public Chain(int cnt)
             {
                 this.cnt = cnt;
@@ -33,7 +33,12 @@ namespace Z_DesignStyle
             }
             private Dictionary<int, IdChainItem> id2ChainItem;
             private IdChainItem chainHead;
-            
+            public int PeekId()
+            {
+                if (chainHead == null)
+                    return -1;
+                return chainHead.v;
+            }
             public int GetId()
             {
                 if (chainHead == null)
@@ -41,6 +46,7 @@ namespace Z_DesignStyle
                 int v = chainHead.v;
 
                 var newHead = chainHead.nxt;
+                newHead.pre = null;
 
                 chainHead.pre = null;
                 chainHead.nxt = null;
@@ -77,6 +83,11 @@ namespace Z_DesignStyle
                 {
                     id2ChainItem[id] = new IdChainItem(id);
                 }
+                if(id2ChainItem[id].nxt!=null|| id2ChainItem[id].pre!=null|| id2ChainItem[id]==chainHead)//double push
+                {
+                    return;
+                }
+
                 id2ChainItem[id].pre = null;
                 id2ChainItem[id].nxt = null;
                 if (chainHead == null)
@@ -110,6 +121,21 @@ namespace Z_DesignStyle
                 id2ChainItem[cnt].nxt = null;
 
                 chainHead = id2ChainItem[1];
+            }
+            public void Debug(int limit=200)
+            {
+                var cur = chainHead;
+                int cnt = 0;
+                string res = "";
+                while(cur!=null&& cnt<limit)
+                {
+                    cnt++;
+
+                    res += cnt+"  :"+cur.v+" "+ (id2ChainItem[cur.v] ==cur)+" pre:"+(id2ChainItem[cur.v].pre!=null? id2ChainItem[cur.v].pre.v:"")+ " nxt:" + (id2ChainItem[cur.v].nxt != null ? id2ChainItem[cur.v].nxt.v : "") + " \n";
+                    cur = cur.nxt;
+                }
+                
+                UnityEngine.Debug.Log(res);
             }
 
         }

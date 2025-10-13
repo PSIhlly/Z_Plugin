@@ -5,12 +5,13 @@ using Ui;
 using Ui.Dialog;
 using UnityEngine;
 using Z_DesignStyle;
+using Z_Ui.Form;
 namespace Z_Ui.Dialog
 {
     public class Settings
     {
             public float autoPlaySpeed;//0~2
-            public float textDisplaySpeed=5;//1~10
+            public float textDisplaySpeed;//1~10
     }
     public enum PlayType
     {
@@ -32,51 +33,47 @@ namespace Z_Ui.Dialog
     {
         public ShowType showType;
     }
-    public class Clip
-    {
-        public string title;
-        public string mainText;
-        public Sprite mainPicture;
-        public Sprite profilePicture;
-    }
     public class DialogManager : Z_Manager<DialogManager>,
         IZ_Listener<ClipPlayEvent>
     {
         //sub
         public Settings settings;
 
-        private List<Clip> clipLst = new List<Clip>();
+        private List<ClipForm.Data> clipLst = new List<ClipForm.Data>();
         private Action onComplete;
+
+        public bool enabled;
+        bool inited;
 
         public override void Init()
         {
+            if (inited)
+                return;
+            inited = true;
             this.Register<ClipPlayEvent>();
-
+            
             settings = new Settings()
             {
                 autoPlaySpeed = 0,
-                textDisplaySpeed = 1,
+                textDisplaySpeed = 5,
             };
 
         }
         #region 开始方法
-        public void Begin(List<string> titleLst, List<string> mainTextLst, List<Sprite> mainPictureLst, List<Sprite> profilePictureLst, Action onComplete)
+        public void Begin(List<string> titleLst, List<string> mainTextLst, List<string> mainPictureLst, List<string> profilePictureLst, Action onComplete)
         {
             clipLst.Clear();
             for (int i = 0, icnt = titleLst.Count; i < icnt; i++)
             {
-                var clip = new Clip();
-                clip.profilePicture = profilePictureLst[i];
-                clip.mainPicture = mainPictureLst[i];
-                clip.mainText = mainTextLst[i];
-                clip.title = titleLst[i];
+                var clip = new ClipForm.Data(-1,titleLst[i], mainTextLst[i], mainPictureLst[i], profilePictureLst[i]);
                 clipLst.Add(clip);
             }
             Begin(clipLst, onComplete);
         }
-        public void Begin(List<Clip> clipLst, Action onComplete)
+        public void Begin(List<ClipForm.Data> clipLst, Action onComplete)
         {
             Init();
+            enabled = true;
             this.clipLst = clipLst;
             this.onComplete = onComplete;
             UiManager.instance.ShowUi<UiDialogCtrl>(new UiDialogParam()
@@ -88,6 +85,7 @@ namespace Z_Ui.Dialog
 
         public void End()
         {
+            enabled = false;
             UiManager.instance.CloseUi<UiDialogCtrl>();
             onComplete?.Invoke();
         }

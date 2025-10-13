@@ -13,7 +13,7 @@ namespace Z_DesignStyle
         public abstract void Destroy();
         public abstract Obj New();
         public abstract void Fresh(Obj obj);
-        public Obj Get()
+        public virtual Obj Get()
         {
             if (pool.Count == 0)
                 pool.Enqueue(New());
@@ -22,7 +22,7 @@ namespace Z_DesignStyle
             Fresh(obj);
             return obj;
         }
-        public void Push(Obj obj)
+        public virtual void Push(Obj obj)
         {
             pool.Enqueue(obj);
             activeObjs.Remove(obj);

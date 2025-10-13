@@ -1,10 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
+using Z_DataSystem;
+using Z_DataSystem.Form;
+using Z_Texture;
 using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Dialog;
+using Z_Ui.Form;
 
 namespace Ui.Dialog
 {
@@ -19,14 +24,29 @@ namespace Ui.Dialog
             {
                 view.sta_autoPlay.ChangeState();
                 DialogManager.instance.settings.autoPlaySpeed = view.sta_autoPlay.state;
+                DialogManager.instance.settings.textDisplaySpeed = 5;
+                UiMainTextCtrl.autoPlaydelay = 5f;
+                parent.view.sub_MainText.Display();
             });
-            view.btn_skip.onClick.AddListener(() =>
+            view.btn_skip.onClickDown=() =>
             {
-                Z_EventHelper.Invoke(new ClipPlayEvent()
-                {
-                    playType = PlayType.clipsOver
-                });
-            });
+                view.sta_autoPlay.ChangeState(0);
+                view.sta_skip.ChangeState(1);
+                UiMainTextCtrl.autoPlaydelay = 0.1f;
+                DialogManager.instance.settings.autoPlaySpeed = 5;
+                DialogManager.instance.settings.textDisplaySpeed = 60;
+                parent.view.sub_MainText.Display();
+
+            };
+            view.btn_skip.onClickUp = () =>
+            {
+                view.sta_skip.ChangeState(0);
+                DialogManager.instance.settings.autoPlaySpeed = view.sta_autoPlay.state;
+                DialogManager.instance.settings.textDisplaySpeed = 5;
+                UiMainTextCtrl.autoPlaydelay = 5f;
+                Debug.Log("danle");
+
+            };
             view.btn_hide.onClick.AddListener(() =>
             {
                 Z_EventHelper.Invoke(new ShowTypeEvent()
@@ -42,9 +62,28 @@ namespace Ui.Dialog
                 });
             });
         }
+        public override void OnHide()
+        {
+            TimeManager.instance.AddNextUpdateWithoutCheckList(() =>
+            {
+                if(!active)
+                {
+                    if (view.sta_skip.state == 1)
+                    {
+                        view.sta_skip.ChangeState(0);
+                        DialogManager.instance.settings.autoPlaySpeed = 0;
+                        DialogManager.instance.settings.textDisplaySpeed = 5;
+                        UiMainTextCtrl.autoPlaydelay = 5f;
+                    }
+                }
+                
+
+            });
+
+        }
         public override void OnShow()
         {
-            view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed);
+            view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed>0?1:0);
         }
     }
     #endregion
@@ -145,12 +184,12 @@ namespace Ui.Dialog
             var interval = Mathf.Max(0.1f, 1f / DialogManager.instance.settings.textDisplaySpeed);
 
             TimeManager.instance.CancelTimer(model.wordTimer);
-            model.wordTimer = TimeManager.instance.StartTimer(interval, Write, uiHolder);
+            model.wordTimer = TimeManager.instance.StartTimer(0,interval, Write, uiHolder);
         }
         public void DelayForOver(float delay)
         {
             TimeManager.instance.CancelTimer(model.overTimer);
-            model.overTimer = TimeManager.instance.StartTimer(delay, () =>
+            model.overTimer = TimeManager.instance.StartTimer(delay,0, () =>
             {
                 Z_EventHelper.Invoke(new ClipPlayEvent()
                 {
@@ -186,13 +225,13 @@ namespace Ui.Dialog
     }
     public partial class UiDialogModel
     {
-        public List<Clip> clips;
+        public List<ClipForm.Data> clips;
         public int curClipId=-1;
         public Timer timer;
     }
     public partial class UiDialogParam
     {
-        public List<Clip> clips;
+        public List<ClipForm.Data> clips;
     }
     public partial class UiDialogCtrl :
         IZ_Listener<ShowTypeEvent>,
@@ -219,8 +258,9 @@ namespace Ui.Dialog
             }
             Display();
         }
-        private void Display(List<Clip> clips = null)
+        private void Display(List<ClipForm.Data> clips = null)
         {
+            model.curClipId = -1;
             if (clips != null)
             {
                 model.clips = clips;
@@ -234,6 +274,7 @@ namespace Ui.Dialog
             model.curClipId++;
             if (model.curClipId >= model.clips.Count)
             {
+
                 Z_EventHelper.Invoke(new ClipPlayEvent()
                 {
                     playType = PlayType.clipsOver
@@ -248,8 +289,12 @@ namespace Ui.Dialog
 
             view.sub_MainText.Display(model.clips[model.curClipId].mainText);
             view.sub_Title.Display(model.clips[model.curClipId].title);
-            view.sub_MainPicture.Display(model.clips[model.curClipId].mainPicture);
-            view.sub_ProfilePicture.Display(model.clips[model.curClipId].profilePicture);
+            var texName = model.clips[model.curClipId].mainPicture;
+            if (TexAssetForm.DataByName.ContainsKey(texName))
+                view.sub_MainPicture.Display(TexAssetForm.DataByName[texName].sprite);
+            texName = model.clips[model.curClipId].profilePicture;
+            if (TexAssetForm.DataByName.ContainsKey(texName))
+                view.sub_ProfilePicture.Display(TexAssetForm.DataByName[texName].sprite);
 
             view.sub_History.AddClip(model.clips[model.curClipId]);
         }
@@ -297,7 +342,7 @@ namespace Ui.Dialog
     }
     public partial class UiHistoryItemParam
     {
-        public Clip clip;
+        public ClipForm.Data clip;
     }
     public partial class UiHistoryItemCtrl
     {
@@ -312,13 +357,17 @@ namespace Ui.Dialog
                 view.txt_title.text = param.clip.title;
 
                 view.img_ProfilePicture.gameObject.SetActive(param.clip.profilePicture!=null);
-                view.img_ProfilePicture.sprite = param.clip.profilePicture;
+
+                if (TexAssetForm.DataByName.ContainsKey(param.clip.profilePicture))
+                    view.img_ProfilePicture.sprite = TexAssetForm.DataByName[param.clip.profilePicture].sprite;
+                else
+                    view.img_ProfilePicture.sprite = TextureHelper.transparentSprite;
             }
         }
     }
     public partial class UiHistoryModel
     {
-        public List<Clip> historyClips=new List<Clip>();
+        public List<ClipForm.Data> historyClips=new List<ClipForm.Data>();
     }
 
     public partial class UiHistoryCtrl
@@ -350,7 +399,7 @@ namespace Ui.Dialog
             }
             con.Refresh();
         }
-        public void AddClip(Clip clip)
+        public void AddClip(ClipForm.Data clip)
         {
             model.historyClips.Add(clip);
             while (model.historyClips.Count > limit)

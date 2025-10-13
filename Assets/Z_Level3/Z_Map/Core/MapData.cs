@@ -9,6 +9,7 @@ using Z_DataSystem.Form;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Map.Form;
+using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
 namespace Z_Map
@@ -16,78 +17,21 @@ namespace Z_Map
     public class MapData
     {
         public MapMainForm.Data mainData;
-        public Dictionary<(int,int,int), MapUnitForm.Data>maps;
-        public Dictionary<(int,int),SortedSet<int>>mapXZ2Y;
+        public Dictionary<(int, int, int), TileUnitForm.Data> maps;
+        public Dictionary<(int, int), SortedSet<int>> mapXZ2Y;
 
-        string mapName = "$map";
-        public MapData(string formData)
+        protected string mapName => GlobalHelper.GetInternalPrefabName("map");
+        public static string imgName => GlobalHelper.GetInternalPrefabName("img");
+        protected string defaultTextureName => "grass";
+
+
+
+        public void Init()
         {
-
-            MapUnitForm.Clear();
-            ItemUnitForm.Clear();
+            TileUnitForm.Clear();
+            ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
-            mainData = MapMainForm.GetDataByJo(JObject.Parse(formData));
-            maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
-            mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
-            var mapDatas = MapUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
-            for (int i = 0; i < mapDatas.Count; i++)
-            {
-                MapUnitForm.AddData(mapDatas[i]);
-                RegisterMap(mapDatas[i]);
-            }
-
-            var itemDatas = ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.itemJa));
-            for (int i = 0; i < itemDatas.Count; i++)
-            {
-                ItemUnitForm.AddData(itemDatas[i]);
-            }
-
-            var charactersDatas = CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
-            for (int i = 0; i < charactersDatas.Count; i++)
-            {
-                CharacterUnitForm.AddData(charactersDatas[i]);
-            }
-
-           
-        }
-        public JObject GetJsonData()
-        {
-            mainData.mapJa = JsonConvert.SerializeObject(MapUnitForm.GetJaByDatas());
-            mainData.itemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
-
-            mainData.characterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
-            return MapMainForm.GetJoByData(mainData);
-        }
-        public MapData()
-        {
-
-            MapUnitForm.Clear();
-            ItemUnitForm.Clear();
-            CharacterUnitForm.Clear();
-            maps = new Dictionary<(int, int, int), MapUnitForm.Data>();
-            mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
             var unitSize = new Vector3(1, 2, 1);
-            Vector3 realPos = Vector3.one; 
-            Vector3Int mapPos= Vector3Int.one;
-            for (int i = 495; i < 505; i++)
-            {
-                realPos.x = i * unitSize.x;
-                mapPos.x = i;
-                for (int j = 500; j < 501; j++)
-                {
-                    realPos.y = j * unitSize.y;
-                    mapPos.y= j;
-
-                    for (int k = 495; k < 505; k++)
-                    {
-                        realPos.z = k * unitSize.z;
-                        mapPos.z = k;
-                        var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0,"grass" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 },{1,0 },{ 2,0} }, mapPos, mapName, realPos, Vector3.zero, Vector3.one, 0);
-                        MapUnitForm.AddData(data);
-                        RegisterMap(data);
-                    }
-                }
-            }
             mainData = new MapMainForm.Data(
                 1,
                 unitSize,
@@ -96,9 +40,55 @@ namespace Z_Map
                "",
                "",
                "",
-                new List<string>() { "grass", "ground","floor","road" },
-                new List<string>() { "alpha"}
+               ""
            );
+            maps = new Dictionary<(int, int, int), TileUnitForm.Data>();
+            mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
+            for (int i = 495; i < 505; i++)
+            {
+                for (int j = 500; j < 501; j++)
+                {
+                    for (int k = 495; k < 505; k++)
+                    {
+                        AddTile(new Vector3Int(i,j,k));
+                    }
+                }
+            }
+            
+        }
+        public void Init(string formData)
+        {
+            TileUnitForm.Clear();
+            ObjectUnitForm.Clear();
+            CharacterUnitForm.Clear();
+            mainData = MapMainForm.GetDataByJo(JObject.Parse(formData));
+            maps = new Dictionary<(int, int, int), TileUnitForm.Data>();
+            mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
+            var mapDatas = GetTileDatasByJa(mainData.mapJa);
+
+
+            for (int i = 0; i < mapDatas.Count; i++)
+            {
+                RegisterNewTile(mapDatas[i]);
+                RegisterMap(mapDatas[i]);
+            }
+            var itemDatas = GetItemDatasByJa(mainData.itemJa);
+            for (int i = 0; i < itemDatas.Count; i++)
+            {
+                RegisterNewItem(itemDatas[i]);
+            }
+
+            var objectDatas = GetObjectDatasByJa(mainData.objectJa);
+            for (int i = 0; i < objectDatas.Count; i++)
+            {
+                RegisterNewObject(objectDatas[i]);
+            }
+
+            var charactersDatas = GetCharacterDatasByJa(mainData.characterJa);
+            for (int i = 0; i < charactersDatas.Count; i++)
+            {
+                RegisterNewCharacter(charactersDatas[i]);
+            }
         }
         public void Unload()
         {
@@ -107,7 +97,7 @@ namespace Z_Map
                 data.unit.Hide();
             }
         }
-        public void RegisterMap(MapUnitForm.Data data)
+        public void RegisterMap(TileUnitForm.Data data)
         {
             maps[(data.mapPos.x, data.mapPos.y, data.mapPos.z)] = data;
 
@@ -115,9 +105,9 @@ namespace Z_Map
                 mapXZ2Y[(data.mapPos.x, data.mapPos.z)] = new SortedSet<int>();
             mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Add(data.mapPos.y);
 
-            
+
         }
-        public void UnRegisterMap(MapUnitForm.Data data)
+        public void UnRegisterMap(TileUnitForm.Data data)
         {
             if (maps.ContainsKey((data.mapPos.x, data.mapPos.y, data.mapPos.z)))
                 maps.Remove((data.mapPos.x, data.mapPos.y, data.mapPos.z));
@@ -125,20 +115,145 @@ namespace Z_Map
             if (mapXZ2Y.ContainsKey((data.mapPos.x, data.mapPos.z)))
                 mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Remove(data.mapPos.y);
         }
-
-        public MapUnitForm.Data AddMap(Vector3Int mapPos)
+        #region unit
+        public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)
         {
-            var data = new MapUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, "grass" } }, new Dictionary<int, string>(), new Dictionary<int, int>() { { 0, 0 }, { 1, 0 },{2,0 } }, mapPos, mapName, mapPos,Vector3.zero,Vector3.one,0);
-            MapUnitForm.AddData(data);
+            var data = GetNewTile(mapPos, prms);
+            RegisterNewTile(data);
             RegisterMap(data);
 
             return data;
         }
-        public ItemUnitForm.Data AddItem()
+        public ItemUnitForm.Data AddItem(string prefabName = "", object[] prms = null)
         {
-            var data = new ItemUnitForm.Data(-1,false,"","", Vector3.zero, Vector3.zero,Vector3.one,0);
-            ItemUnitForm.AddData(data);
+            var data = GetNewItem(prefabName, prms);
+            RegisterNewItem(data);
             return data;
+        }
+        public ObjectUnitForm.Data AddObject(string prefabName = "", object[] prms = null)
+        {
+            var data = GetNewObject(prefabName, prms);
+            RegisterNewObject(data);
+            return data;
+        }
+        public CharacterUnitForm.Data AddCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
+        {
+            var data = GetNewCharacter(prefabName, isMine, prms);
+            RegisterNewCharacter(data);
+            return data;
+        }
+        public void RemoveTile(TileUnitForm.Data data)
+        {
+            UnregisterTile(data);
+        }
+        public void RemoveItem(ItemUnitForm.Data data)
+        {
+            UnregisterItem(data);
+        }
+        public void RemoveObject(ObjectUnitForm.Data data)
+        {
+            UnregisterObject(data);
+        }
+        public void RemoveCharacter(CharacterUnitForm.Data data)
+        {
+            UnregisterCharacter(data);
+        }
+        #endregion
+
+        public virtual JObject GetJsonData()
+        {
+            mainData.mapJa = JsonConvert.SerializeObject(TileUnitForm.GetJaByDatas());
+            mainData.objectJa = JsonConvert.SerializeObject(ObjectUnitForm.GetJaByDatas());
+            mainData.characterJa = JsonConvert.SerializeObject(CharacterUnitForm.GetJaByDatas());
+            mainData.itemJa = JsonConvert.SerializeObject(ItemUnitForm.GetJaByDatas());
+            return MapMainForm.GetJoByData(mainData);
+        }
+
+
+        public virtual CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
+        {
+            return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
+        }
+        public virtual void RegisterNewCharacter(CharacterUnitForm.Data data)
+        {
+            CharacterUnitForm.AddData(data);
+        }
+        public virtual List<CharacterUnitForm.Data> GetCharacterDatasByJa(string ja)
+        {
+            return CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
+        }
+        
+        public virtual ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
+        {
+            return new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
+        }
+        public virtual void RegisterNewItem(ItemUnitForm.Data data)
+        {
+            ItemUnitForm.AddData(data);
+        }
+        public virtual List<ItemUnitForm.Data> GetItemDatasByJa(string ja)
+        {
+            return ItemUnitForm.GetDatasByJa(JArray.Parse(mainData.itemJa));
+        }
+
+
+        public virtual ObjectUnitForm.Data GetNewObject(string prefabName = "",  object[] prms = null)
+        {
+            return new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
+        }
+        
+
+        public virtual void RegisterNewObject(ObjectUnitForm.Data data)
+        {
+            ObjectUnitForm.AddData(data);
+            
+        }
+
+        public virtual List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
+        {
+            return ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
+        }
+        public virtual void UnregisterItem(ItemUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+        public virtual void UnregisterTile(TileUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+        public virtual void UnregisterCharacter(CharacterUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+        public virtual void UnregisterObject(ObjectUnitForm.Data data)
+        {
+            data.unit.Remove();
+        }
+
+        public virtual TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
+        {
+            return new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName,Z_Math.Graph.ElementwiseMultiply( mapPos,mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, "");
+        }
+        public virtual void RegisterNewTile(TileUnitForm.Data data)
+        {
+            TileUnitForm.AddData(data);
+        }
+        public virtual List<TileUnitForm.Data> GetTileDatasByJa(string ja)
+        {
+            return TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
+        }
+
+        public virtual bool CheckItemUnit(ItemUnitForm.Data item)
+        {
+            return InstancePoolManager.instance.GetPrefab(item.prefabName)!=null;
+        }
+        public virtual bool CheckObjectUnit(ObjectUnitForm.Data obj)
+        {
+            return InstancePoolManager.instance.GetPrefab(obj.prefabName) != null;
+        }
+        public virtual bool CheckCharacterUnit(CharacterUnitForm.Data ch)
+        {
+            return InstancePoolManager.instance.GetPrefab(ch.prefabName) != null;
         }
     }
 

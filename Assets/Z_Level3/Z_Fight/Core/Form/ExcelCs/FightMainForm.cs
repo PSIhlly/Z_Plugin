@@ -22,6 +22,13 @@ public static readonly int autoUidCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -168,10 +175,16 @@ public static readonly int autoUidCnt=100;
              this.weaponBulletJa = weaponBulletJa;
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),uidCnt,fightJa,weaponJa,bulletJa,weaponBulletJa);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,0,"","","","");
+                   private static Data _defaultData=new Data(0,0,"","","","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -291,6 +304,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     
@@ -309,15 +323,29 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-            uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                if(key < uidChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(Data data)

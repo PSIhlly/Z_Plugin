@@ -16,3 +16,4 @@ Library/
 /Z_OtherProjects/Z_Tool/Excel2Cs/build
 *.cache
 /Z_OtherProjects/Z_Tool/Excel2Cs/dist
+/obj

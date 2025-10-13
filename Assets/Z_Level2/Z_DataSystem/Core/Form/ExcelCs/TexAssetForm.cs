@@ -31,6 +31,13 @@ namespace Z_DataSystem.Form
 
             AssetForm.changeNameAction+=ChangeName;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -78,10 +85,16 @@ namespace Z_DataSystem.Form
              this.tex = tex;
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),name,tex);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",Texture2D.blackTexture);
+                   private static Data _defaultData=new Data(0,"",Texture2D.blackTexture);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -91,6 +104,16 @@ namespace Z_DataSystem.Form
                 {
                     Init();
                     return _DataById;
+                }
+            }
+    
+            static Dictionary<Texture, List<Data>> _DatasByTex;
+            public static Dictionary<Texture, List<Data>> DatasByTex
+            {
+                get
+                {
+                    Init();
+                    return _DatasByTex;
                 }
             }
     
@@ -126,6 +149,10 @@ namespace Z_DataSystem.Form
     
                     };
     
+                    _DatasByTex = new Dictionary<Texture, List<Data>>() {
+    
+                };
+
 
             childInitAction?.Invoke();
             
@@ -177,7 +204,7 @@ namespace Z_DataSystem.Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<Texture>("tex")
+                    _defaultData.tex
                     );
 
             return data;
@@ -192,8 +219,6 @@ namespace Z_DataSystem.Form
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
-
-            jo.Set<Texture>("tex",data.tex);
 
             return jo;
         }
@@ -211,10 +236,15 @@ namespace Z_DataSystem.Form
                     return -1;
                 data.id=id;  
             }
+            idChain.PopId(data.id);
 
         DataById[data.id]=data;
     
                     DataByName[data.name]=data;
+    
+                    if(!DatasByTex.ContainsKey(data.tex))
+                        DatasByTex[data.tex]=new List<Data>();
+                    DatasByTex[data.tex].Add(data);
     
 AssetForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -232,18 +262,34 @@ AssetForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
+                    DatasByTex[data.tex].Remove(data);
+                    if(DatasByTex[data.tex].Count==0)
+                        DatasByTex.Remove(data.tex);
+    
 AssetForm.RemoveData(id);
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-            idChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                if(key < idChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(AssetForm.Data data)
@@ -291,6 +337,13 @@ AssetForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
+                    DatasByTex[oldV].Remove(data);
+                    if(DatasByTex[oldV].Count==0)
+                        DatasByTex.Remove(oldV);
+                    if(!DatasByTex.ContainsKey(newV))
+                        DatasByTex[newV]=new List<Data>();
+                    DatasByTex[newV].Add(data);
+ 
                 changeTexAction?.Invoke(data,oldV,newV);
                 }
                     

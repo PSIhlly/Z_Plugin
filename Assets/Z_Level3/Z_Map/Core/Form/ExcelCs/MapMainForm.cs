@@ -22,6 +22,13 @@ public static readonly int autoUidCnt=1000000;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -42,13 +49,11 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeMapjaAction;
                 
-        public static Action<Data,string,string> changeItemjaAction;
+        public static Action<Data,string,string> changeObjectjaAction;
                 
         public static Action<Data,string,string> changeCharacterjaAction;
                 
-        public static Action<Data,List<string>,List<string>> changeTexsnameAction;
-                
-        public static Action<Data,List<string>,List<string>> changeMasksnameAction;
+        public static Action<Data,string,string> changeItemjaAction;
                 
 
 
@@ -145,20 +150,20 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private string  _itemJa;
+                    private string  _objectJa;
                     /// <summary>
-                    ///物体数据
+                    ///景物数据
                     ///</summary>
-                    public string  itemJa{
-                                get{return _itemJa;}
+                    public string  objectJa{
+                                get{return _objectJa;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeItemja(this,_itemJa,value); 
+                       ChangeObjectja(this,_objectJa,value); 
                     }
         
-                _itemJa = value;
+                _objectJa = value;
                 }
                  
                      }
@@ -181,43 +186,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private List<string>  _texsName;
+                    private string  _itemJa;
                     /// <summary>
-                    ///贴图名称
+                    ///道具数据
                     ///</summary>
-                    public List<string>  texsName{
-                                get{return _texsName;}
+                    public string  itemJa{
+                                get{return _itemJa;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeTexsname(this,_texsName,value); 
+                       ChangeItemja(this,_itemJa,value); 
                     }
         
-                _texsName = value;
+                _itemJa = value;
                 }
                  
                      }
                     
-                    private List<string>  _masksName;
-                    /// <summary>
-                    ///遮罩名称
-                    ///</summary>
-                    public List<string>  masksName{
-                                get{return _masksName;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeMasksname(this,_masksName,value); 
-                    }
-        
-                _masksName = value;
-                }
-                 
-                     }
-                    
-            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string itemJa,string characterJa,List<string> texsName,List<string> masksName)
+            public Data(int uid,Vector3 mapUnitSize,Vector3Int logicSize,Vector3Int viewSize,string mapJa,string objectJa,string characterJa,string itemJa)
             {
 
              this.uid = uid;
@@ -225,16 +212,21 @@ public static readonly int autoUidCnt=1000000;
              this.logicSize = logicSize;
              this.viewSize = viewSize;
              this.mapJa = mapJa;
-             this.itemJa = itemJa;
+             this.objectJa = objectJa;
              this.characterJa = characterJa;
-             this.texsName = texsName;
-             this.masksName = masksName;
+             this.itemJa = itemJa;
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),mapUnitSize,logicSize,viewSize,mapJa,objectJa,characterJa,itemJa);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","",null,null);
+                   private static Data _defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -314,13 +306,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("mapJa"),
 
-                jo.Get<string>("itemJa"),
+                jo.Get<string>("objectJa"),
 
                 jo.Get<string>("characterJa"),
 
-                jo.Get<List<string>>("texsName"),
-
-                jo.Get<List<string>>("masksName")
+                jo.Get<string>("itemJa")
                     );
 
             return data;
@@ -342,13 +332,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("mapJa",data.mapJa);
 
-            jo.Set<string>("itemJa",data.itemJa);
+            jo.Set<string>("objectJa",data.objectJa);
 
             jo.Set<string>("characterJa",data.characterJa);
 
-            jo.Set<List<string>>("texsName",data.texsName);
-
-            jo.Set<List<string>>("masksName",data.masksName);
+            jo.Set<string>("itemJa",data.itemJa);
 
             return jo;
         }
@@ -366,6 +354,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     
@@ -384,15 +373,29 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     DataByUid.Remove(data.uid);
     
 
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-            uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                if(key < uidChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(Data data)
@@ -462,12 +465,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeItemja(Data superData,string oldV,string newV)
+            public static void ChangeObjectja(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeItemjaAction?.Invoke(data,oldV,newV);
+                changeObjectjaAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -482,22 +485,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeTexsname(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeItemja(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTexsnameAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeMasksname(Data superData,List<string> oldV,List<string> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeMasksnameAction?.Invoke(data,oldV,newV);
+                changeItemjaAction?.Invoke(data,oldV,newV);
                 }
                     
             }

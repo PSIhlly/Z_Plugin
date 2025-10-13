@@ -31,6 +31,13 @@ namespace Z_DataSystem.Form
 
             AssetForm.changeNameAction+=ChangeName;
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -78,10 +85,16 @@ namespace Z_DataSystem.Form
              this.go = go;
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),name,go);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",null);
+                   private static Data _defaultData=new Data(0,"",null);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataById;
@@ -211,6 +224,7 @@ namespace Z_DataSystem.Form
                     return -1;
                 data.id=id;  
             }
+            idChain.PopId(data.id);
 
         DataById[data.id]=data;
     
@@ -233,17 +247,29 @@ AssetForm.AddData(data);
                     DataByName.Remove(data.name);
     
 AssetForm.RemoveData(id);
+            idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataById.Clear();
-    
-                    DataByName.Clear();
-    
-            idChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataById.Keys);
+            foreach(var key in keys)
+            {
+                if(key < idChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(AssetForm.Data data)

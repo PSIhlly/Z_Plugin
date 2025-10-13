@@ -5,12 +5,19 @@ using Z_UnitSystem;
 
 namespace Z_Map
 {
-    public class CharacterInstance : Instance
+    public class CharacterInstance : MapInstance
     {
         public CharacterUnit unit
         {
             set { base.unit = value; }
             get { return (CharacterUnit)base.unit; }
+        }
+        public Vector3 oldPos;
+        public Vector3 step;
+        public void UpdatePos()
+        {
+            step = unit.data.pos - oldPos;
+            oldPos = unit.data.pos;
         }
     }
 }

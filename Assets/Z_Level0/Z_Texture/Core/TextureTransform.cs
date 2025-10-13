@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 namespace Z_Texture
 {
-    public class TextureTransform
+    public static class TextureTransform
     {
 
         public static Texture2D GetTargetSize(Texture2D tex, int width, int height)
@@ -29,7 +29,7 @@ namespace Z_Texture
                 texs[i]=GetTargetSize(texs[i], width, height);
             }
         }
-        public static Texture2D Copy(Texture2D tex)
+        public static Texture2D Copy(this Texture2D tex)
         {
             var texNew = new Texture2D(tex.width, tex.height);
             for(int y=0;y< tex.height;y++)

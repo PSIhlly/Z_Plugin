@@ -12,15 +12,16 @@ namespace Z_Client
     {
         protected string targetIp;
         protected int targetPort;
-
+        protected string streamLock = "stream";
 
         public ClientSender(string targetIp, int targetPort)
         {
             this.targetIp = targetIp;
             this.targetPort = targetPort;
         }
-        public virtual void Send(byte[] msg)
+        public virtual bool Send(byte[] msg)
         {
+            return false;
         }
     }
 

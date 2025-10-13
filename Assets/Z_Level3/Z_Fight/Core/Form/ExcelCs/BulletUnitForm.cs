@@ -42,6 +42,15 @@ namespace Z_Fight.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeExtraAction+=ChangeExtra;
+
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
@@ -70,7 +79,9 @@ namespace Z_Fight.Form
                 
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
-        public static Action<Data,int,int> changeUpdatetypeAction;
+        public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
                 
 
 
@@ -142,7 +153,7 @@ namespace Z_Fight.Form
                  
                      }
                     
-            public Data(int uid,string name,int weaponBulletId,float rangeLast,int attackerUid,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,int updateType):base(uid,name,prefabName,pos,euler,scale,updateType)
+            public Data(int uid,string name,int weaponBulletId,float rangeLast,int attackerUid,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
             {
 
              this.uid = uid;
@@ -155,14 +166,21 @@ namespace Z_Fight.Form
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.extra = extra;
 
                     _unit=new BulletUnit(this);
 
             }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),name,weaponBulletId,rangeLast,attackerUid,prefabName,pos,euler,scale,updateType,extra);
+                }
             
         }
 
-                   public static Data defaultData=new Data(0,"",0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,0);
+                   private static Data _defaultData=new Data(0,"",0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
             static Dictionary<int, Data> _DataByUid;
@@ -258,7 +276,9 @@ namespace Z_Fight.Form
 
                 jo.Get<Vector3>("scale"),
 
-                jo.Get<int>("updateType")
+                jo.Get<UpdateType>("updateType"),
+
+                jo.Get<string>("extra")
                     );
 
             return data;
@@ -288,7 +308,9 @@ namespace Z_Fight.Form
 
             jo.Set<Vector3>("scale",data.scale);
 
-            jo.Set<int>("updateType",data.updateType);
+            jo.Set<UpdateType>("updateType",data.updateType);
+
+            jo.Set<string>("extra",data.extra);
 
             return jo;
         }
@@ -306,6 +328,7 @@ namespace Z_Fight.Form
                     return -1;
                 data.uid=uid;  
             }
+            uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
     
@@ -324,15 +347,29 @@ UnitForm.AddData(data);
                     DataByUid.Remove(data.uid);
     
 UnitForm.RemoveData(uid);
+            uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
         }
         public static void Clear()
         {
             Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                    RemoveData(key);
+            }
 
-                    DataByUid.Clear();
-    
-            uidChain.Clear();
+        }
+        
+        public static void ClearAuto()
+        {
+            Init();
+            var keys = new List<int>(DataByUid.Keys);
+            foreach(var key in keys)
+            {
+                if(key < uidChain.cnt)
+                    RemoveData(key);
+            }
         }
 
          private static void RemoveChildren(UnitForm.Data data)
@@ -442,12 +479,22 @@ UnitForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeUpdatetype(UnitForm.Data superData,int oldV,int newV)
+            public static void ChangeUpdatetype(UnitForm.Data superData,UpdateType oldV,UpdateType newV)
             {
                 if(superData is Data data)
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeExtraAction?.Invoke(data,oldV,newV);
                 }
                     
             }

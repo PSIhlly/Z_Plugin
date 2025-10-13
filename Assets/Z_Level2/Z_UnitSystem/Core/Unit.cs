@@ -5,14 +5,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_UnitSystem.Form;
-
-namespace Z_UnitSystem
+namespace Z_UnitSystem.Form
 {
     public enum UpdateType
     {
         ShowOnly,
         Always,
     }
+}
+namespace Z_UnitSystem
+{
+
+   
 
     public class Unit
     {
@@ -30,10 +34,10 @@ namespace Z_UnitSystem
         public List<Unit> subUnits=new List<Unit>();
         public Unit superUnit;
 
-        private int lastUpdateFrame;
+        protected int lastUpdateFrame;
         public bool isShowing => ins != null && ins.gameObject != null && ins.gameObject.activeSelf;
 
-        public bool isVising => isShowing&&ins.GetComponent<Renderer>().enabled;
+        public bool isVising => isShowing&&ins.vising;
 
         public virtual Type GetInsType()
         {
@@ -48,7 +52,6 @@ namespace Z_UnitSystem
                 var go = InstancePoolManager.instance.CreateInstance(prefab);
                 ins = (Instance)go.GetComponent(GetInsType());
             }
-
             if (_data.scale==Vector3.zero)
             {
                 foreach (var bc in ins.boxColliders)
@@ -102,6 +105,17 @@ namespace Z_UnitSystem
             foreach (var unit in subUnits)
             {
                 unit.VisOff();
+            }
+            return true;
+        }
+        public virtual bool VisDegree(float degree)
+        {
+            if (ins == null || ins.gameObject == null)
+                return false;
+            ins.VisDegree(degree);
+            foreach (var unit in subUnits)
+            {
+                unit.VisDegree(degree);
             }
             return true;
         }
@@ -185,5 +199,25 @@ namespace Z_UnitSystem
             Hide();
             UnitForm.RemoveData(data.uid);
         }
+        public virtual void OnEnter(Unit unit)
+        {
+            Z_EventHelper.Invoke(new CollideEvent()
+            {
+                type = CollideEventType.TriggerEnter,
+                a = this,
+                b = unit
+            });
+        }
+        public virtual void OnExit(Unit unit)
+        {
+            Z_EventHelper.Invoke(new CollideEvent()
+            {
+                type = CollideEventType.TriggerExit,
+                a = this,
+                b = unit
+            });
+        }
     }
+
+    
 }

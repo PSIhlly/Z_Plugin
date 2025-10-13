@@ -4,9 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-
 namespace Ui.Dialog
+
 {
+
+
+
+
+
+
 
 
 
@@ -114,6 +120,8 @@ namespace Ui.Dialog
         
     }
 
+
+
     public partial class UiMainPictureParam:UiParam
     {
     }
@@ -159,6 +167,8 @@ namespace Ui.Dialog
     {
         
     }
+
+
 
     public partial class UiFuncParam:UiParam
     {
@@ -216,6 +226,8 @@ namespace Ui.Dialog
         
     }
 
+
+
     public partial class UiTitleParam:UiParam
     {
     }
@@ -261,6 +273,8 @@ namespace Ui.Dialog
     {
         
     }
+
+
 
     public partial class UiMainTextParam:UiParam
     {
@@ -309,6 +323,8 @@ namespace Ui.Dialog
     {
         
     }
+
+
 
     public partial class UiProfilePictureParam:UiParam
     {

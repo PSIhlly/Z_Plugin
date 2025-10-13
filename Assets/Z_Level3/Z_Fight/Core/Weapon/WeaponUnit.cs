@@ -6,16 +6,23 @@ using UnityEngine;
 using Z_ByteSerialize;
 using Z_Debug;
 using Z_Fight.Form;
+using Z_Map;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Fight
 {
-    public class WeaponUnit : Unit
+    public partial class WeaponUnit : Unit
     {
         public WeaponUnit(WeaponUnitForm.Data data):base(data)
         {
         }
         public WeaponUnitForm.Data data=>(WeaponUnitForm.Data)_data;
+        public WeaponInstance ins
+        {
+            set { base.ins = value; }
+            get { return (WeaponInstance)base.ins; }
+        }
 
         public WeaponBulletForm.Data weaponBullet(int weaponBulletAid) => WeaponBulletForm.DataById[data.weaponBulletsId[weaponBulletAid]];
    
@@ -48,7 +55,8 @@ namespace Z_Fight
                         pos: data.pos + cur.attackPos,
                         euler: Quaternion.LookRotation(dir).eulerAngles,
                         scale: Vector3.one,
-                        updateType: 0
+                        updateType: 0,
+                        ""
                     );
                     FightManager.instance.AddUnit(bulletData.unit);
                 }
@@ -88,7 +96,7 @@ namespace Z_Fight
 
         public override void UpdateInfo()
         {
-            if ((data.updateType == (int)UpdateType.Always || isShowing))
+            if ((data.updateType == UpdateType.Always || isShowing))
             {
                 //持握姿势影响
                 data.pos = superUnit.data.pos;

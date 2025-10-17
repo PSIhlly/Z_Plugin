@@ -107,6 +107,7 @@ namespace {self.file_namespace}
 {self.add_str}
 {add_op_base_str}
             childAddAction?.Invoke(data);
+            addAction?.Invoke(data);
             return data.{self.id_str};
         }}
         public static void RemoveData(int {self.id_str})
@@ -120,6 +121,7 @@ namespace {self.file_namespace}
 {remove_op_base_str}
             {self.id_str}Chain.PushId(data.{self.id_str});
             childRemoveAction?.Invoke(data);
+            removeAction?.Invoke(data);
         }}
         public static void Clear()
         {{
@@ -296,6 +298,8 @@ namespace {self.file_namespace}
         private static bool inited;
 {self.id_chain_get}
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;

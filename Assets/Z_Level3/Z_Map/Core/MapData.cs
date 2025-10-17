@@ -14,7 +14,7 @@ using Z_UnitSystem.Form;
 
 namespace Z_Map
 {
-    public class MapData
+    public class MapInfo
     {
         public MapMainForm.Data mainData;
         public Dictionary<(int, int, int), TileUnitForm.Data> maps;
@@ -50,11 +50,11 @@ namespace Z_Map
                 {
                     for (int k = 495; k < 505; k++)
                     {
-                        AddTile(new Vector3Int(i,j,k));
+                        AddTile(new Vector3Int(i, j, k));
                     }
                 }
             }
-            
+
         }
         public void Init(string formData)
         {
@@ -182,7 +182,7 @@ namespace Z_Map
         {
             return CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
         }
-        
+
         public virtual ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
         {
             return new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
@@ -197,16 +197,16 @@ namespace Z_Map
         }
 
 
-        public virtual ObjectUnitForm.Data GetNewObject(string prefabName = "",  object[] prms = null)
+        public virtual ObjectUnitForm.Data GetNewObject(string prefabName = "", object[] prms = null)
         {
             return new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
         }
-        
+
 
         public virtual void RegisterNewObject(ObjectUnitForm.Data data)
         {
             ObjectUnitForm.AddData(data);
-            
+
         }
 
         public virtual List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
@@ -232,7 +232,7 @@ namespace Z_Map
 
         public virtual TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
         {
-            return new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName,Z_Math.Graph.ElementwiseMultiply( mapPos,mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, "");
+            return new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, "");
         }
         public virtual void RegisterNewTile(TileUnitForm.Data data)
         {
@@ -245,7 +245,7 @@ namespace Z_Map
 
         public virtual bool CheckItemUnit(ItemUnitForm.Data item)
         {
-            return InstancePoolManager.instance.GetPrefab(item.prefabName)!=null;
+            return InstancePoolManager.instance.GetPrefab(item.prefabName) != null;
         }
         public virtual bool CheckObjectUnit(ObjectUnitForm.Data obj)
         {

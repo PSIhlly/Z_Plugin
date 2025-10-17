@@ -35,6 +35,8 @@ public static readonly int autoUidCnt=1000000;
 
         public static Z_Chain.Chain uidChain ;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
@@ -360,6 +362,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
 
             childAddAction?.Invoke(data);
+            addAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
@@ -375,6 +378,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
+            removeAction?.Invoke(data);
         }
         public static void Clear()
         {

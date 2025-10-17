@@ -16,9 +16,9 @@ using Z_UnitSystem;
 using Z_UnitSystem.Form;
 using static UnityEditor.Progress;
 
-    public class GameMapData:MapData
-    {
-      
+public class GameMapData : MapInfo
+{
+
     public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
     {
         var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
@@ -27,11 +27,11 @@ using static UnityEditor.Progress;
         var pdt = form.unit.productInfo;
         return form;
     }
-   
+
     public override List<CharacterUnitForm.Data> GetCharacterDatasByJa(string ja)
     {
         return CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
-        
+
     }
     public override ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
     {
@@ -40,10 +40,10 @@ using static UnityEditor.Progress;
     }
     public override ObjectUnitForm.Data GetNewObject(string prefabName = "", object[] prms = null)
     {
-        var form= new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
+        var form = new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, "");
         return form;
     }
-   
+
     public override List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
     {
         return ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
@@ -58,7 +58,7 @@ using static UnityEditor.Progress;
 
         return form;
     }
- 
+
     public override List<TileUnitForm.Data> GetTileDatasByJa(string ja)
     {
         return TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
@@ -66,9 +66,9 @@ using static UnityEditor.Progress;
     public override bool CheckItemUnit(ItemUnitForm.Data item)
     {
         int id = AssetManager.GetKeyId(item.name);
-        if(ItemProductForm.DataByUid.ContainsKey(id))
+        if (ItemProductForm.DataByUid.ContainsKey(id))
         {
-            if(ItemProductForm.DataByUid[id].name== AssetManager.GetKeyName(item.name))
+            if (ItemProductForm.DataByUid[id].name == AssetManager.GetKeyName(item.name))
                 return base.CheckItemUnit(item);
         }
         return false;

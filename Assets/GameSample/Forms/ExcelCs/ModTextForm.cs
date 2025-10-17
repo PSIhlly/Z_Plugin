@@ -55,6 +55,8 @@ namespace Form
 
         public static Z_Chain.Chain idChain =>TextBaseForm.idChain;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
@@ -776,6 +778,7 @@ namespace Form
     
 TextBaseForm.AddData(data);
             childAddAction?.Invoke(data);
+            addAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
@@ -793,6 +796,7 @@ TextBaseForm.AddData(data);
 TextBaseForm.RemoveData(id);
             idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
+            removeAction?.Invoke(data);
         }
         public static void Clear()
         {

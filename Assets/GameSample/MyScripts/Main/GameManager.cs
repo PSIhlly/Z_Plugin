@@ -24,6 +24,8 @@ using Z_Texture;
 using Z_Ui;
 using Z_UnitSystem;
 
+
+
 public class CameraMoveEvent : Z_Event
 {
 
@@ -114,6 +116,9 @@ public class GameManager : Z_MonoManager<GameManager>
         }
 
         saveCtrl.LoadOverview();
+
+
+
 
         RegisterInputDefault();
     }

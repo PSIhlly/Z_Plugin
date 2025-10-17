@@ -59,6 +59,8 @@ namespace Form
 
         public static Z_Chain.Chain uidChain =>ParamForm.uidChain;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
@@ -282,6 +284,7 @@ private set{
     
 ParamForm.AddData(data);
             childAddAction?.Invoke(data);
+            addAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
@@ -301,6 +304,7 @@ ParamForm.AddData(data);
 ParamForm.RemoveData(uid);
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
+            removeAction?.Invoke(data);
         }
         public static void Clear()
         {

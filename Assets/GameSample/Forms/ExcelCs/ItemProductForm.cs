@@ -55,6 +55,8 @@ namespace Form
 
         public static Z_Chain.Chain uidChain =>ProductForm.uidChain;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
@@ -561,6 +563,7 @@ namespace Form
     
 ProductForm.AddData(data);
             childAddAction?.Invoke(data);
+            addAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
@@ -590,6 +593,7 @@ ProductForm.AddData(data);
 ProductForm.RemoveData(uid);
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
+            removeAction?.Invoke(data);
         }
         public static void Clear()
         {

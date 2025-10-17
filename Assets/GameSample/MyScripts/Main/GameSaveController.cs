@@ -155,7 +155,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
-    
+
     public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
@@ -173,7 +173,7 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
     }
-    public void SaveSceneMap(string scenePath, MapData data)
+    public void SaveSceneMap(string scenePath, MapInfo data)
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
     }
@@ -469,7 +469,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
-  
+
     public void LoadEvent(string storyCoreFolder)
     {
         var pathForm = storyCoreFolder + "/" + eventFormFileName;
@@ -489,7 +489,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
 
     }
-    public MapData LoadSceneMap(string scenePath)
+    public MapInfo LoadSceneMap(string scenePath)
     {
         var mapData = new GameMapData();
         mapData.Init(SaveAndLoad.Load<string>(scenePath));
@@ -581,7 +581,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var itemData in ItemProductForm.DatasByIsproto[true])
             {
-                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label,itemData.uid));
+                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.uid));
             }
         }
 
@@ -591,7 +591,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var characterData in CharacterProductForm.DatasByIsproto[true])
             {
-                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.label,characterData.avatarTexName, characterData.uid));
+                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.label, characterData.avatarTexName, characterData.uid));
             }
         }
 

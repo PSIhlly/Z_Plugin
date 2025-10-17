@@ -75,7 +75,7 @@ public class GameUtilController : Z_Controller<GameManager>
             go.transform.localScale = scales[i];
 
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            var render = go.GetComponent<Renderer>();
+            var render = go.GetComponentInChildren<Renderer>();
             render.GetPropertyBlock(propBlock);
             if(texRealName[i] !=null&& !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
             {

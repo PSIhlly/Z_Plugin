@@ -41,6 +41,8 @@ public static readonly int autoIdCnt=100;
 
         public static Z_Chain.Chain idChain ;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;

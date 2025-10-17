@@ -53,10 +53,10 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadObject(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadCharacter(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadSkill(ModManager.GetStoryCoreFolder(storyFolder));
-            
+
             GameManager.instance.saveCtrl.LoadItem(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadEffect(ModManager.GetStoryCoreFolder(storyFolder));
-            
+
             GameManager.instance.saveCtrl.LoadEvent(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.LoadConfig(ModManager.GetStoryCoreFolder(storyFolder));
 
@@ -70,7 +70,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             SceneForm.AddData(sceneData);
 
             CharacterParamForm.Clear();
-            var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0,default);
+            var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0, default);
             var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, 0f, 5f, 5f, 0, default);
             CharacterParamForm.AddData(hpParamData);
             CharacterParamForm.AddData(speedParamData);
@@ -82,15 +82,16 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             };
             animDic["anim"].animClip.Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
             CharacterProductForm.Clear();
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp",new Dictionary<string,EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false));
 
             ConfigForm.Clear();
-            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1}, new List<int>() { 1}, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName()));
+            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1 }, new List<int>() { 1 }, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName(), CameraMode.Top));
+
 
             var data = new GameMapData();
             data.Init();
             GameManager.instance.saveCtrl.SaveOverview(storyId);
-            
+
             GameManager.instance.saveCtrl.SaveSceneMap(ModManager.GetStoryCoreFolder(storyFolder) + sceneData.uid, data);
             GameManager.instance.saveCtrl.SaveScene(ModManager.GetStoryCoreFolder(storyFolder));
 
@@ -98,6 +99,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.SaveEvent(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.SaveConfig(ModManager.GetStoryCoreFolder(storyFolder));
         }
+        DynamicGlobalSettings.cameraMode = ConfigForm.DataByUid[1].cameraMode;
 
         GameManager.instance.curStory = StoryForm.DataById[storyId];
     }
@@ -154,7 +156,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameManager.instance.saveCtrl.ResetPrefabPool();
 
         UiManager.instance.ShowUi<UiLoadingCtrl>();
-        MapData data;
+        MapInfo data;
 
         data = await Task.Run(() =>
         {

@@ -44,6 +44,8 @@ namespace Z_DataSystem.Form
 
         public static Z_Chain.Chain idChain =>AssetForm.idChain;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
@@ -232,6 +234,7 @@ namespace Z_DataSystem.Form
     
 AssetForm.AddData(data);
             childAddAction?.Invoke(data);
+            addAction?.Invoke(data);
             return data.id;
         }
         public static void RemoveData(int id)
@@ -249,6 +252,7 @@ AssetForm.AddData(data);
 AssetForm.RemoveData(id);
             idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
+            removeAction?.Invoke(data);
         }
         public static void Clear()
         {

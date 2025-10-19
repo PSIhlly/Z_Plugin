@@ -20,7 +20,7 @@ namespace Form
 
     public static partial class ConfigForm
     {
-        public static readonly int autoUidCnt = 100;
+public static readonly int autoUidCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
@@ -28,21 +28,18 @@ namespace Form
 
 
 
-            Z_Json.extra[typeof(Data)] = ((obj) =>
-            {
-                if (obj is Data data)
-                    return GetJoByData(data);
-                return null;
-            }, (jo) =>
-            {
-                return GetDataByJo(jo);
-            }
-            );
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
-
+        
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain;
+        public static Z_Chain.Chain uidChain ;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
@@ -50,291 +47,269 @@ namespace Form
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
-        public static Action<Data, int, int> changeUidAction;
-
-        public static Action<Data, int, int> changeStartsceneidAction;
-
-        public static Action<Data, Vector3, Vector3> changeStartposAction;
-
-        public static Action<Data, int, int> changeMaincharacteruidAction;
-
-        public static Action<Data, List<int>, List<int>> changeDefaultteamAction;
-
-        public static Action<Data, List<int>, List<int>> changeDefaultteamactiveAction;
-
-        public static Action<Data, List<int>, List<int>> changeDefaultbagAction;
-
-        public static Action<Data, string, string> changeOnbegineventAction;
-
-        public static Action<Data, string, string> changeOnendeventAction;
-
-        public static Action<Data, string, string> changeMinimapAction;
-
-        public static Action<Data, CameraMode, CameraMode> changeCameramodeAction;
-
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,int,int> changeStartsceneidAction;
+                
+        public static Action<Data,Vector3,Vector3> changeStartposAction;
+                
+        public static Action<Data,int,int> changeMaincharacteruidAction;
+                
+        public static Action<Data,List<int>,List<int>> changeDefaultteamAction;
+                
+        public static Action<Data,List<int>,List<int>> changeDefaultteamactiveAction;
+                
+        public static Action<Data,List<int>,List<int>> changeDefaultbagAction;
+                
+        public static Action<Data,string,string> changeOnbegineventAction;
+                
+        public static Action<Data,string,string> changeOnendeventAction;
+                
+        public static Action<Data,string,string> changeMinimapAction;
+                
+        public static Action<Data,CameraMode,CameraMode> changeCameramodeAction;
+                
 
 
         public partial class Data
         {
 
-            private int _uid;
-            /// <summary>
-            ///
-            ///</summary>
-            public int uid
-            {
-                get { return _uid; }
-                set
-                {
+                    private int  _uid;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  uid{
+                                get{return _uid;}
+ set{
 
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeUid(this, _uid, value);
+                       ChangeUid(this,_uid,value); 
                     }
-
-                    _uid = value;
+        
+                _uid = value;
                 }
+                 
+                     }
+                    
+                    private int  _startSceneId;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼sceneId
+                    ///</summary>
+                    public int  startSceneId{
+                                get{return _startSceneId;}
+ set{
 
-            }
-
-            private int _startSceneId;
-            /// <summary>
-            ///ï¿½ï¿½Ò³ï¿½Ê¼sceneId
-            ///</summary>
-            public int startSceneId
-            {
-                get { return _startSceneId; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeStartsceneid(this, _startSceneId, value);
+                       ChangeStartsceneid(this,_startSceneId,value); 
                     }
-
-                    _startSceneId = value;
+        
+                _startSceneId = value;
                 }
+                 
+                     }
+                    
+                    private Vector3  _startpos;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼Î»ÖÃ
+                    ///</summary>
+                    public Vector3  startpos{
+                                get{return _startpos;}
+ set{
 
-            }
-
-            private Vector3 _startpos;
-            /// <summary>
-            ///ï¿½ï¿½Ò³ï¿½Ê¼Î»ï¿½ï¿½
-            ///</summary>
-            public Vector3 startpos
-            {
-                get { return _startpos; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeStartpos(this, _startpos, value);
+                       ChangeStartpos(this,_startpos,value); 
                     }
-
-                    _startpos = value;
+        
+                _startpos = value;
                 }
+                 
+                     }
+                    
+                    private int  _mainCharacterUid;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼½ÇÉ«Ãû
+                    ///</summary>
+                    public int  mainCharacterUid{
+                                get{return _mainCharacterUid;}
+ set{
 
-            }
-
-            private int _mainCharacterUid;
-            /// <summary>
-            ///ï¿½ï¿½Ò³ï¿½Ê¼ï¿½ï¿½É«ï¿½ï¿½
-            ///</summary>
-            public int mainCharacterUid
-            {
-                get { return _mainCharacterUid; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeMaincharacteruid(this, _mainCharacterUid, value);
+                       ChangeMaincharacteruid(this,_mainCharacterUid,value); 
                     }
-
-                    _mainCharacterUid = value;
+        
+                _mainCharacterUid = value;
                 }
+                 
+                     }
+                    
+                    private List<int>  _defaultTeam;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼¶ÓÎé
+                    ///</summary>
+                    public List<int>  defaultTeam{
+                                get{return _defaultTeam;}
+ set{
 
-            }
-
-            private List<int> _defaultTeam;
-            /// <summary>
-            ///ï¿½ï¿½Ò³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<int> defaultTeam
-            {
-                get { return _defaultTeam; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeDefaultteam(this, _defaultTeam, value);
+                       ChangeDefaultteam(this,_defaultTeam,value); 
                     }
-
-                    _defaultTeam = value;
+        
+                _defaultTeam = value;
                 }
+                 
+                     }
+                    
+                    private List<int>  _defaultTeamActive;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼³öÕ½¶ÓÎé
+                    ///</summary>
+                    public List<int>  defaultTeamActive{
+                                get{return _defaultTeamActive;}
+ set{
 
-            }
-
-            private List<int> _defaultTeamActive;
-            /// <summary>
-            ///ï¿½ï¿½Ò³ï¿½Ê¼ï¿½ï¿½Õ½ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<int> defaultTeamActive
-            {
-                get { return _defaultTeamActive; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeDefaultteamactive(this, _defaultTeamActive, value);
+                       ChangeDefaultteamactive(this,_defaultTeamActive,value); 
                     }
-
-                    _defaultTeamActive = value;
+        
+                _defaultTeamActive = value;
                 }
+                 
+                     }
+                    
+                    private List<int>  _defaultBag;
+                    /// <summary>
+                    ///Íæ¼Ò³õÊ¼±³°ü
+                    ///</summary>
+                    public List<int>  defaultBag{
+                                get{return _defaultBag;}
+ set{
 
-            }
-
-            private List<int> _defaultBag;
-            /// <summary>
-            ///ï¿½ï¿½Ò³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<int> defaultBag
-            {
-                get { return _defaultBag; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeDefaultbag(this, _defaultBag, value);
+                       ChangeDefaultbag(this,_defaultBag,value); 
                     }
-
-                    _defaultBag = value;
+        
+                _defaultBag = value;
                 }
+                 
+                     }
+                    
+                    private string  _onBeginEvent;
+                    /// <summary>
+                    ///¿ªÊ¼ÊÂ¼þ
+                    ///</summary>
+                    public string  onBeginEvent{
+                                get{return _onBeginEvent;}
+ set{
 
-            }
-
-            private string _onBeginEvent;
-            /// <summary>
-            ///ï¿½ï¿½Ê¼ï¿½Â¼ï¿½
-            ///</summary>
-            public string onBeginEvent
-            {
-                get { return _onBeginEvent; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeOnbeginevent(this, _onBeginEvent, value);
+                       ChangeOnbeginevent(this,_onBeginEvent,value); 
                     }
-
-                    _onBeginEvent = value;
+        
+                _onBeginEvent = value;
                 }
+                 
+                     }
+                    
+                    private string  _onEndEvent;
+                    /// <summary>
+                    ///½áÊøÊÂ¼þ
+                    ///</summary>
+                    public string  onEndEvent{
+                                get{return _onEndEvent;}
+ set{
 
-            }
-
-            private string _onEndEvent;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½
-            ///</summary>
-            public string onEndEvent
-            {
-                get { return _onEndEvent; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeOnendevent(this, _onEndEvent, value);
+                       ChangeOnendevent(this,_onEndEvent,value); 
                     }
-
-                    _onEndEvent = value;
+        
+                _onEndEvent = value;
                 }
+                 
+                     }
+                    
+                    private string  _miniMap;
+                    /// <summary>
+                    ///Ð¡µØÍ¼
+                    ///</summary>
+                    public string  miniMap{
+                                get{return _miniMap;}
+ set{
 
-            }
-
-            private string _miniMap;
-            /// <summary>
-            ///Ð¡ï¿½ï¿½Í¼
-            ///</summary>
-            public string miniMap
-            {
-                get { return _miniMap; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeMinimap(this, _miniMap, value);
+                       ChangeMinimap(this,_miniMap,value); 
                     }
-
-                    _miniMap = value;
+        
+                _miniMap = value;
                 }
+                 
+                     }
+                    
+                    private CameraMode  _cameraMode;
+                    /// <summary>
+                    ///Ïà»úÊÓ½Ç
+                    ///</summary>
+                    public CameraMode  cameraMode{
+                                get{return _cameraMode;}
+ set{
 
-            }
-
-            private CameraMode _cameraMode;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½Ó½ï¿½
-            ///</summary>
-            public CameraMode cameraMode
-            {
-                get { return _cameraMode; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeCameramode(this, _cameraMode, value);
+                       ChangeCameramode(this,_cameraMode,value); 
                     }
-
-                    _cameraMode = value;
+        
+                _cameraMode = value;
                 }
-
-            }
-
-            public Data(int uid, int startSceneId, Vector3 startpos, int mainCharacterUid, List<int> defaultTeam, List<int> defaultTeamActive, List<int> defaultBag, string onBeginEvent, string onEndEvent, string miniMap, CameraMode cameraMode)
+                 
+                     }
+                    
+            public Data(int uid,int startSceneId,Vector3 startpos,int mainCharacterUid,List<int> defaultTeam,List<int> defaultTeamActive,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap,CameraMode cameraMode)
             {
 
-                this.uid = uid;
-                this.startSceneId = startSceneId;
-                this.startpos = startpos;
-                this.mainCharacterUid = mainCharacterUid;
-                this.defaultTeam = defaultTeam;
-                this.defaultTeamActive = defaultTeamActive;
-                this.defaultBag = defaultBag;
-                this.onBeginEvent = onBeginEvent;
-                this.onEndEvent = onEndEvent;
-                this.miniMap = miniMap;
-                this.cameraMode = cameraMode;
+             this.uid = uid;
+             this.startSceneId = startSceneId;
+             this.startpos = startpos;
+             this.mainCharacterUid = mainCharacterUid;
+             this.defaultTeam = defaultTeam;
+             this.defaultTeamActive = defaultTeamActive;
+             this.defaultBag = defaultBag;
+             this.onBeginEvent = onBeginEvent;
+             this.onEndEvent = onEndEvent;
+             this.miniMap = miniMap;
+             this.cameraMode = cameraMode;
 
             }
 
-            public Data Copy(bool sameId = true)
-            {
-                return new Data(sameId ? uid : uidChain.GetId(), startSceneId, startpos, mainCharacterUid, new List<int>(defaultTeam), new List<int>(defaultTeamActive), new List<int>(defaultBag), onBeginEvent, onEndEvent, miniMap, cameraMode);
-            }
-
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterUid,new List<int>(defaultTeam),new List<int>(defaultTeamActive),new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap,cameraMode);
+                }
+            
         }
 
-        private static Data _defaultData = new Data(0, 0, Vector3.zero, 0, null, null, null, "", "", "", CameraMode.Top);
-        public static Data defaultData => _defaultData.Copy();
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,"","","",CameraMode.Overhead);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -343,31 +318,30 @@ namespace Form
         }
         public static void InitInternal()
         {
-            if (inited)
+            if(inited)
                 return;
-            inited = true;
-            uidChain = new Z_Chain.Chain(autoUidCnt);
+            inited=true;  
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
-            _DataByUid = new Dictionary<int, Data>()
-            {
+                _DataByUid = new Dictionary<int, Data>() {
 
-            };
+                };
 
             childInitAction?.Invoke();
+            
 
-
-            foreach (var k in _DataByUid.Keys) { uidChain.PopId(k); }
-
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+             
         }
 
 
         public static List<Data> GetDatasByJa(JArray ja)
         {
             Init();
-            List<Data> lst = new List<Data>();
-            foreach (JObject jo in ja)
+            List<Data> lst=new List<Data>();
+            foreach(JObject jo in ja)
             {
-                if (jo.Get<int>("uid") == 0)
+                if(jo.Get<int>("uid")==0)
                     continue;
                 lst.Add(GetDataByJo(jo));
             }
@@ -377,10 +351,10 @@ namespace Form
         public static JArray GetJaByDatas()
         {
             Init();
-            JArray ja = new JArray();
-            foreach (Data data in _DataByUid.Values)
+            JArray ja=new JArray();
+            foreach(Data data in _DataByUid.Values)
             {
-                if (data.uid == 0)
+                if(data.uid==0)
                     continue;
                 ja.Add(GetJoByData(data));
             }
@@ -391,7 +365,7 @@ namespace Form
         {
             Init();
 
-            Data data = new Data(
+            Data data=new Data(
 
                 jo.Get<int>("uid"),
 
@@ -423,29 +397,29 @@ namespace Form
         {
             Init();
 
-            JObject jo = new JObject();
+            JObject jo=new JObject();
 
-            jo.Set<int>("uid", data.uid);
+            jo.Set<int>("uid",data.uid);
 
-            jo.Set<int>("startSceneId", data.startSceneId);
+            jo.Set<int>("startSceneId",data.startSceneId);
 
-            jo.Set<Vector3>("startpos", data.startpos);
+            jo.Set<Vector3>("startpos",data.startpos);
 
-            jo.Set<int>("mainCharacterUid", data.mainCharacterUid);
+            jo.Set<int>("mainCharacterUid",data.mainCharacterUid);
 
-            jo.Set<List<int>>("defaultTeam", data.defaultTeam);
+            jo.Set<List<int>>("defaultTeam",data.defaultTeam);
 
-            jo.Set<List<int>>("defaultTeamActive", data.defaultTeamActive);
+            jo.Set<List<int>>("defaultTeamActive",data.defaultTeamActive);
 
-            jo.Set<List<int>>("defaultBag", data.defaultBag);
+            jo.Set<List<int>>("defaultBag",data.defaultBag);
 
-            jo.Set<string>("onBeginEvent", data.onBeginEvent);
+            jo.Set<string>("onBeginEvent",data.onBeginEvent);
 
-            jo.Set<string>("onEndEvent", data.onEndEvent);
+            jo.Set<string>("onEndEvent",data.onEndEvent);
 
-            jo.Set<string>("miniMap", data.miniMap);
+            jo.Set<string>("miniMap",data.miniMap);
 
-            jo.Set<CameraMode>("cameraMode", data.cameraMode);
+            jo.Set<CameraMode>("cameraMode",data.cameraMode);
 
             return jo;
         }
@@ -454,34 +428,34 @@ namespace Form
         public static int AddData(Data data)
         {
             Init();
-            if (DataByUid.ContainsKey(data.uid))
+            if(DataByUid.ContainsKey(data.uid))
                 return data.uid;
-            if (data.uid == -1)
-            {
-                int uid = uidChain.GetId();
-                if (uid == -1)
+            if(data.uid==-1)
+            { 
+                int uid=uidChain.GetId();
+                if(uid==-1)
                     return -1;
-                data.uid = uid;
+                data.uid=uid;  
             }
             uidChain.PopId(data.uid);
 
-            DataByUid[data.uid] = data;
-
+        DataByUid[data.uid]=data;
+    
 
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
-        {
+        {            
             Init();
-            if (!DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
+               
+            var data=DataByUid[uid];
 
-            var data = DataByUid[uid];
-
-            DataByUid.Remove(data.uid);
-
+                    DataByUid.Remove(data.uid);
+    
 
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
@@ -491,150 +465,151 @@ namespace Form
         {
             Init();
             var keys = new List<int>(DataByUid.Keys);
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
-                RemoveData(key);
+                    RemoveData(key);
             }
 
         }
-
+        
         public static void ClearAuto()
         {
             Init();
             var keys = new List<int>(DataByUid.Keys);
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
-                if (key < uidChain.cnt)
+                if(key < uidChain.cnt)
                     RemoveData(key);
             }
         }
 
-        private static void RemoveChildren(Data data)
+         private static void RemoveChildren(Data data)
         {
             Init();
-            if (data is Data)
-                RemoveData(data.uid);
+            if(data is Data)
+               RemoveData(data.uid);      
         }
-        private static void AddChildren(Data superData)
+         private static void AddChildren(Data superData)
         {
             Init();
-            if (superData is Data data)
-                AddData(data);
+            if(superData is Data data)
+               AddData(data);      
         }
+        
 
 
 
 
-
-        public static void ChangeUid(Data superData, int oldV, int newV)
-        {
-            if (superData is Data data)
+            public static void ChangeUid(Data superData,int oldV,int newV)
             {
+                if(superData is Data data)
+                {
 
-                changeUidAction?.Invoke(data, oldV, newV);
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeStartsceneid(Data superData, int oldV, int newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeStartsceneid(Data superData,int oldV,int newV)
             {
+                if(superData is Data data)
+                {
 
-                changeStartsceneidAction?.Invoke(data, oldV, newV);
+                changeStartsceneidAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeStartpos(Data superData, Vector3 oldV, Vector3 newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeStartpos(Data superData,Vector3 oldV,Vector3 newV)
             {
+                if(superData is Data data)
+                {
 
-                changeStartposAction?.Invoke(data, oldV, newV);
+                changeStartposAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeMaincharacteruid(Data superData, int oldV, int newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeMaincharacteruid(Data superData,int oldV,int newV)
             {
+                if(superData is Data data)
+                {
 
-                changeMaincharacteruidAction?.Invoke(data, oldV, newV);
+                changeMaincharacteruidAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeDefaultteam(Data superData, List<int> oldV, List<int> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeDefaultteam(Data superData,List<int> oldV,List<int> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeDefaultteamAction?.Invoke(data, oldV, newV);
+                changeDefaultteamAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeDefaultteamactive(Data superData, List<int> oldV, List<int> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeDefaultteamactive(Data superData,List<int> oldV,List<int> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeDefaultteamactiveAction?.Invoke(data, oldV, newV);
+                changeDefaultteamactiveAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeDefaultbag(Data superData, List<int> oldV, List<int> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeDefaultbag(Data superData,List<int> oldV,List<int> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeDefaultbagAction?.Invoke(data, oldV, newV);
+                changeDefaultbagAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeOnbeginevent(Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeOnbeginevent(Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeOnbegineventAction?.Invoke(data, oldV, newV);
+                changeOnbegineventAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeOnendevent(Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeOnendevent(Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeOnendeventAction?.Invoke(data, oldV, newV);
+                changeOnendeventAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeMinimap(Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeMinimap(Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeMinimapAction?.Invoke(data, oldV, newV);
+                changeMinimapAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeCameramode(Data superData, CameraMode oldV, CameraMode newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeCameramode(Data superData,CameraMode oldV,CameraMode newV)
             {
+                if(superData is Data data)
+                {
 
-                changeCameramodeAction?.Invoke(data, oldV, newV);
+                changeCameramodeAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
+            
     }
 }
+        

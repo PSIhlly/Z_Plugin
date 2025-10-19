@@ -575,5 +575,37 @@ namespace Z_Math
             area.GetWorldCorners(cor);
             return new Vector2(cor[3].x - cor[0].x, cor[1].y - cor[0].y);
         }
+
+        /// <summary>
+        /// 计算直角三角形的斜边长度和指定夹角
+        /// </summary>
+        /// <param name="a">第一条直角边长度</param>
+        /// <param name="b">第二条直角边长度</param>
+        /// <param name="hypotenuse">输出：斜边长度</param>
+        /// <param name="angleDegrees">输出：斜边与第一条直角边的夹角（度）</param>
+        public static void Calculate(float a, float b, out float hypotenuse, out float angleDegrees)
+        {
+            // 验证输入（边长必须为正数）
+            if (a <= 0 || b <= 0)
+            {
+                throw new ArgumentException("直角边长度必须为正数");
+            }
+
+            // 1. 计算斜边长度（勾股定理：c = √(a² + b²)）
+            hypotenuse = Mathf.Sqrt(a * a + b * b);
+
+            // 2. 计算夹角（与第一条直角边a的夹角θ）
+            // 原理：tanθ = 对边/邻边 = b/a → θ = arctan(b/a)
+            float angleRadians = Mathf.Atan(b / a); // 结果为弧度
+            angleDegrees = Mathf.Round(RadiansToDegrees(angleRadians)); // 转换为度并保留2位小数
+        }
+
+        /// <summary>
+        /// 弧度转角度
+        /// </summary>
+        public static float RadiansToDegrees(float radians)
+        {
+            return radians * (180 / Mathf.PI);
+        }
     }
 }

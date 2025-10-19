@@ -85,7 +85,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false));
 
             ConfigForm.Clear();
-            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1 }, new List<int>() { 1 }, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName(), CameraMode.Top));
+            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1 }, new List<int>() { 1 }, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName(), CameraMode.Overhead));
 
 
             var data = new GameMapData();
@@ -99,7 +99,6 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.SaveEvent(ModManager.GetStoryCoreFolder(storyFolder));
             GameManager.instance.saveCtrl.SaveConfig(ModManager.GetStoryCoreFolder(storyFolder));
         }
-        DynamicGlobalSettings.cameraMode = ConfigForm.DataByUid[1].cameraMode;
 
         GameManager.instance.curStory = StoryForm.DataById[storyId];
     }
@@ -174,6 +173,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
          }*/
         data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
 
+        DynamicGlobalSettings.cameraMode = ConfigForm.DataByUid[1].cameraMode;
         MapManager.instance.Begin(data);
 
 

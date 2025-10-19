@@ -84,6 +84,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data.model.subPrefabUnitScale[model.id]= model.data.model.subPrefabUnitScale[model.id].NewSetX(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
+            view.btn_image.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.id,model.id);
+                Refresh();
+            });
         }
         public override void OnShow()
         {
@@ -173,6 +178,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             view.btn_.onClick.AddListener(() =>
             {
+                if(model.id==-1)
+                {
+                    ModManager.instance.assetCtrl.CreateObjectUnit(parent.model.data);
+                }
                 parent.model.id = model.id;
                 parent.Refresh();
             });

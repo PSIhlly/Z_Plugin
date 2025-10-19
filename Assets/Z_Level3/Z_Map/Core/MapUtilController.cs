@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map.Form;
@@ -224,6 +225,35 @@ namespace Z_Map
             }
 
             return ans;
+        }
+        public void SetPerspectiveModel(MapUnit tar)
+        {
+            switch (DynamicGlobalSettings.cameraMode)
+            {
+                case CameraMode.Overhead:
+                    foreach (var render in tar.ins.renderers)
+                    {
+                        if (render.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
+                        {
+                            render.transform.localPosition = Vector3.up * tar.ins.transform.localScale.y / 2;
+                            render.transform.localScale = Vector3.one;
+                        }
+                    }
+                    break;
+
+                case CameraMode.Isometric:
+                    foreach (var render in tar.ins.renderers)
+                    {
+                        if (render.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
+                        {
+                            render.transform.localPosition = Vector3.zero;
+                            Graph.Calculate(tar.ins.transform.localScale.z, tar.ins.transform.localScale.y, out var y, out var angle);
+                            render.transform.localScale = new Vector3(tar.ins.transform.localScale.x, y, tar.ins.transform.localScale.z);
+                            render.transform.localEulerAngles = new Vector3(angle, 0, 0);
+                        }
+                    }
+                    break;
+            }
         }
     }
 }

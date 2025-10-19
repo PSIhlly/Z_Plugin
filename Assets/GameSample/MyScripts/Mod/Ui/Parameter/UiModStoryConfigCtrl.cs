@@ -13,6 +13,7 @@ using Z_DataSystem.Form;
 using Z_Text;
 using Z_Ui.Notify;
 using System.Runtime.InteropServices.ComTypes;
+using Z_Map;
 
 namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
 {
@@ -46,6 +47,22 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
                     Refresh();
                 });
             });
+            view.btn_perspective.onClick.AddListener(() =>
+            {
+                var items = new EntryItem();
+                foreach (CameraMode tp in Enum.GetValues(typeof(CameraMode)))
+                    items.Add(tp.ToString(),id:(int)tp);
+
+                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose perspective"),
+                    true, (item) =>
+                    {
+                        GameManager.instance.curConfig.cameraMode = (CameraMode)item.id;
+                        
+
+                        Refresh();
+                        return true;
+                    }, items);
+            });
 
         }
         public override void OnShow()
@@ -58,6 +75,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         {
 
             view.txt_mainCharacter.text = CharacterProductForm.DataByUid[GameManager.instance.curConfig.mainCharacterUid].name;
+            view.txt_perspective.text = TextManager.instance.GetTxt(GameManager.instance.curConfig.cameraMode.ToString());
         }
     }
 

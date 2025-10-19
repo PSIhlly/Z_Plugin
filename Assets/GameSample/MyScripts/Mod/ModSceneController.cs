@@ -8,6 +8,7 @@ using Ui.ModSceneBehaviourUnit;
 using Ui.ModSceneMain;
 using Ui.ModSceneUnit;
 using Ui.ModStory;
+using Unity.Burst.CompilerServices;
 using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
 using UnityEngine;
@@ -113,6 +114,18 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 5, 15);
         CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), mapMgr.data.mainData.mapUnitSize);
+        switch (DynamicGlobalSettings.cameraMode)
+        {
+            case CameraMode.Overhead:
+                CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, 0);
+                CameraInstance.instance.cam.transform.eulerAngles = new Vector3(90, 0, 0);
+                break;
+            case CameraMode.Isometric:
+                CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
+                CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
+                break;
+        }
+
         enable = true;
         waitForActive = false;
         UiManager.instance.ShowUi<UiModSceneMainCtrl>();
@@ -146,14 +159,22 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         // set z
         pos.z = CameraInstance.instance.cam.nearClipPlane;
         // to world
+        Ray ray = CameraInstance.instance.cam.ScreenPointToRay(pos);
         Vector3 worldPosition = CameraInstance.instance.cam.ScreenToWorldPoint(pos);
+        /*;
+        Debug.Log(worldPosition + "  " + CameraInstance.instance.cam.transform.up);
         worldPosition.y = CameraInstance.instance.tarTrs.position.y;
-        var hits = new List<RaycastHit>(Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down));
+        var hits = new List<RaycastHit>(Physics.RaycastAll(worldPosition + CameraInstance.instance.cam.transform.up * 100, -CameraInstance.instance.cam.transform.up));
+    */
+        var hits = new List<RaycastHit>(Physics.RaycastAll(ray , 100));
         hits.Sort((a, b) =>
         {
             return a.distance.CompareTo(b.distance);
         });
-
+        if(hits.Count>0)
+        {
+            worldPosition = new Vector3(hits[0].transform.position.x, CameraInstance.instance.tarTrs.position.y, hits[0].transform.position.z);
+        }
         var hitPos = mapMgr.utilCtrl.RealPos2MapPos(worldPosition);
         //manage
         switch (designType)
@@ -309,7 +330,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newItemData = mapMgr.AddItem(key,finalPos, data.name, prms);
+                                var newItemData = mapMgr.AddItem(key, finalPos, data.name, prms);
                                 newItemData.unit.productInfo = (data.uid, -1);
                                 newItemData.unit.evtDic = data.events;
                                 newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
@@ -389,8 +410,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     {
                         foreach (var hit in hits)
                         {
-                            var ins = hit.transform.parent.GetComponent<Instance>();
-                            if (ins != null && (ins is ObjectInstance || ins is ItemInstance||ins is CharacterInstance))
+                            
+                            var ins = hit.transform.GetComponentInParent<MapInstance>();
+                            if (ins != null && (ins is ObjectInstance || ins is ItemInstance || ins is CharacterInstance))
                             {
                                 UiManager.instance.ShowUi<UiModSceneUnitCtrl>(new UiModSceneUnitParam()
                                 {
@@ -551,7 +573,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         if (!enable)
             return;
 
-            CameraInstance.instance.cam.orthographicSize += evt.delta * -2f;
+        CameraInstance.instance.cam.orthographicSize += evt.delta * -2f;
     }
     #endregion
 

@@ -26,7 +26,7 @@ public interface InternalPlaySceneController
     public void End();
     public void Update();
 
-    
+
 }
 public interface ExternalPlaySceneController
 {
@@ -42,7 +42,7 @@ public interface ExternalPlaySceneController
 
     public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data);
 }
-public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController,IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
+public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
 {
     public PlaySceneController(PlayManager super) : base(super)
     {
@@ -70,8 +70,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     #endregion
 
     #region extern Var
-    public CharacterUnitForm.Data playerM=> _playerM;
-    public CharacterProductForm.Data playerG=> _playerG;
+    public CharacterUnitForm.Data playerM => _playerM;
+    public CharacterProductForm.Data playerG => _playerG;
 
     #endregion
 
@@ -83,8 +83,20 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 5, 15);
         //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
+        switch (DynamicGlobalSettings.cameraMode)
+        {
+            case CameraMode.Overhead:
+                CameraInstance.instance.cam.transform.localPosition = new Vector3(0,8,0);
+                CameraInstance.instance.cam.transform.eulerAngles = new Vector3(90, 0, 0);
+                break;
+            case CameraMode.Isometric:
+                CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
+                CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
+                break;
+        }
+
         setPlayerMove = Vector3.zero;
-         enable = true;
+        enable = true;
         waitForActive = false;
         _characterDic = new Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data>();
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
@@ -97,7 +109,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         foreach (var data in CharacterUnitForm.DataByUid.Values)
         {
             var ch = CharacterProductForm.DataByUid[AssetManager.GetKeyId(data.name)];
-            if (ch.isProto&&!ch.unique)
+            if (ch.isProto && !ch.unique)
             {
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct();
@@ -139,13 +151,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
         var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
-       
+
     }
     public void OnMouseMove(Vector3 pos)
     {
-        SetPlayerRotation( new Vector3(pos.x - InputManager.instance.screenSize.x/2,0, pos.y - InputManager.instance.screenSize.y / 2));
+        SetPlayerRotation(new Vector3(pos.x - InputManager.instance.screenSize.x / 2, 0, pos.y - InputManager.instance.screenSize.y / 2));
     }
-    
+
     public void ForceUpdate()
     {
 
@@ -170,7 +182,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         if (_playerM == null)
         {
-            _playerM = CreateCharacter(_playerG); 
+            _playerM = CreateCharacter(_playerG);
         }
         {
             MapManager.instance.updateCtrl.UpdateInfo();
@@ -205,7 +217,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
     {
-        var unitData=  MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name),_super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
+        var unitData = MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name), _super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
         _characterDic[unitData] = data;
         return unitData;
     }
@@ -216,7 +228,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerPos(Vector3 pos)
     {
-      if (_playerM == null|| _playerM.unit.ins==null)
+        if (_playerM == null || _playerM.unit.ins == null)
             return;
         _playerM.unit.ins.transform.position = pos;
     }
@@ -224,26 +236,27 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         if (_playerM == null || _playerM.unit.ins == null)
             return;
-        if(CharacterParamForm.DataByName.ContainsKey(_playerG.speedParamName))
+        if (CharacterParamForm.DataByName.ContainsKey(_playerG.speedParamName))
         {
             setPlayerMove += dir * (float)_playerG.paramDic[_playerG.speedParamName].v;
-        }else
+        }
+        else
         {
             setPlayerMove += dir;
         }
     }
-    public void SetPlayerRotation(Vector3 dir,float speed=360)
+    public void SetPlayerRotation(Vector3 dir, float speed = 360)
     {
-        if (_playerM == null|| _playerM.unit.ins==null)
+        if (_playerM == null || _playerM.unit.ins == null)
             return;
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-        _playerM.unit.ins.transform.rotation= Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
+        _playerM.unit.ins.transform.rotation = Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
     }
     public void AddMessage(string content)
     {
         var ctrl = UiManager.instance.GetUi<UiPlaySceneMainCtrl>();
-        if(ctrl!=null)
+        if (ctrl != null)
         {
             ctrl.view.page_PlaySceneMessage.AddMessage(content);
         }

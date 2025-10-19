@@ -439,12 +439,16 @@ namespace ModStoryConfig
     {
 
             public Btn btn_mainCharacter;
+            public Btn btn_perspective;
             public Txt txt_mainCharacter;
+            public Txt txt_perspective;
         public UiModStoryConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_mainCharacter = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            txt_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            btn_perspective = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            txt_mainCharacter = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            txt_perspective = uiHolder.elementTrsLst[3].GetComponent<Txt>();
         }
 
     }

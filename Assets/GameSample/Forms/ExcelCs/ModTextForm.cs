@@ -404,6 +404,14 @@ namespace Form
 
                 {1210103,new Data(1210103,"Choose effect","Choose effect","选择特效")},
 
+                {1210104,new Data(1210104,"Choose perspective","Choose perspective","选择视角")},
+
+                {1210105,new Data(1210105,"perspective","Perspective","视角")},
+
+                {1210106,new Data(1210106,"Overhead","Overhead","俯视")},
+
+                {1210107,new Data(1210107,"Isometric","Isometric","斜视")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -678,6 +686,14 @@ namespace Form
                         {"triggerCondition",_DataById[1210102]},
     
                         {"Choose effect",_DataById[1210103]},
+    
+                        {"Choose perspective",_DataById[1210104]},
+    
+                        {"perspective",_DataById[1210105]},
+    
+                        {"Overhead",_DataById[1210106]},
+    
+                        {"Isometric",_DataById[1210107]},
     
                     };
     

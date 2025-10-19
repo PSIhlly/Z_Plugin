@@ -242,25 +242,23 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateObjectUnit(MapObjectForm.Data data)
     {
-        ImportObjectTex(data.name, data.model.subPrefabUnitName.Count);
-
         data.model.subPrefabUnitName.Add("Cube");
         data.model.subPrefabUnitPos.Add(Vector3.zero);
         data.model.subPrefabUnitScale.Add(Vector3.one);
     }
-    public void ImportObjectTex(string name, int id)
+    public void ImportObjectUnitTex(int uid, int id)
     {
 
         AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
         {
 
-            if (MapObjectForm.DataByName[name].model.subUnitTexsName.Count > id)
+            if (MapObjectForm.DataById[uid].model.subUnitTexsName.Count > id)
             {
-                MapObjectForm.DataByName[name].model.subUnitTexsName[id] = form.name;
+                MapObjectForm.DataById[uid].model.subUnitTexsName[id] = form.name;
             }
             else
             {
-                MapObjectForm.DataByName[name].model.subUnitTexsName.Add(form.name);
+                MapObjectForm.DataById[uid].model.subUnitTexsName.Add(form.name);
             }
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
@@ -677,8 +675,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateItemModelUnit(ItemProductForm.Data data)
     {
-        ImportItemModelUnitTex(data.uid, data.model.subPrefabUnitName.Count);
-
         data.model.subPrefabUnitName.Add("Cube");
         data.model.subPrefabUnitPos.Add(Vector3.zero);
         data.model.subPrefabUnitScale.Add(Vector3.one);

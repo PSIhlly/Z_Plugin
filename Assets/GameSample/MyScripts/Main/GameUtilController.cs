@@ -71,7 +71,7 @@ public class GameUtilController : Z_Controller<GameManager>
         for (int i = 0; i < prefabKeys.Count; i++)
         {
             var go = GameObject.Instantiate(AssetManager.instance.GetGameObject(prefabKeys[i]), res.transform);
-            go.transform.localPosition = poss[i] + Vector3.up * scales[i].y / 8f;
+            go.transform.localPosition = poss[i] + Vector3.up * scales[i].y / 8f+    Vector3.up/2;//Ì§¸ß
             go.transform.localScale = scales[i];
 
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();

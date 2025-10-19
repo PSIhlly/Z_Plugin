@@ -1,16 +1,11 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Z_ByteSerialize;
 using Z_Map.Form;
-using Z_UnitSystem;
+using Z_Math;
 
 namespace Z_Map
 {
-    public partial class ItemUnit: MapUnit
+    public partial class ItemUnit : MapUnit
     {
         public ItemUnit(ItemUnitForm.Data data) : base(data)
         {
@@ -22,7 +17,7 @@ namespace Z_Map
             set { base.ins = value; }
             get { return (ItemInstance)base.ins; }
         }
-        
+
 
         public override Type GetInsType()
         {
@@ -31,6 +26,8 @@ namespace Z_Map
         public override void Show()
         {
             base.Show();
+            MapManager.instance.utilCtrl.SetPerspectiveModel(this);
+
             Z_EventHelper.Invoke(new ItemEvent()
             {
                 type = MapEventType.Show,
@@ -57,5 +54,5 @@ namespace Z_Map
             base.Remove();
         }
 
-        }
+    }
 }

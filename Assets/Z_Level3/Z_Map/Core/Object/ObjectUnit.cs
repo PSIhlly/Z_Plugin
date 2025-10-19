@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_Map.Form;
+using Z_Math;
 using Z_UnitSystem;
 
 namespace Z_Map
@@ -30,6 +31,8 @@ namespace Z_Map
         public override void Show()
         {
             base.Show();
+
+            MapManager.instance.utilCtrl.SetPerspectiveModel(this);
             Z_EventHelper.Invoke(new ObjectEvent()
             {
                 type = MapEventType.Show,

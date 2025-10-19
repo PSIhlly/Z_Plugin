@@ -22,8 +22,8 @@ namespace Z_Map
 {
     public enum CameraMode
     {
-        Top,
-        FortyFive,
+        Overhead,
+        Isometric,
     }
 
     public static class GlobalSettings

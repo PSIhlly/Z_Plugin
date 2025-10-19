@@ -1,4 +1,5 @@
 using UnityEngine;
+using Z_Math;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
@@ -36,28 +37,6 @@ namespace Z_Map
             set { base.ins = value; }
             get { return (MapInstance)base.ins; }
         }
-        public override bool VisOn()
-        {
-            if (!base.VisOn())
-                return false;
-            switch (DynamicGlobalSettings.cameraMode)
-            {
-                case CameraMode.Top:
-                    foreach (var render in ins.renderers)
-                    {
-                        render.transform.localPosition = Vector3.up * ins.transform.localScale.y / 2;
-                        render.transform.localScale = Vector3.one;
-                    }
-                    break;
-
-                case CameraMode.FortyFive:
-                    foreach (var render in ins.renderers)
-                    {
-                        render.transform.localPosition = Vector3.up * ins.transform.localScale.y / 2;
-                    }
-                    break;
-            }
-            return true;
-        }
+        
     }
 }

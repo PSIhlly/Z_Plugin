@@ -26,7 +26,6 @@ namespace Z_Map
         public override void Show()
         {
             base.Show();
-            MapManager.instance.utilCtrl.SetPerspectiveModel(this);
 
             Z_EventHelper.Invoke(new ItemEvent()
             {

@@ -32,7 +32,6 @@ namespace Z_Map
         {
             base.Show();
 
-            MapManager.instance.utilCtrl.SetPerspectiveModel(this);
             Z_EventHelper.Invoke(new ObjectEvent()
             {
                 type = MapEventType.Show,

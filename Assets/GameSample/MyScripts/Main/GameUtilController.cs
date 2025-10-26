@@ -25,23 +25,22 @@ public class GameUtilController : Z_Controller<GameManager>
 
         List<bool> showShaddowLst = new List<bool>()
                 {
-                    false,false,true
+                    false,false
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad", "Sphere" }, texRealName, new List<Vector3>() { Vector3.up * 0.4f, Vector3.up * 0.3f, Vector3.up*0.15f}, new List<Vector3>() { Vector3.one , Vector3.one, new Vector3(0.3f, 0.4f, 0.3f)  }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Quad", "Quad"}, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero}, new List<Vector3>() { Vector3.one , Vector3.one }, showShaddowLst);
+        var renders=res.GetComponentsInChildren<Renderer>();
+        renders[0].transform.GetComponent<PerspectiveKeeper>().deepth = 0.01f;
+        renders[1].transform.GetComponent<PerspectiveKeeper>().deepth = 0.05f;
         if (forGame)
         {
+            res.AddComponent<CharacterInstance>();
             //default disable
-            var ins=res.AddComponent<CharacterInstance>();
-            foreach(var r in ins.renderers)
+            foreach (var r in renders)
             {
                 r.enabled = false;
             }
 
-            GameObject.Destroy(res.transform.GetChild(0).gameObject.GetComponent<MeshCollider>());
-            GameObject.Destroy(res.transform.GetChild(1).gameObject.GetComponent<MeshCollider>()); 
-            GameObject.Destroy(res.transform.GetChild(0).gameObject.GetComponent<BoxCollider>());
-            GameObject.Destroy(res.transform.GetChild(1).gameObject.GetComponent<BoxCollider>());
         }
         return res;
     }
@@ -71,7 +70,7 @@ public class GameUtilController : Z_Controller<GameManager>
         for (int i = 0; i < prefabKeys.Count; i++)
         {
             var go = GameObject.Instantiate(AssetManager.instance.GetGameObject(prefabKeys[i]), res.transform);
-            go.transform.localPosition = poss[i] + Vector3.up * scales[i].y / 8f+    Vector3.up/2;//Ì§¸ß
+            go.transform.localPosition = poss[i] +Vector3.up/2;//Ì§¸ß
             go.transform.localScale = scales[i];
 
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();

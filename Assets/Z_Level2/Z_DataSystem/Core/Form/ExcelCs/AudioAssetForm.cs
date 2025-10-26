@@ -11,15 +11,27 @@ using Z_DesignStyle;
 namespace Z_DataSystem.Form
 {
 
-    public static partial class AssetForm
+    public static partial class AudioAssetForm
     {
-public static readonly int autoIdCnt=10000;
+
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
+                AssetForm.childInitAction+=InitInternal;
 
+
+                AssetForm.childRemoveAction+=RemoveChildren;
+                AssetForm.childAddAction+=AddChildren;
+            
+
+            AssetForm.changeIdAction+=ChangeId;
+
+            AssetForm.changeNameAction+=ChangeName;
+
+            AssetForm.changePathAction+=ChangePath;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -32,7 +44,7 @@ public static readonly int autoIdCnt=10000;
         
         private static bool inited;
 
-        public static Z_Chain.Chain idChain ;
+        public static Z_Chain.Chain idChain =>AssetForm.idChain;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
@@ -48,64 +60,10 @@ public static readonly int autoIdCnt=10000;
                 
 
 
-        public partial class Data
+        public partial class Data : AssetForm.Data
         {
 
-                    private int  _id;
-                    /// <summary>
-                    ///
-                    ///</summary>
-                    public int  id{
-                                get{return _id;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeId(this,_id,value); 
-                    }
-        
-                _id = value;
-                }
-                 
-                     }
-                    
-                    private string  _name;
-                    /// <summary>
-                    ///Ãû³Æ£¨Ë÷Òý£©
-                    ///</summary>
-                    public string  name{
-                                get{return _name;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangeName(this,_name,value); 
-                    }
-        
-                _name = value;
-                }
-                 
-                     }
-                    
-                    private string  _path;
-                    /// <summary>
-                    ///Â·¾¶
-                    ///</summary>
-                    public string  path{
-                                get{return _path;}
- set{
-
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
-                    {
-                       ChangePath(this,_path,value); 
-                    }
-        
-                _path = value;
-                }
-                 
-                     }
-                    
-            public Data(int id,string name,string path)
+            public Data(int id,string name,string path):base(id,name,path)
             {
 
              this.id = id;
@@ -145,22 +103,38 @@ public static readonly int autoIdCnt=10000;
                 }
             }
     
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
+            }
+    
 
         static public void Init()
         {
 
-            InitInternal();
+            AssetForm.Init();
+
         }
         public static void InitInternal()
         {
             if(inited)
                 return;
             inited=true;  
-idChain=new Z_Chain.Chain (autoIdCnt);
+
+        
 
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                    };
+    
                     _DatasByPath = new Dictionary<string, List<Data>>() {
     
                 };
@@ -169,7 +143,13 @@ idChain=new Z_Chain.Chain (autoIdCnt);
             childInitAction?.Invoke();
             
 
-foreach(var k in _DataById.Keys){ idChain.PopId(k); }
+            foreach(var data in DataById.Values)
+            {
+                AssetForm.AddData(data);
+            }
+
+
+        
              
         }
 
@@ -246,11 +226,13 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
         DataById[data.id]=data;
     
+                    DataByName[data.name]=data;
+    
                     if(!DatasByPath.ContainsKey(data.path))
                         DatasByPath[data.path]=new List<Data>();
                     DatasByPath[data.path].Add(data);
     
-
+AssetForm.AddData(data);
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.id;
@@ -265,11 +247,13 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                     DataById.Remove(data.id);
     
+                    DataByName.Remove(data.name);
+    
                     DatasByPath[data.path].Remove(data);
                     if(DatasByPath[data.path].Count==0)
                         DatasByPath.Remove(data.path);
     
-
+AssetForm.RemoveData(id);
             idChain.PushId(data.id);
             childRemoveAction?.Invoke(data);
             removeAction?.Invoke(data);
@@ -296,13 +280,13 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             }
         }
 
-         private static void RemoveChildren(Data data)
+         private static void RemoveChildren(AssetForm.Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.id);      
         }
-         private static void AddChildren(Data superData)
+         private static void AddChildren(AssetForm.Data superData)
         {
             Init();
             if(superData is Data data)
@@ -313,7 +297,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
 
 
-            public static void ChangeId(Data superData,int oldV,int newV)
+            public static void ChangeId(AssetForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -323,17 +307,20 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     
             }
             
-            public static void ChangeName(Data superData,string oldV,string newV)
+            public static void ChangeName(AssetForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangePath(Data superData,string oldV,string newV)
+            public static void ChangePath(AssetForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {

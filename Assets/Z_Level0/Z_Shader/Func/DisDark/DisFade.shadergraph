@@ -106,9 +106,6 @@
             "m_Id": "4b1fc6f0558744fcb0de64caf08b7a46"
         },
         {
-            "m_Id": "c5ed585f08b64f6b81b765d72a66949f"
-        },
-        {
             "m_Id": "8f31fcfd3fbd4122abde81b6acf0a76f"
         },
         {
@@ -415,8 +412,8 @@
     ],
     "m_VertexContext": {
         "m_Position": {
-            "x": 1695.0,
-            "y": 358.9999694824219
+            "x": 2247.999755859375,
+            "y": 348.7999572753906
         },
         "m_Blocks": [
             {
@@ -440,6 +437,9 @@
                 "m_Id": "f7457a55bdf242eea060a5cd5e32cf31"
             },
             {
+                "m_Id": "7c78ca29b38d45ce926cae463662c3bf"
+            },
+            {
                 "m_Id": "cc123a64837b46a78059039f3a0c98ea"
             },
             {
@@ -449,16 +449,10 @@
                 "m_Id": "a37de71afbfa40eeacf0bf3b1318b61a"
             },
             {
-                "m_Id": "7c78ca29b38d45ce926cae463662c3bf"
-            },
-            {
                 "m_Id": "89a249ee6ab84ff297a8776f9e46bf5a"
             },
             {
                 "m_Id": "ea43131776724429b1159241c3394168"
-            },
-            {
-                "m_Id": "c5ed585f08b64f6b81b765d72a66949f"
             }
         ]
     },
@@ -475,6 +469,7 @@
     "m_OutputNode": {
         "m_Id": ""
     },
+    "m_SubDatas": [],
     "m_ActiveTargets": [
         {
             "m_Id": "a109d9942c5a40c2818cc8268a5db6f1"
@@ -494,7 +489,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -634,7 +629,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Occlusion",
     "m_StageCapability": 2,
-    "m_Value": 0.0,
+    "m_Value": 1.0,
     "m_DefaultValue": 1.0,
     "m_Labels": []
 }
@@ -688,7 +683,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -1513,7 +1508,8 @@
     },
     "m_TextureType": 0,
     "m_NormalMapSpace": 0,
-    "m_EnableGlobalMipBias": true
+    "m_EnableGlobalMipBias": true,
+    "m_MipSamplingMode": 0
 }
 
 {
@@ -1751,7 +1747,8 @@
     },
     "m_TextureType": 0,
     "m_NormalMapSpace": 0,
-    "m_EnableGlobalMipBias": true
+    "m_EnableGlobalMipBias": true,
+    "m_MipSamplingMode": 0
 }
 
 {
@@ -1794,7 +1791,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -1884,21 +1881,6 @@
     "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "706b367889e34ebc86b54a7051eb8220",
-    "m_Id": 0,
-    "m_DisplayName": "Alpha Clip Threshold",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "AlphaClipThreshold",
-    "m_StageCapability": 2,
-    "m_Value": 0.10000000149011612,
-    "m_DefaultValue": 0.5,
     "m_Labels": []
 }
 
@@ -2097,10 +2079,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 1259.0,
-            "y": 959.9999389648438,
+            "x": 2256.800048828125,
+            "y": 653.5999755859375,
             "width": 200.0,
-            "height": 41.0
+            "height": 40.800048828125
         }
     },
     "m_Slots": [
@@ -2204,7 +2186,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Smoothness",
     "m_StageCapability": 2,
-    "m_Value": 0.0,
+    "m_Value": 0.5,
     "m_DefaultValue": 0.5,
     "m_Labels": []
 }
@@ -2457,18 +2439,20 @@
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalTarget",
     "m_ObjectId": "a109d9942c5a40c2818cc8268a5db6f1",
+    "m_Datas": [],
     "m_ActiveSubTarget": {
         "m_Id": "ca2b1b6e6e144c32abf121b5b91840f2"
     },
     "m_AllowMaterialOverride": false,
     "m_SurfaceType": 1,
     "m_ZTestMode": 4,
-    "m_ZWriteControl": 0,
+    "m_ZWriteControl": 1,
     "m_AlphaMode": 0,
     "m_RenderFace": 2,
-    "m_AlphaClip": true,
+    "m_AlphaClip": false,
     "m_CastShadows": true,
     "m_ReceiveShadows": true,
+    "m_SupportsLODCrossFade": false,
     "m_CustomEditorGUI": "",
     "m_SupportVFX": false
 }
@@ -2665,7 +2649,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Alpha",
     "m_StageCapability": 2,
-    "m_Value": 0.0,
+    "m_Value": 1.0,
     "m_DefaultValue": 1.0,
     "m_Labels": []
 }
@@ -2906,40 +2890,6 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
-    "m_ObjectId": "c5ed585f08b64f6b81b765d72a66949f",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "SurfaceDescription.AlphaClipThreshold",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 0.0,
-            "height": 0.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "706b367889e34ebc86b54a7051eb8220"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedDescriptor": "SurfaceDescription.AlphaClipThreshold"
-}
-
-{
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.ShaderGraph.PositionNode",
     "m_ObjectId": "c87a26a0535c41eca6f2891f2193f156",
@@ -3001,7 +2951,7 @@
 }
 
 {
-    "m_SGVersion": 1,
+    "m_SGVersion": 2,
     "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalLitSubTarget",
     "m_ObjectId": "ca2b1b6e6e144c32abf121b5b91840f2",
     "m_WorkflowMode": 1,
@@ -3231,7 +3181,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -3299,10 +3249,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 0.0,
-            "height": 0.0
+            "x": 2267.199951171875,
+            "y": 890.4000244140625,
+            "width": 200.0,
+            "height": 40.79998779296875
         }
     },
     "m_Slots": [

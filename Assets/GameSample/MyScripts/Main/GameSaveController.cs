@@ -161,7 +161,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
         if (data != null)
         {
-            var imgs = data.code.Split(GlobalEventHelper.eventTexSign);//获取常量图片
+            var imgs = data.code.Split(AssetManager.IMAGE_MARK);//获取常量图片
             for (int i = 1; i < imgs.Length; i += 2)
             {
                 SaveStoryTex(imgs[i], storyCoreFolder);
@@ -231,13 +231,13 @@ public class GameSaveController : Z_Controller<GameManager>
             else if (!GameTexAssetForm.DataByName.ContainsKey(texName))
             {
                 Debug.LogError(texName + "贴图丢失！");
-                AddStoryTex(new TexAssetForm.Data(-1, texName, TextureHelper.transparentTexture));
+                AddStoryTex(new TexAssetForm.Data(-1, texName,"", TextureHelper.transparentTexture));
             }
         }
     }
     public void AddStoryTex(TexAssetForm.Data rawData)
     {
-        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id, rawData.name, rawData.tex);
+        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id, rawData.name,"", rawData.tex);
         if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
         {
             var oldData = StoryTexAssetForm.DataByName[data.name];
@@ -479,7 +479,7 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in EventProgramDataForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
                 EventProgramDataForm.AddData(form);
-                var imgs = form.code.Split(GlobalEventHelper.eventTexSign);//获取常量图片
+                var imgs = form.code.Split(AssetManager.IMAGE_MARK);//获取常量图片
                 for (int i = 1; i < imgs.Length; i += 2)
                 {
                     LoadStoryTex(imgs[i], storyCoreFolder);

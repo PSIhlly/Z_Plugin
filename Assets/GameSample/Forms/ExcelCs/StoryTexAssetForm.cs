@@ -38,7 +38,9 @@ namespace Form
 
             TexAssetForm.changeNameAction+=ChangeName;
 
-            TexAssetForm.changeTexAction+=ChangeTex;
+            TexAssetForm.changePathAction+=ChangePath;
+
+            TexAssetForm.changeForcetexAction+=ChangeForcetex;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -63,30 +65,33 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,Texture,Texture> changeTexAction;
+        public static Action<Data,string,string> changePathAction;
+                
+        public static Action<Data,Texture,Texture> changeForcetexAction;
                 
 
 
         public partial class Data : TexAssetForm.Data
         {
 
-            public Data(int id,string name,Texture tex):base(id,name,tex)
+            public Data(int id,string name,string path,Texture forceTex):base(id,name,path,forceTex)
             {
 
              this.id = id;
              this.name = name;
-             this.tex = tex;
+             this.path = path;
+             this.forceTex = forceTex;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,tex);
+        return new Data(sameId? id:idChain.GetId(),name,path,forceTex);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",Texture2D.blackTexture);
+                   private static Data _defaultData=new Data(0,"","",Texture2D.whiteTexture);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -100,13 +105,13 @@ namespace Form
                 }
             }
     
-            static Dictionary<Texture, List<Data>> _DatasByTex;
-            public static Dictionary<Texture, List<Data>> DatasByTex
+            static Dictionary<string, List<Data>> _DatasByPath;
+            public static Dictionary<string, List<Data>> DatasByPath
             {
                 get
                 {
                     Init();
-                    return _DatasByTex;
+                    return _DatasByPath;
                 }
             }
     
@@ -142,7 +147,7 @@ namespace Form
     
                     };
     
-                    _DatasByTex = new Dictionary<Texture, List<Data>>() {
+                    _DatasByPath = new Dictionary<string, List<Data>>() {
     
                 };
 
@@ -197,7 +202,9 @@ namespace Form
 
                 jo.Get<string>("name"),
 
-                    _defaultData.tex
+                    _defaultData.path,
+
+                jo.Get<Texture>("forceTex")
                     );
 
             return data;
@@ -212,6 +219,8 @@ namespace Form
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<Texture>("forceTex",data.forceTex);
 
             return jo;
         }
@@ -235,9 +244,9 @@ namespace Form
     
                     DataByName[data.name]=data;
     
-                    if(!DatasByTex.ContainsKey(data.tex))
-                        DatasByTex[data.tex]=new List<Data>();
-                    DatasByTex[data.tex].Add(data);
+                    if(!DatasByPath.ContainsKey(data.path))
+                        DatasByPath[data.path]=new List<Data>();
+                    DatasByPath[data.path].Add(data);
     
 TexAssetForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -256,9 +265,9 @@ TexAssetForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
-                    DatasByTex[data.tex].Remove(data);
-                    if(DatasByTex[data.tex].Count==0)
-                        DatasByTex.Remove(data.tex);
+                    DatasByPath[data.path].Remove(data);
+                    if(DatasByPath[data.path].Count==0)
+                        DatasByPath.Remove(data.path);
     
 TexAssetForm.RemoveData(id);
             idChain.PushId(data.id);
@@ -327,19 +336,29 @@ TexAssetForm.RemoveData(id);
                     
             }
             
-            public static void ChangeTex(TexAssetForm.Data superData,Texture oldV,Texture newV)
+            public static void ChangePath(TexAssetForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                    DatasByTex[oldV].Remove(data);
-                    if(DatasByTex[oldV].Count==0)
-                        DatasByTex.Remove(oldV);
-                    if(!DatasByTex.ContainsKey(newV))
-                        DatasByTex[newV]=new List<Data>();
-                    DatasByTex[newV].Add(data);
+                    DatasByPath[oldV].Remove(data);
+                    if(DatasByPath[oldV].Count==0)
+                        DatasByPath.Remove(oldV);
+                    if(!DatasByPath.ContainsKey(newV))
+                        DatasByPath[newV]=new List<Data>();
+                    DatasByPath[newV].Add(data);
  
-                changeTexAction?.Invoke(data,oldV,newV);
+                changePathAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeForcetex(TexAssetForm.Data superData,Texture oldV,Texture newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeForcetexAction?.Invoke(data,oldV,newV);
                 }
                     
             }

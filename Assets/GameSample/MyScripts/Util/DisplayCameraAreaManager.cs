@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_DesignStyle;
+using Z_Map;
 
 public class DisplayCameraAreaManager : Z_MonoManager<DisplayCameraAreaManager>
 {
@@ -16,6 +17,17 @@ public class DisplayCameraAreaManager : Z_MonoManager<DisplayCameraAreaManager>
     }
     public void Show()
     {
+        switch (DynamicGlobalSettings.cameraMode)
+        {
+            case CameraMode.Overhead:
+                displayCamera.transform.localPosition = new Vector3(0, 4, 0);
+                displayCamera.transform.eulerAngles = new Vector3(90, 0, 0);
+                break;
+            case CameraMode.Isometric:
+                displayCamera.transform.localPosition = new Vector3(0, 4, -4);
+                displayCamera.transform.eulerAngles = new Vector3(45, 0, 0);
+                break;
+        }
         Clear();
         gameObject.SetActive(true);
         

@@ -31,6 +31,8 @@ namespace Z_DataSystem.Form
 
             AssetForm.changeNameAction+=ChangeName;
 
+            AssetForm.changePathAction+=ChangePath;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -56,6 +58,8 @@ namespace Z_DataSystem.Form
                 
         public static Action<Data,GameObject,GameObject> changeGoAction;
                 
+        public static Action<Data,string,string> changePathAction;
+                
 
 
         public partial class Data : AssetForm.Data
@@ -79,23 +83,24 @@ namespace Z_DataSystem.Form
                  
                      }
                     
-            public Data(int id,string name,GameObject go):base(id,name)
+            public Data(int id,string name,GameObject go,string path):base(id,name,path)
             {
 
              this.id = id;
              this.name = name;
              this.go = go;
+             this.path = path;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,go);
+        return new Data(sameId? id:idChain.GetId(),name,go,path);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null);
+                   private static Data _defaultData=new Data(0,"",null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -106,6 +111,16 @@ namespace Z_DataSystem.Form
                 {
                     Init();
                     return _DataById;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByPath;
+            public static Dictionary<string, List<Data>> DatasByPath
+            {
+                get
+                {
+                    Init();
+                    return _DatasByPath;
                 }
             }
     
@@ -141,6 +156,10 @@ namespace Z_DataSystem.Form
     
                     };
     
+                    _DatasByPath = new Dictionary<string, List<Data>>() {
+    
+                };
+
 
             childInitAction?.Invoke();
             
@@ -192,7 +211,9 @@ namespace Z_DataSystem.Form
 
                 jo.Get<string>("name"),
 
-                jo.Get<GameObject>("go")
+                jo.Get<GameObject>("go"),
+
+                    _defaultData.path
                     );
 
             return data;
@@ -232,6 +253,10 @@ namespace Z_DataSystem.Form
     
                     DataByName[data.name]=data;
     
+                    if(!DatasByPath.ContainsKey(data.path))
+                        DatasByPath[data.path]=new List<Data>();
+                    DatasByPath[data.path].Add(data);
+    
 AssetForm.AddData(data);
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
@@ -248,6 +273,10 @@ AssetForm.AddData(data);
                     DataById.Remove(data.id);
     
                     DataByName.Remove(data.name);
+    
+                    DatasByPath[data.path].Remove(data);
+                    if(DatasByPath[data.path].Count==0)
+                        DatasByPath.Remove(data.path);
     
 AssetForm.RemoveData(id);
             idChain.PushId(data.id);
@@ -322,6 +351,23 @@ AssetForm.RemoveData(id);
                 {
 
                 changeGoAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePath(AssetForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByPath[oldV].Remove(data);
+                    if(DatasByPath[oldV].Count==0)
+                        DatasByPath.Remove(oldV);
+                    if(!DatasByPath.ContainsKey(newV))
+                        DatasByPath[newV]=new List<Data>();
+                    DatasByPath[newV].Add(data);
+ 
+                changePathAction?.Invoke(data,oldV,newV);
                 }
                     
             }

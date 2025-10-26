@@ -13,7 +13,7 @@ namespace Z_Code.Form
 
     public static partial class CmdDataForm
     {
-        public static readonly int autoUidCnt = 1000000;
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
@@ -21,21 +21,18 @@ namespace Z_Code.Form
 
 
 
-            Z_Json.extra[typeof(Data)] = ((obj) =>
-            {
-                if (obj is Data data)
-                    return GetJoByData(data);
-                return null;
-            }, (jo) =>
-            {
-                return GetDataByJo(jo);
-            }
-            );
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
-
+        
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain;
+        public static Z_Chain.Chain uidChain ;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
@@ -43,232 +40,216 @@ namespace Z_Code.Form
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
 
-        public static Action<Data, int, int> changeUidAction;
-
-        public static Action<Data, string, string> changeNameAction;
-
-        public static Action<Data, List<string>, List<string>> changePrmnamesAction;
-
-        public static Action<Data, List<string>, List<string>> changePrmtypesAction;
-
-        public static Action<Data, List<string>, List<string>> changeRetnamesAction;
-
-        public static Action<Data, List<string>, List<string>> changeRettypesAction;
-
-        public static Action<Data, string, string> changeDescAction;
-
-        public static Action<Data, string, string> changeDefaultcodeAction;
-
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,List<string>,List<string>> changePrmnamesAction;
+                
+        public static Action<Data,List<string>,List<string>> changePrmtypesAction;
+                
+        public static Action<Data,List<string>,List<string>> changeRetnamesAction;
+                
+        public static Action<Data,List<string>,List<string>> changeRettypesAction;
+                
+        public static Action<Data,string,string> changeDescAction;
+                
+        public static Action<Data,string,string> changeDefaultcodeAction;
+                
 
 
         public partial class Data
         {
 
-            private int _uid;
-            /// <summary>
-            ///
-            ///</summary>
-            public int uid
-            {
-                get { return _uid; }
-                set
-                {
+                    private int  _uid;
+                    /// <summary>
+                    ///
+                    ///</summary>
+                    public int  uid{
+                                get{return _uid;}
+ set{
 
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeUid(this, _uid, value);
+                       ChangeUid(this,_uid,value); 
                     }
-
-                    _uid = value;
+        
+                _uid = value;
                 }
+                 
+                     }
+                    
+                    private string  _name;
+                    /// <summary>
+                    ///Ãû³Æ
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
 
-            }
-
-            private string _name;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public string name
-            {
-                get { return _name; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeName(this, _name, value);
+                       ChangeName(this,_name,value); 
                     }
-
-                    _name = value;
+        
+                _name = value;
                 }
+                 
+                     }
+                    
+                    private List<string>  _prmNames;
+                    /// <summary>
+                    ///²ÎÊýÃû³Æ
+                    ///</summary>
+                    public List<string>  prmNames{
+                                get{return _prmNames;}
+ set{
 
-            }
-
-            private List<string> _prmNames;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<string> prmNames
-            {
-                get { return _prmNames; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangePrmnames(this, _prmNames, value);
+                       ChangePrmnames(this,_prmNames,value); 
                     }
-
-                    _prmNames = value;
+        
+                _prmNames = value;
                 }
+                 
+                     }
+                    
+                    private List<string>  _prmTypes;
+                    /// <summary>
+                    ///²ÎÊýÀàÐÍ
+                    ///</summary>
+                    public List<string>  prmTypes{
+                                get{return _prmTypes;}
+ set{
 
-            }
-
-            private List<string> _prmTypes;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<string> prmTypes
-            {
-                get { return _prmTypes; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangePrmtypes(this, _prmTypes, value);
+                       ChangePrmtypes(this,_prmTypes,value); 
                     }
-
-                    _prmTypes = value;
+        
+                _prmTypes = value;
                 }
+                 
+                     }
+                    
+                    private List<string>  _retNames;
+                    /// <summary>
+                    ///·µ»ØÖµÃû³Æ
+                    ///</summary>
+                    public List<string>  retNames{
+                                get{return _retNames;}
+ set{
 
-            }
-
-            private List<string> _retNames;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<string> retNames
-            {
-                get { return _retNames; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeRetnames(this, _retNames, value);
+                       ChangeRetnames(this,_retNames,value); 
                     }
-
-                    _retNames = value;
+        
+                _retNames = value;
                 }
+                 
+                     }
+                    
+                    private List<string>  _retTypes;
+                    /// <summary>
+                    ///·µ»ØÖµÀàÐÍ
+                    ///</summary>
+                    public List<string>  retTypes{
+                                get{return _retTypes;}
+ set{
 
-            }
-
-            private List<string> _retTypes;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public List<string> retTypes
-            {
-                get { return _retTypes; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeRettypes(this, _retTypes, value);
+                       ChangeRettypes(this,_retTypes,value); 
                     }
-
-                    _retTypes = value;
+        
+                _retTypes = value;
                 }
+                 
+                     }
+                    
+                    private string  _desc;
+                    /// <summary>
+                    ///ÃèÊö
+                    ///</summary>
+                    public string  desc{
+                                get{return _desc;}
+ set{
 
-            }
-
-            private string _desc;
-            /// <summary>
-            ///ï¿½ï¿½ï¿½ï¿½
-            ///</summary>
-            public string desc
-            {
-                get { return _desc; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeDesc(this, _desc, value);
+                       ChangeDesc(this,_desc,value); 
                     }
-
-                    _desc = value;
+        
+                _desc = value;
                 }
+                 
+                     }
+                    
+                    private string  _defaultCode;
+                    /// <summary>
+                    ///Ä¬ÈÏ´úÂë
+                    ///</summary>
+                    public string  defaultCode{
+                                get{return _defaultCode;}
+ set{
 
-            }
-
-            private string _defaultCode;
-            /// <summary>
-            ///Ä¬ï¿½Ï´ï¿½ï¿½ï¿½
-            ///</summary>
-            public string defaultCode
-            {
-                get { return _defaultCode; }
-                set
-                {
-
-                    if (_DataByUid != null && _DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                        ChangeDefaultcode(this, _defaultCode, value);
+                       ChangeDefaultcode(this,_defaultCode,value); 
                     }
-
-                    _defaultCode = value;
+        
+                _defaultCode = value;
                 }
-
-            }
-
-            public Data(int uid, string name, List<string> prmNames, List<string> prmTypes, List<string> retNames, List<string> retTypes, string desc, string defaultCode)
+                 
+                     }
+                    
+            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.prmNames = prmNames;
-                this.prmTypes = prmTypes;
-                this.retNames = retNames;
-                this.retTypes = retTypes;
-                this.desc = desc;
-                this.defaultCode = defaultCode;
+             this.uid = uid;
+             this.name = name;
+             this.prmNames = prmNames;
+             this.prmTypes = prmTypes;
+             this.retNames = retNames;
+             this.retTypes = retTypes;
+             this.desc = desc;
+             this.defaultCode = defaultCode;
 
             }
 
-            public Data Copy(bool sameId = true)
-            {
-                return new Data(sameId ? uid : uidChain.GetId(), name, new List<string>(prmNames), new List<string>(prmTypes), new List<string>(retNames), new List<string>(retTypes), desc, defaultCode);
-            }
-
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode);
+                }
+            
         }
 
-        private static Data _defaultData = new Data(0, "", null, null, null, null, "", "");
-        public static Data defaultData => _defaultData.Copy();
+                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
-        static Dictionary<string, Data> _DataByName;
-        public static Dictionary<string, Data> DataByName
-        {
-            get
+    
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
             {
-                Init();
-                return _DataByName;
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -277,12 +258,12 @@ namespace Z_Code.Form
         }
         public static void InitInternal()
         {
-            if (inited)
+            if(inited)
                 return;
-            inited = true;
-            uidChain = new Z_Chain.Chain(autoUidCnt);
+            inited=true;  
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
-            _DataByUid = new Dictionary<int, Data>() {
+                _DataByUid = new Dictionary<int, Data>() {
 
                 {1,new Data(1,"Print",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Print {0}","Print(\"\");")},
 
@@ -290,9 +271,9 @@ namespace Z_Code.Form
 
                 {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} - {0}","1-1")},
 
-                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"ï¿½ï¿½{1}ï¿½ï¿½*ï¿½ï¿½{0}ï¿½ï¿½","1*1")},
+                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£¨{1}£©*£¨{0}£©","1*1")},
 
-                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"ï¿½ï¿½{1}ï¿½ï¿½/ï¿½ï¿½{0}ï¿½ï¿½","1/1")},
+                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£¨{1}£©/£¨{0}£©","1/1")},
 
                 {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} = {0}","var=1;")},
 
@@ -313,54 +294,54 @@ namespace Z_Code.Form
                 {14,new Data(14,"for",new List<string>(){"init","condition","turnOver",},null,null,new List<string>(){"void",},"{0}, if {1} keep do, after every times do{2}","for(id=0;id<3;id=id+1){ }")},
 
                 };
-            _DataByName = new Dictionary<string, Data>() {
-
+                    _DataByName = new Dictionary<string, Data>() {
+    
                         {"Print",_DataByUid[1]},
-
+    
                         {"+",_DataByUid[2]},
-
+    
                         {"-",_DataByUid[3]},
-
+    
                         {"*",_DataByUid[4]},
-
+    
                         {"/",_DataByUid[5]},
-
+    
                         {"=",_DataByUid[6]},
-
+    
                         {"==",_DataByUid[7]},
-
+    
                         {">",_DataByUid[8]},
-
+    
                         {"<",_DataByUid[9]},
-
+    
                         {"!=",_DataByUid[10]},
-
+    
                         {"if",_DataByUid[11]},
-
+    
                         {"else",_DataByUid[12]},
-
+    
                         {"then",_DataByUid[13]},
-
+    
                         {"for",_DataByUid[14]},
-
+    
                     };
-
+    
 
             childInitAction?.Invoke();
+            
 
-
-            foreach (var k in _DataByUid.Keys) { uidChain.PopId(k); }
-
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+             
         }
 
 
         public static List<Data> GetDatasByJa(JArray ja)
         {
             Init();
-            List<Data> lst = new List<Data>();
-            foreach (JObject jo in ja)
+            List<Data> lst=new List<Data>();
+            foreach(JObject jo in ja)
             {
-                if (jo.Get<int>("uid") == 0)
+                if(jo.Get<int>("uid")==0)
                     continue;
                 lst.Add(GetDataByJo(jo));
             }
@@ -370,10 +351,10 @@ namespace Z_Code.Form
         public static JArray GetJaByDatas()
         {
             Init();
-            JArray ja = new JArray();
-            foreach (Data data in _DataByUid.Values)
+            JArray ja=new JArray();
+            foreach(Data data in _DataByUid.Values)
             {
-                if (data.uid == 0)
+                if(data.uid==0)
                     continue;
                 ja.Add(GetJoByData(data));
             }
@@ -384,7 +365,7 @@ namespace Z_Code.Form
         {
             Init();
 
-            Data data = new Data(
+            Data data=new Data(
 
                 jo.Get<int>("uid"),
 
@@ -410,23 +391,23 @@ namespace Z_Code.Form
         {
             Init();
 
-            JObject jo = new JObject();
+            JObject jo=new JObject();
 
-            jo.Set<int>("uid", data.uid);
+            jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("name", data.name);
+            jo.Set<string>("name",data.name);
 
-            jo.Set<List<string>>("prmNames", data.prmNames);
+            jo.Set<List<string>>("prmNames",data.prmNames);
 
-            jo.Set<List<string>>("prmTypes", data.prmTypes);
+            jo.Set<List<string>>("prmTypes",data.prmTypes);
 
-            jo.Set<List<string>>("retNames", data.retNames);
+            jo.Set<List<string>>("retNames",data.retNames);
 
-            jo.Set<List<string>>("retTypes", data.retTypes);
+            jo.Set<List<string>>("retTypes",data.retTypes);
 
-            jo.Set<string>("desc", data.desc);
+            jo.Set<string>("desc",data.desc);
 
-            jo.Set<string>("defaultCode", data.defaultCode);
+            jo.Set<string>("defaultCode",data.defaultCode);
 
             return jo;
         }
@@ -435,38 +416,38 @@ namespace Z_Code.Form
         public static int AddData(Data data)
         {
             Init();
-            if (DataByUid.ContainsKey(data.uid))
+            if(DataByUid.ContainsKey(data.uid))
                 return data.uid;
-            if (data.uid == -1)
-            {
-                int uid = uidChain.GetId();
-                if (uid == -1)
+            if(data.uid==-1)
+            { 
+                int uid=uidChain.GetId();
+                if(uid==-1)
                     return -1;
-                data.uid = uid;
+                data.uid=uid;  
             }
             uidChain.PopId(data.uid);
 
-            DataByUid[data.uid] = data;
-
-            DataByName[data.name] = data;
-
+        DataByUid[data.uid]=data;
+    
+                    DataByName[data.name]=data;
+    
 
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
-        {
+        {            
             Init();
-            if (!DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
+               
+            var data=DataByUid[uid];
 
-            var data = DataByUid[uid];
-
-            DataByUid.Remove(data.uid);
-
-            DataByName.Remove(data.name);
-
+                    DataByUid.Remove(data.uid);
+    
+                    DataByName.Remove(data.name);
+    
 
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
@@ -476,123 +457,124 @@ namespace Z_Code.Form
         {
             Init();
             var keys = new List<int>(DataByUid.Keys);
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
-                RemoveData(key);
+                    RemoveData(key);
             }
 
         }
-
+        
         public static void ClearAuto()
         {
             Init();
             var keys = new List<int>(DataByUid.Keys);
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
-                if (key < uidChain.cnt)
+                if(key < uidChain.cnt)
                     RemoveData(key);
             }
         }
 
-        private static void RemoveChildren(Data data)
+         private static void RemoveChildren(Data data)
         {
             Init();
-            if (data is Data)
-                RemoveData(data.uid);
+            if(data is Data)
+               RemoveData(data.uid);      
         }
-        private static void AddChildren(Data superData)
+         private static void AddChildren(Data superData)
         {
             Init();
-            if (superData is Data data)
-                AddData(data);
+            if(superData is Data data)
+               AddData(data);      
         }
+        
 
 
 
 
-
-        public static void ChangeUid(Data superData, int oldV, int newV)
-        {
-            if (superData is Data data)
+            public static void ChangeUid(Data superData,int oldV,int newV)
             {
+                if(superData is Data data)
+                {
 
-                changeUidAction?.Invoke(data, oldV, newV);
+                changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeName(Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeName(Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                DataByName.Remove(oldV);
-                DataByName[newV] = data;
-
-                changeNameAction?.Invoke(data, oldV, newV);
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangePrmnames(Data superData, List<string> oldV, List<string> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangePrmnames(Data superData,List<string> oldV,List<string> newV)
             {
+                if(superData is Data data)
+                {
 
-                changePrmnamesAction?.Invoke(data, oldV, newV);
+                changePrmnamesAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangePrmtypes(Data superData, List<string> oldV, List<string> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangePrmtypes(Data superData,List<string> oldV,List<string> newV)
             {
+                if(superData is Data data)
+                {
 
-                changePrmtypesAction?.Invoke(data, oldV, newV);
+                changePrmtypesAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeRetnames(Data superData, List<string> oldV, List<string> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeRetnames(Data superData,List<string> oldV,List<string> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeRetnamesAction?.Invoke(data, oldV, newV);
+                changeRetnamesAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeRettypes(Data superData, List<string> oldV, List<string> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeRettypes(Data superData,List<string> oldV,List<string> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeRettypesAction?.Invoke(data, oldV, newV);
+                changeRettypesAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeDesc(Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeDesc(Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeDescAction?.Invoke(data, oldV, newV);
+                changeDescAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeDefaultcode(Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeDefaultcode(Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeDefaultcodeAction?.Invoke(data, oldV, newV);
+                changeDefaultcodeAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
+            
     }
 }
+        

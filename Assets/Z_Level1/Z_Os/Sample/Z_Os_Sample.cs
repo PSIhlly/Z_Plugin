@@ -16,14 +16,13 @@ public class Z_Os_Sample : MonoBehaviour
     {
         
 
-        FileImporter.ImportImageBytes(OnImportImageBytesComplete);
+        FileImporter.ImportImageBytes(OnImportBytesComplete);
     }
 
-    public void OnImportImageBytesComplete(byte[] data)
+    public void OnImportBytesComplete(byte[] data)
     {
         log.text =data.Length + "";
     }
-
 
 
 }

@@ -87,23 +87,23 @@ public class GameManager : Z_MonoManager<GameManager>
 
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets
+        
 
-
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultTexName(""), TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultStoryTexName(), TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultCharacterTexName(), TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultItemTexName(), TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultModelTexName(), new Texture2D(1,1)));
+        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultTexName(""),"", TextureHelper.transparentTexture));
+        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultStoryTexName(), "", TextureHelper.transparentTexture));
+        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultCharacterTexName(), "", TextureHelper.transparentTexture));
+        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultItemTexName(), "", TextureHelper.transparentTexture));
+        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultModelTexName(), "", new Texture2D(1,1)));
 
 
         var res=AssetManager.instance.LoadAssetsByFolder("Z_Map/", true);
         for (int i = 0; i < res.texs.Count; i++)
         {
-            GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(res.texs[i].Item1), res.texs[i].Item2));
+            GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(res.texs[i].Item1), "", res.texs[i].Item2));
         }
         for (int i = 0; i < res.gos.Count; i++)
         {
-            GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(-1 , Path.GetFileName(res.gos[i].Item1), res.gos[i].Item2));
+            GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(-1 , Path.GetFileName(res.gos[i].Item1), res.gos[i].Item2,""));
         }
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))

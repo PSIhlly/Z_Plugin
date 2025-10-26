@@ -81,12 +81,11 @@ namespace Z_Map
 }
 public static partial class GlobalEventHelper
 {
-    public static string eventTexSign = "$img$";
-    public static bool IsEventTex(string name) => name.Split(eventTexSign).Length==3&& name.StartsWith(eventTexSign) && name.EndsWith(eventTexSign);
-    public static string GetEventTexName(string name = "") => eventTexSign + name + eventTexSign;
+    public static bool IsEventTex(string name) => name.Split(AssetManager.IMAGE_MARK).Length==3&& name.StartsWith(AssetManager.IMAGE_MARK) && name.EndsWith(AssetManager.IMAGE_MARK);
+    public static string GetEventTexName(string name = "") => AssetManager.IMAGE_MARK + name + AssetManager.IMAGE_MARK;
     public static string GetEventAssetTexName(string name)
     {
-        string res=name.Split("$img$")[1];
+        string res=name.Split(AssetManager.IMAGE_MARK)[1];
         if (res == "")
             res = GlobalNameHelper.GetDefaultTexName();
         return res;

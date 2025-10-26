@@ -23,13 +23,13 @@ namespace Z_Map
         public MapUtilController(MapManager super) : base(super)
         {
         }
-        public List<TileUnit> GetNineTile((int,int,int) mapPos)
+        public List<TileUnit> GetNineTile((int, int, int) mapPos)
         {
-            List < TileUnit > res= new List < TileUnit >();
+            List<TileUnit> res = new List<TileUnit>();
             for (int i = mapPos.Item1 - 1; i <= mapPos.Item1 + 1; i++)
                 for (int j = mapPos.Item3 - 1; j <= mapPos.Item3 + 1; j++)
                 {
-                    if(_super.data.maps.ContainsKey((i,mapPos.Item2,j)))
+                    if (_super.data.maps.ContainsKey((i, mapPos.Item2, j)))
                     {
                         res.Add(_super.data.maps[(i, mapPos.Item2, j)].unit);
                     }
@@ -183,20 +183,20 @@ namespace Z_Map
                 return false;
             return true;
         }
-        public List<MeshInfo> GetCollidersMesh(GameObject root, Vector3 rootPos,Vector3 rootEuler,Vector3 rootScale, CollideType type= CollideType.All)
+        public List<MeshInfo> GetCollidersMesh(GameObject root, Vector3 rootPos, Vector3 rootEuler, Vector3 rootScale, CollideType type = CollideType.All)
         {
-            UnityEngine.Collider[] cs= root.GetComponentsInChildren<Collider>();
+            UnityEngine.Collider[] cs = root.GetComponentsInChildren<Collider>();
             var res = new List<MeshInfo>();
             foreach (var c in cs)
             {
-                if(type == CollideType.CollideOnly&& c.isTrigger) 
+                if (type == CollideType.CollideOnly && c.isTrigger)
                     continue;
                 if (type == CollideType.TriggerOnly && !c.isTrigger)
                     continue;
                 var pos = c.transform.position;
                 if (c is BoxCollider box)
                 {
-                    res.Add(Mesh.GetMesh(box, pos- root.transform.position + rootPos, rootEuler, rootScale));
+                    res.Add(Mesh.GetMesh(box, pos - root.transform.position + rootPos, rootEuler, rootScale));
                 }
                 else if (c is SphereCollider sp)
                 {
@@ -207,51 +207,38 @@ namespace Z_Map
         }
         public List<TileUnit> GetOverlap(ObjectUnitForm.Data oData)
         {
-            var all = new List<List<Vector3Int>>(); 
-            foreach(var c in GetCollidersMesh(oData.unit.prefab, oData.pos,oData.euler,oData.scale, CollideType.CollideOnly))
+            var all = new List<List<Vector3Int>>();
+            foreach (var c in GetCollidersMesh(oData.unit.prefab, oData.pos, oData.euler, oData.scale, CollideType.CollideOnly))
             {
                 all.Add(Graph.GetRoughOverlapIntPos(c.positions));
             }
             var res = Graph.DeduplicateIntPos(all);
             _super.updateCtrl.objectTileDic.Del(oData.unit);
-            var ans=new List<TileUnit>();
+            var ans = new List<TileUnit>();
             foreach (var p in res)
             {
                 var mp = RealPos2MapPos(p);
                 if (InArea(mp))
                 {
-                    ans.Add(_super.data.maps[(mp.x,mp.y,mp.z)].unit);
+                    ans.Add(_super.data.maps[(mp.x, mp.y, mp.z)].unit);
                 }
             }
 
             return ans;
         }
-        public void SetPerspectiveModel(MapUnit tar)
+        public void SetPerspectiveModel(Transform rootTrs, Transform imgTrs, float deepth)
         {
             switch (DynamicGlobalSettings.cameraMode)
             {
                 case CameraMode.Overhead:
-                    foreach (var render in tar.ins.renderers)
-                    {
-                        if (render.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
-                        {
-                            render.transform.localPosition = Vector3.up * tar.ins.transform.localScale.y / 2;
-                            render.transform.localScale = Vector3.one;
-                        }
-                    }
+                    imgTrs.position = rootTrs.position+ Vector3.up * rootTrs.localScale.y / 2 + Vector3.down * deepth;
+                    imgTrs.localScale = Vector3.one;
                     break;
-
                 case CameraMode.Isometric:
-                    foreach (var render in tar.ins.renderers)
-                    {
-                        if (render.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
-                        {
-                            render.transform.localPosition = Vector3.zero;
-                            Graph.Calculate(tar.ins.transform.localScale.z, tar.ins.transform.localScale.y, out var y, out var angle);
-                            render.transform.localScale = new Vector3(tar.ins.transform.localScale.x, y, tar.ins.transform.localScale.z);
-                            render.transform.localEulerAngles = new Vector3(angle, 0, 0);
-                        }
-                    }
+                    imgTrs.position = rootTrs.position + new Vector3(0, -1, -1) * deepth;
+                    Graph.Calculate(rootTrs.localScale.z, rootTrs.localScale.y, out var y, out var angle);
+                    imgTrs.localScale = new Vector3(rootTrs.localScale.x, y, rootTrs.localScale.z);
+                    imgTrs.eulerAngles = new Vector3(angle, 0, 0);
                     break;
             }
         }

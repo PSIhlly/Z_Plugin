@@ -2,11 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using Z_Audio;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Os.File;
 using Z_Texture;
+using Z_Time;
 namespace Z_DataSystem.Form
 {
     public enum ValType
@@ -21,36 +25,48 @@ namespace Z_DataSystem.Form
         public partial class Data
         {
             private Sprite _sprite;
-            public Sprite sprite
-            {
-                get
-                {
+            private Texture _tex;
 
-                    if (_sprite == null)
-                    {
-                        _sprite = TextureHelper.GetSpriteByTexture(tex);
-                    }
-                    return _sprite;
-                }
-            }
-            internal Texture _tex;
-            public Texture tex
+            bool loading;
+            Action<Texture> onLoaded;
+            public void GetTex(Action<Texture> onLoaded)
             {
-                get
+                this.onLoaded += onLoaded;
+                if (_tex == null)
                 {
-                    if(forceTex!=null)
+                    if (!loading)
                     {
-                        return forceTex;
+                        loading = true;
+                        Task.Run(async () =>
+                        {
+                            _tex = await TextureHelper.GetTextureByPathAsync(path);
+                            TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
+                            {
+                                this.onLoaded?.Invoke(_tex);
+                                this.onLoaded -= this.onLoaded;
+                            });
+                            loading = false;
+                        });
                     }
-                    if (_tex == null)
-                    {
-                        _tex = TextureHelper.GetTextureByPath(path);
-                    }
-                    return _tex;
                 }
-                set
+                else
                 {
-                    _tex = value;
+                    this.onLoaded.Invoke(_tex);
+                }
+
+            }
+            public void SetSpriteAsync(Image img)
+            {
+                if (_sprite != null)
+                {
+                    img.sprite = _sprite;
+                }
+                else
+                {
+                    GetTex((tex) =>
+                    {
+                        img.sprite = TextureHelper.GetSpriteByTexture(tex);
+                    });
                 }
             }
         }
@@ -59,7 +75,7 @@ namespace Z_DataSystem.Form
     {
         public partial class Data
         {
-            
+
             private AudioClip _clip;
             public AudioClip clip
             {
@@ -188,7 +204,7 @@ namespace Z_DataSystem
                     var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
-                    var nm = tex.GetHashCode().ToString();
+                    var nm = IMAGE_MARK + tex.GetSHA1Hash() + IMAGE_MARK;
                     var form = instance.LoadTex(tex, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
@@ -248,106 +264,99 @@ namespace Z_DataSystem
         }
         public TexAssetForm.Data LoadTexPath(string path, string name)
         {
-            var tex = TextureHelper.GetTextureByPath(path);
-            return new TexAssetForm.Data(-1, name, path,null);
+            return new TexAssetForm.Data(-1, name, path, null);
         }
         public TexAssetForm.Data LoadTex(Texture tex, string name)
         {
-            var texData = new TexAssetForm.Data(-1, name, "", null);
-            texData._tex = tex;
-            
+            var texData = new TexAssetForm.Data(-1, name, "", tex);
             return texData;
         }
 
 
         #endregion
-        /*  #region audio
 
-          public const string AUDIO_MARK = "$a$";
-          private static readonly string[] SupportedAudioExtensions = new[]
-      {
-          ".mp3", ".wav"
-      };
+        #region audio
 
-          public class SelectAudioTask
-          {
-              public Action<AudioAssetForm.Data> callback;
-              public void Run()
-              {
-                  FileImporter.ImportAudioBytes(OnImportBytesComplete);
-              }
-              public void OnImportBytesComplete(byte[] data)
-              {
-                  if (data != null)
-                  {
-                      var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
-                      var nm = tex.GetHashCode().ToString();
-                      var form = instance.LoadAudio(tex, nm);
-                      callback?.Invoke(form);
-                      Z_EventHelper.Invoke(new AssetEvent()
-                      {
-                          importAssetName = nm
-                      });
-                  }
-              }
-          }
-          public List<string> GetAudioAssetsByFolder(string path, bool isRes)
-          {
-              List<string> res = new List<string>();
-              if (isRes)
-              {
-                  Texture2D[] textures = Resources.LoadAll<Texture2D>(path);
-                  foreach (var tex in textures)
-                  {
-                      res.Add(tex.name);
-                  }
+        public const string AUDIO_MARK = "$a$";
+        private static readonly string[] SupportedAudioExtensions = new[]
+        {
+          ".mp3"
+        };
 
-              }
-              else
-              {
-                  string[] allFiles = Directory.GetFiles(path);
-                  // 过滤出图片文件
-                  foreach (string file in allFiles)
-                  {
-                      string extension = Path.GetExtension(file).ToLower();
-                      if (Array.Exists(SupportedImageExtensions, ext => ext == extension))
-                      {
-                          res.Add(file);
-                      }
-                  }
-              }
-              return res;
-          }
+        public class SelectAudioTask
+        {
+            public Action<AudioAssetForm.Data> callback;
+            public void Run()
+            {
+                FileImporter.ImportAudioBytes(OnImportBytesComplete);
+            }
+            public async void OnImportBytesComplete(byte[] data)
+            {
+                if (data != null)
+                {
+                    var clip = await AudioHelper.GetAudioByByte(data);
+                    var nm = AUDIO_MARK + clip.GetSHA1Hash() + AUDIO_MARK;
+                    var form = instance.LoadAudio(clip, nm);
+                    callback?.Invoke(form);
+                    Z_EventHelper.Invoke(new AssetEvent()
+                    {
+                        importAssetName = nm
+                    });
+                }
+            }
+        }
+        public List<string> GetAudioAssetsByFolder(string path, bool isRes)
+        {
+            List<string> res = new List<string>();
+            if (isRes)
+            {
+                Texture2D[] textures = Resources.LoadAll<Texture2D>(path);
+                foreach (var tex in textures)
+                {
+                    res.Add(tex.name);
+                }
 
-          public void SelectTex(Vector2Int forceSize = default, Action<TexAssetForm.Data> callback = null)
-          {
-              SelectTexTask task = new SelectTexTask();
-              task.callback = callback;
-              task.forceSize = forceSize;
-              task.Run();
-          }
-          public TexAssetForm.Data LoadTex(Texture2D tex, string name, Vector2Int forceSize)
-          {
-              return LoadTexBytes(TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y).EncodeToPNG(), name);
-          }
-          public TexAssetForm.Data LoadTex(Texture2D tex, string name)
-          {
-              return LoadTexBytes(tex.EncodeToPNG(), name);
-          }
-          public TexAssetForm.Data LoadTexBytes(byte[] data, string name)
-          {
-              var tex = TextureHelper.GetTextureByByte(data);
+            }
+            else
+            {
+                string[] allFiles = Directory.GetFiles(path);
+                // 过滤出图片文件
+                foreach (string file in allFiles)
+                {
+                    string extension = Path.GetExtension(file).ToLower();
+                    if (Array.Exists(SupportedImageExtensions, ext => ext == extension))
+                    {
+                        res.Add(file);
+                    }
+                }
+            }
+            return res;
+        }
 
-              return new TexAssetForm.Data(-1, name, tex);
-          }
-          public TexAssetForm.Data LoadTexPath(string path, string name)
-          {
-              var tex = TextureHelper.GetTextureByPath(path);
-              return new TexAssetForm.Data(-1, name, tex);
-          }
+        public void SelectAudio(Action<TexAssetForm.Data> callback = null)
+        {
+            SelectTexTask task = new SelectTexTask();
+            task.callback = callback;
+            task.Run();
+        }
+        public AudioAssetForm.Data LoadAudio(AudioClip clip, string name)
+        {
+            return new AudioAssetForm.Data(-1, name, "", clip);
+        }
+/*        public AudioAssetForm.Data LoadAudioBytes(byte[] data, string name)
+        {
+            var clip = AudioHelper.GetAudioByByte(data);
+
+            return new AudioAssetForm.Data(-1, name, "", clip);
+        }
+        public AudioAssetForm.Data LoadAudioPath(string path, string name)
+        {
+            var clip = TextureHelper.GetTextureByPath(path);
+            return new AudioAssetForm.Data(-1, name, path,);
+        }*/
 
 
-          #endregion*/
+        #endregion
 
 
         #region gameobject
@@ -373,7 +382,7 @@ namespace Z_DataSystem
         public static string GetKeyName(string key)
         {
             var res = key.Split("$￥$");
-            if (res.Length>1)
+            if (res.Length > 1)
                 return res[1];
             return "";
         }

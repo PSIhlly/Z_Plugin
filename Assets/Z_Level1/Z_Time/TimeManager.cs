@@ -12,6 +12,7 @@ namespace Z_Time
     {
         public static List<(Action, GameObject)> NextFrameList = new List<(Action, GameObject)>();
         public static List<(Action, GameObject)> CurLateUpdateList = new List<(Action, GameObject)>();
+        public static List<Action> CurLateUpdateWithoutCheckList = new List<Action>();
         public static List<(Action, GameObject)> NextBigFrameList = new List<(Action, GameObject)>();
         public static List<Action> NextUpdateWithoutCheckList = new List<Action>();
         public static List<(Action, GameObject)> NextFixedFrameList = new List<(Action, GameObject)>();
@@ -56,7 +57,11 @@ namespace Z_Time
         {
                 CurLateUpdateList.Add((act, ins));
         }
-        public void AddNextUpdateWithoutCheckList(Action act)
+        public void AddCurLateUpdateWithoutCheckAction(Action act)
+        {
+            CurLateUpdateWithoutCheckList.Add(act);
+        }
+        public void AddNextUpdateWithoutCheckAction(Action act)
         {
             lock(queueLock)
             {
@@ -66,6 +71,11 @@ namespace Z_Time
         }
         public void LateUpdate()
         {
+            foreach (var act in CurLateUpdateWithoutCheckList)
+            {
+                act?.Invoke();
+            }
+            
             foreach (var act in CurLateUpdateList)
             {
                 if (act.Item2 != null)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 namespace Z_Texture
 {
@@ -52,6 +53,15 @@ namespace Z_Texture
             {
                 res = InternalGetTextureByPathWithoutExtension(path);
             }
+            return res;
+        }
+        public static async Task<Texture> GetTextureByPathAsync(string path)
+        {
+            Texture res=null;
+            await Task.Run(() =>
+            {
+                res = GetTextureByPath(path);
+            });
             return res;
         }
         public static Texture GetTextureByByte(byte[] data)

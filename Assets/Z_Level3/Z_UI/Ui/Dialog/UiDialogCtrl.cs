@@ -64,7 +64,7 @@ namespace Ui.Dialog
         }
         public override void OnHide()
         {
-            TimeManager.instance.AddNextUpdateWithoutCheckList(() =>
+            TimeManager.instance.AddNextUpdateWithoutCheckAction(() =>
             {
                 if(!active)
                 {

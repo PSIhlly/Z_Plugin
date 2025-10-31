@@ -58,28 +58,49 @@ namespace Z_DataSystem.Form
                 
         public static Action<Data,string,string> changePathAction;
                 
+        public static Action<Data,AudioClip,AudioClip> changeForceclipAction;
+                
 
 
         public partial class Data : AssetForm.Data
         {
 
-            public Data(int id,string name,string path):base(id,name,path)
+                    private AudioClip  _forceClip;
+                    /// <summary>
+                    ///«ø÷∆…˘“Ù
+                    ///</summary>
+                    public AudioClip  forceClip{
+                                get{return _forceClip;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeForceclip(this,_forceClip,value); 
+                    }
+        
+                _forceClip = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string path,AudioClip forceClip):base(id,name,path)
             {
 
              this.id = id;
              this.name = name;
              this.path = path;
+             this.forceClip = forceClip;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,path);
+        return new Data(sameId? id:idChain.GetId(),name,path,forceClip);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","",null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -190,7 +211,9 @@ namespace Z_DataSystem.Form
 
                 jo.Get<string>("name"),
 
-                    _defaultData.path
+                    _defaultData.path,
+
+                jo.Get<AudioClip>("forceClip")
                     );
 
             return data;
@@ -205,6 +228,8 @@ namespace Z_DataSystem.Form
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<AudioClip>("forceClip",data.forceClip);
 
             return jo;
         }
@@ -333,6 +358,16 @@ AssetForm.RemoveData(id);
                     DatasByPath[newV].Add(data);
  
                 changePathAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeForceclip(Data superData,AudioClip oldV,AudioClip newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeForceclipAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -29,6 +29,7 @@ using Z_UnitSystem;
 public class CameraMoveEvent : Z_Event
 {
 
+
 }
 
 public static partial class GlobalSettings

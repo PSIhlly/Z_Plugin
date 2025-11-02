@@ -92,7 +92,7 @@ namespace Ui.PlaySceneMain
             view.sld_hp.value = prm.v/ prm.max;
 
             view.sld_sp.gameObject.SetActive(false);
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName,GlobalNameHelper.GetDefaultCharacterTexName()).sprite;
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName,GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
         }
     }
 

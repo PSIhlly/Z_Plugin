@@ -201,7 +201,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
         {
             view.sta_exist.ChangeState(GlobalNameHelper.IsInnerAssetName(parent.model.data.styleTex[model.style])?0:1);
             view.txt_.text = TextManager.instance.GetTxt(model.style.ToString());
-            view.img_.sprite = TexAssetForm.DataByName[parent.model.data.styleTex[model.style]].sprite;
+            view.img_.sprite = TexAssetForm.DataByName[parent.model.data.styleTex[model.style]].GetSprite();
         }
     }
 

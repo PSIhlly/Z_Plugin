@@ -64,7 +64,7 @@ public class GameEffectController : Z_Controller<GameManager>
 
                 clip = clips[cur];
                 img.render.GetPropertyBlock(propBlock);
-                propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].tex);
+                propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
 
                 img.trs.position = img.oriPos + clip.pos;
                 img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);

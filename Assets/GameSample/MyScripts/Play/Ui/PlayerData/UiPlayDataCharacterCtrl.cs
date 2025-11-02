@@ -135,7 +135,7 @@ namespace Ui.PlayData.PlayDataCharacter
         {
             view.sta_exist.ChangeState(1);
             view.txt_.text = model.data.name;
-            view.img_.sprite = TexAssetForm.DataByName[model.data.avatarTexName].sprite;
+            view.img_.sprite = TexAssetForm.DataByName[model.data.avatarTexName].GetSprite();
             view.sta_.ChangeState(parent.model.sel == model.data ? 1 : 0);
         }
     }

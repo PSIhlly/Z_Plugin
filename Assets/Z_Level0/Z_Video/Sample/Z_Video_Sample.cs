@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using Z_Audio;
-public class Z_Audio_Sample : MonoBehaviour
+using Z_Video;
+public class Z_Video_Sample : MonoBehaviour
 {
     public Sprite[] members;
     public RawImage target;

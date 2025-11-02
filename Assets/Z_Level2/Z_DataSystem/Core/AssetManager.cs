@@ -11,6 +11,7 @@ using Z_DesignStyle;
 using Z_Os.File;
 using Z_Texture;
 using Z_Time;
+using static System.Net.Mime.MediaTypeNames;
 namespace Z_DataSystem.Form
 {
     public enum ValType
@@ -18,6 +19,10 @@ namespace Z_DataSystem.Form
         Float = 0,
         Bool = 1,
         String = 2
+    }
+    public class AsyncHandle
+    {
+
     }
 
     public partial class TexAssetForm
@@ -27,47 +32,85 @@ namespace Z_DataSystem.Form
             private Sprite _sprite;
             private Texture _tex;
 
-            bool loading;
-            Action<Texture> onLoaded;
-            public void GetTex(Action<Texture> onLoaded)
+            bool texLoading;
+            bool spriteLoading;
+            Action<Texture> onLoadedTex;
+            Action<Sprite> onLoadedSprite;
+
+            public Texture GetTex()
             {
-                this.onLoaded += onLoaded;
+                if (forceTex != null)
+                {
+                    return forceTex;
+                }
                 if (_tex == null)
                 {
-                    if (!loading)
+                    _tex = TextureHelper.GetTextureByPath(path);
+                }
+                return _tex;
+            }
+            public void GetTexAsync(Action<Texture> onLoaded)
+            {
+                this.onLoadedTex += onLoaded;
+                if (forceTex != null)
+                {
+                    _tex = forceTex;
+                }
+                if (_tex == null)
+                {
+                    if (!texLoading)
                     {
-                        loading = true;
+                        texLoading = true;
                         Task.Run(async () =>
                         {
                             _tex = await TextureHelper.GetTextureByPathAsync(path);
                             TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
                             {
-                                this.onLoaded?.Invoke(_tex);
-                                this.onLoaded -= this.onLoaded;
+                                this.onLoadedTex?.Invoke(_tex);
+                                this.onLoadedTex -= this.onLoadedTex;
                             });
-                            loading = false;
+                            texLoading = false;
                         });
                     }
                 }
                 else
                 {
-                    this.onLoaded.Invoke(_tex);
+                    this.onLoadedTex.Invoke(_tex);
+                    this.onLoadedTex -= this.onLoadedTex;
                 }
 
             }
-            public void SetSpriteAsync(Image img)
+            public void GetSpriteAsync(Action<Sprite> onLoaded)
             {
-                if (_sprite != null)
+                this.onLoadedSprite += onLoaded;
+
+                if (_sprite == null)
                 {
-                    img.sprite = _sprite;
+                    if (!spriteLoading)
+                    {
+                        spriteLoading = true;
+                        GetTexAsync((tex) =>
+                           {
+                               _sprite = TextureHelper.GetSpriteByTexture(tex);
+                               this.onLoadedSprite?.Invoke(_sprite);
+                               this.onLoadedSprite -= this.onLoadedSprite;
+                               spriteLoading = false;
+                           });
+                    }
                 }
                 else
                 {
-                    GetTex((tex) =>
-                    {
-                        img.sprite = TextureHelper.GetSpriteByTexture(tex);
-                    });
+                    this.onLoadedSprite.Invoke(_sprite);
+                    this.onLoadedSprite -= this.onLoadedSprite;
                 }
+            }
+            public Sprite GetSprite()
+            {
+                if (_sprite == null)
+                {
+                    _sprite = TextureHelper.GetSpriteByTexture(GetTex());
+                }
+                return _sprite;
             }
         }
     }
@@ -77,18 +120,44 @@ namespace Z_DataSystem.Form
         {
 
             private AudioClip _clip;
-            public AudioClip clip
-            {
-                get
-                {
 
-                    if (_clip == null)
-                    {
-                        //_clip = TextureHelper.GetTextureByPath(path);
-                    }
-                    return _clip;
+            bool audioLoading;
+            bool spriteLoading;
+            Action<AudioClip> onLoadedClip;
+
+
+            public void GetClipAsync(Action<AudioClip> onLoaded)
+            {
+                this.onLoadedClip += onLoaded;
+                if (forceClip != null)
+                {
+                    _clip = forceClip;
                 }
+                if (_clip == null)
+                {
+                    if (!audioLoading)
+                    {
+                        audioLoading = true;
+                        Task.Run(async () =>
+                        {
+                            _clip = await AudioHelper.GetAudioByPath(path);
+                            TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
+                            {
+                                this.onLoadedClip?.Invoke(_clip);
+                                this.onLoadedClip -= this.onLoadedClip;
+                            });
+                            audioLoading = false;
+                        });
+                    }
+                }
+                else
+                {
+                    this.onLoadedClip.Invoke(_clip);
+                    this.onLoadedClip -= this.onLoadedClip;
+                }
+
             }
+          
         }
     }
     public partial class ProductForm
@@ -343,17 +412,17 @@ namespace Z_DataSystem
         {
             return new AudioAssetForm.Data(-1, name, "", clip);
         }
-/*        public AudioAssetForm.Data LoadAudioBytes(byte[] data, string name)
-        {
-            var clip = AudioHelper.GetAudioByByte(data);
+        /*        public AudioAssetForm.Data LoadAudioBytes(byte[] data, string name)
+                {
+                    var clip = AudioHelper.GetAudioByByte(data);
 
-            return new AudioAssetForm.Data(-1, name, "", clip);
-        }
-        public AudioAssetForm.Data LoadAudioPath(string path, string name)
-        {
-            var clip = TextureHelper.GetTextureByPath(path);
-            return new AudioAssetForm.Data(-1, name, path,);
-        }*/
+                    return new AudioAssetForm.Data(-1, name, "", clip);
+                }
+                public AudioAssetForm.Data LoadAudioPath(string path, string name)
+                {
+                    var clip = TextureHelper.GetTextureByPath(path);
+                    return new AudioAssetForm.Data(-1, name, path,);
+                }*/
 
 
         #endregion

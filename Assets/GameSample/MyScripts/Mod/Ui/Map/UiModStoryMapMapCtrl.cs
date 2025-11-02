@@ -54,7 +54,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         }
         public void Refresh()
         {
-            view.img_map.sprite = TexAssetForm.DataByName[GameManager.instance.curConfig.miniMap].sprite;
+            view.img_map.sprite = TexAssetForm.DataByName[GameManager.instance.curConfig.miniMap].GetSprite();
             con.Clear();
             foreach (var data in SceneForm.DataByUid.Values)
             {

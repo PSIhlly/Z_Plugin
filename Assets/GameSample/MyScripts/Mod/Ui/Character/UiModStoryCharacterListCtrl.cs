@@ -154,7 +154,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.avatarTexName].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.avatarTexName].GetSprite();
             }
         }
     }

@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Video;
-namespace Z_Audio
+namespace Z_Video
 {
     public static class VideoHelper
     {

@@ -185,7 +185,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
             for (int i = 0; i < maskData.texsName.Count; i++)
             {
-                raws[i] = (Texture2D)TexAssetForm.DataByName[maskData.texsName[i]].tex;
+                raws[i] = (Texture2D)TexAssetForm.DataByName[maskData.texsName[i]].GetTex();
             }
             GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic6(maskData.name, raws);
         }

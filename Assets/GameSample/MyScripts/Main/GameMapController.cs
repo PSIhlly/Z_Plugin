@@ -769,7 +769,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
                     ins.renderers[i].GetPropertyBlock(propBlock);
                     animCurCache[data][i] = cur;
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].GetTex());
                     int renderId = i;
                     ins.animTimer[i] =TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
                     {
@@ -777,14 +777,14 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                         ins.renderers[renderId].GetPropertyBlock(propBlock);
                         cur = (cur + 1) % texForm.texsName.Count;
                         animCurCache[data][renderId] = cur;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].tex);
+                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].GetTex());
                         ins.renderers[renderId].SetPropertyBlock(propBlock);
                         return false;
                     }, ins);
                 }
                 else
                 {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[0]].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[0]].GetTex());
                 }
             }else
             {

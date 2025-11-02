@@ -152,7 +152,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].GetSprite();
             }
         }
     }

@@ -94,7 +94,7 @@ public class GameUtilController : Z_Controller<GameManager>
             }
             else
             {
-                var tex = TexAssetForm.DataByName[texRealName[i]].tex;
+                var tex = TexAssetForm.DataByName[texRealName[i]].GetTex();
                 render.shadowCastingMode = showShadow[i] ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
                 propBlock.SetTexture("_Tex", tex);
             }

@@ -207,21 +207,21 @@ namespace Form
                     render.GetPropertyBlock(propBlock);
                     animCurCache[part] = anim.name;
 
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[part]].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[part]].GetTex());
                     var renderPart = part;
                     animTimer[part] = TimeManager.instance.StartTimer(timeProgress, anim.animTimeInterval, () =>
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         render.GetPropertyBlock(propBlock);
                         cur = (cur + 1) % anim.animClip.Count;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[renderPart]].tex);
+                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[renderPart]].GetTex());
                         render.SetPropertyBlock(propBlock);
                         return false;
                     }, data.unit.ins);
                 }
                 else
                 {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[0].partTex[part]].tex);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[0].partTex[part]].GetTex());
                 }
                 render.SetPropertyBlock(propBlock);
             }

@@ -91,11 +91,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 view.txt_.text = model.data.name;
                 if(model.data.animClip.Count > 0&& model.data.animClip[0].partTex.ContainsKey(BodyPartType.UpperPart))
                 {
-                    view.img_.sprite = TexAssetForm.DataByName[model.data.animClip[0].partTex[BodyPartType.UpperPart]].sprite;
+                    view.img_.sprite = TexAssetForm.DataByName[model.data.animClip[0].partTex[BodyPartType.UpperPart]].GetSprite();
                 }
                 else
                 {
-                    view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetDefaultTexName()].sprite;
+                    view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetDefaultTexName()].GetSprite();
                 }
             }
         }

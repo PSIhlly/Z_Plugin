@@ -308,7 +308,7 @@ public partial class UiItemParam
             if (model.id != -1)
             {
                 view.txt_.text = "";
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.animClip[model.id].partTex[BodyPartType.UpperPart]].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.animClip[model.id].partTex[BodyPartType.UpperPart]].GetSprite();
             }
 
         }

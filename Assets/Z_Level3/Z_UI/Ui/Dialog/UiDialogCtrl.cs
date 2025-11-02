@@ -291,10 +291,10 @@ namespace Ui.Dialog
             view.sub_Title.Display(model.clips[model.curClipId].title);
             var texName = model.clips[model.curClipId].mainPicture;
             if (TexAssetForm.DataByName.ContainsKey(texName))
-                view.sub_MainPicture.Display(TexAssetForm.DataByName[texName].sprite);
+                view.sub_MainPicture.Display(TexAssetForm.DataByName[texName].GetSprite());
             texName = model.clips[model.curClipId].profilePicture;
             if (TexAssetForm.DataByName.ContainsKey(texName))
-                view.sub_ProfilePicture.Display(TexAssetForm.DataByName[texName].sprite);
+                view.sub_ProfilePicture.Display(TexAssetForm.DataByName[texName].GetSprite());
 
             view.sub_History.AddClip(model.clips[model.curClipId]);
         }
@@ -359,7 +359,7 @@ namespace Ui.Dialog
                 view.img_ProfilePicture.gameObject.SetActive(param.clip.profilePicture!=null);
 
                 if (TexAssetForm.DataByName.ContainsKey(param.clip.profilePicture))
-                    view.img_ProfilePicture.sprite = TexAssetForm.DataByName[param.clip.profilePicture].sprite;
+                    view.img_ProfilePicture.sprite = TexAssetForm.DataByName[param.clip.profilePicture].GetSprite();
                 else
                     view.img_ProfilePicture.sprite = TextureHelper.transparentSprite;
             }

@@ -302,7 +302,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             foreach (var data in CharacterProductForm.DatasByIsproto[true])
             {
-                items.Add(data.name, TexAssetForm.DataByName[data.avatarTexName].sprite);
+                items.Add(data.name, TexAssetForm.DataByName[data.avatarTexName].GetSprite());
             }
         }
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
@@ -482,7 +482,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         
             foreach (var data in EffectForm.DataByUid.Values)
             {
-                items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].sprite);
+                items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].GetSprite());
             }
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>

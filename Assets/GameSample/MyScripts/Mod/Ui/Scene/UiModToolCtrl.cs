@@ -429,7 +429,7 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
+            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
 
             view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
 
@@ -462,7 +462,7 @@ namespace Ui.ModSceneMain.ModTool
             model.data = param.data;
             view.sta_exist.ChangeState(1);
             view.txt_.text = TextManager.instance.GetTxt(model.data.NameKey);
-            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
+            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
 
 
             view.sta_.ChangeState(parent.model.curType == model.data ? 1 : 0);

@@ -77,8 +77,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
-            view.img_image.sprite = TexAssetForm.DataByName[model.data.avatarTexName].sprite;
-            view.img_tachie.sprite = TexAssetForm.DataByName[model.data.tachie].sprite;
+            view.img_image.sprite = TexAssetForm.DataByName[model.data.avatarTexName].GetSprite();
+            view.img_tachie.sprite = TexAssetForm.DataByName[model.data.tachie].GetSprite();
             view.ipt_desc.Set(model.data.desc);
         }
         public void OnEvent(AssetEvent evt)

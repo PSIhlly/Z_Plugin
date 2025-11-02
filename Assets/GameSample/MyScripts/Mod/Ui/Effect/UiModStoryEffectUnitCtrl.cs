@@ -87,7 +87,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
             });
             effectCon.Refresh();
 
-            view.img_image.sprite = TexAssetForm.DataByName[model.data.clips[0].tex].sprite;
+            view.img_image.sprite = TexAssetForm.DataByName[model.data.clips[0].tex].GetSprite();
         }
     }
 

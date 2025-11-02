@@ -205,7 +205,7 @@ public class GameSaveController : Z_Controller<GameManager>
         if (TexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = TexAssetForm.DataByName[texName];
-            SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.tex));
+            SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.GetTex()));
         }
     }
     private void SaveStoryTex(string texName, string path)
@@ -213,7 +213,7 @@ public class GameSaveController : Z_Controller<GameManager>
         if (!string.IsNullOrEmpty(texName) && TexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = StoryTexAssetForm.DataByName[texName];
-            SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.tex));
+            SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.GetTex()));
         }
     }
     #endregion
@@ -237,7 +237,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void AddStoryTex(TexAssetForm.Data rawData)
     {
-        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id, rawData.name,"", rawData.tex);
+        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id, rawData.name,"", rawData.GetTex());
         if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
         {
             var oldData = StoryTexAssetForm.DataByName[data.name];

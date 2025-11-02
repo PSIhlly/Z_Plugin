@@ -83,7 +83,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
 
             if (model.id >= 0)
             {
-                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].sprite;
+                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].GetSprite();
                 for(int i = 0;i< conditions.Length;i++)
                 {
                     conditions[i].SetActive(i == model.id);
@@ -130,7 +130,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
             if (model.id >= 0)
             {
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].GetSprite();
             }
 
         }

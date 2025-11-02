@@ -101,7 +101,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
             if (model.id >= 0)
             {
-                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].sprite;
+                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].GetSprite();
             }
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
@@ -146,7 +146,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             if (model.id != -1)
             {
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].GetSprite();
             }
         }
     }

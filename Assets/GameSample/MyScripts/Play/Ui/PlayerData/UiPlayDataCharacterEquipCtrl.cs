@@ -117,7 +117,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
             view.sta_exist.ChangeState(model.data != null ? 1 : 0);
             if (model.data != null)
             {
-                view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].GetSprite();
             }
             view.txt_.text = TextManager.instance.GetTxt(model.part.ToString());
 

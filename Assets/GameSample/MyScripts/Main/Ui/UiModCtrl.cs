@@ -88,7 +88,7 @@ namespace Ui.Mod
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
             }
         }
 

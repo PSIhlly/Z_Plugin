@@ -93,7 +93,7 @@ namespace Ui.PlayData.PlayDataBackpack
             view.sta_show.ChangeState(model.sel != null ? 1 : 0);
             if (model.sel != null)
             {
-                view.img_.sprite = TexAssetForm.DataByName[model.sel.iconTexName].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.sel.iconTexName].GetSprite();
                 view.txt_desc.text = model.sel.desc;
                 view.txt_name.text = model.sel.name;
                 view.txt_amount.text = TextManager.instance.GetTxt("count")+":"+ model.sel.amount.ToString();
@@ -189,7 +189,7 @@ namespace Ui.PlayData.PlayDataBackpack
             view.sta_exist.ChangeState(1);
             view.txt_.text = model.data.name;
             view.txt_count.text = model.data.amount.ToString();
-            view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].sprite;
+            view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].GetSprite();
             view.sta_.ChangeState(parent.model.sel == model.data ? 1 : 0);
         }
     }

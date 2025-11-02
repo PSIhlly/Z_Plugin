@@ -68,7 +68,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
         }
         public void Refresh()
         {
-            view.img_map.sprite = TexAssetForm.DataByName[model.data.miniMap].sprite;
+            view.img_map.sprite = TexAssetForm.DataByName[model.data.miniMap].GetSprite();
             view.ipt_name.Set(model.data.name);
         }
     }

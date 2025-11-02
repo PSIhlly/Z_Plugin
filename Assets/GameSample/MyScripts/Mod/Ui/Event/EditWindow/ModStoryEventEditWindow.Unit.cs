@@ -113,7 +113,7 @@ namespace Ui.ModStoryEventEditWindow
 
                 if (GlobalEventHelper.IsEventTex(model.node.desc.code))
                 {
-                    view.img_.sprite = TexAssetForm.DataByName[string.IsNullOrEmpty(model.node.desc.code)?GlobalNameHelper.GetDefaultTexName():GlobalEventHelper.GetEventAssetTexName(model.node.desc.code)].sprite;
+                    view.img_.sprite = TexAssetForm.DataByName[string.IsNullOrEmpty(model.node.desc.code) ? GlobalNameHelper.GetDefaultTexName() : GlobalEventHelper.GetEventAssetTexName(model.node.desc.code)].GetSprite();
                 }
             }
 

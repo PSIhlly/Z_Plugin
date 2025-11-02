@@ -151,7 +151,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.clips.Count>0? model.data.clips[0].tex:GlobalNameHelper.GetDefaultTexName()].sprite;
+                view.img_.sprite = TexAssetForm.DataByName[model.data.clips.Count > 0 ? model.data.clips[0].tex : GlobalNameHelper.GetDefaultTexName()].GetSprite();
             }
         }
     }

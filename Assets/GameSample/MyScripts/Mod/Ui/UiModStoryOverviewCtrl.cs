@@ -67,7 +67,7 @@ namespace Ui.ModStory.ModStoryOverview
         }
         public void Refresh()
         {
-            view.img_image.sprite = TexAssetForm.DataByName[GameManager.instance.curStory.icon].sprite;
+            view.img_image.sprite = TexAssetForm.DataByName[GameManager.instance.curStory.icon].GetSprite();
             view.ipt_introduction.Set(GameManager.instance.curStory.desc);
             view.ipt_name.Set(GameManager.instance.curStory.name);
         }

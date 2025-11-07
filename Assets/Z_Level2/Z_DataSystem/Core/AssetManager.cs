@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Audio;
@@ -11,6 +12,7 @@ using Z_DesignStyle;
 using Z_Os.File;
 using Z_Texture;
 using Z_Time;
+using Z_UnitSystem;
 using static System.Net.Mime.MediaTypeNames;
 namespace Z_DataSystem.Form
 {
@@ -119,34 +121,60 @@ namespace Z_DataSystem.Form
         public partial class Data
         {
 
+            private byte[] _bytes;
             private AudioClip _clip;
 
-            bool audioLoading;
-            bool spriteLoading;
+            bool byteLoading;
+            bool clipLoading;
+            Action<byte[]> onLoadedBytes;
             Action<AudioClip> onLoadedClip;
 
 
+            public void GetBytesAsync(Action<byte[]> onLoaded)
+            {
+                this.onLoadedBytes += onLoaded;
+                if (_clip == null)
+                {
+                    if (!byteLoading)
+                    {
+                        byteLoading = true;
+                        Task.Run(async () =>
+                        {
+                            _bytes = SaveAndLoad.Load<byte[]>(path);
+                            TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
+                            {
+                                this.onLoadedBytes?.Invoke(_bytes);
+                                this.onLoadedBytes -= this.onLoadedBytes;
+                            });
+                            byteLoading = false;
+                        });
+                    }
+                }
+                else
+                {
+                    this.onLoadedBytes.Invoke(_bytes);
+                    this.onLoadedBytes -= this.onLoadedBytes;
+                }
+
+            }
             public void GetClipAsync(Action<AudioClip> onLoaded)
             {
                 this.onLoadedClip += onLoaded;
-                if (forceClip != null)
+                if(forceClip!=null)
                 {
                     _clip = forceClip;
                 }
                 if (_clip == null)
                 {
-                    if (!audioLoading)
+                    if (!clipLoading)
                     {
-                        audioLoading = true;
-                        Task.Run(async () =>
+                        clipLoading = true;
+                        GetBytesAsync(async (bytes) =>
                         {
-                            _clip = await AudioHelper.GetAudioByPath(path);
-                            TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
-                            {
-                                this.onLoadedClip?.Invoke(_clip);
-                                this.onLoadedClip -= this.onLoadedClip;
-                            });
-                            audioLoading = false;
+                            _clip = await AudioHelper.GetAudioByByte(bytes);
+                            this.onLoadedClip?.Invoke(_clip);
+                            this.onLoadedClip -= this.onLoadedClip;
+                            clipLoading = false;
                         });
                     }
                 }
@@ -155,9 +183,8 @@ namespace Z_DataSystem.Form
                     this.onLoadedClip.Invoke(_clip);
                     this.onLoadedClip -= this.onLoadedClip;
                 }
-
             }
-          
+
         }
     }
     public partial class ProductForm

@@ -10,34 +10,29 @@ namespace Z_Video
 {
     public static class VideoHelper
     {
-        /*public static VideoClip  GetVideoByByte(byte[] data)
+        public static void PlayVideoByPath(this VideoPlayer player, string path)
         {
-            using (MemoryStream stream = new MemoryStream(data))
+            string url = "file://" + path;
+            player.source = VideoSource.Url;
+            player.url = url;
+            player.playOnAwake = false;
+
+            // 准备播放
+            player.Prepare();
+            player.prepareCompleted += OnPrepareCompleted;
+            player.errorReceived += OnErrorReceived;
+
+        }
+        private static void OnPrepareCompleted(VideoPlayer vp)
         {
-            // 2. 加载视频数据到 VideoClip（Unity 2020+ 支持）
-            VideoClip clip = VideoClip.CreateFromStream(stream, "InMemoryMP4", (int)stream.Length);
-
-            // 3. 配置 VideoPlayer
-            videoPlayer.source = VideoSource.VideoClip;
-            videoPlayer.clip = clip;
-
-            // 4. 关联渲染目标
-            if (videoScreen != null)
-            {
-                videoPlayer.targetTexture = new RenderTexture(
-                    Screen.width, Screen.height, 24
-                );
-                videoScreen.texture = videoPlayer.targetTexture;
-            }
-
-            // 5. 准备并播放
-            videoPlayer.Prepare();
-            while (!videoPlayer.isPrepared) yield return null;
-            videoPlayer.Play();
+            Debug.Log("Play!");
+            vp.Play();
         }
 
-        }*/
-
+        private static void OnErrorReceived(VideoPlayer vp, string error)
+        {
+            Debug.LogError("Err: " + error);
+        }
 
     }
 

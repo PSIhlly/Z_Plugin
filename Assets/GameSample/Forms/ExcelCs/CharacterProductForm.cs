@@ -314,6 +314,10 @@ namespace Form
                  
                      }
                     
+            public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.isProto)
+            {
+            }
+            
             public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique):base(uid,name,label,isProto)
             {
 

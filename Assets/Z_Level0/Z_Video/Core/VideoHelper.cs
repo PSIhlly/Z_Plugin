@@ -18,9 +18,10 @@ namespace Z_Video
             player.playOnAwake = false;
 
             // 准备播放
-            player.Prepare();
             player.prepareCompleted += OnPrepareCompleted;
             player.errorReceived += OnErrorReceived;
+            player.Prepare();
+
 
         }
         private static void OnPrepareCompleted(VideoPlayer vp)

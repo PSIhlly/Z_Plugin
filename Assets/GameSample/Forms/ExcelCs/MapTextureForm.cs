@@ -134,6 +134,10 @@ namespace Form
                  
                      }
                     
+            public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.label)
+            {
+            }
+            
             public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName,string label,Dictionary<string,EventTriggerForm.Data> events):base(id,name,icon,label)
             {
 

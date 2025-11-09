@@ -38,6 +38,9 @@ public class GameSaveController : Z_Controller<GameManager>
     public string effectFormFileName => "etf";
     public string skillFormFileName => "slf";
     public string itemProductFormFileName => "iprf";
+
+
+    public string assetFolder => "/ast/";
     public GameSaveController(GameManager super) : base(super)
     {
     }
@@ -161,7 +164,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
         if (data != null)
         {
-            var imgs = data.code.Split(AssetManager.IMAGE_MARK);//获取常量图片
+            var imgs = data.code.Split(AssetDefines.IMAGE_MARK);//获取常量图片
             for (int i = 1; i < imgs.Length; i += 2)
             {
                 SaveStoryTex(imgs[i], storyCoreFolder);
@@ -205,7 +208,10 @@ public class GameSaveController : Z_Controller<GameManager>
         if (TexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = TexAssetForm.DataByName[texName];
-            SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.GetTex()));
+            if(tex.bytes != null)
+            {
+                SaveAndLoad.Save(path + assetFolder + texName, tex.bytes);
+            }
         }
     }
     private void SaveStoryTex(string texName, string path)
@@ -223,21 +229,21 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         if (!string.IsNullOrEmpty(texName) && SaveAndLoad.Exist(path) && !StoryTexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
         {
-            var res = SaveAndLoad.Load<byte[]>(path + "/" + texName);
+            var res = SaveAndLoad.Load<byte[]>(path + assetFolder + texName);
             if (res != null)
             {
-                AddStoryTex(AssetManager.instance.LoadTexBytes(res, texName));
+                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByBytes(res, texName));
             }
             else if (!GameTexAssetForm.DataByName.ContainsKey(texName))
             {
                 Debug.LogError(texName + "贴图丢失！");
-                AddStoryTex(new TexAssetForm.Data(-1, texName,"", TextureHelper.transparentTexture));
+                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, texName));
             }
         }
     }
     public void AddStoryTex(TexAssetForm.Data rawData)
     {
-        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData.id, rawData.name,"", rawData.GetTex());
+        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData);
         if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
         {
             var oldData = StoryTexAssetForm.DataByName[data.name];
@@ -250,11 +256,26 @@ public class GameSaveController : Z_Controller<GameManager>
             importAssetName = data.name
         });
     }
+    public void AddGameTex(TexAssetForm.Data rawData)
+    {
+        GameTexAssetForm.Data data = new GameTexAssetForm.Data(rawData);
+        if (GameTexAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = GameTexAssetForm.DataByName[data.name];
+            GameTexAssetForm.RemoveData(oldData.id);
+        }
+        GameTexAssetForm.AddData(data);
+
+        Z_EventHelper.Invoke(new AssetEvent()
+        {
+            importAssetName = data.name
+        });
+    }
     public void LoadTex(string texName, string path)
     {
         if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(texName))
         {
-            AddTex(AssetManager.instance.LoadTexBytes(SaveAndLoad.Load<byte[]>(path + "/" + texName), texName));
+            AddTex(AssetManager.instance.texCtrl.CreateDataByBytes(SaveAndLoad.Load<byte[]>(path + assetFolder + texName), texName));
         }
     }
     public void AddTex(TexAssetForm.Data rawData)
@@ -479,7 +500,7 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in EventProgramDataForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
                 EventProgramDataForm.AddData(form);
-                var imgs = form.code.Split(AssetManager.IMAGE_MARK);//获取常量图片
+                var imgs = form.code.Split(AssetDefines.IMAGE_MARK);//获取常量图片
                 for (int i = 1; i < imgs.Length; i += 2)
                 {
                     LoadStoryTex(imgs[i], storyCoreFolder);
@@ -565,7 +586,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             if (form.name.StartsWith(GlobalNameHelper.GetInternalPrefabName("")))
             {
-                InstancePoolManager.instance.AddPool(form.go);
+                InstancePoolManager.instance.AddPool(form.GetGo());
             }
         }
         foreach (var form in MapObjectForm.DataById.Values)

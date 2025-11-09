@@ -43,7 +43,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region story
     public void ImportStoryTex()
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             GameManager.instance.curStory.icon = form.name;
             GameManager.instance.saveCtrl.AddTex(form);
@@ -138,7 +138,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportTex(string name, int id = -1)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
          {
              if (id != -1 && MapTextureForm.DataByName[name].texsName.Count > id)
              {
@@ -176,7 +176,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportMask(string name, int id)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
 
 
@@ -249,7 +249,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportObjectUnitTex(int uid, int id)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
 
             if (MapObjectForm.DataById[uid].model.subUnitTexsName.Count > id)
@@ -331,7 +331,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportCharacterAvatar(int uid)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             CharacterProductForm.DataByUid[uid].avatarTexName = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
@@ -341,7 +341,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportCharacterTachie(int characterUid)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             CharacterProductForm.DataByUid[characterUid].tachie = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
@@ -411,7 +411,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportCharacterAnim(int characterUid, string animNm, BodyPartType part, int id)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = CharacterProductForm.DataByUid[characterUid];
             var anim = data.animDic[animNm];
@@ -466,7 +466,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportEffectImage(int effectUid)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = EffectForm.DataByUid[effectUid];
             foreach(var clip in data.clips)
@@ -507,7 +507,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportSkillIcon(int skillUid)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = SkillForm.DataByUid[skillUid];
             data.icon= form.name;
@@ -520,7 +520,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region event
     public void ImportImage(Action<TexAssetForm.Data> act)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             GameManager.instance.saveCtrl.AddStoryTex(form);
             act?.Invoke(form);
@@ -583,7 +583,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportClipTex(Action<string> callback)
     {
-        AssetManager.instance.SelectTex(callback: (form) =>
+        AssetManager.instance.texCtrl.Select(callback: (form) =>
         {
             callback?.Invoke(form.name);
             GameManager.instance.saveCtrl.AddStoryTex(form);
@@ -629,7 +629,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportItemIcon(int itemUid)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             ItemProductForm.DataByUid[itemUid].iconTexName = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
@@ -681,7 +681,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportItemModelUnitTex(int itemUid, int id)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = ItemProductForm.DataByUid[itemUid];
             if (data.model.subUnitTexsName.Count > id)
@@ -700,7 +700,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ImportItemStyleTex(int itemUid, ItemStyle style)
     {
 
-        AssetManager.instance.SelectTex(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = ItemProductForm.DataByUid[itemUid];
             data.styleTex[style] = form.name;
@@ -716,7 +716,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region scene
     public void ImportMapMiniMap()
     {
-        AssetManager.instance.SelectTex(new Vector2Int(1000, 1000), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
         {
             GameManager.instance.curConfig.miniMap = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
@@ -735,7 +735,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public void ImportSceneMiniMap(string name)
     {
-        AssetManager.instance.SelectTex(new Vector2Int(1000, 1000), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
         {
             var data = SceneForm.DataByName[name].miniMap = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);

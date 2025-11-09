@@ -46,6 +46,12 @@ public static readonly int autoIdCnt=10000;
                 
         public static Action<Data,string,string> changePathAction;
                 
+        public static Action<Data,byte[],byte[]> changeBytesAction;
+                
+        public static Action<Data,string,string> changeHashAction;
+                
+        public static Action<Data,object,object> changeAssetAction;
+                
 
 
         public partial class Data
@@ -105,23 +111,80 @@ public static readonly int autoIdCnt=10000;
                  
                      }
                     
-            public Data(int id,string name,string path)
+                    private byte[]  _bytes;
+                    /// <summary>
+                    ///二进制文件
+                    ///</summary>
+                    public byte[]  bytes{
+                                get{return _bytes;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeBytes(this,_bytes,value); 
+                    }
+        
+                _bytes = value;
+                }
+                 
+                     }
+                    
+                    private string  _hash;
+                    /// <summary>
+                    ///哈希
+                    ///</summary>
+                    public string  hash{
+                                get{return _hash;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeHash(this,_hash,value); 
+                    }
+        
+                _hash = value;
+                }
+                 
+                     }
+                    
+                    private object  _asset;
+                    /// <summary>
+                    ///运行时资源
+                    ///</summary>
+                    public object  asset{
+                                get{return _asset;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeAsset(this,_asset,value); 
+                    }
+        
+                _asset = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string path,byte[] bytes,string hash,object asset)
             {
 
              this.id = id;
              this.name = name;
              this.path = path;
+             this.bytes = bytes;
+             this.hash = hash;
+             this.asset = asset;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,path);
+        return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","",null,"",null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -210,7 +273,13 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                    _defaultData.path
+                jo.Get<string>("path"),
+
+                jo.Get<byte[]>("bytes"),
+
+                jo.Get<string>("hash"),
+
+                    _defaultData.asset
                     );
 
             return data;
@@ -225,6 +294,12 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<string>("path",data.path);
+
+            jo.Set<byte[]>("bytes",data.bytes);
+
+            jo.Set<string>("hash",data.hash);
 
             return jo;
         }
@@ -346,6 +421,36 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     DatasByPath[newV].Add(data);
  
                 changePathAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBytes(Data superData,byte[] oldV,byte[] newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBytesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHash(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHashAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAsset(Data superData,object oldV,object newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAssetAction?.Invoke(data,oldV,newV);
                 }
                     
             }

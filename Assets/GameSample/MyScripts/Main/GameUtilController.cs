@@ -69,7 +69,7 @@ public class GameUtilController : Z_Controller<GameManager>
         var res = new GameObject(name);
         for (int i = 0; i < prefabKeys.Count; i++)
         {
-            var go = GameObject.Instantiate(AssetManager.instance.GetGameObject(prefabKeys[i]), res.transform);
+            var go = GameObject.Instantiate(GameObjectAssetForm.DataByName[prefabKeys[i]].GetGo(), res.transform);
             go.transform.localPosition = poss[i] +Vector3.up/2;//Ì§¸ß
             go.transform.localScale = scales[i];
 

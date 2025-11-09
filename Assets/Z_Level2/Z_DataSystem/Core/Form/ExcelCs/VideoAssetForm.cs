@@ -33,6 +33,12 @@ namespace Z_DataSystem.Form
 
             AssetForm.changePathAction+=ChangePath;
 
+            AssetForm.changeBytesAction+=ChangeBytes;
+
+            AssetForm.changeHashAction+=ChangeHash;
+
+            AssetForm.changeAssetAction+=ChangeAsset;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -58,28 +64,41 @@ namespace Z_DataSystem.Form
                 
         public static Action<Data,string,string> changePathAction;
                 
+        public static Action<Data,byte[],byte[]> changeBytesAction;
+                
+        public static Action<Data,string,string> changeHashAction;
+                
+        public static Action<Data,object,object> changeAssetAction;
+                
 
 
         public partial class Data : AssetForm.Data
         {
 
-            public Data(int id,string name,string path):base(id,name,path)
+            public Data(AssetForm.Data data):base(data.id,data.name,data.path,data.bytes,data.hash,data.asset)
+            {
+            }
+            
+            public Data(int id,string name,string path,byte[] bytes,string hash,object asset):base(id,name,path,bytes,hash,asset)
             {
 
              this.id = id;
              this.name = name;
              this.path = path;
+             this.bytes = bytes;
+             this.hash = hash;
+             this.asset = asset;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,path);
+        return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","",null,"",null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -190,7 +209,13 @@ namespace Z_DataSystem.Form
 
                 jo.Get<string>("name"),
 
-                    _defaultData.path
+                    _defaultData.path,
+
+                jo.Get<byte[]>("bytes"),
+
+                jo.Get<string>("hash"),
+
+                    _defaultData.asset
                     );
 
             return data;
@@ -205,6 +230,10 @@ namespace Z_DataSystem.Form
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<byte[]>("bytes",data.bytes);
+
+            jo.Set<string>("hash",data.hash);
 
             return jo;
         }
@@ -333,6 +362,36 @@ AssetForm.RemoveData(id);
                     DatasByPath[newV].Add(data);
  
                 changePathAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBytes(AssetForm.Data superData,byte[] oldV,byte[] newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBytesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHash(AssetForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHashAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAsset(AssetForm.Data superData,object oldV,object newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAssetAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -74,6 +74,10 @@ namespace Form
         public partial class Data : TextBaseForm.Data
         {
 
+            public Data(TextBaseForm.Data data):base(data.id,data.key,data.contentEn,data.contentCn)
+            {
+            }
+            
             public Data(int id,string key,string contentEn,string contentCn):base(id,key,contentEn,contentCn)
             {
 

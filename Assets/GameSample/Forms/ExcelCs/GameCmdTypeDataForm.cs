@@ -66,6 +66,10 @@ namespace Form
         public partial class Data : CmdTypeDataForm.Data
         {
 
+            public Data(CmdTypeDataForm.Data data):base(data.uid,data.name)
+            {
+            }
+            
             public Data(int uid,string name):base(uid,name)
             {
 

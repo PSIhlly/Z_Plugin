@@ -130,6 +130,10 @@ namespace Form
                  
                      }
                     
+            public Data(CmdDataForm.Data data):base(data.uid,data.name,data.prmNames,data.prmTypes,data.retNames,data.retTypes,data.desc,data.defaultCode)
+            {
+            }
+            
             public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode,string category,string type):base(uid,name,prmNames,prmTypes,retNames,retTypes,desc,defaultCode)
             {
 

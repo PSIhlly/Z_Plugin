@@ -43,8 +43,8 @@ public static partial class GlobalSettings
 public static class GlobalNameHelper
 {
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
-    public static string GetRuntimePrefabName(string name="") => "runtime$" + name;
-    public static string GetDefaultTexName(string name="") => "reserved$"+ name;
+    public static string GetRuntimePrefabName(string name = "") => "runtime$" + name;
+    public static string GetDefaultTexName(string name = "") => "reserved$" + name;
     public static bool IsInnerAssetName(string name)
     {
         return name.Contains("$");
@@ -62,7 +62,7 @@ public class GameManager : Z_MonoManager<GameManager>
     public GameUtilController utilCtrl;
     public GameSaveController saveCtrl;
     public GameEventController evtCtrl;
-    public GameMapController mapCtrl; 
+    public GameMapController mapCtrl;
     public GameCharacterController characterCtrl;
     public GameItemController itemCtrl;
     public GameEffectController effectCtrl;
@@ -88,23 +88,24 @@ public class GameManager : Z_MonoManager<GameManager>
 
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets
-        
-
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultTexName(""),"", TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultStoryTexName(), "", TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultCharacterTexName(), "", TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultItemTexName(), "", TextureHelper.transparentTexture));
-        GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, GlobalNameHelper.GetDefaultModelTexName(), "", new Texture2D(1,1)));
 
 
-        var res=AssetManager.instance.LoadAssetsByFolder("Z_Map/", true);
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName("")));
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultStoryTexName()));
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultCharacterTexName()));
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName()));
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(new Texture2D(1, 1), GlobalNameHelper.GetDefaultModelTexName()));
+
+
+
+        var res = AssetManager.instance.LoadAssetsByFolder("Z_Map/", true);
         for (int i = 0; i < res.texs.Count; i++)
         {
-            GameTexAssetForm.AddData(new GameTexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(res.texs[i].Item1), "", res.texs[i].Item2));
+            saveCtrl.AddGameTex(res.texs[i].Item2);
         }
         for (int i = 0; i < res.gos.Count; i++)
         {
-            GameObjectAssetForm.AddData(new GameObjectAssetForm.Data(-1 , Path.GetFileName(res.gos[i].Item1), res.gos[i].Item2,""));
+            GameObjectAssetForm.AddData(res.gos[i].Item2);
         }
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))
@@ -160,5 +161,5 @@ public class GameManager : Z_MonoManager<GameManager>
     }
 
 
-   
+
 }

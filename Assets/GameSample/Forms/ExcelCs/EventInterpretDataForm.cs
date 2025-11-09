@@ -102,6 +102,10 @@ namespace Form
                  
                      }
                     
+            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top)
+            {
+            }
+            
             public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user):base(uid,stack,heap,program,p,top)
             {
 

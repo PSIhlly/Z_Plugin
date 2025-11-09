@@ -217,6 +217,7 @@ def create_data_handle():
     for formInfo in form_info_list:
          #类型构造方法设置
         con_extend_str = ':base('
+        con_extend_replace_str = ':base('
         con_arg_str = ''
 
         con_copy_str= f'''
@@ -232,14 +233,24 @@ def create_data_handle():
                     con_copy_str+=key+','
             if 'override' in formInfo.var_config_dic[key]:
                 con_extend_str+=key+','
+                con_extend_replace_str+='data.'+key+","
             con_arg_str+=val + ' ' + key + ','
             con_set_str+=f'''
              this.{key} = {key};'''
         con_copy_str=con_copy_str[0:-1]+f''');
                 }}'''
         con_extend_str=con_extend_str[0:-1]+')'
+        con_extend_replace_str = con_extend_replace_str[0:-1]+')'
+
         if formInfo.extend_data_str == '':
             con_extend_str=''
+        else :
+            formInfo.declare_str+=f'''
+            public Data({formInfo.extend_data_str}Form.Data data){con_extend_replace_str}
+            {{
+            }}
+            '''
+
         formInfo.declare_str+=f'''
             public Data({con_arg_str[0:-1]}){con_extend_str}
             {{

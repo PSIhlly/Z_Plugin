@@ -114,6 +114,10 @@ namespace Form
                  
                      }
                     
+            public Data(ProgramDataForm.Data data):base(data.uid,data.name,data.code,data.zCode)
+            {
+            }
+            
             public Data(int uid,string name,string code,List<string> zCode,string category,string type):base(uid,name,code,zCode)
             {
 

@@ -294,6 +294,10 @@ namespace Form
                  
                      }
                     
+            public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.isProto)
+            {
+            }
+            
             public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,bool isProto,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events):base(uid,name,label,isProto)
             {
 

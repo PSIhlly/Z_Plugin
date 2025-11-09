@@ -95,6 +95,10 @@ private set{
                  
                      }
                     
+            public Data(ParamForm.Data data):base(data.uid,data.name,data.valueType,data.min,data.v,data.max)
+            {
+            }
+            
             public Data(int uid,string name,ValType valueType,float min,float v,float max,int SpecialType):base(uid,name,valueType,min,v,max)
             {
 

@@ -94,6 +94,10 @@ namespace Form
                  
                      }
                     
+            public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.label)
+            {
+            }
+            
             public Data(int id,string name,string icon,List<string> texsName,string label):base(id,name,icon,label)
             {
 

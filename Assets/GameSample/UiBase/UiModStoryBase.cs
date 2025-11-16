@@ -5024,6 +5024,7 @@ namespace ModStoryMapConfig
 
             public Btn btn_back;
             public Btn btn_play;
+            public Btn btn_save;
             public ModStoryOverview.UiModStoryOverviewCtrl page_ModStoryOverview;
             public ModStoryParameter.UiModStoryParameterCtrl page_ModStoryParameter;
             public ModStoryCharacter.UiModStoryCharacterCtrl page_ModStoryCharacter;
@@ -5058,35 +5059,36 @@ namespace ModStoryMapConfig
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_play = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            page_ModStoryOverview = (ModStoryOverview.UiModStoryOverviewCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            page_ModStoryParameter = (ModStoryParameter.UiModStoryParameterCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            page_ModStoryCharacter = (ModStoryCharacter.UiModStoryCharacterCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            page_ModStorySkill = (ModStorySkill.UiModStorySkillCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            page_ModStoryItem = (ModStoryItem.UiModStoryItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMapObject = (ModStoryMapObject.UiModStoryMapObjectCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            page_ModStoryEffect = (ModStoryEffect.UiModStoryEffectCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            page_ModStoryEvent = (ModStoryEvent.UiModStoryEventCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMap = (ModStoryMap.UiModStoryMapCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            txt_title = uiHolder.elementTrsLst[11].GetComponent<Txt>();
-            btn_overview = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            sta_overview = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            btn_parameter = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            sta_parameter = uiHolder.elementTrsLst[15].GetComponent<Sta>();
-            btn_character = uiHolder.elementTrsLst[16].GetComponent<Btn>();
-            sta_character = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            btn_skill = uiHolder.elementTrsLst[18].GetComponent<Btn>();
-            sta_skill = uiHolder.elementTrsLst[19].GetComponent<Sta>();
-            btn_item = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            sta_item = uiHolder.elementTrsLst[21].GetComponent<Sta>();
-            btn_mapObject = uiHolder.elementTrsLst[22].GetComponent<Btn>();
-            sta_mapObject = uiHolder.elementTrsLst[23].GetComponent<Sta>();
-            btn_effect = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            sta_effect = uiHolder.elementTrsLst[25].GetComponent<Sta>();
-            btn_event = uiHolder.elementTrsLst[26].GetComponent<Btn>();
-            sta_event = uiHolder.elementTrsLst[27].GetComponent<Sta>();
-            btn_map = uiHolder.elementTrsLst[28].GetComponent<Btn>();
-            sta_map = uiHolder.elementTrsLst[29].GetComponent<Sta>();
-            txt_overview = uiHolder.elementTrsLst[30].GetComponent<Txt>();
+            btn_save = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            page_ModStoryOverview = (ModStoryOverview.UiModStoryOverviewCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            page_ModStoryParameter = (ModStoryParameter.UiModStoryParameterCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            page_ModStoryCharacter = (ModStoryCharacter.UiModStoryCharacterCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            page_ModStorySkill = (ModStorySkill.UiModStorySkillCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            page_ModStoryItem = (ModStoryItem.UiModStoryItemCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMapObject = (ModStoryMapObject.UiModStoryMapObjectCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            page_ModStoryEffect = (ModStoryEffect.UiModStoryEffectCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            page_ModStoryEvent = (ModStoryEvent.UiModStoryEventCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMap = (ModStoryMap.UiModStoryMapCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            txt_title = uiHolder.elementTrsLst[12].GetComponent<Txt>();
+            btn_overview = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_overview = uiHolder.elementTrsLst[14].GetComponent<Sta>();
+            btn_parameter = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            sta_parameter = uiHolder.elementTrsLst[16].GetComponent<Sta>();
+            btn_character = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            sta_character = uiHolder.elementTrsLst[18].GetComponent<Sta>();
+            btn_skill = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            sta_skill = uiHolder.elementTrsLst[20].GetComponent<Sta>();
+            btn_item = uiHolder.elementTrsLst[21].GetComponent<Btn>();
+            sta_item = uiHolder.elementTrsLst[22].GetComponent<Sta>();
+            btn_mapObject = uiHolder.elementTrsLst[23].GetComponent<Btn>();
+            sta_mapObject = uiHolder.elementTrsLst[24].GetComponent<Sta>();
+            btn_effect = uiHolder.elementTrsLst[25].GetComponent<Btn>();
+            sta_effect = uiHolder.elementTrsLst[26].GetComponent<Sta>();
+            btn_event = uiHolder.elementTrsLst[27].GetComponent<Btn>();
+            sta_event = uiHolder.elementTrsLst[28].GetComponent<Sta>();
+            btn_map = uiHolder.elementTrsLst[29].GetComponent<Btn>();
+            sta_map = uiHolder.elementTrsLst[30].GetComponent<Sta>();
+            txt_overview = uiHolder.elementTrsLst[31].GetComponent<Txt>();
         }
 
     }

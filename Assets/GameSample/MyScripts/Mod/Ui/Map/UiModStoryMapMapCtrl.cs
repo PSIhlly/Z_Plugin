@@ -48,7 +48,6 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveConfig(ModManager.instance.GetStoryCoreFolder());
             base.Close();
 
         }

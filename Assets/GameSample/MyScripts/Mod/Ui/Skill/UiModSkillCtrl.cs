@@ -37,10 +37,7 @@ namespace Ui.ModStory.ModStorySkill
                 model.selPage = param.selPage;
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveSkill(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void SelPage(int id, SkillForm.Data data = null)
         {
             model.selPage = id;
@@ -50,8 +47,8 @@ namespace Ui.ModStory.ModStorySkill
         public void Refresh()
         {
 
-            view.page_ModStorySkillList.SetActive(model.selPage == 0);
-            view.page_ModStorySkillUnit.SetActive(model.selPage == 1, new UiModStorySkillUnitParam() { data = model.data });
+            view.page_ModStorySkillList.SetShow(model.selPage == 0);
+            view.page_ModStorySkillUnit.SetShow(model.selPage == 1, new UiModStorySkillUnitParam() { data = model.data });
         }
     }
 

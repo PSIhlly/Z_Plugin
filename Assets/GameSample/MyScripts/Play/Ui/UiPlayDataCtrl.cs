@@ -52,9 +52,9 @@ namespace Ui.PlayData
         public void Refresh()
         {
 
-            view.page_PlayDataBackpack.SetActive(model.selPage == 1);
+            view.page_PlayDataBackpack.SetShow(model.selPage == 1);
             view.sta_backpack.ChangeState(model.selPage == 1 ? 1 : 0);
-            view.page_PlayDataCharacter.SetActive(model.selPage == 2);
+            view.page_PlayDataCharacter.SetShow(model.selPage == 2);
             view.sta_character.ChangeState(model.selPage == 2 ? 1 : 0);
 
         }

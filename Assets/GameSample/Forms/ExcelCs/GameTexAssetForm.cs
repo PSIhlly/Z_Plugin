@@ -139,6 +139,16 @@ namespace Form
                 }
             }
     
+            static Dictionary<string, Data> _DataByHash;
+            public static Dictionary<string, Data> DataByHash
+            {
+                get
+                {
+                    Init();
+                    return _DataByHash;
+                }
+            }
+    
 
         static public void Init()
         {
@@ -158,6 +168,10 @@ namespace Form
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
+    
+                    };
+    
+                    _DataByHash = new Dictionary<string, Data>() {
     
                     };
     
@@ -264,6 +278,8 @@ namespace Form
     
                     DataByName[data.name]=data;
     
+                    DataByHash[data.hash]=data;
+    
                     if(!DatasByPath.ContainsKey(data.path))
                         DatasByPath[data.path]=new List<Data>();
                     DatasByPath[data.path].Add(data);
@@ -284,6 +300,8 @@ TexAssetForm.AddData(data);
                     DataById.Remove(data.id);
     
                     DataByName.Remove(data.name);
+    
+                    DataByHash.Remove(data.hash);
     
                     DatasByPath[data.path].Remove(data);
                     if(DatasByPath[data.path].Count==0)
@@ -388,6 +406,9 @@ TexAssetForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
+                    DataByHash.Remove(oldV);
+                    DataByHash[newV]=data;
+ 
                 changeHashAction?.Invoke(data,oldV,newV);
                 }
                     

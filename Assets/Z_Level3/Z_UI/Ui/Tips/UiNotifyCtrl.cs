@@ -24,7 +24,7 @@ namespace Ui.Notify
         public List<ChooseInfo> chooseInfos = new List<ChooseInfo>();
         public List<MultipleChooseInfo> multipleChooseInfos = new List<MultipleChooseInfo>();
         public List<InputAreaInfo> inputAreaInfos = new List<InputAreaInfo>();
-        
+
         public int id;
     }
     public partial class UiNotifyCtrl
@@ -41,7 +41,7 @@ namespace Ui.Notify
             popupCon = new UiContainer<UiPopupCtrl>(view.sub_Popup.gameObject);
             multipleChooseCon = new UiContainer<UiMultipleChooseCtrl>(view.sub_MultipleChoose.gameObject);
             inputAreaCon = new UiContainer<UiInputAreaCtrl>(view.sub_InputArea.gameObject);
-            
+
 
             view.btn_back.onClick.AddListener(() =>
             {
@@ -55,14 +55,14 @@ namespace Ui.Notify
                 if (param.tipInfo != null)
                     Add(param.tipInfo);
                 if (param.chooseInfo != null)
-                    Add(param.chooseInfo); 
+                    Add(param.chooseInfo);
                 if (param.multipleChooseInfo != null)
                     Add(param.multipleChooseInfo);
                 if (param.popupInfo != null)
                     Add(param.popupInfo);
                 if (param.inputAreaInfo != null)
                     Add(param.inputAreaInfo);
-                
+
             }
         }
         public void Refresh()
@@ -71,6 +71,10 @@ namespace Ui.Notify
             //tip:
 
             tipCon.Clear();
+            while (model.tipInfos.Count > 0 && model.tipInfos[model.tipInfos.Count - 1].time - Time.time <= 0)
+            {
+                model.tipInfos.RemoveAt(model.tipInfos.Count - 1);
+            }
             if (model.tipInfos.Count > 0)
             {
                 var cur = model.tipInfos[model.tipInfos.Count - 1];
@@ -160,7 +164,7 @@ namespace Ui.Notify
             model.inputAreaInfos.Add(info);
             Refresh();
         }
-        
+
         public void RemoveTip(int id)
         {
             for (int i = 0; i < model.tipInfos.Count; i++)
@@ -225,5 +229,5 @@ namespace Ui.Notify
             Refresh();
         }
     }
-  
+
 }

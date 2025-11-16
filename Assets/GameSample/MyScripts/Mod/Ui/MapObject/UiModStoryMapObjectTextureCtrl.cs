@@ -56,18 +56,15 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture
             }
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveMaterial(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void Refresh()
         {
 
-            view.page_ModStoryMapObjectTextureAppearance.SetActive(model.selPage == 0, new UiModStoryMapObjectTextureAppearanceParam()
+            view.page_ModStoryMapObjectTextureAppearance.SetShow(model.selPage == 0, new UiModStoryMapObjectTextureAppearanceParam()
             {
                 data = model.data
             });
-            view.page_ModStoryMapObjectTextureConfig.SetActive(model.selPage == 1, new UiModStoryMapObjectTextureConfigParam()
+            view.page_ModStoryMapObjectTextureConfig.SetShow(model.selPage == 1, new UiModStoryMapObjectTextureConfigParam()
             {
                 data = model.data
             });

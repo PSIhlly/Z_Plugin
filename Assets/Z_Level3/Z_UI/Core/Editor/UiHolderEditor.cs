@@ -100,6 +100,11 @@ namespace Z_Ui_Editor
                     refreshCode += $@"
             view.rimg_{o.name.Split("_")[1]}.sprite=TextureHelper.transparentSprite;";
                 }
+                else if (o.name.Split("_")[0].Split("|").Contains("vp"))
+                {
+                    initCode += $@"
+            view.vp_{o.name.Split("_")[1]}.PlayVideoByPath("");";
+                }
                 else if (o.name.Split("_")[0].Split("|").Contains("txt"))
                 {
                     refreshCode += $@"
@@ -153,6 +158,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
+using Z_Video;
+using UnityEngine.Video;
 {namespaceContent}
 {namespaceStr}
 {{
@@ -336,7 +343,12 @@ using Z_Texture;
                             initContent += $@"
             btn_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Btn>();";
                             break;
-
+                        case "vp":
+                            declareContent += $@"
+            public VideoPlayer vp_{realName};";
+                            initContent += $@"
+            vp_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<VideoPlayer>();";
+                            break;
                         case "txt":
                             declareContent += $@"
             public Txt txt_{realName};";
@@ -436,6 +448,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_Texture;
+using Z_Video;
+using UnityEngine.Video;
 namespace Ui.{uiHolder.uiName}
 ";
             }

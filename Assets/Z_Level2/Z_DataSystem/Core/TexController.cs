@@ -24,17 +24,23 @@ namespace Z_DataSystem.Form
         {
             private Sprite _sprite;
             private Texture _texture => (Texture)asset;
-            Z_MultiTask<Texture> texTask=new Z_MultiTask<Texture>();
-            Z_MultiTask<Sprite> spriteTask=new Z_MultiTask<Sprite>();
+            Z_MultiTask<Texture> texTask = new Z_MultiTask<Texture>();
+            Z_MultiTask<Sprite> spriteTask = new Z_MultiTask<Sprite>();
             public void GetTexAsync(Action<Texture> onLoaded)
             {
-                texTask.Run(_texture, GetTex,onLoaded);
+                texTask.Run(_texture, GetTex, onLoaded);
             }
             public Texture GetTex()
             {
                 if (_texture == null)
                 {
-                    asset = TextureHelper.GetTextureByPathAsync(path).Result;
+                    if(bytes == null)
+                    {
+                        asset = TextureHelper.GetTextureByPath(path);
+                    }else
+                    {
+                        asset = TextureHelper.GetTextureByByte(bytes);
+                    }
                 }
                 return _texture;
             }
@@ -82,8 +88,9 @@ namespace Z_DataSystem.Form
                     var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
-                    var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
-                    var form = ctrl.CreateDataByTex(tex, nm);
+                    var newBytes=TextureHelper.GetTextureByte(tex);
+                    var nm = ctrl.GetMark() + BytesSerialize.GetHash(newBytes) + ctrl.GetMark();
+                    var form = ctrl.CreateDataByBytes(newBytes, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {
@@ -133,19 +140,19 @@ namespace Z_DataSystem.Form
         }
         public TexAssetForm.Data CreateDataByTex(Texture2D tex, string name)
         {
-            return CreateDataByTex(tex, name);
+            return new TexAssetForm.Data(-1, name, "", null, "", tex);
         }
         public TexAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new TexAssetForm.Data(-1, name, "", data, "", null);
+            return new TexAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null);
         }
         public TexAssetForm.Data CreateDataByPath(string path, string name)
         {
-            return new TexAssetForm.Data(-1, name, path, null,"",null);
+            return new TexAssetForm.Data(-1, name, path, null, "", null);
         }
         public TexAssetForm.Data CreateDataByTex(Texture tex, string name)
         {
-            return new TexAssetForm.Data(-1, name, "", null, "", tex);
+            return CreateDataByTex((Texture2D)tex, name);
         }
 
     }

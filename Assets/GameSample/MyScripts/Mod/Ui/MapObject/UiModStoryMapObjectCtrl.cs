@@ -37,11 +37,6 @@ namespace Ui.ModStory.ModStoryMapObject
                 model.type = param.type;
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveObject(ModManager.instance.GetStoryCoreFolder());
-            GameManager.instance.saveCtrl.SaveMaterial(ModManager.instance.GetStoryCoreFolder());
-        }
         public void SelType(int type)
         {
             model.type = type;
@@ -55,20 +50,20 @@ namespace Ui.ModStory.ModStoryMapObject
         }
         public void Refresh()
         {
-            view.page_ModStoryMapObjectList.SetActive(model.type > 0&& model.data==null, new UiModStoryMapObjectListParam()
+            view.page_ModStoryMapObjectList.SetShow(model.type > 0&& model.data==null, new UiModStoryMapObjectListParam()
             {
                  type = model.type,
             });
-            view.page_ModStoryMapObjectType.SetActive(model.type == 0);
-            view.page_ModStoryMapObjectTexture.SetActive(model.data is MapTextureForm.Data, new UiModStoryMapObjectTextureParam()
+            view.page_ModStoryMapObjectType.SetShow(model.type == 0);
+            view.page_ModStoryMapObjectTexture.SetShow(model.data is MapTextureForm.Data, new UiModStoryMapObjectTextureParam()
             {
                 data = model.data is MapTextureForm.Data ? (MapTextureForm.Data)model.data : null,
             });
-            view.page_ModStoryMapObjectMask.SetActive(model.data is MapMaskForm.Data, new UiModStoryMapObjectMaskParam()
+            view.page_ModStoryMapObjectMask.SetShow(model.data is MapMaskForm.Data, new UiModStoryMapObjectMaskParam()
             {
                 data = model.data is MapMaskForm.Data ? (MapMaskForm.Data)model.data : null,
             });
-            view.page_ModStoryMapObjectObject.SetActive(model.data is MapObjectForm.Data, new UiModStoryMapObjectObjectParam()
+            view.page_ModStoryMapObjectObject.SetShow(model.data is MapObjectForm.Data, new UiModStoryMapObjectObjectParam()
             {
                 data = model.data is MapObjectForm.Data?(MapObjectForm.Data)model.data:null,
             });

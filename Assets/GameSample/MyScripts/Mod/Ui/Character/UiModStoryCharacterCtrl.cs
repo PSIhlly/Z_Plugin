@@ -38,10 +38,7 @@ namespace Ui.ModStory.ModStoryCharacter
                 model.selPage = param.selPage;
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveCharacter(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void SelPage(int id, CharacterProductForm.Data data=null)
         {
             model.selPage = id;
@@ -51,8 +48,8 @@ namespace Ui.ModStory.ModStoryCharacter
         public void Refresh()
         {
 
-            view.page_ModStoryCharacterList.SetActive(model.selPage == 0);
-            view.page_ModStoryCharacterUnit.SetActive(model.selPage == 1, new UiModStoryCharacterUnitParam() { data = model.data });
+            view.page_ModStoryCharacterList.SetShow(model.selPage == 0);
+            view.page_ModStoryCharacterUnit.SetShow(model.selPage == 1, new UiModStoryCharacterUnitParam() { data = model.data });
         }
     }
 

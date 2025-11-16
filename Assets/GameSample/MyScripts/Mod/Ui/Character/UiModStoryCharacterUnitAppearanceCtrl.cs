@@ -53,11 +53,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public void Refresh()
         {
 
-            view.page_ModStoryCharacterUnitAppearanceList.SetActive(model.selPage == 0,new UiModStoryCharacterUnitAppearanceListParam()
+            view.page_ModStoryCharacterUnitAppearanceList.SetShow(model.selPage == 0,new UiModStoryCharacterUnitAppearanceListParam()
             {
                 data = model.data  
             });
-            view.page_ModStoryCharacterUnitAppearanceUnit.SetActive(model.selPage == 1, new UiModStoryCharacterUnitAppearanceUnitParam()
+            view.page_ModStoryCharacterUnitAppearanceUnit.SetShow(model.selPage == 1, new UiModStoryCharacterUnitAppearanceUnitParam()
             {
                 data = model.animData
             });

@@ -11,7 +11,7 @@ namespace Z_Ui
     {
         public List<GameObject> preloadUis;
         public List<GameObject> layerRootLst;
-        public Dictionary<UiLayer, int> layer2Id=new Dictionary<UiLayer, int>() { { UiLayer.Bottom,0 }, { UiLayer.Mid, 1 }, { UiLayer.Top, 2 } };
+        public Dictionary<UiLayer, int> layer2Id = new Dictionary<UiLayer, int>() { { UiLayer.Bottom, 0 }, { UiLayer.Mid, 1 }, { UiLayer.Top, 2 } };
 
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
@@ -20,7 +20,7 @@ namespace Z_Ui
         protected override void Awake()
         {
             base.Awake();
-            foreach(var ui in preloadUis)
+            foreach (var ui in preloadUis)
             {
                 ui.GetComponent<UiHolder>().OriInit();
                 ui.SetActive(false);
@@ -33,10 +33,10 @@ namespace Z_Ui
             {
                 return null;
             }
-            var uiHolder =uiCtrlName2Uis[tp.Name][0];
+            var uiHolder = uiCtrlName2Uis[tp.Name][0];
             return (T)uiHolder.ctrl;
         }
-        public UiHolder ShowUi<T>(UiParam param=null) where T : UiCtrl, new()
+        public UiHolder ShowUi<T>(UiParam param = null) where T : UiCtrl, new()
         {
             var tp = typeof(T);
             if (uiCtrlName2Uis[tp.Name].Count == 0)
@@ -44,8 +44,8 @@ namespace Z_Ui
                 CreateUi<T>();
             }
             var uiHolder = uiCtrlName2Uis[tp.Name][0];
-            uiHolder.ctrl.SetParam(param);
-            uiHolder.gameObject.SetActive(true);
+            uiHolder.ctrl.SetShow(true, param);
+
             uiHolder.transform.SetAsLastSibling();
             return uiHolder;
         }
@@ -59,7 +59,7 @@ namespace Z_Ui
             var uiHolder = uiCtrlName2Uis[tp.Name][0];
             uiHolder.ctrl.Close();
         }
-       
+
         public UiHolder CreateUi<T>() where T : UiCtrl, new()
         {
             var tp = typeof(T);
@@ -68,7 +68,7 @@ namespace Z_Ui
             uiHolder.InstanceInit<T>();
             return uiHolder;
         }
-        
+
 
         public void DestroyUi<T>(T uiCtrl) where T : UiCtrl, new()
         {
@@ -82,10 +82,10 @@ namespace Z_Ui
         }
         public void CloseAll(UiLayer layer)
         {
-            for(int i=0;i< layerRootLst[(int)layer].transform.childCount;i++)
+            for (int i = 0; i < layerRootLst[(int)layer].transform.childCount; i++)
             {
-               var holder= layerRootLst[(int)layer].transform.GetChild(i).GetComponent<UiHolder>();
-                if(holder.ctrl.isActive)
+                var holder = layerRootLst[(int)layer].transform.GetChild(i).GetComponent<UiHolder>();
+                if (holder.ctrl.isActive)
                 {
                     holder.ctrl.Close();
                 }
@@ -93,7 +93,7 @@ namespace Z_Ui
         }
         public void CloseAll()
         {
-            foreach(var layer in layer2Id)
+            foreach (var layer in layer2Id)
             {
                 CloseAll(layer.Key);
             }

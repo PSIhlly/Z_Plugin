@@ -74,24 +74,24 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit
         public void Refresh()
         {
 
-            view.page_ModStoryItemUnitOverview.SetActive(model.selPage == 0, new UiModStoryItemUnitOverviewParam()
+            view.page_ModStoryItemUnitOverview.SetShow(model.selPage == 0, new UiModStoryItemUnitOverviewParam()
             {
                 data = model.data
             });
             view.sta_overview.ChangeState(model.selPage == 0 ? 1 : 0);
-            view.page_ModStoryItemUnitParameter.SetActive(model.selPage == 1, new UiModStoryItemUnitParameterParam()
+            view.page_ModStoryItemUnitParameter.SetShow(model.selPage == 1, new UiModStoryItemUnitParameterParam()
             {
                 data = model.data
             });
             view.sta_parameter.ChangeState(model.selPage == 1 ? 1 : 0);
 
-            view.page_ModStoryItemUnitAppearance.SetActive(model.selPage == 2, new UiModStoryItemUnitAppearanceParam()
+            view.page_ModStoryItemUnitAppearance.SetShow(model.selPage == 2, new UiModStoryItemUnitAppearanceParam()
             {
                 data = model.data
             });
             view.sta_appearance.ChangeState(model.selPage == 2 ? 1 : 0);
 
-            view.page_ModStoryItemUnitConfig.SetActive(model.selPage == 3, new UiModStoryItemUnitConfigParam()
+            view.page_ModStoryItemUnitConfig.SetShow(model.selPage == 3, new UiModStoryItemUnitConfigParam()
             {
                 data = model.data
             });

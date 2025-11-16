@@ -45,7 +45,32 @@ public class GameSaveController : Z_Controller<GameManager>
     {
     }
     #region save
+    public void SaveSceneMap(string scenePath)
+    {
+        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
+    }
+    public void SaveSceneMap(string scenePath, MapInfo data)
+    {
+        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
+    }
 
+    public void SaveModStory(int id)
+    {
+        GameManager.instance.saveCtrl.SaveOverview(id);
+        SaveOverview(id);
+        string path = ModManager.GetStoryCoreFolder(Main2StoryManager.GetSceneFileNameById(id));
+
+        SaveMaterial(path);
+        SaveObject(path);
+        SaveCharacter(path);
+        SaveSkill(path);
+        SaveItem(path);
+        SaveEffect(path);
+        SaveEvent(path);
+        SaveConfig(path);
+        SaveScene(path);
+
+    }
     public void SaveOverview(int id)
     {
         var storyCoreFolder = ModManager.GetStoryCoreFolder(Main2StoryManager.GetStoryFolderNameById(id));
@@ -172,14 +197,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
 
     }
-    public void SaveSceneMap(string scenePath)
-    {
-        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
-    }
-    public void SaveSceneMap(string scenePath, MapInfo data)
-    {
-        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
-    }
+
     public void SaveConfig(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + configFormFileName, ConfigForm.GetJaByDatas().ToString());
@@ -203,25 +221,35 @@ public class GameSaveController : Z_Controller<GameManager>
             SaveStoryTex(icon, storyCoreFolder);
         }
     }
+    #region util
     private void SaveTex(string texName, string path)
     {
-        if (TexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
+        var data = TexAssetForm.DataByName.GetDk(texName, null);
+        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(texName))
         {
-            var tex = TexAssetForm.DataByName[texName];
-            if(tex.bytes != null)
+
+            path = path + assetFolder + texName;
+            if (!SaveAndLoad.Exist(path))
             {
-                SaveAndLoad.Save(path + assetFolder + texName, tex.bytes);
+                SaveAndLoad.Save(path, data.bytes);
             }
+
         }
     }
     private void SaveStoryTex(string texName, string path)
     {
-        if (!string.IsNullOrEmpty(texName) && TexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
+        var data = TexAssetForm.DataByName.GetDk(texName, null);
+        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = StoryTexAssetForm.DataByName[texName];
-            SaveAndLoad.Save(path + "/" + texName, TextureHelper.GetTextureByte((Texture2D)tex.GetTex()));
+            path = path + assetFolder + texName;
+            if (!SaveAndLoad.Exist(path))
+            {
+                SaveAndLoad.Save(path, data.bytes);
+            }
         }
     }
+    #endregion
     #endregion
 
     #region load

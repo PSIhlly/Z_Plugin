@@ -37,10 +37,7 @@ namespace Ui.ModStory.ModStoryEffect
                 model.selPage = param.selPage;
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveEffect(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void SelPage(int id, EffectForm.Data data = null)
         {
             model.selPage = id;
@@ -50,8 +47,8 @@ namespace Ui.ModStory.ModStoryEffect
         public void Refresh()
         {
 
-            view.page_ModStoryEffectList.SetActive(model.selPage == 0);
-            view.page_ModStoryEffectUnit.SetActive(model.selPage == 1, new UiModStoryEffectUnitParam() { data = model.data });
+            view.page_ModStoryEffectList.SetShow(model.selPage == 0);
+            view.page_ModStoryEffectUnit.SetShow(model.selPage == 1, new UiModStoryEffectUnitParam() { data = model.data });
         }
     }
 

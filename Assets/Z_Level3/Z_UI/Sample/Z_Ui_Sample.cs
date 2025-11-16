@@ -1,6 +1,3 @@
-using Z_Ui.Form.Sample_DialogForm;
-using Z_Ui.Form.Sample_NpcForm;
-using Z_Ui.Form.Sample_ImgForm;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,15 +12,20 @@ using System;
 using Z_Time;
 using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_Ui.Form.Sample_DialogForm;
+using Z_Ui.Form.Sample_NpcForm;
+using Z_Ui.Form.Sample_ImgForm;
 
 public class Z_Ui_Sample : MonoBehaviour
 {
     public Text t;
+    public Texture[] bg;
     public void StartDialog()
     {
         var contentLst = new List<string>();
         var nameLst = new List<string>();
         var bgLst = new List<string>();
+        var videoLst = new List<string>();
         var avatarLst = new List<string>();
 
         foreach (var v in Sample_DialogForm.Datas.Values)
@@ -32,16 +34,21 @@ public class Z_Ui_Sample : MonoBehaviour
             {
                 contentLst.Add(v.text);
                 nameLst.Add(Sample_NpcForm.Datas[v.speaker_npcId].name);
-                var bgForm = Sample_ImgForm.Datas[v.background_imgId];
-                TexAssetForm.AddData(AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + bgForm.path, bgForm.id + "bg"));
-                bgLst.Add(bgForm.id + "bg");
 
+                var bgForm = Sample_ImgForm.Datas[v.background_imgId];
+                var bgTexData = AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + bgForm.path, bgForm.id + "bg");
+                TexAssetForm.AddData(bgTexData);
+                bgLst.Add(bgTexData.name);
+
+                videoLst.Add("");
+                
                 var avatarForm = Sample_ImgForm.Datas[Sample_NpcForm.Datas[v.speaker_npcId].avatar_imgId];
-                TexAssetForm.AddData(AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + avatarForm.path, avatarForm.id + "avt"));
-                avatarLst.Add(avatarForm.id + "avt");
+                var avatarTexData = AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + avatarForm.path, avatarForm.id + "avt");
+                TexAssetForm.AddData(avatarTexData);
+                avatarLst.Add(avatarTexData.name);
             }
         }
-        DialogManager.instance.Begin(nameLst, contentLst, bgLst, avatarLst, OnComplete);
+        DialogManager.instance.Begin(nameLst, contentLst, bgLst, videoLst, avatarLst, OnComplete);
     }
     private void OnComplete()
     {
@@ -51,7 +58,7 @@ public class Z_Ui_Sample : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            NotifyManager.instance.AddTip("tips");
+            NotifyManager.instance.AddTip("tips"+UnityEngine.Random.Range(1,99));
         }
         if (Input.GetKeyDown(KeyCode.W))
         {

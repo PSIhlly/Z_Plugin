@@ -61,10 +61,7 @@ namespace Ui.ModStory.ModStoryOverview
             base.Close();
 
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveOverview(GameManager.instance.curStory.id);
-        }
+ 
         public void Refresh()
         {
             view.img_image.sprite = TexAssetForm.DataByName[GameManager.instance.curStory.icon].GetSprite();

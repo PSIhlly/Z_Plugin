@@ -47,7 +47,7 @@ public static class GlobalNameHelper
     public static string GetDefaultTexName(string name = "") => "reserved$" + name;
     public static bool IsInnerAssetName(string name)
     {
-        return name.Contains("$");
+        return !name.Contains(AssetDefines.IMAGE_MARK);
     }
 
     public static string GetDefaultStoryTexName() => GetDefaultTexName("story");

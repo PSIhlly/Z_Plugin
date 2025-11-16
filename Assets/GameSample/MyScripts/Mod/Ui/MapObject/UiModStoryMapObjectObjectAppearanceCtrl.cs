@@ -100,11 +100,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             DisplayCameraAreaManager.instance.Show();
             Refresh();
         }
-        public override void OnHide()
-        {
-            DisplayCameraAreaManager.instance.Hide();
-            GameManager.instance.saveCtrl.SaveItem(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void Refresh()
         {
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
@@ -113,7 +109,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
             DisplayCameraAreaManager.instance.Clear();
 
-            view.model_Axis.SetActive(false);
+            view.model_Axis.SetShow(false);
             if (model.id != -1)
             {
                 view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
@@ -121,7 +117,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
 
                 float rate = DisplayCameraAreaManager.instance.normalized2scene;
-                view.model_Axis.SetActive(true, new UiAxisParam()
+                view.model_Axis.SetShow(true, new UiAxisParam()
                 {
                     pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x+ rate/2)/rate,( model.data.model.subPrefabUnitPos[model.id].z+rate/2)/rate),
                     limitRtf = view.rtf_image,

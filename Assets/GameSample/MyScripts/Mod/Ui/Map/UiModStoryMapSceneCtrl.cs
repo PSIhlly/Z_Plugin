@@ -46,8 +46,8 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene
         public void Refresh()
         {
 
-            view.page_ModStoryMapSceneList.SetActive(model.selPage == 0);
-            view.page_ModStoryMapSceneUnit.SetActive(model.selPage == 1, new UiModStoryMapSceneUnitParam() { data = model.data });
+            view.page_ModStoryMapSceneList.SetShow(model.selPage == 0);
+            view.page_ModStoryMapSceneUnit.SetShow(model.selPage == 1, new UiModStoryMapSceneUnitParam() { data = model.data });
         }
     }
 

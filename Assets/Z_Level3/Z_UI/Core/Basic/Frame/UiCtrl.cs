@@ -19,10 +19,6 @@ namespace Z_Ui.Base
             {
                 try
                 {
-                    if(uiHolder==null)
-                    {
-                        Debug.LogError(name+"aaaaaa??");
-                    }
                     return gameObject != null && gameObject.activeInHierarchy;
                 }
                 catch (Exception e)
@@ -73,12 +69,19 @@ namespace Z_Ui.Base
         {
             gameObject.SetActive(false);
         }
-        public void SetActive(bool active, UiParam param = null)
+        public void SetShow(bool active, UiParam param = null)
         {
             if (uiHolder != null && uiHolder.gameObject != null)
             {
                 SetParam(param);
-                uiHolder.gameObject.SetActive(active);
+                if (active && uiHolder.gameObject.activeInHierarchy)
+                {
+                    OnShow();
+                }
+                else
+                {
+                    uiHolder.gameObject.SetActive(active);
+                }
             }
         }
         public bool isActive => (uiHolder != null && uiHolder.gameObject != null) ? uiHolder.gameObject.activeSelf : false;

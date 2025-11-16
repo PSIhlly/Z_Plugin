@@ -58,12 +58,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
         }
         public void Refresh()
         {
-            view.page_ModStoryMapObjectObjectAppearance.SetActive(model.selPage == 0, new UiModStoryMapObjectObjectAppearanceParam()
+            view.page_ModStoryMapObjectObjectAppearance.SetShow(model.selPage == 0, new UiModStoryMapObjectObjectAppearanceParam()
             {
                 data = model.data
             });
             view.sta_appearance.ChangeState(model.selPage == 0 ? 1 : 0);
-            view.page_ModStoryMapObjectObjectConfig.SetActive(model.selPage == 1, new UiModStoryMapObjectObjectConfigParam()
+            view.page_ModStoryMapObjectObjectConfig.SetShow(model.selPage == 1, new UiModStoryMapObjectObjectConfigParam()
             {
                 data = model.data
             });

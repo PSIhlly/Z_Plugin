@@ -35,8 +35,12 @@ namespace Ui.ModStory
                 Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
 
             });
+            view.btn_save.onClick.AddListener(() =>
+            {
+                GameManager.instance.saveCtrl.SaveModStory(GameManager.instance.curStory.id);
 
-
+            });
+            
             view.btn_overview.onClick.AddListener(() =>
             {
                 model.curUi = view.page_ModStoryOverview;
@@ -92,31 +96,31 @@ namespace Ui.ModStory
         }
         public void Refresh()
         {
-            view.page_ModStoryOverview.SetActive(model.curUi == view.page_ModStoryOverview);
+            view.page_ModStoryOverview.SetShow(model.curUi == view.page_ModStoryOverview);
             view.sta_overview.ChangeState(model.curUi == view.page_ModStoryOverview ? 1 : 0);
 
-            view.page_ModStoryParameter.SetActive(model.curUi == view.page_ModStoryParameter);
+            view.page_ModStoryParameter.SetShow(model.curUi == view.page_ModStoryParameter);
             view.sta_parameter.ChangeState(model.curUi == view.page_ModStoryParameter ? 1 : 0);
 
-            view.page_ModStoryCharacter.SetActive(model.curUi == view.page_ModStoryCharacter);
+            view.page_ModStoryCharacter.SetShow(model.curUi == view.page_ModStoryCharacter);
             view.sta_character.ChangeState(model.curUi == view.page_ModStoryCharacter ? 1 : 0);
 
-            view.page_ModStorySkill.SetActive(model.curUi == view.page_ModStorySkill);
+            view.page_ModStorySkill.SetShow(model.curUi == view.page_ModStorySkill);
             view.sta_skill.ChangeState(model.curUi == view.page_ModStorySkill ? 1 : 0);
 
-            view.page_ModStoryItem.SetActive(model.curUi == view.page_ModStoryItem);
+            view.page_ModStoryItem.SetShow(model.curUi == view.page_ModStoryItem);
             view.sta_item.ChangeState(model.curUi == view.page_ModStoryItem ? 1 : 0);
 
-            view.page_ModStoryMapObject.SetActive(model.curUi == view.page_ModStoryMapObject);
+            view.page_ModStoryMapObject.SetShow(model.curUi == view.page_ModStoryMapObject);
             view.sta_mapObject.ChangeState(model.curUi == view.page_ModStoryMapObject ? 1 : 0);
 
-            view.page_ModStoryEffect.SetActive(model.curUi == view.page_ModStoryEffect);
+            view.page_ModStoryEffect.SetShow(model.curUi == view.page_ModStoryEffect);
             view.sta_effect.ChangeState(model.curUi == view.page_ModStoryEffect ? 1 : 0);
 
-            view.page_ModStoryEvent.SetActive(model.curUi == view.page_ModStoryEvent);
+            view.page_ModStoryEvent.SetShow(model.curUi == view.page_ModStoryEvent);
             view.sta_event.ChangeState(model.curUi == view.page_ModStoryEvent ? 1 : 0);
 
-            view.page_ModStoryMap.SetActive(model.curUi == view.page_ModStoryMap);
+            view.page_ModStoryMap.SetShow(model.curUi == view.page_ModStoryMap);
             view.sta_map.ChangeState(model.curUi == view.page_ModStoryMap ? 1 : 0);
 
         }

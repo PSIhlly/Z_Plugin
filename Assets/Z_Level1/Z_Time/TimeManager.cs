@@ -7,7 +7,7 @@ using Z_DesignStyle;
 
 namespace Z_Time
 {
-
+    [DefaultExecutionOrder(1000)]
     public class TimeManager : Z_MonoManager<TimeManager>
     {
         public static List<(Action, GameObject)> NextFrameList = new List<(Action, GameObject)>();

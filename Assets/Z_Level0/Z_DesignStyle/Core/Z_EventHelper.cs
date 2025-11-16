@@ -9,10 +9,6 @@ public abstract class Z_Event
 public interface IZ_Listener<T>
 {
     public abstract void OnEvent(T evt);
-    public void GG()
-    {
-
-    }
 }
 public static class Z_EventHelper
 {

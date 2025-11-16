@@ -55,13 +55,10 @@ namespace Z_Texture
             }
             return res;
         }
-        public static async Task<Texture> GetTextureByPathAsync(string path)
+        public static async Task<Texture> GetTextureByPathAsync(string path)//todo
         {
             Texture res=null;
-            await Task.Run(() =>
-            {
-                res = GetTextureByPath(path);
-            });
+            res = GetTextureByPath(path);
             return res;
         }
         public static Texture GetTextureByByte(byte[] data)

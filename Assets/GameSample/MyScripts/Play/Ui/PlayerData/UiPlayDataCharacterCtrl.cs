@@ -77,12 +77,12 @@ namespace Ui.PlayData.PlayDataCharacter
 
 
             view.sta_data.ChangeState(model.module == 1 ? 1 : 0);
-            view.page_PlayDataCharacterData.SetActive(model.module == 1, new UiPlayDataCharacterDataParam()
+            view.page_PlayDataCharacterData.SetShow(model.module == 1, new UiPlayDataCharacterDataParam()
             {
                 data = model.sel
             });
             view.sta_equip.ChangeState(model.module == 2 ? 1 : 0);
-            view.page_PlayDataCharacterEquip.SetActive(model.module == 2, new UiPlayDataCharacterEquipParam()
+            view.page_PlayDataCharacterEquip.SetShow(model.module == 2, new UiPlayDataCharacterEquipParam()
             {
                 data = model.sel
             });

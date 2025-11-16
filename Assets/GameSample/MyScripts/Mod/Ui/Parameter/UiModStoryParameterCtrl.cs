@@ -57,24 +57,19 @@ namespace Ui.ModStory.ModStoryParameter
                 model.selPage = param.selPage;
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveCharacter(ModManager.instance.GetStoryCoreFolder());
-            GameManager.instance.saveCtrl.SaveConfig(ModManager.instance.GetStoryCoreFolder());
-            GameManager.instance.saveCtrl.SaveItem(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void Refresh()
         {
-            view.page_ModStoryGlobalParameter.SetActive(model.selPage == 0);
+            view.page_ModStoryGlobalParameter.SetShow(model.selPage == 0);
             view.sta_globalParameter.ChangeState(model.selPage == 0?1:0);
 
-            view.page_ModStoryCharacterParameter.SetActive(model.selPage == 1);
+            view.page_ModStoryCharacterParameter.SetShow(model.selPage == 1);
             view.sta_characterParameter.ChangeState(model.selPage == 1 ? 1 : 0);
 
-            view.page_ModStoryItemParameter.SetActive(model.selPage == 2);
+            view.page_ModStoryItemParameter.SetShow(model.selPage == 2);
             view.sta_itemParameter.ChangeState(model.selPage == 2 ? 1 : 0);
 
-            view.page_ModStoryConfig.SetActive(model.selPage == 3);
+            view.page_ModStoryConfig.SetShow(model.selPage == 3);
             view.sta_config.ChangeState(model.selPage == 3 ? 1 : 0);
 
         }

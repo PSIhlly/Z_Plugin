@@ -131,7 +131,6 @@ namespace Ui.ModStoryEventEditWindow
         }
         public override void OnDisable()
         {
-            GameManager.instance.saveCtrl.SaveEvent(ModManager.instance.GetStoryCoreFolder(), model.data);
             model.onClose?.Invoke();
         }
         public void Refresh()

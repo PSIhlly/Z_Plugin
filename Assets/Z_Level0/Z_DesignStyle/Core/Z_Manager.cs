@@ -10,9 +10,14 @@ namespace Z_DesignStyle
     }
 
 
-    public abstract class Z_Manager<T> : Z_Singleton<T>, IZ_Manager where T : class, new()
+    public abstract class Z_Manager<T> : Z_Singleton<T>, IZ_Manager where T : Z_Singleton<T>, new()
     {
         // Start is called before the first frame update
         public abstract void Init();
+
+        protected override void OnInit()
+        {
+            Init();
+        }
     }
 }

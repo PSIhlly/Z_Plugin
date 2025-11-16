@@ -47,9 +47,11 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeMaintextAction;
                 
-        public static Action<Data,string,string> changeMainpictureAction;
+        public static Action<Data,string,string> changeMainpicturenameAction;
                 
-        public static Action<Data,string,string> changeProfilepictureAction;
+        public static Action<Data,string,string> changeMainvideonameAction;
+                
+        public static Action<Data,string,string> changeProfilepicturenameAction;
                 
 
 
@@ -110,61 +112,80 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _mainPicture;
+                    private string  _mainPictureName;
                     /// <summary>
                     ///±³¾°Í¼Æ¬
                     ///</summary>
-                    public string  mainPicture{
-                                get{return _mainPicture;}
+                    public string  mainPictureName{
+                                get{return _mainPictureName;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeMainpicture(this,_mainPicture,value); 
+                       ChangeMainpicturename(this,_mainPictureName,value); 
                     }
         
-                _mainPicture = value;
+                _mainPictureName = value;
                 }
                  
                      }
                     
-                    private string  _profilePicture;
+                    private string  _mainVideoName;
+                    /// <summary>
+                    ///±³¾°ÊÓÆµ
+                    ///</summary>
+                    public string  mainVideoName{
+                                get{return _mainVideoName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMainvideoname(this,_mainVideoName,value); 
+                    }
+        
+                _mainVideoName = value;
+                }
+                 
+                     }
+                    
+                    private string  _profilePictureName;
                     /// <summary>
                     ///Í·ÏñÍ¼Æ¬
                     ///</summary>
-                    public string  profilePicture{
-                                get{return _profilePicture;}
+                    public string  profilePictureName{
+                                get{return _profilePictureName;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeProfilepicture(this,_profilePicture,value); 
+                       ChangeProfilepicturename(this,_profilePictureName,value); 
                     }
         
-                _profilePicture = value;
+                _profilePictureName = value;
                 }
                  
                      }
                     
-            public Data(int uid,string title,string mainText,string mainPicture,string profilePicture)
+            public Data(int uid,string title,string mainText,string mainPictureName,string mainVideoName,string profilePictureName)
             {
 
              this.uid = uid;
              this.title = title;
              this.mainText = mainText;
-             this.mainPicture = mainPicture;
-             this.profilePicture = profilePicture;
+             this.mainPictureName = mainPictureName;
+             this.mainVideoName = mainVideoName;
+             this.profilePictureName = profilePictureName;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPicture,profilePicture);
+        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPictureName,mainVideoName,profilePictureName);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","","");
+                   private static Data _defaultData=new Data(0,"","","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -241,9 +262,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("mainText"),
 
-                jo.Get<string>("mainPicture"),
+                jo.Get<string>("mainPictureName"),
 
-                jo.Get<string>("profilePicture")
+                jo.Get<string>("mainVideoName"),
+
+                jo.Get<string>("profilePictureName")
                     );
 
             return data;
@@ -261,9 +284,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("mainText",data.mainText);
 
-            jo.Set<string>("mainPicture",data.mainPicture);
+            jo.Set<string>("mainPictureName",data.mainPictureName);
 
-            jo.Set<string>("profilePicture",data.profilePicture);
+            jo.Set<string>("mainVideoName",data.mainVideoName);
+
+            jo.Set<string>("profilePictureName",data.profilePictureName);
 
             return jo;
         }
@@ -374,22 +399,32 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeMainpicture(Data superData,string oldV,string newV)
+            public static void ChangeMainpicturename(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMainpictureAction?.Invoke(data,oldV,newV);
+                changeMainpicturenameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeProfilepicture(Data superData,string oldV,string newV)
+            public static void ChangeMainvideoname(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeProfilepictureAction?.Invoke(data,oldV,newV);
+                changeMainvideonameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeProfilepicturename(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeProfilepicturenameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

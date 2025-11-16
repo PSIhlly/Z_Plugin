@@ -25,7 +25,7 @@ namespace Ui.PlaySceneMain
         {
 
 #if UNITY_STANDALONE_WIN
-            view.page_PlayerTouchOpt.SetActive(false);
+            view.page_PlayerTouchOpt.SetShow(false);
 #else
             view.page_PlayerTouchOpt.SetActive(true);
 #endif

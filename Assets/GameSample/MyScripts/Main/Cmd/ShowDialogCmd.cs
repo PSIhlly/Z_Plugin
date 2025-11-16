@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowDialogCmd();
         protected override BoxDataForm.Data[] ExecuteInternal(BoxDataForm.Data[] prm, InterpretLock localLock)
         {
-            DialogManager.instance.Begin(new List<string>() { prm[2].str }, new List<string>() { prm[3].str }, new List<string>() { GlobalEventHelper.GetEventAssetTexName(prm[0].str) }, new List<string>() { GlobalEventHelper.GetEventAssetTexName(prm[1].str) }, () =>
+            DialogManager.instance.Begin(prm[2].str,  prm[3].str , GlobalEventHelper.GetEventAssetTexName(prm[0].str) ,"", GlobalEventHelper.GetEventAssetTexName(prm[1].str), () =>
             {
                 localLock.Unlock();
             });

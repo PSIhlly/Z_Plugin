@@ -37,10 +37,7 @@ namespace Ui.ModStory.ModStoryItem
                 model.selPage = param.selPage;
             Refresh();
         }
-        public override void OnHide()
-        {
-            GameManager.instance.saveCtrl.SaveItem(ModManager.instance.GetStoryCoreFolder());
-        }
+
         public void SelPage(int id, ItemProductForm.Data data = null)
         {
             model.selPage = id;
@@ -50,8 +47,8 @@ namespace Ui.ModStory.ModStoryItem
         public void Refresh()
         {
 
-            view.page_ModStoryItemList.SetActive(model.selPage == 0);
-            view.page_ModStoryItemUnit.SetActive(model.selPage == 1, new UiModStoryItemUnitParam() { data = model.data });
+            view.page_ModStoryItemList.SetShow(model.selPage == 0);
+            view.page_ModStoryItemUnit.SetShow(model.selPage == 1, new UiModStoryItemUnitParam() { data = model.data });
         }
     }
 

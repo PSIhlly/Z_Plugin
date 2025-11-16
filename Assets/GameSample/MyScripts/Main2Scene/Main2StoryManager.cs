@@ -93,11 +93,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.SaveOverview(storyId);
 
             GameManager.instance.saveCtrl.SaveSceneMap(ModManager.GetStoryCoreFolder(storyFolder) + sceneData.uid, data);
-            GameManager.instance.saveCtrl.SaveScene(ModManager.GetStoryCoreFolder(storyFolder));
+            
 
-            GameManager.instance.saveCtrl.SaveCharacter(ModManager.GetStoryCoreFolder(storyFolder));
-            GameManager.instance.saveCtrl.SaveEvent(ModManager.GetStoryCoreFolder(storyFolder));
-            GameManager.instance.saveCtrl.SaveConfig(ModManager.GetStoryCoreFolder(storyFolder));
         }
 
         GameManager.instance.curStory = StoryForm.DataById[storyId];

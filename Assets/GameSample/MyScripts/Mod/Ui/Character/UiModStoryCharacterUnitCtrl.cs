@@ -71,25 +71,25 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit
         public void Refresh()
         {
 
-            view.page_ModStoryCharacterUnitOverview.SetActive(model.selPage == 0,new UiModStoryCharacterUnitOverviewParam()
+            view.page_ModStoryCharacterUnitOverview.SetShow(model.selPage == 0,new UiModStoryCharacterUnitOverviewParam()
             {
                 data=model.data
             });
             view.sta_overview.ChangeState(model.selPage == 0?1:0);
 
-            view.page_ModStoryCharacterUnitParameter.SetActive(model.selPage == 1, new UiModStoryCharacterUnitParameterParam()
+            view.page_ModStoryCharacterUnitParameter.SetShow(model.selPage == 1, new UiModStoryCharacterUnitParameterParam()
             {
                 data = model.data
             });
             view.sta_parameter.ChangeState(model.selPage == 1 ? 1 : 0);
 
-            view.page_ModStoryCharacterUnitAppearance.SetActive(model.selPage == 2, new UiModStoryCharacterUnitAppearanceParam()
+            view.page_ModStoryCharacterUnitAppearance.SetShow(model.selPage == 2, new UiModStoryCharacterUnitAppearanceParam()
             {
                 data = model.data
             });
             view.sta_appearance.ChangeState(model.selPage == 2 ? 1 : 0);
 
-            view.page_ModStoryCharacterUnitConfig.SetActive(model.selPage == 3, new UiModStoryCharacterUnitConfigParam() 
+            view.page_ModStoryCharacterUnitConfig.SetShow(model.selPage == 3, new UiModStoryCharacterUnitConfigParam() 
             {
                 data = model.data 
             });

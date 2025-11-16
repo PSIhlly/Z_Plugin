@@ -62,7 +62,6 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
         }
         public override void Close()
         {
-            GameManager.instance.saveCtrl.SaveScene(ModManager.instance.GetStoryCoreFolder());
             base.Close();
 
         }

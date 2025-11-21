@@ -61,6 +61,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<int>,List<int>> changeTeamactiveAction;
                 
+        public static Action<Data,ClipForm.Data,ClipForm.Data> changeDialogcacheAction;
+                
 
 
         public partial class Data
@@ -192,7 +194,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive)
+                    private ClipForm.Data  _dialogCache;
+                    /// <summary>
+                    ///¶Ô»°»º´æ
+                    ///</summary>
+                    public ClipForm.Data  dialogCache{
+                                get{return _dialogCache;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDialogcache(this,_dialogCache,value); 
+                    }
+        
+                _dialogCache = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,ClipForm.Data dialogCache)
             {
 
              this.uid = uid;
@@ -202,17 +222,18 @@ public static readonly int autoUidCnt=100;
              this.bag = bag;
              this.team = team;
              this.teamActive = teamActive;
+             this.dialogCache = dialogCache;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive));
+        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),dialogCache);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null);
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,ClipForm.defaultData);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -295,7 +316,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<int>>("team"),
 
-                jo.Get<List<int>>("teamActive")
+                jo.Get<List<int>>("teamActive"),
+
+                jo.Get<ClipForm.Data>("dialogCache")
                     );
 
             return data;
@@ -320,6 +343,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<List<int>>("team",data.team);
 
             jo.Set<List<int>>("teamActive",data.teamActive);
+
+            jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
 
             return jo;
         }
@@ -466,6 +491,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeTeamactiveAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDialogcache(Data superData,ClipForm.Data oldV,ClipForm.Data newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDialogcacheAction?.Invoke(data,oldV,newV);
                 }
                     
             }

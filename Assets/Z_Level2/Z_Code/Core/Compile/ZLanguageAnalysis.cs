@@ -51,6 +51,10 @@ namespace Z_Code
                 case CodeType.Reserved:
                     switch (node.desc.code)
                     {
+                        case "Wait":
+                            BuildZl(cmds, node.subNodes[0]);
+                            cmds.Add(GetOpName(Op.Wait));
+                            break;
                         case "if":
                             BuildZl(cmds, node.subNodes[0]);
                             cmds.Add(GetOpName(Op.IfFalseJump));

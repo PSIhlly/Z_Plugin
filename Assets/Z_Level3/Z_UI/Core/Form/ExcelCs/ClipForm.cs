@@ -53,6 +53,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeProfilepicturenameAction;
                 
+        public static Action<Data,string,string> changeMainaudionameAction;
+                
 
 
         public partial class Data
@@ -166,7 +168,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string title,string mainText,string mainPictureName,string mainVideoName,string profilePictureName)
+                    private string  _mainAudioName;
+                    /// <summary>
+                    ///“Ù…˘
+                    ///</summary>
+                    public string  mainAudioName{
+                                get{return _mainAudioName;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeMainaudioname(this,_mainAudioName,value); 
+                    }
+        
+                _mainAudioName = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string title,string mainText,string mainPictureName,string mainVideoName,string profilePictureName,string mainAudioName)
             {
 
              this.uid = uid;
@@ -175,17 +195,18 @@ public static readonly int autoUidCnt=100;
              this.mainPictureName = mainPictureName;
              this.mainVideoName = mainVideoName;
              this.profilePictureName = profilePictureName;
+             this.mainAudioName = mainAudioName;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPictureName,mainVideoName,profilePictureName);
+        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPictureName,mainVideoName,profilePictureName,mainAudioName);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","","","");
+                   private static Data _defaultData=new Data(0,"","","","","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -266,7 +287,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("mainVideoName"),
 
-                jo.Get<string>("profilePictureName")
+                jo.Get<string>("profilePictureName"),
+
+                jo.Get<string>("mainAudioName")
                     );
 
             return data;
@@ -289,6 +312,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("mainVideoName",data.mainVideoName);
 
             jo.Set<string>("profilePictureName",data.profilePictureName);
+
+            jo.Set<string>("mainAudioName",data.mainAudioName);
 
             return jo;
         }
@@ -425,6 +450,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeProfilepicturenameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMainaudioname(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMainaudionameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

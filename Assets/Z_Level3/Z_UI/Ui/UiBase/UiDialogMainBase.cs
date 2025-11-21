@@ -29,10 +29,12 @@ namespace MainText
     {
 
             public Txt txt_;
+            public AudioSource as_;
         public UiMainTextView(UiHolder uiHolder):base(uiHolder)
         {
 
             txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            as_ = uiHolder.elementTrsLst[1].GetComponent<AudioSource>();
         }
 
     }

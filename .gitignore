@@ -42,3 +42,4 @@ Z_Serialize.csproj
 Z_Plugin.sln
 *.cache
 Assets/TextMesh Pro/Resources/Fonts & Materials/Alibaba-PuHuiTi-Light SDF.asset
+/Packages/com.merry-yellow.code-assist

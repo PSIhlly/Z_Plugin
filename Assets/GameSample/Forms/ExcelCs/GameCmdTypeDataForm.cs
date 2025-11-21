@@ -128,10 +128,18 @@ namespace Form
 
                 {10001,new Data(10001,"img")},
 
+                {10002,new Data(10002,"video")},
+
+                {10003,new Data(10003,"audio")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"img",_DataByUid[10001]},
+    
+                        {"video",_DataByUid[10002]},
+    
+                        {"audio",_DataByUid[10003]},
     
                     };
     

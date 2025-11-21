@@ -293,6 +293,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {14,new Data(14,"for",new List<string>(){"init","condition","turnOver",},null,null,new List<string>(){"void",},"{0}, if {1} keep do, after every times do{2}","for(id=0;id<3;id=id+1){ }")},
 
+                {15,new Data(15,"Wait",new List<string>(){"time",},new List<string>(){"num",},null,new List<string>(){"void",},"wait for {0} seconds","Wait(1);")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -323,6 +325,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                         {"then",_DataByUid[13]},
     
                         {"for",_DataByUid[14]},
+    
+                        {"Wait",_DataByUid[15]},
     
                     };
     

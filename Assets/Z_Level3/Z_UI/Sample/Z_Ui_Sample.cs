@@ -26,6 +26,7 @@ public class Z_Ui_Sample : MonoBehaviour
         var nameLst = new List<string>();
         var bgLst = new List<string>();
         var videoLst = new List<string>();
+        var audioLst = new List<string>();
         var avatarLst = new List<string>();
 
         foreach (var v in Sample_DialogForm.Datas.Values)
@@ -41,14 +42,15 @@ public class Z_Ui_Sample : MonoBehaviour
                 bgLst.Add(bgTexData.name);
 
                 videoLst.Add("");
-                
+                audioLst.Add("");
+
                 var avatarForm = Sample_ImgForm.Datas[Sample_NpcForm.Datas[v.speaker_npcId].avatar_imgId];
                 var avatarTexData = AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + avatarForm.path, avatarForm.id + "avt");
                 TexAssetForm.AddData(avatarTexData);
                 avatarLst.Add(avatarTexData.name);
             }
         }
-        DialogManager.instance.Begin(nameLst, contentLst, bgLst, videoLst, avatarLst, OnComplete);
+        DialogManager.instance.Begin(nameLst, contentLst, bgLst, videoLst, avatarLst, audioLst, OnComplete);
     }
     private void OnComplete()
     {

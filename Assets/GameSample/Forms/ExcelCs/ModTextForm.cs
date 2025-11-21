@@ -416,6 +416,10 @@ namespace Form
 
                 {1210107,new Data(1210107,"Isometric","Isometric","斜视")},
 
+                {1210108,new Data(1210108,"dialogAdvanced","dialog(Advanced)","对话(高级)")},
+
+                {1210109,new Data(1210109,"const","const","常量")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -698,6 +702,10 @@ namespace Form
                         {"Overhead",_DataById[1210106]},
     
                         {"Isometric",_DataById[1210107]},
+    
+                        {"dialogAdvanced",_DataById[1210108]},
+    
+                        {"const",_DataById[1210109]},
     
                     };
     

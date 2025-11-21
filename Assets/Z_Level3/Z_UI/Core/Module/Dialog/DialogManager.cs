@@ -45,7 +45,6 @@ namespace Z_Ui.Dialog
     {
         //sub
         public Settings settings;
-        private ClipForm.Data cache;
         private List<ClipForm.Data> clipLst;
         private Action onComplete;
 
@@ -60,7 +59,6 @@ namespace Z_Ui.Dialog
                 return;
             inited = true;
             this.Register<ClipPlayEvent>();
-            Clear();
             clipLst = new List<ClipForm.Data>();
             historyClips = new List<ClipForm.Data>();
             settings = new Settings()
@@ -71,48 +69,26 @@ namespace Z_Ui.Dialog
             };
 
         }
-        public void Clear()
-        {
-            cache = new ClipForm.Data(-1, "", "", "", "", "");
-        }
-        public void SetCacheTitle(string title)
-        {
-            cache.title = title;
-        }
-        public void SetCacheMainText(string mainText)
-        {
-            cache.mainText = mainText;
-        }
-        public void SetCacheBg(string texName)
-        {
-            cache.mainPictureName = texName;
-        }
-        public void SetCacheVideoPath(string videoName)
-        {
-            cache.mainVideoName = videoName;
-        }
-        public void SetCacheProfile(string profileName)
-        {
-            cache.profilePictureName = profileName;
-        }
+
         #region 开始方法
-        public void BeginCache(Action onComplete, bool autoClose = true)
+
+        public void Begin(string title, string mainText, string mainPicture, string mainVideo, string profilePicture, string mainAudio, Action onComplete, bool autoClose = true)
         {
-            Begin(new List<ClipForm.Data>() { cache }, onComplete, autoClose);
+            Begin(new List<string>() { title }, new List<string>() { mainText }, new List<string>() { mainPicture }, new List<string>() { mainVideo }, new List<string>() { profilePicture }, new List<string>() { mainAudio }, onComplete, autoClose);
         }
-        public void Begin(string title, string mainText, string mainPicture, string mainVideo, string profilePicture, Action onComplete, bool autoClose = true)
-        {
-            Begin(new List<string>() { title }, new List<string>() { mainText }, new List<string>() { mainPicture }, new List<string>() { mainVideo }, new List<string>() { profilePicture }, onComplete, autoClose);
-        }
-        public void Begin(List<string> titleLst, List<string> mainTextLst, List<string> mainPictureLst, List<string> mainVideoLst, List<string> profilePictureLst, Action onComplete, bool autoClose = true)
+        public void Begin(List<string> titleLst, List<string> mainTextLst, List<string> mainPictureLst, List<string> mainVideoLst, List<string> profilePictureLst, List<string> mainAudioLst, Action onComplete, bool autoClose = true)
         {
             clipLst.Clear();
             for (int i = 0, icnt = titleLst.Count; i < icnt; i++)
             {
-                var clip = new ClipForm.Data(-1, titleLst[i], mainTextLst[i], mainPictureLst[i], mainVideoLst[i], profilePictureLst[i]);
+                var clip = new ClipForm.Data(-1, titleLst[i], mainTextLst[i], mainPictureLst[i], mainVideoLst[i], profilePictureLst[i], mainAudioLst[i]);
                 clipLst.Add(clip);
             }
             Begin(clipLst, onComplete, autoClose);
+        }
+        public void Begin(ClipForm.Data clip, Action onComplete, bool autoClose = true)
+        {
+            Begin(new List<ClipForm.Data>() { clip }, onComplete, autoClose);
         }
         public void Begin(List<ClipForm.Data> clipLst, Action onComplete, bool autoClose = true)
         {

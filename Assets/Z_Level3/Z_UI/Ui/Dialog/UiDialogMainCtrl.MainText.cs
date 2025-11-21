@@ -48,7 +48,11 @@ namespace Ui.DialogMain
                 model.isDisplaying = true;
                 model.nowWord = 0;
                 view.txt_.text = "";
-
+                var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
+                if (audioData != null)
+                {
+                    view.as_.PlayOneShot(audioData.GetClip());
+                }
                 Display();
             }
             private void Display()
@@ -61,6 +65,7 @@ namespace Ui.DialogMain
             private void DelayForOver(float delay)
             {
                 TimeManager.instance.CancelTimer(model.overTimer);
+                view.as_.Stop();
                 model.overTimer = TimeManager.instance.StartTimer(delay, 0, () =>
                 {
                     Z_EventHelper.Invoke(new ClipPlayEvent()
@@ -102,7 +107,8 @@ namespace Ui.DialogMain
                         if (model.wordTimer == null || model.wordTimer.cancel)
                         {
                             DelayForOver(model.autoPlaydelay / DialogManager.instance.settings.autoPlaySpeed);
-                        }else
+                        }
+                        else
                         {
                             Display();
                         }

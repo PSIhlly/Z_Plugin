@@ -44,10 +44,13 @@ public static class GlobalNameHelper
 {
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
     public static string GetRuntimePrefabName(string name = "") => "runtime$" + name;
-    public static string GetDefaultTexName(string name = "") => "reserved$" + name;
+    public static string GetDefaultTexName(string name = "") => "reservedI$" + name;
+
+    public static string GetDefaultVideoName(string name = "") => "reservedV$" + name;
+    public static string GetDefaultAudioName(string name = "") => "reservedA$" + name;
     public static bool IsInnerAssetName(string name)
     {
-        return !name.Contains(AssetDefines.IMAGE_MARK);
+        return !name.Contains(AssetDefines.IMAGE_MARK) && !name.Contains(AssetDefines.VIDEO_MARK) && !name.Contains(AssetDefines.AUDIO_MARK);
     }
 
     public static string GetDefaultStoryTexName() => GetDefaultTexName("story");

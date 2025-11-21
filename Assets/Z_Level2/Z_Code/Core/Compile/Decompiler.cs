@@ -16,7 +16,7 @@ namespace Z_Code
             string code = "";
             foreach (var node in syntaxNodes)
             {
-                code += ResetStatement(node)+ ";\n";
+                code += ResetStatement(node) + ";\n";
             }
             if (DEBUG)
             {
@@ -27,20 +27,23 @@ namespace Z_Code
         public string ResetStatement(SyntaxNode node)
         {
             var code = "";
-            if(node.desc.type == CodeType.Action)
+            if (node.desc.type == CodeType.Action)
             {
                 foreach (var sub in node.subNodes)
                 {
-                    code += ResetStatement(sub)+";\n";
+                    code += ResetStatement(sub) + ";\n";
                 }
             }
             if (node.desc.type == CodeType.Reserved)
             {
                 switch (node.desc.code)
                 {
+                    case "Wait":
+                        code = $"Wait({ResetStatement(node.subNodes[0])})";
+                        break;
                     case "if":
                         code = $"if({ResetStatement(node.subNodes[0])})\n{{\n{ResetStatement(node.subNodes[1])}}} \n" +
-                            $"{ (node.subNodes.Count>2? $"else \n{{\n{ResetStatement(node.subNodes[2])}}}\n" :"") }";
+                            $"{(node.subNodes.Count > 2 ? $"else \n{{\n{ResetStatement(node.subNodes[2])}}}\n" : "")}";
                         break;
                     case "for":
                         code = $"for({ResetStatement(node.subNodes[0])};{ResetStatement(node.subNodes[1])};{ResetStatement(node.subNodes[2])})\n{{\n{ResetStatement(node.subNodes[3])} }}\n ";
@@ -56,7 +59,7 @@ namespace Z_Code
                 for (int i = 0; i < node.subNodes.Count; i++)
                 {
                     code += ResetStatement(node.subNodes[i]);
-                    if(i< node.subNodes.Count-1)
+                    if (i < node.subNodes.Count - 1)
                     {
                         code += ",";
                     }

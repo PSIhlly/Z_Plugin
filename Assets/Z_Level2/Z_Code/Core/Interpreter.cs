@@ -23,7 +23,8 @@ namespace Z_Code
         Sub,
         Get,
         IfFalseJump,
-        Jump
+        Jump,
+        Wait
     }
     namespace Form
     {
@@ -37,9 +38,18 @@ namespace Z_Code
                 {
                     if (_interpreter == null)
                     {
-                        _interpreter = new Interpreter(program);
+                        _interpreter = new Interpreter(this);
                     }
                     return _interpreter.Interpret();
+                }
+                public void Reset()
+                {
+                    _interpreter.Reset();
+
+                    p = 0;
+                    stack.Clear();
+                    top = -1;
+                    heap.Clear();
                 }
             }
 
@@ -74,9 +84,9 @@ namespace Z_Code
         public const bool DEBUG = false;
         InterpretLock localLock;
 
-        public Interpreter(ProgramDataForm.Data program)
+        public Interpreter(InterpretDataForm.Data interpret)
         {
-            data = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1);
+            data = interpret;
             localLock = new InterpretLock(this);
         }
 
@@ -98,61 +108,66 @@ namespace Z_Code
                 {
                     case Op.PushNum:
                         data.p++;
-                        Push(new BoxDataForm.Data(-1, "", "", float.Parse(data.program.zCode[data.p])));
+                        Push(new BoxDataForm.Data(-1, null, null, float.Parse(data.program.zCode[data.p])));
                         break;
                     case Op.PushStr:
                         data.p++;
-                        Push(new BoxDataForm.Data(-1, data.program.zCode[data.p], "", 0));
+                        Push(new BoxDataForm.Data(-1, data.program.zCode[data.p], null, 0));
                         break;
                     case Op.Get:
                         data.p++;
                         var nm = data.program.zCode[data.p];
                         if (!data.heap.ContainsKey(nm))
                         {
-                            data.heap[nm] = new BoxDataForm.Data(-1, "", "", 0);
+                            data.heap[nm] = new BoxDataForm.Data(-1, null, null, 0);
                         }
-                        Push(new BoxDataForm.Data(-1, "", nm, 0));
+                        Push(new BoxDataForm.Data(-1, null, nm, 0));
                         break;
                     case Op.Call:
-                        data.p++;
-                        var cmd = BaseData.cmdDic[data.program.zCode[data.p]].GetNew();
+                        var cmd = BaseData.cmdDic[data.program.zCode[data.p + 1]].GetNew();
                         var form = cmd.GetForm();
                         var prm = new BoxDataForm.Data[form.prmNames == null ? 0 : form.prmNames.Count];
                         for (int i = 0; i < prm.Length; i++)
                         {
-                            prm[i] = Pop();
+                            prm[i] = data.stack[data.top - i];
                         }
                         var ret = cmd.Execute(prm, data.heap, localLock);
- 
-                        for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
-                        {
-                            Push(ret[i]);
-                        }
+
                         if (localLock.IsLocked())
                         {
                             return false;
                         }
+                        //Delay
+                        data.p++;
+                        for (int i = 0; i < prm.Length; i++)
+                        {
+                            Pop();
+                        }
+                        for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                        {
+                            Push(ret[i]);
+                        }
                         break;
                     case Op.Equal:
-                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
+                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
                         break;
                     case Op.NotEqual:
-                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) != GetNum(Pop()) ? 1 : 0));
+                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) != GetNum(Pop()) ? 1 : 0));
                         break;
                     case Op.Assign:
                         data.heap[Pop().valName] = Pop().Copy();
                         break;
                     case Op.Plus:
-                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) + GetNum(Pop())));
+                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) + GetNum(Pop())));
                         break;
                     case Op.Minus:
-                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) - GetNum(Pop())));
+                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) - GetNum(Pop())));
                         break;
                     case Op.Mul:
-                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) * GetNum(Pop())));
+                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) * GetNum(Pop())));
                         break;
                     case Op.Div:
-                        Push(new BoxDataForm.Data(-1, "", "", GetNum(Pop()) / GetNum(Pop())));
+                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) / GetNum(Pop())));
                         break;
                     case Op.Jump:
                         data.p++;
@@ -170,6 +185,15 @@ namespace Z_Code
                          heap[Pop().valName]
 
                          break;*/
+                    case Op.Wait:
+                        var box = Pop();
+                        box.num -= Time.deltaTime;
+                        if(box.num > 0)
+                        {
+                            Push(box);
+                            return false;
+                        }
+                        break;
                     default:
                         Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not found£¡£¡");
                         break;
@@ -207,6 +231,10 @@ namespace Z_Code
                 return data.heap[box.valName].str;
             }
             return box.str;
+        }
+        public void Reset()
+        {
+            localLock.Unlock();
         }
     }
 

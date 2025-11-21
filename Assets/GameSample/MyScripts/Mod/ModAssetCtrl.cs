@@ -54,22 +54,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region param
-    public void CreateGlobalArg(string name)
-    {
-        if (GlobalParamForm.DataByName.Keys.Count > GlobalSettings.GLOBAL_PARAM_MAX)
-            return;
-
-        if (string.IsNullOrEmpty(name))
-        {
-            name = StringHelper.GetUniqueName(GlobalParamForm.DataByName.Keys);
-        }
-        GlobalParamForm.AddData(new GlobalParamForm.Data(-1, name, 0, 0f, 0f, 1f, 0));
-    }
-    public void DeleteGlobalArg(string name)
-    {
-
-        GlobalParamForm.RemoveData(CharacterParamForm.DataByName[name].uid);
-    }
+   
     public void CreateCharacterArg(string name)
     {
         if (CharacterParamForm.DataByName.Keys.Count > GlobalSettings.CHARACTER_PARAM_MAX)

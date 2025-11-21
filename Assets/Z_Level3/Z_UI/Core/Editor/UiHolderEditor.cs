@@ -105,6 +105,11 @@ namespace Z_Ui_Editor
                     initCode += $@"
             view.vp_{o.name.Split("_")[1]}.PlayVideoByPath("");";
                 }
+                else if (o.name.Split("_")[0].Split("|").Contains("as"))
+                {
+                    initCode += $@"
+            view.as_{o.name.Split("_")[1]}.Play("");";
+                }
                 else if (o.name.Split("_")[0].Split("|").Contains("txt"))
                 {
                     refreshCode += $@"
@@ -380,6 +385,12 @@ using UnityEngine.Video;
             public RImg rimg_{realName};";
                             initContent += $@"
             rimg_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<RImg>();";
+                            break;
+                        case "as":
+                            declareContent += $@"
+            public AudioSource as_{realName};";
+                            initContent += $@"
+            as_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<AudioSource>();";
                             break;
                         case "scr":
                             declareContent += $@"

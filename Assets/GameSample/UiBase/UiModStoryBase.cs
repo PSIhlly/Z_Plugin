@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_Texture;
+using Z_Video;
+using UnityEngine.Video;
 namespace Ui.ModStory
 
 {
@@ -75,122 +78,6 @@ namespace ModStoryParameter
 
 
 
-
-namespace ModStoryGlobalParameter
-
-{
-
-
-
-
-
-
-
-    public partial class UiArgParam:UiParam
-    {
-    }
-
-    public partial class UiArgView:UiView
-    {
-
-            public GameObject go_arg;
-            public Sta sta_exist;
-            public Btn btn_new;
-            public Btn btn_delete;
-            public Ipt ipt_name;
-            public Ipt ipt_value;
-            public Dp dp_;
-        public UiArgView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_arg = uiHolder.elementTrsLst[0].gameObject;
-            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
-        }
-
-    }
-    public partial class UiArgCtrl:UiCtrl
-    {
-        public UiArgView view;
-        public UiArgModel model;
-        public UiArgParam param;
-        public UiModStoryGlobalParameterCtrl parent=>(UiModStoryGlobalParameterCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiArgParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiArgView(uiHolder);
-            model=new UiArgModel();
-
-
-        }
-
-    }
-    public partial class UiArgModel:UiModel
-    {
-        
-    }
-    public partial class UiModStoryGlobalParameterParam:UiParam
-    {
-    }
-
-    public partial class UiModStoryGlobalParameterView:UiView
-    {
-
-            public ScrView scr_args;
-            public GameObject go_arg;
-            public UiArgCtrl sub_Arg;
-        public UiModStoryGlobalParameterView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            scr_args = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            go_arg = uiHolder.elementTrsLst[1].gameObject;
-            sub_Arg = (UiArgCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-        }
-
-    }
-    public partial class UiModStoryGlobalParameterCtrl:UiCtrl
-    {
-        public UiModStoryGlobalParameterView view;
-        public UiModStoryGlobalParameterModel model;
-        public UiModStoryGlobalParameterParam param;
-        public UiModStoryParameterCtrl parent=>(UiModStoryParameterCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiModStoryGlobalParameterParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiModStoryGlobalParameterView(uiHolder);
-            model=new UiModStoryGlobalParameterModel();
-
-
-            view.sub_Arg = new UiArgCtrl();
-            view.sub_Arg.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-        }
-
-    }
-    public partial class UiModStoryGlobalParameterModel:UiModel
-    {
-        
-    }
-}
 
 namespace ModStoryCharacterParameter
 
@@ -489,12 +376,9 @@ namespace ModStoryConfig
     public partial class UiModStoryParameterView:UiView
     {
 
-            public ModStoryGlobalParameter.UiModStoryGlobalParameterCtrl page_ModStoryGlobalParameter;
             public ModStoryCharacterParameter.UiModStoryCharacterParameterCtrl page_ModStoryCharacterParameter;
             public ModStoryItemParameter.UiModStoryItemParameterCtrl page_ModStoryItemParameter;
             public ModStoryConfig.UiModStoryConfigCtrl page_ModStoryConfig;
-            public Btn btn_globalParameter;
-            public Sta sta_globalParameter;
             public Btn btn_characterParameter;
             public Sta sta_characterParameter;
             public Btn btn_itemParameter;
@@ -504,18 +388,15 @@ namespace ModStoryConfig
         public UiModStoryParameterView(UiHolder uiHolder):base(uiHolder)
         {
 
-            page_ModStoryGlobalParameter = (ModStoryGlobalParameter.UiModStoryGlobalParameterCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
-            page_ModStoryCharacterParameter = (ModStoryCharacterParameter.UiModStoryCharacterParameterCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            page_ModStoryItemParameter = (ModStoryItemParameter.UiModStoryItemParameterCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            page_ModStoryConfig = (ModStoryConfig.UiModStoryConfigCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            btn_globalParameter = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_globalParameter = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_characterParameter = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_characterParameter = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_itemParameter = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_itemParameter = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            btn_config = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            sta_config = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            page_ModStoryCharacterParameter = (ModStoryCharacterParameter.UiModStoryCharacterParameterCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
+            page_ModStoryItemParameter = (ModStoryItemParameter.UiModStoryItemParameterCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            page_ModStoryConfig = (ModStoryConfig.UiModStoryConfigCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            btn_characterParameter = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_characterParameter = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            btn_itemParameter = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_itemParameter = uiHolder.elementTrsLst[6].GetComponent<Sta>();
+            btn_config = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_config = uiHolder.elementTrsLst[8].GetComponent<Sta>();
         }
 
     }
@@ -540,14 +421,12 @@ namespace ModStoryConfig
             model=new UiModStoryParameterModel();
 
 
-            view.page_ModStoryGlobalParameter = new ModStoryGlobalParameter.UiModStoryGlobalParameterCtrl();
-            view.page_ModStoryGlobalParameter.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.page_ModStoryCharacterParameter = new ModStoryCharacterParameter.UiModStoryCharacterParameterCtrl();
-            view.page_ModStoryCharacterParameter.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_ModStoryCharacterParameter.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.page_ModStoryItemParameter = new ModStoryItemParameter.UiModStoryItemParameterCtrl();
-            view.page_ModStoryItemParameter.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.page_ModStoryItemParameter.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.page_ModStoryConfig = new ModStoryConfig.UiModStoryConfigCtrl();
-            view.page_ModStoryConfig.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.page_ModStoryConfig.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }

@@ -57,6 +57,23 @@ namespace Z_Math
         {
             return new Vector3(v3.x, v3.y, z);
         }
+        public static Color NewSetR(this Color c, float r)
+        {
+            return new Color(r, c.g, c.b, c.a);
+        }
+        public static Color NewSetG(this Color c, float g)
+        {
+            return new Color(c.r, g, c.b, c.a);
+        }
+        public static Color NewSetB(this Color c, float b)
+        {
+            return new Color(c.r, c.g, b, c.a);
+        }
+        public static Color NewSetA(this Color c, float a)
+        {
+            return new Color(c.r, c.g, c.b, a);
+        }
+
         public static Vector3[] RotatePointAroundOrigin(Vector3[] points, Vector3 euler)
         {
             Vector3[] newPos = new Vector3[points.Length];

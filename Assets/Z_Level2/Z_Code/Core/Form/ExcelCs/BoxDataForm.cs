@@ -142,7 +142,7 @@ public static readonly int autoUidCnt=100;
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",0f);
+                   private static Data _defaultData=new Data(0,null,null,0f);
                    public static Data defaultData=>_defaultData.Copy();
 
 

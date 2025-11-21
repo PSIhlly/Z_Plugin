@@ -36,7 +36,8 @@ namespace Z_Code
         {
             "if",
             "for",
-            "else"
+            "else",
+            "Wait"
         };
         public static HashSet<string> operators = new HashSet<string>()
         {

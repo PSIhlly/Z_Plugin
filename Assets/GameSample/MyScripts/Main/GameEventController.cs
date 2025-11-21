@@ -83,9 +83,24 @@ public static partial class GlobalEventHelper
 {
     public static bool IsEventTex(string name) => name.Split(AssetDefines.IMAGE_MARK).Length==3&& name.StartsWith(AssetDefines.IMAGE_MARK) && name.EndsWith(AssetDefines.IMAGE_MARK);
     public static string GetEventTexName(string name = "") => AssetDefines.IMAGE_MARK + name + AssetDefines.IMAGE_MARK;
+    public static string GetEventVideoName(string name = "") => AssetDefines.VIDEO_MARK + name + AssetDefines.VIDEO_MARK;
     public static string GetEventAssetTexName(string name)
     {
         string res=name.Split(AssetDefines.IMAGE_MARK)[1];
+        if (res == "")
+            res = GlobalNameHelper.GetDefaultTexName();
+        return res;
+    }
+    public static string GetEventAssetVideoName(string name)
+    {
+        string res = name.Split(AssetDefines.VIDEO_MARK)[1];
+        if (res == "")
+            res = GlobalNameHelper.GetDefaultTexName();
+        return res;
+    }
+    public static string GetEventAssetAudioName(string name)
+    {
+        string res = name.Split(AssetDefines.AUDIO_MARK)[1];
         if (res == "")
             res = GlobalNameHelper.GetDefaultTexName();
         return res;

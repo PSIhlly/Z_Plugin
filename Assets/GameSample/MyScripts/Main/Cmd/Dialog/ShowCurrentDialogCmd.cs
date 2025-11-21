@@ -8,21 +8,22 @@ using Z_Ui.Notify;
 
 namespace Z_Code
 {
-    public class ShowDialogCmd : CmdBase
+    public class ShowCurrentDialogCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new ShowDialogCmd());
+            Register(new ShowCurrentDialogCmd());
         }
-        public override string GetName() => "ShowDialog";
-        public override CmdBase GetNew() => new ShowDialogCmd();
+        public override string GetName() => "ShowCurrentDialog";
+        public override CmdBase GetNew() => new ShowCurrentDialogCmd();
         protected override BoxDataForm.Data[] ExecuteInternal(BoxDataForm.Data[] prm, InterpretLock localLock)
         {
-            DialogManager.instance.Begin(prm[2].str,  prm[3].str , GlobalEventHelper.GetEventAssetTexName(prm[0].str) ,"", GlobalEventHelper.GetEventAssetTexName(prm[1].str), () =>
+            var cache = PlayManager.instance.data.progress.dialogCache;
+            DialogManager.instance.Begin(cache,() =>
             {
                 localLock.Unlock();
-            });
+            }, prm[0].num > 0);
             localLock.Lock();
             return null;
         }

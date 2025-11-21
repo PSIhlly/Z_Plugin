@@ -7,44 +7,19 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Z_ByteSerialize;
 using Z_DesignStyle;
-using Z_UnitSystem.Form;
-using Z_Text.Form;
-using Z_DataSystem.Form;
-using Z_Map.Form;
-using Z_Map;
-using Z_Ui.Form;
-using Z_Code.Form;
 
-namespace Form
+namespace Z_Code.Form
 {
 
-    public static partial class GlobalParamForm
+    public static partial class EventGlobalVariableForm
     {
-
-        
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-                ParamForm.childInitAction+=InitInternal;
 
-
-                ParamForm.childRemoveAction+=RemoveChildren;
-                ParamForm.childAddAction+=AddChildren;
-            
-
-            ParamForm.changeUidAction+=ChangeUid;
-
-            ParamForm.changeNameAction+=ChangeName;
-
-            ParamForm.changeValuetypeAction+=ChangeValuetype;
-
-            ParamForm.changeMinAction+=ChangeMin;
-
-            ParamForm.changeVAction+=ChangeV;
-
-            ParamForm.changeMaxAction+=ChangeMax;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -57,7 +32,7 @@ namespace Form
         
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain =>ParamForm.uidChain;
+        public static Z_Chain.Chain uidChain ;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
@@ -69,57 +44,84 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,ValType,ValType> changeValuetypeAction;
-                
-        public static Action<Data,float,float> changeMinAction;
-                
-        public static Action<Data,float,float> changeVAction;
-                
-        public static Action<Data,float,float> changeMaxAction;
+        public static Action<Data,BoxDataForm.Data,BoxDataForm.Data> changeDataAction;
                 
 
 
-        public partial class Data : ParamForm.Data
+        public partial class Data
         {
 
-                    private int  _SpecialType;
+                    private int  _uid;
                     /// <summary>
-                    ///特殊类型
+                    ///
                     ///</summary>
-                    public int  SpecialType{
-                                get{return _SpecialType;}
-private set{
+                    public int  uid{
+                                get{return _uid;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUid(this,_uid,value); 
+                    }
         
-                _SpecialType = value;
+                _uid = value;
                 }
                  
                      }
                     
-            public Data(ParamForm.Data data):base(data.uid,data.name,data.valueType,data.min,data.v,data.max)
-            {
-            }
-            
-            public Data(int uid,string name,ValType valueType,float min,float v,float max,int SpecialType):base(uid,name,valueType,min,v,max)
+                    private string  _name;
+                    /// <summary>
+                    ///名称
+                    ///</summary>
+                    public string  name{
+                                get{return _name;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeName(this,_name,value); 
+                    }
+        
+                _name = value;
+                }
+                 
+                     }
+                    
+                    private BoxDataForm.Data  _data;
+                    /// <summary>
+                    ///数据
+                    ///</summary>
+                    public BoxDataForm.Data  data{
+                                get{return _data;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeData(this,_data,value); 
+                    }
+        
+                _data = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,BoxDataForm.Data data)
             {
 
              this.uid = uid;
              this.name = name;
-             this.valueType = valueType;
-             this.min = min;
-             this.v = v;
-             this.max = max;
-             this.SpecialType = SpecialType;
+             this.data = data;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,valueType,min,v,max,SpecialType);
+        return new Data(sameId? uid:uidChain.GetId(),name,data);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f,0);
+                   private static Data _defaultData=new Data(0,"",null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -143,30 +145,18 @@ private set{
                 }
             }
     
-            static Dictionary<int, Data> _DataBySpecialtype;
-            public static Dictionary<int, Data> DataBySpecialtype
-            {
-                get
-                {
-                    Init();
-                    return _DataBySpecialtype;
-                }
-            }
-    
 
         static public void Init()
         {
 
-            ParamForm.Init();
-
+            InitInternal();
         }
         public static void InitInternal()
         {
             if(inited)
                 return;
             inited=true;  
-
-        
+uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
@@ -175,21 +165,11 @@ private set{
     
                     };
     
-                    _DataBySpecialtype = new Dictionary<int, Data>() {
-    
-                    };
-    
 
             childInitAction?.Invoke();
             
 
-            foreach(var data in DataByUid.Values)
-            {
-                ParamForm.AddData(data);
-            }
-
-
-        
+foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
              
         }
 
@@ -230,15 +210,7 @@ private set{
 
                 jo.Get<string>("name"),
 
-                jo.Get<ValType>("valueType"),
-
-                jo.Get<float>("min"),
-
-                jo.Get<float>("v"),
-
-                jo.Get<float>("max"),
-
-                    _defaultData.SpecialType
+                jo.Get<BoxDataForm.Data>("data")
                     );
 
             return data;
@@ -254,13 +226,7 @@ private set{
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<ValType>("valueType",data.valueType);
-
-            jo.Set<float>("min",data.min);
-
-            jo.Set<float>("v",data.v);
-
-            jo.Set<float>("max",data.max);
+            jo.Set<BoxDataForm.Data>("data",data.data);
 
             return jo;
         }
@@ -284,9 +250,7 @@ private set{
     
                     DataByName[data.name]=data;
     
-                    DataBySpecialtype[data.SpecialType]=data;
-    
-ParamForm.AddData(data);
+
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.uid;
@@ -303,9 +267,7 @@ ParamForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
-                    DataBySpecialtype.Remove(data.SpecialType);
-    
-ParamForm.RemoveData(uid);
+
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
             removeAction?.Invoke(data);
@@ -332,13 +294,13 @@ ParamForm.RemoveData(uid);
             }
         }
 
-         private static void RemoveChildren(ParamForm.Data data)
+         private static void RemoveChildren(Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.uid);      
         }
-         private static void AddChildren(ParamForm.Data superData)
+         private static void AddChildren(Data superData)
         {
             Init();
             if(superData is Data data)
@@ -349,7 +311,7 @@ ParamForm.RemoveData(uid);
 
 
 
-            public static void ChangeUid(ParamForm.Data superData,int oldV,int newV)
+            public static void ChangeUid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -359,7 +321,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeName(ParamForm.Data superData,string oldV,string newV)
+            public static void ChangeName(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -372,42 +334,12 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeValuetype(ParamForm.Data superData,ValType oldV,ValType newV)
+            public static void ChangeData(Data superData,BoxDataForm.Data oldV,BoxDataForm.Data newV)
             {
                 if(superData is Data data)
                 {
 
-                changeValuetypeAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeMin(ParamForm.Data superData,float oldV,float newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeMinAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeV(ParamForm.Data superData,float oldV,float newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeVAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeMax(ParamForm.Data superData,float oldV,float newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeMaxAction?.Invoke(data,oldV,newV);
+                changeDataAction?.Invoke(data,oldV,newV);
                 }
                     
             }

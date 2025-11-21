@@ -34,15 +34,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
     private InternalPlayInfoController _infoCtrl;
     public ExternalPlayInfoController infoCtrl;
 
-
+    private InternalPlayAssetController _assetCtrl;
+    public ExternalPlayAssetController assetCtrl;
 
     // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
         base.Init();
-
-
-
 
         var __sceneCtrl = new PlaySceneController(this);
         _sceneCtrl = __sceneCtrl;
@@ -52,6 +50,9 @@ public class PlayManager : Z_MonoManager<PlayManager>
         _infoCtrl = __infoCtrl;
         infoCtrl = __infoCtrl;
 
+        var __assetCtrl = new PlayAssetController(this);
+        _assetCtrl = __assetCtrl;
+        assetCtrl = __assetCtrl;
         //  assetCtrl = new ModAssetCtrl(this);
     }
 
@@ -62,7 +63,6 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public void Update()
     {
         _sceneCtrl.Update();
-
         _infoCtrl.Update();
     }
     public void LateUpdate()
@@ -89,6 +89,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
             data = await Task.Run(() =>
             {
+                GameManager.instance.saveCtrl.LoadUiItem(GetStorySaveFolder());
                 return GameManager.instance.saveCtrl.LoadProgress(GetStorySaveProgressFileName());
             });
 
@@ -103,6 +104,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
 
         Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curConfig.startSceneId);
+        _assetCtrl.Begin();
 
     }
 
@@ -141,12 +143,12 @@ public class PlayManager : Z_MonoManager<PlayManager>
                 }
             }
         }
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive));
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive, Z_Ui.Form.ClipForm.defaultData.Copy()));
     }
 
     public void EndStory()
     {
-
+        _assetCtrl.End();
     }
     public async void BeginScene(int id)
     {

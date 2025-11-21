@@ -701,19 +701,9 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 'a=2+3+(2)*(6);
+  m_Text: 'Wait(1);
 
-    Print(a);
-
-    for(i=0;i!=3;i=i+1)
-
-    {
-
-    Print(i);
-
-    }
-
-    ;
+    Print("?");
 
 '
   m_CaretBlinkRate: 0.85
@@ -1151,7 +1141,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "a=2+3+(2)*(6);\nPrint(a);\nfor(i=0;i!=3;i=i+1)\n{\nPrint(i);\n}\n;\n\u200B"
+  m_text: "Wait(1);\nPrint(\"?\");\n\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aca4fb8574a1a54db6e09a7d1d50e70, type: 2}
   m_sharedMaterial: {fileID: 8623805276869744401, guid: 0aca4fb8574a1a54db6e09a7d1d50e70, type: 2}

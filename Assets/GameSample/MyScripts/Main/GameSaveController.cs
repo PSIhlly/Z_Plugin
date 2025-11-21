@@ -38,6 +38,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string effectFormFileName => "etf";
     public string skillFormFileName => "slf";
     public string itemProductFormFileName => "iprf";
+    public string imageUiItemFormFileName => "iuif";
 
 
     public string assetFolder => "/ast/";
@@ -211,6 +212,10 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveProgress(string progressPath)
     {
         SaveAndLoad.Save(progressPath, JsonConvert.SerializeObject(PlayManager.instance.data.GetJsonData()));
+    }
+    public void SaveUiItem(string storySaveFolder)
+    {
+        SaveAndLoad.Save(storySaveFolder + "/" + imageUiItemFormFileName, JsonConvert.SerializeObject(ImageUiItemForm.GetJaByDatas().ToString()));
     }
     public void SaveScene(string storyCoreFolder)
     {
@@ -566,6 +571,18 @@ public class GameSaveController : Z_Controller<GameManager>
             return new PlayData(SaveAndLoad.Load<string>(progressPath));
         }
         return new PlayData();
+    }
+    public void LoadUiItem(string storySaveFolder)
+    {
+        var pathForm = storySaveFolder + "/" + imageUiItemFormFileName;
+        ImageUiItemForm.Clear();
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in ImageUiItemForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                ImageUiItemForm.AddData(form);
+            }
+        }
     }
 
     public void LoadScene(string storyCoreFolder)

@@ -27,25 +27,19 @@ namespace Ui.ModStory.ModStoryParameter
 
         public override void OnCreate()
         {
-
-            view.btn_globalParameter.onClick.AddListener(() =>
+            view.btn_characterParameter.onClick.AddListener(() =>
             {
                 model.selPage = 0;
                 Refresh();
             });
-            view.btn_characterParameter.onClick.AddListener(() =>
+            view.btn_itemParameter.onClick.AddListener(() =>
             {
                 model.selPage = 1;
                 Refresh();
             });
-            view.btn_itemParameter.onClick.AddListener(() =>
-            {
-                model.selPage = 2;
-                Refresh();
-            });
             view.btn_config.onClick.AddListener(() =>
             {
-                model.selPage = 3;
+                model.selPage = 2;
                 Refresh();
             });
 
@@ -60,17 +54,14 @@ namespace Ui.ModStory.ModStoryParameter
 
         public void Refresh()
         {
-            view.page_ModStoryGlobalParameter.SetShow(model.selPage == 0);
-            view.sta_globalParameter.ChangeState(model.selPage == 0?1:0);
+            view.page_ModStoryCharacterParameter.SetShow(model.selPage == 0);
+            view.sta_characterParameter.ChangeState(model.selPage == 0 ? 1 : 0);
 
-            view.page_ModStoryCharacterParameter.SetShow(model.selPage == 1);
-            view.sta_characterParameter.ChangeState(model.selPage == 1 ? 1 : 0);
+            view.page_ModStoryItemParameter.SetShow(model.selPage == 1);
+            view.sta_itemParameter.ChangeState(model.selPage == 1 ? 1 : 0);
 
-            view.page_ModStoryItemParameter.SetShow(model.selPage == 2);
-            view.sta_itemParameter.ChangeState(model.selPage == 2 ? 1 : 0);
-
-            view.page_ModStoryConfig.SetShow(model.selPage == 3);
-            view.sta_config.ChangeState(model.selPage == 3 ? 1 : 0);
+            view.page_ModStoryConfig.SetShow(model.selPage == 2);
+            view.sta_config.ChangeState(model.selPage == 2 ? 1 : 0);
 
         }
     }

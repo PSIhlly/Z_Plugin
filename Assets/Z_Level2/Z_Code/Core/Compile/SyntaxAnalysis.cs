@@ -56,6 +56,7 @@ namespace Z_Code
                 if (nodes[i].desc.type == CodeType.Reserved)
                 {
                     int oriPos = i;
+                    int split = 0;
                     List<SyntaxNode> subStatements = new List<SyntaxNode>();
                     switch (nodes[i].desc.code)
                     {
@@ -76,7 +77,7 @@ namespace Z_Code
                         case "for":
                             int endForIf = GetFirstDepth0(nodes, i + 1, r, ")");
 
-                            int split = GetFirstDepth0(nodes, i+2, endForIf-1, ";");
+                            split = GetFirstDepth0(nodes, i+2, endForIf-1, ";");
                             subStatements.Add(BuildStatement(nodes, i+2, split - 1)[0]);
                             i = split+1;
                             split = GetFirstDepth0(nodes, i, endForIf - 1, ";");
@@ -88,6 +89,14 @@ namespace Z_Code
                             subStatements.Add(new SyntaxNode(new Desc("do", CodeType.Action), BuildBlock(nodes, endForIf+2, endForDo)));
 
                             i = endForDo;
+                            break;
+                        default:
+                            split = GetFirstDepth0(nodes, i, r, ";");
+                            if (split > 0)
+                            {
+                                subStatements.AddRange(BuildStatement(nodes, i, split - 1));
+                                i = split;
+                            }
                             break;
                     }
                     statements.Add(new SyntaxNode(nodes[oriPos].desc, subStatements));

@@ -11,6 +11,8 @@ using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.UI;
 using Z_Code.Form;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
+using Z_DataSystem;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiUnitParam
@@ -38,6 +40,7 @@ namespace Ui.ModStoryEventEditWindow
             view.btn_.onClick.AddListener(() =>
             {
                 parent.SelUnit(model.node);
+
             });
         }
         public override void OnShow()
@@ -108,12 +111,12 @@ namespace Ui.ModStoryEventEditWindow
                         view.txt_.text = model.node.desc.code;
                         break;
                 }
-                view.img_.gameObject.SetActive(GlobalEventHelper.IsEventTex(model.node.desc.code));
-                view.txt_.gameObject.SetActive(!GlobalEventHelper.IsEventTex(model.node.desc.code));
+                view.img_.gameObject.SetActive(AssetManager.instance.texCtrl.IsAsset(model.node.desc.code));
+                view.txt_.gameObject.SetActive(!AssetManager.instance.texCtrl.IsAsset(model.node.desc.code));
 
-                if (GlobalEventHelper.IsEventTex(model.node.desc.code))
+                if (AssetManager.instance.texCtrl.IsAsset(model.node.desc.code))
                 {
-                    view.img_.sprite = TexAssetForm.DataByName[string.IsNullOrEmpty(model.node.desc.code) ? GlobalNameHelper.GetDefaultTexName() : GlobalEventHelper.GetEventAssetTexName(model.node.desc.code)].GetSprite();
+                    view.img_.sprite = TexAssetForm.DataByName.GetDk(model.node.desc.code, GlobalNameHelper.GetDefaultTexName()).GetSprite();
                 }
             }
 

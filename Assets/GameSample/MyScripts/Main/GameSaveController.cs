@@ -188,12 +188,23 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
-        if (data != null)
+        Action<EventProgramDataForm.Data> act =(data)=>
         {
             var imgs = data.code.Split(AssetDefines.IMAGE_MARK);//获取常量图片
             for (int i = 1; i < imgs.Length; i += 2)
             {
-                SaveStoryTex(imgs[i], storyCoreFolder);
+                SaveStoryTex(AssetManager.instance.texCtrl.GetName(imgs[i]), storyCoreFolder);
+            }
+        };
+        if (data != null)
+        {
+            act.Invoke(data);
+        }
+        else
+        {
+            foreach (var curData in EventProgramDataForm.DataByUid.Values)
+            {
+                act.Invoke(curData);
             }
         }
 
@@ -243,7 +254,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     private void SaveStoryTex(string texName, string path)
     {
-        var data = TexAssetForm.DataByName.GetDk(texName, null);
+        var data = TexAssetForm.DataByName.GetDk(texName, GlobalNameHelper.GetDefaultTexName());
         if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = StoryTexAssetForm.DataByName[texName];
@@ -536,7 +547,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 var imgs = form.code.Split(AssetDefines.IMAGE_MARK);//获取常量图片
                 for (int i = 1; i < imgs.Length; i += 2)
                 {
-                    LoadStoryTex(imgs[i], storyCoreFolder);
+                    LoadStoryTex(AssetManager.instance.texCtrl.GetName(imgs[i]), storyCoreFolder);
                 }
             }
         }

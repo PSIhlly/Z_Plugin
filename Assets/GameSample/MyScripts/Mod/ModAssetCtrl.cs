@@ -511,17 +511,17 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             act?.Invoke(form);
         });
     }
-    public void ChooseEvent(Dictionary<string, EventTriggerForm.Data>  dic,string key,EventType type, string retType, string title, Action<EntryItem> act)
+    public void ChooseEvent(Dictionary<string, EventTriggerForm.Data>  dic,string key,SceneEventType type, string retType, string title, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
         {
-            dic[key] = new EventTriggerForm.Data(-1, key, res.content);
+            dic[key] = GameEventController.CreateTrigger(key, res.content);
             act?.Invoke(res);
             return true;
         }, items);
     }
-    public void ChooseEvent(EventType type, string retType, string title, Action<EntryItem> act)
+    public void ChooseEvent(SceneEventType type, string retType, string title, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
@@ -539,7 +539,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return true;
         }, items);
     }
-    public void ChooseCmd(EventType type, string retType, Action<EntryItem> act)
+    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType);
         NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>

@@ -25,7 +25,7 @@ namespace Ui.DialogMain
         {
             public override void OnShow()
             {
-                var data = TexAssetForm.DataByName.GetDv(param.clip.mainPictureName, null);
+                var data = TexAssetForm.DataByName.GetDv(param.clip.profilePictureName, null);
                 if(data == null)
                 {
                     Close();

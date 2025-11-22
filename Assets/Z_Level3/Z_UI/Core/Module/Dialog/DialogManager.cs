@@ -105,7 +105,7 @@ namespace Z_Ui.Dialog
                 InternalEnd();
                 return;
             }
-            curId = targetId;
+            curId = targetId; 
             UiManager.instance.ShowUi<UiDialogBgCtrl>(new UiDialogBgParam()
             {
                 clip = clipLst[curId]

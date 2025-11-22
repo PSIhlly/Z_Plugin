@@ -15,17 +15,11 @@ using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
 using Z_Ui;
+using Z_Ui.Loading;
 using Z_UnitSystem;
 
-public enum LoadingState
-{
-    Loading,
-    Done
-}
-public class LoadingEvent : Z_Event
-{
-    public LoadingState state;
-}
+
+
 public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 {
     #region story
@@ -85,7 +79,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false));
 
             ConfigForm.Clear();
-            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1 }, new List<int>() { 1 }, new List<int>(), "", "", GlobalNameHelper.GetDefaultTexName(), CameraMode.Overhead));
+            ConfigForm.AddData(new ConfigForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { 1 }, new List<int>() { 1 }, new List<int>(), new Dictionary<string, EventTriggerForm.Data>(), GlobalNameHelper.GetDefaultTexName(), CameraMode.Overhead));
 
 
             var data = new GameMapData();
@@ -151,13 +145,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         GameManager.instance.saveCtrl.ResetPrefabPool();
 
-        UiManager.instance.ShowUi<UiLoadingCtrl>();
+        LoadingManager.instance.AddLoadItem("scene");
         MapInfo data;
 
         data = await Task.Run(() =>
         {
             return GameManager.instance.saveCtrl.LoadSceneMap(storyCoreFolder + "/" + GetSceneFileNameById(id));
         });
+
+        LoadingManager.instance.RemoveLoadItem("scene");
 
         /* {
              //new
@@ -191,12 +187,6 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             GameManager.instance.characterCtrl.RegisterAnim(character);
         }
-
-        Z_EventHelper.Invoke(new LoadingEvent()
-        {
-            state = LoadingState.Done
-        });
-        UiManager.instance.CloseUi<UiLoadingCtrl>();
         return true;
     }
     public void UnloadSceneUgc()

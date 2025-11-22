@@ -15,7 +15,7 @@ namespace Z_Code
         }
         public override string GetName()=> "Print";
         public override CmdBase GetNew()=>new PrintCmd();
-        protected override BoxDataForm.Data[] ExecuteInternal(BoxDataForm.Data[] prm, InterpretLock localLock)
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask localLock)
         {
             if(prm[0].str==null)
             {
@@ -25,7 +25,7 @@ namespace Z_Code
             {
                 Debug.Log(prm[0].str);
             }
-            return null;
+            return true;
         }
     }
 }

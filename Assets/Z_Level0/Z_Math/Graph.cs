@@ -45,6 +45,7 @@ namespace Z_Math
             Up,
             Right
         }
+
         public static Vector3 NewSetX(this Vector3 v3, float x)
         {
             return new Vector3(x, v3.y, v3.z);
@@ -586,11 +587,17 @@ namespace Z_Math
             area.GetWorldCorners(cor);
             return new Vector2(cor[0].x + (cor[3].x - cor[0].x) * relativeNormalizedPos.x, cor[0].y + (cor[1].y - cor[0].y) * relativeNormalizedPos.y);
         }
-        public static Vector2 GetSize(RectTransform area)
+        public static Vector2 GetSize(this RectTransform area)
         {
             Vector3[] cor = new Vector3[4];
             area.GetWorldCorners(cor);
             return new Vector2(cor[3].x - cor[0].x, cor[1].y - cor[0].y);
+        }
+        public static Vector2 GetCenterWorldPos(this RectTransform area)
+        {
+            Vector3[] cor = new Vector3[4];
+            area.GetWorldCorners(cor);
+            return new Vector2((cor[3].x + cor[0].x)/2, (cor[1].y + cor[0].y)/2);
         }
 
         /// <summary>

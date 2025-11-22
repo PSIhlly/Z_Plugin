@@ -75,16 +75,15 @@ namespace Z_Time
             {
                 act?.Invoke();
             }
-            
+            CurLateUpdateWithoutCheckList.Clear();
             foreach (var act in CurLateUpdateList)
             {
                 if (act.Item2 != null)
                 {
-
                     act.Item1?.Invoke();
                 }
             }
-            
+            CurLateUpdateList.Clear();
         }
 
         public void Update()

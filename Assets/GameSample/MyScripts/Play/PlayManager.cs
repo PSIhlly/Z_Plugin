@@ -14,6 +14,7 @@ using Z_Map;
 using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_Ui;
+using Z_Ui.Loading;
 using Z_UnitSystem;
 using static UnityEditor.PlayerSettings;
 
@@ -24,7 +25,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     public bool boxPlay;
 
-
+    private bool enable;
 
     #region life
 
@@ -62,11 +63,19 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
     public void Update()
     {
+        if(!enable)
+        {
+            return;
+        }
         _sceneCtrl.Update();
         _infoCtrl.Update();
     }
     public void LateUpdate()
     {
+        if (!enable)
+        {
+            return;
+        }
         GameManager.instance.evtCtrl.LateUpdate();
     }
     public async void BeginStory(string storyName, bool boxPlay)
@@ -74,6 +83,8 @@ public class PlayManager : Z_MonoManager<PlayManager>
         this._folderName = storyName;
         data = null;
         this.boxPlay = boxPlay;
+
+        LoadingManager.instance.AddLoadItem("playData");
         if (!boxPlay)
         {
             if (!SaveAndLoad.Exist(GetStorySaveProgressFileName()))
@@ -102,10 +113,12 @@ public class PlayManager : Z_MonoManager<PlayManager>
             });
         }
 
+        LoadingManager.instance.RemoveLoadItem("playData");
 
         Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curConfig.startSceneId);
         _assetCtrl.Begin();
 
+        enable = true;
     }
 
     public static PlayData GetInitPlayDataByConfig()
@@ -143,12 +156,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
                 }
             }
         }
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive, Z_Ui.Form.ClipForm.defaultData.Copy()));
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive, Z_Ui.Form.ClipForm.defaultData.Copy(),false));
     }
 
     public void EndStory()
     {
         _assetCtrl.End();
+        enable = false;
     }
     public async void BeginScene(int id)
     {

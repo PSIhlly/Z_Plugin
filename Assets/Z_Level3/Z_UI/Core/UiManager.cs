@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Z_DesignStyle;
 using Z_Ui.Base;
+using Z_Math;
 namespace Z_Ui
 {
     [DefaultExecutionOrder(-1)]
@@ -11,7 +13,7 @@ namespace Z_Ui
     {
         public List<GameObject> preloadUis;
         public List<GameObject> layerRootLst;
-        public Dictionary<UiLayer, int> layer2Id = new Dictionary<UiLayer, int>() { { UiLayer.Bottom, 0 }, { UiLayer.Mid, 1 }, { UiLayer.Top, 2 } };
+        public Dictionary<UiLayer, int> layer2Id;
 
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
@@ -20,6 +22,11 @@ namespace Z_Ui
         protected override void Awake()
         {
             base.Awake();
+            layer2Id = new Dictionary<UiLayer, int>();
+            foreach(UiLayer ly in Enum.GetValues(typeof(UiLayer)))
+            {
+                layer2Id[ly] = (int)ly;
+            }
             foreach (var ui in preloadUis)
             {
                 ui.GetComponent<UiHolder>().OriInit();
@@ -85,7 +92,7 @@ namespace Z_Ui
             for (int i = 0; i < layerRootLst[(int)layer].transform.childCount; i++)
             {
                 var holder = layerRootLst[(int)layer].transform.GetChild(i).GetComponent<UiHolder>();
-                if (holder.ctrl.isActive)
+                if (holder.ctrl.active)
                 {
                     holder.ctrl.Close();
                 }
@@ -97,6 +104,28 @@ namespace Z_Ui
             {
                 CloseAll(layer.Key);
             }
+        }
+        public static void Jump(RectTransform tar, ScrollRect scr)
+        {
+            Vector3 dir =  scr.viewport.GetCenterWorldPos() - tar.GetCenterWorldPos();
+            scr.content.position = scr.content.position + dir;
+        }
+        public static void Rebuild(GameObject go, bool recursion = false)
+        {
+           var rt= go.GetComponent<RectTransform>();
+            if(rt!=null)
+            {
+                if(recursion)
+                {
+                    for (int i = 0, icnt = rt.childCount; i < icnt; i++)
+                    {
+                        Rebuild(rt.GetChild(i).gameObject,recursion);
+                     }
+                }
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+               
+            }
+
         }
 
     }

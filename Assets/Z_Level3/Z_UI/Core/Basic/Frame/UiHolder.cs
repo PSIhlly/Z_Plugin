@@ -14,9 +14,12 @@ namespace Z_Ui.Base
     }
     public enum UiLayer
     {
-        Bottom,
-        Mid,
-        Top
+        Basic,
+        Window,
+        DialogBg,
+        DialogCustom,
+        DialogText,
+        Notice
     }
     public partial class UiHolder : MonoBehaviour
     {
@@ -104,7 +107,10 @@ namespace Z_Ui.Base
             if (binded)
             {
                 if (firstEnter)
+                {
                     ctrl.OnCreate();
+                    ctrl.inited = true;
+                }
                 firstEnter = false;
                 ctrl.OnEnable();
                 ctrl.OnShow();

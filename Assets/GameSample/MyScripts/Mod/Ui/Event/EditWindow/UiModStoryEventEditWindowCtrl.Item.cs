@@ -42,7 +42,7 @@ namespace Ui.ModStoryEventEditWindow
             {
                 if(model.node==null)
                 {
-                    ModManager.instance.assetCtrl.ChooseCmd( EventType.All, CmdTypeDataForm.defaultData.name, (item) =>
+                    ModManager.instance.assetCtrl.ChooseCmd( SceneEventType.All, CmdTypeDataForm.defaultData.name, (item) =>
                     {
                         GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[item.content];
                         parent.model.cpr.Compile(sel.defaultCode, out var res);

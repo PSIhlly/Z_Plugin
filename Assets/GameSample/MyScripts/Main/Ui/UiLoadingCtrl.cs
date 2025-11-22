@@ -20,18 +20,12 @@ namespace Ui.Loading
     {
         public Action onComplete;
     }
-    public partial class UiLoadingCtrl :
-        IZ_Listener<LoadingEvent>
+    public partial class UiLoadingCtrl
     {
        public override void OnCreate()
         {
-            this.Register<LoadingEvent>();
         }
 
-        public void OnEvent(LoadingEvent evt)
-        {
-            Close();
-        }
 
         public override void OnShow()
         {

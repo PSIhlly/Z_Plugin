@@ -86,7 +86,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
             view.btn_onTriggerEvent.onClick.AddListener(() =>
             {
                 var key = "onTriggerEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });

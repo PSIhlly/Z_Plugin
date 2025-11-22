@@ -6,20 +6,20 @@ namespace Z_Ui.Base
 {
     public class UiParam
     {
-
     }
     public class UiCtrl
     {
         public static string name = "Ui";
         public UiHolder uiHolder;
         public GameObject gameObject => uiHolder?.gameObject;
+        public bool inited;
         public bool active
         {
             get
             {
                 try
                 {
-                    return gameObject != null && gameObject.activeInHierarchy;
+                    return inited&&gameObject != null && uiHolder != null && gameObject.activeInHierarchy && gameObject.activeSelf;
                 }
                 catch (Exception e)
                 {
@@ -74,7 +74,7 @@ namespace Z_Ui.Base
             if (uiHolder != null && uiHolder.gameObject != null)
             {
                 SetParam(param);
-                if (active && uiHolder.gameObject.activeInHierarchy)
+                if (active && this.active)
                 {
                     OnShow();
                 }
@@ -84,6 +84,5 @@ namespace Z_Ui.Base
                 }
             }
         }
-        public bool isActive => (uiHolder != null && uiHolder.gameObject != null) ? uiHolder.gameObject.activeSelf : false;
     }
 }

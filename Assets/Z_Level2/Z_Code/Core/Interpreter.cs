@@ -55,26 +55,38 @@ namespace Z_Code
 
         }
     }
-    public class InterpretLock
+    public class InterpretAsyncTask
     {
         Interpreter interpreter;
-        public InterpretLock(Interpreter interpreter)
+        public BoxDataForm.Data[] res;
+        public InterpretAsyncTask(Interpreter interpreter)
         {
             this.interpreter = interpreter;
         }
-        private bool isLocked;
-        public bool IsLocked()
+        private bool isRuning;
+        private bool isComplete;
+        public bool IsRuning()
         {
-            return isLocked;
+            return isRuning;
         }
-        public void Lock()
+        public bool IsComplete()
         {
-            isLocked = true;
+            return isComplete;
         }
-        public void Unlock()
+        public void Run()
         {
-            isLocked = false;
-            interpreter.data.p++;
+            isComplete = false;
+            isRuning = true;
+        }
+        public void Complete()
+        {
+            isComplete = true;
+            isRuning = false;
+        }
+        public void Reset()
+        {
+            isComplete = false;
+            isRuning = false;
         }
     }
 
@@ -82,20 +94,16 @@ namespace Z_Code
     {
         public InterpretDataForm.Data data;
         public const bool DEBUG = false;
-        InterpretLock localLock;
+        InterpretAsyncTask asyncTask;
 
         public Interpreter(InterpretDataForm.Data interpret)
         {
             data = interpret;
-            localLock = new InterpretLock(this);
+            asyncTask = new InterpretAsyncTask(this);
         }
 
         public bool Interpret()
         {
-            if (localLock.IsLocked())
-            {
-                return false;
-            }
 
             int cnt = data.program.zCode.Count;
             for (; data.p < cnt; data.p++)
@@ -131,22 +139,30 @@ namespace Z_Code
                         {
                             prm[i] = data.stack[data.top - i];
                         }
-                        var ret = cmd.Execute(prm, data.heap, localLock);
+                        if (!asyncTask.IsRuning()&&!asyncTask.IsComplete())
+                        {
+                            cmd.Execute(prm, data.heap, asyncTask);
+                        }
 
-                        if (localLock.IsLocked())
+                        if(asyncTask.IsComplete())
+                        {
+                            //Delay
+                            data.p++;
+                            for (int i = 0; i < prm.Length; i++)
+                            {
+                                Pop();
+                            }
+                            for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                            {
+                                Push(asyncTask.res[i]);
+                            }
+                            asyncTask.Reset();
+                        }
+                        else
                         {
                             return false;
                         }
-                        //Delay
-                        data.p++;
-                        for (int i = 0; i < prm.Length; i++)
-                        {
-                            Pop();
-                        }
-                        for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
-                        {
-                            Push(ret[i]);
-                        }
+                        
                         break;
                     case Op.Equal:
                         Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
@@ -234,7 +250,7 @@ namespace Z_Code
         }
         public void Reset()
         {
-            localLock.Unlock();
+            asyncTask.Reset();
         }
     }
 

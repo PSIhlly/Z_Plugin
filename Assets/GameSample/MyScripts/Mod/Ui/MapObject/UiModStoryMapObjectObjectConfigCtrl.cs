@@ -40,7 +40,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.btn_onTouchEvent.onClick.AddListener(() =>
             {
                 var key = "onTouchEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });               
@@ -48,7 +48,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.btn_onLeaveEvent.onClick.AddListener(() =>
             {
                 var key = "onLeaveEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });
@@ -56,7 +56,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.btn_onShowEvent.onClick.AddListener(() =>
             {
                 var key = "onShowEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });

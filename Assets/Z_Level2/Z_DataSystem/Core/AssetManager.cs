@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -59,6 +60,10 @@ namespace Z_DataSystem
 
         public abstract string GetMark();
         public abstract string[] GetSupportedExtensions();
+
+        public abstract string GetName(string name);
+
+        public abstract bool IsAsset(string name);
     }
 
     public abstract class SelectTask<T>where T : IAssetController

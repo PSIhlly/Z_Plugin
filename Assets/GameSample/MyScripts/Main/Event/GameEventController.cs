@@ -1,0 +1,141 @@
+using Form;
+using Newtonsoft.Json.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Z_DataSystem;
+using Z_DesignStyle;
+using Z_Map;
+using Z_UnitSystem;
+using Z_Debug;
+using Z_Code.Form;
+using Z_Ui.Notify;
+using Z_Text;
+using System;
+using Z_ByteSerialize;
+using Z_Code;
+using Unity.VisualScripting;
+using Ui.ModStoryEventTrigger;
+
+
+
+public static partial class GlobalEventHelper
+{
+
+    public static string GetGameRetType(Desc desc)
+    {
+        var res = desc.retType;
+        if (AssetManager.instance.texCtrl.IsAsset(desc.code))
+            res = "img";
+        return res;
+    }
+}
+public static partial class GlobalSettings
+{
+    public static int CUSTOM_EVENT_MAX => 1000000;
+}
+public class GameEventController : Z_Controller<GameManager>
+{
+
+    public GameEventSceneTriggerController sceneTriggerCtrl;
+    public GameEventStoryTriggerController storyTriggerCtrl;
+    public GameEventController(GameManager super) : base(super)
+    {
+        sceneTriggerCtrl = new GameEventSceneTriggerController(this);
+        storyTriggerCtrl = new GameEventStoryTriggerController(this);
+    }
+
+
+    public void LateUpdate()
+    {
+        //lifeEvent
+        if (!PlayManager.instance.data.progress.notFirstTime)
+        {
+            PlayManager.instance.data.progress.notFirstTime = true;
+            Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.FirstEnter });
+        }
+
+        var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
+        foreach (var data in lst)
+        {
+            if (data.Interpret())
+            {
+                EventInterpretDataForm.RemoveData(data.uid);
+            }
+        }
+
+    }
+
+
+
+
+
+    public void Execute(EventProgramDataForm.Data evt, int uid = -1)
+    {
+        if(evt==null) 
+            return;
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, uid));
+    }
+    public EntryItem GetEventEntry(SceneEventType objectType, string retType)
+    {
+        var res = new EntryItem();
+        foreach (var data in EventProgramDataForm.DataByName.Values)
+        {
+            var cat = data.category == "" ? TextManager.instance.GetTxt("unclassified") : data.category;
+            var type = data.type == "" ? TextManager.instance.GetTxt("unclassified") : data.type;
+            if (!res.subs.ContainsKey(cat))
+            {
+                res.Add(cat);
+            }
+            if (!res.subs[cat].subs.ContainsKey(type))
+            {
+                res.subs[cat].Add(type);
+            }
+            res.subs[cat].subs[type].Add(data.name);
+        }
+        return res;
+    }
+    public EntryItem GetTriggerConditionEntry()
+    {
+        var res = new EntryItem();
+        foreach (var data in EventTriggerForm.DataByName.Values)
+        {
+            res.Add(TextManager.instance.GetTxt(data.name),id:data.uid);
+          
+        }
+        return res;
+    }
+    public EntryItem GetCmdEntry(SceneEventType objectType, string retType)
+    {
+        var res = new EntryItem();
+        foreach (var data in GameCmdDataForm.DataByName.Values)
+        {
+            if (data.retTypes == null)
+            {
+                if (retType != CmdTypeDataForm.defaultData.name)
+                    continue;
+            }
+            else
+            {
+                if (data.retTypes[0] != retType)
+                    continue;
+            }
+
+            if (!res.subs.ContainsKey(data.category))
+            {
+                res.Add(data.category);
+            }
+            if (!res.subs[data.category].subs.ContainsKey(data.type))
+            {
+                res.subs[data.category].Add(data.type);
+            }
+            res.subs[data.category].subs[data.type].Add(data.name);
+        }
+        return res;
+    }
+    public static EventTriggerForm.Data CreateTrigger(string key,string evt)
+    {
+        return new EventTriggerForm.Data(-1, key, evt);
+    }
+
+}

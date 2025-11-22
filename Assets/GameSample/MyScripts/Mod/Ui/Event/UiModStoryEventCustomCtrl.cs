@@ -9,6 +9,7 @@ using Z_Texture;
 using Z_Ui;
 using Ui.ModStoryEventEditWindow;
 using Unity.VisualScripting;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
 {

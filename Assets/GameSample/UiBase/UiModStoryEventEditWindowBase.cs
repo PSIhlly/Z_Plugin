@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_Texture;
+using Z_Video;
+using UnityEngine.Video;
 namespace Ui.ModStoryEventEditWindow
 
 {
@@ -144,6 +147,7 @@ namespace Ui.ModStoryEventEditWindow
             public Ipt ipt_category;
             public Ipt ipt_type;
             public Sta sta_unit;
+            public ScrView scr_units;
             public RectTransform rtf_itemRoot;
             public RectTransform rtf_unitRoot;
             public GameObject go_item;
@@ -169,14 +173,15 @@ namespace Ui.ModStoryEventEditWindow
             ipt_category = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
             ipt_type = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
             sta_unit = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            rtf_itemRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
-            rtf_unitRoot = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
-            go_item = uiHolder.elementTrsLst[16].gameObject;
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
-            btn_edit = uiHolder.elementTrsLst[18].GetComponent<Btn>();
-            go_unit = uiHolder.elementTrsLst[19].gameObject;
-            rtf_unit = uiHolder.elementTrsLst[20].GetComponent<RectTransform>();
-            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
+            scr_units = uiHolder.elementTrsLst[14].GetComponent<ScrView>();
+            rtf_itemRoot = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
+            rtf_unitRoot = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
+            go_item = uiHolder.elementTrsLst[17].gameObject;
+            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            btn_edit = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            go_unit = uiHolder.elementTrsLst[20].gameObject;
+            rtf_unit = uiHolder.elementTrsLst[21].GetComponent<RectTransform>();
+            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[22].GetComponent<UiHolder>().ctrl;
         }
 
     }

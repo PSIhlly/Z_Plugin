@@ -22,12 +22,13 @@ namespace Z_Code
         public abstract string GetName();
 
         public abstract CmdBase GetNew();
-        protected abstract BoxDataForm.Data[] ExecuteInternal(BoxDataForm.Data[] prm, InterpretLock localLock);
-        public BoxDataForm.Data[] Execute(BoxDataForm.Data[] prm, Dictionary<string, BoxDataForm.Data> heap, InterpretLock localLock)
+        protected abstract bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask);
+        public void Execute(BoxDataForm.Data[] prm, Dictionary<string, BoxDataForm.Data> heap, InterpretAsyncTask asyncTask)
         {
             try
             {
-                for(int i=0; i<prm.Length;i++)
+                asyncTask.Run();
+                for (int i=0; i<prm.Length;i++)
                 {
                     if (!string.IsNullOrEmpty(prm[i].valName))
                     {
@@ -41,13 +42,14 @@ namespace Z_Code
                     }
 
                 }
-                var ret = ExecuteInternal(prm,localLock);
-                return ret==null?null: ret;
+                if(ExecuteInternal(prm,asyncTask))
+                {
+                    asyncTask.Complete();
+                }
             }
             catch (Exception e)
             {
                 Debug.LogError(GetName() + " execute fail:" + e);
-                return null;
             }
         }
     }

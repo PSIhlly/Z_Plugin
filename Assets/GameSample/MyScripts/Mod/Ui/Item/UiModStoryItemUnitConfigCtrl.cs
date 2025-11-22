@@ -35,7 +35,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.btn_onTouchEvent.onClick.AddListener(() =>
             {
                 var key = "onTouchEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });
@@ -45,7 +45,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.btn_onLeaveEvent.onClick.AddListener(() =>
             {
                 var key = "onLeaveEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });
@@ -53,7 +53,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.btn_onShowEvent.onClick.AddListener(() =>
             {
                 var key = "onShowEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });
@@ -71,7 +71,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.btn_onUseEvent.onClick.AddListener(() =>
             {
                 var key = "onUseEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });
@@ -80,7 +80,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.btn_onEquipEvent.onClick.AddListener(() =>
             {
                 var key = "onEquipEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });
@@ -88,7 +88,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.btn_onDisequipEvent.onClick.AddListener(() =>
             {
                 var key = "onDisequipEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, EventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
+                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
                     Refresh();
                 });

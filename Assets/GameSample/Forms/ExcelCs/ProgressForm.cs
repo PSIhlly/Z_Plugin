@@ -63,6 +63,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,ClipForm.Data,ClipForm.Data> changeDialogcacheAction;
                 
+        public static Action<Data,bool,bool> changeNotfirsttimeAction;
+                
 
 
         public partial class Data
@@ -212,7 +214,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,ClipForm.Data dialogCache)
+                    private bool  _notFirstTime;
+                    /// <summary>
+                    ///非第一次进入
+                    ///</summary>
+                    public bool  notFirstTime{
+                                get{return _notFirstTime;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeNotfirsttime(this,_notFirstTime,value); 
+                    }
+        
+                _notFirstTime = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,ClipForm.Data dialogCache,bool notFirstTime)
             {
 
              this.uid = uid;
@@ -223,17 +243,18 @@ public static readonly int autoUidCnt=100;
              this.team = team;
              this.teamActive = teamActive;
              this.dialogCache = dialogCache;
+             this.notFirstTime = notFirstTime;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),dialogCache);
+        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),dialogCache,notFirstTime);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,ClipForm.defaultData);
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,ClipForm.defaultData,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -318,7 +339,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<int>>("teamActive"),
 
-                jo.Get<ClipForm.Data>("dialogCache")
+                jo.Get<ClipForm.Data>("dialogCache"),
+
+                jo.Get<bool>("notFirstTime")
                     );
 
             return data;
@@ -345,6 +368,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<List<int>>("teamActive",data.teamActive);
 
             jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
+
+            jo.Set<bool>("notFirstTime",data.notFirstTime);
 
             return jo;
         }
@@ -501,6 +526,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeDialogcacheAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeNotfirsttime(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNotfirsttimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

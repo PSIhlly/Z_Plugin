@@ -797,7 +797,7 @@ MonoBehaviour:
   subUiHolderLst:
   - {fileID: 7228735488872711554}
   uiType: 0
-  layer: 2
+  layer: 5
 --- !u!1 &4394476702754716929
 GameObject:
   m_ObjectHideFlags: 0
@@ -951,7 +951,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   dir: 1
-  viewPort: {fileID: 236491942048029238}
   spacing: 0
   cell: {fileID: 2627010452131768599}
   fiilType: 0

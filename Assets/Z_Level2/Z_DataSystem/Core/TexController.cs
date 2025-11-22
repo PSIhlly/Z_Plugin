@@ -34,10 +34,11 @@ namespace Z_DataSystem.Form
             {
                 if (_texture == null)
                 {
-                    if(bytes == null)
+                    if (bytes == null)
                     {
                         asset = TextureHelper.GetTextureByPath(path);
-                    }else
+                    }
+                    else
                     {
                         asset = TextureHelper.GetTextureByByte(bytes);
                     }
@@ -61,6 +62,16 @@ namespace Z_DataSystem.Form
     }
     public class TexController : Z_Controller<AssetManager>, IAssetController
     {
+
+        public bool IsAsset(string name)
+        {
+            var parts = name.Split(GetMark());
+            return parts.Length == 3 && string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[2]);
+        }
+        public string GetName(string name = "")
+        {
+            return $"{GetMark()}{name}{GetMark()}";
+        }
         public string GetMark() => AssetDefines.IMAGE_MARK;
         public string[] GetSupportedExtensions() => new[]
 {
@@ -88,8 +99,8 @@ namespace Z_DataSystem.Form
                     var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
                     if (forceSize != Vector2Int.zero)
                         tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
-                    var newBytes=TextureHelper.GetTextureByte(tex);
-                    var nm = ctrl.GetMark() + BytesSerialize.GetHash(newBytes) + ctrl.GetMark();
+                    var newBytes = TextureHelper.GetTextureByte(tex);
+                    var nm = ctrl.GetName(BytesSerialize.GetHash(newBytes));
                     var form = ctrl.CreateDataByBytes(newBytes, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()

@@ -13,6 +13,8 @@ using Z_Code.Form;
 using Form;
 using UnityEditor.Experimental.GraphView;
 using System;
+using Z_Ui;
+using static Unity.Burst.Intrinsics.X86.Avx;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiModStoryEventEditWindowParam
@@ -92,7 +94,7 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_edit.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseCmd(EventType.All, GlobalEventHelper.GetGameRetType(model.selUnit.desc), (item) =>
+                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, GlobalEventHelper.GetGameRetType(model.selUnit.desc), (item) =>
                 {
                     BaseData.cmdDic[item.content].GetUnitChooseCode((code) =>
                     {
@@ -107,7 +109,7 @@ namespace Ui.ModStoryEventEditWindow
         public void ApplyEntry()
         {
             model.data.code = model.dcpr.Decompile(model.curEntry);
-            model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+            model.data.zCode = model.cpr.Compile(model.data.code, out _);
             view.ipt_code.Set(model.data.code);
             Refresh();
         }
@@ -184,7 +186,7 @@ namespace Ui.ModStoryEventEditWindow
 
             TimeManager.instance.AddCurLateUpdateAction(() =>
             {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unitRoot);
+                UiManager.Rebuild(view.rtf_unitRoot.gameObject,true);
             }, gameObject);
 
         }
@@ -207,16 +209,46 @@ namespace Ui.ModStoryEventEditWindow
         {
             model.selUnit = node;
             Refresh();
+            if(node!=null)
+            {
+
+                TimeManager.instance.AddCurLateUpdateAction(() =>
+                {
+                    for (int i = 0, icnt = unitCon.paramLst.Count; i < icnt; i++)
+                    {
+                        if (unitCon.paramLst[i] is UiUnitParam uPrm && uPrm.node == node)
+                        {
+                            UiManager.Jump(unitCon.Get(uPrm).ctrl.rect, view.scr_units);
+                        }
+                    }
+                },gameObject);
+               
+            }
         }
         public void ReplaceNode(SyntaxNode nodeNow, SyntaxNode nodeNew)
         {
+
+            foreach (var o in model.curEntry)
+            {
+                Debug.Log(o.Contains(nodeNow) + "!!!");
+            }
             if (nodeNow.parentNode != null)
             {
+                var tmp=nodeNow.parentNode;
+                while(tmp!=null)
+                {
+                    if(tmp == model.selItem)
+                    {
+                        Debug.Log("finded");
+                    }
+                    tmp = tmp.parentNode;
+                }
                 for (int i = 0, icnt = nodeNow.parentNode.subNodes.Count; i < icnt; i++)
                 {
                     if (nodeNow.parentNode.subNodes[i] == nodeNow)
                     {
                         nodeNow.parentNode.subNodes[i] = nodeNew;
+                        nodeNew.parentNode = nodeNow.parentNode;
                     }
                 }
             }
@@ -238,6 +270,10 @@ namespace Ui.ModStoryEventEditWindow
             if (nodeNow == model.selUnit)
             {
                 model.selUnit = nodeNew;
+            }
+            foreach(var o in model.curEntry)
+            {
+                Debug.Log(o.Contains(nodeNew) + "!!!");
             }
         }
     }

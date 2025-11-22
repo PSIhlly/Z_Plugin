@@ -28,7 +28,7 @@ namespace Ui.DialogBg
             view.vp_.gameObject.SetActive(!string.IsNullOrEmpty(param.clip.mainVideoName));
             if (string.IsNullOrEmpty(param.clip.mainVideoName))
             {
-                var data = TexAssetForm.DataByName.GetDv(param.clip.profilePictureName, null);
+                var data = TexAssetForm.DataByName.GetDv(param.clip.mainPictureName, null);
                 if (data == null)
                 {
                     Close();

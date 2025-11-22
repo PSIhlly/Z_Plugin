@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 
 namespace Z_Trick.BaseFunc
@@ -16,14 +17,18 @@ namespace Z_Trick.BaseFunc
         private GameObject[] stateGo;
         public void Awake()
         {
-            for(int i=0;i< stateGo.Length;i++)
+            for (int i = 0; i < stateGo.Length; i++)
             {
                 stateGo[i].SetActive(false);
             }
             ChangeState(state);
         }
-        public void ChangeState(int tar)
+        public void ChangeState(int tar, bool forceReset = false)
         {
+            if (tar == state && stateGo[state].activeInHierarchy && !forceReset)
+            {
+                return;
+            }
             stateGo[state].SetActive(false);
             state = tar;
             if (state >= stateGo.Length)

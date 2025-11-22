@@ -12,6 +12,7 @@ using Z_Ui.Notify;
 using Z_Code.Form;
 using Z_String;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 
 namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
 {
@@ -30,17 +31,19 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
 
             view.btn_onBeginEvent.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(EventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt("onBeginEvent"), (item) =>
+                var key = "onBeginEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    GameManager.instance.curConfig.onBeginEvent = item.content;
+                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content); 
                     Refresh();
                 });
             });
             view.btn_onEndEvent.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(EventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt("onEndEvent"), (item) =>
+                var key = "onEndEvent";
+                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    GameManager.instance.curConfig.onEndEvent = item.content;
+                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content);
                     Refresh();
                 });
             });
@@ -52,8 +55,8 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
         }
         public void Refresh()
         {
-            view.txt_onBeginEvent.text = GameManager.instance.curConfig.onBeginEvent;
-            view.txt_onEndEvent.text = GameManager.instance.curConfig.onEndEvent;
+            view.txt_onBeginEvent.text = GameManager.instance.curConfig.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onEndEvent.text = GameManager.instance.curConfig.events.GetDv("onEndEvent", EventTriggerForm.defaultData).evt;
         }
     }
 

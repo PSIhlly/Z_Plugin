@@ -20,7 +20,6 @@ namespace Z_Ui.Base
         }
         public Direction dir;
 
-        public RectTransform viewPort;
         public Func<int, GameObject> ContainerAdd;
         public Action<GameObject> ContainerDel;
         public float spacing; 
@@ -32,8 +31,8 @@ namespace Z_Ui.Base
         public RectTransform cell;
 
         public FillType fiilType;
-        float width => viewPort.rect.width;
-        float height => viewPort.rect.height;
+        float width => viewport.rect.width;
+        float height => viewport.rect.height;
         int rowCnt
         {
             get
@@ -135,7 +134,7 @@ namespace Z_Ui.Base
                 return;
 
             Vector3[] viewPortCorners = new Vector3[4];
-            viewPort.GetWorldCorners(viewPortCorners);
+            viewport.GetWorldCorners(viewPortCorners);
 
             Vector3[] contentCorners = new Vector3[4];
             content.GetWorldCorners(contentCorners);

@@ -92,7 +92,7 @@ namespace Z_Ui.Notify
                 id = tipIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
-            if(ctrl!=null&&ctrl.isActive)
+            if(ctrl!=null&&ctrl.active)
             {
                 ctrl.Add(info);
             }else
@@ -114,7 +114,7 @@ namespace Z_Ui.Notify
                 id = popupIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
-            if (ctrl != null && ctrl.isActive)
+            if (ctrl != null && ctrl.active)
             {
                 ctrl.Add(info);
             }
@@ -137,7 +137,7 @@ namespace Z_Ui.Notify
                 id = popupIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
-            if (ctrl != null && ctrl.isActive)
+            if (ctrl != null && ctrl.active)
             {
                 ctrl.Add(info);
             }
@@ -161,7 +161,7 @@ namespace Z_Ui.Notify
                 id = popupIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
-            if (ctrl != null && ctrl.isActive)
+            if (ctrl != null && ctrl.active)
             {
                 ctrl.Add(info);
             }
@@ -183,7 +183,7 @@ namespace Z_Ui.Notify
                 id = popupIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
-            if (ctrl != null && ctrl.isActive)
+            if (ctrl != null && ctrl.active)
             {
                 ctrl.Add(info);
             }

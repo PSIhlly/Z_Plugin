@@ -103,7 +103,6 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         _playerM = null;
         _playerG = null;
 
-
         //character Reflect
 
         foreach (var data in CharacterUnitForm.DataByUid.Values)
@@ -175,7 +174,6 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         if (!enable)
             return;
-
         if (_playerG == null)
         {
             _playerG = CharacterProductForm.DataByUid[_super.data.progress.characterUid];
@@ -202,6 +200,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         lastPlayerPos = _playerM.pos;
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
+
+        
     }
     public void SetCamera(float x, float y, float z)
     {

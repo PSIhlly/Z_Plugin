@@ -27,6 +27,19 @@ namespace Z_Code
         public Desc desc;
         public SyntaxNode parentNode;
         public List<SyntaxNode> subNodes = new List<SyntaxNode>();
+        public bool Contains(SyntaxNode tar) 
+        { 
+            if(this == tar)
+            {
+                return true;
+            }
+            bool has = false;
+            foreach (var node in this.subNodes)
+            {
+                has |= node.Contains(tar);
+            }
+            return has;
+        }
     }
 
     public class SyntaxAnalysis

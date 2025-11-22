@@ -61,9 +61,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<int>,List<int>> changeDefaultbagAction;
                 
-        public static Action<Data,string,string> changeOnbegineventAction;
-                
-        public static Action<Data,string,string> changeOnendeventAction;
+        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
         public static Action<Data,string,string> changeMinimapAction;
                 
@@ -200,38 +198,20 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _onBeginEvent;
+                    private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    ///开始事件
+                    ///事件
                     ///</summary>
-                    public string  onBeginEvent{
-                                get{return _onBeginEvent;}
+                    public Dictionary<string,EventTriggerForm.Data>  events{
+                                get{return _events;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeOnbeginevent(this,_onBeginEvent,value); 
+                       ChangeEvents(this,_events,value); 
                     }
         
-                _onBeginEvent = value;
-                }
-                 
-                     }
-                    
-                    private string  _onEndEvent;
-                    /// <summary>
-                    ///结束事件
-                    ///</summary>
-                    public string  onEndEvent{
-                                get{return _onEndEvent;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeOnendevent(this,_onEndEvent,value); 
-                    }
-        
-                _onEndEvent = value;
+                _events = value;
                 }
                  
                      }
@@ -272,7 +252,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int startSceneId,Vector3 startpos,int mainCharacterUid,List<int> defaultTeam,List<int> defaultTeamActive,List<int> defaultBag,string onBeginEvent,string onEndEvent,string miniMap,CameraMode cameraMode)
+            public Data(int uid,int startSceneId,Vector3 startpos,int mainCharacterUid,List<int> defaultTeam,List<int> defaultTeamActive,List<int> defaultBag,Dictionary<string,EventTriggerForm.Data> events,string miniMap,CameraMode cameraMode)
             {
 
              this.uid = uid;
@@ -282,8 +262,7 @@ public static readonly int autoUidCnt=100;
              this.defaultTeam = defaultTeam;
              this.defaultTeamActive = defaultTeamActive;
              this.defaultBag = defaultBag;
-             this.onBeginEvent = onBeginEvent;
-             this.onEndEvent = onEndEvent;
+             this.events = events;
              this.miniMap = miniMap;
              this.cameraMode = cameraMode;
 
@@ -291,12 +270,12 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterUid,new List<int>(defaultTeam),new List<int>(defaultTeamActive),new List<int>(defaultBag),onBeginEvent,onEndEvent,miniMap,cameraMode);
+        return new Data(sameId? uid:uidChain.GetId(),startSceneId,startpos,mainCharacterUid,new List<int>(defaultTeam),new List<int>(defaultTeamActive),new List<int>(defaultBag),new Dictionary<string,EventTriggerForm.Data>(events),miniMap,cameraMode);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,"","","",CameraMode.Overhead);
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,new Dictionary<string,EventTriggerForm.Data>(){},"",CameraMode.Overhead);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -381,9 +360,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<int>>("defaultBag"),
 
-                jo.Get<string>("onBeginEvent"),
-
-                jo.Get<string>("onEndEvent"),
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
                 jo.Get<string>("miniMap"),
 
@@ -413,9 +390,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<List<int>>("defaultBag",data.defaultBag);
 
-            jo.Set<string>("onBeginEvent",data.onBeginEvent);
-
-            jo.Set<string>("onEndEvent",data.onEndEvent);
+            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             jo.Set<string>("miniMap",data.miniMap);
 
@@ -570,22 +545,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeOnbeginevent(Data superData,string oldV,string newV)
+            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeOnbegineventAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeOnendevent(Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeOnendeventAction?.Invoke(data,oldV,newV);
+                changeEventsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

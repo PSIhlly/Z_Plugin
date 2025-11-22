@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_Debug;
 using Z_DesignStyle;
 
 namespace Z_Ui.Base
@@ -33,7 +35,8 @@ namespace Z_Ui.Base
                 return newGo;
             }
         }
-        List<GameObject> curUis;
+        List<UiHolder> curUis;
+        Dictionary<UiParam, UiHolder> prm2Ui;
         int curRenderId;
         public UiContainer(GameObject ori,bool cycle=true)
         {
@@ -47,7 +50,8 @@ namespace Z_Ui.Base
                 };
             }
             
-            curUis = new List<GameObject>();
+            curUis = new List<UiHolder>();
+            prm2Ui = new Dictionary<UiParam, UiHolder>();
         }
 
         public virtual void Clear()
@@ -56,14 +60,15 @@ namespace Z_Ui.Base
             {
                 if(cycle)
                 {
-                    uiPool.Push(ui);
+                    uiPool.Push(ui.gameObject);
                 }else
                 {
-                    GameObject.Destroy(ui);
+                    GameObject.Destroy(ui.gameObject);
                 }
             }
             curUis.Clear();
             paramLst.Clear();
+            prm2Ui.Clear();
         }
         public virtual void DelReal(GameObject go)
         {
@@ -74,7 +79,7 @@ namespace Z_Ui.Base
             {
                 GameObject.Destroy(go);
             }
-            curUis.Remove(go);
+            curUis.Remove(go.GetComponent<UiHolder>());
         }
         public GameObject AddReal(UiParam param = null)
         {
@@ -96,7 +101,7 @@ namespace Z_Ui.Base
             }
             ctrl.SetParam(param);
             holder.gameObject.SetActive(true);
-            curUis.Add(holder.gameObject);
+            curUis.Add(holder);
             return holder.gameObject;
         }
         public virtual void Add(UiParam param=null,int id=-1)
@@ -122,8 +127,13 @@ namespace Z_Ui.Base
             for(curRenderId = 0; curRenderId < paramLst.Count; curRenderId++)
             {
                 var go=AddReal(paramLst[curRenderId]);
+                prm2Ui[paramLst[curRenderId]]=go.GetComponent<UiHolder>();
             }
             curRenderId = 0;
+        }
+        public UiHolder Get(UiParam prm)
+        {
+            return prm2Ui[prm];
         }
     }
 }

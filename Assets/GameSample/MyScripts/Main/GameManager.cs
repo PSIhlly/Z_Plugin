@@ -92,6 +92,7 @@ public class GameManager : Z_MonoManager<GameManager>
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets
 
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, AssetManager.instance.texCtrl.GetName()));
 
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName("")));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultStoryTexName()));

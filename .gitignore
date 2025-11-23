@@ -39,7 +39,6 @@ Z_Trick.csproj
 Z_Time.csproj
 Z_Texture.csproj
 Z_Serialize.csproj
-Z_Plugin.sln
 *.cache
 Assets/TextMesh Pro/Resources/Fonts & Materials/Alibaba-PuHuiTi-Light SDF.asset
 /Packages/com.merry-yellow.code-assist
@@ -51,7 +50,6 @@ Z_Plugin.sln
 /Z_OtherProjects/Z_Tool/Excel2Cs/__pycache__
 /Z_OtherProjects/Z_Tool/Excel2Cs/.vs/Excel2Cs/FileContentIndex
 /UserSettings/Layouts
-/UserSettings/Layouts
 Assets/TextMesh Pro/Resources/Fonts & Materials/Alibaba-PuHuiTi-Light SDF.asset
-Assembly-CSharp.csproj
 Assembly-CSharp-Editor.csproj
+Assembly-CSharp.csproj

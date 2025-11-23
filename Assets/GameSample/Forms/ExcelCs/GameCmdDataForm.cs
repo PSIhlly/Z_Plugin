@@ -226,37 +226,43 @@ namespace Form
 
                 {100004,new Data(100004,"Image",null,null,null,new List<string>(){"img",},"","\"$i$$i$\"","basic","const")},
 
-                {100005,new Data(100005,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog")},
+                {100005,new Data(100005,"Video",null,null,null,new List<string>(){"video",},"","\"$v$$v$\"","basic","const")},
 
-                {100006,new Data(100006,"ShowEffect",new List<string>(){"uid","positionX","positionY","positionZ","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} position({1},{2},{3}) angle{4}","ShowEffect(0,0,0,0,0);","scene","effect")},
+                {100006,new Data(100006,"Audio",null,null,null,new List<string>(){"audio",},"","\"$a$$a$\"","basic","const")},
 
-                {100007,new Data(100007,"ShowCurrentDialog",new List<string>(){"canClickOver",},new List<string>(){"bool",},null,new List<string>(){"void",},"Show Current Dialog, over when click?{0}","ShowCurrentDialog(1);","ui","dialogAdvanced")},
+                {100007,new Data(100007,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog")},
 
-                {100008,new Data(100008,"CloseCurrentDialog",null,null,null,new List<string>(){"void",},"Close Current Dialog","CloseCurrentDialog();","ui","dialogAdvanced")},
+                {100008,new Data(100008,"ShowEffect",new List<string>(){"uid","positionX","positionY","positionZ","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} position({1},{2},{3}) angle{4}","ShowEffect(0,0,0,0,0);","scene","effect")},
 
-                {100009,new Data(100009,"SetDialogBackground",new List<string>(){"background",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog bg:{0}","SetDialogBackground(\"$i$$i$\");","ui","dialogAdvanced")},
+                {100009,new Data(100009,"ShowCurrentDialog",new List<string>(){"canClickOver",},new List<string>(){"bool",},null,new List<string>(){"void",},"Show Current Dialog, over when click?{0}","ShowCurrentDialog(1);","ui","dialogAdvanced")},
 
-                {100010,new Data(100010,"SetDialogContent",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog content:{0}","SetDialogContent(\"empty\")","ui","dialogAdvanced")},
+                {100010,new Data(100010,"CloseCurrentDialog",null,null,null,new List<string>(){"void",},"Close Current Dialog","CloseCurrentDialog();","ui","dialogAdvanced")},
 
-                {100011,new Data(100011,"SetDialogAvatar",new List<string>(){"avatar",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog avatar:{0}","SetDialogAvatar(\"$i$$i$\");","ui","dialogAdvanced")},
+                {100011,new Data(100011,"SetDialogBackground",new List<string>(){"background",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog bg:{0}","SetDialogBackground(\"$i$$i$\");","ui","dialogAdvanced")},
 
-                {100012,new Data(100012,"SetDialogTitle",new List<string>(){"title",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog title:{0}","SetDialogTitle(\"empty\");","ui","dialogAdvanced")},
+                {100012,new Data(100012,"SetDialogContent",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog content:{0}","SetDialogContent(\"empty\")","ui","dialogAdvanced")},
 
-                {100013,new Data(100013,"SetDialogVideo",new List<string>(){"video",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog video:{0}","SetDialogVideo(\"$v$$v$\");","ui","dialogAdvanced")},
+                {100013,new Data(100013,"SetDialogAvatar",new List<string>(){"avatar",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog avatar:{0}","SetDialogAvatar(\"$i$$i$\");","ui","dialogAdvanced")},
 
-                {100014,new Data(100014,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogContent(\"$a$$a$\")","ui","dialogAdvanced")},
+                {100014,new Data(100014,"SetDialogTitle",new List<string>(){"title",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog title:{0}","SetDialogTitle(\"empty\");","ui","dialogAdvanced")},
 
-                {100015,new Data(100015,"ShowImage",new List<string>(){"image","width","height","showTime",},new List<string>(){"img","num","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Show Image:{0} ,width {1},height {2}, last {3} seconds","ShowImage(\"$i$$i$\",400,400,1);","ui","image")},
+                {100015,new Data(100015,"SetDialogVideo",new List<string>(){"video",},new List<string>(){"video",},null,new List<string>(){"void",},"Set Dialog video:{0}","SetDialogVideo(\"$v$$v$\");","ui","dialogAdvanced")},
 
-                {100016,new Data(100016,"CreateImage",new List<string>(){"image","width","height",},new List<string>(){"img","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Create Image {0},width {1},height {2}","CreateImage(\"$i$$i$\",400,400);","ui","imageAdvanced")},
+                {100016,new Data(100016,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogContent(\"$a$$a$\")","ui","dialogAdvanced")},
 
-                {100017,new Data(100017,"DeleteImage",new List<string>(){"imageId","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(1,1);","ui","imageAdvanced")},
+                {100017,new Data(100017,"ResetDialog",null,null,null,new List<string>(){"void",},"Reset Dialog","ResetDialog();","ui","dialogAdvanced")},
 
-                {100018,new Data(100018,"SetImagePos",new List<string>(){"imageId","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(1,0.5,0.5,1);","ui","imageAdvanced")},
+                {100018,new Data(100018,"ShowImage",new List<string>(){"image","width","height","showTime",},new List<string>(){"img","num","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Show Image:{0} ,width {1},height {2}, last {3} seconds","ShowImage(\"$i$$i$\",400,400,1);","ui","image")},
 
-                {100019,new Data(100019,"SetImageOpacity",new List<string>(){"imageId","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(1,1,1);","ui","imageAdvanced")},
+                {100019,new Data(100019,"CreateImage",new List<string>(){"image","width","height",},new List<string>(){"img","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Create Image {0},width {1},height {2}","CreateImage(\"$i$$i$\",400,400);","ui","imageAdvanced")},
 
-                {100020,new Data(100020,"SetImageRotate",new List<string>(){"imageId","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(1,0,1);","ui","imageAdvanced")},
+                {100020,new Data(100020,"DeleteImage",new List<string>(){"imageId","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(1,1);","ui","imageAdvanced")},
+
+                {100021,new Data(100021,"SetImagePos",new List<string>(){"imageId","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(1,0.5,0.5,1);","ui","imageAdvanced")},
+
+                {100022,new Data(100022,"SetImageOpacity",new List<string>(){"imageId","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(1,1,1);","ui","imageAdvanced")},
+
+                {100023,new Data(100023,"SetImageRotate",new List<string>(){"imageId","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(1,0,1);","ui","imageAdvanced")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -269,37 +275,43 @@ namespace Form
     
                         {"Image",_DataByUid[100004]},
     
-                        {"ShowDialog",_DataByUid[100005]},
+                        {"Video",_DataByUid[100005]},
     
-                        {"ShowEffect",_DataByUid[100006]},
+                        {"Audio",_DataByUid[100006]},
     
-                        {"ShowCurrentDialog",_DataByUid[100007]},
+                        {"ShowDialog",_DataByUid[100007]},
     
-                        {"CloseCurrentDialog",_DataByUid[100008]},
+                        {"ShowEffect",_DataByUid[100008]},
     
-                        {"SetDialogBackground",_DataByUid[100009]},
+                        {"ShowCurrentDialog",_DataByUid[100009]},
     
-                        {"SetDialogContent",_DataByUid[100010]},
+                        {"CloseCurrentDialog",_DataByUid[100010]},
     
-                        {"SetDialogAvatar",_DataByUid[100011]},
+                        {"SetDialogBackground",_DataByUid[100011]},
     
-                        {"SetDialogTitle",_DataByUid[100012]},
+                        {"SetDialogContent",_DataByUid[100012]},
     
-                        {"SetDialogVideo",_DataByUid[100013]},
+                        {"SetDialogAvatar",_DataByUid[100013]},
     
-                        {"SetDialogAudio",_DataByUid[100014]},
+                        {"SetDialogTitle",_DataByUid[100014]},
     
-                        {"ShowImage",_DataByUid[100015]},
+                        {"SetDialogVideo",_DataByUid[100015]},
     
-                        {"CreateImage",_DataByUid[100016]},
+                        {"SetDialogAudio",_DataByUid[100016]},
     
-                        {"DeleteImage",_DataByUid[100017]},
+                        {"ResetDialog",_DataByUid[100017]},
     
-                        {"SetImagePos",_DataByUid[100018]},
+                        {"ShowImage",_DataByUid[100018]},
     
-                        {"SetImageOpacity",_DataByUid[100019]},
+                        {"CreateImage",_DataByUid[100019]},
     
-                        {"SetImageRotate",_DataByUid[100020]},
+                        {"DeleteImage",_DataByUid[100020]},
+    
+                        {"SetImagePos",_DataByUid[100021]},
+    
+                        {"SetImageOpacity",_DataByUid[100022]},
+    
+                        {"SetImageRotate",_DataByUid[100023]},
     
                     };
     
@@ -329,13 +341,13 @@ namespace Form
 
                     _DatasByCategoryType[("basic","const")].Add(_DataByUid[100004]);
 
-                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100005]);
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100005]);
 
-                    _DatasByCategoryType[("scene","effect")].Add(_DataByUid[100006]);
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100006]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100007]);
+                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100007]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100008]);
+                    _DatasByCategoryType[("scene","effect")].Add(_DataByUid[100008]);
 
                     _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100009]);
 
@@ -349,17 +361,23 @@ namespace Form
 
                     _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100014]);
 
-                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100015]);
+                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100015]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100016]);
+                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100016]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100017]);
+                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100017]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100018]);
+                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100018]);
 
                     _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100019]);
 
                     _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100020]);
+
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100021]);
+
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100022]);
+
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100023]);
 
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
@@ -379,13 +397,13 @@ namespace Form
 
                     _DatasByCategory["basic"].Add(_DataByUid[100004]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100005]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100005]);
 
-                    _DatasByCategory["scene"].Add(_DataByUid[100006]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100006]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100007]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100008]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100008]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100009]);
 
@@ -410,6 +428,12 @@ namespace Form
                     _DatasByCategory["ui"].Add(_DataByUid[100019]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100020]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100021]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100022]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100023]);
 
 
             childInitAction?.Invoke();

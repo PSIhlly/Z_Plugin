@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using Ui.DialogHistory;
 using Ui.DialogMain.MainText;
+using Ui.DialogMain.Options;
 using Ui.DialogMain.Profile;
 using Ui.DialogMain.Title;
 using UnityEngine;
@@ -57,7 +58,7 @@ namespace Ui.DialogMain
             {
                 case ShowType.Normal:
                     view.page_MainText.SetShow(true, new UiMainTextParam() { clip = model.prm.clip });
-                    view.page_Options.SetShow(true);
+                    view.page_Options.SetShow(true, new UiOptionsParam() { clip = model.prm.clip });
                     view.page_Title.SetShow(true, new UiTitleParam() { clip = model.prm.clip });
                     view.page_Profile.SetShow(true, new UiProfileParam() { clip = model.prm.clip });
                     view.btn_back.gameObject.SetActive(false);

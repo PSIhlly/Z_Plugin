@@ -70,7 +70,7 @@ namespace Z_UnitSystem
                 File.Delete(path);
             }
         }
-        private static string GetRealPath(string key)
+        public static string GetRealPath(string key)
         {
             return Path.GetFullPath((key.Contains("HlZy") ? "" : (perPath + "/")) + key);
         }

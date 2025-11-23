@@ -50,7 +50,7 @@ public static class GlobalNameHelper
     public static string GetDefaultAudioName(string name = "") => "reservedA$" + name;
     public static bool IsInnerAssetName(string name)
     {
-        return !name.Contains(AssetDefines.IMAGE_MARK) && !name.Contains(AssetDefines.VIDEO_MARK) && !name.Contains(AssetDefines.AUDIO_MARK);
+        return !AssetManager.instance.texCtrl.IsAsset(name) && !AssetManager.instance.audioCtrl.IsAsset(name) && !AssetManager.instance.videoCtrl.IsAsset(name);
     }
 
     public static string GetDefaultStoryTexName() => GetDefaultTexName("story");

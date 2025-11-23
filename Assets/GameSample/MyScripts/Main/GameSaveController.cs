@@ -41,7 +41,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string imageUiItemFormFileName => "iuif";
 
 
-    public string assetFolder => "/ast/";
+    public string assetFolder => "ast/";
     public GameSaveController(GameManager super) : base(super)
     {
     }
@@ -195,6 +195,16 @@ public class GameSaveController : Z_Controller<GameManager>
             {
                 SaveStoryTex(AssetManager.instance.texCtrl.GetName(imgs[i]), storyCoreFolder);
             }
+            var videos = data.code.Split(AssetDefines.VIDEO_MARK);//获取常量图片
+            for (int i = 1; i < videos.Length; i += 2)
+            {
+                SaveStoryVideo(AssetManager.instance.videoCtrl.GetName(videos[i]), storyCoreFolder);
+            }
+            var audios = data.code.Split(AssetDefines.AUDIO_MARK);//获取常量图片
+            for (int i = 1; i < audios.Length; i += 2)
+            {
+                SaveStoryAudio(AssetManager.instance.audioCtrl.GetName(audios[i]), storyCoreFolder);
+            }
         };
         if (data != null)
         {
@@ -254,7 +264,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     private void SaveStoryTex(string texName, string path)
     {
-        var data = TexAssetForm.DataByName.GetDk(texName, GlobalNameHelper.GetDefaultTexName());
+        var data = TexAssetForm.DataByName.GetDv(texName, null);
         if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(texName))
         {
             var tex = StoryTexAssetForm.DataByName[texName];
@@ -265,78 +275,37 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+    private void SaveStoryVideo(string videoName, string path)
+    {
+        var data = VideoAssetForm.DataByName.GetDv(videoName, null);
+        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(videoName))
+        {
+            var tex = VideoAssetForm.DataByName[videoName];
+            path = path + assetFolder + videoName;
+            if (!SaveAndLoad.Exist(path))
+            {
+                SaveAndLoad.Save(path, data.bytes);
+            }
+        }
+    }
+    private void SaveStoryAudio(string audioName, string path)
+    {
+        var data = AudioAssetForm.DataByName.GetDv(audioName, null);
+        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(audioName))
+        {
+            var tex = AudioAssetForm.DataByName[audioName];
+            path = path + assetFolder + audioName;
+            if (!SaveAndLoad.Exist(path))
+            {
+                SaveAndLoad.Save(path, data.bytes);
+            }
+        }
+    }
     #endregion
     #endregion
 
     #region load
-    public void LoadStoryTex(string texName, string path)
-    {
-        if (!string.IsNullOrEmpty(texName) && SaveAndLoad.Exist(path) && !StoryTexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
-        {
-            var res = SaveAndLoad.Load<byte[]>(path + assetFolder + texName);
-            if (res != null)
-            {
-                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByBytes(res, texName));
-            }
-            else if (!GameTexAssetForm.DataByName.ContainsKey(texName))
-            {
-                Debug.LogError(texName + "贴图丢失！");
-                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, texName));
-            }
-        }
-    }
-    public void AddStoryTex(TexAssetForm.Data rawData)
-    {
-        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData);
-        if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
-        {
-            var oldData = StoryTexAssetForm.DataByName[data.name];
-            StoryTexAssetForm.RemoveData(oldData.id);
-        }
-        StoryTexAssetForm.AddData(data);
-
-        Z_EventHelper.Invoke(new AssetEvent()
-        {
-            importAssetName = data.name
-        });
-    }
-    public void AddGameTex(TexAssetForm.Data rawData)
-    {
-        GameTexAssetForm.Data data = new GameTexAssetForm.Data(rawData);
-        if (GameTexAssetForm.DataByName.ContainsKey(data.name))
-        {
-            var oldData = GameTexAssetForm.DataByName[data.name];
-            GameTexAssetForm.RemoveData(oldData.id);
-        }
-        GameTexAssetForm.AddData(data);
-
-        Z_EventHelper.Invoke(new AssetEvent()
-        {
-            importAssetName = data.name
-        });
-    }
-    public void LoadTex(string texName, string path)
-    {
-        if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(texName))
-        {
-            AddTex(AssetManager.instance.texCtrl.CreateDataByBytes(SaveAndLoad.Load<byte[]>(path + assetFolder + texName), texName));
-        }
-    }
-    public void AddTex(TexAssetForm.Data rawData)
-    {
-        TexAssetForm.Data data = rawData;
-        if (TexAssetForm.DataByName.ContainsKey(data.name))
-        {
-            var oldData = TexAssetForm.DataByName[data.name];
-            TexAssetForm.RemoveData(oldData.id);
-        }
-        TexAssetForm.AddData(data);
-
-        Z_EventHelper.Invoke(new AssetEvent()
-        {
-            importAssetName = data.name
-        });
-    }
+    
     public void LoadOverview()
     {
         StoryForm.Clear();
@@ -549,6 +518,16 @@ public class GameSaveController : Z_Controller<GameManager>
                 {
                     LoadStoryTex(AssetManager.instance.texCtrl.GetName(imgs[i]), storyCoreFolder);
                 }
+                var audios = form.code.Split(AssetDefines.AUDIO_MARK);//获取常量图片
+                for (int i = 1; i < audios.Length; i += 2)
+                {
+                    LoadStoryAudio(AssetManager.instance.audioCtrl.GetName(audios[i]), storyCoreFolder);
+                }
+                var videos = form.code.Split(AssetDefines.VIDEO_MARK);//获取常量图片
+                for (int i = 1; i < videos.Length; i += 2)
+                {
+                    LoadStoryVideo(AssetManager.instance.videoCtrl.GetName(videos[i]), storyCoreFolder);
+                }
             }
         }
 
@@ -619,6 +598,124 @@ public class GameSaveController : Z_Controller<GameManager>
     {
 
     }
+    #region util
+    public void LoadStoryTex(string texName, string path)
+    {
+        if (!string.IsNullOrEmpty(texName) && SaveAndLoad.Exist(path) && !StoryTexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
+        {
+            path = path + assetFolder + texName;
+            if (SaveAndLoad.Exist(path))
+            {
+                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByPath(path, texName));
+            }
+            else if (!GameTexAssetForm.DataByName.ContainsKey(texName))
+            {
+                Debug.LogError(texName + "贴图丢失！");
+                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, texName));
+            }
+        }
+    }
+    public void AddStoryTex(TexAssetForm.Data rawData)
+    {
+        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData);
+        if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = StoryTexAssetForm.DataByName[data.name];
+            StoryTexAssetForm.RemoveData(oldData.id);
+        }
+        StoryTexAssetForm.AddData(data);
+
+        Z_EventHelper.Invoke(new AssetEvent()
+        {
+            importAssetName = data.name
+        });
+    }
+    public void AddGameTex(TexAssetForm.Data rawData)
+    {
+        GameTexAssetForm.Data data = new GameTexAssetForm.Data(rawData);
+        if (GameTexAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = GameTexAssetForm.DataByName[data.name];
+            GameTexAssetForm.RemoveData(oldData.id);
+        }
+        GameTexAssetForm.AddData(data);
+
+        Z_EventHelper.Invoke(new AssetEvent()
+        {
+            importAssetName = data.name
+        });
+    }
+    public void LoadTex(string texName, string path)
+    {
+        path = path + assetFolder + texName;
+        if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(texName))
+        {
+            AddTex(AssetManager.instance.texCtrl.CreateDataByPath(path, texName));
+        }
+    }
+    public void AddTex(TexAssetForm.Data rawData)
+    {
+        TexAssetForm.Data data = rawData;
+        if (TexAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = TexAssetForm.DataByName[data.name];
+            TexAssetForm.RemoveData(oldData.id);
+        }
+        TexAssetForm.AddData(data);
+
+        Z_EventHelper.Invoke(new AssetEvent()
+        {
+            importAssetName = data.name
+        });
+    }
+
+    public void LoadStoryAudio(string audioName, string path)
+    {
+        path = path + assetFolder + audioName;
+        if (!string.IsNullOrEmpty(audioName) && SaveAndLoad.Exist(path) && !StoryAudioAssetForm.DataByName.ContainsKey(audioName) && !GlobalNameHelper.IsInnerAssetName(audioName))
+        {
+            AddStoryAudio(AssetManager.instance.audioCtrl.CreateDataByPath(path, audioName));
+        }
+    }
+    public void AddStoryAudio(AudioAssetForm.Data rawData)
+    {
+        StoryAudioAssetForm.Data data = new StoryAudioAssetForm.Data(rawData);
+        if (StoryAudioAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = StoryAudioAssetForm.DataByName[data.name];
+            StoryAudioAssetForm.RemoveData(oldData.id);
+        }
+        StoryAudioAssetForm.AddData(data);
+
+        Z_EventHelper.Invoke(new AssetEvent()
+        {
+            importAssetName = data.name
+        });
+    }
+    public void LoadStoryVideo(string videoName, string path)
+    {
+        path = path + assetFolder + videoName;
+        if (!string.IsNullOrEmpty(videoName) && SaveAndLoad.Exist(path) && !StoryVideoAssetForm.DataByName.ContainsKey(videoName) && !GlobalNameHelper.IsInnerAssetName(videoName))
+        {
+            AddStoryVideo(AssetManager.instance.videoCtrl.CreateDataByPath(path,  videoName));
+        }
+    }
+    public void AddStoryVideo(VideoAssetForm.Data rawData)
+    {
+        StoryVideoAssetForm.Data data = new StoryVideoAssetForm.Data(rawData);
+        if (StoryVideoAssetForm.DataByName.ContainsKey(data.name))
+        {
+            var oldData = StoryVideoAssetForm.DataByName[data.name];
+            StoryVideoAssetForm.RemoveData(oldData.id);
+        }
+        StoryVideoAssetForm.AddData(data);
+
+        Z_EventHelper.Invoke(new AssetEvent()
+        {
+            importAssetName = data.name
+        });
+    }
+    #endregion
     #endregion
 
     #region del

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Ui.DialogHistory;
+using Ui.DialogMain.MainText;
 using Unity.VisualScripting.ReorderableList.Internal;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -20,10 +21,13 @@ namespace Ui.DialogMain
     #region func
     namespace Options
     {
+        public partial class UiOptionsParam
+        {
+            public ClipForm.Data clip;
+        }
         public partial class UiOptionsModel
         {
-
-            
+            public UiOptionsParam prm;
         }
         public partial class UiOptionsCtrl
         {
@@ -115,7 +119,7 @@ namespace Ui.DialogMain
                 view.btn_history.onClick.AddListener(() =>
                 {
                     DialogManager.instance.ShowHistory();
-                    
+
                 });
             }
             public override void OnHide()
@@ -137,6 +141,8 @@ namespace Ui.DialogMain
             }
             public override void OnShow()
             {
+                model.prm = param;
+                view.go_func.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
                 view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed > 0 ? 1 : 0);
             }
         }

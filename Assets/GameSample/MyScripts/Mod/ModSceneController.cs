@@ -310,7 +310,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     }
                     else if (curData is MapItemForm.Data itemData)
                     {
-                        var data = ItemProductForm.DataByUid[AssetManager.GetKeyId(itemData.name)];
+                        var data = ItemProductForm.DataByUid[itemData.itemUid];
 
                         var key = AssetManager.GetIdNameKey(data.uid, data.name);
                         ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>

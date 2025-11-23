@@ -48,13 +48,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             GameManager.instance.curStory.icon = form.name;
             GameManager.instance.saveCtrl.AddTex(form);
         });
-
     }
+   
 
     #endregion
 
     #region param
-   
+
     public void CreateCharacterArg(string name)
     {
         if (CharacterParamForm.DataByName.Keys.Count > GlobalSettings.CHARACTER_PARAM_MAX)
@@ -508,6 +508,22 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             GameManager.instance.saveCtrl.AddStoryTex(form);
+            act?.Invoke(form);
+        });
+    }
+    public void ImportVideo(Action<VideoAssetForm.Data> act)
+    {
+        AssetManager.instance.videoCtrl.Select(new Vector2Int(100, 100), (form) =>
+        {
+            GameManager.instance.saveCtrl.AddStoryVideo(form);
+            act?.Invoke(form);
+        });
+    }
+    public void ImportAudio(Action<AudioAssetForm.Data> act)
+    {
+        AssetManager.instance.audioCtrl.Select(new Vector2Int(100, 100), (form) =>
+        {
+            GameManager.instance.saveCtrl.AddStoryAudio(form);
             act?.Invoke(form);
         });
     }

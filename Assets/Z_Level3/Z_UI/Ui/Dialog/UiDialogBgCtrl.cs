@@ -24,25 +24,22 @@ namespace Ui.DialogBg
     {
         public override void OnShow()
         {
-
-            view.vp_.gameObject.SetActive(!string.IsNullOrEmpty(param.clip.mainVideoName));
-            if (string.IsNullOrEmpty(param.clip.mainVideoName))
+            view.vp_.gameObject.SetActive(false);
+            if (!string.IsNullOrEmpty(param.clip.mainVideoName))
             {
-                var data = TexAssetForm.DataByName.GetDv(param.clip.mainPictureName, null);
-                if (data == null)
+                var videoData = VideoAssetForm.DataByName.GetDv(param.clip.mainVideoName, null);
+                if (videoData != null)
                 {
-                    Close();
-                    return;
+                    view.vp_.gameObject.SetActive(true);
+                    videoData.Play(view.vp_);
                 }
-                view.img_.sprite = data.GetSprite();
             }
-            else
+            var data = TexAssetForm.DataByName.GetDv(param.clip.mainPictureName, null);
+            view.img_.gameObject.SetActive(false);
+            if (data != null)
             {
-                var data = VideoAssetForm.DataByName.GetDv(param.clip.mainVideoName, null);
-                if (data!=null)
-                {
-                    view.vp_.PlayVideoByPath(data.path);
-                }
+                view.img_.sprite = data.GetSprite(); 
+                view.img_.gameObject.SetActive(true);
             }
         }
     }

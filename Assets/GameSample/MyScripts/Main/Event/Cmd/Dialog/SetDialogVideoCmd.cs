@@ -13,9 +13,9 @@ namespace Z_Code
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new SetDialogBackgroundCmd());
+            Register(new SetDialogVideoCmd());
         }
-        public override string GetName() => "SetDialogBackground";
+        public override string GetName() => "SetDialogVideo";
         public override CmdBase GetNew() => new SetDialogVideoCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {

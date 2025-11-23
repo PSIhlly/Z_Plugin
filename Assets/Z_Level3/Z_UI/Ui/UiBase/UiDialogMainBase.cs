@@ -28,13 +28,15 @@ namespace MainText
     public partial class UiMainTextView:UiView
     {
 
-            public Txt txt_;
+            public GameObject go_bg;
             public AudioSource as_;
+            public Txt txt_;
         public UiMainTextView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            go_bg = uiHolder.elementTrsLst[0].gameObject;
             as_ = uiHolder.elementTrsLst[1].GetComponent<AudioSource>();
+            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
         }
 
     }
@@ -186,9 +188,9 @@ namespace Options
     public partial class UiOptionsView:UiView
     {
 
-            public Btn btn_menu;
-            public GameObject go_func;
             public Btn btn_over;
+            public GameObject go_func;
+            public Btn btn_menu;
             public Btn btn_history;
             public Btn btn_hide;
             public Sta sta_skip;
@@ -198,9 +200,9 @@ namespace Options
         public UiOptionsView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_menu = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            btn_over = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             go_func = uiHolder.elementTrsLst[1].gameObject;
-            btn_over = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_history = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             btn_hide = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             sta_skip = uiHolder.elementTrsLst[5].GetComponent<Sta>();

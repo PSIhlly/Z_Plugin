@@ -60,6 +60,9 @@ namespace Z_DataSystem.Form
             }
         }
     }
+}
+namespace Z_DataSystem
+{
     public class TexController : Z_Controller<AssetManager>, IAssetController
     {
 
@@ -159,6 +162,7 @@ namespace Z_DataSystem.Form
         }
         public TexAssetForm.Data CreateDataByPath(string path, string name)
         {
+            path = SaveAndLoad.GetRealPath(path);
             return new TexAssetForm.Data(-1, name, path, null, "", null);
         }
         public TexAssetForm.Data CreateDataByTex(Texture tex, string name)

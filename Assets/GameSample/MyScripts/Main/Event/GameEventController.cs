@@ -27,6 +27,10 @@ public static partial class GlobalEventHelper
         var res = desc.retType;
         if (AssetManager.instance.texCtrl.IsAsset(desc.code))
             res = "img";
+        else if (AssetManager.instance.videoCtrl.IsAsset(desc.code))
+            res = "video";
+        else if (AssetManager.instance.audioCtrl.IsAsset(desc.code))
+            res = "audio";
         return res;
     }
 }

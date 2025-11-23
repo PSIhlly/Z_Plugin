@@ -38,6 +38,9 @@ namespace Z_DataSystem.Form
             }
         }
     }
+}
+namespace Z_DataSystem
+{
     public class AudioController : Z_Controller<AssetManager>, IAssetController
     {
         public bool IsAsset(string name)
@@ -122,11 +125,12 @@ namespace Z_DataSystem.Form
         }
         public AudioAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new AudioAssetForm.Data(-1, name, "", data, "",null);
+            return new AudioAssetForm.Data(-1, name, "", data, "", null);
         }
-        public TexAssetForm.Data CreateDataByPath(string path, string name)
+        public AudioAssetForm.Data CreateDataByPath(string path, string name)
         {
-            return new TexAssetForm.Data(-1, name, path, null, "", null);
+            path = SaveAndLoad.GetRealPath(path);
+            return new AudioAssetForm.Data(-1, name, path, null, "", null);
         }
 
     }

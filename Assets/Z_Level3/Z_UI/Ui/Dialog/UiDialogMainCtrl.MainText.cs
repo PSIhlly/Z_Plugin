@@ -44,16 +44,20 @@ namespace Ui.DialogMain
             public override void OnShow()
             {
                 model.prm = param;
-
-                model.isDisplaying = true;
-                model.nowWord = 0;
-                view.txt_.text = "";
-                var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
-                if (audioData != null)
+                view.go_bg.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
+                if (!string.IsNullOrEmpty(model.prm.clip.mainText))
                 {
-                    view.as_.PlayOneShot(audioData.GetClip());
+                    model.isDisplaying = true;
+                    model.nowWord = 0;
+                    view.txt_.text = "";
+                    var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
+                    if (audioData != null)
+                    {
+                        view.as_.PlayOneShot(audioData.GetClip());
+                    }
+                    Display();
+
                 }
-                Display();
             }
             private void Display()
             {

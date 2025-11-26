@@ -555,9 +555,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return true;
         }, items);
     }
-    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act)
+    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act,bool createOnly=false)
     {
-        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType);
+        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType, createOnly);
         NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>
         {
             act?.Invoke(res);

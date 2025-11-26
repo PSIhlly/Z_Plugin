@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Z_Code.Form;
 using Z_Debug;
+using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 namespace Z_Code
 {
     public enum Op
@@ -20,11 +21,16 @@ namespace Z_Code
         Assign,
         Equal,
         NotEqual,
+        Take,
         Sub,
         Get,
         IfFalseJump,
         Jump,
-        Wait
+        Wait,
+        Greater,
+        Less,
+        NotGreater,
+        NotLess
     }
     namespace Form
     {
@@ -106,6 +112,8 @@ namespace Z_Code
         {
 
             int cnt = data.program.zCode.Count;
+            BoxDataForm.Data box = null;
+            BoxDataForm.Data realBox = null;
             for (; data.p < cnt; data.p++)
             {
                 if (DEBUG)
@@ -116,20 +124,16 @@ namespace Z_Code
                 {
                     case Op.PushNum:
                         data.p++;
-                        Push(new BoxDataForm.Data(-1, null, null, float.Parse(data.program.zCode[data.p])));
+                        Push(CodeHelper.CreateBoxByNum(float.Parse(data.program.zCode[data.p])));
                         break;
                     case Op.PushStr:
                         data.p++;
-                        Push(new BoxDataForm.Data(-1, data.program.zCode[data.p], null, 0));
+                        Push(CodeHelper.CreateBoxByStr(data.program.zCode[data.p]));
                         break;
                     case Op.Get:
                         data.p++;
                         var nm = data.program.zCode[data.p];
-                        if (!data.heap.ContainsKey(nm))
-                        {
-                            data.heap[nm] = new BoxDataForm.Data(-1, null, null, 0);
-                        }
-                        Push(new BoxDataForm.Data(-1, null, nm, 0));
+                        Push(CodeHelper.CreateBoxByVal(nm));
                         break;
                     case Op.Call:
                         var cmd = BaseData.cmdDic[data.program.zCode[data.p + 1]].GetNew();
@@ -137,14 +141,14 @@ namespace Z_Code
                         var prm = new BoxDataForm.Data[form.prmNames == null ? 0 : form.prmNames.Count];
                         for (int i = 0; i < prm.Length; i++)
                         {
-                            prm[i] = data.stack[data.top - i];
+                            prm[i] = GetBox(data.stack[data.top - i]);
                         }
-                        if (!asyncTask.IsRuning()&&!asyncTask.IsComplete())
+                        if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
                         {
                             cmd.Execute(prm, data.heap, asyncTask);
                         }
 
-                        if(asyncTask.IsComplete())
+                        if (asyncTask.IsComplete())
                         {
                             //Delay
                             data.p++;
@@ -162,28 +166,58 @@ namespace Z_Code
                         {
                             return false;
                         }
-                        
+
                         break;
                     case Op.Equal:
-                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
+                        break;
+                    case Op.Greater:
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) > GetNum(Pop()) ? 1 : 0));
+                        break;
+                    case Op.Less:
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) < GetNum(Pop()) ? 1 : 0));
+                        break;
+                    case Op.NotGreater:
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) <= GetNum(Pop()) ? 1 : 0));
+                        break;
+                    case Op.NotLess:
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) >= GetNum(Pop()) ? 1 : 0));
                         break;
                     case Op.NotEqual:
-                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) != GetNum(Pop()) ? 1 : 0));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) != GetNum(Pop()) ? 1 : 0));
+                        break;
+                    case Op.Take:
+                        box = Pop();
+                        realBox = GetBox(box);
+                        var key = GetStr(Pop());
+                        box = CodeHelper.CreateBoxByVal(box.valName);
+                        box.str = key;
+                        Push(box);
                         break;
                     case Op.Assign:
-                        data.heap[Pop().valName] = Pop().Copy();
+
+                        box = Pop();
+                        realBox = GetBox(box);
+                        if (box.str != null)
+                        {
+                            data.heap[box.valName].dic[box.str] = GetBox(Pop()).Copy();
+                        }
+                        else
+                        {
+                            data.heap[box.valName] = GetBox(Pop()).Copy();
+                        }
                         break;
                     case Op.Plus:
-                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) + GetNum(Pop())));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) + GetNum(Pop())));
                         break;
                     case Op.Minus:
-                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) - GetNum(Pop())));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) - GetNum(Pop())));
                         break;
                     case Op.Mul:
-                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) * GetNum(Pop())));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * GetNum(Pop())));
                         break;
                     case Op.Div:
-                        Push(new BoxDataForm.Data(-1, null, null, GetNum(Pop()) / GetNum(Pop())));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) / GetNum(Pop())));
                         break;
                     case Op.Jump:
                         data.p++;
@@ -202,9 +236,13 @@ namespace Z_Code
 
                          break;*/
                     case Op.Wait:
-                        var box = Pop();
+                        box = Pop();
+                        if (box.valName != null && box.num == 0)
+                        {
+                            box.num = GetBox(box).num;
+                        }
                         box.num -= Time.deltaTime;
-                        if(box.num > 0)
+                        if (box.num > 0)
                         {
                             Push(box);
                             return false;
@@ -220,6 +258,7 @@ namespace Z_Code
             }
             return true;
         }
+
         private BoxDataForm.Data Pop()
         {
             var res = data.stack[data.top];
@@ -232,19 +271,40 @@ namespace Z_Code
             data.stack.Add(box);
             data.top++;
         }
-        private float GetNum(BoxDataForm.Data box)
+        private BoxDataForm.Data GetBox(BoxDataForm.Data box)
         {
             if (!string.IsNullOrEmpty(box.valName))
             {
-                return data.heap[box.valName].num;
+                if (!data.heap.ContainsKey(box.valName))
+                {
+                    data.heap[box.valName] = CodeHelper.CreateBox();
+                }
+                if (box.str != null)
+                {
+                    if (!data.heap[box.valName].dic.ContainsKey(box.str))
+                    {
+                        data.heap[box.valName].dic[box.str] = CodeHelper.CreateBox();
+                    }
+                    return data.heap[box.valName].dic[box.str];
+                }
+                else
+                {
+                    return data.heap[box.valName];
+                }
             }
+            return box;
+        }
+        private float GetNum(BoxDataForm.Data box)
+        {
+            box = GetBox(box);
             return box.num;
         }
         private string GetStr(BoxDataForm.Data box)
         {
-            if (!string.IsNullOrEmpty(box.valName))
+            box = GetBox(box);
+            if (box.str == null)
             {
-                return data.heap[box.valName].str;
+                return box.num.ToString();
             }
             return box.str;
         }
@@ -252,6 +312,7 @@ namespace Z_Code
         {
             asyncTask.Reset();
         }
+
     }
 
 

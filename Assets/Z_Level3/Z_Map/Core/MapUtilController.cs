@@ -236,7 +236,7 @@ namespace Z_Map
                     break;
                 case CameraMode.Isometric:
                     imgTrs.position = rootTrs.position + new Vector3(0, -1, -1) * deepth;
-                    Graph.Calculate(rootTrs.localScale.z, rootTrs.localScale.y, out var y, out var angle);
+                    Graph.CalculateTriangle(rootTrs.localScale.z, rootTrs.localScale.y, out var y, out var angle);
                     imgTrs.localScale = new Vector3(rootTrs.localScale.x, y, rootTrs.localScale.z);
                     imgTrs.eulerAngles = new Vector3(angle, 0, 0);
                     break;

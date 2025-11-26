@@ -136,6 +136,11 @@ namespace Z_Code
             {
                 l++;
                 r--;
+            } 
+            while (GetFirstDepth0(nodes, l, r, "]") == r && GetFirstDepth0(nodes, l, r, "[") == l && l < r)
+            {
+                l++;
+                r--;
             }
 
             List<SyntaxNode> res = new List<SyntaxNode>();
@@ -164,12 +169,24 @@ namespace Z_Code
                             i = endBkt;
                         }
                     }
+                    else if (nodes[i].desc.code == "[")
+                    {
+                        int endBkt = GetFirstDepth0(nodes, i, r, "]");
+                        if (endBkt > 0)
+                        {
+                            int cur = cache.Count;
+                            cache.Add(nodes[i]);
+                            cache.Add(BuildStatement(nodes, i, endBkt)[0]);
+                            SetSub(cache, nodes[i], ref cur, 1, 1);
+                            i = endBkt;
+                        }
+                    }
                     else
                     {
                         cache.Add(nodes[i]);
                     }
                 }
-               
+
                 //level2
                 for (int i = 0; i < cache.Count; i++)
                 {
@@ -213,6 +230,22 @@ namespace Z_Code
                         }
                     }
                 }
+                //level4.5
+                for (int i = 0; i < cache.Count; i++)
+                {
+                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
+                    {
+                        switch (lex.desc.code)
+                        {
+                            case ">":
+                            case "<":
+                            case ">=":
+                            case "<=":
+                                SetSub(cache, lex, ref i, 1, 1);
+                                break;
+                        }
+                    }
+                }
                 //level5
                 for (int i = 0; i < cache.Count; i++)
                 {
@@ -243,6 +276,7 @@ namespace Z_Code
                         }
                     }
                 }
+
                 for (int i = 0; i < cache.Count; i++)
                 {
                     if (cache[i] is SyntaxNode node)

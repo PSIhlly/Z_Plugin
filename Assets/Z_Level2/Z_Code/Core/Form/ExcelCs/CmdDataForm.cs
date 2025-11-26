@@ -277,23 +277,27 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} = {0}","var=1;")},
 
-                {7,new Data(7,"==",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} equal {0}","1==1")},
+                {7,new Data(7,"==",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} equal to {0}","1==1")},
 
-                {8,new Data(8,">",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} bigger than {0}","2>1")},
+                {8,new Data(8,">",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} greater than {0}","2>1")},
 
-                {9,new Data(9,"<",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} smaller than {0}","1<2")},
+                {9,new Data(9,"<",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} less than {0}","1<2")},
 
-                {10,new Data(10,"!=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} not equal {0}","1!=2")},
+                {10,new Data(10,">=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} not less than {0}","1<2")},
 
-                {11,new Data(11,"if",new List<string>(){"condition",},null,new List<string>(){"result",},new List<string>(){"bool",},"if {0}","if(1){ }else{ }")},
+                {11,new Data(11,"<=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} not greater than {0}","1<2")},
 
-                {12,new Data(12,"else",null,null,null,new List<string>(){"void",},"else","")},
+                {12,new Data(12,"!=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} not equal to {0}","1!=2")},
 
-                {13,new Data(13,"then",null,null,null,new List<string>(){"void",},"then","")},
+                {13,new Data(13,"if",new List<string>(){"condition",},null,new List<string>(){"result",},new List<string>(){"bool",},"if {0}","if(1){ }else{ }")},
 
-                {14,new Data(14,"for",new List<string>(){"init","condition","turnOver",},null,null,new List<string>(){"void",},"{0}, if {1} keep do, after every times do{2}","for(id=0;id<3;id=id+1){ }")},
+                {14,new Data(14,"else",null,null,null,new List<string>(){"void",},"else","")},
 
-                {15,new Data(15,"Wait",new List<string>(){"time",},new List<string>(){"num",},null,new List<string>(){"void",},"wait for {0} seconds","Wait(1);")},
+                {15,new Data(15,"then",null,null,null,new List<string>(){"void",},"then","")},
+
+                {16,new Data(16,"for",new List<string>(){"init","condition","turnOver",},null,null,new List<string>(){"void",},"{0}, if {1} keep do, after every times do{2}","for(id=0;id<3;id=id+1){ }")},
+
+                {17,new Data(17,"Wait",new List<string>(){"time",},new List<string>(){"num",},null,new List<string>(){"void",},"wait for {0} seconds","Wait(1);")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -316,17 +320,21 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
     
                         {"<",_DataByUid[9]},
     
-                        {"!=",_DataByUid[10]},
+                        {">=",_DataByUid[10]},
     
-                        {"if",_DataByUid[11]},
+                        {"<=",_DataByUid[11]},
     
-                        {"else",_DataByUid[12]},
+                        {"!=",_DataByUid[12]},
     
-                        {"then",_DataByUid[13]},
+                        {"if",_DataByUid[13]},
     
-                        {"for",_DataByUid[14]},
+                        {"else",_DataByUid[14]},
     
-                        {"Wait",_DataByUid[15]},
+                        {"then",_DataByUid[15]},
+    
+                        {"for",_DataByUid[16]},
+    
+                        {"Wait",_DataByUid[17]},
     
                     };
     

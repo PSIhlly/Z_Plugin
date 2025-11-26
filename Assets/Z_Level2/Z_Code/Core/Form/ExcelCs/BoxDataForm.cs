@@ -48,6 +48,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,float,float> changeNumAction;
                 
+        public static Action<Data,Dictionary<string,BoxDataForm.Data>,Dictionary<string,BoxDataForm.Data>> changeDicAction;
+                
 
 
         public partial class Data
@@ -125,24 +127,43 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string str,string valName,float num)
+                    private Dictionary<string,BoxDataForm.Data>  _dic;
+                    /// <summary>
+                    ///×Öµä
+                    ///</summary>
+                    public Dictionary<string,BoxDataForm.Data>  dic{
+                                get{return _dic;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeDic(this,_dic,value); 
+                    }
+        
+                _dic = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string str,string valName,float num,Dictionary<string,BoxDataForm.Data> dic)
             {
 
              this.uid = uid;
              this.str = str;
              this.valName = valName;
              this.num = num;
+             this.dic = dic;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),str,valName,num);
+        return new Data(sameId? uid:uidChain.GetId(),str,valName,num,new Dictionary<string,BoxDataForm.Data>(dic));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,null,null,0f);
+                   private static Data _defaultData=new Data(0,null,null,0f,new Dictionary<string,BoxDataForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -219,7 +240,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("valName"),
 
-                jo.Get<float>("num")
+                jo.Get<float>("num"),
+
+                jo.Get<Dictionary<string,BoxDataForm.Data>>("dic")
                     );
 
             return data;
@@ -238,6 +261,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("valName",data.valName);
 
             jo.Set<float>("num",data.num);
+
+            jo.Set<Dictionary<string,BoxDataForm.Data>>("dic",data.dic);
 
             return jo;
         }
@@ -354,6 +379,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeNumAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDic(Data superData,Dictionary<string,BoxDataForm.Data> oldV,Dictionary<string,BoxDataForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDicAction?.Invoke(data,oldV,newV);
                 }
                     
             }

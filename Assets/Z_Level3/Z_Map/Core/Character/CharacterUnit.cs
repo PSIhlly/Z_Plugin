@@ -78,50 +78,46 @@ namespace Z_Map
         }
         public void Move(Vector3 dir)
         {
-
-            var selfLength = 0.15f;
-            var offset = Vector3.up * (selfLength);
-
             var mag = dir.magnitude;
             HashSet<int> exist = new HashSet<int>() { data.uid };
-            var from = data.pos + offset;
-            var to = from + (mag + selfLength) * (dir / mag);
 
-            float res = mag + selfLength;
-            var floor = manager.updateCtrl.CheckCollide(this, belongTile, from, data.pos - offset, CollideType.CollideOnly);
+            float res = mag;
+            var floor = manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly);
 
-            if (dir.y < 0 && floor <= selfLength + 0.01f)
+            if (dir.y < 0 && floor <= 0.01f)
             {
                 dir.y = 0;
             }
             else
             {
-                res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, from, to, CollideType.CollideOnly), res);
-
+                res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly), res);
             }
-            foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
+            if (dir != Vector3.zero)
             {
-                foreach (var obj in manager.updateCtrl.objectTileDic.Get(tile))
+                foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
                 {
-                    if (exist.Contains(obj.data.uid))
-                        continue;
-                    exist.Add(obj.data.uid);
-                    res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, from, to, CollideType.CollideOnly), res);
-                }
-                foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
-                {
-                    if (exist.Contains(ch.data.uid))
-                        continue;
-                    exist.Add(ch.data.uid);
+                    foreach (var obj in manager.updateCtrl.objectTileDic.Get(tile))
+                    {
+                        if (exist.Contains(obj.data.uid))
+                            continue;
+                        exist.Add(obj.data.uid);
+                        res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly), res);
 
-                    res = Math.Min(manager.updateCtrl.CheckCollide(this, ch, from, to, CollideType.CollideOnly), res);
 
+                    }
+                    foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
+                    {
+                        if (exist.Contains(ch.data.uid))
+                            continue;
+                        exist.Add(ch.data.uid);
+
+                        res = Math.Min(manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly), res);
+
+                    }
                 }
+
             }
-            res -= selfLength;
             dir *= (res) / mag;
-
-
             manager.updateCtrl.ApplyMove(this, data.pos + dir, data.euler);
 
 

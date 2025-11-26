@@ -1,8 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
+using UnityEditor.SceneTemplate;
 using UnityEngine;
+using UnityEngine.Windows;
 using Z_Math;
+using static UnityEditor.PlayerSettings;
+using static Z_Math.Graph;
 namespace Z_Mesh
 {
     public enum MeshType
@@ -16,12 +21,13 @@ namespace Z_Mesh
         public MeshType type;
         public Vector3[] positions;
         public Vector3 center;
+        
     }
     public static class Mesh
     {
-        public static MeshInfo GetMesh(BoxCollider box,Vector3 pos,Vector3 euler,Vector3 scale)
+        public static MeshInfo GetMesh(BoxCollider box, Vector3 pos, Vector3 euler, Vector3 scale)
         {
-            return GetMesh(Graph.ElementwiseMultiply(box.center, scale) + pos, euler, Graph.ElementwiseMultiply(box.size,scale));
+            return GetMesh(Graph.ElementwiseMultiply(box.center, scale) + pos, euler, Graph.ElementwiseMultiply(box.size, scale));
         }
         public static MeshInfo GetMesh(Vector3 pos, Vector3 euler, Vector3 size)
         {
@@ -36,14 +42,61 @@ namespace Z_Mesh
         {
             return GetMesh(Graph.ElementwiseMultiply(sp.center, scale) + pos, sp.radius, euler, scale);
         }
-        public static MeshInfo GetMesh(Vector3 pos, float radius,Vector3 euler, Vector3 scale)
+        public static MeshInfo GetMesh(Vector3 pos, float radius, Vector3 euler, Vector3 scale)
         {
             return new MeshInfo()
             {
                 type = MeshType.Sphere,
                 center = pos,
-                positions = Graph.GetSphereFourPoint(pos, radius, euler, scale)
+                positions = Graph.GetSphereSixPoint(pos, radius, euler, scale)
             };
         }
+        public static IntersectType MeshIntersectMesh(MeshInfo o, MeshInfo tar, Vector3 step, out float dis)
+        {
+            float curDis = 0;
+            float length = step.magnitude;
+            dis = length;
+            var assist = new Graph.IntersectAssisant();
+            switch(o.type)
+            {
+                case MeshType.Cube:
+                    switch (tar.type)
+                    {
+                        case Z_Mesh.MeshType.Cube:
+                            {
+                                assist.Add(Graph.CubeIntersectCube(o.positions,tar.positions, step, out curDis));
+                                dis = Math.Min(dis, curDis);
+                                break;
+                            }
+                        case Z_Mesh.MeshType.Sphere:
+                            {
+                                assist.Add(Graph.SphereIntersectCube(o.positions,tar.positions, -step, out curDis));
+                                dis = Math.Min(dis, curDis);
+                                break;
+                            }
+                    }
+                    break;
+                case MeshType.Sphere:
+                    switch (tar.type)
+                    {
+                        case Z_Mesh.MeshType.Cube:
+                            {
+                                assist.Add(Graph.SphereIntersectCube(o.positions, tar.positions, step, out curDis));
+                                dis = Math.Min(dis, curDis);
+                                break;
+                            }
+                        case Z_Mesh.MeshType.Sphere:
+                            {
+                                assist.Add(Graph.SphereIntersectSphere(o.positions, tar.positions, -step, out curDis));
+                                dis = Math.Min(dis, curDis);
+                                break;
+                            }
+                    }
+                    break;
+            }
+           
+            return assist.GetRes();
         }
+
+    }
 }

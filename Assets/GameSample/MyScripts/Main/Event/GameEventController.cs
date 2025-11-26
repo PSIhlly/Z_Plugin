@@ -25,12 +25,15 @@ public static partial class GlobalEventHelper
     public static string GetGameRetType(Desc desc)
     {
         var res = desc.retType;
-        if (AssetManager.instance.texCtrl.IsAsset(desc.code))
+        if (desc.type == CodeType.VarName)
+            res = "var";
+        else if (AssetManager.instance.texCtrl.IsAsset(desc.code))
             res = "img";
         else if (AssetManager.instance.videoCtrl.IsAsset(desc.code))
             res = "video";
         else if (AssetManager.instance.audioCtrl.IsAsset(desc.code))
             res = "audio";
+
         return res;
     }
 }
@@ -76,7 +79,7 @@ public class GameEventController : Z_Controller<GameManager>
 
     public void Execute(EventProgramDataForm.Data evt, int uid = -1)
     {
-        if(evt==null) 
+        if (evt == null)
             return;
         EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, uid));
     }
@@ -104,25 +107,32 @@ public class GameEventController : Z_Controller<GameManager>
         var res = new EntryItem();
         foreach (var data in EventTriggerForm.DataByName.Values)
         {
-            res.Add(TextManager.instance.GetTxt(data.name),id:data.uid);
-          
+            res.Add(TextManager.instance.GetTxt(data.name), id: data.uid);
+
         }
         return res;
     }
-    public EntryItem GetCmdEntry(SceneEventType objectType, string retType)
+    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, bool createOnly)
     {
         var res = new EntryItem();
         foreach (var data in GameCmdDataForm.DataByName.Values)
         {
-            if (data.retTypes == null)
+            if (createOnly && !data.canCreate)
             {
-                if (retType != CmdTypeDataForm.defaultData.name)
-                    continue;
+                continue;
             }
-            else
+            if (!string.IsNullOrEmpty(retType))
             {
-                if (data.retTypes[0] != retType)
-                    continue;
+                if (data.retTypes == null)
+                {
+                    if (retType != CmdTypeDataForm.defaultData.name)
+                        continue;
+                }
+                else
+                {
+                    if (data.retTypes[0] != retType && data.retTypes[0] != "var")
+                        continue;
+                }
             }
 
             if (!res.subs.ContainsKey(data.category))
@@ -137,7 +147,7 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
-    public static EventTriggerForm.Data CreateTrigger(string key,string evt)
+    public static EventTriggerForm.Data CreateTrigger(string key, string evt)
     {
         return new EventTriggerForm.Data(-1, key, evt);
     }

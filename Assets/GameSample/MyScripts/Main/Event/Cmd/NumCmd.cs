@@ -26,7 +26,7 @@ namespace Z_Code
                 return true;
             });
         }
-        public override string GetName() => "Text";
+        public override string GetName() => "Num";
         public override CmdBase GetNew() => new NumCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {

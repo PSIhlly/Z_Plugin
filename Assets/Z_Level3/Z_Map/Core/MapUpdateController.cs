@@ -8,6 +8,7 @@ using Z_DesignStyle;
 using Z_Map.Form;
 using Z_Math;
 using Z_Mesh;
+using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 using static UnityEditor.PlayerSettings;
@@ -461,9 +462,9 @@ namespace Z_Map
             unit.data.pos = newPos;
             unit.data.euler = euler;
             if (oldPos != newPos)
-                ChechCollideEvent(unit, oldPos, newPos);
+                ChechCollideEvent(unit, newPos - oldPos);
         }
-        public void ChechCollideEvent(Unit unit, Vector3 from, Vector3 to)
+        public void ChechCollideEvent(Unit unit, Vector3 dir)
         {
             if (unit is CharacterUnit ch)
             {
@@ -476,97 +477,63 @@ namespace Z_Map
                         if (exist.Contains(obj.data.uid))
                             continue;
                         exist.Add(obj.data.uid);
-                        CheckCollide(ch, obj, from, to, CollideType.TriggerOnly);
+
+                        CheckCollide(ch, obj, dir, CollideType.TriggerOnly, (tar, res, dis) =>
+                        {
+                            ManageTriggerEvent(ch, tar, res);
+                        });
                     }
                     foreach (var item in itemTileDic.Get(tile))
                     {
                         if (exist.Contains(item.data.uid))
                             continue;
                         exist.Add(item.data.uid);
-                        CheckCollide(ch, item, from, to, CollideType.TriggerOnly, (tar, res, dis) =>
+                        CheckCollide(ch, item, dir, CollideType.TriggerOnly, (tar, res, dis) =>
                         {
-                            switch (res)
-                            {
-                                case Graph.IntersectType.In:
-                                    tar.OnEnter(ch);
-                                    break;
-                                case Graph.IntersectType.Out:
-                                    tar.OnExit(ch);
-                                    break;
-                                case Graph.IntersectType.Cross:
-                                    tar.OnEnter(ch);
-                                    tar.OnExit(ch);
-                                    break;
-                            }
+                            ManageTriggerEvent(ch, tar, res);
                         });
                     }
                 }
             }
         }
-        public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 from, Vector3 to, CollideType type, Action<Unit, Graph.IntersectType, float> onCast = null)
+        private void ManageTriggerEvent(Unit trigger,Unit tar, Graph.IntersectType type)
         {
-            var disRes = (to - from).magnitude;
-
-            int isOut = 0;
-            int isIn = 0;
-            int isCross = 0;
-            foreach (var res in _super.utilCtrl.GetCollidersMesh(unit.prefab, unit.data.pos, unit.data.euler, unit.data.scale, type))
+            TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
             {
-                float dis = 0;
-                var curType = IntersectType.None;
-                switch (res.type)
+                switch (type)
                 {
-                    case Z_Mesh.MeshType.Cube:
-                        {
-                            curType = Graph.LineIntersectCube(res.positions, from, to, out dis);
-                            break;
-                        }
-                    case Z_Mesh.MeshType.Sphere:
-                        {
-                            curType = Graph.LineIntersectSphere(res.positions, from, to, out dis);
-
-                            break;
-                        }
-
-                }
-                switch (curType)
-                {
-                    case IntersectType.Inner:
-                        isIn = -1;
-                        isOut = -1;
-                        isCross = -1;
+                    case Graph.IntersectType.In:
+                        tar.OnEnter(trigger);
                         break;
-                    case IntersectType.In:
-                        isOut = -1;
-                        isCross = -1;
-                        if (isIn == 0)
-                            isIn = 1;
+                    case Graph.IntersectType.Out:
+                        tar.OnExit(trigger);
                         break;
-                    case IntersectType.Out:
-                        isIn = -1;
-                        isCross = -1;
-                        if (isOut == 0)
-                            isOut = 1;
-                        break;
-                    case IntersectType.Cross:
-                        if (isCross == 0)
-                            isCross = 1;
+                    case Graph.IntersectType.Cross:
+                        tar.OnEnter(trigger);
+                        tar.OnExit(trigger);
                         break;
                 }
-                disRes = Math.Min(disRes, dis);
-
-            }
-            if (isCross == 1)
+            });
+           
+        }
+        public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type, Action<Unit, Graph.IntersectType, float> onCast = null)
+        {
+            var disRes = (dir).magnitude;
+            var assist = new Graph.IntersectAssisant();
+            foreach (var tar in _super.utilCtrl.GetCollidersMesh(unit.prefab, unit.data.pos, unit.data.euler, unit.data.scale, type))
             {
-                onCast?.Invoke(unit, IntersectType.Cross, disRes);
+                foreach (var cur in _super.utilCtrl.GetCollidersMesh(trigger.prefab, trigger.data.pos, trigger.data.euler, trigger.data.scale, type))
+                {
+                    float dis = 0;
+                    var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis);
+                    assist.Add(curType);
+                    disRes = Math.Min(disRes, dis);
+                }
             }
-            else if (isIn == 1)
+            var res = assist.GetRes();
+            if (res != IntersectType.None)
             {
-                onCast?.Invoke(unit, IntersectType.In, disRes);
-            }
-            else if (isOut == 1)
-            {
-                onCast?.Invoke(unit, IntersectType.Out, disRes);
+                onCast?.Invoke(unit, res, disRes);
             }
             return disRes;
         }

@@ -24,14 +24,14 @@ namespace Z_DesignStyle
                 if (!d2.ContainsKey(key))
                     d2[key] = new List<T1>();
 
-                return new List<T1>(d2[key]);
+                return d2[key];
             }
             public List<T2> Get(T1 key)
             {
                 if (!d1.ContainsKey(key))
                     d1[key] = new List<T2>();
 
-                return new List<T2>(d1[key]);
+                return d1[key];
             }
             public void Move(T1 t1, T2 cur, T2 old)
             {

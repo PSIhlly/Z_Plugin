@@ -57,7 +57,6 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveModStory(int id)
     {
-        GameManager.instance.saveCtrl.SaveOverview(id);
         SaveOverview(id);
         string path = ModManager.GetStoryCoreFolder(Main2StoryManager.GetSceneFileNameById(id));
 

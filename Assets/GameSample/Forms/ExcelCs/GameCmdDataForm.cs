@@ -89,6 +89,8 @@ namespace Form
                 
         public static Action<Data,string,string> changeTypeAction;
                 
+        public static Action<Data,bool,bool> changeCancreateAction;
+                
 
 
         public partial class Data : CmdDataForm.Data
@@ -130,11 +132,29 @@ namespace Form
                  
                      }
                     
+                    private bool  _canCreate;
+                    /// <summary>
+                    ///可被entry创建
+                    ///</summary>
+                    public bool  canCreate{
+                                get{return _canCreate;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCancreate(this,_canCreate,value); 
+                    }
+        
+                _canCreate = value;
+                }
+                 
+                     }
+                    
             public Data(CmdDataForm.Data data):base(data.uid,data.name,data.prmNames,data.prmTypes,data.retNames,data.retTypes,data.desc,data.defaultCode)
             {
             }
             
-            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode,string category,string type):base(uid,name,prmNames,prmTypes,retNames,retTypes,desc,defaultCode)
+            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode,string category,string type,bool canCreate):base(uid,name,prmNames,prmTypes,retNames,retTypes,desc,defaultCode)
             {
 
              this.uid = uid;
@@ -147,17 +167,18 @@ namespace Form
              this.defaultCode = defaultCode;
              this.category = category;
              this.type = type;
+             this.canCreate = canCreate;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode,category,type);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode,category,type,canCreate);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","","","");
+                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","","","",false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -191,6 +212,16 @@ namespace Form
                 }
             }
     
+            static Dictionary<bool, List<Data>> _DatasByCancreate;
+            public static Dictionary<bool, List<Data>> DatasByCancreate
+            {
+                get
+                {
+                    Init();
+                    return _DatasByCancreate;
+                }
+            }
+    
             static Dictionary<string, Data> _DataByName;
             public static Dictionary<string, Data> DataByName
             {
@@ -218,51 +249,77 @@ namespace Form
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"ShowTip",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Show Tip: {0}","ShowTip(\"empty\");","ui","notice")},
+                {100001,new Data(100001,"ShowTip",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Show Tip: {0}","ShowTip(\"empty\");","ui","notice",true)},
 
-                {100002,new Data(100002,"Text",null,null,null,new List<string>(){"string",},"","\"\"","basic","const")},
+                {100002,new Data(100002,"Text",null,null,null,new List<string>(){"string",},"","\"\"","basic","const",false)},
 
-                {100003,new Data(100003,"Num",null,null,null,new List<string>(){"num",},"","1","basic","const")},
+                {100003,new Data(100003,"Num",null,null,null,new List<string>(){"num",},"","1","basic","const",false)},
 
-                {100004,new Data(100004,"Image",null,null,null,new List<string>(){"img",},"","\"$i$$i$\"","basic","const")},
+                {100004,new Data(100004,"Image",null,null,null,new List<string>(){"img",},"","\"$i$$i$\"","basic","const",false)},
 
-                {100005,new Data(100005,"Video",null,null,null,new List<string>(){"video",},"","\"$v$$v$\"","basic","const")},
+                {100005,new Data(100005,"Video",null,null,null,new List<string>(){"video",},"","\"$v$$v$\"","basic","const",false)},
 
-                {100006,new Data(100006,"Audio",null,null,null,new List<string>(){"audio",},"","\"$a$$a$\"","basic","const")},
+                {100006,new Data(100006,"Audio",null,null,null,new List<string>(){"audio",},"","\"$a$$a$\"","basic","const",false)},
 
-                {100007,new Data(100007,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog")},
+                {100007,new Data(100007,"LocalVar",null,null,null,new List<string>(){"var",},"","a","basic","variable",false)},
 
-                {100008,new Data(100008,"ShowEffect",new List<string>(){"uid","positionX","positionY","positionZ","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} position({1},{2},{3}) angle{4}","ShowEffect(0,0,0,0,0);","scene","effect")},
+                {100008,new Data(100008,"Set LocalVar",null,null,null,new List<string>(){"void",},"","a = 0;","basic","variable",true)},
 
-                {100009,new Data(100009,"ShowCurrentDialog",new List<string>(){"canClickOver",},new List<string>(){"bool",},null,new List<string>(){"void",},"Show Current Dialog, over when click?{0}","ShowCurrentDialog(1);","ui","dialogAdvanced")},
+                {100009,new Data(100009,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog",true)},
 
-                {100010,new Data(100010,"CloseCurrentDialog",null,null,null,new List<string>(){"void",},"Close Current Dialog","CloseCurrentDialog();","ui","dialogAdvanced")},
+                {100010,new Data(100010,"ShowEffect",new List<string>(){"uid","positionX","positionY","positionZ","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} position({1},{2},{3}) angle{4}","ShowEffect(0,0,0,0,0);","scene","effect",true)},
 
-                {100011,new Data(100011,"SetDialogBackground",new List<string>(){"background",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog bg:{0}","SetDialogBackground(\"$i$$i$\");","ui","dialogAdvanced")},
+                {100011,new Data(100011,"ShowCurrentDialog",new List<string>(){"canClickOver",},new List<string>(){"bool",},null,new List<string>(){"void",},"Show Current Dialog, over when click?{0}","ShowCurrentDialog(1);","ui","dialogAdvanced",true)},
 
-                {100012,new Data(100012,"SetDialogContent",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog content:{0}","SetDialogContent(\"empty\")","ui","dialogAdvanced")},
+                {100012,new Data(100012,"CloseCurrentDialog",null,null,null,new List<string>(){"void",},"Close Current Dialog","CloseCurrentDialog();","ui","dialogAdvanced",true)},
 
-                {100013,new Data(100013,"SetDialogAvatar",new List<string>(){"avatar",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog avatar:{0}","SetDialogAvatar(\"$i$$i$\");","ui","dialogAdvanced")},
+                {100013,new Data(100013,"SetDialogBackground",new List<string>(){"background",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog bg:{0}","SetDialogBackground(\"$i$$i$\");","ui","dialogAdvanced",true)},
 
-                {100014,new Data(100014,"SetDialogTitle",new List<string>(){"title",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog title:{0}","SetDialogTitle(\"empty\");","ui","dialogAdvanced")},
+                {100014,new Data(100014,"SetDialogContent",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog content:{0}","SetDialogContent(\"empty\")","ui","dialogAdvanced",true)},
 
-                {100015,new Data(100015,"SetDialogVideo",new List<string>(){"video",},new List<string>(){"video",},null,new List<string>(){"void",},"Set Dialog video:{0}","SetDialogVideo(\"$v$$v$\");","ui","dialogAdvanced")},
+                {100015,new Data(100015,"SetDialogAvatar",new List<string>(){"avatar",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog avatar:{0}","SetDialogAvatar(\"$i$$i$\");","ui","dialogAdvanced",true)},
 
-                {100016,new Data(100016,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogContent(\"$a$$a$\")","ui","dialogAdvanced")},
+                {100016,new Data(100016,"SetDialogTitle",new List<string>(){"title",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog title:{0}","SetDialogTitle(\"empty\");","ui","dialogAdvanced",true)},
 
-                {100017,new Data(100017,"ResetDialog",null,null,null,new List<string>(){"void",},"Reset Dialog","ResetDialog();","ui","dialogAdvanced")},
+                {100017,new Data(100017,"SetDialogVideo",new List<string>(){"video",},new List<string>(){"video",},null,new List<string>(){"void",},"Set Dialog video:{0}","SetDialogVideo(\"$v$$v$\");","ui","dialogAdvanced",true)},
 
-                {100018,new Data(100018,"ShowImage",new List<string>(){"image","width","height","showTime",},new List<string>(){"img","num","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Show Image:{0} ,width {1},height {2}, last {3} seconds","ShowImage(\"$i$$i$\",400,400,1);","ui","image")},
+                {100018,new Data(100018,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogContent(\"$a$$a$\")","ui","dialogAdvanced",true)},
 
-                {100019,new Data(100019,"CreateImage",new List<string>(){"image","width","height",},new List<string>(){"img","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Create Image {0},width {1},height {2}","CreateImage(\"$i$$i$\",400,400);","ui","imageAdvanced")},
+                {100019,new Data(100019,"ResetDialog",null,null,null,new List<string>(){"void",},"Reset Dialog","ResetDialog();","ui","dialogAdvanced",true)},
 
-                {100020,new Data(100020,"DeleteImage",new List<string>(){"imageId","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(1,1);","ui","imageAdvanced")},
+                {100020,new Data(100020,"ShowImage",new List<string>(){"image","width","height","showTime",},new List<string>(){"img","num","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Show Image:{0} ,width {1},height {2}, last {3} seconds","ShowImage(\"$i$$i$\",400,400,1);","ui","image",true)},
 
-                {100021,new Data(100021,"SetImagePos",new List<string>(){"imageId","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(1,0.5,0.5,1);","ui","imageAdvanced")},
+                {100021,new Data(100021,"CreateImage",new List<string>(){"image","width","height",},new List<string>(){"img","num","num",},new List<string>(){"imageId",},new List<string>(){"num",},"Create Image {0},width {1},height {2}","CreateImage(\"$i$$i$\",400,400);","ui","imageAdvanced",true)},
 
-                {100022,new Data(100022,"SetImageOpacity",new List<string>(){"imageId","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(1,1,1);","ui","imageAdvanced")},
+                {100022,new Data(100022,"DeleteImage",new List<string>(){"imageId","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(1,1);","ui","imageAdvanced",true)},
 
-                {100023,new Data(100023,"SetImageRotate",new List<string>(){"imageId","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(1,0,1);","ui","imageAdvanced")},
+                {100023,new Data(100023,"SetImagePos",new List<string>(){"imageId","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(1,0.5,0.5,1);","ui","imageAdvanced",true)},
+
+                {100024,new Data(100024,"SetImageOpacity",new List<string>(){"imageId","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(1,1,1);","ui","imageAdvanced",true)},
+
+                {100025,new Data(100025,"SetImageRotate",new List<string>(){"imageId","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(1,0,1);","ui","imageAdvanced",true)},
+
+                {100026,new Data(100026,"Add",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 + 1","basic","math",false)},
+
+                {100027,new Data(100027,"Subtract",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 - 1","basic","math",false)},
+
+                {100028,new Data(100028,"Multiply",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 * 1","basic","math",false)},
+
+                {100029,new Data(100029,"Divide",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 / 1","basic","math",false)},
+
+                {100030,new Data(100030,"Wait",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Wait {0} seconds","Wait(1);","basic","process",true)},
+
+                {100031,new Data(100031,"If",null,null,null,new List<string>(){"void",},"","if(1){ }else{ }","basic","process",true)},
+
+                {100032,new Data(100032,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i++){ }","basic","process",true)},
+
+                {100033,new Data(100033,"Greater",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 > 1","basic","math",false)},
+
+                {100034,new Data(100034,"Less",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 < 1","basic","math",false)},
+
+                {100035,new Data(100035,"Equal",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 = 1","basic","math",false)},
+
+                {100036,new Data(100036,"NotEqual",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 != 1","basic","math",false)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -279,39 +336,65 @@ namespace Form
     
                         {"Audio",_DataByUid[100006]},
     
-                        {"ShowDialog",_DataByUid[100007]},
+                        {"LocalVar",_DataByUid[100007]},
     
-                        {"ShowEffect",_DataByUid[100008]},
+                        {"Set LocalVar",_DataByUid[100008]},
     
-                        {"ShowCurrentDialog",_DataByUid[100009]},
+                        {"ShowDialog",_DataByUid[100009]},
     
-                        {"CloseCurrentDialog",_DataByUid[100010]},
+                        {"ShowEffect",_DataByUid[100010]},
     
-                        {"SetDialogBackground",_DataByUid[100011]},
+                        {"ShowCurrentDialog",_DataByUid[100011]},
     
-                        {"SetDialogContent",_DataByUid[100012]},
+                        {"CloseCurrentDialog",_DataByUid[100012]},
     
-                        {"SetDialogAvatar",_DataByUid[100013]},
+                        {"SetDialogBackground",_DataByUid[100013]},
     
-                        {"SetDialogTitle",_DataByUid[100014]},
+                        {"SetDialogContent",_DataByUid[100014]},
     
-                        {"SetDialogVideo",_DataByUid[100015]},
+                        {"SetDialogAvatar",_DataByUid[100015]},
     
-                        {"SetDialogAudio",_DataByUid[100016]},
+                        {"SetDialogTitle",_DataByUid[100016]},
     
-                        {"ResetDialog",_DataByUid[100017]},
+                        {"SetDialogVideo",_DataByUid[100017]},
     
-                        {"ShowImage",_DataByUid[100018]},
+                        {"SetDialogAudio",_DataByUid[100018]},
     
-                        {"CreateImage",_DataByUid[100019]},
+                        {"ResetDialog",_DataByUid[100019]},
     
-                        {"DeleteImage",_DataByUid[100020]},
+                        {"ShowImage",_DataByUid[100020]},
     
-                        {"SetImagePos",_DataByUid[100021]},
+                        {"CreateImage",_DataByUid[100021]},
     
-                        {"SetImageOpacity",_DataByUid[100022]},
+                        {"DeleteImage",_DataByUid[100022]},
     
-                        {"SetImageRotate",_DataByUid[100023]},
+                        {"SetImagePos",_DataByUid[100023]},
+    
+                        {"SetImageOpacity",_DataByUid[100024]},
+    
+                        {"SetImageRotate",_DataByUid[100025]},
+    
+                        {"Add",_DataByUid[100026]},
+    
+                        {"Subtract",_DataByUid[100027]},
+    
+                        {"Multiply",_DataByUid[100028]},
+    
+                        {"Divide",_DataByUid[100029]},
+    
+                        {"Wait",_DataByUid[100030]},
+    
+                        {"If",_DataByUid[100031]},
+    
+                        {"For",_DataByUid[100032]},
+    
+                        {"Greater",_DataByUid[100033]},
+    
+                        {"Less",_DataByUid[100034]},
+    
+                        {"Equal",_DataByUid[100035]},
+    
+                        {"NotEqual",_DataByUid[100036]},
     
                     };
     
@@ -320,6 +403,8 @@ namespace Form
                             {("ui","notice"),new List<Data>()},
         
                             {("basic","const"),new List<Data>()},
+        
+                            {("basic","variable"),new List<Data>()},
         
                             {("ui","dialog"),new List<Data>()},
         
@@ -330,6 +415,10 @@ namespace Form
                             {("ui","image"),new List<Data>()},
         
                             {("ui","imageAdvanced"),new List<Data>()},
+        
+                            {("basic","math"),new List<Data>()},
+        
+                            {("basic","process"),new List<Data>()},
         
                 };
 
@@ -345,13 +434,13 @@ namespace Form
 
                     _DatasByCategoryType[("basic","const")].Add(_DataByUid[100006]);
 
-                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100007]);
+                    _DatasByCategoryType[("basic","variable")].Add(_DataByUid[100007]);
 
-                    _DatasByCategoryType[("scene","effect")].Add(_DataByUid[100008]);
+                    _DatasByCategoryType[("basic","variable")].Add(_DataByUid[100008]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100009]);
+                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100009]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100010]);
+                    _DatasByCategoryType[("scene","effect")].Add(_DataByUid[100010]);
 
                     _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100011]);
 
@@ -367,17 +456,43 @@ namespace Form
 
                     _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100017]);
 
-                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100018]);
+                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100018]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100019]);
+                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100019]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100020]);
+                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100020]);
 
                     _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100021]);
 
                     _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100022]);
 
                     _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100023]);
+
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100024]);
+
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100025]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100026]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100027]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100028]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100029]);
+
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100030]);
+
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100031]);
+
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100032]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100033]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100034]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100035]);
+
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100036]);
 
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
@@ -401,13 +516,13 @@ namespace Form
 
                     _DatasByCategory["basic"].Add(_DataByUid[100006]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100007]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100007]);
 
-                    _DatasByCategory["scene"].Add(_DataByUid[100008]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100008]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100009]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100010]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100010]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100011]);
 
@@ -434,6 +549,112 @@ namespace Form
                     _DatasByCategory["ui"].Add(_DataByUid[100022]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100023]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100024]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100025]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100026]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100027]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100028]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100029]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100030]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100031]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100032]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100033]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100034]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100035]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100036]);
+
+                    _DatasByCancreate = new Dictionary<bool, List<Data>>() {
+    
+                            {true,new List<Data>()},
+        
+                            {false,new List<Data>()},
+        
+                };
+
+                    _DatasByCancreate[true].Add(_DataByUid[100001]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100002]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100003]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100004]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100005]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100006]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100007]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100008]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100009]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100010]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100011]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100012]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100013]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100014]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100015]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100016]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100017]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100018]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100019]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100020]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100021]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100022]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100023]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100024]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100025]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100026]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100027]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100028]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100029]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100030]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100031]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100032]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100033]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100034]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100035]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100036]);
 
 
             childInitAction?.Invoke();
@@ -500,7 +721,9 @@ namespace Form
 
                 jo.Get<string>("category"),
 
-                jo.Get<string>("type")
+                jo.Get<string>("type"),
+
+                jo.Get<bool>("canCreate")
                     );
 
             return data;
@@ -532,6 +755,8 @@ namespace Form
 
             jo.Set<string>("type",data.type);
 
+            jo.Set<bool>("canCreate",data.canCreate);
+
             return jo;
         }
 
@@ -562,6 +787,10 @@ namespace Form
                         DatasByCategory[data.category]=new List<Data>();
                     DatasByCategory[data.category].Add(data);
     
+                    if(!DatasByCancreate.ContainsKey(data.canCreate))
+                        DatasByCancreate[data.canCreate]=new List<Data>();
+                    DatasByCancreate[data.canCreate].Add(data);
+    
 CmdDataForm.AddData(data);
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
@@ -586,6 +815,10 @@ CmdDataForm.AddData(data);
                     DatasByCategory[data.category].Remove(data);
                     if(DatasByCategory[data.category].Count==0)
                         DatasByCategory.Remove(data.category);
+    
+                    DatasByCancreate[data.canCreate].Remove(data);
+                    if(DatasByCancreate[data.canCreate].Count==0)
+                        DatasByCancreate.Remove(data.canCreate);
     
 CmdDataForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -751,6 +984,23 @@ CmdDataForm.RemoveData(uid);
                     DatasByCategoryType[(data.category,newV)].Add(data);
  
                 changeTypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCancreate(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByCancreate[oldV].Remove(data);
+                    if(DatasByCancreate[oldV].Count==0)
+                        DatasByCancreate.Remove(oldV);
+                    if(!DatasByCancreate.ContainsKey(newV))
+                        DatasByCancreate[newV]=new List<Data>();
+                    DatasByCancreate[newV].Add(data);
+ 
+                changeCancreateAction?.Invoke(data,oldV,newV);
                 }
                     
             }

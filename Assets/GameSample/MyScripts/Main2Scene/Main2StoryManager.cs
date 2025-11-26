@@ -84,7 +84,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
             var data = new GameMapData();
             data.Init();
-            GameManager.instance.saveCtrl.SaveOverview(storyId);
+            
+            GameManager.instance.saveCtrl.SaveModStory(storyId);
 
             GameManager.instance.saveCtrl.SaveSceneMap(ModManager.GetStoryCoreFolder(storyFolder) + sceneData.uid, data);
             

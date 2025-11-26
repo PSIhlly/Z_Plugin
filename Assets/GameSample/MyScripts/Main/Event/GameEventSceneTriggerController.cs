@@ -76,7 +76,6 @@ namespace Z_Map
         {
             if (evtDic.ContainsKey(name) && EventProgramDataForm.DataByName.ContainsKey(evtDic[name].evt))
             {
-                Debug.Log(evtDic[name].evt);
                 GameManager.instance.evtCtrl.Execute(EventProgramDataForm.DataByName[evtDic[name].evt], productInfo.Item2);
             }
         }

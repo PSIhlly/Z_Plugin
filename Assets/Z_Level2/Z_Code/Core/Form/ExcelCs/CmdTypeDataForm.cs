@@ -145,6 +145,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {3,new Data(3,"bool")},
 
+                {4,new Data(4,"var")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -153,6 +155,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                         {"string",_DataByUid[2]},
     
                         {"bool",_DataByUid[3]},
+    
+                        {"var",_DataByUid[4]},
     
                     };
     

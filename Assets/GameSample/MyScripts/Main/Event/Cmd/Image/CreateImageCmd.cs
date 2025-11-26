@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new CreateImageCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            asyncTask.res = new BoxDataForm.Data[] { new BoxDataForm.Data(-1, "", "", PlayManager.instance.assetCtrl.Add(prm[0].str, new Vector2(prm[1].num, prm[2].num))) };
+            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(PlayManager.instance.assetCtrl.Add(prm[0].str, new Vector2(prm[1].num, prm[2].num))) };
             return true;
         }
     }

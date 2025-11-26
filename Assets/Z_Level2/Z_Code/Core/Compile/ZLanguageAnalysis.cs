@@ -144,6 +144,31 @@ namespace Z_Code
                             BuildZl(cmds, node.subNodes[1]);
                             cmds.Add(GetOpName(Op.NotEqual));
                             break;
+                        case ">":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.Greater));
+                            break;
+                        case "<":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.Less));
+                            break;
+                        case ">=":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.NotLess));
+                            break;
+                        case "<=":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.NotGreater));
+                            break;
+                        case "[":
+                            BuildZl(cmds, node.subNodes[0]);
+                            BuildZl(cmds, node.subNodes[1]);
+                            cmds.Add(GetOpName(Op.Take));
+                            break;
                     }
                     break;
 

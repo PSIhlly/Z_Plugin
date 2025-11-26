@@ -42,13 +42,13 @@ namespace Ui.ModStoryEventEditWindow
             {
                 if(model.node==null)
                 {
-                    ModManager.instance.assetCtrl.ChooseCmd( SceneEventType.All, CmdTypeDataForm.defaultData.name, (item) =>
+                    ModManager.instance.assetCtrl.ChooseCmd( SceneEventType.All, "", (item) =>
                     {
                         GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[item.content];
                         parent.model.cpr.Compile(sel.defaultCode, out var res);
                         parent.model.curEntry.AddRange(res);
                         parent.ApplyEntry();
-                    });
+                    },true);
                 }
                 else
                 {

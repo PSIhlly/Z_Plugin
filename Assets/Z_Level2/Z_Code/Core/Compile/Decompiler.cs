@@ -82,8 +82,16 @@ namespace Z_Code
                     case "=":
                     case "==":
                     case "!=":
+                    case ">":
+                    case "<":
+                    case ">=":
+                    case "<=":
                         code = $"{ResetStatement(node.subNodes[1])}{node.desc.code}{ResetStatement(node.subNodes[0])}";
                         break;
+                    case "[":
+                        code = $"{ResetStatement(node.subNodes[1])}[{ResetStatement(node.subNodes[0])}]";
+                        break;
+
                 }
             }
             switch (node.desc.type)

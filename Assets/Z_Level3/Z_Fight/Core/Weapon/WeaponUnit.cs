@@ -56,6 +56,7 @@ namespace Z_Fight
                         euler: Quaternion.LookRotation(dir).eulerAngles,
                         scale: Vector3.one,
                         updateType: 0,
+                        new List<int>(),
                         ""
                     );
                     FightManager.instance.AddUnit(bulletData.unit);

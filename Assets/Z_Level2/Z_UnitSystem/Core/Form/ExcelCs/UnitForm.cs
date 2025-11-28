@@ -54,6 +54,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
                 
+        public static Action<Data,List<int>,List<int>> changeCollidingunituidAction;
+                
         public static Action<Data,string,string> changeExtraAction;
                 
 
@@ -200,6 +202,24 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
+                    private List<int>  _collidingUnitUid;
+                    /// <summary>
+                    ///Åö×²ÖÐ
+                    ///</summary>
+                    public List<int>  collidingUnitUid{
+                                get{return _collidingUnitUid;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCollidingunituid(this,_collidingUnitUid,value); 
+                    }
+        
+                _collidingUnitUid = value;
+                }
+                 
+                     }
+                    
                     private string  _extra;
                     /// <summary>
                     ///À©Õ¹Î»
@@ -218,7 +238,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra)
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra)
             {
 
              this.uid = uid;
@@ -228,6 +248,7 @@ public static readonly int autoUidCnt=1000000;
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.collidingUnitUid = collidingUnitUid;
              this.extra = extra;
 
                     _unit=new Unit(this);
@@ -236,12 +257,12 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
+                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -326,6 +347,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<UpdateType>("updateType"),
 
+                jo.Get<List<int>>("collidingUnitUid"),
+
                 jo.Get<string>("extra")
                     );
 
@@ -351,6 +374,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<UpdateType>("updateType",data.updateType);
+
+            jo.Set<List<int>>("collidingUnitUid",data.collidingUnitUid);
 
             jo.Set<string>("extra",data.extra);
 
@@ -499,6 +524,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCollidingunituid(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCollidingunituidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

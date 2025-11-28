@@ -58,6 +58,7 @@ namespace Z_Ui.Notify
         public string title;
         public Func<EntryItem, bool> func;
         public EntryItem item;
+        public EntryItem defaultItem;
         public bool canClose;
         public int id;
     }
@@ -126,7 +127,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddMultipleChoose(string title, bool canClose,Func<EntryItem, bool> func, EntryItem items)
+        public void AddMultipleChoose(string title, bool canClose,Func<EntryItem, bool> func, EntryItem items, EntryItem defaltItem=null)
         {
             var info = new MultipleChooseInfo()
             {
@@ -134,7 +135,8 @@ namespace Z_Ui.Notify
                 item = items,
                 func = func,
                 canClose = canClose,
-                id = popupIdCnt++
+                id = popupIdCnt++,
+                defaultItem = defaltItem,
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
             if (ctrl != null && ctrl.active)

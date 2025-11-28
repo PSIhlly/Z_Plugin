@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Ui.PlayAsset;
 using UnityEngine;
 using UnityEngine.Video;
+using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Math;
 using Z_Texture;
@@ -77,15 +78,43 @@ namespace Ui.PlayAsset
         {
             model.prm = param;
             rect.rect.Set(0, 0, model.prm.data.size.x, model.prm.data.size.y);
-            view.img_image.sprite = StoryTexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultTexName()).GetSprite();
+            view.img_image.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultTexName()).GetSprite();
             Refresh();
         }
         public void Refresh()
         {
             var data = model.prm.data;
-            rect.position = Graph.GetRealPos(data.oldPos + (data.tarPos - data.oldPos) * (data.posProgress / data.posTime), parent.rect);
-            rect.eulerAngles = rect.eulerAngles.NewSetZ(data.oldEuler + (data.tarEuler - data.oldEuler) * (data.eulerProgress / data.eulerTime));
-            view.img_image.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * (data.opacityProgress / data.opacityTime));
+
+            data.posProgress += Time.deltaTime;
+            if (data.posTime == 0)
+            {
+                rect.position = Graph.GetRealPos(data.tarPos, parent.rect);
+            }
+            else
+            {
+                rect.position = Graph.GetRealPos(data.oldPos + (data.tarPos - data.oldPos) * (data.posProgress / data.posTime), parent.rect);
+            }
+
+            data.eulerProgress += Time.deltaTime;
+            if (data.posTime == 0)
+            {
+                rect.eulerAngles = rect.eulerAngles.NewSetZ(data.tarEuler);
+            }
+            else
+            {
+                rect.eulerAngles = rect.eulerAngles.NewSetZ(data.oldEuler + (data.tarEuler - data.oldEuler) * (data.eulerProgress / data.eulerTime));
+            }
+
+            data.opacityProgress += Time.deltaTime;
+            if (data.posTime == 0)
+            {
+                view.img_image.color.NewSetA(data.tarOpacity);
+            }
+            else
+            {
+                view.img_image.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * (data.opacityProgress / data.opacityTime));
+            }
+
             data.removeTime -= Time.deltaTime;
             if (data.removeTime <= 0)
             {

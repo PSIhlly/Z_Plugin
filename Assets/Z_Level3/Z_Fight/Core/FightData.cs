@@ -108,6 +108,7 @@ namespace Z_Fight
                      euler:new Vector3(0, 0, 0),
                      scale:Vector3.one,
                      updateType: 0,
+                     new List<int>(),
                      ""
                      ));
             }
@@ -128,6 +129,7 @@ namespace Z_Fight
                      euler: new Vector3(0, 0, 0),
                      scale: Vector3.one,
                      updateType: 0,
+                     new List<int>(),
                      ""
                      );
                 WeaponUnitForm.AddData(data);

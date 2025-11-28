@@ -461,8 +461,10 @@ namespace Z_Map
             var oldPos = unit.data.pos;
             unit.data.pos = newPos;
             unit.data.euler = euler;
-            if (oldPos != newPos)
-                ChechCollideEvent(unit, newPos - oldPos);
+               if(oldPos!= newPos)
+            {
+                MapManager.instance.updateCtrl.ChechCollideEvent(unit, Vector3.zero);
+            }
         }
         public void ChechCollideEvent(Unit unit, Vector3 dir)
         {
@@ -496,21 +498,25 @@ namespace Z_Map
                 }
             }
         }
-        private void ManageTriggerEvent(Unit trigger,Unit tar, Graph.IntersectType type)
+        private void ManageTriggerEvent(Unit a,Unit b, Graph.IntersectType type)
         {
             TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
             {
                 switch (type)
                 {
                     case Graph.IntersectType.In:
-                        tar.OnEnter(trigger);
+                        b.OnEnter(a);
+                        a.OnEnter(b);
                         break;
                     case Graph.IntersectType.Out:
-                        tar.OnExit(trigger);
+                        b.OnExit(a);
+                        a.OnExit(b);
                         break;
                     case Graph.IntersectType.Cross:
-                        tar.OnEnter(trigger);
-                        tar.OnExit(trigger);
+                        b.OnEnter(a);
+                        a.OnEnter(b);
+                        b.OnExit(a);
+                        a.OnExit(b);
                         break;
                 }
             });
@@ -519,7 +525,7 @@ namespace Z_Map
         public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type, Action<Unit, Graph.IntersectType, float> onCast = null)
         {
             var disRes = (dir).magnitude;
-            var assist = new Graph.IntersectAssisant();
+            var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
             foreach (var tar in _super.utilCtrl.GetCollidersMesh(unit.prefab, unit.data.pos, unit.data.euler, unit.data.scale, type))
             {
                 foreach (var cur in _super.utilCtrl.GetCollidersMesh(trigger.prefab, trigger.data.pos, trigger.data.euler, trigger.data.scale, type))

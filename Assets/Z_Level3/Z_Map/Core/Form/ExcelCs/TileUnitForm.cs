@@ -42,6 +42,8 @@ namespace Z_Map.Form
 
             UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
+            UnitForm.changeCollidingunituidAction+=ChangeCollidingunituid;
+
             UnitForm.changeExtraAction+=ChangeExtra;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
@@ -80,6 +82,8 @@ namespace Z_Map.Form
         public static Action<Data,Vector3,Vector3> changeScaleAction;
                 
         public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
+                
+        public static Action<Data,List<int>,List<int>> changeCollidingunituidAction;
                 
         public static Action<Data,string,string> changeExtraAction;
                 
@@ -135,11 +139,11 @@ namespace Z_Map.Form
                  
                      }
                     
-            public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.extra)
+            public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
             
-            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,extra)
+            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -151,6 +155,7 @@ namespace Z_Map.Form
              this.euler = euler;
              this.scale = scale;
              this.updateType = updateType;
+             this.collidingUnitUid = collidingUnitUid;
              this.extra = extra;
 
                     _unit=new TileUnit(this);
@@ -159,12 +164,12 @@ namespace Z_Map.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<int,string>(texNameDic),mapPos,prefabName,pos,euler,scale,updateType,extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<int,string>(texNameDic),mapPos,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,"");
+                   private static Data _defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -275,6 +280,8 @@ namespace Z_Map.Form
 
                 jo.Get<UpdateType>("updateType"),
 
+                jo.Get<List<int>>("collidingUnitUid"),
+
                 jo.Get<string>("extra")
                     );
 
@@ -304,6 +311,8 @@ namespace Z_Map.Form
             jo.Set<Vector3>("scale",data.scale);
 
             jo.Set<UpdateType>("updateType",data.updateType);
+
+            jo.Set<List<int>>("collidingUnitUid",data.collidingUnitUid);
 
             jo.Set<string>("extra",data.extra);
 
@@ -479,6 +488,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCollidingunituid(UnitForm.Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCollidingunituidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

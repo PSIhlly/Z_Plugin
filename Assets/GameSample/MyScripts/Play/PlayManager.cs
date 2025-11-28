@@ -90,9 +90,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
             if (!SaveAndLoad.Exist(GetStorySaveProgressFileName()))
             {
                 //new , copy to save
-                SaveAndLoad.Copy(GetStoryCoreFolder() + "scene1", GetStorySaveFolder() + "scene1");
-
-                SaveAndLoad.Copy(GetStoryCoreConfigFileName(), GetStorySaveProgressFileName());
+                foreach(var data in SceneForm.DataByUid.Values)
+                {
+                    SaveAndLoad.Copy(GetStoryCoreFolder() + data.uid, GetStorySaveFolder() + data.uid);
+                }
 
                 //create play only
                 SaveAndLoad.Save(GetStorySaveProgressFileName(), ProgressForm.GetJoByData(GetInitPlayDataByConfig().progress).ToString());
@@ -196,7 +197,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
     public string GetStoryCoreConfigFileName()
     {
-        return _folderName + "/Core/config";
+        return _folderName + "/Core/cf";
     }
 
 }

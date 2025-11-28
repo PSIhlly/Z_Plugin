@@ -7,6 +7,7 @@ using Z_Texture;
 using Z_Ui;
 using Ui.Mod;
 using Ui.EnterMain;
+using Ui.Story;
 
 namespace Ui.Start
 {
@@ -15,9 +16,19 @@ namespace Ui.Start
         public override void OnCreate()
         {
             base.OnCreate();
+            view.btn_ori.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiStoryCtrl>(new UiStoryParam()
+                {
+                    datas = new List<StoryForm.Data>(StoryForm.DataById.Values)
+                });
+            });
             view.btn_mod.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiModCtrl>();
+                UiManager.instance.ShowUi<UiStoryCtrl>(new UiStoryParam()
+                {
+                    datas = new List<StoryForm.Data>(StoryForm.DataById.Values)
+                });
                 Close();
             });
             view.btn_back.onClick.AddListener(() =>
@@ -27,7 +38,7 @@ namespace Ui.Start
             });
         }
 
-        
+
         public override void OnShow()
         {
             Refresh();

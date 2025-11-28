@@ -53,16 +53,15 @@ namespace Ui.Notify
             if (param != null)
             {
                 model.info = param.info;
-                model.sel = param.info.item;
+                model.sel = model.info.defaultItem==null? model.info.item: model.info.defaultItem;
             }
-            if(model.sel==null||model.sel.subs.Count==0)
+            if(model.sel==null|| model.info.item.subs.Count==0)
             {
                 Debug.LogError("No Option");
                 Close();
                 return;
             }
             model.deepth = GetDeepth(model.info.item);
-            model.sel = model.info.item;
             Refresh();
 
 

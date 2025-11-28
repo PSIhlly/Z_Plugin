@@ -101,7 +101,9 @@ namespace Z_Map
                         if (exist.Contains(obj.data.uid))
                             continue;
                         exist.Add(obj.data.uid);
+                        //Graph.dDebug = true;
                         res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly), res);
+                        //Graph.dDebug = false;
 
 
                     }

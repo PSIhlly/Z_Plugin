@@ -10,14 +10,17 @@ namespace Z_Time
     [DefaultExecutionOrder(1000)]
     public class TimeManager : Z_MonoManager<TimeManager>
     {
-        public static List<(Action, GameObject)> NextFrameList = new List<(Action, GameObject)>();
-        public static List<(Action, GameObject)> CurLateUpdateList = new List<(Action, GameObject)>();
-        public static List<Action> CurLateUpdateWithoutCheckList = new List<Action>();
-        public static List<(Action, GameObject)> NextBigFrameList = new List<(Action, GameObject)>();
-        public static List<Action> NextUpdateWithoutCheckList = new List<Action>();
-        public static List<(Action, GameObject)> NextFixedFrameList = new List<(Action, GameObject)>();
-        public static string queueLock = "queue";
+        static List<(Action, GameObject)> NextFrameList = new List<(Action, GameObject)>();
+        static List<(Action, GameObject)> CurLateUpdateList = new List<(Action, GameObject)>();
+        static List<Action> CurLateUpdateWithoutCheckList = new List<Action>();
+        static List<(Action, GameObject)> NextBigFrameList = new List<(Action, GameObject)>();
+        static List<Action> NextUpdateWithoutCheckList = new List<Action>();
+        static List<(Action, GameObject)> NextUpdateList = new List<(Action, GameObject)>();
+        
+        static List<(Action, GameObject)> NextFixedFrameList = new List<(Action, GameObject)>();
+        static string queueLock = "queue";
         int id = 0;
+
         public Timer StartTimer(float delay,float interval, Func<bool> func, MonoBehaviour bind = null)
         {
             Timer timer = new Timer() {
@@ -69,6 +72,14 @@ namespace Z_Time
                 NextUpdateWithoutCheckList.Add(act);
             }
         }
+        public void AddNextUpdateAction(Action act, GameObject ins)
+        {
+            lock (queueLock)
+            {
+
+                NextUpdateList.Add((act,ins));
+            }
+        }
         public void LateUpdate()
         {
             foreach (var act in CurLateUpdateWithoutCheckList)
@@ -113,6 +124,16 @@ namespace Z_Time
                     act?.Invoke();
                 }
                 NextUpdateWithoutCheckList.Clear();
+                foreach (var act in NextUpdateList)
+                {
+                    if (act.Item2 != null)
+                    {
+
+                        act.Item1?.Invoke();
+                    }
+                }
+                NextUpdateList.Clear();
+                
             }
         }
         public void FixedUpdate()

@@ -102,7 +102,7 @@ namespace Ui.ModStoryEventEditWindow
                     }
                 }
 
-                view.txt_.text = " ".Repeat(model.deepth) + GetNodeDesc(model.node);
+                view.txt_.oriText=" ".Repeat(model.deepth) + GetNodeDesc(model.node);
             }
 
             

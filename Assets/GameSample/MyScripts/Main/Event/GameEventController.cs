@@ -112,8 +112,9 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
-    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, bool createOnly)
+    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, bool createOnly,out EntryItem defaultItem)
     {
+        defaultItem = null;
         var res = new EntryItem();
         foreach (var data in GameCmdDataForm.DataByName.Values)
         {
@@ -142,8 +143,11 @@ public class GameEventController : Z_Controller<GameManager>
             if (!res.subs[data.category].subs.ContainsKey(data.type))
             {
                 res.subs[data.category].Add(data.type);
+
             }
-            res.subs[data.category].subs[data.type].Add(data.name);
+            res.subs[data.category].subs[data.type].Add(data.name); 
+            if (defaultItem == null)
+                defaultItem = res.subs[data.category].subs[data.type].subs[data.name];
         }
         return res;
     }

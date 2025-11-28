@@ -29,7 +29,7 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Sphere", "Sphere"}, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero}, new List<Vector3>() { Vector3.one , Vector3.one }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Sphere", "Sphere" }, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero}, new List<Vector3>() { Vector3.one , Vector3.one }, showShaddowLst);
         var renders=res.GetComponentsInChildren<Renderer>();
         renders[0].transform.GetComponent<PerspectiveKeeper>().deepth = 0.01f;
         renders[1].transform.GetComponent<PerspectiveKeeper>().deepth = 0.05f;
@@ -107,14 +107,14 @@ public class GameUtilController : Z_Controller<GameManager>
                 if(com is BoxCollider box)
                 {
                     var trigger=com.gameObject.AddComponent<BoxCollider>();
-                    trigger.size = box.size+Graph.ElementwiseDivide(Vector3.one * 0.05f  , scale);
+                    trigger.size = box.size+Graph.ElementwiseDivide(Vector3.one * 0.1f  , scale);
                     trigger.center = box.center;
                     trigger.isTrigger = true;
                 }
                 else if (com is SphereCollider sphere)
                 {
                     var trigger = com.gameObject.AddComponent<SphereCollider>();
-                    trigger.radius = sphere.radius+ 0.05f * Mathf.Max(scale.x, scale.y, scale.z);
+                    trigger.radius = sphere.radius+ 0.1f * Mathf.Max(scale.x, scale.y, scale.z);
                     trigger.center = sphere.center;
                     trigger.isTrigger = true;
                 }

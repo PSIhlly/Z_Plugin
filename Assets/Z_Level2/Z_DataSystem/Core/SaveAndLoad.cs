@@ -76,10 +76,11 @@ namespace Z_UnitSystem
         }
         public static void Copy(string from, string to)
         {
+            Debug.Log(to);
             to = GetRealPath(to);
             from = GetRealPath(from);
             Build(to);
-            File.Copy(from, to);
+            File.Copy(from, to,true);
         }
     }
 

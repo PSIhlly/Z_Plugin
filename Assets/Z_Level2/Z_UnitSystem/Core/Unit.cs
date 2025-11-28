@@ -201,21 +201,32 @@ namespace Z_UnitSystem
         }
         public virtual void OnEnter(Unit unit)
         {
-            Z_EventHelper.Invoke(new CollideEvent()
+            if(!data.collidingUnitUid.Contains(unit.data.uid))
             {
-                type = CollideEventType.TriggerEnter,
-                a = this,
-                b = unit
-            });
+                data.collidingUnitUid.Add(unit.data.uid);
+                Z_EventHelper.Invoke(new CollideEvent()
+                {
+                    type = CollideEventType.TriggerEnter,
+                    a = this,
+                    b = unit
+                });
+            }
+            
         }
         public virtual void OnExit(Unit unit)
         {
-            Z_EventHelper.Invoke(new CollideEvent()
+            if (data.collidingUnitUid.Contains(unit.data.uid))
             {
-                type = CollideEventType.TriggerExit,
-                a = this,
-                b = unit
-            });
+                data.collidingUnitUid.Remove(unit.data.uid);
+
+                Z_EventHelper.Invoke(new CollideEvent()
+                {
+                    type = CollideEventType.TriggerExit,
+                    a = this,
+                    b = unit
+                });
+            }
+            
         }
     }
 

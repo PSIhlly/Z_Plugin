@@ -17,7 +17,7 @@ namespace Z_Ui.Base
         Basic,
         Window,
         DialogBg,
-        DialogCustom,
+        Custom,
         DialogText,
         Notice
     }

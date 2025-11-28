@@ -100,7 +100,6 @@ namespace Ui.DialogMain
                     view.txt_.text += model.prm.clip.mainText[model.nowWord];
                     model.nowWord++;
                 }
-
                 return false;
             }
             public void OnEvent(ClipPlayEvent e)

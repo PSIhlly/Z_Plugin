@@ -56,7 +56,7 @@ namespace Z_Mesh
             float curDis = 0;
             float length = step.magnitude;
             dis = length;
-            var assist = new Graph.IntersectAssisant();
+            var assist = new Graph.IntersectAssisant(false);
             switch(o.type)
             {
                 case MeshType.Cube:

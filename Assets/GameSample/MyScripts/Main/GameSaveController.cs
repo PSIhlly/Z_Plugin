@@ -54,7 +54,10 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
     }
-
+    public void SavePlayStory(int id)
+    {
+        SaveProgress(PlayManager.instance.GetStorySaveFolder());
+    }
     public void SaveModStory(int id)
     {
         SaveOverview(id);

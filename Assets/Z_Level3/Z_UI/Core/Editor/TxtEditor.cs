@@ -12,10 +12,12 @@ namespace Z_Ui_Editor
     public class TxtEditor : TMPro.EditorUtilities.TMP_EditorPanelUI
     {
         SerializedProperty languageTranslatable;
+        SerializedProperty imageEnable;
         protected override void OnEnable()
         {
             base.OnEnable();
             languageTranslatable = serializedObject.FindProperty("languageTranslatable");
+            imageEnable = serializedObject.FindProperty("imageEnable");
         }
 
         public override void OnInspectorGUI()
@@ -24,7 +26,8 @@ namespace Z_Ui_Editor
             EditorGUILayout.Space();
 
             serializedObject.Update();
-            EditorGUILayout.PropertyField(languageTranslatable);
+            EditorGUILayout.PropertyField(languageTranslatable); 
+            EditorGUILayout.PropertyField(imageEnable);
             serializedObject.ApplyModifiedProperties();
         }
     }

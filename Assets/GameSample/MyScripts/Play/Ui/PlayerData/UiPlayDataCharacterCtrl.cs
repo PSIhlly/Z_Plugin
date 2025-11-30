@@ -54,9 +54,9 @@ namespace Ui.PlayData.PlayDataCharacter
         public override void OnShow()
         {
             model.sel = null;
-            if (PlayManager.instance.data.progress.team.Count>0)
+            if (GameManager.instance.curProgress.team.Count>0)
             {
-                model.sel = CharacterProductForm.DataByUid[PlayManager.instance.data.progress.team[0]];
+                model.sel = CharacterProductForm.DataByUid[GameManager.instance.curProgress.team[0]];
             }
             Refresh();
         }
@@ -64,9 +64,9 @@ namespace Ui.PlayData.PlayDataCharacter
         {
 
             itemCon.Clear();
-            for (int i = 0, icnt = PlayManager.instance.data.progress.team.Count; i < icnt; i++)
+            for (int i = 0, icnt = GameManager.instance.curProgress.team.Count; i < icnt; i++)
             {
-                var data = CharacterProductForm.DataByUid[PlayManager.instance.data.progress.team[i]];
+                var data = CharacterProductForm.DataByUid[GameManager.instance.curProgress.team[i]];
                 itemCon.Add(new UiGameItemParam()
                 {
                     data = data

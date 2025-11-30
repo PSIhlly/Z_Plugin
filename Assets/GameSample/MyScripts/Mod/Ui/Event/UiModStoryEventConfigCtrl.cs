@@ -34,7 +34,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
                 var key = "onBeginEvent";
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content); 
+                    GameManager.instance.curProgress.events[key] = GameEventController.CreateTrigger(key, item.content); 
                     Refresh();
                 });
             });
@@ -43,7 +43,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
                 var key = "onEndEvent";
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content);
+                    GameManager.instance.curProgress.events[key] = GameEventController.CreateTrigger(key, item.content);
                     Refresh();
                 });
             });
@@ -55,8 +55,8 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
         }
         public void Refresh()
         {
-            view.txt_onBeginEvent.text = GameManager.instance.curConfig.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onEndEvent.text = GameManager.instance.curConfig.events.GetDv("onEndEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onBeginEvent.text = GameManager.instance.curProgress.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt;
+            view.txt_onEndEvent.text = GameManager.instance.curProgress.events.GetDv("onEndEvent", EventTriggerForm.defaultData).evt;
         }
     }
 

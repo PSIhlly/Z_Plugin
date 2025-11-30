@@ -103,7 +103,33 @@ namespace Ui.ModStoryEventEditWindow
                         ApplyEntry();
                     });
                 });
-                
+
+            });
+            view.btn_del.onClick.AddListener(() =>
+            {
+                model.curEntry.Remove(model.selItem);
+                model.selItem = null;
+                ApplyEntry();
+            });
+            view.btn_insert.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "", (item) =>
+                {
+                    if (item != null)
+                    {
+                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[item.content];
+                        model.cpr.Compile(sel.defaultCode, out var res);
+                        int id = model.curEntry.IndexOf(model.selItem);
+                        foreach (var r in res)
+                        {
+                            model.curEntry.Insert(id, r);
+                            model.selItem = r;
+                            id++;
+                        }
+                        ApplyEntry();
+                    }
+
+                }, true);
             });
         }
         public void ApplyEntry()
@@ -155,8 +181,7 @@ namespace Ui.ModStoryEventEditWindow
                 deepth = 0,
             });
             itemCon.Refresh();
-            RefreshUnit();
-
+            //
             view.txt_title.text = model.data.name;
 
             view.ipt_name.Set(model.data.name);
@@ -165,7 +190,12 @@ namespace Ui.ModStoryEventEditWindow
 
             view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
             view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
-            RefreshUnitDetail();
+            RefreshUnitDetail(); 
+            RefreshUnit();
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
+            }, gameObject);
         }
         public void RefreshUnit()
         {
@@ -184,14 +214,13 @@ namespace Ui.ModStoryEventEditWindow
             unitCon.Refresh();
 
 
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(view.rtf_unitRoot.gameObject,true);
-            }, gameObject);
+            
 
         }
         public void RefreshUnitDetail()
         {
+            view.sta_item.ChangeState(model.selItem == null ? 0 : 1);
+
             view.sta_unit.ChangeState(model.selUnit == null ? 0 : 1);
 
             if (model.selUnit != null)
@@ -209,7 +238,7 @@ namespace Ui.ModStoryEventEditWindow
         {
             model.selUnit = node;
             Refresh();
-            if(node!=null)
+            if (node != null)
             {
 
                 TimeManager.instance.AddCurLateUpdateAction(() =>
@@ -221,8 +250,8 @@ namespace Ui.ModStoryEventEditWindow
                             UiManager.Jump(unitCon.Get(uPrm).ctrl.rect, view.scr_units);
                         }
                     }
-                },gameObject);
-               
+                }, gameObject);
+
             }
         }
         public void ReplaceNode(SyntaxNode nodeNow, SyntaxNode nodeNew)
@@ -234,10 +263,10 @@ namespace Ui.ModStoryEventEditWindow
             }
             if (nodeNow.parentNode != null)
             {
-                var tmp=nodeNow.parentNode;
-                while(tmp!=null)
+                var tmp = nodeNow.parentNode;
+                while (tmp != null)
                 {
-                    if(tmp == model.selItem)
+                    if (tmp == model.selItem)
                     {
                         Debug.Log("finded");
                     }
@@ -271,7 +300,7 @@ namespace Ui.ModStoryEventEditWindow
             {
                 model.selUnit = nodeNew;
             }
-            foreach(var o in model.curEntry)
+            foreach (var o in model.curEntry)
             {
                 Debug.Log(o.Contains(nodeNew) + "!!!");
             }

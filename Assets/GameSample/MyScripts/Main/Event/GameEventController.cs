@@ -56,9 +56,9 @@ public class GameEventController : Z_Controller<GameManager>
     public void LateUpdate()
     {
         //lifeEvent
-        if (!PlayManager.instance.data.progress.notFirstTime)
+        if (!GameManager.instance.curProgress.notFirstTime)
         {
-            PlayManager.instance.data.progress.notFirstTime = true;
+            GameManager.instance.curProgress.notFirstTime = true;
             Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.FirstEnter });
         }
 

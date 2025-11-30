@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetDialogBackgroundCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.data.progress.dialogCache.mainPictureName = prm[0].str;
+            GameManager.instance.curProgress.dialogCache.mainPictureName = prm[0].str;
             return true;
         }
     }

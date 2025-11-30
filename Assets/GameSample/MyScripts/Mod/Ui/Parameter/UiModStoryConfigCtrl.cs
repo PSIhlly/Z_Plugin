@@ -35,14 +35,14 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             {
                 ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose main character"), (data) =>
                 {
-                    GameManager.instance.curConfig.mainCharacterUid = data.uid;
-                    if (!GameManager.instance.curConfig.defaultTeam.Contains(data.uid))
+                    GameManager.instance.curProgress.characterUid = data.uid;
+                    if (!GameManager.instance.curProgress.team.Contains(data.uid))
                     {
-                        GameManager.instance.curConfig.defaultTeam.Add(data.uid);
+                        GameManager.instance.curProgress.team.Add(data.uid);
                     }
-                    if (!GameManager.instance.curConfig.defaultTeamActive.Contains(data.uid))
+                    if (!GameManager.instance.curProgress.teamActive.Contains(data.uid))
                     {
-                        GameManager.instance.curConfig.defaultTeamActive.Add(data.uid);
+                        GameManager.instance.curProgress.teamActive.Add(data.uid);
                     }
                     Refresh();
                 });
@@ -56,7 +56,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose perspective"),
                     true, (item) =>
                     {
-                        GameManager.instance.curConfig.cameraMode = (CameraMode)item.id;
+                        GameManager.instance.curProgress.cameraMode = (CameraMode)item.id;
                         
 
                         Refresh();
@@ -74,8 +74,8 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         public void Refresh()
         {
 
-            view.txt_mainCharacter.text = CharacterProductForm.DataByUid[GameManager.instance.curConfig.mainCharacterUid].name;
-            view.txt_perspective.text = TextManager.instance.GetTxt(GameManager.instance.curConfig.cameraMode.ToString());
+            view.txt_mainCharacter.text = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid].name;
+            view.txt_perspective.text = TextManager.instance.GetTxt(GameManager.instance.curProgress.cameraMode.ToString());
         }
     }
 

@@ -73,7 +73,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public StoryForm.Data curStory;
     public SceneForm.Data curScene;
-    public ConfigForm.Data curConfig => ConfigForm.DataByUid[1];
+    public ProgressForm.Data curProgress => ProgressForm.DataByUid[1];
 
     public override void Init()
     {

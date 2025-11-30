@@ -420,6 +420,8 @@ namespace Form
 
                 {1210109,new Data(1210109,"const","const","≥£¡ø")},
 
+                {1210110,new Data(1210110,"insert","insert","≤Â»Î")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -706,6 +708,8 @@ namespace Form
                         {"dialogAdvanced",_DataById[1210108]},
     
                         {"const",_DataById[1210109]},
+    
+                        {"insert",_DataById[1210110]},
     
                     };
     

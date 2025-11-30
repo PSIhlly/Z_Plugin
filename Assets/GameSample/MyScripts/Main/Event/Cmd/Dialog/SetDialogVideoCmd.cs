@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetDialogVideoCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.data.progress.dialogCache.mainVideoName = prm[0].str;
+            GameManager.instance.curProgress.dialogCache.mainVideoName = prm[0].str;
             return true;
         }
     }

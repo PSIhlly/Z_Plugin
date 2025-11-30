@@ -64,10 +64,14 @@ namespace Z_UnitSystem
         }
         public static void Delete(string path)
         {
-            path=GetRealPath(path);
-            if(Exist(path))
+            path = GetRealPath(path);
+            if (File.Exists(path))
             {
                 File.Delete(path);
+            }
+            else if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
             }
         }
         public static string GetRealPath(string key)
@@ -80,7 +84,7 @@ namespace Z_UnitSystem
             to = GetRealPath(to);
             from = GetRealPath(from);
             Build(to);
-            File.Copy(from, to,true);
+            File.Copy(from, to, true);
         }
     }
 

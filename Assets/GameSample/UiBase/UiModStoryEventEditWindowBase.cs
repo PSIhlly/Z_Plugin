@@ -146,16 +146,19 @@ namespace Ui.ModStoryEventEditWindow
             public Ipt ipt_name;
             public Ipt ipt_category;
             public Ipt ipt_type;
-            public Sta sta_unit;
-            public ScrView scr_units;
+            public Sta sta_item;
             public RectTransform rtf_itemRoot;
-            public RectTransform rtf_unitRoot;
+            public ScrView scr_units;
+            public Sta sta_unit;
             public GameObject go_item;
             public UiItemCtrl sub_Item;
-            public Btn btn_edit;
+            public Btn btn_del;
+            public Btn btn_insert;
+            public RectTransform rtf_unitRoot;
             public GameObject go_unit;
             public RectTransform rtf_unit;
             public UiUnitCtrl sub_Unit;
+            public Btn btn_edit;
         public UiModStoryEventEditWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -172,16 +175,19 @@ namespace Ui.ModStoryEventEditWindow
             ipt_name = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
             ipt_category = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
             ipt_type = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
-            sta_unit = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            scr_units = uiHolder.elementTrsLst[14].GetComponent<ScrView>();
-            rtf_itemRoot = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
-            rtf_unitRoot = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
+            sta_item = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            rtf_itemRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
+            scr_units = uiHolder.elementTrsLst[15].GetComponent<ScrView>();
+            sta_unit = uiHolder.elementTrsLst[16].GetComponent<Sta>();
             go_item = uiHolder.elementTrsLst[17].gameObject;
             sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
-            btn_edit = uiHolder.elementTrsLst[19].GetComponent<Btn>();
-            go_unit = uiHolder.elementTrsLst[20].gameObject;
-            rtf_unit = uiHolder.elementTrsLst[21].GetComponent<RectTransform>();
-            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[22].GetComponent<UiHolder>().ctrl;
+            btn_del = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            btn_insert = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            rtf_unitRoot = uiHolder.elementTrsLst[21].GetComponent<RectTransform>();
+            go_unit = uiHolder.elementTrsLst[22].gameObject;
+            rtf_unit = uiHolder.elementTrsLst[23].GetComponent<RectTransform>();
+            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[24].GetComponent<UiHolder>().ctrl;
+            btn_edit = uiHolder.elementTrsLst[25].GetComponent<Btn>();
         }
 
     }

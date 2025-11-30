@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowCurrentDialogCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var cache = PlayManager.instance.data.progress.dialogCache;
+            var cache = GameManager.instance.curProgress.dialogCache;
             DialogManager.instance.Begin(cache,() =>
             {
                 asyncTask.Complete();

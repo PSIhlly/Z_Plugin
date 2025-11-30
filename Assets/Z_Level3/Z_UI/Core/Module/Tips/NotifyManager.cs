@@ -15,22 +15,22 @@ namespace Z_Ui.Notify
         public EntryItem parent;
         public int deepth;
         public int id = 1;
-        public Dictionary<string, EntryItem> subs=new Dictionary<string, EntryItem>();
-        public void Add(string name,Sprite icon=null,int id=0)
+        public Dictionary<string, EntryItem> subs = new Dictionary<string, EntryItem>();
+        public void Add(string name, Sprite icon = null, int id = 0)
         {
             subs[name] = new EntryItem()
             {
                 content = name,
                 sprite = icon,
-                parent= this,
-                deepth= deepth+1,
-                id= id
+                parent = this,
+                deepth = deepth + 1,
+                id = id
             };
         }
         public bool IsChildOf(EntryItem item)
         {
             var tmp = this;
-            while(tmp!=null)
+            while (tmp != null)
             {
                 if (tmp == item)
                     return true;
@@ -74,18 +74,27 @@ namespace Z_Ui.Notify
     public class InputAreaInfo
     {
         public string title;
-        public Func<string,bool> func;
+        public Func<string, bool> func;
         public bool canClose;
         public int id;
     }
+    public class NotifyManager: NotifyManagerBase<UiNotifyCtrl, UiTipCtrl, UiChooseCtrl, UiMultipleChooseCtrl, UiPopupCtrl, UiInputAreaCtrl>
+    {
 
-    public class NotifyManager : Z_Manager<NotifyManager>
+    }
+    public class NotifyManagerBase<Notify, Tip, Choose, MultiChoose, Popup, Input> : Z_Manager<NotifyManagerBase<Notify, Tip, Choose, MultiChoose, Popup, Input>>
+        where Notify : UiNotifyCtrl
+        where Tip : UiTipCtrl
+        where Choose : UiChooseCtrl
+        where MultiChoose : UiMultipleChooseCtrl
+        where Popup : UiPopupCtrl
+        where Input : UiInputAreaCtrl
     {
         public static int tipIdCnt;
         public static int chooseIdCnt;
         public static int popupIdCnt;
-        public void AddTip(string content,float time=2)
-       {
+        public void AddTip(string content, float time = 2)
+        {
             var info = new TipInfo()
             {
                 content = content,
@@ -93,17 +102,18 @@ namespace Z_Ui.Notify
                 id = tipIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
-            if(ctrl!=null&&ctrl.active)
+            if (ctrl != null && ctrl.active)
             {
                 ctrl.Add(info);
-            }else
+            }
+            else
             {
                 UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
                 {
-                    tipInfo= info
-                }) ;
+                    tipInfo = info
+                });
             }
-       }
+        }
         public void AddChoose(string title, bool canClose, Func<EntryItem, bool> func, EntryItem items)
         {
             var info = new ChooseInfo()
@@ -111,7 +121,7 @@ namespace Z_Ui.Notify
                 title = title,
                 items = items,
                 func = func,
-                canClose= canClose,
+                canClose = canClose,
                 id = popupIdCnt++
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
@@ -127,7 +137,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddMultipleChoose(string title, bool canClose,Func<EntryItem, bool> func, EntryItem items, EntryItem defaltItem=null)
+        public void AddMultipleChoose(string title, bool canClose, Func<EntryItem, bool> func, EntryItem items, EntryItem defaltItem = null)
         {
             var info = new MultipleChooseInfo()
             {
@@ -151,13 +161,13 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddPopup(string title,string content, bool canClose,List<string>words,List<Func<bool>> funcs)
+        public void AddPopup(string title, string content, bool canClose, List<string> words, List<Func<bool>> funcs)
         {
             var info = new PopupInfo()
             {
-                title=title,
+                title = title,
                 content = content,
-                canClose=canClose,
+                canClose = canClose,
                 selectionWords = words,
                 funcs = funcs,
                 id = popupIdCnt++
@@ -175,7 +185,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddInputArea(string title, bool canClose, Func<string,bool> func)
+        public void AddInputArea(string title, bool canClose, Func<string, bool> func)
         {
             var info = new InputAreaInfo()
             {
@@ -197,7 +207,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        
+
         public override void Init()
         {
         }

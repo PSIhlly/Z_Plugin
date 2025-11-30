@@ -49,7 +49,7 @@ namespace Ui.PlaySceneMain
         public void Refresh()
         {
             teamerCon.Clear();
-            foreach(var uid in PlayManager.instance.data.progress.teamActive)
+            foreach(var uid in GameManager.instance.curProgress.teamActive)
             {
                 teamerCon.Add(new UiTeamerParam()
                 {

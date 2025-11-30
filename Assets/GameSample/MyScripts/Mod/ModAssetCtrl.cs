@@ -505,7 +505,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region event
     public void ImportImage(Action<TexAssetForm.Data> act)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
         {
             GameManager.instance.saveCtrl.AddStoryTex(form);
             act?.Invoke(form);
@@ -717,11 +717,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region scene
     public void ImportMapMiniMap()
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
+/*        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
         {
-            GameManager.instance.curConfig.miniMap = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
-        });
+        });*/
 
     }
 

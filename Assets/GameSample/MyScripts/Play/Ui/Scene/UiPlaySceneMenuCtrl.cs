@@ -62,7 +62,7 @@ namespace Ui.PlaySceneMenu
         public void Save()
         {
             model.lastSaveTime = Time.time;
-            GameManager.instance.saveCtrl.SavePlayStory(GameManager.instance.curStory.id);
+            GameManager.instance.saveCtrl.SaveSaveStory(GameManager.instance.curStory.id);
         }
         public void Exit()
         {

@@ -42,7 +42,7 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryLifeEventType.FirstEnter:
-                _super.Execute(EventProgramDataForm.DataByName.GetDv(GameManager.instance.curConfig.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt,null));
+                _super.Execute(EventProgramDataForm.DataByName.GetDv(GameManager.instance.curProgress.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt,null));
                 break;
         }
     }

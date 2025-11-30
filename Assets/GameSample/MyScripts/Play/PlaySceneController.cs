@@ -86,7 +86,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         switch (DynamicGlobalSettings.cameraMode)
         {
             case CameraMode.Overhead:
-                CameraInstance.instance.cam.transform.localPosition = new Vector3(0,8,0);
+                CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, 0);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(90, 0, 0);
                 break;
             case CameraMode.Isometric:
@@ -119,6 +119,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void End()
     {
+
+        GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         enable = false;
         MapManager.instance.End();
         UiManager.instance.CloseAll();
@@ -176,7 +178,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return;
         if (_playerG == null)
         {
-            _playerG = CharacterProductForm.DataByUid[_super.data.progress.characterUid];
+            _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
         }
         if (_playerM == null)
         {
@@ -201,7 +203,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         lastPlayerPos = _playerM.pos;
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
 
-        
+        GameManager.instance.curProgress.pos = _playerM.pos;
     }
     public void SetCamera(float x, float y, float z)
     {
@@ -217,7 +219,20 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
     {
-        var unitData = MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name), _super.data.progress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true);
+        CharacterUnitForm.Data unitData = null;
+        foreach (var unit in CharacterUnitForm.DataByUid.Values)
+        {
+            if (unit.name == AssetManager.GetIdNameKey(data.uid, data.name))
+            {
+                unitData = unit;
+                break;
+            }
+        }
+        Debug.Log((unitData == null) + " " + AssetManager.GetIdNameKey(data.uid, data.name));
+        if (unitData == null)
+        {
+            unitData=MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name), GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true); ;
+        }
         _characterDic[unitData] = data;
         return unitData;
     }

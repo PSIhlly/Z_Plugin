@@ -113,9 +113,10 @@ namespace Z_Code
                 }
                 else if (IsOperator(code[i]))
                 {
-                    if (IsNum(sb.ToString())&& !IsNum (sb.ToString()+code[i]))
+                    if (IsNum(sb.ToString()))
                     {
-                        End(lst, sb);
+                        if(!IsNum (sb.ToString()+code[i]))
+                            End(lst, sb);
                     }
                     else if(!IsOperator(sb.ToString()+ code[i]))
                     {

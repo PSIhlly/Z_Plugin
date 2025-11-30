@@ -75,9 +75,9 @@ namespace Ui.PlayData.PlayDataBackpack
             labCon.Refresh();
 
             itemCon.Clear();
-            for (int i = 0, icnt = PlayManager.instance.data.progress.bag.Count; i < icnt; i++)
+            for (int i = 0, icnt = GameManager.instance.curProgress.bag.Count; i < icnt; i++)
             {
-                var data = ItemProductForm.DataByUid[PlayManager.instance.data.progress.bag[i]];
+                var data = ItemProductForm.DataByUid[GameManager.instance.curProgress.bag[i]];
                 if (model.lab == null || data.label == model.lab)
                 {
                     itemCon.Add(new UiGameItemParam()

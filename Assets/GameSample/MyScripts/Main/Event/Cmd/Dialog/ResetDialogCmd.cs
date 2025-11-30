@@ -20,7 +20,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new ResetDialogCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.data.progress.dialogCache = ClipForm.defaultData.Copy();
+            GameManager.instance.curProgress.dialogCache = ClipForm.defaultData.Copy();
             return true;
         }
     }

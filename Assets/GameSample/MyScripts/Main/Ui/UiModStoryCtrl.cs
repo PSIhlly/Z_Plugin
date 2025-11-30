@@ -9,6 +9,8 @@ using Z_Ui;
 using Z_DataSystem;
 using Ui.Mod;
 using Ui.Loading;
+using Z_Ui.Notify;
+using Z_Text;
 
 namespace Ui.ModStory
 {
@@ -29,6 +31,7 @@ namespace Ui.ModStory
             });
             view.btn_play.onClick.AddListener(() =>
             {
+                GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
                 Close();
                 int curId = GameManager.instance.curStory.id;
                 Main2StoryManager.instance.UnloadStoryUgc();
@@ -37,8 +40,8 @@ namespace Ui.ModStory
             });
             view.btn_save.onClick.AddListener(() =>
             {
-                GameManager.instance.saveCtrl.SaveModStory(GameManager.instance.curStory.id);
-
+                GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
+                NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
             });
             
             view.btn_overview.onClick.AddListener(() =>

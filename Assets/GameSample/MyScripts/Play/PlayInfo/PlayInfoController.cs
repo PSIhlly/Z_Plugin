@@ -55,7 +55,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void Begin()
     {
         enable = true;
-        foreach(var uid in _super.data.progress.bag)
+        foreach(var uid in GameManager.instance.curProgress.bag)
         {
             GainItem(uid,false,false);
         }    
@@ -109,7 +109,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         }
 
         bagName2UidDic[data.name].Add(data.uid);
-        _super.data.progress.bag.Add(data.uid);
+        GameManager.instance.curProgress.bag.Add(data.uid);
 
     }
 

@@ -65,6 +65,10 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,bool,bool> changeNotfirsttimeAction;
                 
+        public static Action<Data,CameraMode,CameraMode> changeCameramodeAction;
+                
+        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
+                
 
 
         public partial class Data
@@ -232,7 +236,43 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,ClipForm.Data dialogCache,bool notFirstTime)
+                    private CameraMode  _cameraMode;
+                    /// <summary>
+                    ///相机视角
+                    ///</summary>
+                    public CameraMode  cameraMode{
+                                get{return _cameraMode;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCameramode(this,_cameraMode,value); 
+                    }
+        
+                _cameraMode = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<string,EventTriggerForm.Data>  _events;
+                    /// <summary>
+                    ///事件
+                    ///</summary>
+                    public Dictionary<string,EventTriggerForm.Data>  events{
+                                get{return _events;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEvents(this,_events,value); 
+                    }
+        
+                _events = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,ClipForm.Data dialogCache,bool notFirstTime,CameraMode cameraMode,Dictionary<string,EventTriggerForm.Data> events)
             {
 
              this.uid = uid;
@@ -244,17 +284,19 @@ public static readonly int autoUidCnt=100;
              this.teamActive = teamActive;
              this.dialogCache = dialogCache;
              this.notFirstTime = notFirstTime;
+             this.cameraMode = cameraMode;
+             this.events = events;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),dialogCache,notFirstTime);
+        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),dialogCache,notFirstTime,cameraMode,new Dictionary<string,EventTriggerForm.Data>(events));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,ClipForm.defaultData,false);
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,ClipForm.defaultData,false,CameraMode.Overhead,new Dictionary<string,EventTriggerForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -341,7 +383,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<ClipForm.Data>("dialogCache"),
 
-                jo.Get<bool>("notFirstTime")
+                jo.Get<bool>("notFirstTime"),
+
+                jo.Get<CameraMode>("cameraMode"),
+
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
                     );
 
             return data;
@@ -370,6 +416,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
 
             jo.Set<bool>("notFirstTime",data.notFirstTime);
+
+            jo.Set<CameraMode>("cameraMode",data.cameraMode);
+
+            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             return jo;
         }
@@ -536,6 +586,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeNotfirsttimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCameramode(Data superData,CameraMode oldV,CameraMode newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCameramodeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEventsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

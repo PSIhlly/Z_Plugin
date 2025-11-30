@@ -1,6 +1,7 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Ui.Loading;
 using Ui.ModSceneMain;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.WSA;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
@@ -17,15 +19,19 @@ using Z_Ui;
 using Z_Ui.Loading;
 using Z_UnitSystem;
 using static UnityEditor.PlayerSettings;
-
+public enum ParamShowType
+{
+    Always,
+    OnlyNotZero,
+    Hide
+}
 public class PlayManager : Z_MonoManager<PlayManager>
 {
-    public PlayData data;
     private string _folderName;
 
     public bool boxPlay;
 
-    private bool enable;
+    public bool enable;
 
     #region life
 
@@ -78,87 +84,40 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
         GameManager.instance.evtCtrl.LateUpdate();
     }
-    public async void BeginStory(string storyName, bool boxPlay)
+    public async void BeginStory(int id, bool boxPlay)
     {
-        this._folderName = storyName;
-        data = null;
+        this._folderName = Main2StoryManager.GetStoryFolderNameById(id);
         this.boxPlay = boxPlay;
 
         LoadingManager.instance.AddLoadItem("playData");
         if (!boxPlay)
         {
-            if (!SaveAndLoad.Exist(GetStorySaveProgressFileName()))
+            if (!SaveAndLoad.Exist(GetStorySaveFolder()))
             {
-                //new , copy to save
-                foreach(var data in SceneForm.DataByUid.Values)
-                {
-                    SaveAndLoad.Copy(GetStoryCoreFolder() + data.uid, GetStorySaveFolder() + data.uid);
-                }
-
-                //create play only
-                SaveAndLoad.Save(GetStorySaveProgressFileName(), ProgressForm.GetJoByData(GetInitPlayDataByConfig().progress).ToString());
+                GameManager.instance.saveCtrl.LoadCoreStory(id);
+                FirstPlayInit();
+                GameManager.instance.saveCtrl.SaveSaveStory(id);
             }
-
-            data = await Task.Run(() =>
+            else
             {
-                GameManager.instance.saveCtrl.LoadUiItem(GetStorySaveFolder());
-                return GameManager.instance.saveCtrl.LoadProgress(GetStorySaveProgressFileName());
-            });
-
+                GameManager.instance.saveCtrl.LoadSaveStory(id);
+            }
         }
         else
         {
-            data = await Task.Run(() =>
-            {
-                return GetInitPlayDataByConfig();
-            });
+            GameManager.instance.saveCtrl.LoadCoreStory(id);
+            FirstPlayInit();
         }
 
         LoadingManager.instance.RemoveLoadItem("playData");
-
-        Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curConfig.startSceneId);
+     
+        Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.sceneId);
         _assetCtrl.Begin();
 
         enable = true;
     }
 
-    public static PlayData GetInitPlayDataByConfig()
-    {
-        var config = GameManager.instance.curConfig;
-        //get instance by proto
-        var items = new List<int>();
-        foreach (var uid in config.defaultBag)
-        {
-            var newItem = ItemProductForm.DataByUid[uid].Copy(false);
-            newItem.ToProduct();
-            items.Add(newItem.uid);
-        }
-        var characters = new List<int>();
-        var charactersActive = new List<int>();
-
-
-        foreach (var uid in config.defaultTeam)
-        {
-            var ch = CharacterProductForm.DataByUid[uid];
-            if (!ch.unique)
-            {
-                var newCharacter = ch.Copy(false);
-                newCharacter.ToProduct();
-                GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
-
-                characters.Add(newCharacter.uid);
-                foreach (var uidActive in config.defaultTeamActive)
-                {
-                    if (uidActive == uid)
-                    {
-                        charactersActive.Add(newCharacter.uid);
-                        break;
-                    }
-                }
-            }
-        }
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive, Z_Ui.Form.ClipForm.defaultData.Copy(),false));
-    }
+    
 
     public void EndStory()
     {
@@ -178,6 +137,47 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
 
     #endregion
+    public static void FirstPlayInit()
+    {
+        var progress = GameManager.instance.curProgress;
+        //get instance by proto
+        var items = new List<int>();
+        foreach (var uid in progress.bag)
+        {
+            var newItem = ItemProductForm.DataByUid[uid].Copy(false);
+            newItem.ToProduct();
+            items.Add(newItem.uid);
+        }
+        var characters = new List<int>();
+        var charactersActive = new List<int>();
+
+
+        foreach (var uid in progress.team)
+        {
+            var ch = CharacterProductForm.DataByUid[uid];
+            if (!ch.unique)
+            {
+                var newCharacter = ch.Copy(false);
+                newCharacter.ToProduct();
+                GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
+
+                characters.Add(newCharacter.uid);
+                foreach (var uidActive in progress.teamActive)
+                {
+                    if (uidActive == uid)
+                    {
+                        charactersActive.Add(newCharacter.uid);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public string GetSceneCacheFileName()
+    {
+        return GetStoryCacheFolder() + _sceneCtrl.fileName;
+    }
     public string GetSceneSaveFileName()
     {
         return _folderName + "/Save/" + _sceneCtrl.fileName;
@@ -186,18 +186,17 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         return _folderName + "/Core/";
     }
-
+    public string GetStoryCacheFolder()
+    {
+        return _folderName + "/Cache/";
+    }
     public string GetStorySaveFolder()
     {
         return _folderName + "/Save/";
     }
     public string GetStorySaveProgressFileName()
     {
-        return _folderName + "/Save/progress";
-    }
-    public string GetStoryCoreConfigFileName()
-    {
-        return _folderName + "/Core/cf";
+        return _folderName + "/Save/"+GameManager.instance.saveCtrl.progressFormFileName;
     }
 
 }

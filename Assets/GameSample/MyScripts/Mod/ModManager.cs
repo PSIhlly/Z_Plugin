@@ -43,9 +43,10 @@ public class ModManager : Z_MonoManager<ModManager>
     {
         _sceneCtrl.Update();
     }
-    public void BeginStory(string storyName)
+    public void BeginStory(int id)
     {
-        this._folderName = storyName;
+        GameManager.instance.saveCtrl.LoadCoreStory(id);
+        _folderName = Main2StoryManager.GetStoryFolderNameById(id);
         UiManager.instance.ShowUi<UiModStoryCtrl>();
     }
     public void EndStory()
@@ -63,21 +64,19 @@ public class ModManager : Z_MonoManager<ModManager>
     }
 
     #endregion
-    public string GetSceneFileName()
+
+    public string GetSceneCoreFileName()
     {
-        return GetStoryCoreFolder(_folderName) + _sceneCtrl.fileName;
+        return Main2StoryManager.GetStoryCoreFolder(_folderName) + _sceneCtrl.fileName;
     }
-   
+
     public string GetStoryCoreFolder()
     {
-        return GetStoryCoreFolder(_folderName);
+        return Main2StoryManager.GetStoryCoreFolder(_folderName);
     }
     public string GetFolderName()
     {
         return _folderName;
     }
-    public static string GetStoryCoreFolder(string folderName)
-    {
-        return folderName + "/Core/";
-    }
+
 }

@@ -293,9 +293,9 @@ namespace Form
 
                 {100022,new Data(100022,"DeleteImage",new List<string>(){"imageId","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(1,1);","ui","imageAdvanced",true)},
 
-                {100023,new Data(100023,"SetImagePos",new List<string>(){"imageId","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(1,0.5,0.5,1);","ui","imageAdvanced",true)},
+                {100023,new Data(100023,"SetImagePos",new List<string>(){"imageId","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image {0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(1,0.5,0.5,1);","ui","imageAdvanced",true)},
 
-                {100024,new Data(100024,"SetImageOpacity",new List<string>(){"imageId","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(1,1,1);","ui","imageAdvanced",true)},
+                {100024,new Data(100024,"SetImageOpacity",new List<string>(){"imageId","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image {0}: opacity {1},transition takes {2} seconds","SetImageOpacity(1,1,1);","ui","imageAdvanced",true)},
 
                 {100025,new Data(100025,"SetImageRotate",new List<string>(){"imageId","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(1,0,1);","ui","imageAdvanced",true)},
 

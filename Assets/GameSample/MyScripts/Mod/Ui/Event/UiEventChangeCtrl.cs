@@ -50,7 +50,10 @@ namespace Ui.EventChoose
         }
         public override void OnShow()
         {
-            model.prm = param;
+        }
+        public void Set(UiEventChooseParam prm)
+        {
+            model.prm = prm;
             Refresh();
         }
         public void Refresh()

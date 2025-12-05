@@ -61,13 +61,17 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<int>,List<int>> changeTeamactiveAction;
                 
-        public static Action<Data,ClipForm.Data,ClipForm.Data> changeDialogcacheAction;
-                
-        public static Action<Data,bool,bool> changeNotfirsttimeAction;
+        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
         public static Action<Data,CameraMode,CameraMode> changeCameramodeAction;
                 
-        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
+        public static Action<Data,ClipForm.Data,ClipForm.Data> changeDialogcacheAction;
+                
+        public static Action<Data,Dictionary<int,List<string>>,Dictionary<int,List<string>>> changeTriggeredonceevtsAction;
+                
+        public static Action<Data,bool,bool> changeNotfirsttimeAction;
+                
+        public static Action<Data,int,int> changeBlockprogramuidAction;
                 
 
 
@@ -200,38 +204,20 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private ClipForm.Data  _dialogCache;
+                    private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    ///对话缓存
+                    ///事件
                     ///</summary>
-                    public ClipForm.Data  dialogCache{
-                                get{return _dialogCache;}
+                    public Dictionary<string,EventTriggerForm.Data>  events{
+                                get{return _events;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeDialogcache(this,_dialogCache,value); 
+                       ChangeEvents(this,_events,value); 
                     }
         
-                _dialogCache = value;
-                }
-                 
-                     }
-                    
-                    private bool  _notFirstTime;
-                    /// <summary>
-                    ///非第一次进入
-                    ///</summary>
-                    public bool  notFirstTime{
-                                get{return _notFirstTime;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeNotfirsttime(this,_notFirstTime,value); 
-                    }
-        
-                _notFirstTime = value;
+                _events = value;
                 }
                  
                      }
@@ -254,25 +240,79 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private Dictionary<string,EventTriggerForm.Data>  _events;
+                    private ClipForm.Data  _dialogCache;
                     /// <summary>
-                    ///事件
+                    ///对话缓存
                     ///</summary>
-                    public Dictionary<string,EventTriggerForm.Data>  events{
-                                get{return _events;}
+                    public ClipForm.Data  dialogCache{
+                                get{return _dialogCache;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeEvents(this,_events,value); 
+                       ChangeDialogcache(this,_dialogCache,value); 
                     }
         
-                _events = value;
+                _dialogCache = value;
                 }
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,ClipForm.Data dialogCache,bool notFirstTime,CameraMode cameraMode,Dictionary<string,EventTriggerForm.Data> events)
+                    private Dictionary<int,List<string>>  _triggeredOnceEvts;
+                    /// <summary>
+                    ///触发过的一次性事件
+                    ///</summary>
+                    public Dictionary<int,List<string>>  triggeredOnceEvts{
+                                get{return _triggeredOnceEvts;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTriggeredonceevts(this,_triggeredOnceEvts,value); 
+                    }
+        
+                _triggeredOnceEvts = value;
+                }
+                 
+                     }
+                    
+                    private bool  _notFirstTime;
+                    /// <summary>
+                    ///非第一次进入
+                    ///</summary>
+                    public bool  notFirstTime{
+                                get{return _notFirstTime;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeNotfirsttime(this,_notFirstTime,value); 
+                    }
+        
+                _notFirstTime = value;
+                }
+                 
+                     }
+                    
+                    private int  _blockProgramUid;
+                    /// <summary>
+                    ///阻塞的程序uid
+                    ///</summary>
+                    public int  blockProgramUid{
+                                get{return _blockProgramUid;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeBlockprogramuid(this,_blockProgramUid,value); 
+                    }
+        
+                _blockProgramUid = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid)
             {
 
              this.uid = uid;
@@ -282,21 +322,23 @@ public static readonly int autoUidCnt=100;
              this.bag = bag;
              this.team = team;
              this.teamActive = teamActive;
-             this.dialogCache = dialogCache;
-             this.notFirstTime = notFirstTime;
-             this.cameraMode = cameraMode;
              this.events = events;
+             this.cameraMode = cameraMode;
+             this.dialogCache = dialogCache;
+             this.triggeredOnceEvts = triggeredOnceEvts;
+             this.notFirstTime = notFirstTime;
+             this.blockProgramUid = blockProgramUid;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),dialogCache,notFirstTime,cameraMode,new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,ClipForm.defaultData,false,CameraMode.Overhead,new Dictionary<string,EventTriggerForm.Data>(){});
+                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -381,13 +423,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<List<int>>("teamActive"),
 
-                jo.Get<ClipForm.Data>("dialogCache"),
-
-                jo.Get<bool>("notFirstTime"),
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
                 jo.Get<CameraMode>("cameraMode"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
+                jo.Get<ClipForm.Data>("dialogCache"),
+
+                jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
+
+                jo.Get<bool>("notFirstTime"),
+
+                jo.Get<int>("blockProgramUid")
                     );
 
             return data;
@@ -413,13 +459,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<List<int>>("teamActive",data.teamActive);
 
-            jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
-
-            jo.Set<bool>("notFirstTime",data.notFirstTime);
+            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             jo.Set<CameraMode>("cameraMode",data.cameraMode);
 
-            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+            jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
+
+            jo.Set<Dictionary<int,List<string>>>("triggeredOnceEvts",data.triggeredOnceEvts);
+
+            jo.Set<bool>("notFirstTime",data.notFirstTime);
+
+            jo.Set<int>("blockProgramUid",data.blockProgramUid);
 
             return jo;
         }
@@ -570,22 +620,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeDialogcache(Data superData,ClipForm.Data oldV,ClipForm.Data newV)
+            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeDialogcacheAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeNotfirsttime(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeNotfirsttimeAction?.Invoke(data,oldV,newV);
+                changeEventsAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -600,12 +640,42 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
+            public static void ChangeDialogcache(Data superData,ClipForm.Data oldV,ClipForm.Data newV)
             {
                 if(superData is Data data)
                 {
 
-                changeEventsAction?.Invoke(data,oldV,newV);
+                changeDialogcacheAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTriggeredonceevts(Data superData,Dictionary<int,List<string>> oldV,Dictionary<int,List<string>> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTriggeredonceevtsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeNotfirsttime(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNotfirsttimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBlockprogramuid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBlockprogramuidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -31,19 +31,19 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         public override void OnCreate()
         {
 
-           
-     
+
+
             view.btn_canEquipped.onClick.AddListener(() =>
             {
                 model.data.canEquipe = !model.data.canEquipe;
                 Refresh();
             });
-            view.ipt_price.onFinishInput+=(s) =>
+            view.ipt_price.onFinishInput += (s) =>
             {
-                model.data.price= StringHelper.ToInt(s,0);
+                model.data.price = StringHelper.ToInt(s, 0);
                 Refresh();
             };
-           
+
             view.btn_part.onClick.AddListener(() =>
             {
                 var items = new EntryItem();
@@ -53,29 +53,32 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 }
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("chooseEquipPart"), false, (res) =>
                 {
-                    model.data.equip = (EquipPartType)Enum.Parse(typeof(EquipPartType),res.content);
+                    model.data.equip = (EquipPartType)Enum.Parse(typeof(EquipPartType), res.content);
                     Refresh();
                     return true;
                 }, items);
             });
-           
+
         }
         public override void OnShow()
         {
-            model.data=param.data;
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_canEquipped.ChangeState(model.data.canEquipe?1:0);
+            view.sta_canEquipped.ChangeState(model.data.canEquipe ? 1 : 0);
             view.ipt_price.Set(model.data.price.ToString());
 
-            view.txt_onUseEvent.text = model.data.events.GetDv("onUseEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onEquipEvent.text = model.data.events.GetDv("onEquipEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onDisequipEvent.text = model.data.events.GetDv("onDisequipEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onTouchEvent.text = model.data.events.GetDv("onTouchEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onLeaveEvent.text = model.data.events.GetDv("onLeaveEvent", EventTriggerForm.defaultData).evt;
-            view.txt_onShowEvent.text = model.data.events.GetDv("onShowEvent", EventTriggerForm.defaultData).evt;
+            view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onUseEvent" });
+            view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onEquipEvent" });
+            view.model_EventChooseDisequip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onDisequipEvent" });
+
+            view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
+            view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });
+            view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent" });
+            view.model_EventChooseObjectLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectLeaveEvent" });
+            view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
 
 
         }

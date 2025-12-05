@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SaveCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            GameManager.instance.saveCtrl.SavePlayStory(GameManager.instance.curStory.id);
+            GameManager.instance.saveCtrl.SaveSaveStory(GameManager.instance.curStory.id);
             return true;
         }
     }

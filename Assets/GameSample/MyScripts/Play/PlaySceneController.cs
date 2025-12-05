@@ -142,7 +142,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
-        if (_super.data.progress.blockProgramUid > 0)
+        if (GameManager.instance.curProgress.blockProgramUid > 0)
         {
             return;
         }
@@ -159,7 +159,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void OnMouseMove(Vector3 pos)
     {
-        if (_super.data.progress.blockProgramUid > 0)
+        if (GameManager.instance.curProgress.blockProgramUid > 0)
         {
             return;
         }

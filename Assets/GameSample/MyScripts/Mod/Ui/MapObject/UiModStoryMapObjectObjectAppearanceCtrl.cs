@@ -109,7 +109,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
             DisplayCameraAreaManager.instance.Clear();
 
-            view.model_Axis.SetShow(false);
+            view.model_axis.SetShow(false);
             if (model.id != -1)
             {
                 view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
@@ -117,7 +117,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
 
                 float rate = DisplayCameraAreaManager.instance.normalized2scene;
-                view.model_Axis.SetShow(true, new UiAxisParam()
+                view.model_axis.SetShow(true, new UiAxisParam()
                 {
                     pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x+ rate/2)/rate,( model.data.model.subPrefabUnitPos[model.id].z+rate/2)/rate),
                     limitRtf = view.rtf_image,

@@ -88,7 +88,7 @@ public class GameEventController : Z_Controller<GameManager>
         var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
         foreach (var data in lst)
         {
-            if(PlayManager.instance.data.progress.blockProgramUid>0&& PlayManager.instance.data.progress.blockProgramUid!=data.uid)
+            if(GameManager.instance.curProgress.blockProgramUid>0&& GameManager.instance.curProgress.blockProgramUid!=data.uid)
             {
                 continue;
             }
@@ -96,12 +96,12 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 if(!string.IsNullOrEmpty(data.releaseTrigger))
                 {
-                    PlayManager.instance.data.progress.triggeredOnceEvts[data.uid].Remove(data.releaseTrigger);
+                    GameManager.instance.curProgress.triggeredOnceEvts[data.uid].Remove(data.releaseTrigger);
                 }
                 EventInterpretDataForm.RemoveData(data.uid);
-                if(data.uid == PlayManager.instance.data.progress.blockProgramUid)
+                if(data.uid == GameManager.instance.curProgress.blockProgramUid)
                 {
-                    PlayManager.instance.data.progress.blockProgramUid = 0;
+                    GameManager.instance.curProgress.blockProgramUid = 0;
                     break;
                 }
             }
@@ -114,7 +114,7 @@ public class GameEventController : Z_Controller<GameManager>
     public void TriggerEventExecute(EventTriggerForm.Data trigger,int user, List<BoxDataForm.Data> args)
     {
         List<string> triggered;
-        var dict = PlayManager.instance.data.progress.triggeredOnceEvts;
+        var dict = GameManager.instance.curProgress.triggeredOnceEvts;
         switch (trigger.type)
         {
             case TriggerType.Once:

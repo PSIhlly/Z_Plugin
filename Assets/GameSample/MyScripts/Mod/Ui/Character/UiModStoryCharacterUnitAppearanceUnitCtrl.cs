@@ -149,7 +149,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             DisplayCameraAreaManager.instance.Clear();
 
             view.sta_equip.ChangeState(model.id > -1 && model.equipPart != EquipPartType.None?1:0);
-            view.model_Axis.SetShow(false);
+            view.model_axis.SetShow(false);
             if (model.id > -1)
             {
                

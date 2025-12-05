@@ -58,7 +58,7 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
                 delta.z = delta.y;
                 delta.y = 0;
 
-                if (PlayManager.instance.data.progress.blockProgramUid <= 0)
+                if (GameManager.instance.curProgress.blockProgramUid <= 0)
                 {
                     PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * delta);
                 }

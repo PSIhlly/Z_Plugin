@@ -36,7 +36,7 @@ namespace Ui.PlaySceneMain
             });
             view.btn_data.onClick.AddListener(() =>
             {
-                if (PlayManager.instance.data.progress.blockProgramUid <= 0)
+                if (GameManager.instance.curProgress.blockProgramUid <= 0)
                 {
                     UiManager.instance.ShowUi<UiPlayDataCtrl>();
                 }

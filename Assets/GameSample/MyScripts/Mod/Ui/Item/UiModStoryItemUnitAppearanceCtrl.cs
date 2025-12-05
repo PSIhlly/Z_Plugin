@@ -1,21 +1,13 @@
 using Form;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using UnityEngine.UIElements;
-using Z_Text;
-using UnityEngine;
-using Z_DataSystem.Form;
-using Z_UnitSystem;
-using Z_Ui.Notify;
-using Z_String;
-using Z_Math;
-using Z_DataSystem;
 using Ui.Axis;
+using UnityEngine;
+using Z_DataSystem;
+using Z_DataSystem.Form;
+using Z_Math;
+using Z_String;
+using Z_Text;
+using Z_Ui.Base;
 
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 {
@@ -113,7 +105,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             view.sta_show.ChangeState(model.id == -1?0:1);
 
             DisplayCameraAreaManager.instance.Clear();
-            view.model_Axis.SetShow(false);
+            view.model_axis.SetShow(false);
 
             if (model.id != -1)
             {
@@ -122,7 +114,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
                 view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
 
                 float rate = DisplayCameraAreaManager.instance.normalized2scene;
-                view.model_Axis.SetShow(true, new UiAxisParam()
+                view.model_axis.SetShow(true, new UiAxisParam()
                 {
                     pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[model.id].z + rate / 2) / rate),
                     limitRtf = view.rtf_image,

@@ -19,9 +19,9 @@ namespace Z_Code
         public override CmdBase GetNew() => new ContinueCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            if(PlayManager.instance.data.progress.blockProgramUid == asyncTask.interpreter.data.uid)
+            if(GameManager.instance.curProgress.blockProgramUid == asyncTask.interpreter.data.uid)
             {
-                PlayManager.instance.data.progress.blockProgramUid = 0;
+                GameManager.instance.curProgress.blockProgramUid = 0;
             }
             return true;
         }

@@ -32,32 +32,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         {
 
            
-            view.btn_onTouchEvent.onClick.AddListener(() =>
-            {
-                var key = "onTouchEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-               
-                
-            });
-            view.btn_onLeaveEvent.onClick.AddListener(() =>
-            {
-                var key = "onLeaveEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
-            view.btn_onShowEvent.onClick.AddListener(() =>
-            {
-                var key = "onShowEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
+     
             view.btn_canEquipped.onClick.AddListener(() =>
             {
                 model.data.canEquipe = !model.data.canEquipe;
@@ -68,31 +43,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 model.data.price= StringHelper.ToInt(s,0);
                 Refresh();
             };
-            view.btn_onUseEvent.onClick.AddListener(() =>
-            {
-                var key = "onUseEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-                
-            });
-            view.btn_onEquipEvent.onClick.AddListener(() =>
-            {
-                var key = "onEquipEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
-            view.btn_onDisequipEvent.onClick.AddListener(() =>
-            {
-                var key = "onDisequipEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Item, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
+           
             view.btn_part.onClick.AddListener(() =>
             {
                 var items = new EntryItem();
@@ -107,6 +58,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                     return true;
                 }, items);
             });
+           
         }
         public override void OnShow()
         {
@@ -116,13 +68,16 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         public void Refresh()
         {
             view.sta_canEquipped.ChangeState(model.data.canEquipe?1:0);
+            view.ipt_price.Set(model.data.price.ToString());
+
             view.txt_onUseEvent.text = model.data.events.GetDv("onUseEvent", EventTriggerForm.defaultData).evt;
             view.txt_onEquipEvent.text = model.data.events.GetDv("onEquipEvent", EventTriggerForm.defaultData).evt;
             view.txt_onDisequipEvent.text = model.data.events.GetDv("onDisequipEvent", EventTriggerForm.defaultData).evt;
-            view.ipt_price.Set(model.data.price.ToString());
             view.txt_onTouchEvent.text = model.data.events.GetDv("onTouchEvent", EventTriggerForm.defaultData).evt;
             view.txt_onLeaveEvent.text = model.data.events.GetDv("onLeaveEvent", EventTriggerForm.defaultData).evt;
             view.txt_onShowEvent.text = model.data.events.GetDv("onShowEvent", EventTriggerForm.defaultData).evt;
+
+
         }
     }
 

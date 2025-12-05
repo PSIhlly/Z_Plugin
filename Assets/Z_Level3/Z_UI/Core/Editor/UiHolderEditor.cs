@@ -276,36 +276,36 @@ using UnityEngine.Video;
                     {
                         case UiType.Panel:
                             bindContent += $@"
-            view.page_{subHolder.uiName} = new {subHolder.uiName}.Ui{subHolder.uiName}Ctrl();
-            view.page_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
+            view.page_{subHolder.name} = new {subHolder.uiName}.Ui{subHolder.uiName}Ctrl();
+            view.page_{subHolder.name}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
-            public {subHolder.uiName}.Ui{subHolder.uiName}Ctrl page_{subHolder.uiName};";
+            public {subHolder.uiName}.Ui{subHolder.uiName}Ctrl page_{subHolder.name};";
                             initContent += $@"
-            page_{subHolder.uiName} = ({subHolder.uiName}.Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
+            page_{subHolder.name} = ({subHolder.uiName}.Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
                             subContent += subEditor.GetCode(uiHolder.uiName);
                             break;
                         case UiType.Model:
                             namespaceContent += $"using Ui.{subHolder.uiName};\n";
                             bindContent += $@"
-            view.model_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
-            view.model_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
+            view.model_{subHolder.name} = new Ui{subHolder.uiName}Ctrl();
+            view.model_{subHolder.name}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
-            public Ui{subHolder.uiName}Ctrl model_{subHolder.uiName};";
+            public Ui{subHolder.name}Ctrl model_{subHolder.name};";
                             initContent += $@"
-            model_{subHolder.uiName} = (Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
+            model_{subHolder.name} = (Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
                             break;
 
                         case UiType.Sub:
                             bindContent += $@"
-            view.sub_{subHolder.uiName} = new Ui{subHolder.uiName}Ctrl();
-            view.sub_{subHolder.uiName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
+            view.sub_{subHolder.name} = new Ui{subHolder.uiName}Ctrl();
+            view.sub_{subHolder.name}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
 
                             declareContent += $@"
-            public Ui{subHolder.uiName}Ctrl sub_{subHolder.uiName};";
+            public Ui{subHolder.uiName}Ctrl sub_{subHolder.name};";
                             initContent += $@"
-            sub_{subHolder.uiName} = (Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
+            sub_{subHolder.name} = (Ui{subHolder.uiName}Ctrl) uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<UiHolder>().ctrl;";
 
                             subContent += subEditor.GetCode(uiHolder.uiName);
                             break;

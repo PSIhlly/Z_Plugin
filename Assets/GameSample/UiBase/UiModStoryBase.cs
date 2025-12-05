@@ -1348,11 +1348,17 @@ namespace ModStoryCharacterUnitConfig
             public Txt txt_idleAnim;
             public Txt txt_moveAnim;
             public Btn btn_onTouchEvent;
+            public Btn btn_onTouchEventTrigger;
             public Btn btn_onLeaveEvent;
+            public Btn btn_onLeaveEventTrigger;
             public Btn btn_onShowEvent;
+            public Btn btn_onShowEventTrigger;
             public Txt txt_onTouchEvent;
+            public Txt txt_onTouchEventTrigger;
             public Txt txt_onLeaveEvent;
+            public Txt txt_onLeaveEventTrigger;
             public Txt txt_onShowEvent;
+            public Txt txt_onShowEventTrigger;
         public UiModStoryCharacterUnitConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -1367,11 +1373,17 @@ namespace ModStoryCharacterUnitConfig
             txt_idleAnim = uiHolder.elementTrsLst[8].GetComponent<Txt>();
             txt_moveAnim = uiHolder.elementTrsLst[9].GetComponent<Txt>();
             btn_onTouchEvent = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            btn_onLeaveEvent = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            btn_onShowEvent = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            txt_onTouchEvent = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            txt_onLeaveEvent = uiHolder.elementTrsLst[14].GetComponent<Txt>();
-            txt_onShowEvent = uiHolder.elementTrsLst[15].GetComponent<Txt>();
+            btn_onTouchEventTrigger = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            btn_onLeaveEvent = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            btn_onLeaveEventTrigger = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            btn_onShowEvent = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_onShowEventTrigger = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            txt_onTouchEvent = uiHolder.elementTrsLst[16].GetComponent<Txt>();
+            txt_onTouchEventTrigger = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            txt_onLeaveEvent = uiHolder.elementTrsLst[18].GetComponent<Txt>();
+            txt_onLeaveEventTrigger = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            txt_onShowEvent = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            txt_onShowEventTrigger = uiHolder.elementTrsLst[21].GetComponent<Txt>();
         }
 
     }
@@ -2469,11 +2481,17 @@ namespace ModStoryItemUnitConfig
             public Txt txt_part;
             public Txt txt_onUseEvent;
             public Btn btn_onTouchEvent;
+            public Btn btn_onTouchEventTrigger;
             public Btn btn_onLeaveEvent;
+            public Btn btn_onLeaveEventTrigger;
             public Btn btn_onShowEvent;
+            public Btn btn_onShowEventTrigger;
             public Txt txt_onTouchEvent;
+            public Txt txt_onTouchEventTrigger;
             public Txt txt_onLeaveEvent;
+            public Txt txt_onLeaveEventTrigger;
             public Txt txt_onShowEvent;
+            public Txt txt_onShowEventTrigger;
         public UiModStoryItemUnitConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -2490,11 +2508,17 @@ namespace ModStoryItemUnitConfig
             txt_part = uiHolder.elementTrsLst[10].GetComponent<Txt>();
             txt_onUseEvent = uiHolder.elementTrsLst[11].GetComponent<Txt>();
             btn_onTouchEvent = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            btn_onLeaveEvent = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            btn_onShowEvent = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            txt_onTouchEvent = uiHolder.elementTrsLst[15].GetComponent<Txt>();
-            txt_onLeaveEvent = uiHolder.elementTrsLst[16].GetComponent<Txt>();
-            txt_onShowEvent = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            btn_onTouchEventTrigger = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            btn_onLeaveEvent = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_onLeaveEventTrigger = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            btn_onShowEvent = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            btn_onShowEventTrigger = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            txt_onTouchEvent = uiHolder.elementTrsLst[18].GetComponent<Txt>();
+            txt_onTouchEventTrigger = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            txt_onLeaveEvent = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            txt_onLeaveEventTrigger = uiHolder.elementTrsLst[21].GetComponent<Txt>();
+            txt_onShowEvent = uiHolder.elementTrsLst[22].GetComponent<Txt>();
+            txt_onShowEventTrigger = uiHolder.elementTrsLst[23].GetComponent<Txt>();
         }
 
     }
@@ -3059,20 +3083,32 @@ namespace ModStoryMapObjectTextureConfig
     {
 
             public Btn btn_onTouchEvent;
+            public Btn btn_onTouchEventTrigger;
             public Btn btn_onLeaveEvent;
+            public Btn btn_onLeaveEventTrigger;
             public Btn btn_onShowEvent;
+            public Btn btn_onShowEventTrigger;
             public Txt txt_onTouchEvent;
+            public Txt txt_onTouchEventTrigger;
             public Txt txt_onLeaveEvent;
+            public Txt txt_onLeaveEventTrigger;
             public Txt txt_onShowEvent;
+            public Txt txt_onShowEventTrigger;
         public UiModStoryMapObjectTextureConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_onTouchEvent = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            btn_onLeaveEvent = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            btn_onShowEvent = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            txt_onTouchEvent = uiHolder.elementTrsLst[3].GetComponent<Txt>();
-            txt_onLeaveEvent = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            txt_onShowEvent = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            btn_onTouchEventTrigger = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            btn_onLeaveEvent = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_onLeaveEventTrigger = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_onShowEvent = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            btn_onShowEventTrigger = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            txt_onTouchEvent = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_onTouchEventTrigger = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            txt_onLeaveEvent = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_onLeaveEventTrigger = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            txt_onShowEvent = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            txt_onShowEventTrigger = uiHolder.elementTrsLst[11].GetComponent<Txt>();
         }
 
     }
@@ -3482,22 +3518,34 @@ namespace ModStoryMapObjectObjectConfig
             public Btn btn_fixed;
             public Sta sta_fixed;
             public Btn btn_onTouchEvent;
+            public Btn btn_onTouchEventTrigger;
             public Btn btn_onLeaveEvent;
+            public Btn btn_onLeaveEventTrigger;
             public Btn btn_onShowEvent;
+            public Btn btn_onShowEventTrigger;
             public Txt txt_onTouchEvent;
+            public Txt txt_onTouchEventTrigger;
             public Txt txt_onLeaveEvent;
+            public Txt txt_onLeaveEventTrigger;
             public Txt txt_onShowEvent;
+            public Txt txt_onShowEventTrigger;
         public UiModStoryMapObjectObjectConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_fixed = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             sta_fixed = uiHolder.elementTrsLst[1].GetComponent<Sta>();
             btn_onTouchEvent = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_onLeaveEvent = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_onShowEvent = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            txt_onTouchEvent = uiHolder.elementTrsLst[5].GetComponent<Txt>();
-            txt_onLeaveEvent = uiHolder.elementTrsLst[6].GetComponent<Txt>();
-            txt_onShowEvent = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            btn_onTouchEventTrigger = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_onLeaveEvent = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            btn_onLeaveEventTrigger = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            btn_onShowEvent = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            btn_onShowEventTrigger = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            txt_onTouchEvent = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_onTouchEventTrigger = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            txt_onLeaveEvent = uiHolder.elementTrsLst[10].GetComponent<Txt>();
+            txt_onLeaveEventTrigger = uiHolder.elementTrsLst[11].GetComponent<Txt>();
+            txt_onShowEvent = uiHolder.elementTrsLst[12].GetComponent<Txt>();
+            txt_onShowEventTrigger = uiHolder.elementTrsLst[13].GetComponent<Txt>();
         }
 
     }

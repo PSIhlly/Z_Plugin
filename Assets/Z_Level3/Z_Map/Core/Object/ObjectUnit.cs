@@ -53,6 +53,35 @@ namespace Z_Map
                 unit = this
             });
         }
+        public void Move(Vector3 dir)
+        {
+            var mag = dir.magnitude;
+            HashSet<int> exist = new HashSet<int>() { data.uid };
+            float res = mag;
+            Dictionary<CharacterUnit, Vector3> push=new Dictionary<CharacterUnit, Vector3>();
+            if (dir != Vector3.zero)
+            {
+                foreach (var tile in manager.utilCtrl.GetOverlap(data))
+                {
+                    foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
+                    {
+                        if (exist.Contains(ch.data.uid))
+                            continue;
+                        exist.Add(ch.data.uid);
+                        var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly);
+                        if (dis < mag && dis>0 )
+                        {
+                            push[ch] = dir / mag * (dis - mag);
+                        }
+                    }
+                }
+            }
+            manager.updateCtrl.ApplyMove(this, data.pos + dir, data.euler);
+            foreach (var pair in push)
+            {
+                pair.Key.Move(pair.Value);
+            }
+        }
         public override void Remove()
         {
             ObjectUnitForm.RemoveData(data.uid);

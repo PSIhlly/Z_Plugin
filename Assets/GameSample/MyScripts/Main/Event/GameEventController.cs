@@ -16,8 +16,31 @@ using Z_ByteSerialize;
 using Z_Code;
 using Unity.VisualScripting;
 using Ui.ModStoryEventTrigger;
+using Z_DataSystem.Form;
+namespace Form
+{
 
-
+    public static partial class EventInterpretDataForm
+    {
+        public partial class Data
+        {
+            public override bool Interpret()
+            {
+                if (_interpreter == null)
+                {
+                    _interpreter = new Interpreter(this);
+                }
+                return _interpreter.Interpret();
+            }
+        }
+    }
+}
+            public enum TriggerType
+{
+    NoLimit,
+    Once,
+    OnceDuring
+}
 
 public static partial class GlobalEventHelper
 {
@@ -65,9 +88,22 @@ public class GameEventController : Z_Controller<GameManager>
         var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
         foreach (var data in lst)
         {
+            if(PlayManager.instance.data.progress.blockProgramUid>0&& PlayManager.instance.data.progress.blockProgramUid!=data.uid)
+            {
+                continue;
+            }
             if (data.Interpret())
             {
+                if(!string.IsNullOrEmpty(data.releaseTrigger))
+                {
+                    PlayManager.instance.data.progress.triggeredOnceEvts[data.uid].Remove(data.releaseTrigger);
+                }
                 EventInterpretDataForm.RemoveData(data.uid);
+                if(data.uid == PlayManager.instance.data.progress.blockProgramUid)
+                {
+                    PlayManager.instance.data.progress.blockProgramUid = 0;
+                    break;
+                }
             }
         }
 
@@ -75,13 +111,48 @@ public class GameEventController : Z_Controller<GameManager>
 
 
 
+    public void TriggerEventExecute(EventTriggerForm.Data trigger,int user, List<BoxDataForm.Data> args)
+    {
+        List<string> triggered;
+        var dict = PlayManager.instance.data.progress.triggeredOnceEvts;
+        switch (trigger.type)
+        {
+            case TriggerType.Once:
+                if (dict.TryGetValue(user, out triggered))
+                {
+                    if (triggered.Contains(trigger.name))
+                        return;
+                }
+                else
+                {
+                    dict[user] = new List<string>();
+                }
+                dict[user].Add(trigger.name);
+                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), args);
+                break;
+            case TriggerType.OnceDuring:
+                if (dict.TryGetValue(user, out triggered))
+                {
+                    if (triggered.Contains(trigger.name))
+                        return;
+                }else
+                {
+                    dict[user] = new List<string>();
+                }
+                dict[user].Add(trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), args, trigger.name);
+                break;
+            default:
+                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt,null), args);
+                break;
+        }
+    }
 
-
-    public void Execute(EventProgramDataForm.Data evt, int uid = -1)
+    public void Execute(EventProgramDataForm.Data evt, List<BoxDataForm.Data> args, string releaseTrigger="")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, uid));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, args, releaseTrigger,0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {
@@ -151,9 +222,9 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
-    public static EventTriggerForm.Data CreateTrigger(string key, string evt)
+    public static EventTriggerForm.Data CreateTrigger(string key, string evt,TriggerType type)
     {
-        return new EventTriggerForm.Data(-1, key, evt);
+        return new EventTriggerForm.Data(-1, key, evt, type);
     }
 
 }

@@ -36,7 +36,10 @@ namespace Ui.PlaySceneMain
             });
             view.btn_data.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiPlayDataCtrl>();
+                if (PlayManager.instance.data.progress.blockProgramUid <= 0)
+                {
+                    UiManager.instance.ShowUi<UiPlayDataCtrl>();
+                }
             });
             teamerCon = new UiContainer<UiTeamerCtrl>(view.go_teamer);
 

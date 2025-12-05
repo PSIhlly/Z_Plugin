@@ -33,31 +33,6 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         {
 
 
-            view.btn_onTouchEvent.onClick.AddListener(() =>
-            {
-                var key = "onTouchEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Tile, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
-            view.btn_onLeaveEvent.onClick.AddListener(() =>
-            {
-                var key = "onLeaveEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Tile, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-               
-            });
-            view.btn_onShowEvent.onClick.AddListener(() =>
-            {
-                var key = "onShowEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Tile, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
 
         }
         public override void OnShow()

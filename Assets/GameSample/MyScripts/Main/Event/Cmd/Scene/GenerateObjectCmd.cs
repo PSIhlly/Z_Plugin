@@ -1,0 +1,38 @@
+using Form;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using Z_Code.Form;
+using Z_DataSystem;
+using Z_Map;
+using Z_Map.Form;
+using Z_Text;
+using Z_Ui.Dialog;
+using Z_Ui.Notify;
+using Z_UnitSystem.Form;
+
+namespace Z_Code
+{
+    public class GenerateObjectCmd : CmdBase
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Init()
+        {
+            Register(new GenerateObjectCmd());
+        }
+        public override string GetName() => "GenerateObject";
+        public override CmdBase GetNew() => new GenerateObjectCmd();
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        {
+            var data = MapObjectForm.DataByName[prm[0].str];
+            var key = AssetManager.GetIdNameKey(data.id, data.name);
+                var newObjectData = MapManager.instance.AddObject(key, Vector3.one*99999f, data.name, null);
+                newObjectData.unit.evtDic = data.events;
+            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(newObjectData.uid) };
+
+            return true;
+        }
+    }
+}

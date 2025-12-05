@@ -53,6 +53,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeEvtAction;
                 
+        public static Action<Data,TriggerType,TriggerType> changeTypeAction;
+                
 
 
         public partial class Data
@@ -112,23 +114,42 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string evt)
+                    private TriggerType  _type;
+                    /// <summary>
+                    ///¥•∑¢¿‡–Õ
+                    ///</summary>
+                    public TriggerType  type{
+                                get{return _type;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeType(this,_type,value); 
+                    }
+        
+                _type = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string evt,TriggerType type)
             {
 
              this.uid = uid;
              this.name = name;
              this.evt = evt;
+             this.type = type;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,evt);
+        return new Data(sameId? uid:uidChain.GetId(),name,evt,type);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"","",default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -167,9 +188,9 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"onCharacterParamChange","")},
+                {1,new Data(1,"onCharacterParamChange","",default)},
 
-                {2,new Data(2,"onItemParamChange","")},
+                {2,new Data(2,"onItemParamChange","",default)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -225,7 +246,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("evt")
+                jo.Get<string>("evt"),
+
+                jo.Get<TriggerType>("type")
                     );
 
             return data;
@@ -242,6 +265,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("name",data.name);
 
             jo.Set<string>("evt",data.evt);
+
+            jo.Set<TriggerType>("type",data.type);
 
             return jo;
         }
@@ -355,6 +380,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeEvtAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeType(Data superData,TriggerType oldV,TriggerType newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -33,8 +33,10 @@ namespace Z_Ui.Base
             }
             set
             {
-                _oriTxt=value;
+                _oriTxt = value;
+
                 Refresh();
+
             }
         }
         [Tooltip("use language manage")]
@@ -54,10 +56,12 @@ namespace Z_Ui.Base
 
         protected override void Awake()
         {
-            if(oriText==null)
+#if UNITY_EDITOR
+            if (EditorApplication.isPlaying)
             {
                 oriText = text;
             }
+#endif
             base.Awake();
         }
         protected override void OnEnable()
@@ -96,9 +100,9 @@ namespace Z_Ui.Base
                 text += parts[i - 1];
                 var curText = text;
                 TimeManager.instance.CancelTimer(timer);
-                timer=TimeManager.instance.StartTimer(0,0,() =>
+                timer = TimeManager.instance.StartTimer(0, 0, () =>
                 {
-                    if (curText!= text||textInfo.characterCount != text.Length)
+                    if (curText != text || textInfo.characterCount != text.Length)
                         return false;
 
                     var parts = text.Split(AssetManager.instance.texCtrl.GetMark());
@@ -120,7 +124,7 @@ namespace Z_Ui.Base
                         }
                         var info = textInfo.characterInfo[cnt + 1];
                         images[i].transform.localPosition = (info.topLeft + info.bottomRight) / 2;
-                        
+
                         var size = (info.bottomRight.x - info.topLeft.x) * 7;
                         var rect = images[i].rectTransform.sizeDelta = new Vector2(size, size);
 

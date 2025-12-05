@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using Z_String;
-using Z_Math;
 using Unity.VisualScripting;
-using Z_DataSystem.Form;
 using Z_Code.Form;
+using Z_DataSystem.Form;
+using Z_DesignStyle;
+using Z_Math;
+using Z_String;
 using Z_Text;
+using Z_Texture;
+using Z_Ui.Base;
 
 namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
 {
@@ -83,14 +84,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
             {
                 SetKillType(SkillType.HeavyAttack);
             });
-            view.btn_onTriggerEvent.onClick.AddListener(() =>
-            {
-                var key = "onTriggerEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
+            
             view.btn_triggerCondition.onClick.AddListener(() =>
             {
                 var key = "triggerCondition";
@@ -122,6 +116,9 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
             view.sta_q.ChangeState(model.data.skillTypes.Contains(SkillType.Q)?1:0);
             view.sta_lightAttack.ChangeState(model.data.skillTypes.Contains(SkillType.LightAttack)?1:0);
             view.sta_heavyAttack.ChangeState(model.data.skillTypes.Contains(SkillType.HeavyAttack)?1:0);
+
+            view.txt_onTriggerEvent.text = model.data.events.GetDv("onTriggerEvent", EventTriggerForm.defaultData).evt;
+
         }
         private void SetKillType(SkillType tp)
         {

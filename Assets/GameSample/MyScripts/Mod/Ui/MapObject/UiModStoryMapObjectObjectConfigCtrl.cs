@@ -37,36 +37,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data.isFixed = !model.data.isFixed;
                 Refresh();
             });
-            view.btn_onTouchEvent.onClick.AddListener(() =>
-            {
-                var key = "onTouchEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });               
-            });
-            view.btn_onLeaveEvent.onClick.AddListener(() =>
-            {
-                var key = "onLeaveEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
-            view.btn_onShowEvent.onClick.AddListener(() =>
-            {
-                var key = "onShowEvent";
-                ModManager.instance.assetCtrl.ChooseEvent(model.data.events, key, SceneEventType.Object, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
-                {
-                    Refresh();
-                });
-            });
+
             view.btn_fixed.onClick.AddListener(() =>
             {
                 model.data.isFixed = !model.data.isFixed;
                 Refresh();
             });
-
+           
         }
         public override void OnShow()
         {
@@ -79,6 +56,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.txt_onTouchEvent.text = model.data.events.GetDv("onTouchEvent", EventTriggerForm.defaultData).evt;
             view.txt_onLeaveEvent.text = model.data.events.GetDv("onLeaveEvent", EventTriggerForm.defaultData).evt;
             view.txt_onShowEvent.text = model.data.events.GetDv("onShowEvent", EventTriggerForm.defaultData).evt;
+
         }
     }
 

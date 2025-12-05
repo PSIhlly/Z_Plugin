@@ -57,9 +57,11 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
 
                 delta.z = delta.y;
                 delta.y = 0;
-                PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * delta);
 
-                
+                if (PlayManager.instance.data.progress.blockProgramUid <= 0)
+                {
+                    PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * delta);
+                }
                 view.rtf_moveStick.position = view.rtf_move.position + Graph.GetSize(view.rtf_move).x  * realDelta;
             }
             else

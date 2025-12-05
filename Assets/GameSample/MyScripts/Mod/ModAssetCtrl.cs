@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.TextCore.Text;
 using Z_Code.Form;
 using Z_DataSystem;
@@ -527,13 +528,25 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             act?.Invoke(form);
         });
     }
-    public void ChooseEvent(Dictionary<string, EventTriggerForm.Data>  dic,string key,SceneEventType type, string retType, string title, Action<EntryItem> act)
+    public void ChooseEvent(string key,SceneEventType type, string retType, string title, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
         {
-            dic[key] = GameEventController.CreateTrigger(key, res.content);
             act?.Invoke(res);
+            return true;
+        }, items);
+    }
+    public void ChooseEventTriggerType(Action<TriggerType> act)
+    {
+        var items = new EntryItem();
+        foreach(TriggerType tp in Enum.GetValues(typeof(TriggerType)))
+        {
+            items.Add(TextManager.instance.GetTxt(tp.ToString()));
+        }
+        NotifyManager.instance.AddMultipleChoose("Choose trigger condition", true, (res) =>
+        {
+            act?.Invoke((TriggerType)res.id);
             return true;
         }, items);
     }

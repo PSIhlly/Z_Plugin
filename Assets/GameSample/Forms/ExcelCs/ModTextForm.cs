@@ -312,8 +312,6 @@ namespace Form
 
                 {1210055,new Data(1210055,"onBeginEvent","On begin event","开幕事件")},
 
-                {1210056,new Data(1210056,"onEndEvent","On end event","结局事件")},
-
                 {1210057,new Data(1210057,"skillEvent","Skill event","技能事件")},
 
                 {1210058,new Data(1210058,"map","Map","地图")},
@@ -419,6 +417,18 @@ namespace Form
                 {1210108,new Data(1210108,"dialogAdvanced","dialog(Advanced)","对话(高级)")},
 
                 {1210109,new Data(1210109,"const","const","常量")},
+
+                {1210110,new Data(1210110,"trigger","Trigger","触发")},
+
+                {1210111,new Data(1210111,"NoLimit","no limit","不限制")},
+
+                {1210112,new Data(1210112,"Once","once","一次性")},
+
+                {1210113,new Data(1210113,"OnceDuring","once during triggering","期间一次")},
+
+                {1210114,new Data(1210114,"unique","unique","唯一的")},
+
+                {1210115,new Data(1210115,"Choose trigger condition","Choose trigger condition","选择触发条件")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -599,8 +609,6 @@ namespace Form
     
                         {"onBeginEvent",_DataById[1210055]},
     
-                        {"onEndEvent",_DataById[1210056]},
-    
                         {"skillEvent",_DataById[1210057]},
     
                         {"map",_DataById[1210058]},
@@ -706,6 +714,18 @@ namespace Form
                         {"dialogAdvanced",_DataById[1210108]},
     
                         {"const",_DataById[1210109]},
+    
+                        {"trigger",_DataById[1210110]},
+    
+                        {"NoLimit",_DataById[1210111]},
+    
+                        {"Once",_DataById[1210112]},
+    
+                        {"OnceDuring",_DataById[1210113]},
+    
+                        {"unique",_DataById[1210114]},
+    
+                        {"Choose trigger condition",_DataById[1210115]},
     
                     };
     

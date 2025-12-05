@@ -157,7 +157,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
                 }
             }
         }
-        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive, Z_Ui.Form.ClipForm.defaultData.Copy(),false));
+        return new PlayData(new ProgressForm.Data(1, config.startSceneId, config.startpos, config.mainCharacterUid, items, characters, charactersActive, default, Z_Ui.Form.ClipForm.defaultData.Copy(),new Dictionary<int, List<string>>(), false,0));
     }
 
     public void EndStory()

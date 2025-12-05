@@ -77,27 +77,67 @@ namespace Form
                 
         public static Action<Data,int,int> changeTopAction;
                 
-        public static Action<Data,int,int> changeUserAction;
+        public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeArgsAction;
+                
+        public static Action<Data,string,string> changeReleasetriggerAction;
+                
+        public static Action<Data,int,int> changeBlockprogramuidAction;
                 
 
 
         public partial class Data : InterpretDataForm.Data
         {
 
-                    private int  _user;
+                    private List<BoxDataForm.Data>  _args;
                     /// <summary>
-                    ///调用者Productuid
+                    ///参数
                     ///</summary>
-                    public int  user{
-                                get{return _user;}
+                    public List<BoxDataForm.Data>  args{
+                                get{return _args;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeUser(this,_user,value); 
+                       ChangeArgs(this,_args,value); 
                     }
         
-                _user = value;
+                _args = value;
+                }
+                 
+                     }
+                    
+                    private string  _releaseTrigger;
+                    /// <summary>
+                    ///结束释放的trigger
+                    ///</summary>
+                    public string  releaseTrigger{
+                                get{return _releaseTrigger;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeReleasetrigger(this,_releaseTrigger,value); 
+                    }
+        
+                _releaseTrigger = value;
+                }
+                 
+                     }
+                    
+                    private int  _blockProgramUid;
+                    /// <summary>
+                    ///阻塞的程序uid
+                    ///</summary>
+                    public int  blockProgramUid{
+                                get{return _blockProgramUid;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeBlockprogramuid(this,_blockProgramUid,value); 
+                    }
+        
+                _blockProgramUid = value;
                 }
                  
                      }
@@ -106,7 +146,7 @@ namespace Form
             {
             }
             
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user):base(uid,stack,heap,program,p,top)
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,List<BoxDataForm.Data> args,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top)
             {
 
              this.uid = uid;
@@ -115,18 +155,20 @@ namespace Form
              this.program = program;
              this.p = p;
              this.top = top;
-             this.user = user;
+             this.args = args;
+             this.releaseTrigger = releaseTrigger;
+             this.blockProgramUid = blockProgramUid;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,new List<BoxDataForm.Data>(args),releaseTrigger,blockProgramUid);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0,0);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,null,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -217,7 +259,11 @@ namespace Form
 
                 jo.Get<int>("top"),
 
-                jo.Get<int>("user")
+                jo.Get<List<BoxDataForm.Data>>("args"),
+
+                jo.Get<string>("releaseTrigger"),
+
+                jo.Get<int>("blockProgramUid")
                     );
 
             return data;
@@ -241,7 +287,11 @@ namespace Form
 
             jo.Set<int>("top",data.top);
 
-            jo.Set<int>("user",data.user);
+            jo.Set<List<BoxDataForm.Data>>("args",data.args);
+
+            jo.Set<string>("releaseTrigger",data.releaseTrigger);
+
+            jo.Set<int>("blockProgramUid",data.blockProgramUid);
 
             return jo;
         }
@@ -382,12 +432,32 @@ InterpretDataForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeUser(Data superData,int oldV,int newV)
+            public static void ChangeArgs(Data superData,List<BoxDataForm.Data> oldV,List<BoxDataForm.Data> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeUserAction?.Invoke(data,oldV,newV);
+                changeArgsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeReleasetrigger(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeReleasetriggerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBlockprogramuid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBlockprogramuidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

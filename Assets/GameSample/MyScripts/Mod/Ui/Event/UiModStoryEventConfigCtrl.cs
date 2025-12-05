@@ -13,6 +13,7 @@ using Z_Code.Form;
 using Z_String;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Unity.VisualScripting;
 
 namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
 {
@@ -34,7 +35,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
                 var key = "onBeginEvent";
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content); 
+                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content,TriggerType.NoLimit); 
                     Refresh();
                 });
             });
@@ -43,7 +44,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventConfig
                 var key = "onEndEvent";
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.Global, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(key), (item) =>
                 {
-                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content);
+                    GameManager.instance.curConfig.events[key] = GameEventController.CreateTrigger(key, item.content, TriggerType.NoLimit);
                     Refresh();
                 });
             });

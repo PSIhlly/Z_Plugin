@@ -24,6 +24,7 @@ using System.Xml.Linq;
 public enum StoryLifeEventType
 {
     FirstEnter = 0,
+    GameOver = 1,
 }
 public class StoryLifeEvent : Z_Event
 {
@@ -37,12 +38,17 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
     {
         Z_EventHelper.Register<StoryLifeEvent>(this);
     }
+
     public void OnEvent(StoryLifeEvent evt)
     {
         switch (evt.type)
         {
             case StoryLifeEventType.FirstEnter:
-                _super.Execute(EventProgramDataForm.DataByName.GetDv(GameManager.instance.curConfig.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt,null));
+                _super.Execute(EventProgramDataForm.DataByName.GetDv(GameManager.instance.curConfig.events.GetDv("onBeginEvent", EventTriggerForm.defaultData).evt,null),null);
+                break;
+            case StoryLifeEventType.GameOver:
+                _super.Execute(EventProgramDataForm.DataByName.GetDv(GameManager.instance.curConfig.events.GetDv("onEndEvent", EventTriggerForm.defaultData).evt, null), null);
+
                 break;
         }
     }

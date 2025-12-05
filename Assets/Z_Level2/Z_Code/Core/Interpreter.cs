@@ -39,8 +39,8 @@ namespace Z_Code
         {
             public partial class Data
             {
-                Interpreter _interpreter;
-                public bool Interpret()
+                protected Interpreter _interpreter;
+                public virtual bool Interpret()
                 {
                     if (_interpreter == null)
                     {
@@ -63,7 +63,7 @@ namespace Z_Code
     }
     public class InterpretAsyncTask
     {
-        Interpreter interpreter;
+        public readonly Interpreter interpreter;
         public BoxDataForm.Data[] res;
         public InterpretAsyncTask(Interpreter interpreter)
         {

@@ -140,7 +140,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
-
+        if (_super.data.progress.blockProgramUid > 0)
+        {
+            return;
+        }
         if (waitForActive || !enable)
             return;
         // set z
@@ -154,6 +157,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void OnMouseMove(Vector3 pos)
     {
+        if (_super.data.progress.blockProgramUid > 0)
+        {
+            return;
+        }
         SetPlayerRotation(new Vector3(pos.x - InputManager.instance.screenSize.x / 2, 0, pos.y - InputManager.instance.screenSize.y / 2));
     }
 
@@ -234,6 +241,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerMove(Vector3 dir)
     {
+
         if (_playerM == null || _playerM.unit.ins == null)
             return;
         if (CharacterParamForm.DataByName.ContainsKey(_playerG.speedParamName))
@@ -247,6 +255,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerRotation(Vector3 dir, float speed = 360)
     {
+
+
         if (_playerM == null || _playerM.unit.ins == null)
             return;
         dir.y = 0;

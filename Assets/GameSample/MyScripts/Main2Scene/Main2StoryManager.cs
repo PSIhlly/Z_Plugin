@@ -52,7 +52,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.saveCtrl.LoadEffect(ModManager.GetStoryCoreFolder(storyFolder));
 
             GameManager.instance.saveCtrl.LoadEvent(ModManager.GetStoryCoreFolder(storyFolder));
-            GameManager.instance.saveCtrl.LoadConfig(ModManager.GetStoryCoreFolder(storyFolder));
+            GameManager.instance.saveCtrl.LoadProgress(ModManager.GetStoryCoreFolder(storyFolder));
 
         }
         else //初始化

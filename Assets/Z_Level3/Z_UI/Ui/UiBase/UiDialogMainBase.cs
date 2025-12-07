@@ -28,15 +28,17 @@ namespace MainText
     public partial class UiMainTextView:UiView
     {
 
+            public Img img_bg;
             public GameObject go_bg;
             public AudioSource as_;
             public Txt txt_;
         public UiMainTextView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_bg = uiHolder.elementTrsLst[0].gameObject;
-            as_ = uiHolder.elementTrsLst[1].GetComponent<AudioSource>();
-            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            img_bg = uiHolder.elementTrsLst[0].GetComponent<Img>();
+            go_bg = uiHolder.elementTrsLst[1].gameObject;
+            as_ = uiHolder.elementTrsLst[2].GetComponent<AudioSource>();
+            txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
         }
 
     }
@@ -84,11 +86,13 @@ namespace Title
     public partial class UiTitleView:UiView
     {
 
+            public Img img_bg;
             public Txt txt_;
         public UiTitleView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            img_bg = uiHolder.elementTrsLst[0].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
         }
 
     }
@@ -136,11 +140,13 @@ namespace Profile
     public partial class UiProfileView:UiView
     {
 
+            public Img img_bg;
             public Img img_;
         public UiProfileView(UiHolder uiHolder):base(uiHolder)
         {
 
-            img_ = uiHolder.elementTrsLst[0].GetComponent<Img>();
+            img_bg = uiHolder.elementTrsLst[0].GetComponent<Img>();
+            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
         }
 
     }
@@ -190,7 +196,9 @@ namespace Options
 
             public Btn btn_over;
             public GameObject go_func;
+            public Img img_func;
             public Btn btn_menu;
+            public Img img_menu;
             public Btn btn_history;
             public Btn btn_hide;
             public Sta sta_skip;
@@ -202,13 +210,15 @@ namespace Options
 
             btn_over = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             go_func = uiHolder.elementTrsLst[1].gameObject;
-            btn_menu = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_history = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_hide = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_skip = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_skip = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_autoPlay = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_autoPlay = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            img_func = uiHolder.elementTrsLst[2].GetComponent<Img>();
+            btn_menu = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            img_menu = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            btn_history = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            btn_hide = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            sta_skip = uiHolder.elementTrsLst[7].GetComponent<Sta>();
+            btn_skip = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_autoPlay = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_autoPlay = uiHolder.elementTrsLst[10].GetComponent<Btn>();
         }
 
     }

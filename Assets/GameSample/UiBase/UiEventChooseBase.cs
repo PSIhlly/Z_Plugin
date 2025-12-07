@@ -21,6 +21,7 @@ namespace Ui.EventChoose
     public partial class UiEventChooseView:UiView
     {
 
+            public Txt txt_name;
             public Btn btn_onEvent;
             public Btn btn_onEventTrigger;
             public Txt txt_onEvent;
@@ -28,10 +29,11 @@ namespace Ui.EventChoose
         public UiEventChooseView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_onEvent = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            btn_onEventTrigger = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            txt_onEvent = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            txt_onEventTrigger = uiHolder.elementTrsLst[3].GetComponent<Txt>();
+            txt_name = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            btn_onEvent = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            btn_onEventTrigger = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            txt_onEvent = uiHolder.elementTrsLst[3].GetComponent<Txt>();
+            txt_onEventTrigger = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
     }

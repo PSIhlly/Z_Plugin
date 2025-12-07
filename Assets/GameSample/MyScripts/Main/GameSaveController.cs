@@ -139,7 +139,7 @@ public class GameSaveController : Z_Controller<GameManager>
     {
 
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectFormFileName, MapObjectForm.GetJaByDatas().ToString());
-        if (noImage)
+        if (!noImage)
             foreach (var data in MapObjectForm.DataById.Values)
             {
                 for (int i = 0; i < data.model.subUnitTexsName.Count; i++)

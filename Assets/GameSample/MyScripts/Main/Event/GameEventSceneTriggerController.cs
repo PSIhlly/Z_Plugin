@@ -19,6 +19,7 @@ using Z_DataSystem.Form;
 using Z_Time;
 using Z_Math;
 using Z_Map.Form;
+using System.Xml.Linq;
 
 public enum SceneEventType
 {
@@ -73,19 +74,42 @@ namespace Z_Map
             }
 
         }
-        public void ExecuteEvt(string name, List<BoxDataForm.Data> args)
+        public bool ExecuteEvt(string name, List<BoxDataForm.Data> args)
         {
-            if (evtDic.ContainsKey(name) && EventProgramDataForm.DataByName.ContainsKey(evtDic[name].evt))
+            EventTriggerForm.Data trigger = null;
+            if (evtDic.ContainsKey(name))
             {
-                GameManager.instance.evtCtrl.TriggerEventExecute(evtDic[name], data.uid, args);
+                trigger = evtDic[name];
             }
+            else
+            {
+                int id = AssetManager.GetKeyId(data.name);
+                if (this is CharacterUnit && CharacterProductForm.DataByUid.TryGetValue(id, out var ch) && ch.events.ContainsKey(name))
+                {
+                    trigger = ch.events[name];
+                }
+                else if (this is ObjectUnit && MapObjectForm.DataById.TryGetValue(id, out var ob) && ob.events.ContainsKey(name))
+                {
+                    trigger = ob.events[name];
+                }
+                else if (this is ItemUnit && ItemProductForm.DataByUid.TryGetValue(id, out var it) && it.events.ContainsKey(name))
+                {
+                    trigger = it.events[name];
+                }
+            }
+            if (trigger != null && EventProgramDataForm.DataByName.ContainsKey(trigger.evt))
+            {
+                GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, args);
+                return true;
+            }
+            return false;
         }
 
     }
 }
 public class GameEventSceneTriggerController : Z_Controller<GameEventController>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ItemEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
 {
-    
+
     public GameEventSceneTriggerController(GameEventController super) : base(super)
     {
         Z_EventHelper.Register<CollideEvent>(this);
@@ -99,13 +123,12 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
         if (evt.a is MapUnit mapUnit)
         {
             var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.a.data.uid), CodeHelper.CreateBoxByNum(evt.b.data.uid) };
-            
+
             switch (evt.type)
             {
                 case CollideEventType.TriggerEnter:
-                    if(evt.b is CharacterUnit)
+                    if (evt.b is CharacterUnit)
                     {
-
                         mapUnit.ExecuteEvt("onCharacterTouchEvent", args);
                     }
                     else if (evt.b is ObjectUnit)
@@ -135,7 +158,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
             switch (evt.type)
             {
                 case MapEventType.Show:
-                    mapUnit.ExecuteEvt("onShowEvent",args);
+                    mapUnit.ExecuteEvt("onShowEvent", args);
                     break;
             }
         }
@@ -157,7 +180,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     {
         if (evt.unit is MapUnit mapUnit)
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid)};
+            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
 
             switch (evt.type)
             {
@@ -171,7 +194,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     {
         if (evt.unit is MapUnit mapUnit)
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid)};
+            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
 
 
             switch (evt.type)

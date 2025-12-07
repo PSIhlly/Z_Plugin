@@ -301,7 +301,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             {
                                 object[] prms = null;
                                 var newObjectData = mapMgr.AddObject(key, finalPos, objectData.name, prms);
-                                newObjectData.unit.evtDic = objectData.events;
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
 
@@ -332,7 +331,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 object[] prms = null;
                                 var newItemData = mapMgr.AddItem(key, finalPos, data.name, prms);
                                 newItemData.unit.productInfo = (data.uid, -1);
-                                newItemData.unit.evtDic = data.events;
                                 newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
                             }
                         });
@@ -360,7 +358,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 object[] prms = null;
                                 var newCharacerData = mapMgr.AddCharacter(key, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false);
                                 newCharacerData.unit.productInfo = (data.uid, -1);
-                                newCharacerData.unit.evtDic = data.events;
                                 newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
                             }
                         });

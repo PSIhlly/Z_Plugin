@@ -18,7 +18,7 @@ using Z_Code.Form;
 namespace Form
 {
 
-    public static partial class ProgressForm
+    public static partial class UiConfigForm
     {
 public static readonly int autoUidCnt=100;
 
@@ -49,31 +49,35 @@ public static readonly int autoUidCnt=100;
 
         public static Action<Data,int,int> changeUidAction;
                 
-        public static Action<Data,int,int> changeSceneidAction;
+        public static Action<Data,string,string> changeTexnameAction;
                 
-        public static Action<Data,Vector3,Vector3> changePosAction;
+        public static Action<Data,Vector2,Vector2> changeSizeAction;
                 
-        public static Action<Data,int,int> changeCharacteruidAction;
+        public static Action<Data,Vector2,Vector2> changeOldposAction;
                 
-        public static Action<Data,List<int>,List<int>> changeBagAction;
+        public static Action<Data,float,float> changePosprogressAction;
                 
-        public static Action<Data,List<int>,List<int>> changeTeamAction;
+        public static Action<Data,float,float> changePostimeAction;
                 
-        public static Action<Data,List<int>,List<int>> changeTeamactiveAction;
+        public static Action<Data,Vector2,Vector2> changeTarposAction;
                 
-        public static Action<Data,Dictionary<string,string>,Dictionary<string,string>> changeUistyleimagenameAction;
+        public static Action<Data,float,float> changeOldopacityAction;
                 
-        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
+        public static Action<Data,float,float> changeOpacityprogressAction;
                 
-        public static Action<Data,CameraMode,CameraMode> changeCameramodeAction;
+        public static Action<Data,float,float> changeOpacitytimeAction;
                 
-        public static Action<Data,ClipForm.Data,ClipForm.Data> changeDialogcacheAction;
+        public static Action<Data,float,float> changeTaropacityAction;
                 
-        public static Action<Data,Dictionary<int,List<string>>,Dictionary<int,List<string>>> changeTriggeredonceevtsAction;
+        public static Action<Data,float,float> changeOldeulerAction;
                 
-        public static Action<Data,bool,bool> changeNotfirsttimeAction;
+        public static Action<Data,float,float> changeEulerprogressAction;
                 
-        public static Action<Data,int,int> changeBlockprogramuidAction;
+        public static Action<Data,float,float> changeEulertimeAction;
+                
+        public static Action<Data,float,float> changeTareulerAction;
+                
+        public static Action<Data,float,float> changeRemovetimeAction;
                 
 
 
@@ -98,268 +102,306 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private int  _sceneId;
+                    private string  _texName;
                     /// <summary>
-                    ///玩家所处sceneId
+                    ///图片名称
                     ///</summary>
-                    public int  sceneId{
-                                get{return _sceneId;}
+                    public string  texName{
+                                get{return _texName;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeSceneid(this,_sceneId,value); 
+                       ChangeTexname(this,_texName,value); 
                     }
         
-                _sceneId = value;
+                _texName = value;
                 }
                  
                      }
                     
-                    private Vector3  _pos;
+                    private Vector2  _size;
                     /// <summary>
-                    ///玩家位置
+                    ///尺寸
                     ///</summary>
-                    public Vector3  pos{
-                                get{return _pos;}
+                    public Vector2  size{
+                                get{return _size;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangePos(this,_pos,value); 
+                       ChangeSize(this,_size,value); 
                     }
         
-                _pos = value;
+                _size = value;
                 }
                  
                      }
                     
-                    private int  _characterUid;
+                    private Vector2  _oldPos;
                     /// <summary>
-                    ///玩家角色Uid
+                    ///原位置
                     ///</summary>
-                    public int  characterUid{
-                                get{return _characterUid;}
+                    public Vector2  oldPos{
+                                get{return _oldPos;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeCharacteruid(this,_characterUid,value); 
+                       ChangeOldpos(this,_oldPos,value); 
                     }
         
-                _characterUid = value;
+                _oldPos = value;
                 }
                  
                      }
                     
-                    private List<int>  _bag;
+                    private float  _posProgress;
                     /// <summary>
-                    ///背包（道具uid）
+                    ///位置进度
                     ///</summary>
-                    public List<int>  bag{
-                                get{return _bag;}
+                    public float  posProgress{
+                                get{return _posProgress;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeBag(this,_bag,value); 
+                       ChangePosprogress(this,_posProgress,value); 
                     }
         
-                _bag = value;
+                _posProgress = value;
                 }
                  
                      }
                     
-                    private List<int>  _team;
+                    private float  _posTime;
                     /// <summary>
-                    ///队伍（人物uid）
+                    ///位置总耗时
                     ///</summary>
-                    public List<int>  team{
-                                get{return _team;}
+                    public float  posTime{
+                                get{return _posTime;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeTeam(this,_team,value); 
+                       ChangePostime(this,_posTime,value); 
                     }
         
-                _team = value;
+                _posTime = value;
                 }
                  
                      }
                     
-                    private List<int>  _teamActive;
+                    private Vector2  _tarPos;
                     /// <summary>
-                    ///出战队伍（人物uid）
+                    ///目标位置
                     ///</summary>
-                    public List<int>  teamActive{
-                                get{return _teamActive;}
+                    public Vector2  tarPos{
+                                get{return _tarPos;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeTeamactive(this,_teamActive,value); 
+                       ChangeTarpos(this,_tarPos,value); 
                     }
         
-                _teamActive = value;
+                _tarPos = value;
                 }
                  
                      }
                     
-                    private Dictionary<string,string>  _uiStyleImageName;
+                    private float  _oldOpacity;
                     /// <summary>
-                    ///ui样式图片名称
+                    ///原不透明度
                     ///</summary>
-                    public Dictionary<string,string>  uiStyleImageName{
-                                get{return _uiStyleImageName;}
+                    public float  oldOpacity{
+                                get{return _oldOpacity;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeUistyleimagename(this,_uiStyleImageName,value); 
+                       ChangeOldopacity(this,_oldOpacity,value); 
                     }
         
-                _uiStyleImageName = value;
+                _oldOpacity = value;
                 }
                  
                      }
                     
-                    private Dictionary<string,EventTriggerForm.Data>  _events;
+                    private float  _opacityProgress;
                     /// <summary>
-                    ///事件
+                    ///不透明度进度
                     ///</summary>
-                    public Dictionary<string,EventTriggerForm.Data>  events{
-                                get{return _events;}
+                    public float  opacityProgress{
+                                get{return _opacityProgress;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeEvents(this,_events,value); 
+                       ChangeOpacityprogress(this,_opacityProgress,value); 
                     }
         
-                _events = value;
+                _opacityProgress = value;
                 }
                  
                      }
                     
-                    private CameraMode  _cameraMode;
+                    private float  _opacityTime;
                     /// <summary>
-                    ///相机视角
+                    ///不透明度总耗时
                     ///</summary>
-                    public CameraMode  cameraMode{
-                                get{return _cameraMode;}
+                    public float  opacityTime{
+                                get{return _opacityTime;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeCameramode(this,_cameraMode,value); 
+                       ChangeOpacitytime(this,_opacityTime,value); 
                     }
         
-                _cameraMode = value;
+                _opacityTime = value;
                 }
                  
                      }
                     
-                    private ClipForm.Data  _dialogCache;
+                    private float  _tarOpacity;
                     /// <summary>
-                    ///对话缓存
+                    ///目标不透明度
                     ///</summary>
-                    public ClipForm.Data  dialogCache{
-                                get{return _dialogCache;}
+                    public float  tarOpacity{
+                                get{return _tarOpacity;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeDialogcache(this,_dialogCache,value); 
+                       ChangeTaropacity(this,_tarOpacity,value); 
                     }
         
-                _dialogCache = value;
+                _tarOpacity = value;
                 }
                  
                      }
                     
-                    private Dictionary<int,List<string>>  _triggeredOnceEvts;
+                    private float  _oldEuler;
                     /// <summary>
-                    ///触发过的一次性事件
+                    ///原旋转
                     ///</summary>
-                    public Dictionary<int,List<string>>  triggeredOnceEvts{
-                                get{return _triggeredOnceEvts;}
+                    public float  oldEuler{
+                                get{return _oldEuler;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeTriggeredonceevts(this,_triggeredOnceEvts,value); 
+                       ChangeOldeuler(this,_oldEuler,value); 
                     }
         
-                _triggeredOnceEvts = value;
+                _oldEuler = value;
                 }
                  
                      }
                     
-                    private bool  _notFirstTime;
+                    private float  _eulerProgress;
                     /// <summary>
-                    ///非第一次进入
+                    ///旋转进度
                     ///</summary>
-                    public bool  notFirstTime{
-                                get{return _notFirstTime;}
+                    public float  eulerProgress{
+                                get{return _eulerProgress;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeNotfirsttime(this,_notFirstTime,value); 
+                       ChangeEulerprogress(this,_eulerProgress,value); 
                     }
         
-                _notFirstTime = value;
+                _eulerProgress = value;
                 }
                  
                      }
                     
-                    private int  _blockProgramUid;
+                    private float  _eulerTime;
                     /// <summary>
-                    ///阻塞的程序uid
+                    ///旋转总耗时
                     ///</summary>
-                    public int  blockProgramUid{
-                                get{return _blockProgramUid;}
+                    public float  eulerTime{
+                                get{return _eulerTime;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeBlockprogramuid(this,_blockProgramUid,value); 
+                       ChangeEulertime(this,_eulerTime,value); 
                     }
         
-                _blockProgramUid = value;
+                _eulerTime = value;
                 }
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid)
+                    private float  _tarEuler;
+                    /// <summary>
+                    ///目标旋转
+                    ///</summary>
+                    public float  tarEuler{
+                                get{return _tarEuler;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeTareuler(this,_tarEuler,value); 
+                    }
+        
+                _tarEuler = value;
+                }
+                 
+                     }
+                    
+                    private float  _removeTime;
+                    /// <summary>
+                    ///移除时间
+                    ///</summary>
+                    public float  removeTime{
+                                get{return _removeTime;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeRemovetime(this,_removeTime,value); 
+                    }
+        
+                _removeTime = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string texName,Vector2 size,Vector2 oldPos,float posProgress,float posTime,Vector2 tarPos,float oldOpacity,float opacityProgress,float opacityTime,float tarOpacity,float oldEuler,float eulerProgress,float eulerTime,float tarEuler,float removeTime)
             {
 
              this.uid = uid;
-             this.sceneId = sceneId;
-             this.pos = pos;
-             this.characterUid = characterUid;
-             this.bag = bag;
-             this.team = team;
-             this.teamActive = teamActive;
-             this.uiStyleImageName = uiStyleImageName;
-             this.events = events;
-             this.cameraMode = cameraMode;
-             this.dialogCache = dialogCache;
-             this.triggeredOnceEvts = triggeredOnceEvts;
-             this.notFirstTime = notFirstTime;
-             this.blockProgramUid = blockProgramUid;
+             this.texName = texName;
+             this.size = size;
+             this.oldPos = oldPos;
+             this.posProgress = posProgress;
+             this.posTime = posTime;
+             this.tarPos = tarPos;
+             this.oldOpacity = oldOpacity;
+             this.opacityProgress = opacityProgress;
+             this.opacityTime = opacityTime;
+             this.tarOpacity = tarOpacity;
+             this.oldEuler = oldEuler;
+             this.eulerProgress = eulerProgress;
+             this.eulerTime = eulerTime;
+             this.tarEuler = tarEuler;
+             this.removeTime = removeTime;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),texName,size,oldPos,posProgress,posTime,tarPos,oldOpacity,opacityProgress,opacityTime,tarOpacity,oldEuler,eulerProgress,eulerTime,tarEuler,removeTime);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0);
+                   private static Data _defaultData=new Data(0,"",default,default,0f,0f,default,0f,0f,0f,0f,0f,0f,0f,0f,999999f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -432,31 +474,35 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("uid"),
 
-                jo.Get<int>("sceneId"),
+                jo.Get<string>("texName"),
 
-                jo.Get<Vector3>("pos"),
+                jo.Get<Vector2>("size"),
 
-                jo.Get<int>("characterUid"),
+                jo.Get<Vector2>("oldPos"),
 
-                jo.Get<List<int>>("bag"),
+                jo.Get<float>("posProgress"),
 
-                jo.Get<List<int>>("team"),
+                jo.Get<float>("posTime"),
 
-                jo.Get<List<int>>("teamActive"),
+                jo.Get<Vector2>("tarPos"),
 
-                jo.Get<Dictionary<string,string>>("uiStyleImageName"),
+                jo.Get<float>("oldOpacity"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+                jo.Get<float>("opacityProgress"),
 
-                jo.Get<CameraMode>("cameraMode"),
+                jo.Get<float>("opacityTime"),
 
-                jo.Get<ClipForm.Data>("dialogCache"),
+                jo.Get<float>("tarOpacity"),
 
-                jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
+                jo.Get<float>("oldEuler"),
 
-                jo.Get<bool>("notFirstTime"),
+                jo.Get<float>("eulerProgress"),
 
-                jo.Get<int>("blockProgramUid")
+                jo.Get<float>("eulerTime"),
+
+                jo.Get<float>("tarEuler"),
+
+                jo.Get<float>("removeTime")
                     );
 
             return data;
@@ -470,31 +516,35 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<int>("sceneId",data.sceneId);
+            jo.Set<string>("texName",data.texName);
 
-            jo.Set<Vector3>("pos",data.pos);
+            jo.Set<Vector2>("size",data.size);
 
-            jo.Set<int>("characterUid",data.characterUid);
+            jo.Set<Vector2>("oldPos",data.oldPos);
 
-            jo.Set<List<int>>("bag",data.bag);
+            jo.Set<float>("posProgress",data.posProgress);
 
-            jo.Set<List<int>>("team",data.team);
+            jo.Set<float>("posTime",data.posTime);
 
-            jo.Set<List<int>>("teamActive",data.teamActive);
+            jo.Set<Vector2>("tarPos",data.tarPos);
 
-            jo.Set<Dictionary<string,string>>("uiStyleImageName",data.uiStyleImageName);
+            jo.Set<float>("oldOpacity",data.oldOpacity);
 
-            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+            jo.Set<float>("opacityProgress",data.opacityProgress);
 
-            jo.Set<CameraMode>("cameraMode",data.cameraMode);
+            jo.Set<float>("opacityTime",data.opacityTime);
 
-            jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
+            jo.Set<float>("tarOpacity",data.tarOpacity);
 
-            jo.Set<Dictionary<int,List<string>>>("triggeredOnceEvts",data.triggeredOnceEvts);
+            jo.Set<float>("oldEuler",data.oldEuler);
 
-            jo.Set<bool>("notFirstTime",data.notFirstTime);
+            jo.Set<float>("eulerProgress",data.eulerProgress);
 
-            jo.Set<int>("blockProgramUid",data.blockProgramUid);
+            jo.Set<float>("eulerTime",data.eulerTime);
+
+            jo.Set<float>("tarEuler",data.tarEuler);
+
+            jo.Set<float>("removeTime",data.removeTime);
 
             return jo;
         }
@@ -585,132 +635,152 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeSceneid(Data superData,int oldV,int newV)
+            public static void ChangeTexname(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeSceneidAction?.Invoke(data,oldV,newV);
+                changeTexnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangePos(Data superData,Vector3 oldV,Vector3 newV)
+            public static void ChangeSize(Data superData,Vector2 oldV,Vector2 newV)
             {
                 if(superData is Data data)
                 {
 
-                changePosAction?.Invoke(data,oldV,newV);
+                changeSizeAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeCharacteruid(Data superData,int oldV,int newV)
+            public static void ChangeOldpos(Data superData,Vector2 oldV,Vector2 newV)
             {
                 if(superData is Data data)
                 {
 
-                changeCharacteruidAction?.Invoke(data,oldV,newV);
+                changeOldposAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeBag(Data superData,List<int> oldV,List<int> newV)
+            public static void ChangePosprogress(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeBagAction?.Invoke(data,oldV,newV);
+                changePosprogressAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeTeam(Data superData,List<int> oldV,List<int> newV)
+            public static void ChangePostime(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTeamAction?.Invoke(data,oldV,newV);
+                changePostimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeTeamactive(Data superData,List<int> oldV,List<int> newV)
+            public static void ChangeTarpos(Data superData,Vector2 oldV,Vector2 newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTeamactiveAction?.Invoke(data,oldV,newV);
+                changeTarposAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeUistyleimagename(Data superData,Dictionary<string,string> oldV,Dictionary<string,string> newV)
+            public static void ChangeOldopacity(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeUistyleimagenameAction?.Invoke(data,oldV,newV);
+                changeOldopacityAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
+            public static void ChangeOpacityprogress(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeEventsAction?.Invoke(data,oldV,newV);
+                changeOpacityprogressAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeCameramode(Data superData,CameraMode oldV,CameraMode newV)
+            public static void ChangeOpacitytime(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeCameramodeAction?.Invoke(data,oldV,newV);
+                changeOpacitytimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeDialogcache(Data superData,ClipForm.Data oldV,ClipForm.Data newV)
+            public static void ChangeTaropacity(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeDialogcacheAction?.Invoke(data,oldV,newV);
+                changeTaropacityAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeTriggeredonceevts(Data superData,Dictionary<int,List<string>> oldV,Dictionary<int,List<string>> newV)
+            public static void ChangeOldeuler(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTriggeredonceevtsAction?.Invoke(data,oldV,newV);
+                changeOldeulerAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeNotfirsttime(Data superData,bool oldV,bool newV)
+            public static void ChangeEulerprogress(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeNotfirsttimeAction?.Invoke(data,oldV,newV);
+                changeEulerprogressAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeBlockprogramuid(Data superData,int oldV,int newV)
+            public static void ChangeEulertime(Data superData,float oldV,float newV)
             {
                 if(superData is Data data)
                 {
 
-                changeBlockprogramuidAction?.Invoke(data,oldV,newV);
+                changeEulertimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTareuler(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTareulerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRemovetime(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRemovetimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

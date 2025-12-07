@@ -235,7 +235,6 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 break;
             }
         }
-        Debug.Log((unitData == null) + " " + AssetManager.GetIdNameKey(data.uid, data.name));
         if (unitData == null)
         {
             unitData=MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name), GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true); ;
@@ -292,7 +291,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputKeyEvent evt)
     {
-        if (!enable)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid >0)
             return;
         switch (evt.key)
         {
@@ -314,7 +313,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseEvent evt)
     {
-        if (!enable)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
         if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
         {
@@ -324,7 +323,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseDownEvent evt)
     {
-        if (!enable)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
         if (evt.ui == null)
         {
@@ -338,7 +337,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseUpEvent evt)
     {
-        if (!enable)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
         if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
         {
@@ -349,7 +348,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseMoveEvent evt)
     {
-        if (!enable)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
         OnMouseMove(evt.pos);
     }

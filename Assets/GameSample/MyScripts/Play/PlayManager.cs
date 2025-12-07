@@ -122,6 +122,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public void EndStory()
     {
         _assetCtrl.End();
+        GameManager.instance.evtCtrl.Reset();
         enable = false;
     }
     public async void BeginScene(int id)

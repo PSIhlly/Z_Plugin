@@ -40,22 +40,23 @@ namespace Ui.ModStoryEventEditWindow
         {
             view.btn_.onClick.AddListener(() =>
             {
-                if(model.node==null)
+                if (model.node == null)
                 {
-                    ModManager.instance.assetCtrl.ChooseCmd( SceneEventType.All, "", (item) =>
+                    ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "", (item) =>
                     {
-                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[item.content];
+                        var data = GameCmdDataForm.DataByUid[item.id];
+                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
                         parent.model.cpr.Compile(sel.defaultCode, out var res);
                         parent.model.curEntry.AddRange(res);
                         parent.ApplyEntry();
-                    },true);
+                    }, true);
                 }
                 else
                 {
                     parent.SelItem(model.node);
                 }
             });
-           
+
         }
         public override void OnShow()
         {
@@ -68,11 +69,12 @@ namespace Ui.ModStoryEventEditWindow
 
         public void Refresh()
         {
-            view.sta_isEmpty.ChangeState(model.node == null?0:1);
+            view.sta_isEmpty.ChangeState(model.node == null ? 0 : 1);
             if (model.node == null)
             {
 
-            }else
+            }
+            else
             {
                 int curRender = model.con.GetNowRenderId();
                 foreach (var sub in model.node.subNodes)
@@ -102,10 +104,10 @@ namespace Ui.ModStoryEventEditWindow
                     }
                 }
 
-                view.txt_.oriText=" ".Repeat(model.deepth) + GetNodeDesc(model.node);
+                view.txt_.oriText = " ".Repeat(model.deepth) + GetNodeDesc(model.node);
             }
 
-            
+
 
         }
 
@@ -123,10 +125,11 @@ namespace Ui.ModStoryEventEditWindow
                     {
                         var form = CmdDataForm.DataByName[node.desc.code];
                         res = form.desc;
-                        for (int i = 0; i < form.prmNames.Count; i++)
-                        {
-                            res = res.Replace($"{{{i}}}", GetNodeDesc(node.subNodes[i]));
-                        }
+                        if (form.prmNames != null)
+                            for (int i = 0; i < form.prmNames.Count; i++)
+                            {
+                                res = res.Replace($"{{{i}}}", GetNodeDesc(node.subNodes[i]));
+                            }
                     }
                     else
                     {

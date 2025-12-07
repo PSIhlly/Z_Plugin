@@ -132,7 +132,7 @@ namespace Ui.Notify
             public GameObject go_close;
             public Btn btn_close;
             public GameObject go_item;
-            public UiItemCtrl sub_Item;
+            public UiItemCtrl sub_item;
         public UiChooseView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -144,7 +144,7 @@ namespace Ui.Notify
             go_close = uiHolder.elementTrsLst[5].gameObject;
             btn_close = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             go_item = uiHolder.elementTrsLst[7].gameObject;
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -169,8 +169,8 @@ namespace Ui.Notify
             model=new UiChooseModel();
 
 
-            view.sub_Item = new UiItemCtrl();
-            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_item = new UiItemCtrl();
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -249,7 +249,7 @@ namespace Ui.Notify
             public GameObject go_labels;
             public ScrView scr_labels;
             public GameObject go_label;
-            public UiLabelCtrl sub_Label;
+            public UiLabelCtrl sub_label;
         public UiColumnView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -257,7 +257,7 @@ namespace Ui.Notify
             go_labels = uiHolder.elementTrsLst[1].gameObject;
             scr_labels = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             go_label = uiHolder.elementTrsLst[3].gameObject;
-            sub_Label = (UiLabelCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            sub_label = (UiLabelCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -282,8 +282,8 @@ namespace Ui.Notify
             model=new UiColumnModel();
 
 
-            view.sub_Label = new UiLabelCtrl();
-            view.sub_Label.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_label = new UiLabelCtrl();
+            view.sub_label.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -357,13 +357,13 @@ namespace Ui.Notify
             public GameObject go_close;
             public Btn btn_close;
             public GameObject go_column;
-            public UiColumnCtrl sub_Column;
+            public UiColumnCtrl sub_column;
             public GameObject go_choose;
             public Btn btn_choose;
             public GameObject go_subItems;
             public ScrView scr_subItems;
             public GameObject go_subItem;
-            public UiSubItemCtrl sub_SubItem;
+            public UiSubItemCtrl sub_subItem;
         public UiMultipleChooseView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -372,13 +372,13 @@ namespace Ui.Notify
             go_close = uiHolder.elementTrsLst[2].gameObject;
             btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             go_column = uiHolder.elementTrsLst[4].gameObject;
-            sub_Column = (UiColumnCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            sub_column = (UiColumnCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
             go_choose = uiHolder.elementTrsLst[6].gameObject;
             btn_choose = uiHolder.elementTrsLst[7].GetComponent<Btn>();
             go_subItems = uiHolder.elementTrsLst[8].gameObject;
             scr_subItems = uiHolder.elementTrsLst[9].GetComponent<ScrView>();
             go_subItem = uiHolder.elementTrsLst[10].gameObject;
-            sub_SubItem = (UiSubItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            sub_subItem = (UiSubItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -403,10 +403,10 @@ namespace Ui.Notify
             model=new UiMultipleChooseModel();
 
 
-            view.sub_Column = new UiColumnCtrl();
-            view.sub_Column.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_SubItem = new UiSubItemCtrl();
-            view.sub_SubItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_column = new UiColumnCtrl();
+            view.sub_column.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_subItem = new UiSubItemCtrl();
+            view.sub_subItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

@@ -96,7 +96,8 @@ namespace Ui.ModStoryEventEditWindow
             {
                 ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, GlobalEventHelper.GetGameRetType(model.selUnit.desc), (item) =>
                 {
-                    BaseData.cmdDic[item.content].GetUnitChooseCode((code) =>
+                    var data = GameCmdDataForm.DataByUid[item.id];
+                    BaseData.cmdDic[data.name].GetUnitChooseCode((code) =>
                     {
                         model.cpr.Compile(code, out var res);
                         ReplaceNode(model.selUnit, res[0]);
@@ -117,7 +118,8 @@ namespace Ui.ModStoryEventEditWindow
                 {
                     if (item != null)
                     {
-                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[item.content];
+                        var data = GameCmdDataForm.DataByUid[item.id];
+                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
                         model.cpr.Compile(sel.defaultCode, out var res);
                         int id = model.curEntry.IndexOf(model.selItem);
                         foreach (var r in res)

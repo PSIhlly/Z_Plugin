@@ -77,6 +77,8 @@ namespace Form
                 
         public static Action<Data,int,int> changeTopAction;
                 
+        public static Action<Data,int,int> changeUserAction;
+                
         public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeArgsAction;
                 
         public static Action<Data,string,string> changeReleasetriggerAction;
@@ -88,6 +90,24 @@ namespace Form
         public partial class Data : InterpretDataForm.Data
         {
 
+                    private int  _user;
+                    /// <summary>
+                    ///调用者id
+                    ///</summary>
+                    public int  user{
+                                get{return _user;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUser(this,_user,value); 
+                    }
+        
+                _user = value;
+                }
+                 
+                     }
+                    
                     private List<BoxDataForm.Data>  _args;
                     /// <summary>
                     ///参数
@@ -146,7 +166,7 @@ namespace Form
             {
             }
             
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,List<BoxDataForm.Data> args,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top)
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,List<BoxDataForm.Data> args,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top)
             {
 
              this.uid = uid;
@@ -155,6 +175,7 @@ namespace Form
              this.program = program;
              this.p = p;
              this.top = top;
+             this.user = user;
              this.args = args;
              this.releaseTrigger = releaseTrigger;
              this.blockProgramUid = blockProgramUid;
@@ -163,12 +184,12 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,new List<BoxDataForm.Data>(args),releaseTrigger,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,new List<BoxDataForm.Data>(args),releaseTrigger,blockProgramUid);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0,null,"",0);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -259,6 +280,8 @@ namespace Form
 
                 jo.Get<int>("top"),
 
+                jo.Get<int>("user"),
+
                 jo.Get<List<BoxDataForm.Data>>("args"),
 
                 jo.Get<string>("releaseTrigger"),
@@ -286,6 +309,8 @@ namespace Form
             jo.Set<int>("p",data.p);
 
             jo.Set<int>("top",data.top);
+
+            jo.Set<int>("user",data.user);
 
             jo.Set<List<BoxDataForm.Data>>("args",data.args);
 
@@ -428,6 +453,16 @@ InterpretDataForm.RemoveData(uid);
                 {
 
                 changeTopAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUser(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUserAction?.Invoke(data,oldV,newV);
                 }
                     
             }

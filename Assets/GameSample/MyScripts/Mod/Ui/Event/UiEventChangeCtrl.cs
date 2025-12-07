@@ -58,6 +58,7 @@ namespace Ui.EventChoose
         }
         public void Refresh()
         {
+            view.txt_name.oriText = model.prm.key;
             view.txt_onEvent.text = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).evt;
 
             view.txt_onEventTrigger.oriText = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).type.ToString();

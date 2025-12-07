@@ -57,7 +57,7 @@ namespace Z_Ui.Base
         protected override void Awake()
         {
 #if UNITY_EDITOR
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlaying&&string.IsNullOrEmpty(oriText))
             {
                 oriText = text;
             }

@@ -542,23 +542,15 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         var items = new EntryItem();
         foreach(TriggerType tp in Enum.GetValues(typeof(TriggerType)))
         {
-            items.Add(TextManager.instance.GetTxt(tp.ToString()));
+            items.Add(TextManager.instance.GetTxt(tp.ToString()),null,(int)tp);
         }
-        NotifyManager.instance.AddMultipleChoose("Choose trigger condition", true, (res) =>
+        NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose trigger condition"), true, (res) =>
         {
             act?.Invoke((TriggerType)res.id);
             return true;
         }, items);
     }
-    public void ChooseEvent(SceneEventType type, string retType, string title, Action<EntryItem> act)
-    {
-        var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
-        NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
-        {
-            act?.Invoke(res);
-            return true;
-        }, items);
-    }
+
     public void ChooseTriggerCondition(string title,Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetTriggerConditionEntry();

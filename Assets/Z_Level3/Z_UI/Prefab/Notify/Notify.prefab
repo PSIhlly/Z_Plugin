@@ -243,8 +243,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 7.9680176, y: -94.988}
-  m_SizeDelta: {x: -43.331, y: 145.505}
+  m_AnchoredPosition: {x: 7.9680176, y: -84.24734}
+  m_SizeDelta: {x: -43.331, y: 124.0236}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &286262132243793259
 CanvasRenderer:
@@ -1240,7 +1240,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   dir: 0
-  spacing: 0
+  xSpacing: 0
+  ySpacing: 0
   cell: {fileID: 6819280404064098270}
   fiilType: 1
 --- !u!1 &2539074896032828492
@@ -2398,9 +2399,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   dir: 1
-  spacing: 0
+  xSpacing: 0
+  ySpacing: 30
   cell: {fileID: 3358784229704946627}
-  fiilType: 1
+  fiilType: 0
 --- !u!1 &7795912855661144399
 GameObject:
   m_ObjectHideFlags: 0
@@ -2723,9 +2725,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   dir: 1
-  spacing: 0
+  xSpacing: 0
+  ySpacing: 30
   cell: {fileID: 2158489453122028109}
-  fiilType: 1
+  fiilType: 0
 --- !u!1001 &74264747567094245
 PrefabInstance:
   m_ObjectHideFlags: 0

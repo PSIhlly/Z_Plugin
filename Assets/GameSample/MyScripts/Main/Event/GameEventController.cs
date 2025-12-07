@@ -69,12 +69,22 @@ public class GameEventController : Z_Controller<GameManager>
 
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
+    List<Func<bool>> tasks;
+
     public GameEventController(GameManager super) : base(super)
     {
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
         storyTriggerCtrl = new GameEventStoryTriggerController(this);
+        tasks= new List<Func<bool>>();
     }
-
+    public void Reset()
+    {
+        tasks.Clear();
+    }
+    public void StartTask(Func<bool> func)
+    {
+        tasks.Add(func);
+    }
 
     public void LateUpdate()
     {
@@ -96,7 +106,7 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 if(!string.IsNullOrEmpty(data.releaseTrigger))
                 {
-                    GameManager.instance.curProgress.triggeredOnceEvts[data.uid].Remove(data.releaseTrigger);
+                    GameManager.instance.curProgress.triggeredOnceEvts[data.user].Remove(data.releaseTrigger);
                 }
                 EventInterpretDataForm.RemoveData(data.uid);
                 if(data.uid == GameManager.instance.curProgress.blockProgramUid)
@@ -106,7 +116,14 @@ public class GameEventController : Z_Controller<GameManager>
                 }
             }
         }
-
+        for(int i=0;i< tasks.Count;i++)
+        {
+            if(tasks[i]())
+            {
+                tasks.RemoveAt(i);
+                i--;
+            }
+        }
     }
 
 
@@ -128,7 +145,7 @@ public class GameEventController : Z_Controller<GameManager>
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), args);
+                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), user, args);
                 break;
             case TriggerType.OnceDuring:
                 if (dict.TryGetValue(user, out triggered))
@@ -140,19 +157,19 @@ public class GameEventController : Z_Controller<GameManager>
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                    Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), user, args, trigger.name);
                 break;
             default:
-                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt,null), args);
+                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt,null), user, args);
                 break;
         }
     }
 
-    public void Execute(EventProgramDataForm.Data evt, List<BoxDataForm.Data> args, string releaseTrigger="")
+    public void Execute(EventProgramDataForm.Data evt,int user, List<BoxDataForm.Data> args, string releaseTrigger="")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, args, releaseTrigger,0));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1,  new List<Z_Code.Form.BoxDataForm.Data>(),  new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, user, args, releaseTrigger,0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {
@@ -206,19 +223,20 @@ public class GameEventController : Z_Controller<GameManager>
                         continue;
                 }
             }
-
-            if (!res.subs.ContainsKey(data.category))
+            string category = TextManager.instance.GetTxt(data.category);
+            if (!res.subs.ContainsKey(category))
             {
-                res.Add(data.category);
+                res.Add(category);
             }
-            if (!res.subs[data.category].subs.ContainsKey(data.type))
+            string type = TextManager.instance.GetTxt(data.type);
+            if (!res.subs[category].subs.ContainsKey(type))
             {
-                res.subs[data.category].Add(data.type);
-
+                res.subs[category].Add(type);
             }
-            res.subs[data.category].subs[data.type].Add(data.name); 
+            string name = TextManager.instance.GetTxt(data.name);
+            res.subs[category].subs[type].Add(name,null,data.uid); 
             if (defaultItem == null)
-                defaultItem = res.subs[data.category].subs[data.type].subs[data.name];
+                defaultItem = res.subs[category].subs[type].subs[name];
         }
         return res;
     }

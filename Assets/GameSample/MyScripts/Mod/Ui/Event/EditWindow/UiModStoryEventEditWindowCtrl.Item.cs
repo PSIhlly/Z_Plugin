@@ -126,10 +126,18 @@ namespace Ui.ModStoryEventEditWindow
                         var form = CmdDataForm.DataByName[node.desc.code];
                         res = form.desc;
                         if (form.prmNames != null)
-                            for (int i = 0; i < form.prmNames.Count; i++)
+                        {
+                            int i = 0;
+                            for (; i < node.subNodes.Count; i++)
                             {
                                 res = res.Replace($"{{{i}}}", GetNodeDesc(node.subNodes[i]));
                             }
+                            for (; i< form.prmNames.Count;i++)
+                            {
+                                res = res.Replace($"{{{i}}}","");
+                            }
+                        }
+                            
                     }
                     else
                     {

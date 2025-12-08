@@ -70,7 +70,7 @@ namespace Z_Mesh
                             }
                         case Z_Mesh.MeshType.Sphere:
                             {
-                                assist.Add(Graph.SphereIntersectCube(o.positions,tar.positions, -step, out curDis));
+                                assist.Add(Graph.SphereIntersectCube(tar.positions,o.positions, -step, out curDis));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }

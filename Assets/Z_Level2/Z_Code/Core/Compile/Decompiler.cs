@@ -86,8 +86,14 @@ namespace Z_Code
                     case "<":
                     case ">=":
                     case "<=":
-                        code = $"{ResetStatement(node.subNodes[1])}{node.desc.code}{ResetStatement(node.subNodes[0])}";
-                        break;
+                        if(node.subNodes.Count > 1)
+                        {
+                            code = $"{ResetStatement(node.subNodes[1])}{node.desc.code}{ResetStatement(node.subNodes[0])}";
+                        }else
+                        {
+                            code = $"{node.desc.code}{ResetStatement(node.subNodes[0])}";
+                        }
+                            break;
                     case "[":
                         code = $"{ResetStatement(node.subNodes[1])}[{ResetStatement(node.subNodes[0])}]";
                         break;

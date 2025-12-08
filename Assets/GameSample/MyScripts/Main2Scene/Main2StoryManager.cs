@@ -60,7 +60,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             };
             animDic["anim"].animClip.Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
             CharacterProductForm.Clear();
-            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, "anim", "anim", "Speed", "Hp", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), true));
+            var defaultAnimName = new Dictionary<string, string>();
+            defaultAnimName["idle"] = "anim";
+            defaultAnimName["move"] = "anim";
+            for (int i=0;i<4;i++)
+            {
+                defaultAnimName["idle" + i] = "anim";
+                defaultAnimName["move" + i] = "anim";
+            }
+            CharacterProductForm.AddData(new CharacterProductForm.Data(-1, "Player", "", GlobalNameHelper.GetDefaultCharacterTexName(), new Dictionary<string, CharacterParamForm.Data>() { { "Hp", hpParamData.Copy() }, { "Speed", speedParamData.Copy() } }, true, animDic, defaultAnimName,  default, "Speed", "Hp", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), true));
 
             ProgressForm.Clear();
             ProgressForm.AddData(new ProgressForm.Data(1, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { }, new List<int>() { 1 }, new List<int>() { 1 }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0));

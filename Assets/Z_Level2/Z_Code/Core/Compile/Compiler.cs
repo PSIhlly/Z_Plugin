@@ -23,6 +23,7 @@ namespace Z_Code
     public abstract class Node
     {
 
+        public Desc desc;
     }
     public static class BaseData
     {
@@ -32,6 +33,7 @@ namespace Z_Code
         }
 
         public static Dictionary<string, CmdBase> cmdDic = new Dictionary<string, CmdBase>();
+
         public static HashSet<string> reserved = new HashSet<string>()
         {
             "if",

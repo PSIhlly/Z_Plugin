@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
 namespace Ui.Notify
 {
-    
+
 
     public partial class UiInputAreaParam
     {
@@ -31,10 +32,14 @@ namespace Ui.Notify
             });
             view.btn_.onClick.AddListener(() =>
             {
-               if(model.info.func(view.ipt_.text))
+                if (model.info.func(view.ipt_.text))
                 {
                     Close();
                 }
+            });
+            view.ipt_.onValueChanged.AddListener((v) =>
+            {
+                Refresh();
             });
         }
         public override void Close()
@@ -50,16 +55,16 @@ namespace Ui.Notify
                 model.info = param.info;
             }
             Refresh();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
 
         }
         public void Refresh()
         {
             view.txt_title.text = model.info.title;
+            UiManager.Rebuild(gameObject, true);
         }
 
     }
 
-    
+
 
 }

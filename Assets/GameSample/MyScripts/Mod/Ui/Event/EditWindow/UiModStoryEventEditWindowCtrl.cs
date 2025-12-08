@@ -194,10 +194,8 @@ namespace Ui.ModStoryEventEditWindow
             view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
             RefreshUnitDetail(); 
             RefreshUnit();
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
-            }, gameObject);
+
+            UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
         }
         public void RefreshUnit()
         {

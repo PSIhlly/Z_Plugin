@@ -13,6 +13,7 @@ using Z_Code.Form;
 using static UnityEditor.Progress;
 using UnityEditor.DeviceSimulation;
 using Z_DesignStyle;
+using Ui.AnimChoose;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitConfig
 {
@@ -28,10 +29,28 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
     public partial class UiModStoryCharacterUnitConfigCtrl
     {
-
+        UiAnimChooseCtrl[] idles;
+        UiAnimChooseCtrl[] moves;
         public override void OnCreate()
         {
+            idles = new UiAnimChooseCtrl[] { view.model_idle0AnimChoose, view.model_idle1AnimChoose, view.model_idle2AnimChoose, view.model_idle3AnimChoose };
+            moves = new UiAnimChooseCtrl[] { view.model_move0AnimChoose, view.model_move1AnimChoose, view.model_move2AnimChoose, view.model_move3AnimChoose };
+            view.btn_faceType.onClick.AddListener(() =>
+            {
+                var items = new EntryItem();
+                foreach (FaceType tp in Enum.GetValues(typeof(FaceType)))
+                {
+                    items.Add(TextManager.instance.GetTxt(tp.ToString()), null, (int)tp);
+                }
+                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose faceType"),
+                    true, (item) =>
+                    {
+                        model.data.faceType = (FaceType)item.id;
+                        Refresh();
+                        return true;
+                    }, items);
 
+            });
             view.btn_hpArgument.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseCharacterParam(TextManager.instance.GetTxt("Choose Hp param"), (item) =>
@@ -48,29 +67,14 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                     Refresh();
                 });
             });
-            view.btn_idleAnim.onClick.AddListener(() =>
-            {
-                ModManager.instance.assetCtrl.ChooseCharacterAnim(model.data.animDic, TextManager.instance.GetTxt("Choose Idle anim"), (item) =>
-                {
-                    model.data.idleAnimName = item.content;
-                    Refresh();
-                });
-            });
-            view.btn_moveAnim.onClick.AddListener(() =>
-            {
-                ModManager.instance.assetCtrl.ChooseCharacterAnim(model.data.animDic, TextManager.instance.GetTxt("Choose Idle anim"), (item) =>
-                {
-                    model.data.moveAnimName = item.content;
-                    Refresh();
-                });
-            });
+
             view.btn_unique.onClick.AddListener(() =>
             {
                 model.data.unique = !model.data.unique;
                 Refresh();
             });
 
-         
+
         }
         public override void OnShow()
         {
@@ -81,14 +85,24 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
             view.txt_hpArgument.text = model.data.hpParamName;
             view.txt_moveSpeedParameter.text = model.data.speedParamName;
-            view.txt_idleAnim.text = model.data.idleAnimName;
-            view.txt_moveAnim.text = model.data.moveAnimName;
+
+            view.txt_faceType.oriText = model.data.faceType.ToString();
+
+            idles[0].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = (model.data.faceType == FaceType.FourDirection ? "idle0" : "idle") });
+            moves[0].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = (model.data.faceType == FaceType.FourDirection ? "move0" : "move") });
+            for (int i = 1; i < 4; i++)
+            {
+                idles[i].gameObject.SetActive(model.data.faceType == FaceType.FourDirection);
+                idles[i].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = "idle" + i });
+                moves[i].gameObject.SetActive(model.data.faceType == FaceType.FourDirection);
+                moves[i].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = "move" + i });
+            }
 
             view.sta_unique.ChangeState(model.data.unique ? 1 : 0);
 
-            view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent"});
-            view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent"});
-            view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent"});
+            view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
+            view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });
+            view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent" });
             view.model_EventChooseObjectLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectLeaveEvent" });
             view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
 

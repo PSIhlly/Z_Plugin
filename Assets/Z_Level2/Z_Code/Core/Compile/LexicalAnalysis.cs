@@ -18,7 +18,6 @@ namespace Z_Code
             this.rawCode = code;
         }
         public string rawCode;
-        public Desc desc;
     }
     public class Desc
     {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
@@ -35,12 +36,10 @@ namespace Ui.Notify
                 parent.RemoveTip(model.info.id);
                 return true;
             }, uiHolder);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            /*TimeManager.instance.AddNextBigFrameAction(()=>
-            {
 
-            }, gameObject);*/
+
+            UiManager.Rebuild(gameObject);
+
             
         }
 

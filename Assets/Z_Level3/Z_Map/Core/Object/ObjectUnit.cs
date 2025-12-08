@@ -68,11 +68,13 @@ namespace Z_Map
                         if (exist.Contains(ch.data.uid))
                             continue;
                         exist.Add(ch.data.uid);
-                        var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly);
-                        if (dis < mag && dis>0 )
-                        {
-                            push[ch] = dir / mag * (dis - mag);
-                        }
+   
+                            var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly);
+                            if (dis < mag)
+                            {
+                                push[ch] = -dir * 1.1f / mag * (dis - mag);
+                            }
+                           
                     }
                 }
             }

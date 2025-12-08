@@ -12,6 +12,19 @@ namespace Z_Map
             get { return (MapUnit)base.unit; }
         }
         private float degree = 0;
+
+        private PerspectiveKeeper[] _keepers;
+        public PerspectiveKeeper[] keepers
+        {
+            get
+            {
+                if (_keepers == null)
+                {
+                    _keepers = GetComponentsInChildren<PerspectiveKeeper>();
+                }
+                return _keepers;
+            }
+        }
         public override void VisOn()
         {
 

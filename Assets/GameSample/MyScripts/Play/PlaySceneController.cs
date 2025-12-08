@@ -58,6 +58,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     Vector3 lastPlayerPos;
     Vector3 setPlayerMove;
+    Quaternion? setPlayerRot;
+    float rotHoldingSeconds;
 
     Vector2 downPos;
     private CharacterUnitForm.Data _playerM;
@@ -78,6 +80,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
+        setPlayerRot = null;
         downPos = Vector2.zero;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
@@ -207,6 +210,20 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             setPlayerMove = Vector3.zero;
         }
 
+        if (setPlayerRot != null)
+        {
+            _playerM.unit.ins.transform.rotation = (Quaternion)setPlayerRot;
+
+#if PLATFORM_ANDROID
+            rotHoldingSeconds-=Time.deltaTime;
+            if(rotHoldingSeconds < 0)
+            {
+                setPlayerRot = null;
+                rotHoldingSeconds = 2f;
+            }
+#endif
+        }
+
         lastPlayerPos = _playerM.pos;
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
 
@@ -269,13 +286,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerRotation(Vector3 dir, float speed = 360)
     {
-
-
         if (_playerM == null || _playerM.unit.ins == null)
             return;
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-        _playerM.unit.ins.transform.rotation = Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
+        setPlayerRot= Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
+        
+        
     }
     public void AddMessage(string content)
     {

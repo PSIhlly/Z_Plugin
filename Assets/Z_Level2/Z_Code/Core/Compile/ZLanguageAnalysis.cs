@@ -106,13 +106,27 @@ namespace Z_Code
                     {
                         case "+":
                             BuildZl(cmds, node.subNodes[0]);
-                            BuildZl(cmds, node.subNodes[1]);
-                            cmds.Add(GetOpName(Op.Plus));
+                            if (node.subNodes.Count > 1)
+                            { 
+                                BuildZl(cmds, node.subNodes[1]);
+                                cmds.Add(GetOpName(Op.Plus));
+                            }
+                            else
+                            {
+                                cmds.Add(GetOpName(Op.Positive));
+                            }
                             break;
                         case "-":
                             BuildZl(cmds, node.subNodes[0]);
-                            BuildZl(cmds, node.subNodes[1]);
-                            cmds.Add(GetOpName(Op.Minus));
+                            if (node.subNodes.Count > 1)
+                            {
+                                BuildZl(cmds, node.subNodes[1]);
+                                cmds.Add(GetOpName(Op.Minus));
+                            }
+                            else
+                            {
+                                cmds.Add(GetOpName(Op.Negative));
+                            }
                             break;
                         case "*":
                             BuildZl(cmds, node.subNodes[0]);

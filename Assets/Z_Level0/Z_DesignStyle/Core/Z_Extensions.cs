@@ -25,9 +25,9 @@ namespace Z_DesignStyle
         TKey key,
         TValue defaultValue = default)
     {
-        // 校验字典是否为null
-        if (dict == null)
-            throw new ArgumentNullException(nameof(dict));
+            // 校验字典是否为null
+            if (dict == null || key == null)
+                return defaultValue;
 
         // 存在键则返回对应值，否则返回默认值
         return dict.TryGetValue(key, out TValue value) ? value : defaultValue;
@@ -40,7 +40,7 @@ namespace Z_DesignStyle
         {
             // 校验字典是否为null
             if (dict == null)
-                throw new ArgumentNullException(nameof(dict));
+                return default;
 
             // 存在键则返回对应值，否则返回默认值
             return dict.TryGetValue(key, out TValue value) ? value : dict[defaultKey];

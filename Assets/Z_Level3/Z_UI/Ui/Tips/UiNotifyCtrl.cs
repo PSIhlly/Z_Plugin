@@ -14,6 +14,7 @@ namespace Ui.Notify
         public TipInfo tipInfo;
         public PopupInfo popupInfo;
         public ChooseInfo chooseInfo;
+        public QuickChooseInfo quickChooseInfo;
         public MultipleChooseInfo multipleChooseInfo;
         public InputAreaInfo inputAreaInfo;
     }
@@ -22,6 +23,7 @@ namespace Ui.Notify
         public List<TipInfo> tipInfos = new List<TipInfo>();
         public List<PopupInfo> popupInfos = new List<PopupInfo>();
         public List<ChooseInfo> chooseInfos = new List<ChooseInfo>();
+        public List<QuickChooseInfo> quickChooseInfos = new List<QuickChooseInfo>();
         public List<MultipleChooseInfo> multipleChooseInfos = new List<MultipleChooseInfo>();
         public List<InputAreaInfo> inputAreaInfos = new List<InputAreaInfo>();
 
@@ -30,7 +32,8 @@ namespace Ui.Notify
     public partial class UiNotifyCtrl
     {
         UiContainer<UiTipCtrl> tipCon;
-        UiContainer<UiChooseCtrl> chooseCon;
+        UiContainer<UiChooseCtrl> chooseCon; 
+        UiContainer<UiQuickChooseCtrl> quickChooseCon;
         UiContainer<UiMultipleChooseCtrl> multipleChooseCon;
         UiContainer<UiPopupCtrl> popupCon;
         UiContainer<UiInputAreaCtrl> inputAreaCon;
@@ -38,6 +41,7 @@ namespace Ui.Notify
         {
             tipCon = new UiContainer<UiTipCtrl>(view.sub_Tip.gameObject);
             chooseCon = new UiContainer<UiChooseCtrl>(view.sub_Choose.gameObject);
+            quickChooseCon = new UiContainer<UiQuickChooseCtrl>(view.sub_QuickChoose.gameObject);
             popupCon = new UiContainer<UiPopupCtrl>(view.sub_Popup.gameObject);
             multipleChooseCon = new UiContainer<UiMultipleChooseCtrl>(view.sub_MultipleChoose.gameObject);
             inputAreaCon = new UiContainer<UiInputAreaCtrl>(view.sub_InputArea.gameObject);
@@ -95,6 +99,17 @@ namespace Ui.Notify
                 });
             }
             chooseCon.Refresh();
+            //quickchoose
+            quickChooseCon.Clear();
+            if (model.quickChooseInfos.Count > 0)
+            {
+                var cur = model.quickChooseInfos[model.quickChooseInfos.Count - 1];
+                quickChooseCon.Add(new UiQuickChooseParam()
+                {
+                    info = cur
+                });
+            }
+            quickChooseCon.Refresh();
 
             //multipleChoose
             multipleChooseCon.Clear();
@@ -144,9 +159,15 @@ namespace Ui.Notify
             model.tipInfos.Add(info);
             Refresh();
         }
+        
         public void Add(ChooseInfo info)
         {
             model.chooseInfos.Add(info);
+            Refresh();
+        }
+        public void Add(QuickChooseInfo info)
+        {
+            model.quickChooseInfos.Add(info);
             Refresh();
         }
         public void Add(MultipleChooseInfo info)
@@ -186,6 +207,19 @@ namespace Ui.Notify
                 if (model.chooseInfos[i].id == id)
                 {
                     model.chooseInfos.RemoveAt(i);
+                    break;
+                }
+            }
+            Refresh();
+        }
+        public void RemoveQuickChoose(int id)
+        {
+            for (int i = 0; i < model.quickChooseInfos.Count; i++)
+            {
+
+                if (model.quickChooseInfos[i].id == id)
+                {
+                    model.quickChooseInfos.RemoveAt(i);
                     break;
                 }
             }

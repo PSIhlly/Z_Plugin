@@ -24,22 +24,35 @@ public static partial class GlobalSettings
 }
 public static partial class GlobalDataHelper
 {
-    
 
+
+}
+public enum FourDirecton
+{
+    Up,
+    Down,
+    Left,
+    Right,
+}
+public enum FaceType
+{
+    Fixed,
+    FourDirection,
+    Flexible
 }
 public enum BodyPartType
 {
-    None=0,
+    None = 0,
     UpperPart = 1,
     LowerPart = 2
 }
 public enum EquipPartType
 {
     None = 0,
-    LeftHand =1,
-    RightHand=2,
-    Head=3,
-    Body=4,
+    LeftHand = 1,
+    RightHand = 2,
+    Head = 3,
+    Body = 4,
 }
 public enum SkillType
 {
@@ -58,12 +71,12 @@ namespace Form
         {
             public bool CanShow(string prmName)
             {
-                if(!paramDic.ContainsKey(prmName)|| !CharacterParamForm.DataByName.ContainsKey(prmName))
+                if (!paramDic.ContainsKey(prmName) || !CharacterParamForm.DataByName.ContainsKey(prmName))
                 {
                     return false;
                 }
                 var prmData = CharacterParamForm.DataByName[prmName];
-                switch(prmData.showType)
+                switch (prmData.showType)
                 {
                     case ParamShowType.Always:
                         return true;
@@ -77,7 +90,7 @@ namespace Form
         }
     }
 }
-        public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
+public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<CharacterEvent>
 {
     public GameCharacterController(GameManager super) : base(super)
     {
@@ -99,8 +112,8 @@ namespace Form
         }
         public CharacterProductForm.Data form;
         public CharacterInstance ins;
-        public CharacterAnimForm.Data idleAnim;
-        public CharacterAnimForm.Data moveAnim;
+        public CharacterAnimForm.Data[] idleAnim;
+        public CharacterAnimForm.Data[] moveAnim;
 
         public Dictionary<BodyPartType, State> stateCur = new Dictionary<BodyPartType, State>();
         public Dictionary<BodyPartType, State> stateTar = new Dictionary<BodyPartType, State>();
@@ -113,15 +126,42 @@ namespace Form
             switch (state)
             {
                 case State.Move:
-                    return moveAnim;
+                    return moveAnim[(int)GetDir()];
                 default:
-                    return idleAnim;
+                    return idleAnim[(int)GetDir()];
             }
         }
-       
+        private FourDirecton GetDir()
+        {
+            switch (form.faceType)
+            {
+                case FaceType.FourDirection:
+                    var angle = ins.transform.eulerAngles.y % 360 + 360 % 360;
+                    if (angle >= 45 && angle < 135)
+                    {
+                        return FourDirecton.Right;
+                    }
+                    else if (angle >= 135 && angle < 225)
+                    {
+                        return FourDirecton.Down;
+                    }
+                    else if (angle >= 225 && angle < 315)
+                    {
+                        return FourDirecton.Left;
+                    }
+                    else
+                    {
+                        return FourDirecton.Up;
+                    }
+                default:
+                    return FourDirecton.Up;
+            }
+
+        }
+
         public void Reset()
         {
-            foreach(BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+            foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
             {
                 stateCur[part] = State.None;
                 stateTar[part] = State.None;
@@ -137,10 +177,11 @@ namespace Form
                 if (part == BodyPartType.None)
                     continue;
                 var anim = GetAnim(stateCur[part]);
-                if (anim.partEnable.ContainsKey(part)&&anim.partEnable[part])
+                if (anim.partEnable.ContainsKey(part) && anim.partEnable[part])
                 {
                     ins.renderers[(int)part - 1].enabled = true;
-                }else
+                }
+                else
                 {
                     ins.renderers[(int)part - 1].enabled = false;
                 }
@@ -150,7 +191,7 @@ namespace Form
         {
             if (part == BodyPartType.None)
                 return;
-            CharacterAnimForm.Data anim=GetAnim(tar);
+            CharacterAnimForm.Data anim = GetAnim(tar);
             //Debug.Log((anim == null) + " " + tar);
             if (!anim.partEnable.ContainsKey(part) || !anim.partEnable[part])
             {
@@ -173,7 +214,7 @@ namespace Form
                 return;
             }
             stateCur[part] = tar;
-            
+
             UpdateAnim(part, ins.renderers[(int)part - 1], ins.unit.data, anim, forceReplay);
         }
 
@@ -184,7 +225,7 @@ namespace Form
             {
                 animCurCache[part] = "";
             }
-            if (anim==null||(animCurCache.ContainsKey(part) && animCurCache[part] == anim.name))
+            if (anim == null || (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name))
             {
                 return;
             }
@@ -231,26 +272,32 @@ namespace Form
 
     public void RegisterAnim(CharacterProductForm.Data character)
     {
-        CharacterAnimForm.Data idleAnim = null;
-        CharacterAnimForm.Data moveAnim = null;
-        foreach (var anim in character.animDic.Values)
+        CharacterAnimForm.Data[] idleAnim = new CharacterAnimForm.Data[4];
+        CharacterAnimForm.Data[] moveAnim = new CharacterAnimForm.Data[4];
+
+        switch (character.faceType)
         {
-            if (anim.name == character.idleAnimName)
-            {
-                idleAnim = anim;
-            }
-            if (anim.name == character.moveAnimName)
-            {
-                moveAnim = anim;
-            }
+            case FaceType.Fixed:
+            case FaceType.Flexible:
+                idleAnim[0] = character.animDic.GetDv(character.defaultAnimName.GetDv("idle", null), null);
+                moveAnim[0] = character.animDic.GetDv(character.defaultAnimName.GetDv("move", null), null);
+                break;
+            case FaceType.FourDirection:
+                for (int i = 0; i < 4; i++)
+                {
+                    idleAnim[i] = character.animDic.GetDv(character.defaultAnimName.GetDv("idle" + i, null), null);
+                    moveAnim[i] = character.animDic.GetDv(character.defaultAnimName.GetDv("move" + i, null), null);
+                }
+                break;
         }
+
         GameManager.instance.characterCtrl.CreateAnim(character, idleAnim, moveAnim);
     }
     public void Reset()
     {
         animControllerDic.Clear();
     }
-    public void CreateAnim(CharacterProductForm.Data key, CharacterAnimForm.Data idleAnim, CharacterAnimForm.Data moveAnim)
+    public void CreateAnim(CharacterProductForm.Data key, CharacterAnimForm.Data[] idleAnim, CharacterAnimForm.Data[] moveAnim)
     {
         animControllerDic[key] = new AnimController()
         {
@@ -272,6 +319,12 @@ namespace Form
 
         animControllerDic[form].Reset();
         animControllerDic[form].ins = ins;
+
+        foreach(var keeper in ins.keepers)
+        {
+            keeper.enableFixedYRotation = form.faceType != FaceType.Flexible;
+            keeper.fixedYRotation = 0;
+        }
     }
 
 
@@ -303,7 +356,7 @@ namespace Form
         }
         status.CloseHideRenderer();
     }
-
+ 
 
 
     public void OnEvent(CharacterEvent evt)

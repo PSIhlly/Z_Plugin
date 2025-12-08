@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_DesignStyle;
-using Z_Ui.Base;
 using Z_Math;
+using Z_Time;
+using Z_Ui.Base;
 namespace Z_Ui
 {
     [DefaultExecutionOrder(-1)]
@@ -23,7 +24,7 @@ namespace Z_Ui
         {
             base.Awake();
             layer2Id = new Dictionary<UiLayer, int>();
-            foreach(UiLayer ly in Enum.GetValues(typeof(UiLayer)))
+            foreach (UiLayer ly in Enum.GetValues(typeof(UiLayer)))
             {
                 layer2Id[ly] = (int)ly;
             }
@@ -107,27 +108,31 @@ namespace Z_Ui
         }
         public static void Jump(RectTransform tar, ScrollRect scr)
         {
-            Vector3 dir =  scr.viewport.GetCenterWorldPos() - tar.GetCenterWorldPos();
+            Vector3 dir = scr.viewport.GetCenterWorldPos() - tar.GetCenterWorldPos();
             scr.content.position = scr.content.position + dir;
         }
         public static void Rebuild(GameObject go, bool recursion = false)
         {
-           var rt= go.GetComponent<RectTransform>();
-            if(rt!=null)
+            var rts = new List<RectTransform>() { go.GetComponent<RectTransform>() };
+
+
+            if (recursion)
             {
-                if(recursion)
-                {
-                    for (int i = 0, icnt = rt.childCount; i < icnt; i++)
-                    {
-                        Rebuild(rt.GetChild(i).gameObject,recursion);
-                     }
-                }
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
-               
+                rts.Clear();
+                rts.AddRange(go.GetComponentsInChildren<RectTransform>());
             }
 
-        }
 
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                foreach (var rt in rts)
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+                }
+            }, go);
+
+
+        }
     }
 
 }

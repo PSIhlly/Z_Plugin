@@ -364,7 +364,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic, "", "", "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic,new Dictionary<string, string>(), default, "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
     }
     public void DeleteCharacter(int uid)
     {

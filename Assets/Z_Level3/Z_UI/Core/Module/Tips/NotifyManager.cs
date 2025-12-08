@@ -53,6 +53,12 @@ namespace Z_Ui.Notify
         public bool canClose;
         public int id;
     }
+    public class QuickChooseInfo
+    {
+        public Func<EntryItem, bool> func;
+        public EntryItem items;
+        public int id;
+    }
     public class MultipleChooseInfo
     {
         public string title;
@@ -78,14 +84,15 @@ namespace Z_Ui.Notify
         public bool canClose;
         public int id;
     }
-    public class NotifyManager: NotifyManagerBase<UiNotifyCtrl, UiTipCtrl, UiChooseCtrl, UiMultipleChooseCtrl, UiPopupCtrl, UiInputAreaCtrl>
+    public class NotifyManager: NotifyManagerBase<UiNotifyCtrl, UiTipCtrl, UiChooseCtrl, UiQuickChooseCtrl, UiMultipleChooseCtrl, UiPopupCtrl, UiInputAreaCtrl>
     {
 
     }
-    public class NotifyManagerBase<Notify, Tip, Choose, MultiChoose, Popup, Input> : Z_Manager<NotifyManagerBase<Notify, Tip, Choose, MultiChoose, Popup, Input>>
+    public class NotifyManagerBase<Notify, Tip, Choose, QuickChoose, MultiChoose, Popup, Input> : Z_Manager<NotifyManagerBase<Notify, Tip, Choose, QuickChoose, MultiChoose, Popup, Input>>
         where Notify : UiNotifyCtrl
         where Tip : UiTipCtrl
         where Choose : UiChooseCtrl
+        where QuickChoose : UiQuickChooseCtrl
         where MultiChoose : UiMultipleChooseCtrl
         where Popup : UiPopupCtrl
         where Input : UiInputAreaCtrl
@@ -134,6 +141,27 @@ namespace Z_Ui.Notify
                 UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
                 {
                     chooseInfo = info
+                });
+            }
+        }
+        public void AddQuickChoose(Func<EntryItem, bool> func, EntryItem items)
+        {
+            var info = new QuickChooseInfo()
+            {
+                items = items,
+                func = func,
+                id = popupIdCnt++
+            };
+            var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
+            if (ctrl != null && ctrl.active)
+            {
+                ctrl.Add(info);
+            }
+            else
+            {
+                UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
+                {
+                    quickChooseInfo = info
                 });
             }
         }

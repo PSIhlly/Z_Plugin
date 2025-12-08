@@ -15,6 +15,8 @@ namespace Z_Code
         PushStr,
         Call,
         Plus,
+        Positive,
+        Negative,
         Minus,
         Mul,
         Div,
@@ -210,8 +212,14 @@ namespace Z_Code
                     case Op.Plus:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) + GetNum(Pop())));
                         break;
+                    case Op.Positive:
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop())));
+                        break;
                     case Op.Minus:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) - GetNum(Pop())));
+                        break;
+                    case Op.Negative:
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop())*-1f));
                         break;
                     case Op.Mul:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * GetNum(Pop())));

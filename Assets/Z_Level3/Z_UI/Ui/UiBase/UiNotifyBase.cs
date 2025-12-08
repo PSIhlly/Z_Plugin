@@ -184,6 +184,108 @@ namespace Ui.Notify
 
 
 
+    public partial class UiQuickItemParam:UiParam
+    {
+    }
+
+    public partial class UiQuickItemView:UiView
+    {
+
+            public GameObject go_quickItem;
+            public Img img_;
+            public Btn btn_;
+            public Txt txt_;
+        public UiQuickItemView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_quickItem = uiHolder.elementTrsLst[0].gameObject;
+            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiQuickItemCtrl:UiCtrl
+    {
+        public UiQuickItemView view;
+        public UiQuickItemModel model;
+        public UiQuickItemParam param;
+        public UiQuickChooseCtrl parent=>(UiQuickChooseCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiQuickItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiQuickItemView(uiHolder);
+            model=new UiQuickItemModel();
+
+
+        }
+
+    }
+    public partial class UiQuickItemModel:UiModel
+    {
+        
+    }
+    public partial class UiQuickChooseParam:UiParam
+    {
+    }
+
+    public partial class UiQuickChooseView:UiView
+    {
+
+            public GameObject go_quickItem;
+            public UiQuickItemCtrl sub_quickItem;
+        public UiQuickChooseView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_quickItem = uiHolder.elementTrsLst[0].gameObject;
+            sub_quickItem = (UiQuickItemCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiQuickChooseCtrl:UiCtrl
+    {
+        public UiQuickChooseView view;
+        public UiQuickChooseModel model;
+        public UiQuickChooseParam param;
+        public UiNotifyCtrl parent=>(UiNotifyCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiQuickChooseParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiQuickChooseView(uiHolder);
+            model=new UiQuickChooseModel();
+
+
+            view.sub_quickItem = new UiQuickItemCtrl();
+            view.sub_quickItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiQuickChooseModel:UiModel
+    {
+        
+    }
+
+
+
+
+
+
 
 
 
@@ -588,6 +690,7 @@ namespace Ui.Notify
             public GameObject go_block;
             public Btn btn_block;
             public UiChooseCtrl sub_Choose;
+            public UiQuickChooseCtrl sub_QuickChoose;
             public UiMultipleChooseCtrl sub_MultipleChoose;
             public UiPopupCtrl sub_Popup;
             public UiInputAreaCtrl sub_InputArea;
@@ -599,9 +702,10 @@ namespace Ui.Notify
             go_block = uiHolder.elementTrsLst[2].gameObject;
             btn_block = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             sub_Choose = (UiChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            sub_MultipleChoose = (UiMultipleChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            sub_Popup = (UiPopupCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            sub_InputArea = (UiInputAreaCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            sub_QuickChoose = (UiQuickChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            sub_MultipleChoose = (UiMultipleChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            sub_Popup = (UiPopupCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            sub_InputArea = (UiInputAreaCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -630,12 +734,14 @@ namespace Ui.Notify
             view.sub_Tip.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_Choose = new UiChooseCtrl();
             view.sub_Choose.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_QuickChoose = new UiQuickChooseCtrl();
+            view.sub_QuickChoose.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
             view.sub_MultipleChoose = new UiMultipleChooseCtrl();
-            view.sub_MultipleChoose.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.sub_MultipleChoose.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.sub_Popup = new UiPopupCtrl();
-            view.sub_Popup.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.sub_Popup.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.sub_InputArea = new UiInputAreaCtrl();
-            view.sub_InputArea.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.sub_InputArea.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
         }
 
     }

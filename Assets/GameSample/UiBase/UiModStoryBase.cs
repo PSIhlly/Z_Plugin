@@ -1327,6 +1327,7 @@ namespace ModStoryCharacterUnitConfig
 
 {
 
+using Ui.AnimChoose;
 using Ui.EventChoose;
 
 
@@ -1340,8 +1341,15 @@ using Ui.EventChoose;
 
             public Btn btn_hpArgument;
             public Btn btn_moveSpeedParameter;
-            public Btn btn_idleAnim;
-            public Btn btn_moveAnim;
+            public Btn btn_faceType;
+            public UiAnimChooseCtrl model_idle0AnimChoose;
+            public UiAnimChooseCtrl model_idle1AnimChoose;
+            public UiAnimChooseCtrl model_idle2AnimChoose;
+            public UiAnimChooseCtrl model_idle3AnimChoose;
+            public UiAnimChooseCtrl model_move0AnimChoose;
+            public UiAnimChooseCtrl model_move1AnimChoose;
+            public UiAnimChooseCtrl model_move2AnimChoose;
+            public UiAnimChooseCtrl model_move3AnimChoose;
             public Btn btn_unique;
             public Sta sta_unique;
             public UiEventChooseCtrl model_EventChooseCharacterTouch;
@@ -1351,26 +1359,31 @@ using Ui.EventChoose;
             public UiEventChooseCtrl model_EventChooseShow;
             public Txt txt_hpArgument;
             public Txt txt_moveSpeedParameter;
-            public Txt txt_idleAnim;
-            public Txt txt_moveAnim;
+            public Txt txt_faceType;
         public UiModStoryCharacterUnitConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_hpArgument = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_moveSpeedParameter = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            btn_idleAnim = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            btn_moveAnim = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_unique = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_unique = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            model_EventChooseCharacterTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            model_EventChooseCharacterLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            txt_hpArgument = uiHolder.elementTrsLst[11].GetComponent<Txt>();
-            txt_moveSpeedParameter = uiHolder.elementTrsLst[12].GetComponent<Txt>();
-            txt_idleAnim = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            txt_moveAnim = uiHolder.elementTrsLst[14].GetComponent<Txt>();
+            btn_faceType = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            model_idle0AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            model_idle1AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            model_idle2AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            model_idle3AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            model_move0AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            model_move1AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            model_move2AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            model_move3AnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            btn_unique = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_unique = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            model_EventChooseCharacterTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            model_EventChooseCharacterLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
+            model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            txt_hpArgument = uiHolder.elementTrsLst[18].GetComponent<Txt>();
+            txt_moveSpeedParameter = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            txt_faceType = uiHolder.elementTrsLst[20].GetComponent<Txt>();
         }
 
     }
@@ -1395,16 +1408,32 @@ using Ui.EventChoose;
             model=new UiModStoryCharacterUnitConfigModel();
 
 
+            view.model_idle0AnimChoose = new UiAnimChooseCtrl();
+            view.model_idle0AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_idle1AnimChoose = new UiAnimChooseCtrl();
+            view.model_idle1AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.model_idle2AnimChoose = new UiAnimChooseCtrl();
+            view.model_idle2AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_idle3AnimChoose = new UiAnimChooseCtrl();
+            view.model_idle3AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.model_move0AnimChoose = new UiAnimChooseCtrl();
+            view.model_move0AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.model_move1AnimChoose = new UiAnimChooseCtrl();
+            view.model_move1AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.model_move2AnimChoose = new UiAnimChooseCtrl();
+            view.model_move2AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
+            view.model_move3AnimChoose = new UiAnimChooseCtrl();
+            view.model_move3AnimChoose.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
             view.model_EventChooseCharacterTouch = new UiEventChooseCtrl();
-            view.model_EventChooseCharacterTouch.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_EventChooseCharacterTouch.BindHolderRecursively(uiHolder.subUiHolderLst[8]);
             view.model_EventChooseCharacterLeave = new UiEventChooseCtrl();
-            view.model_EventChooseCharacterLeave.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.model_EventChooseCharacterLeave.BindHolderRecursively(uiHolder.subUiHolderLst[9]);
             view.model_EventChooseObjectTouch = new UiEventChooseCtrl();
-            view.model_EventChooseObjectTouch.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_EventChooseObjectTouch.BindHolderRecursively(uiHolder.subUiHolderLst[10]);
             view.model_EventChooseObjectLeave = new UiEventChooseCtrl();
-            view.model_EventChooseObjectLeave.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.model_EventChooseObjectLeave.BindHolderRecursively(uiHolder.subUiHolderLst[11]);
             view.model_EventChooseShow = new UiEventChooseCtrl();
-            view.model_EventChooseShow.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.model_EventChooseShow.BindHolderRecursively(uiHolder.subUiHolderLst[12]);
         }
 
     }

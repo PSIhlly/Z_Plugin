@@ -75,9 +75,9 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,CharacterAnimForm.Data>,Dictionary<string,CharacterAnimForm.Data>> changeAnimdicAction;
                 
-        public static Action<Data,string,string> changeIdleanimnameAction;
+        public static Action<Data,Dictionary<string,string>,Dictionary<string,string>> changeDefaultanimnameAction;
                 
-        public static Action<Data,string,string> changeMoveanimnameAction;
+        public static Action<Data,FaceType,FaceType> changeFacetypeAction;
                 
         public static Action<Data,string,string> changeSpeedparamnameAction;
                 
@@ -152,38 +152,38 @@ namespace Form
                  
                      }
                     
-                    private string  _idleAnimName;
+                    private Dictionary<string,string>  _defaultAnimName;
                     /// <summary>
-                    ///闲置动画名
+                    ///预设动画名
                     ///</summary>
-                    public string  idleAnimName{
-                                get{return _idleAnimName;}
+                    public Dictionary<string,string>  defaultAnimName{
+                                get{return _defaultAnimName;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeIdleanimname(this,_idleAnimName,value); 
+                       ChangeDefaultanimname(this,_defaultAnimName,value); 
                     }
         
-                _idleAnimName = value;
+                _defaultAnimName = value;
                 }
                  
                      }
                     
-                    private string  _moveAnimName;
+                    private FaceType  _faceType;
                     /// <summary>
-                    ///移动动画名
+                    ///朝向类型
                     ///</summary>
-                    public string  moveAnimName{
-                                get{return _moveAnimName;}
+                    public FaceType  faceType{
+                                get{return _faceType;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeMoveanimname(this,_moveAnimName,value); 
+                       ChangeFacetype(this,_faceType,value); 
                     }
         
-                _moveAnimName = value;
+                _faceType = value;
                 }
                  
                      }
@@ -318,7 +318,7 @@ namespace Form
             {
             }
             
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,string idleAnimName,string moveAnimName,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique):base(uid,name,label,isProto)
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -328,8 +328,8 @@ namespace Form
              this.paramDic = paramDic;
              this.isProto = isProto;
              this.animDic = animDic;
-             this.idleAnimName = idleAnimName;
-             this.moveAnimName = moveAnimName;
+             this.defaultAnimName = defaultAnimName;
+             this.faceType = faceType;
              this.speedParamName = speedParamName;
              this.hpParamName = hpParamName;
              this.events = events;
@@ -342,12 +342,12 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),idleAnimName,moveAnimName,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,"","","","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false);
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -496,9 +496,9 @@ namespace Form
 
                 jo.Get<Dictionary<string,CharacterAnimForm.Data>>("animDic"),
 
-                jo.Get<string>("idleAnimName"),
+                jo.Get<Dictionary<string,string>>("defaultAnimName"),
 
-                jo.Get<string>("moveAnimName"),
+                jo.Get<FaceType>("faceType"),
 
                 jo.Get<string>("speedParamName"),
 
@@ -538,9 +538,9 @@ namespace Form
 
             jo.Set<Dictionary<string,CharacterAnimForm.Data>>("animDic",data.animDic);
 
-            jo.Set<string>("idleAnimName",data.idleAnimName);
+            jo.Set<Dictionary<string,string>>("defaultAnimName",data.defaultAnimName);
 
-            jo.Set<string>("moveAnimName",data.moveAnimName);
+            jo.Set<FaceType>("faceType",data.faceType);
 
             jo.Set<string>("speedParamName",data.speedParamName);
 
@@ -764,22 +764,22 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeIdleanimname(Data superData,string oldV,string newV)
+            public static void ChangeDefaultanimname(Data superData,Dictionary<string,string> oldV,Dictionary<string,string> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIdleanimnameAction?.Invoke(data,oldV,newV);
+                changeDefaultanimnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeMoveanimname(Data superData,string oldV,string newV)
+            public static void ChangeFacetype(Data superData,FaceType oldV,FaceType newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMoveanimnameAction?.Invoke(data,oldV,newV);
+                changeFacetypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

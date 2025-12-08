@@ -84,7 +84,8 @@ namespace Ui.ModStoryEventEditWindow
                                 if (ch == '}')
                                 {
                                     int id = int.Parse(cur);
-                                    CreateNode(model.node.subNodes[id]);
+                                    if(id< model.node.subNodes.Count)
+                                        CreateNode(model.node.subNodes[id]);
                                     cur = "";
                                 }
                                 else if (ch == '{')

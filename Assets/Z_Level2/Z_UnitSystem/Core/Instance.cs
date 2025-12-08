@@ -49,6 +49,7 @@ namespace Z_UnitSystem
                 return _renderers;
             }
         }
+
         private Rigidbody _rigidbody;
         public Rigidbody rigidbody
         {

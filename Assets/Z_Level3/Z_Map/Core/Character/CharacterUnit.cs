@@ -83,7 +83,7 @@ namespace Z_Map
 
             float res = mag;
             var floor = manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly);
-
+            
             if (dir.y < 0 && floor <= 0.01f)
             {
                 dir.y = 0;
@@ -92,6 +92,7 @@ namespace Z_Map
             {
                 res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly), res);
             }
+            var euler = data.euler;
             if (dir != Vector3.zero)
             {
                 foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
@@ -118,10 +119,14 @@ namespace Z_Map
                     }
                 }
 
+                var faceDir = dir;
+                faceDir.y = 0;
+                euler = Quaternion.LookRotation(faceDir).eulerAngles;
+
             }
             dir *= (res) / mag;
-            manager.updateCtrl.ApplyMove(this, data.pos + dir, data.euler);
 
+            manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
 
         }
 

@@ -454,17 +454,22 @@ namespace Z_Map
 
 
             }
+
+            var oldPos = unit.data.pos;
             if (unit.ins != null)
             {
                 unit.ins.transform.position = newPos;
+                unit.ins.transform.eulerAngles = euler;
+
             }
-            var oldPos = unit.data.pos;
             unit.data.pos = newPos;
             unit.data.euler = euler;
                if(oldPos!= newPos)
             {
                 MapManager.instance.updateCtrl.ChechCollideEvent(unit, Vector3.zero);
             }
+
+
         }
         public void ChechCollideEvent(Unit unit, Vector3 dir)
         {

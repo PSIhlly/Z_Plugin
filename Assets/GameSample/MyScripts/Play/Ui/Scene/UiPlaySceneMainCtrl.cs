@@ -1,19 +1,12 @@
 using Form;
-using System.Collections;
-using System.Collections.Generic;
-using Ui.ModSceneMenu;
+using Ui.ParamShow;
 using Ui.PlayData;
 using Ui.PlaySceneMenu;
 using UnityEngine;
 using Z_DataSystem.Form;
-using Z_Map;
-using Z_ObjectAnimator.Base;
-using Z_ObjectAnimator.Core;
-using Z_Texture;
+using Z_DesignStyle;
 using Z_Ui;
 using Z_Ui.Base;
-using Z_DesignStyle;
-using Z_DataSystem;
 
 namespace Ui.PlaySceneMain
 {
@@ -52,7 +45,7 @@ namespace Ui.PlaySceneMain
         public void Refresh()
         {
             teamerCon.Clear();
-            foreach(var uid in GameManager.instance.curProgress.teamActive)
+            foreach (var uid in GameManager.instance.curProgress.teamActive)
             {
                 teamerCon.Add(new UiTeamerParam()
                 {
@@ -60,10 +53,14 @@ namespace Ui.PlaySceneMain
                 });
             }
 
-                teamerCon.Refresh();
+            teamerCon.Refresh();
+
+
+
+            var cur = GameManager.instance.curProgress.characterUid;
         }
 
-       
+
     }
     public partial class UiTeamerParam
     {
@@ -76,12 +73,11 @@ namespace Ui.PlaySceneMain
     }
     public partial class UiTeamerCtrl
     {
-
+        Color[] colors = new Color[] { Color.red, Color.blue, Color.yellow };
+        UiContainer<UiParamShowCtrl> con;
         public override void OnCreate()
         {
-
-
-
+            con = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
         }
         public override void OnShow()
         {
@@ -91,11 +87,24 @@ namespace Ui.PlaySceneMain
         public void Refresh()
         {
             view.txt_.text = model.data.name;
-            var prm = model.data.paramDic[model.data.hpParamName];
-            view.sld_hp.value = prm.v/ prm.max;
 
-            view.sld_sp.gameObject.SetActive(false);
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName,GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
+            con.Clear();
+            int id = 0;
+            foreach (var prm in model.data.paramDic.Values)
+            {
+                if (prm.showType == ParamShowType.AlwaysWithPanel)
+                {
+                    con.Add(new UiParamShowParam() { max = prm.max - prm.min, value = prm.v - prm.min, color = colors[id] });
+                    if (id < colors.Length - 1)
+                    {
+                        id++;
+                    }
+                }
+            }
+            con.Refresh();
+
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName, GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
+
         }
     }
 

@@ -35,7 +35,7 @@ namespace Form
         }
     }
 }
-            public enum TriggerType
+public enum TriggerType
 {
     NoLimit,
     Once,
@@ -70,16 +70,19 @@ public class GameEventController : Z_Controller<GameManager>
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
     List<Func<bool>> tasks;
+    HashSet<(int, string)> releaseTriggerTuple;
 
     public GameEventController(GameManager super) : base(super)
     {
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
         storyTriggerCtrl = new GameEventStoryTriggerController(this);
-        tasks= new List<Func<bool>>();
+        tasks = new List<Func<bool>>();
+        releaseTriggerTuple = new HashSet<(int, string)>();
     }
     public void Reset()
     {
         tasks.Clear();
+        releaseTriggerTuple.Clear();
     }
     public void StartTask(Func<bool> func)
     {
@@ -96,39 +99,51 @@ public class GameEventController : Z_Controller<GameManager>
         }
 
         var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
+        releaseTriggerTuple.Clear();
         foreach (var data in lst)
         {
-            if(GameManager.instance.curProgress.blockProgramUid>0&& GameManager.instance.curProgress.blockProgramUid!=data.uid)
+            if (GameManager.instance.curProgress.blockProgramUid > 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
             {
                 continue;
             }
             if (data.Interpret())
             {
-                if(!string.IsNullOrEmpty(data.releaseTrigger))
+                if (!string.IsNullOrEmpty(data.releaseTrigger))
                 {
-                    GameManager.instance.curProgress.triggeredOnceEvts[data.user].Remove(data.releaseTrigger);
+                    releaseTriggerTuple.Add((data.user, data.releaseTrigger));
                 }
                 EventInterpretDataForm.RemoveData(data.uid);
-                if(data.uid == GameManager.instance.curProgress.blockProgramUid)
+                if (data.uid == GameManager.instance.curProgress.blockProgramUid)
                 {
                     GameManager.instance.curProgress.blockProgramUid = 0;
                     break;
                 }
             }
         }
-        for(int i=0;i< tasks.Count;i++)
+        for (int i = 0; i < tasks.Count; i++)
         {
-            if(tasks[i]())
+            if (tasks[i]())
             {
                 tasks.RemoveAt(i);
                 i--;
             }
         }
+        foreach (var data in EventInterpretDataForm.DataByUid.Values)
+        {
+            if (releaseTriggerTuple.Contains((data.user, data.releaseTrigger)))
+            {
+                releaseTriggerTuple.Remove((data.user, data.releaseTrigger));
+            }
+        }
+        foreach (var trigger in releaseTriggerTuple)
+        {
+            GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
+        }
     }
 
 
 
-    public void TriggerEventExecute(EventTriggerForm.Data trigger,int user, List<BoxDataForm.Data> args)
+    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, List<BoxDataForm.Data> args)
     {
         List<string> triggered;
         var dict = GameManager.instance.curProgress.triggeredOnceEvts;
@@ -145,31 +160,41 @@ public class GameEventController : Z_Controller<GameManager>
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), user, args);
+                foreach (var nm in trigger.evt)
+                {
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args);
+                }
                 break;
             case TriggerType.OnceDuring:
                 if (dict.TryGetValue(user, out triggered))
                 {
                     if (triggered.Contains(trigger.name))
                         return;
-                }else
+                }
+                else
                 {
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                    Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt, null), user, args, trigger.name);
+                foreach (var nm in trigger.evt)
+                {
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args, trigger.name);
+                }
                 break;
             default:
-                Execute(EventProgramDataForm.DataByName.GetDv(trigger.evt,null), user, args);
+                foreach (var nm in trigger.evt)
+                {
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args);
+                }
                 break;
         }
     }
 
-    public void Execute(EventProgramDataForm.Data evt,int user, List<BoxDataForm.Data> args, string releaseTrigger="")
+    public void Execute(EventProgramDataForm.Data evt, int user, List<BoxDataForm.Data> args, string releaseTrigger = "")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1,  new List<Z_Code.Form.BoxDataForm.Data>(),  new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, user, args, releaseTrigger,0));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, user, args, releaseTrigger, 0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {
@@ -200,7 +225,7 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
-    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, bool createOnly,out EntryItem defaultItem)
+    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, bool createOnly, out EntryItem defaultItem)
     {
         defaultItem = null;
         var res = new EntryItem();
@@ -234,15 +259,15 @@ public class GameEventController : Z_Controller<GameManager>
                 res.subs[category].Add(type);
             }
             string name = TextManager.instance.GetTxt(data.name);
-            res.subs[category].subs[type].Add(name,null,data.uid); 
+            res.subs[category].subs[type].Add(name, null, data.uid);
             if (defaultItem == null)
                 defaultItem = res.subs[category].subs[type].subs[name];
         }
         return res;
     }
-    public static EventTriggerForm.Data CreateTrigger(string key, string evt,TriggerType type)
+    public static EventTriggerForm.Data CreateTrigger(string key, string evt, TriggerType type)
     {
-        return new EventTriggerForm.Data(-1, key, evt, type);
+        return new EventTriggerForm.Data(-1, key, new List<string> { evt }, type);
     }
 
 }

@@ -19,7 +19,16 @@ using Z_Time;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
-
+public enum StoryItemEventType
+{
+    Add,
+    Remove
+}
+public class StoryItemEvent : Z_Event
+{
+    public StoryItemEventType type;
+    public ItemProductForm.Data data;
+}
 public interface InternalPlayInfoController
 {
     public void Begin();
@@ -55,10 +64,10 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void Begin()
     {
         enable = true;
-        foreach(var uid in GameManager.instance.curProgress.bag)
+        foreach (var uid in GameManager.instance.curProgress.bag)
         {
-            GainItem(uid,false,false);
-        }    
+            GainItem(uid, false, false);
+        }
     }
     public void End()
     {
@@ -69,11 +78,22 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     {
         if (!enable)
             return;
+        int oldSecond = (int)GameManager.instance.curProgress.seconds;
+        GameManager.instance.curProgress.seconds += Time.deltaTime;
+        if (oldSecond < (int)GameManager.instance.curProgress.seconds)
+        {
+            Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.EverySecond });
+        }
+    }
+
+    public void ChangeParam(string name, float value)
+    {
 
     }
+
     public void GainItem(int uid, bool toast = true, bool message = true)
     {
-        var newItem=ItemProductForm.DataByUid[uid].Copy(false);
+        var newItem = ItemProductForm.DataByUid[uid].Copy(false);
         newItem.ToProduct();
         GainItem(newItem, toast, message);
     }
@@ -84,25 +104,27 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         {
             NotifyManager.instance.AddTip(content);
         }
-        if(message)
-        { 
+        if (message)
+        {
             _super.sceneCtrl.AddMessage(content);
         }
+
+        Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Add, data = data });
 
         if (!bagName2UidDic.ContainsKey(data.name))
             bagName2UidDic[data.name] = new List<int>();
 
-        foreach(var uid in bagName2UidDic[data.name])
+        foreach (var uid in bagName2UidDic[data.name])
         {
             var old = ItemProductForm.DataByUid[uid];
-            if (old.amount< old.maxAmountPer)
+            if (old.amount < old.maxAmountPer)
             {
                 int addition = Mathf.Min(old.maxAmountPer - old.amount, data.amount);
                 data.amount -= addition;
                 old.amount += addition;
             }
         }
-        if(data.amount==0)
+        if (data.amount == 0)
         {
             data.DestroyProduct();
             return;
@@ -122,7 +144,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             case CollideEventType.TriggerEnter:
                 if (evt.b == _super.sceneCtrl.playerM.unit && evt.a is ItemUnit obj)
                 {
-                    if (obj.productInfo.Item1>0)
+                    if (obj.productInfo.Item1 > 0)
                     {
                         GainItem(obj.productInfo.Item1);
                         MapManager.instance.RemoveItem(obj.data);

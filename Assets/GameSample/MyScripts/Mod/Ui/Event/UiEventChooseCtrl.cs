@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ui.ModStoryEventTriggerWindow;
 using UnityEngine.Video;
 using Z_Code.Form;
 using Z_DesignStyle;
 using Z_Text;
 using Z_Texture;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Video;
 
@@ -32,11 +34,7 @@ namespace Ui.EventChoose
 
             view.btn_onEvent.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(model.prm.key, SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(model.prm.key), (res) =>
-                {
-                    model.prm.dic[model.prm.key] = GameEventController.CreateTrigger(model.prm.key, res.content, default);
-                    Refresh();
-                });
+                UiManager.instance.ShowUi<UiModStoryEventTriggerWindowCtrl>(new UiModStoryEventTriggerWindowParam() { trigger = model.prm.dic[model.prm.key], onChange = Refresh });
             });
             view.btn_onEventTrigger.onClick.AddListener(() =>
             {
@@ -59,7 +57,8 @@ namespace Ui.EventChoose
         public void Refresh()
         {
             view.txt_name.oriText = model.prm.key;
-            view.txt_onEvent.text = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).evt;
+            var evt = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).evt;
+            view.txt_onEvent.text = $"{evt.GetDv(0, "")}({evt.Count})";
 
             view.txt_onEventTrigger.oriText = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).type.ToString();
         }

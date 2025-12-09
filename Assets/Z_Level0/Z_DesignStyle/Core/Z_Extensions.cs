@@ -19,8 +19,20 @@ namespace Z_DesignStyle
             }
             return false;
         }
+        public static TValue GetDv<TValue>(
+        this List<TValue> lst,
+        int id,
+        TValue defaultValue = default)
+        {
+            // 校验字典是否为null
+            if (lst == null || lst.Count<=id)
+                return defaultValue;
 
-    public static TValue GetDv<TKey, TValue>(
+            // 存在键则返回对应值，否则返回默认值
+            return lst[id];
+        }
+
+        public static TValue GetDv<TKey, TValue>(
         this Dictionary<TKey, TValue> dict,
         TKey key,
         TValue defaultValue = default)

@@ -494,7 +494,14 @@ namespace {uiHolder.uiName}
 
         string GetCoreCode(string parent)
         {
-            return $@"
+            int id = subContent.IndexOf("using ");
+            while(id!=-1)
+            {
+                int end= subContent.IndexOf("\n",id);
+                namespaceContent += subContent.Substring(id, end - id) + "\n";
+                subContent.Remove(id, end-id);
+            }
+            var res= $@"
 {StringHelper.RemoveMultiLine(namespaceContent)}
 {subContent}
     public partial class Ui{uiHolder.uiName}Param:UiParam
@@ -538,6 +545,8 @@ namespace {uiHolder.uiName}
     {{
         
     }}";
+
+            return res;
         }
 
 

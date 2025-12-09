@@ -51,7 +51,7 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeEvtAction;
+        public static Action<Data,List<string>,List<string>> changeEvtAction;
                 
         public static Action<Data,TriggerType,TriggerType> changeTypeAction;
                 
@@ -96,11 +96,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private string  _evt;
+                    private List<string>  _evt;
                     /// <summary>
                     ///ÊÂ¼þÃû³Æ
                     ///</summary>
-                    public string  evt{
+                    public List<string>  evt{
                                 get{return _evt;}
  set{
 
@@ -132,7 +132,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string evt,TriggerType type)
+            public Data(int uid,string name,List<string> evt,TriggerType type)
             {
 
              this.uid = uid;
@@ -144,12 +144,12 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,evt,type);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(evt),type);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",default);
+                   private static Data _defaultData=new Data(0,"",null,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -188,16 +188,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"onCharacterParamChange","",default)},
-
-                {2,new Data(2,"onItemParamChange","",default)},
-
                 };
                     _DataByName = new Dictionary<string, Data>() {
-    
-                        {"onCharacterParamChange",_DataByUid[1]},
-    
-                        {"onItemParamChange",_DataByUid[2]},
     
                     };
     
@@ -246,7 +238,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("name"),
 
-                jo.Get<string>("evt"),
+                jo.Get<List<string>>("evt"),
 
                 jo.Get<TriggerType>("type")
                     );
@@ -264,7 +256,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("evt",data.evt);
+            jo.Set<List<string>>("evt",data.evt);
 
             jo.Set<TriggerType>("type",data.type);
 
@@ -374,7 +366,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeEvt(Data superData,string oldV,string newV)
+            public static void ChangeEvt(Data superData,List<string> oldV,List<string> newV)
             {
                 if(superData is Data data)
                 {

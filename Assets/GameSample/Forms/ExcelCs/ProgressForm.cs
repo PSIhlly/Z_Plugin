@@ -49,6 +49,8 @@ public static readonly int autoUidCnt=100;
 
         public static Action<Data,int,int> changeUidAction;
                 
+        public static Action<Data,float,float> changeSecondsAction;
+                
         public static Action<Data,int,int> changeSceneidAction;
                 
         public static Action<Data,Vector3,Vector3> changePosAction;
@@ -94,6 +96,24 @@ public static readonly int autoUidCnt=100;
                     }
         
                 _uid = value;
+                }
+                 
+                     }
+                    
+                    private float  _seconds;
+                    /// <summary>
+                    ///Ê±³¤
+                    ///</summary>
+                    public float  seconds{
+                                get{return _seconds;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeSeconds(this,_seconds,value); 
+                    }
+        
+                _seconds = value;
                 }
                  
                      }
@@ -332,10 +352,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid)
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid)
             {
 
              this.uid = uid;
+             this.seconds = seconds;
              this.sceneId = sceneId;
              this.pos = pos;
              this.characterUid = characterUid;
@@ -354,12 +375,12 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0);
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -432,6 +453,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("uid"),
 
+                jo.Get<float>("seconds"),
+
                 jo.Get<int>("sceneId"),
 
                 jo.Get<Vector3>("pos"),
@@ -469,6 +492,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             JObject jo=new JObject();
 
             jo.Set<int>("uid",data.uid);
+
+            jo.Set<float>("seconds",data.seconds);
 
             jo.Set<int>("sceneId",data.sceneId);
 
@@ -581,6 +606,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeUidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSeconds(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSecondsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

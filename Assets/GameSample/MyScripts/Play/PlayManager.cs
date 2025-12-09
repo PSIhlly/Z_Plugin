@@ -22,6 +22,7 @@ using static UnityEditor.PlayerSettings;
 public enum ParamShowType
 {
     Always,
+    AlwaysWithPanel,
     OnlyNotZero,
     Hide
 }

@@ -70,7 +70,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateCharacterAnim(parent.model.data.name);
+                ModManager.instance.assetCtrl.CreateCharacterAnim(parent.model.data.uid,parent.model.data.name);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>

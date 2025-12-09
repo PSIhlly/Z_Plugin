@@ -97,7 +97,7 @@ namespace Z_Map
                     trigger = it.events[name];
                 }
             }
-            if (trigger != null && EventProgramDataForm.DataByName.ContainsKey(trigger.evt))
+            if (trigger != null)
             {
                 GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, args);
                 return true;

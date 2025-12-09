@@ -4,10 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_Texture;
+using Z_Video;
+using UnityEngine.Video;
 namespace Ui.PlaySceneMain
 
 {
 
+using Ui.ParamShow;
 
 
 
@@ -74,12 +78,12 @@ namespace PlaySceneMessage
     {
 
             public GameObject go_message;
-            public UiMessageCtrl sub_Message;
+            public UiMessageCtrl sub_message;
         public UiPlaySceneMessageView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_message = uiHolder.elementTrsLst[0].gameObject;
-            sub_Message = (UiMessageCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            sub_message = (UiMessageCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -104,8 +108,8 @@ namespace PlaySceneMessage
             model=new UiPlaySceneMessageModel();
 
 
-            view.sub_Message = new UiMessageCtrl();
-            view.sub_Message.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_message = new UiMessageCtrl();
+            view.sub_message.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -189,19 +193,17 @@ namespace PlayerTouchOpt
 
             public GameObject go_teamer;
             public Btn btn_;
-            public Sld sld_hp;
-            public Sld sld_sp;
             public Txt txt_;
             public Img img_;
+            public UiParamShowCtrl model_ParamShow;
         public UiTeamerView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_teamer = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sld_hp = uiHolder.elementTrsLst[2].GetComponent<Sld>();
-            sld_sp = uiHolder.elementTrsLst[3].GetComponent<Sld>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
+            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -226,6 +228,8 @@ namespace PlayerTouchOpt
             model=new UiTeamerModel();
 
 
+            view.model_ParamShow = new UiParamShowCtrl();
+            view.model_ParamShow.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -245,7 +249,8 @@ namespace PlayerTouchOpt
             public GameObject go_map;
             public GameObject go_menu;
             public GameObject go_teamer;
-            public UiTeamerCtrl sub_Teamer;
+            public UiTeamerCtrl sub_teamer;
+            public UiParamShowCtrl model_ParamSlider;
             public GameObject go_func;
             public Btn btn_map;
             public Btn btn_menu;
@@ -258,11 +263,12 @@ namespace PlayerTouchOpt
             go_map = uiHolder.elementTrsLst[2].gameObject;
             go_menu = uiHolder.elementTrsLst[3].gameObject;
             go_teamer = uiHolder.elementTrsLst[4].gameObject;
-            sub_Teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            go_func = uiHolder.elementTrsLst[6].gameObject;
-            btn_map = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            btn_menu = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_data = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            model_ParamSlider = (UiParamShowCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_func = uiHolder.elementTrsLst[7].gameObject;
+            btn_map = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            btn_data = uiHolder.elementTrsLst[10].GetComponent<Btn>();
         }
 
     }
@@ -291,8 +297,10 @@ namespace PlayerTouchOpt
             view.page_PlaySceneMessage.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.page_PlayerTouchOpt = new PlayerTouchOpt.UiPlayerTouchOptCtrl();
             view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
-            view.sub_Teamer = new UiTeamerCtrl();
-            view.sub_Teamer.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.sub_teamer = new UiTeamerCtrl();
+            view.sub_teamer.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_ParamSlider = new UiParamShowCtrl();
+            view.model_ParamSlider.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
         }
 
     }

@@ -117,7 +117,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
             view.sta_lightAttack.ChangeState(model.data.skillTypes.Contains(SkillType.LightAttack)?1:0);
             view.sta_heavyAttack.ChangeState(model.data.skillTypes.Contains(SkillType.HeavyAttack)?1:0);
 
-            view.txt_onTriggerEvent.text = model.data.events.GetDv("onTriggerEvent", EventTriggerForm.defaultData).evt;
+            //view.txt_onTriggerEvent.text = model.data.events.GetDv("onTriggerEvent", EventTriggerForm.defaultData).evt;
 
         }
         private void SetKillType(SkillType tp)

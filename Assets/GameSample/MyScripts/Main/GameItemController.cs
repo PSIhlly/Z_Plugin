@@ -35,6 +35,7 @@ namespace Form
                 switch (prmData.showType)
                 {
                     case ParamShowType.Always:
+                    case ParamShowType.AlwaysWithPanel:
                         return true;
                     case ParamShowType.OnlyNotZero:
                         return paramDic[prmName].v != 0;

@@ -13,7 +13,7 @@ namespace Z_Code.Form
 
     public static partial class CmdDataForm
     {
-public static readonly int autoUidCnt=1000000;
+public static readonly int autoUidCnt=100;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()

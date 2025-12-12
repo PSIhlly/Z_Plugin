@@ -183,7 +183,6 @@ namespace PlayerTouchOpt
 
 
 
-
     public partial class UiTeamerParam:UiParam
     {
     }
@@ -248,9 +247,9 @@ namespace PlayerTouchOpt
             public PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt;
             public GameObject go_map;
             public GameObject go_menu;
+            public UiParamShowCtrl model_ParamShow;
             public GameObject go_teamer;
             public UiTeamerCtrl sub_teamer;
-            public UiParamShowCtrl model_ParamSlider;
             public GameObject go_func;
             public Btn btn_map;
             public Btn btn_menu;
@@ -262,9 +261,9 @@ namespace PlayerTouchOpt
             page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
             go_map = uiHolder.elementTrsLst[2].gameObject;
             go_menu = uiHolder.elementTrsLst[3].gameObject;
-            go_teamer = uiHolder.elementTrsLst[4].gameObject;
-            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            model_ParamSlider = (UiParamShowCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            go_teamer = uiHolder.elementTrsLst[5].gameObject;
+            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
             go_func = uiHolder.elementTrsLst[7].gameObject;
             btn_map = uiHolder.elementTrsLst[8].GetComponent<Btn>();
             btn_menu = uiHolder.elementTrsLst[9].GetComponent<Btn>();
@@ -297,10 +296,10 @@ namespace PlayerTouchOpt
             view.page_PlaySceneMessage.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.page_PlayerTouchOpt = new PlayerTouchOpt.UiPlayerTouchOptCtrl();
             view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.model_ParamShow = new UiParamShowCtrl();
+            view.model_ParamShow.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
             view.sub_teamer = new UiTeamerCtrl();
-            view.sub_teamer.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
-            view.model_ParamSlider = new UiParamShowCtrl();
-            view.model_ParamSlider.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.sub_teamer.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
         }
 
     }

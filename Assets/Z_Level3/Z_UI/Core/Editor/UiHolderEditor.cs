@@ -268,7 +268,7 @@ using UnityEngine.Video;
                 if (o != uiHolder.gameObject.transform && o.TryGetComponent<UiHolder>(out var subHolder))
                 {
                     var tmp = subHolder.name.Split("_");
-                    string realName = tmp[tmp.Length-1];
+                    string realName = tmp[tmp.Length - 1];
                     uiHolder.subUiHolderLst.Add(subHolder);
                     subHolder.parent = uiHolder;
 
@@ -495,13 +495,16 @@ namespace {uiHolder.uiName}
         string GetCoreCode(string parent)
         {
             int id = subContent.IndexOf("using ");
-            while(id!=-1)
+            int times = 0;
+            while (id != -1 && times < 10)
             {
-                int end= subContent.IndexOf("\n",id);
-                namespaceContent += subContent.Substring(id, end - id) + "\n";
-                subContent.Remove(id, end-id);
+                int end = subContent.IndexOf("\n", id) + 2;
+                namespaceContent += subContent.Substring(id, end - id);
+                subContent = subContent.Remove(id, end - id);
+                id = subContent.IndexOf("using ");
+                times++;
             }
-            var res= $@"
+            var res = $@"
 {StringHelper.RemoveMultiLine(namespaceContent)}
 {subContent}
     public partial class Ui{uiHolder.uiName}Param:UiParam

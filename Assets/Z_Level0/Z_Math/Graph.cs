@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Schema;
 using UnityEngine;
+using UnityEngine.AI;
 namespace Z_Math
 {
     public static class Graph
@@ -49,16 +50,17 @@ namespace Z_Math
             {
                 if (isCross == 1)
                 {
-                    return oldIn? IntersectType.Out : IntersectType.Cross;
+                    return oldIn ? IntersectType.Out : IntersectType.Cross;
                 }
                 else if (isIn == 1)
                 {
-                    return oldIn ? IntersectType.Inner: IntersectType.In;
+                    return oldIn ? IntersectType.Inner : IntersectType.In;
                 }
                 else if (isOut == 1)
                 {
-                    return oldIn ? IntersectType.Out: IntersectType.None;
-                }else if (isIn==-1&&isOut == -1&&isCross == -1)
+                    return oldIn ? IntersectType.Out : IntersectType.None;
+                }
+                else if (isIn == -1 && isOut == -1 && isCross == -1)
                 {
                     return oldIn ? IntersectType.Inner : IntersectType.In;
                 }
@@ -270,8 +272,9 @@ namespace Z_Math
         }
 
         #region Intersect
-        public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis)
+        public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
+            avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
             var mag = dir.magnitude;
@@ -292,12 +295,7 @@ namespace Z_Math
 
             float touchTime = 0;
             float avoidTime = 1;
-            if (fromIn)
-            {
-                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
-                    touchTime = 1;
-            }
-            else
+           
             {
                 axesToCheck.AddRange(GetFaceNormals(aCubeEightPoints));
                 axesToCheck.AddRange(GetFaceNormals(bCubeEightPoints));
@@ -320,9 +318,17 @@ namespace Z_Math
 
                     float dirProj = Vector3.Dot(dir, axis);
 
-                    if (CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime))
+                    if (CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid))
                         break;
+                    avoidDir += (avoid * axis).normalized;
                 }
+            }
+            if (fromIn)
+            {
+                avoidTime = 1;
+                touchTime = 0;
+                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
+                    touchTime = 1;
             }
             if (touchTime > avoidTime)
             {
@@ -334,10 +340,12 @@ namespace Z_Math
             }
 
             dis = mag * touchTime;
+            avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
-        public static IntersectType SphereIntersectCube(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints, Vector3 dir, out float dis)
+        public static IntersectType SphereIntersectCube(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
+            avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
             var mag = dir.magnitude;
@@ -358,12 +366,7 @@ namespace Z_Math
 
             float touchTime = 0;
             float avoidTime = 1;
-            if (fromIn)
-            {
-                if (Vector3.Dot((sphereCenter - cubeCenter), dir) >= 0)
-                    touchTime = 1;
-            }
-            else
+
             {
                 // 生成所有潜在分离轴（与静态重叠判断一致）
 
@@ -402,7 +405,9 @@ namespace Z_Math
 
                     float dirProj = Vector3.Dot(dir, axis);
 
-                    var res = CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime);
+                    var res = CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
+
+                    avoidDir += (avoid * axis).normalized;
                     if (dDebug)
                         Debug.Log(res + " " + sphereMin + " " + sphereMax + " " + cubeMin + " " + cubeMax + "  " + dir + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
                     if (res)
@@ -410,6 +415,14 @@ namespace Z_Math
 
                 }
             }
+            if (fromIn)
+            {
+                avoidTime = 1;
+                touchTime = 0;
+                if (Vector3.Dot((sphereCenter - cubeCenter), dir) >= 0)
+                    touchTime = 1;
+            }
+
             if (touchTime > avoidTime && avoidTime > 0)
             {
                 touchTime = 1;
@@ -421,35 +434,34 @@ namespace Z_Math
 
             dis = touchTime * mag;
 
+            avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
 
-        public static IntersectType SphereIntersectSphere(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints, Vector3 dir, out float dis)
+        public static IntersectType SphereIntersectSphere(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
+            avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
             var mag = dir.magnitude;
             dis = mag;
-            float touchTime = 0;
-            float avoidTime = 0;
-
-
-            HashSet<Vector3> exist = new HashSet<Vector3>();
-            var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-            var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-
             // 先检查初始是否已重叠
             if (IsSpheresOverlap(aSphereSixPoints, bSphereSixPoints))
             {
                 fromIn = true;
+                if (mag == 0)
+                {
+                    return IntersectType.Inner;
+                }
             }
+            HashSet<Vector3> exist = new HashSet<Vector3>();
+            var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
+            var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
 
-            if (fromIn)
-            {
-                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
-                    touchTime = 1;
-            }
-            else
+            float touchTime = 0;
+            float avoidTime = 1;
+
+
             {
                 // 生成15个分离轴
                 List<Vector3> axesToCheck = GenerateSpheresSeparationAxes(aSphereSixPoints, bSphereSixPoints);
@@ -475,13 +487,25 @@ namespace Z_Math
 
                     // 2. 移动速度在轴上的投影
                     float dirProj = Vector3.Dot(dir, axis);
-                    var res = CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime);
-                    Debug.Log(res + " " + aMin + " " + aMax + " " + bMin + " " + bMax + "  " + dir + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
+                    var res = CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
+                    
+                    if(!res)
+                        Debug.Log(res + " " + aMin + " " + aMax + " " + bMin + " " + bMax + "  " + axis + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
+
+                    avoidDir += (avoid * axis).normalized;
                     if (res)
                         break;
                 }
 
             }
+            if (fromIn)
+            {
+                avoidTime = 1;
+                touchTime = 0;
+                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
+                    touchTime = 1;
+            }
+
             if (touchTime > avoidTime)
             {
                 touchTime = 1;
@@ -492,6 +516,7 @@ namespace Z_Math
             }
             dis = touchTime * mag;
 
+            avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
         /// <summary>
@@ -525,6 +550,8 @@ namespace Z_Math
                         axes.Add(cross);
                 }
             }
+            //4.center
+            axes.Add((aCenter-bCenter).normalized);
             return axes;
         }
         private static List<Vector3> GetFaceNormals(Vector3[] cubeEightPoints)
@@ -975,8 +1002,17 @@ namespace Z_Math
 
         #endregion
         #region 2DUtil
-        private static bool CalcTouchTimeAndAvoidTime(float aMin, float aMax, float bMin, float bMax, float dir, ref float touchTime, ref float avoidTime)
+        private static bool CalcTouchTimeAndAvoidTime(float aMin, float aMax, float bMin, float bMax, float dir, ref float touchTime, ref float avoidTime, out int avoidDir)
         {
+            avoidDir = 0;
+            if (Mathf.Abs(aMax - bMin) < 0.1f)
+            {
+                avoidDir = -1;
+            }
+            else if (Mathf.Abs(aMin - bMax) < 0.1f)
+            {
+                avoidDir = 1;
+            }
             if (Mathf.Abs(dir) <= 0)
             {
                 if (aMax <= bMin || aMin >= bMax)

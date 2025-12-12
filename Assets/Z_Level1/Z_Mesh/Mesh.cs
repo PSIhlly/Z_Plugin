@@ -51,8 +51,9 @@ namespace Z_Mesh
                 positions = Graph.GetSphereSixPoint(pos, radius, euler, scale)
             };
         }
-        public static IntersectType MeshIntersectMesh(MeshInfo o, MeshInfo tar, Vector3 step, out float dis)
+        public static IntersectType MeshIntersectMesh(MeshInfo o, MeshInfo tar, Vector3 step, out float dis, out Vector3 avoidDir)
         {
+            avoidDir = Vector3.zero;
             float curDis = 0;
             float length = step.magnitude;
             dis = length;
@@ -64,13 +65,13 @@ namespace Z_Mesh
                     {
                         case Z_Mesh.MeshType.Cube:
                             {
-                                assist.Add(Graph.CubeIntersectCube(o.positions,tar.positions, step, out curDis));
+                                assist.Add(Graph.CubeIntersectCube(o.positions,tar.positions, step, out curDis,out avoidDir));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
                         case Z_Mesh.MeshType.Sphere:
                             {
-                                assist.Add(Graph.SphereIntersectCube(tar.positions,o.positions, -step, out curDis));
+                                assist.Add(Graph.SphereIntersectCube(tar.positions,o.positions, -step, out curDis, out avoidDir));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
@@ -81,13 +82,13 @@ namespace Z_Mesh
                     {
                         case Z_Mesh.MeshType.Cube:
                             {
-                                assist.Add(Graph.SphereIntersectCube(o.positions, tar.positions, step, out curDis));
+                                assist.Add(Graph.SphereIntersectCube(o.positions, tar.positions, step, out curDis, out avoidDir));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
                         case Z_Mesh.MeshType.Sphere:
                             {
-                                assist.Add(Graph.SphereIntersectSphere(o.positions, tar.positions, -step, out curDis));
+                                assist.Add(Graph.SphereIntersectSphere(o.positions, tar.positions, step, out curDis, out avoidDir));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }

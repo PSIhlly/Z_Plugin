@@ -77,7 +77,7 @@ namespace Z_Map
         public bool ExecuteEvt(string name, List<BoxDataForm.Data> args)
         {
             EventTriggerForm.Data trigger = null;
-            if (evtDic.ContainsKey(name))
+            if (evtDic.ContainsKey(name)&& evtDic[name].evt.Count>0)
             {
                 trigger = evtDic[name];
             }

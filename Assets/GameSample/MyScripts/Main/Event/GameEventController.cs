@@ -71,7 +71,6 @@ public class GameEventController : Z_Controller<GameManager>
     public GameEventStoryTriggerController storyTriggerCtrl;
     List<Func<bool>> tasks;
     HashSet<(int, string)> releaseTriggerTuple;
-
     public GameEventController(GameManager super) : base(super)
     {
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
@@ -145,6 +144,10 @@ public class GameEventController : Z_Controller<GameManager>
 
     public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, List<BoxDataForm.Data> args)
     {
+        if(trigger==null)
+        {
+            return;
+        }
         List<string> triggered;
         var dict = GameManager.instance.curProgress.triggeredOnceEvts;
         switch (trigger.type)
@@ -160,7 +163,7 @@ public class GameEventController : Z_Controller<GameManager>
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                foreach (var nm in trigger.evt)
+                foreach(var nm in trigger.evt)
                 {
                     Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args);
                 }
@@ -265,9 +268,9 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
-    public static EventTriggerForm.Data CreateTrigger(string key, string evt, TriggerType type)
+    public static EventTriggerForm.Data CreateTrigger(string key)
     {
-        return new EventTriggerForm.Data(-1, key, new List<string> { evt }, type);
+        return new EventTriggerForm.Data(-1, key, new List<string>(), default);
     }
 
 }

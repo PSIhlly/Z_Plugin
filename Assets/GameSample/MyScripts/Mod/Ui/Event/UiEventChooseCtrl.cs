@@ -34,10 +34,16 @@ namespace Ui.EventChoose
 
             view.btn_onEvent.onClick.AddListener(() =>
             {
+                if (!model.prm.dic.ContainsKey(model.prm.key))
+                    model.prm.dic[model.prm.key] = GameEventController.CreateTrigger(model.prm.key);
+
                 UiManager.instance.ShowUi<UiModStoryEventTriggerWindowCtrl>(new UiModStoryEventTriggerWindowParam() { trigger = model.prm.dic[model.prm.key], onChange = Refresh });
             });
             view.btn_onEventTrigger.onClick.AddListener(() =>
             {
+                if (!model.prm.dic.ContainsKey(model.prm.key))
+                    model.prm.dic[model.prm.key] = GameEventController.CreateTrigger(model.prm.key);
+
                 ModManager.instance.assetCtrl.ChooseEventTriggerType((item) =>
                 {
                     model.prm.dic[model.prm.key].type = item;

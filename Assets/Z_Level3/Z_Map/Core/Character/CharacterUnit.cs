@@ -80,17 +80,18 @@ namespace Z_Map
         {
             var mag = dir.magnitude;
             HashSet<int> exist = new HashSet<int>() { data.uid };
-
+            var avoidDir = new List<Vector3>();
             float res = mag;
-            var floor = manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly);
-            
+            var floor = manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly,out _);
+
             if (dir.y < 0 && floor <= 0.01f)
             {
                 dir.y = 0;
             }
             else
             {
-                res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly), res);
+                res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly, out var avoid), res);
+                avoidDir.AddRange(avoid);
             }
             var euler = data.euler;
             if (dir != Vector3.zero)
@@ -103,18 +104,20 @@ namespace Z_Map
                             continue;
                         exist.Add(obj.data.uid);
                         //Graph.dDebug = true;
-                        res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly), res);
+                        res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly, out var avoid), res);
+                        avoidDir.AddRange(avoid);
                         //Graph.dDebug = false;
 
 
                     }
                     foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
                     {
-                        if (exist.Contains(ch.data.uid))
+                        if (exist.Contains(ch.data.uid) || ch == this)
                             continue;
                         exist.Add(ch.data.uid);
 
-                        res = Math.Min(manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly), res);
+                        res = Math.Min(manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly, out var avoid), res);
+                        avoidDir.AddRange(avoid);
 
                     }
                 }
@@ -125,7 +128,10 @@ namespace Z_Map
 
             }
             dir *= (res) / mag;
-
+            if(avoidDir.Count>0)
+            {
+                Debug.Log(avoidDir[0].x+" "+ avoidDir[0].y+" "+ avoidDir[0].z);
+            }
             manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
 
         }

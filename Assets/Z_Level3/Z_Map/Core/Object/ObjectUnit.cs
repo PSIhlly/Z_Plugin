@@ -56,6 +56,7 @@ namespace Z_Map
         public void Move(Vector3 dir)
         {
             var mag = dir.magnitude;
+            var avoidDir = new List<Vector3>();
             HashSet<int> exist = new HashSet<int>() { data.uid };
             float res = mag;
             Dictionary<CharacterUnit, Vector3> push=new Dictionary<CharacterUnit, Vector3>();
@@ -69,7 +70,7 @@ namespace Z_Map
                             continue;
                         exist.Add(ch.data.uid);
    
-                            var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly);
+                            var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly,out _);
                             if (dis < mag)
                             {
                                 push[ch] = -dir * 1.1f / mag * (dis - mag);

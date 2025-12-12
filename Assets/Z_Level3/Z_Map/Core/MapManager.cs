@@ -175,23 +175,27 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.characterTileDic.Del(form.unit);
         updateCtrl.itemTileDic.Del(form.unit);
         updateCtrl.objectTileDic.Del(form.unit);
+        updateCtrl.curTileLst.Remove(form);
     }
     public void RemoveCharacter(CharacterUnitForm.Data form)
     {
         data.RemoveCharacter(form);
         updateCtrl.characterTileDic.Del(form.unit);
+        updateCtrl.curCharacterLst.Remove(form);
 
     }
     public void RemoveItem(ItemUnitForm.Data form)
     {
         data.RemoveItem(form);
         updateCtrl.itemTileDic.Del(form.unit);
+        updateCtrl.curItemLst.Remove(form);
 
     }
     public void RemoveObject(ObjectUnitForm.Data form)
     {
         data.RemoveObject(form);
         updateCtrl.objectTileDic.Del(form.unit);
+        updateCtrl.curObjectLst.Remove(form);
     }
     #endregion
     public void SetPos(Vector3 curCenterPos)

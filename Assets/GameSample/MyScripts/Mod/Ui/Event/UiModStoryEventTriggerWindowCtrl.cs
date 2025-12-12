@@ -81,7 +81,7 @@ namespace Ui.ModStoryEventTriggerWindow
         {
             view.btn_add.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(parent.model.prm.trigger.name, SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
+                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
                 {
                     parent.model.prm.trigger.evt.Add(res.content);
                     parent.model.prm.onChange?.Invoke();
@@ -96,7 +96,7 @@ namespace Ui.ModStoryEventTriggerWindow
             });
             view.btn_edit.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(parent.model.prm.trigger.name, SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
+                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
                 {
                     int pos=parent.model.prm.trigger.evt.IndexOf(model.prm.nm);
                     parent.model.prm.trigger.evt[pos] = res.content;

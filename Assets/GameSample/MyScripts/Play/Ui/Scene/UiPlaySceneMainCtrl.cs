@@ -13,7 +13,9 @@ namespace Ui.PlaySceneMain
 
     public partial class UiPlaySceneMainCtrl
     {
+        Color[] colors = new Color[] { Color.red, Color.blue, Color.yellow };
         UiContainer<UiTeamerCtrl> teamerCon;
+        UiContainer<UiParamShowCtrl> prmCon;
         public override void OnCreate()
         {
 
@@ -35,7 +37,7 @@ namespace Ui.PlaySceneMain
                 }
             });
             teamerCon = new UiContainer<UiTeamerCtrl>(view.go_teamer);
-
+            prmCon = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
         }
         public override void OnShow()
         {
@@ -52,15 +54,24 @@ namespace Ui.PlaySceneMain
                     data = CharacterProductForm.DataByUid[uid]
                 });
             }
-
             teamerCon.Refresh();
 
-
-
-            var cur = GameManager.instance.curProgress.characterUid;
+            int id = 0;
+            var cur = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
+            prmCon.Clear();
+            foreach (var prm in cur.paramDic.Values)
+            {
+                if (prm.showType == ParamShowType.AlwaysWithPanel)
+                {
+                    prmCon.Add(new UiParamShowParam() { max = prm.max - prm.min, value = prm.v - prm.min, color = colors[id] });
+                    if (id < colors.Length - 1)
+                    {
+                        id++;
+                    }
+                }
+            }
+            prmCon.Refresh();
         }
-
-
     }
     public partial class UiTeamerParam
     {

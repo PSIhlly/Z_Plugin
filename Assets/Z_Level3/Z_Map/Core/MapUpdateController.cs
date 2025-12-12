@@ -31,7 +31,7 @@ namespace Z_Map
         public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
 
-        public List<TileUnitForm.Data> curMapLst
+        public List<TileUnitForm.Data> curTileLst
         {
             get;
             private set;
@@ -80,7 +80,7 @@ namespace Z_Map
                 Mathf.Max(curView.Item5, lastView.Item5), Mathf.Min(curView.Item6, lastView.Item6));
 
             //old:
-            foreach (var map in curMapLst)
+            foreach (var map in curTileLst)
             {
                 if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
                     || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
@@ -125,7 +125,7 @@ namespace Z_Map
             {
                 newMapLst.Add(now);
             }
-            foreach (var old in curMapLst)
+            foreach (var old in curTileLst)
             {
                 newMapLst.Remove(old);
                 delMapLst.Add(old);
@@ -176,7 +176,7 @@ namespace Z_Map
                 }
             }
 
-            curMapLst = nowTmp;
+            curTileLst = nowTmp;
             lastView = curView;
         }
         private void ShowAndAddLst(List<TileUnitForm.Data> lst, int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
@@ -212,7 +212,7 @@ namespace Z_Map
             //update
             if (GlobalSettings.UPDATE_TILE_ALWAYS)
             {
-                foreach (var map in curMapLst)
+                foreach (var map in curTileLst)
                 {
                     map.unit.UpdateInfo();
                 }
@@ -245,7 +245,7 @@ namespace Z_Map
             if (GlobalSettings.OVERLAY_HIDE)
             {
                 var viewSize = _super.data.mainData.viewSize;
-                foreach (var curMap in curMapLst)
+                foreach (var curMap in curTileLst)
                 {
                     SetGroupVision(curMap.unit, 1);
                 }
@@ -321,7 +321,7 @@ namespace Z_Map
             }
             else
             {
-                foreach (var curMap in curMapLst)
+                foreach (var curMap in curTileLst)
                 {
                     if (curMap.mapPos.y <= viewCenter.y)
                     {
@@ -345,11 +345,11 @@ namespace Z_Map
         public void ResetInfo()
         {
             lastView = (0, 0, 0, 0, 0, 0);
-            foreach (var map in curMapLst)
+            foreach (var map in curTileLst)
             {
                 map.unit.Hide();
             }
-            curMapLst.Clear();
+            curTileLst.Clear();
             UpdateInfo(true);
         }
         public void UpdateInfo(bool forceFresh = false)
@@ -464,7 +464,7 @@ namespace Z_Map
             }
             unit.data.pos = newPos;
             unit.data.euler = euler;
-               if(oldPos!= newPos)
+            if (oldPos != newPos)
             {
                 MapManager.instance.updateCtrl.ChechCollideEvent(unit, Vector3.zero);
             }
@@ -473,37 +473,40 @@ namespace Z_Map
         }
         public void ChechCollideEvent(Unit unit, Vector3 dir)
         {
+            TileUnit cur = null;
             if (unit is CharacterUnit ch)
             {
-                var cur = characterTileDic.Get(ch)[0];
-                HashSet<int> exist = new HashSet<int>();
-                foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z)))
-                {
-                    foreach (var obj in objectTileDic.Get(tile))
-                    {
-                        if (exist.Contains(obj.data.uid))
-                            continue;
-                        exist.Add(obj.data.uid);
+                cur = characterTileDic.Get(ch)[0];
+            }
+            else if (unit is ObjectUnit obj)
+            {
+                cur = objectTileDic.Get(obj)[0];
+            }
+            else if (unit is ItemUnit it)
+            {
+                cur = itemTileDic.Get(it)[0];
+            }
+            HashSet<int> exist = new HashSet<int>();
 
-                        CheckCollide(ch, obj, dir, CollideType.TriggerOnly, (tar, res, dis) =>
-                        {
-                            ManageTriggerEvent(ch, tar, res);
-                        });
-                    }
-                    foreach (var item in itemTileDic.Get(tile))
+            foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z)))
+            {
+                var lst = new List<Unit>(objectTileDic.Get(tile));
+                lst.AddRange(itemTileDic.Get(tile));
+                lst.AddRange(characterTileDic.Get(tile));
+
+                foreach (var tar in lst)
+                {
+                    if (exist.Contains(tar.data.uid))
+                        continue;
+                    exist.Add(tar.data.uid);
+                    CheckCollide((MapUnit)unit, (MapUnit)tar, dir, CollideType.TriggerOnly,out _, (tar, res, dis) =>
                     {
-                        if (exist.Contains(item.data.uid))
-                            continue;
-                        exist.Add(item.data.uid);
-                        CheckCollide(ch, item, dir, CollideType.TriggerOnly, (tar, res, dis) =>
-                        {
-                            ManageTriggerEvent(ch, tar, res);
-                        });
-                    }
+                        ManageTriggerEvent(unit, tar, res);
+                    });
                 }
             }
         }
-        private void ManageTriggerEvent(Unit a,Unit b, Graph.IntersectType type)
+        private void ManageTriggerEvent(Unit a, Unit b, Graph.IntersectType type)
         {
             TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
             {
@@ -525,10 +528,11 @@ namespace Z_Map
                         break;
                 }
             });
-           
+
         }
-        public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type, Action<Unit, Graph.IntersectType, float> onCast = null)
+        public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type,out List<Vector3> avoidDir, Action<Unit, Graph.IntersectType, float> onCast = null)
         {
+            avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
             var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
             foreach (var tar in _super.utilCtrl.GetCollidersMesh(unit.prefab, unit.data.pos, unit.data.euler, unit.data.scale, type))
@@ -536,9 +540,19 @@ namespace Z_Map
                 foreach (var cur in _super.utilCtrl.GetCollidersMesh(trigger.prefab, trigger.data.pos, trigger.data.euler, trigger.data.scale, type))
                 {
                     float dis = 0;
-                    var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis);
+                    var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis,out var avoid);
+
                     assist.Add(curType);
-                    disRes = Math.Min(disRes, dis);
+                    if(MathF.Abs(dis)<=0.01f&& MathF.Abs(disRes) <= 0.01f)
+                    {
+                        avoidDir.Add(avoid);
+                    }
+                    if(dis< disRes)
+                    {
+                        disRes = dis;
+                        avoidDir.Clear();
+                        avoidDir.Add(avoid);
+                    }
                 }
             }
             var res = assist.GetRes();
@@ -608,8 +622,8 @@ namespace Z_Map
         }
         public void End()
         {
-            if (curMapLst != null)
-                curMapLst.Clear();
+            if (curTileLst != null)
+                curTileLst.Clear();
             if (newMapLst != null)
                 newMapLst.Clear();
             if (delMapLst != null)
@@ -629,7 +643,7 @@ namespace Z_Map
         }
         public void DebugShow()
         {
-            foreach (var map in curMapLst)
+            foreach (var map in curTileLst)
             {
                 if ((map.unit.ins.transform.GetChild(0).position - map.pos).sqrMagnitude > 0.2)
                     Debug.Log((map.unit.ins.transform.position - map.pos).sqrMagnitude + "    ->  " + map.pos + " " + map.unit.ins.transform.position);

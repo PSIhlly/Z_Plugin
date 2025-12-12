@@ -358,13 +358,24 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
         }
-        var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "new1", CreateCharacterAnim("new1") } };
+        var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "anim", CreateCharacterAnim("anim") } };
+
+        animDic["anim"].animClip.Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
+        var defaultAnimName = new Dictionary<string, string>();
+        defaultAnimName["idle"] = "anim";
+        defaultAnimName["move"] = "anim";
+        for (int i = 0; i < 4; i++)
+        {
+            defaultAnimName["idle" + i] = "anim";
+            defaultAnimName["move" + i] = "anim";
+        }
+
         var paramDic = new Dictionary<string, CharacterParamForm.Data>();
         foreach (var prm in CharacterParamForm.DataByName.Values)
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic,new Dictionary<string, string>(), default, "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
     }
     public void DeleteCharacter(int uid)
     {
@@ -528,7 +539,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             act?.Invoke(form);
         });
     }
-    public void ChooseEvent(string key,SceneEventType type, string retType, string title, Action<EntryItem> act)
+    public void ChooseEvent(SceneEventType type, string retType, string title, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>

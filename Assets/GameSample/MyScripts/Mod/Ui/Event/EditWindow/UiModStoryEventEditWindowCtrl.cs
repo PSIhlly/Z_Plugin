@@ -214,7 +214,8 @@ namespace Ui.ModStoryEventEditWindow
             unitCon.Refresh();
 
 
-            
+
+            UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
 
         }
         public void RefreshUnitDetail()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Map;
 using Z_Math;
-
+[DefaultExecutionOrder(10000)]
 public class PerspectiveKeeper : MonoBehaviour
 {
     private Vector3 insLastRot;
@@ -29,7 +29,7 @@ public class PerspectiveKeeper : MonoBehaviour
             }
         }
     }
-    public void Update()
+    public void LateUpdate()
     {
         if (ins == null)
         {

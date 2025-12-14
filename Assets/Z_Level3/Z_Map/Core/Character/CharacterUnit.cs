@@ -78,61 +78,97 @@ namespace Z_Map
         }
         public void Move(Vector3 dir)
         {
-            var mag = dir.magnitude;
-            HashSet<int> exist = new HashSet<int>() { data.uid };
-            var avoidDir = new List<Vector3>();
-            float res = mag;
+            /*
             var floor = manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly,out _);
 
             if (dir.y < 0 && floor <= 0.01f)
             {
                 dir.y = 0;
             }
-            else
+            else*/
+            Queue<Vector3> dirQue = new Queue<Vector3>();
+            dirQue.Enqueue(dir);
+            bool firstTry = true;
+
+            HashSet<Vector3> existAvoid = new HashSet<Vector3>();
+
+            HashSet<MapUnit> existUnit = new HashSet<MapUnit>();
+
+            while (dirQue.Count > 0)
             {
-                res = Math.Min(manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly, out var avoid), res);
-                avoidDir.AddRange(avoid);
-            }
-            var euler = data.euler;
-            if (dir != Vector3.zero)
-            {
-                foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
+                dir = dirQue.Dequeue();
+                var mag = dir.magnitude;
+                var avoidDir = new List<Vector3>();
+                float res = mag;
+
+                var euler = data.euler;
+                if (dir != Vector3.zero)
                 {
-                    foreach (var obj in manager.updateCtrl.objectTileDic.Get(tile))
+                    existUnit.Clear();
+                    foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
                     {
-                        if (exist.Contains(obj.data.uid))
+                        if ((tile.data.pos - data.pos).sqrMagnitude > 1.69f)
                             continue;
-                        exist.Add(obj.data.uid);
-                        //Graph.dDebug = true;
-                        res = Math.Min(manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly, out var avoid), res);
-                        avoidDir.AddRange(avoid);
-                        //Graph.dDebug = false;
 
+                        List<Vector3> avoid;
 
+                        List<MapUnit> casts = new List<MapUnit>();
+                        casts.Add(tile);
+                        casts.AddRange(manager.updateCtrl.objectTileDic.Get(tile));
+                        casts.AddRange(manager.updateCtrl.characterTileDic.Get(tile));
+
+                        foreach (var obj in casts)
+                        {
+                            if (existUnit.Contains(obj) || obj == this)
+                                continue;
+                            existUnit.Add(obj);
+                            var cur = manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly, out avoid);
+                            if (Mathf.Abs(cur - res) < 0.01f && MathF.Abs(cur) < 0.01f)
+                            {
+                                avoidDir.AddRange(avoid);
+                            }
+                            else if (cur < res)
+                            {
+                                res = cur;
+                                avoidDir.Clear();
+                                avoidDir.AddRange(avoid);
+                            }
+                        }
                     }
-                    foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
+
+                    var faceDir = dir;
+                    faceDir.y = 0;
+                    if (faceDir != Vector3.zero)
+                        euler = Quaternion.LookRotation(faceDir).eulerAngles;
+
+                }
+                if ((firstTry || res > 0.001f) && avoidDir.Count > 0)
+                {
+                    var curDir = dir * (mag - res) / mag;
+                    dirQue.Clear();
+                    existAvoid.Clear();
+                    foreach (var o in avoidDir)
                     {
-                        if (exist.Contains(ch.data.uid) || ch == this)
+                        if (existAvoid.Contains(o))
                             continue;
-                        exist.Add(ch.data.uid);
-
-                        res = Math.Min(manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly, out var avoid), res);
-                        avoidDir.AddRange(avoid);
-
+                        existAvoid.Add(o);
+                        var dot = Vector3.Dot(curDir, o) - 0.001f;
+                        if (dot >= 0)
+                            continue;
+                        var realO = o * dot;
+                        if ((curDir - realO).sqrMagnitude < 0.0001f)
+                            continue;
+         /*               if (dir.x != 0 && dir.z != 0)
+                            Debug.Log(Time.frameCount + " " + realO.magnitude + " " + curDir.magnitude + " " + (curDir - realO).magnitude + " " + dir.magnitude);
+      */                  dirQue.Enqueue(curDir - realO);
                     }
                 }
-
-                var faceDir = dir;
-                faceDir.y = 0;
-                euler = Quaternion.LookRotation(faceDir).eulerAngles;
-
+                firstTry = false;
+                dir *= (res) / mag;
+                if (res > 0.01f)
+                    manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
             }
-            dir *= (res) / mag;
-            if(avoidDir.Count>0)
-            {
-                Debug.Log(avoidDir[0].x+" "+ avoidDir[0].y+" "+ avoidDir[0].z);
-            }
-            manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
+
 
         }
 

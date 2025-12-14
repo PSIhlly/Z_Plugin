@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ui.Loading;
 using Ui.ModSceneMain;
+using Ui.Start;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.WSA;
@@ -174,6 +175,22 @@ public class PlayManager : Z_MonoManager<PlayManager>
                 }
             }
         }
+    }
+    public void Exit()
+    {
+        int curId = GameManager.instance.curStory.id;
+
+        Main2StoryManager.instance.UnloadScenePlay();
+        Main2StoryManager.instance.UnloadStoryPlay();
+        if (instance.boxPlay)
+        {
+            Main2StoryManager.instance.StartLoadStoryUgc(curId);
+        }
+        else
+        {
+            UiManager.instance.ShowUi<UiStartCtrl>();
+        }
+
     }
 
     public string GetSceneCacheFileName()

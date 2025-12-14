@@ -66,16 +66,7 @@ namespace Ui.PlaySceneMenu
         }
         public void Exit()
         {
-            int curId = GameManager.instance.curStory.id;
-            Main2StoryManager.instance.UnloadScenePlay();
-            Main2StoryManager.instance.UnloadStoryPlay(); 
-            if(PlayManager.instance.boxPlay)
-            {
-                Main2StoryManager.instance.StartLoadStoryUgc(curId);
-            }else
-            {
-                UiManager.instance.ShowUi<UiStartCtrl>();
-            }
+            PlayManager.instance.Exit();
         }
     }
 }

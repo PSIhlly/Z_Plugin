@@ -8,18 +8,17 @@ using Z_DesignStyle;
 using Z_Debug;
 namespace Z_Input
 {
-    
-    public class InputKeyDownEvent:Z_Event
+    public class InputKeyDownEvent : Z_Event
     {
-        public KeyCode key;
+        public List<KeyCode> key;
     }
     public class InputKeyEvent : Z_Event
     {
-        public KeyCode key;
+        public List<KeyCode> key;
     }
     public class InputKeyUpEvent : Z_Event
     {
-        public KeyCode key;
+        public List<KeyCode> key;
     }
 
     public class InputPointDownEvent : Z_Event
@@ -74,6 +73,7 @@ namespace Z_Input
     [DefaultExecutionOrder(-100)]
     public class InputManager : Z_MonoManager<InputManager>
     {
+        List<KeyCode> keyLst = new List<KeyCode>();
         public bool enabled = true;
         public Vector2 screenSize;
         public Vector2 screenWorldSize;
@@ -152,14 +152,14 @@ namespace Z_Input
             {
                 Z_EventHelper.Invoke(new InputPointUpEvent()
                 {
-                     id = k,
-                      pos = id2Pos[k],
-                       ui = UICheck(id2Pos[k])
+                    id = k,
+                    pos = id2Pos[k],
+                    ui = UICheck(id2Pos[k])
                 });
                 id2Pos.Remove(k);
             }
 
-            
+
 
             for (int i = 0; i < Input.touchCount; i++)
             {
@@ -241,7 +241,7 @@ namespace Z_Input
 
             for (int i = 0; i <= 1; i++)
             {
-                if (Input.GetMouseButton(i)&&!tmpHash.Contains(i)&& mouseOldPos.ContainsKey(i))//ignore first frame
+                if (Input.GetMouseButton(i) && !tmpHash.Contains(i) && mouseOldPos.ContainsKey(i))//ignore first frame
                 {
                     mousePos[i] = Input.mousePosition;
                     Z_EventHelper.Invoke(new InputMouseEvent()
@@ -256,14 +256,14 @@ namespace Z_Input
             }
             //scroll
             float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (scroll!=0)
+            if (scroll != 0)
             {
                 Z_EventHelper.Invoke(new InputMouseScrollEvent()
                 {
                     delta = scroll
                 });
             }
-            if((lastMousePos- Input.mousePosition).sqrMagnitude>0.0001f)
+            if ((lastMousePos - Input.mousePosition).sqrMagnitude > 0.0001f)
             {
                 lastMousePos = Input.mousePosition;
                 Z_EventHelper.Invoke(new InputMouseMoveEvent()
@@ -293,9 +293,9 @@ namespace Z_Input
 
             EventSystem.current.RaycastAll(pointerData, results);
 
-            foreach(var result in results)
+            foreach (var result in results)
             {
-                if(result.gameObject.layer == 5)
+                if (result.gameObject.layer == 5)
                 {
                     return result.gameObject;
                 }
@@ -307,7 +307,7 @@ namespace Z_Input
         {
             float min = float.MaxValue;
             int id = 0;
-            foreach(var pair in id2Pos)
+            foreach (var pair in id2Pos)
             {
                 var dis2 = (pair.Value - pos).sqrMagnitude;
                 if (dis2 < min)
@@ -329,102 +329,88 @@ namespace Z_Input
 #else
 
             ManageMouse();
+            keyLst.Clear();
+
             if (Input.GetKeyDown(KeyCode.W))
             {
-                Z_EventHelper.Invoke(new InputKeyDownEvent()
-                {
-                    key = KeyCode.W
-                });
+                keyLst.Add(KeyCode.W);
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                Z_EventHelper.Invoke(new InputKeyDownEvent()
-                {
-                    key = KeyCode.S
-                });
+
+                keyLst.Add(KeyCode.S);
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                Z_EventHelper.Invoke(new InputKeyDownEvent()
-                {
-                    key = KeyCode.A
-                });
+
+                keyLst.Add(KeyCode.A);
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                Z_EventHelper.Invoke(new InputKeyDownEvent()
-                {
-                    key = KeyCode.D
-                });
+                keyLst.Add(KeyCode.D);
             }
             if (Input.GetKeyDown(KeyCode.E))
             {
+                keyLst.Add(KeyCode.E);
+            }
+            if (keyLst.Count > 0)
+            {
                 Z_EventHelper.Invoke(new InputKeyDownEvent()
                 {
-                    key = KeyCode.E
+                    key = keyLst
                 });
             }
 
+            keyLst.Clear();
             if (Input.GetKey(KeyCode.W))
             {
-                Z_EventHelper.Invoke(new InputKeyEvent()
-                {
-                    key = KeyCode.W
-                });
+                keyLst.Add(KeyCode.W);
             }
             if (Input.GetKey(KeyCode.S))
             {
-                Z_EventHelper.Invoke(new InputKeyEvent()
-                {
-                    key = KeyCode.S
-                });
+                keyLst.Add(KeyCode.S);
             }
             if (Input.GetKey(KeyCode.A))
             {
-                Z_EventHelper.Invoke(new InputKeyEvent()
-                {
-                    key = KeyCode.A
-                });
+                keyLst.Add(KeyCode.A);
             }
             if (Input.GetKey(KeyCode.D))
             {
+                keyLst.Add(KeyCode.D);
+            }
+            if (keyLst.Count > 0)
+            {
                 Z_EventHelper.Invoke(new InputKeyEvent()
                 {
-                    key = KeyCode.D
+                    key = keyLst
                 });
             }
 
-
+            keyLst.Clear();
             if (Input.GetKeyUp(KeyCode.W))
             {
-                Z_EventHelper.Invoke(new InputKeyUpEvent()
-                {
-                    key = KeyCode.W
-                });
+                keyLst.Add(KeyCode.W);
             }
             if (Input.GetKeyUp(KeyCode.S))
             {
-                Z_EventHelper.Invoke(new InputKeyUpEvent()
-                {
-                    key = KeyCode.S
-                });
+                keyLst.Add(KeyCode.S);
             }
             if (Input.GetKeyUp(KeyCode.A))
             {
-                Z_EventHelper.Invoke(new InputKeyUpEvent()
-                {
-                    key = KeyCode.A
-                });
+                keyLst.Add(KeyCode.A);
             }
             if (Input.GetKeyUp(KeyCode.D))
             {
+                keyLst.Add(KeyCode.D);
+            }
+            if (keyLst.Count > 0)
+            {
                 Z_EventHelper.Invoke(new InputKeyUpEvent()
                 {
-                    key = KeyCode.D
+                    key = keyLst
                 });
             }
 
-            
 #endif
 
         }

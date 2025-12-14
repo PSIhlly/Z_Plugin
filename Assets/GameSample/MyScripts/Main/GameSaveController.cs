@@ -93,7 +93,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveEvent(path);
         SaveConfig(path);
         SaveScene(path);
-
+        SaveAndLoad.Delete(Main2StoryManager.GetStorySaveFolder(id));
     }
     public void SaveOverview(int id)
     {

@@ -1,9 +1,12 @@
+using Form;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using Z_Code.Form;
+using Z_DataSystem;
+using Z_DesignStyle;
 using Z_Map;
 using Z_Text;
 using Z_Ui.Dialog;
@@ -31,6 +34,16 @@ namespace Z_Code
             else if (unit is ItemUnit i)
             {
                 MapManager.instance.RemoveItem(i.data);
+            }
+            else if (unit is CharacterUnit c)
+            {
+                var form=CharacterProductForm.DataByUid.GetDv(AssetManager.GetKeyId(c.data.name),null);
+                if(form!=null&&!form.unique)
+                {
+                    CharacterProductForm.RemoveData(form.uid);
+                    MapManager.instance.RemoveCharacter(c.data);
+                }
+
             }
             return true;
         }

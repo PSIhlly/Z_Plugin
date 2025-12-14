@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Ui;
 using Ui.ModSceneBehaviourUnit;
 using Ui.ModSceneMain;
@@ -174,6 +175,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         if(hits.Count>0)
         {
             worldPosition = new Vector3(hits[0].transform.position.x, CameraInstance.instance.tarTrs.position.y, hits[0].transform.position.z);
+        }else
+        {
+            worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         }
         var hitPos = mapMgr.utilCtrl.RealPos2MapPos(worldPosition);
         //manage
@@ -512,22 +516,28 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     {
         if (!enable)
             return;
-        switch (evt.key)
+        var cur = evt.key.Where((o) => o == KeyCode.W || o == KeyCode.S || o == KeyCode.A || o == KeyCode.D);
+        var step = Vector3.zero;
+        foreach (var c in cur)
         {
-            case KeyCode.W:
-                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.forward * 4;
-                break;
-            case KeyCode.S:
-                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.back * 4;
-                break;
+            switch (c)
+            {
+                case KeyCode.W:
+                    step += Vector3.forward;
+                    break;
+                case KeyCode.S:
+                    step += Vector3.back;
+                    break;
 
-            case KeyCode.A:
-                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.left * 4;
-                break;
-            case KeyCode.D:
-                CameraInstance.instance.tarTrs.position += Time.deltaTime * Vector3.right * 4;
-                break;
+                case KeyCode.A:
+                    step += Vector3.left;
+                    break;
+                case KeyCode.D:
+                    step += Vector3.right;
+                    break;
+            }
         }
+        CameraInstance.instance.tarTrs.position += step.normalized * 0.02f;
     }
 
     public void OnEvent(InputMouseEvent evt)

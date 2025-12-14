@@ -18,21 +18,26 @@ public class Z_Input_Sample : MonoBehaviour, IZ_Listener<InputKeyEvent>
     }
     public void OnEvent(InputKeyEvent evt)
     {
-        switch (evt.key)
+        if (evt.key.Contains(KeyCode.W))
         {
-            case KeyCode.W:
-                tr.position += Time.deltaTime * Vector3.forward * 2;
-                break;
-            case KeyCode.S:
-                tr.position += Time.deltaTime * Vector3.back * 2;
-                break;
-
-            case KeyCode.A:
-                tr.position += Time.deltaTime * Vector3.left * 2;
-                break;
-            case KeyCode.D:
-                tr.position += Time.deltaTime * Vector3.right * 2;
-                break;
+            tr.position += Time.deltaTime * Vector3.forward * 2;
         }
+        else if (evt.key.Contains(KeyCode.S))
+        {
+
+            tr.position += Time.deltaTime * Vector3.back * 2;
+        }
+        else if (evt.key.Contains(KeyCode.A))
+        {
+
+            tr.position += Time.deltaTime * Vector3.left * 2;
+        }
+        else if (evt.key.Contains(KeyCode.D))
+        {
+
+            tr.position += Time.deltaTime * Vector3.right * 2;
+        }
+
+
     }
 }

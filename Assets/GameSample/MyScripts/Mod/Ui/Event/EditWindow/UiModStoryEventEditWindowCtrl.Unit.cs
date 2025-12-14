@@ -13,6 +13,7 @@ using Z_Code.Form;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_DataSystem;
+using Z_Ui;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiUnitParam
@@ -125,8 +126,8 @@ namespace Ui.ModStoryEventEditWindow
             size.y = height;
             view.rtf_root.sizeDelta = size;
             view.img_.rectTransform.sizeDelta = new Vector2(height,height);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.img_.rectTransform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unit);
+
+
         }
 
         private void CreateTxt(string desc)

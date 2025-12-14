@@ -2,6 +2,8 @@ using Form;
 using Microsoft.Win32;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
@@ -305,27 +307,32 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
 
     #region op
-
     public void OnEvent(InputKeyEvent evt)
     {
         if (!enable || GameManager.instance.curProgress.blockProgramUid >0)
             return;
-        switch (evt.key)
+        var cur = evt.key.Where((o) => o == KeyCode.W || o == KeyCode.S || o == KeyCode.A || o == KeyCode.D);
+        var step = Vector3.zero;
+        foreach(var c in cur)
         {
-            case KeyCode.W:
-                SetPlayerMove(Time.deltaTime * Vector3.forward);
-                break;
-            case KeyCode.S:
-                SetPlayerMove(Time.deltaTime * Vector3.back);
-                break;
+            switch(c)
+            {
+                case KeyCode.W:
+                    step+= Vector3.forward;
+                    break;
+                case KeyCode.S:
+                    step += Vector3.back;
+                    break;
 
-            case KeyCode.A:
-                SetPlayerMove(Time.deltaTime * Vector3.left);
-                break;
-            case KeyCode.D:
-                SetPlayerMove(Time.deltaTime * Vector3.right);
-                break;
+                case KeyCode.A:
+                    step +=Vector3.left;
+                    break;
+                case KeyCode.D:
+                    step +=  Vector3.right;
+                    break;
+            }
         }
+        SetPlayerMove(step.normalized* 0.02f);
     }
 
     public void OnEvent(InputMouseEvent evt)

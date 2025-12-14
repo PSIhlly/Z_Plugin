@@ -29,10 +29,13 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Sphere", "Sphere" }, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero}, new List<Vector3>() { Vector3.one , Vector3.one }, showShaddowLst);
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Sphere", "Sphere" }, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero}, new List<Vector3>() { Vector3.one , Vector3.one}, showShaddowLst);
         var renders=res.GetComponentsInChildren<Renderer>();
         renders[0].transform.GetComponent<PerspectiveKeeper>().deepth = 0.01f;
         renders[1].transform.GetComponent<PerspectiveKeeper>().deepth = 0.05f;
+
+        res.GetComponentsInChildren<SphereCollider>()[0].radius=0.4f;
+        GameObject.Destroy( res.GetComponentsInChildren<SphereCollider>()[2].gameObject);
         if (forGame)
         {
             res.AddComponent<CharacterInstance>();

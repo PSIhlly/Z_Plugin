@@ -311,7 +311,7 @@ namespace Form
 
                 {100031,new Data(100031,"If",null,null,null,new List<string>(){"void",},"","if(1){ }else{ }","basic","process",true)},
 
-                {100032,new Data(100032,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i++){ }","basic","process",true)},
+                {100032,new Data(100032,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i=i+1){ }","basic","process",true)},
 
                 {100033,new Data(100033,"Greater",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 > 1","basic","math",false)},
 

@@ -17,6 +17,7 @@ using Z_Code;
 using Unity.VisualScripting;
 using Ui.ModStoryEventTrigger;
 using Z_DataSystem.Form;
+using System.Runtime.ConstrainedExecution;
 namespace Form
 {
 
@@ -80,6 +81,7 @@ public class GameEventController : Z_Controller<GameManager>
     }
     public void Reset()
     {
+        EventInterpretDataForm.Clear();
         tasks.Clear();
         releaseTriggerTuple.Clear();
     }

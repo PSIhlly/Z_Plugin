@@ -1,13 +1,17 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Schema;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations;
+using UnityEngine.UIElements;
 namespace Z_Math
 {
     public static class Graph
     {
+        public static float DELTA = 0.05f;
         public static bool dDebug;
         public class IntersectAssisant
         {
@@ -87,10 +91,13 @@ namespace Z_Math
         {
             LeftDownBack,
             RightDownBack,
+
             LeftUpBack,
             RightUpBack,
+
             LeftDownForward,
             RightDownForward,
+
             LeftUpForward,
             RightUpForward,
         }
@@ -256,20 +263,7 @@ namespace Z_Math
 
 
 
-        // 计算椭球在指定轴上的有效半径
-        private static float ProjectSphereRadius(Vector3[] sphereSixPoints, Vector3 axis)
-        {
-            var center = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
-            Vector3 a = sphereSixPoints[(int)SphereSixPoint.Right] - center; // 第一个半轴向量
-            Vector3 b = sphereSixPoints[(int)SphereSixPoint.Up] - center; // 第二个半轴向量
-            Vector3 c = sphereSixPoints[(int)SphereSixPoint.Forward] - center; // 第三个半轴向量
 
-            float dotA = Vector3.Dot(a, axis);
-            float dotB = Vector3.Dot(b, axis);
-            float dotC = Vector3.Dot(c, axis);
-
-            return Mathf.Sqrt(dotA * dotA + dotB * dotB + dotC * dotC);
-        }
 
         #region Intersect
         public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
@@ -295,7 +289,7 @@ namespace Z_Math
 
             float touchTime = 0;
             float avoidTime = 1;
-           
+
             {
                 axesToCheck.AddRange(GetFaceNormals(aCubeEightPoints));
                 axesToCheck.AddRange(GetFaceNormals(bCubeEightPoints));
@@ -327,7 +321,7 @@ namespace Z_Math
             {
                 avoidTime = 1;
                 touchTime = 0;
-                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
+                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)//todo
                     touchTime = 1;
             }
             if (touchTime > avoidTime)
@@ -350,87 +344,65 @@ namespace Z_Math
             bool toIn = false;
             var mag = dir.magnitude;
             dis = mag;
-            HashSet<Vector3> exist = new HashSet<Vector3>();
-            // 先检查初始是否重叠
-            if (IsSphereAndCubeOverlap(sphereSixPoints, cubeEightPoints))
+            
+            var sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
+            var disDir = GetPointToCube(sphereCenter, cubeEightPoints,out fromIn);
+
+            var newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
+
+            if (fromIn)
             {
-                fromIn = true;
                 if (mag == 0)
                 {
                     return IntersectType.Inner;
                 }
             }
 
-            var sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
+            float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
             var cubeCenter = (cubeEightPoints[(int)CubeEightPoint.LeftDownBack] + cubeEightPoints[(int)CubeEightPoint.RightUpForward]) / 2;
 
             float touchTime = 0;
             float avoidTime = 1;
 
+            var axis = disDir.normalized;
+            
+            // 1. 初始投影区间
+            float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
+            float sphereMin = sphereCenterProj - sphereRadius;
+            float sphereMax = sphereCenterProj + sphereRadius;
+
+            (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
+
+            float dirProj = Vector3.Dot(dir, axis);
+
+            var res = CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
+
+            avoidDir += (avoid * axis).normalized;
+            if (dir.y == 0)
             {
-                // 生成所有潜在分离轴（与静态重叠判断一致）
-
-                List<Vector3> axesToCheck = new List<Vector3>();
-                axesToCheck.AddRange(GetFaceNormals(cubeEightPoints));
-                // 2. 添加椭球的3个半轴方向
-                axesToCheck.Add(sphereSixPoints[(int)SphereSixPoint.Right].normalized);
-                axesToCheck.Add(sphereSixPoints[(int)SphereSixPoint.Up].normalized);
-                axesToCheck.Add(sphereSixPoints[(int)SphereSixPoint.Forward].normalized);
-
-                // 3. 添加椭球半轴与立方体面法线的叉乘方向（补充潜在分离轴）
-                for (int i = 0; i < 3; i++)
-                {
-                    for (int j = 3; j < 6; j++)
-                    {
-                        var cross = Vector3.Cross(axesToCheck[i], axesToCheck[j]).normalized;
-                        if (cross.sqrMagnitude > 0) // 避免零向量
-                            axesToCheck.Add(cross);
-                    }
-                }
-                // 对每个轴计算碰撞时间
-                foreach (var axis in axesToCheck)
-                {
-                    if (exist.Contains(axis))
-                    {
-                        continue;
-                    }
-                    exist.Add(axis);
-                    // 1. 初始投影区间
-                    float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
-                    float sphereRadius = ProjectSphereRadius(sphereSixPoints, axis);
-                    float sphereMin = sphereCenterProj - sphereRadius;
-                    float sphereMax = sphereCenterProj + sphereRadius;
-
-                    (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
-
-                    float dirProj = Vector3.Dot(dir, axis);
-
-                    var res = CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
-
-                    avoidDir += (avoid * axis).normalized;
-                    if (dDebug)
-                        Debug.Log(res + " " + sphereMin + " " + sphereMax + " " + cubeMin + " " + cubeMax + "  " + dir + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
-                    if (res)
-                        break; ;
-
-                }
+                int temp = 0;
+                //Debug.Log(Time.frameCount);
             }
-            if (fromIn)
-            {
-                avoidTime = 1;
-                touchTime = 0;
-                if (Vector3.Dot((sphereCenter - cubeCenter), dir) >= 0)
-                    touchTime = 1;
-            }
-
-            if (touchTime > avoidTime && avoidTime > 0)
+            //Debug.Log(Time.frameCount + " : " + axis + " " + sphereMin + " " + sphereMax + " " + cubeMin + " " + cubeMax + "  " + dir + "  " + dirProj + " " + " --- " + touchTime + " " + avoidTime);
+            
+            if ((fromIn && !newInner) ||
+    (fromIn && newInner && newDisDir.sqrMagnitude < disDir.sqrMagnitude)
+    || (!fromIn && !newInner && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
             {
                 touchTime = 1;
+            }
+            else
+            {
+                if (touchTime > avoidTime && avoidTime > 0)
+                {
+                    touchTime = 1;
+                }
             }
             if (IsSphereAndCubeOverlap(ElementwisePlus(sphereSixPoints, dir), cubeEightPoints))
             {
                 toIn = true;
             }
+
 
             dis = touchTime * mag;
 
@@ -454,106 +426,66 @@ namespace Z_Math
                     return IntersectType.Inner;
                 }
             }
-            HashSet<Vector3> exist = new HashSet<Vector3>();
             var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
             var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-
+            var aRadius = (aSphereSixPoints[(int)SphereSixPoint.Left] - aSphereSixPoints[(int)SphereSixPoint.Right]).magnitude / 2;
+            var bRadius = (bSphereSixPoints[(int)SphereSixPoint.Left] - bSphereSixPoints[(int)SphereSixPoint.Right]).magnitude / 2;
             float touchTime = 0;
             float avoidTime = 1;
 
 
             {
-                // 生成15个分离轴
-                List<Vector3> axesToCheck = GenerateSpheresSeparationAxes(aSphereSixPoints, bSphereSixPoints);
 
-                foreach (var axis in axesToCheck)
+                var axis = (aCenter - bCenter).normalized;
+
+                if (axis.sqrMagnitude > 0)
                 {
-                    if (exist.Contains(axis))
-                    {
-                        continue;
-                    }
-                    if (axis.sqrMagnitude <= 0) continue;
-
                     // 1. 初始投影区间（t=0时）
                     float aCenterProj = Vector3.Dot(aCenter, axis);
-                    float aRadius = ProjectSphereRadius(aSphereSixPoints, axis);
                     float aMin = aCenterProj - aRadius;
                     float aMax = aCenterProj + aRadius;
 
                     float bCenterProj = Vector3.Dot(bCenter, axis);
-                    float bRadius = ProjectSphereRadius(bSphereSixPoints, axis);
                     float bMin = bCenterProj - bRadius;
                     float bMax = bCenterProj + bRadius;
 
                     // 2. 移动速度在轴上的投影
                     float dirProj = Vector3.Dot(dir, axis);
                     var res = CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
-                    
-                    if(!res)
-                        Debug.Log(res + " " + aMin + " " + aMax + " " + bMin + " " + bMax + "  " + axis + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
 
+                    /* if(!res)
+                         Debug.Log(res + " " + aMin + " " + aMax + " " + bMin + " " + bMax + "  " + axis + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
+ */
                     avoidDir += (avoid * axis).normalized;
-                    if (res)
-                        break;
+
+
+
                 }
 
             }
-            if (fromIn)
-            {
-                avoidTime = 1;
-                touchTime = 0;
-                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
-                    touchTime = 1;
-            }
 
-            if (touchTime > avoidTime)
+            if ((aCenter - bCenter).sqrMagnitude < (aCenter + dir - bCenter).sqrMagnitude)
             {
                 touchTime = 1;
             }
-            if (IsSpheresOverlap(ElementwisePlus(aSphereSixPoints, dir), bSphereSixPoints))
+            else
             {
-                toIn = true;
+                if (touchTime > avoidTime)
+                {
+                    touchTime = 1;
+                }
+                if (IsSpheresOverlap(ElementwisePlus(aSphereSixPoints, dir), bSphereSixPoints))
+                {
+                    toIn = true;
+                }
             }
+
             dis = touchTime * mag;
 
             avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
-        /// <summary>
-        /// 生成两个椭球的15个分离轴
-        /// </summary>
-        private static List<Vector3> GenerateSpheresSeparationAxes(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints)
-        {
-            List<Vector3> axes = new List<Vector3>();
-            var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
 
-            // 1. 添加E1的3个半轴方向
-
-            axes.Add((aSphereSixPoints[(int)SphereSixPoint.Right] - aCenter).normalized);
-            axes.Add((aSphereSixPoints[(int)SphereSixPoint.Up] - aCenter).normalized);
-            axes.Add((aSphereSixPoints[(int)SphereSixPoint.Forward] - aCenter).normalized);
-
-            var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-
-            // 2. 添加E2的3个半轴方向
-            axes.Add((bSphereSixPoints[(int)SphereSixPoint.Right] - bCenter).normalized);
-            axes.Add((bSphereSixPoints[(int)SphereSixPoint.Up] - bCenter).normalized);
-            axes.Add((bSphereSixPoints[(int)SphereSixPoint.Forward] - bCenter).normalized);
-
-            // 3. 添加E1半轴与E2半轴的两两叉乘方向（3×3=9个）
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 3; j < 6; j++)
-                {
-                    Vector3 cross = Vector3.Cross(axes[i], axes[j]).normalized;
-                    if (cross.sqrMagnitude > 0) // 避免零向量
-                        axes.Add(cross);
-                }
-            }
-            //4.center
-            axes.Add((aCenter-bCenter).normalized);
-            return axes;
-        }
         private static List<Vector3> GetFaceNormals(Vector3[] cubeEightPoints)
         {
             List<Vector3> normals = new List<Vector3>();
@@ -595,8 +527,8 @@ namespace Z_Math
             var forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
             var up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
             var right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
-            to = GetNewCoordinateVector(to, forward, up, right) - eightPoints[(int)CubeEightPoint.LeftDownBack];
-            from = GetNewCoordinateVector(from, forward, up, right) - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            to = GetNewCoordinateVector(to, right, up, forward ) - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            from = GetNewCoordinateVector(from, right , up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
 
             var x = right.magnitude;
             var y = up.magnitude;
@@ -679,12 +611,13 @@ namespace Z_Math
 
             return GetIntersectRes(fromIn, toIn, dis < mag);
         }
-        public static IntersectType PointIntersectCube(Vector3[] eightPoints, Vector3 point)
+        public static IntersectType PointIntersectCube(Vector3[] eightPoints, Vector3 point,out float dis)
         {
+            dis = 0;
             var forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
             var up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
             var right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
-            point = GetNewCoordinateVector(point, forward, up, right) - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            point = GetNewCoordinateVector(point, right, up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
 
             var x = right.magnitude;
             var y = up.magnitude;
@@ -704,8 +637,8 @@ namespace Z_Math
             var forward = sixPoint[(int)SphereSixPoint.Forward] - center;
             var up = sixPoint[(int)SphereSixPoint.Up] - center;
             var right = sixPoint[(int)SphereSixPoint.Right] - center;
-            to = GetNewCoordinateVector(to, forward, up, right) - center;
-            from = GetNewCoordinateVector(from, forward, up, right) - center;
+            to = GetNewCoordinateVector(to, right, up, forward) - center;
+            from = GetNewCoordinateVector(from, right, up, forward) - center;
 
             var x = right.magnitude;
             var y = up.magnitude;
@@ -869,7 +802,17 @@ namespace Z_Math
 
             return randomVector;
         }
+        public static Vector3 GetDistanceVector3D(Vector3 linePoint, Vector3 lineDir, Vector3 targetPoint)
+        {
+            Vector3 w = targetPoint - linePoint;
+            float dotVV = Vector3.Dot(lineDir, lineDir);
+            if (dotVV < 1e-6f) // 直线方向向量不能为零
+                return Vector3.zero;
 
+            float t = Vector3.Dot(w, lineDir) / dotVV;
+            Vector3 projection = t * lineDir;
+            return w - projection;
+        }
         private static bool IsCubesOverlap(Vector3[] cubeA, Vector3[] cubeB)
         {
             List<Vector3> axes = new List<Vector3>();
@@ -890,36 +833,22 @@ namespace Z_Math
             }
             return true;
         }
+
         public static bool IsSphereAndCubeOverlap(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints)
         {
-            List<Vector3> axesToCheck = new List<Vector3>();
-            // 1. 添加立方体的3个面法线
-            axesToCheck.AddRange(GetFaceNormals(cubeEightPoints));
+            
 
-            // 2. 添加椭球的3个半轴方向
-            axesToCheck.Add(sphereSixPoints[(int)SphereSixPoint.Right].normalized);
-            axesToCheck.Add(sphereSixPoints[(int)SphereSixPoint.Up].normalized);
-            axesToCheck.Add(sphereSixPoints[(int)SphereSixPoint.Forward].normalized);
-
-            // 3. 添加椭球半轴与立方体面法线的叉乘方向（补充潜在分离轴）
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 3; j < 6; j++)
-                {
-                    var cross = Vector3.Cross(axesToCheck[i], axesToCheck[j]).normalized;
-                    if (cross.sqrMagnitude > 0) // 避免零向量
-                        axesToCheck.Add(cross);
-                }
-            }
-            var center = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
+            var aCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
+            var aRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
+            var axis = GetPointToCube(aCenter, cubeEightPoints,out var inner).normalized;
+            if (inner)
+                return true;
             // 对每个轴检查投影重叠
-            foreach (var axis in axesToCheck)
             {
                 // 计算椭球在轴上的投影区间 [ellipsoidMin, ellipsoidMax]
-                float ellipsoidCenterProj = Vector3.Dot(center, axis);
-                float ellipsoidRadius = ProjectSphereRadius(sphereSixPoints, axis);
-                float ellipsoidMin = ellipsoidCenterProj - ellipsoidRadius;
-                float ellipsoidMax = ellipsoidCenterProj + ellipsoidRadius;
+                float ellipsoidCenterProj = Vector3.Dot(aCenter, axis);
+                float ellipsoidMin = ellipsoidCenterProj - aRadius;
+                float ellipsoidMax = ellipsoidCenterProj + aRadius;
 
                 // 计算立方体在轴上的投影区间 [cubeMin, cubeMax]
                 (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
@@ -933,41 +862,76 @@ namespace Z_Math
         }
         public static bool IsSpheresOverlap(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints)
         {
-            List<Vector3> axesToCheck = GenerateSpheresSeparationAxes(aSphereSixPoints, bSphereSixPoints);
+
             var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
             var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-            foreach (var axis in axesToCheck)
+
+            return (bCenter - aCenter).magnitude <= (aSphereSixPoints[(int)SphereSixPoint.Left] - aCenter).magnitude + (bSphereSixPoints[(int)SphereSixPoint.Left] - bCenter).magnitude; // 所有轴都重叠，判定碰撞
+        }
+
+        public static Vector3 GetPointToCube(Vector3 point, Vector3[] cubeEightPoints,out bool inner)
+        {
+            inner = false;
+            var boxCenter = (cubeEightPoints[(int)CubeEightPoint.LeftUpBack] + cubeEightPoints[(int)CubeEightPoint.RightDownForward]) / 2;
+            var min2 = float.MaxValue;
+            var id = 0;
+            for (int i = 0; i < cubeEightPoints.Length; i++)
             {
-                if (axis.sqrMagnitude < 0) continue; // 跳过零向量
-
-                // 计算E1在轴上的投影区间 [min1, max1]
-                float projCenter1 = Vector3.Dot(aCenter, axis);
-                float radius1 = ProjectSphereRadius(aSphereSixPoints, axis);
-                float min1 = projCenter1 - radius1;
-                float max1 = projCenter1 + radius1;
-
-                // 计算E2在轴上的投影区间 [min2, max2]
-                float projCenter2 = Vector3.Dot(bCenter, axis);
-                float radius2 = ProjectSphereRadius(bSphereSixPoints, axis);
-                float min2 = projCenter2 - radius2;
-                float max2 = projCenter2 + radius2;
-
-                // 检查投影是否分离（分离则两椭球不重叠）
-                if (max1 < min2 || max2 < min1)
-                    return false;
+                var dis = (cubeEightPoints[i] - point).sqrMagnitude;
+                if (dis < min2)
+                {
+                    min2 = dis;
+                    id = i;
+                }
             }
+            var dir = cubeEightPoints[id] - point;
+            var axis = GetCubeClosePoint(cubeEightPoints, (CubeEightPoint)id);
+            axis[0] = (cubeEightPoints[id] - axis[0]).normalized;
+            axis[1] = (cubeEightPoints[id] - axis[1]).normalized;
+            axis[2] = (cubeEightPoints[id] - axis[2]).normalized;
+            var res = GetNewCoordinateVector(point - cubeEightPoints[id], axis[0], axis[1], axis[2]);
+            if(res.x<=0&&res.y<=0&&res.z<=0)
+            {
+                inner = true;
+                if (res.x > res.y&& res.x > res.z)
+                {
+                    res.y = 0;res.z = 0;
+                }else if(res.y > res.z && res.y > res.z)
+                {
+                    res.x = 0; res.z = 0;
+                }
+                else
+                {
+                    res.x = 0; res.y = 0;
+                }
+            }else
+            {
+                if (res.x < 0) res.x = 0;
+                if (res.y < 0) res.y = 0;
+                if (res.z < 0) res.z = 0;
+            }
+            return new Vector3(res.x * axis[0].x + res.y * axis[1].x + res.z * axis[2].x,
+                                   res.x * axis[0].y + res.y * axis[1].y + res.z * axis[2].y,
+                                   res.x * axis[0].z + res.y * axis[1].z + res.z * axis[2].z);
 
-            return true; // 所有轴都重叠，判定碰撞
         }
 
 
-
-        public static Vector3 GetNewCoordinateVector(Vector3 old, Vector3 forward, Vector3 up, Vector3 right)
+        public static Vector3 GetNewCoordinateVector(Vector3 old,Vector3 right, Vector3 up, Vector3 forward)
         {
             float x = Vector3.Dot(old, right.normalized);
             float y = Vector3.Dot(old, up.normalized);
             float z = Vector3.Dot(old, forward.normalized);
             return new Vector3(x, y, z);
+        }
+        public static Vector3[] GetCubeClosePoint(Vector3[] cubeEightPoints, CubeEightPoint cur)
+        {
+            int id = (int)cur;
+            var res = new Vector3[3];
+            res[0] = (cubeEightPoints[id / 4 == 0 ? id + 4 : id - 4]);
+            res[1] = (cubeEightPoints[id % 2 == 0 ? id + 1 : id - 1]);
+            res[2] = (cubeEightPoints[id / 2 % 2 == 0 ? id + 2 : id - 2]);
+            return res;
         }
 
         #endregion
@@ -1005,11 +969,11 @@ namespace Z_Math
         private static bool CalcTouchTimeAndAvoidTime(float aMin, float aMax, float bMin, float bMax, float dir, ref float touchTime, ref float avoidTime, out int avoidDir)
         {
             avoidDir = 0;
-            if (Mathf.Abs(aMax - bMin) < 0.1f)
+            if (Mathf.Abs(aMax - bMin) < DELTA)
             {
                 avoidDir = -1;
             }
-            else if (Mathf.Abs(aMin - bMax) < 0.1f)
+            else if (Mathf.Abs(aMin - bMax) < DELTA)
             {
                 avoidDir = 1;
             }

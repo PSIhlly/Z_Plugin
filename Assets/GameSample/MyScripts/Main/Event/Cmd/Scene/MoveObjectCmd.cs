@@ -33,9 +33,9 @@ namespace Z_Code
                 var relaPos = new Vector3(prm[1].num, prm[3].num, prm[2].num);
                 var time = prm[4].num;
                 var step = Mathf.Min(1,Time.deltaTime / time) * relaPos;
-                prm[1].num -= step.x;
-                prm[2].num -= step.z;
-                prm[3].num -= step.y;
+
+
+                var oldPos = unit.data.pos;
                 if (time <= 0)
                 {
                     asyncTask.Complete();
@@ -47,11 +47,20 @@ namespace Z_Code
                     {
                         o.Move(step);
                     }
-                    else if (unit is ItemUnit i)
+                    /*else if (unit is ItemUnit i)
                     {
-                        
+                        i.Move(step);
+                    }*/
+                    else if (unit is CharacterUnit c)
+                    {
+                        c.Move(step);
                     }
                 }
+                var realStep = (unit.data.pos - oldPos);
+                Debug.Log(prm[1].num + " " + time+" "+ realStep.x);
+                prm[1].num -= realStep.x;
+                prm[2].num -= realStep.z;
+                prm[3].num -= realStep.y;
                 prm[4].num -= Time.deltaTime;
                 return false;
             });

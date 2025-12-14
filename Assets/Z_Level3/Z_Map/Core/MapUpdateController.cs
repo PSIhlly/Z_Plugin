@@ -486,7 +486,7 @@ namespace Z_Map
             {
                 cur = itemTileDic.Get(it)[0];
             }
-            HashSet<int> exist = new HashSet<int>();
+            HashSet<int> exist = new HashSet<int>() { unit.data.uid };
 
             foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z)))
             {
@@ -499,7 +499,7 @@ namespace Z_Map
                     if (exist.Contains(tar.data.uid))
                         continue;
                     exist.Add(tar.data.uid);
-                    CheckCollide((MapUnit)unit, (MapUnit)tar, dir, CollideType.TriggerOnly,out _, (tar, res, dis) =>
+                    CheckCollide((MapUnit)unit, (MapUnit)tar, dir, CollideType.TriggerOnly, out _, (tar, res, dis) =>
                     {
                         ManageTriggerEvent(unit, tar, res);
                     });
@@ -530,7 +530,7 @@ namespace Z_Map
             });
 
         }
-        public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type,out List<Vector3> avoidDir, Action<Unit, Graph.IntersectType, float> onCast = null)
+        public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type, out List<Vector3> avoidDir, Action<Unit, Graph.IntersectType, float> onCast = null)
         {
             avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
@@ -540,14 +540,14 @@ namespace Z_Map
                 foreach (var cur in _super.utilCtrl.GetCollidersMesh(trigger.prefab, trigger.data.pos, trigger.data.euler, trigger.data.scale, type))
                 {
                     float dis = 0;
-                    var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis,out var avoid);
+                    var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis, out var avoid);
 
                     assist.Add(curType);
-                    if(MathF.Abs(dis)<=0.01f&& MathF.Abs(disRes) <= 0.01f)
+                    if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
                     {
                         avoidDir.Add(avoid);
                     }
-                    if(dis< disRes)
+                    else if (dis < disRes)
                     {
                         disRes = dis;
                         avoidDir.Clear();

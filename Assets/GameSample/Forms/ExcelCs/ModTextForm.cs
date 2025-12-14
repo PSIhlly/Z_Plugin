@@ -562,6 +562,8 @@ namespace Form
 
                 {1000213,new Data(1000213,"faceType","Face type","≥ØœÚ¿‡–Õ")},
 
+                {1000214,new Data(1000214,"Image","Image","Õº∆¨")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -990,6 +992,8 @@ namespace Form
                         {"Flexible",_DataById[1000212]},
     
                         {"faceType",_DataById[1000213]},
+    
+                        {"Image",_DataById[1000214]},
     
                     };
     

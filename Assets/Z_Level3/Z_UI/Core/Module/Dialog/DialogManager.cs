@@ -1,17 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using Ui;
 using Ui.DialogBg;
 using Ui.DialogHistory;
 using Ui.DialogMain;
-using Unity.VisualScripting;
-using UnityEngine;
 using Z_DesignStyle;
 using Z_Time;
 using Z_Ui.Form;
-using static UnityEditor.PlayerSettings;
 namespace Z_Ui.Dialog
 {
     public class Settings
@@ -105,7 +99,7 @@ namespace Z_Ui.Dialog
                 InternalEnd();
                 return;
             }
-            curId = targetId; 
+            curId = targetId;
             UiManager.instance.ShowUi<UiDialogBgCtrl>(new UiDialogBgParam()
             {
                 clip = clipLst[curId]

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.Networking;
 namespace Z_Audio
@@ -17,7 +19,7 @@ namespace Z_Audio
             string tempPath = Path.Combine(Application.temporaryCachePath, $"temp{handleId++}.mp3");
             File.WriteAllBytes(tempPath, data);
 
-            AudioClip clip = await GetAudioByPath(tempPath);
+            AudioClip clip = await GetAudioByPathAsync(tempPath);
             await Task.Delay(100);
             try
             {
@@ -28,15 +30,36 @@ namespace Z_Audio
             }
             return clip;
         }
+        public static AudioClip GetAudioByPath(string path)
+        {
+            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(
+                "file://" + path, // 本地文件需加 file:// 前缀
+                AudioType.MPEG // 指定为 MP3 格式
+            );
+            request.SendWebRequest();
+            var time = Time.time;
+            while(!request.isDone)
+            {
+                // 可选：添加超时逻辑（避免无限阻塞）
+                if (Time.time > time+5) // 超时5秒
+                {
+                    request.Abort();
+                    throw new TimeoutException("请求超时（5秒）");
+                }
+            }
 
+            var res = DownloadHandlerAudioClip.GetContent(request);
+            return res;
+        }
 
-        public static Task<AudioClip> GetAudioByPath(string path)
+        public static async Task<AudioClip> GetAudioByPathAsync(string path)
         {
             var tcs = new TaskCompletionSource<AudioClip>();
             UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(
                 "file://" + path, // 本地文件需加 file:// 前缀
                 AudioType.MPEG // 指定为 MP3 格式
             );
+            AudioClip res = null;
             request.SendWebRequest().completed += _ =>
             {
                 if (request.result == UnityWebRequest.Result.Success)
@@ -50,8 +73,7 @@ namespace Z_Audio
                 }
                 request.Dispose();
             };
-
-            return tcs.Task;
+            return await tcs.Task;
         }
 
 

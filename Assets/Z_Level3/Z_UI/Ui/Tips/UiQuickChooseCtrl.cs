@@ -1,11 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using TMPro.EditorUtilities;
-using UnityEngine;
-using UnityEngine.UI;
-using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -54,11 +46,11 @@ namespace Ui.Notify
             {
                 con.Add(new UiItemParam()
                 {
-                    cur= item
+                    cur = item
                 });
             }
             con.Refresh();
-            UiManager.Rebuild(gameObject,true);
+            UiManager.Rebuild(gameObject, true);
         }
 
 
@@ -91,7 +83,7 @@ namespace Ui.Notify
         }
         public void Refresh()
         {
-            view.txt_.text= model.cur.content;
+            view.txt_.text = model.cur.content;
             view.img_.sprite = model.cur.sprite;
         }
     }

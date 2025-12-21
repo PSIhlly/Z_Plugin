@@ -325,7 +325,7 @@ namespace Z_Input
 
 #if UNITY_ANDROID && !UNITY_EDITOR
 
-            ManagePoint();
+            ManageTouch();
 #else
 
             ManageMouse();

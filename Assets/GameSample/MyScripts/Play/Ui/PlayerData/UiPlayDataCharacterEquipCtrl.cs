@@ -1,16 +1,9 @@
 using Form;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using UnityEngine;
-using Z_DesignStyle;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Text;
-using static UnityEditor.Progress;
+using Z_Ui.Base;
 
 namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
 {

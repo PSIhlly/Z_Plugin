@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using Z_DataSystem;
@@ -29,6 +30,17 @@ public class StoryItemEvent : Z_Event
     public StoryItemEventType type;
     public ItemProductForm.Data data;
 }
+public enum StoryCharacterEventType
+{
+    ParamChange,
+}
+public class StoryCharacterEvent : Z_Event
+{
+    public StoryCharacterEventType type;
+    public string name;
+    public CharacterProductForm.Data data;
+}
+
 public interface InternalPlayInfoController
 {
     public void Begin();
@@ -86,9 +98,19 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         }
     }
 
-    public void ChangeParam(string name, float value)
+    public void ChangeParam(int characterUid,string name, float value)
     {
+       var data= CharacterProductForm.DataByUid.GetDv(characterUid, null);
+        if(data!=null)
+        {
+            var prm = data.paramDic.GetDv(name, null);
+            if(prm!=null)
+            {
+                prm.v = Mathf.Min(Mathf.Max(prm.v, prm.min), prm.max);
+                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.ParamChange, data = data, name=name });
 
+            }
+        }
     }
 
     public void GainItem(int uid, bool toast = true, bool message = true)

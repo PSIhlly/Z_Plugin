@@ -37,7 +37,7 @@ namespace Ui.EventChoose
                 if (!model.prm.dic.ContainsKey(model.prm.key))
                     model.prm.dic[model.prm.key] = GameEventController.CreateTrigger(model.prm.key);
 
-                UiManager.instance.ShowUi<UiModStoryEventTriggerWindowCtrl>(new UiModStoryEventTriggerWindowParam() { trigger = model.prm.dic[model.prm.key], onChange = Refresh });
+                UiManager.instance.ShowUi<UiModStoryEventTriggerWindowCtrl>(new UiModStoryEventTriggerWindowParam() { trigger = model.prm.dic[model.prm.key], onHide = Refresh ,dic= model.prm.dic });
             });
             view.btn_onEventTrigger.onClick.AddListener(() =>
             {

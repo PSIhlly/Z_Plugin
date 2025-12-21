@@ -1,14 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Code;
 using Z_Code.Form;
-using Z_Ui.Base;
-using static UnityEngine.EventSystems.EventTrigger;
 namespace Z_CodeVisual
 {
 
@@ -35,12 +30,12 @@ namespace Z_CodeVisual
                     {
                         var form = CmdDataForm.DataByName[syntaxNode.desc.code];
                         string cur = "";
-                        
-                        foreach(var ch in form.desc)
+
+                        foreach (var ch in form.desc)
                         {
-                            if(ch=='}')
+                            if (ch == '}')
                             {
-                               int id=int.Parse(cur);
+                                int id = int.Parse(cur);
                                 var subUnit = entry.CreateUnit(transform);
                                 height = Mathf.Max(subUnit.Draw(syntaxNode.subNodes[id]) + 10, height);
                                 cur = "";
@@ -49,7 +44,8 @@ namespace Z_CodeVisual
                             {
                                 CreateTxt(cur);
                                 cur = "";
-                            }else
+                            }
+                            else
                             {
                                 cur += ch;
                             }
@@ -67,17 +63,17 @@ namespace Z_CodeVisual
             }
 
             var size = gameObject.GetComponent<RectTransform>().sizeDelta;
-            size.y= height;
+            size.y = height;
             gameObject.GetComponent<RectTransform>().sizeDelta = size;
             gameObject.GetComponent<Image>().color = colors[height];
-        LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
+            LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
             return height;
         }
         private void CreateTxt(string desc)
         {
             var txtGo = Instantiate(txt.gameObject, transform);
             txtGo.SetActive(true);
-            txtGo.GetComponent<TextMeshProUGUI>().text=desc;
+            txtGo.GetComponent<TextMeshProUGUI>().text = desc;
 
         }
 

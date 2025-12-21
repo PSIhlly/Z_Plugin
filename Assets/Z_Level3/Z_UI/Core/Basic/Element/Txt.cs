@@ -61,6 +61,11 @@ namespace Z_Ui.Base
             {
                 oriText = text;
             }
+#else
+            if (string.IsNullOrEmpty(oriText))
+            {
+                oriText = text;
+            }
 #endif
             base.Awake();
         }
@@ -80,13 +85,13 @@ namespace Z_Ui.Base
 
         public void Refresh()
         {
-            text = oriText;
             if (languageTranslatable)
             {
                 text = TextManager.instance.GetTxt(oriText);
             }
             if (imageEnable)
             {
+                text = oriText;
                 var parts = text.Split(AssetManager.instance.texCtrl.GetMark());
                 text = "";
                 sprites.Clear();

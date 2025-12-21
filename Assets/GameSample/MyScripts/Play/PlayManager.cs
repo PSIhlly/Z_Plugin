@@ -1,25 +1,10 @@
 using Form;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ui.Loading;
-using Ui.ModSceneMain;
 using Ui.Start;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.WSA;
 using Z_DesignStyle;
-using Z_Input;
-using Z_Map;
-using Z_Map.Analysis;
-using Z_Map.Form;
 using Z_Ui;
 using Z_Ui.Loading;
 using Z_UnitSystem;
-using static UnityEditor.PlayerSettings;
 public enum ParamShowType
 {
     Always,
@@ -71,7 +56,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
     public void Update()
     {
-        if(!enable)
+        if (!enable)
         {
             return;
         }
@@ -112,14 +97,14 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
 
         LoadingManager.instance.RemoveLoadItem("playData");
-     
+
         Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.sceneId);
         _assetCtrl.Begin();
 
         enable = true;
     }
 
-    
+
 
     public void EndStory()
     {
@@ -215,7 +200,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
     }
     public string GetStorySaveProgressFileName()
     {
-        return _folderName + "/Save/"+GameManager.instance.saveCtrl.progressFormFileName;
+        return _folderName + "/Save/" + GameManager.instance.saveCtrl.progressFormFileName;
     }
 
 }

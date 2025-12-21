@@ -1,12 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Z_Code.Form;
 using Z_Debug;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 namespace Z_Code
 {
     public enum Op
@@ -219,7 +213,7 @@ namespace Z_Code
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) - GetNum(Pop())));
                         break;
                     case Op.Negative:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop())*-1f));
+                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * -1f));
                         break;
                     case Op.Mul:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * GetNum(Pop())));

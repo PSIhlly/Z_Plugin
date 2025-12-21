@@ -1,17 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Xml.Linq;
-using Ui.DialogHistory;
-using Ui.DialogMain.MainText;
-using Unity.VisualScripting.ReorderableList.Internal;
-using UnityEngine;
-using UnityEngine.Animations;
-using Z_DataSystem;
-using Z_DataSystem.Form;
-using Z_Texture;
 using Z_Time;
-using Z_Ui;
-using Z_Ui.Base;
 using Z_Ui.Dialog;
 using Z_Ui.Form;
 

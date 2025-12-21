@@ -49,6 +49,7 @@ namespace Z_Map
     }
     public enum MapEventType
     {
+        Create,
         Show,
         AfterUpdate,
     }
@@ -116,15 +117,33 @@ public class MapManager : Z_MonoManager<MapManager>
         this.data = data;
         updateCtrl.Begin();
 
-
-
         navigationCtrl.Build();
         mainGo.SetActive(true);
+
+        //try invoke create
+        foreach (var tData in TileUnitForm.DataByUid.Values)
+        {
+            tData.unit.Create();
+        }
+        foreach (var iData in ItemUnitForm.DataByUid.Values)
+        {
+            iData.unit.Create();
+        }
+        foreach (var oData in ObjectUnitForm.DataByUid.Values)
+        {
+            oData.unit.Create();
+        }
+        foreach (var cData in CharacterUnitForm.DataByUid.Values)
+        {
+            cData.unit.Create();
+        }
     }
     #region unit
     public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)
     {
-        return data.AddTile(mapPos, prms);
+        var tData = data.AddTile(mapPos, prms);
+        tData.unit.Create();
+        return tData;
     }
     public ObjectUnitForm.Data AddObject(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
@@ -133,14 +152,15 @@ public class MapManager : Z_MonoManager<MapManager>
         {
             return null;
         }
-        var data = this.data.AddObject(prefabName, prms);
-        data.name = name;
-        data.pos = realPos;
-        foreach (var m in utilCtrl.GetOverlap(data))
+        var oData = this.data.AddObject(prefabName, prms);
+        oData.name = name;
+        oData.pos = realPos;
+        foreach (var m in utilCtrl.GetOverlap(oData))
         {
-            updateCtrl.objectTileDic.Add(data.unit, m);
+            updateCtrl.objectTileDic.Add(oData.unit, m);
         }
-        return data;
+        oData.unit.Create();
+        return oData;
     }
     public ItemUnitForm.Data AddItem(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
@@ -149,11 +169,12 @@ public class MapManager : Z_MonoManager<MapManager>
         {
             return null;
         }
-        var data = this.data.AddItem(prefabName, prms);
-        data.name = name; ;
-        data.pos = realPos;
-        updateCtrl.itemTileDic.Add(data.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
-        return data;
+        var iData = this.data.AddItem(prefabName, prms);
+        iData.name = name; ;
+        iData.pos = realPos;
+        updateCtrl.itemTileDic.Add(iData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+        iData.unit.Create();
+        return iData;
     }
     public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, object[] prms = null)
     {
@@ -162,11 +183,12 @@ public class MapManager : Z_MonoManager<MapManager>
         {
             return null;
         }
-        var data = this.data.AddCharacter(prefabName, isMine, prms);
-        data.pos = realPos;
-        updateCtrl.characterTileDic.Add(data.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
-        data.name = name;
-        return data;
+        var cData = this.data.AddCharacter(prefabName, isMine, prms);
+        cData.pos = realPos;
+        updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+        cData.name = name;
+        cData.unit.Create();
+        return cData;
     }
     public void RemoveTile(TileUnitForm.Data form)
     {
@@ -202,7 +224,25 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         updateCtrl.curCenterPos = curCenterPos;
     }
-
+    public void ClearEnteredScene()
+    {
+        foreach (var tData in TileUnitForm.DataByUid.Values)
+        {
+            tData.enteredScene = false;
+        }
+        foreach (var iData in ItemUnitForm.DataByUid.Values)
+        {
+            iData.enteredScene = false;
+        }
+        foreach (var oData in ObjectUnitForm.DataByUid.Values)
+        {
+            oData.enteredScene = false;
+        }
+        foreach (var cData in CharacterUnitForm.DataByUid.Values)
+        {
+            cData.enteredScene = false;
+        }
+    }
     public void End()
     {
         updateCtrl.End();

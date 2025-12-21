@@ -3,25 +3,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Ui.ModSceneMain.ModTool;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.WSA;
-using Z_ByteSerialize;
 using Z_DataSystem;
 using Z_DataSystem.Form;
-using Z_Debug;
 using Z_DesignStyle;
 using Z_Map;
-using Z_Map.Analysis;
 using Z_Texture;
-using Z_Ui.Form;
 using Z_UnitSystem;
 
 public class GameSaveController : Z_Controller<GameManager>
@@ -49,7 +37,7 @@ public class GameSaveController : Z_Controller<GameManager>
     #region save
     public void SaveSceneMap(string scenePath)
     {
-        if(MapManager.instance.data!=null)
+        if (MapManager.instance.data != null)
         {
             SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
         }
@@ -397,7 +385,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
-    public void LoadMaterial(string folder,string assetFolder)
+    public void LoadMaterial(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + mapTextureFormFileName;
         MapMaskForm.ClearAuto();
@@ -506,7 +494,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
-    public void LoadSkill(string folder,string assetFolder)
+    public void LoadSkill(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + skillFormFileName;
         SkillForm.ClearAuto();
@@ -523,7 +511,7 @@ public class GameSaveController : Z_Controller<GameManager>
             LoadStoryTex(data.icon, assetFolder);
         }
     }
-    public void LoadItem(string folder,string assetFolder)
+    public void LoadItem(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + itemParamFormFileName;
         ItemParamForm.ClearAuto();
@@ -613,7 +601,7 @@ public class GameSaveController : Z_Controller<GameManager>
         mapData.Init(SaveAndLoad.Load<string>(scenePath));
         return mapData;
     }
-    public void LoadProgress(string folder,string assetFolder)
+    public void LoadProgress(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + progressFormFileName;
 
@@ -626,7 +614,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
-  
+
     public void LoadUiItem(string folder)
     {
         var pathForm = folder + "/" + imageUiItemFormFileName;
@@ -640,7 +628,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
-    public void LoadScene(string folder,string assetFolder)
+    public void LoadScene(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + sceneFormFileName;
         SceneForm.ClearAuto();

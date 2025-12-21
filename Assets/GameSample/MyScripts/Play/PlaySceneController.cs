@@ -82,6 +82,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
+        
         setPlayerRot = null;
         downPos = Vector2.zero;
 
@@ -121,10 +122,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
             }
         }
+
+
     }
     public void End()
     {
-
+        GameManager.instance.evtCtrl.ClearSceneEvent();
         GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         enable = false;
         MapManager.instance.End();
@@ -235,6 +238,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         CameraInstance.instance.tarTrs.position = new Vector3(x, y, z);
         //Z_EventHelper.Invoke(new CameraMoveEvent());
+    }
+    public void EnterScene(int sceneId)
+    {
+        MapManager.instance.ClearEnteredScene();
+        Main2StoryManager.instance.UnloadScenePlay();
+        Main2StoryManager.instance.StartLoadScenePlay(sceneId);
     }
     public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data)
     {

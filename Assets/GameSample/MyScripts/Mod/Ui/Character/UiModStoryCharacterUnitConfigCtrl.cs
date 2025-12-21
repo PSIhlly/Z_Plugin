@@ -1,19 +1,8 @@
 using Form;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using UnityEngine;
+using Ui.AnimChoose;
 using Z_Text;
 using Z_Ui.Notify;
-using Z_Code.Form;
-using static UnityEditor.Progress;
-using UnityEditor.DeviceSimulation;
-using Z_DesignStyle;
-using Ui.AnimChoose;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitConfig
 {
@@ -105,6 +94,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent" });
             view.model_EventChooseObjectLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectLeaveEvent" });
             view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
+            view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
 
         }
     }

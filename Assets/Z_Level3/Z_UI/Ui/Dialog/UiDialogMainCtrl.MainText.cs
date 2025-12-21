@@ -45,16 +45,19 @@ namespace Ui.DialogMain
             {
                 model.prm = param;
                 view.go_bg.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
+
+                var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
+                if (audioData != null)
+                {
+                    view.as_.PlayOneShot(audioData.GetClip());
+                }
+
                 if (!string.IsNullOrEmpty(model.prm.clip.mainText))
                 {
                     model.isDisplaying = true;
                     model.nowWord = 0;
                     view.txt_.text = "";
-                    var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
-                    if (audioData != null)
-                    {
-                        view.as_.PlayOneShot(audioData.GetClip());
-                    }
+                    
                     Display();
 
                 }

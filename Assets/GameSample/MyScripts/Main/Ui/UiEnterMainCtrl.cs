@@ -31,6 +31,13 @@ namespace Ui.EnterMain
                 UiManager.instance.ShowUi<UiModCtrl>();
                 Close();
             });
+            view.btn_quit.onClick.AddListener(() =>
+            {
+#if UNITY_EDITOR
+#else
+                Application.Quit();
+#endif
+            });
         }
         public override void OnShow()
         {

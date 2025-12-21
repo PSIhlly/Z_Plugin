@@ -110,14 +110,14 @@ public class GameUtilController : Z_Controller<GameManager>
                 if(com is BoxCollider box)
                 {
                     var trigger=com.gameObject.AddComponent<BoxCollider>();
-                    trigger.size = box.size+Graph.ElementwiseDivide(Vector3.one * 0.1f  , scale);
+                    trigger.size = box.size+Graph.ElementwiseDivide(Vector3.one * 0.02f  , scale);
                     trigger.center = box.center;
                     trigger.isTrigger = true;
                 }
                 else if (com is SphereCollider sphere)
                 {
                     var trigger = com.gameObject.AddComponent<SphereCollider>();
-                    trigger.radius = sphere.radius+ 0.1f * Mathf.Max(scale.x, scale.y, scale.z);
+                    trigger.radius = sphere.radius+ 0.02f * Mathf.Max(scale.x, scale.y, scale.z);
                     trigger.center = sphere.center;
                     trigger.isTrigger = true;
                 }

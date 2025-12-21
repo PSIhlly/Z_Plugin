@@ -1,17 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine;
-using static UnityEditor.Progress;
-using Z_Code;
-using Z_CodeVisual;
-using Z_Ui.Base;
-using Z_String;
-using static UnityEngine.EventSystems.EventTrigger;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using Z_Code.Form;
 using System;
+using Z_Code;
+using Z_Code.Form;
+using Z_String;
+using Z_Ui.Base;
 namespace Ui.ZCodeEntry
 {
     public partial class UiItemParam
@@ -57,10 +48,10 @@ namespace Ui.ZCodeEntry
                 {
                     model.con.Add(new UiItemParam()
                     {
-                        con=model.con,
-                        node=sub,
-                        deepth=model.deepth+1,
-                    },++curRender);
+                        con = model.con,
+                        node = sub,
+                        deepth = model.deepth + 1,
+                    }, ++curRender);
                 }
 
             }

@@ -38,8 +38,10 @@ namespace Z_Map
                 unit = this
             });
         }
+
         public override void UpdateInfo()
         {
+            
             if (isShowing)
             {
                 if (_data.pos != ins.transform.position || _data.euler != ins.transform.eulerAngles)

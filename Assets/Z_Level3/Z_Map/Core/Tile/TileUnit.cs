@@ -69,6 +69,7 @@ namespace Z_Map
 
         public override void UpdateInfo()
         {
+
             base.UpdateInfo();
 
             Z_EventHelper.Invoke(new TileEvent()

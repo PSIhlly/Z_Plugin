@@ -1,20 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine;
-using static UnityEditor.Progress;
-using Z_Code;
-using Z_CodeVisual;
-using Z_Ui.Base;
-using UnityEngine.UI;
-using Z_Time;
-using Z_Code.Form;
 using Form;
-using UnityEditor.Experimental.GraphView;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Z_Code;
+using Z_Time;
 using Z_Ui;
-using static Unity.Burst.Intrinsics.X86.Avx;
+using Z_Ui.Base;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiModStoryEventEditWindowParam
@@ -192,7 +183,7 @@ namespace Ui.ModStoryEventEditWindow
 
             view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
             view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
-            RefreshUnitDetail(); 
+            RefreshUnitDetail();
             RefreshUnit();
 
             UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);

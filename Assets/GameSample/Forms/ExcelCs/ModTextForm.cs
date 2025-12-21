@@ -564,6 +564,20 @@ namespace Form
 
                 {1000214,new Data(1000214,"Image","Image","图片")},
 
+                {1000215,new Data(1000215,"onPerSecondEvent","on per second event","每秒事件")},
+
+                {1000216,new Data(1000216,"Specific param and  character  change event","Specific param and  character  change event","特定玩家和属性 改变的事件")},
+
+                {1000217,new Data(1000217,"Gain specific item event","Gain specific item event","获得指定道具的事件")},
+
+                {1000218,new Data(1000218,"Lost specific item event","Lost specific item event","失去指定道具的事件")},
+
+                {1000219,new Data(1000219,"onGainItemEvent","On gain item event","获得道具事件")},
+
+                {1000220,new Data(1000220,"onLostItemEvent","On lost item event","失去道具事件")},
+
+                {1000221,new Data(1000221,"onCharacterParamChangeEvent","On character param change event","玩家属性变化事件")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -994,6 +1008,20 @@ namespace Form
                         {"faceType",_DataById[1000213]},
     
                         {"Image",_DataById[1000214]},
+    
+                        {"onPerSecondEvent",_DataById[1000215]},
+    
+                        {"Specific param and  character  change event",_DataById[1000216]},
+    
+                        {"Gain specific item event",_DataById[1000217]},
+    
+                        {"Lost specific item event",_DataById[1000218]},
+    
+                        {"onGainItemEvent",_DataById[1000219]},
+    
+                        {"onLostItemEvent",_DataById[1000220]},
+    
+                        {"onCharacterParamChangeEvent",_DataById[1000221]},
     
                     };
     

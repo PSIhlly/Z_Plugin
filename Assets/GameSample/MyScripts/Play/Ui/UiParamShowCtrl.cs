@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Video;
 using Z_Code.Form;
 using Z_DesignStyle;
@@ -34,9 +35,9 @@ namespace Ui.ParamShow
         }
         public void Refresh()
         {
-            view.sld_.value = model.prm.value;
-            view.sld_.maxValue = model.prm.max;
+            view.sld_.value = model.prm.value/ model.prm.max;
             view.img_.color = model.prm.color;
+            view.txt_.text = $"{model.prm.value}/{model.prm.max}";
         }
     }
 

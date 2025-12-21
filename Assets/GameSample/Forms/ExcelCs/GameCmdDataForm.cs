@@ -283,7 +283,7 @@ namespace Form
 
                 {100017,new Data(100017,"SetDialogVideo",new List<string>(){"video",},new List<string>(){"video",},null,new List<string>(){"void",},"Set Dialog video:{0}","SetDialogVideo(\"$v$$v$\");","ui","dialogAdvanced",true)},
 
-                {100018,new Data(100018,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogContent(\"$a$$a$\")","ui","dialogAdvanced",true)},
+                {100018,new Data(100018,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogAudio(\"$a$$a$\")","ui","dialogAdvanced",true)},
 
                 {100019,new Data(100019,"ResetDialog",null,null,null,new List<string>(){"void",},"Reset Dialog","ResetDialog();","ui","dialogAdvanced",true)},
 

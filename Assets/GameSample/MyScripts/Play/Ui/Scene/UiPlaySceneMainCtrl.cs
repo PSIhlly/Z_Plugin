@@ -11,18 +11,18 @@ using Z_Ui.Base;
 namespace Ui.PlaySceneMain
 {
 
-    public partial class UiPlaySceneMainCtrl
+    public partial class UiPlaySceneMainCtrl:IZ_Listener<StoryCharacterEvent>
     {
         Color[] colors = new Color[] { Color.red, Color.blue, Color.yellow };
         UiContainer<UiTeamerCtrl> teamerCon;
         UiContainer<UiParamShowCtrl> prmCon;
         public override void OnCreate()
         {
-
+            this.Register();
 #if UNITY_STANDALONE_WIN
             view.page_PlayerTouchOpt.SetShow(false);
 #else
-            view.page_PlayerTouchOpt.SetActive(true);
+            view.page_PlayerTouchOpt.SetShow(true);
 #endif
 
             view.btn_menu.onClick.AddListener(() =>
@@ -39,6 +39,15 @@ namespace Ui.PlaySceneMain
             teamerCon = new UiContainer<UiTeamerCtrl>(view.go_teamer);
             prmCon = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
         }
+
+        public void OnEvent(StoryCharacterEvent evt)
+        {
+            if(GameManager.instance.curProgress.teamActive.Contains(evt.data.uid))
+            {
+                Refresh();
+            }
+        }
+
         public override void OnShow()
         {
             Refresh();

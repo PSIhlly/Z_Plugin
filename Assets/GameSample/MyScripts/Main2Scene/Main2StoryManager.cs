@@ -1,20 +1,12 @@
 using Form;
-using Newtonsoft.Json.Linq;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using TreeEditor;
-using Ui;
-using Ui.Loading;
-using Ui.ModSceneMain;
+using Unity.VisualScripting;
 using UnityEngine;
-using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
-using Z_Ui;
 using Z_Ui.Form;
 using Z_Ui.Loading;
 using Z_UnitSystem;
@@ -58,18 +50,18 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByName["Player"];
             player.hpParamName = "Hp";
             player.speedParamName = "Speed";
-            
+            player.unique = true;
             ProgressForm.Clear();
-            ProgressForm.AddData(new ProgressForm.Data(1,0, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { }, new List<int>() { 1 }, new List<int>() { 1 }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0));
+            ProgressForm.AddData(new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { }, new List<int>() { 1 }, new List<int>() { 1 }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0));
 
 
             var data = new GameMapData();
             data.Init();
-            
+
             GameManager.instance.saveCtrl.SaveCoreStory(storyId);
 
             GameManager.instance.saveCtrl.SaveSceneMap(GetStoryCoreFolder(storyFolder) + Main2StoryManager.GetSceneFileNameById(sceneData.uid), data);
-            
+
         }
 
         GameManager.instance.curStory = StoryForm.DataById[storyId];
@@ -173,6 +165,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
     public void UnloadScenePlay()
     {
+
+        GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         UnloadScene();
         PlayManager.instance.EndScene();
     }

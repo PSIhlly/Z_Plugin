@@ -17,6 +17,56 @@ namespace Ui.ModStoryEventTriggerWindow
 
 
 
+    public partial class UiPrmParam:UiParam
+    {
+    }
+
+    public partial class UiPrmView:UiView
+    {
+
+            public GameObject go_prm;
+            public Btn btn_edit;
+            public Txt txt_;
+        public UiPrmView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_prm = uiHolder.elementTrsLst[0].gameObject;
+            btn_edit = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiPrmCtrl:UiCtrl
+    {
+        public UiPrmView view;
+        public UiPrmModel model;
+        public UiPrmParam param;
+        public UiModStoryEventTriggerWindowCtrl parent=>(UiModStoryEventTriggerWindowCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiPrmParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiPrmView(uiHolder);
+            model=new UiPrmModel();
+
+
+        }
+
+    }
+    public partial class UiPrmModel:UiModel
+    {
+        
+    }
+
+
+
     public partial class UiEventParam:UiParam
     {
     }
@@ -78,22 +128,28 @@ namespace Ui.ModStoryEventTriggerWindow
     {
 
             public Btn btn_bbg;
-            public Img img_;
+            public GameObject go_params;
             public Txt txt_name;
+            public Btn btn_delete;
             public ScrView scr_;
             public Btn btn_close;
+            public GameObject go_prm;
+            public UiPrmCtrl sub_prm;
             public GameObject go_event;
             public UiEventCtrl sub_event;
         public UiModStoryEventTriggerWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_bbg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            go_params = uiHolder.elementTrsLst[1].gameObject;
             txt_name = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            scr_ = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
-            btn_close = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            go_event = uiHolder.elementTrsLst[5].gameObject;
-            sub_event = (UiEventCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            scr_ = uiHolder.elementTrsLst[4].GetComponent<ScrView>();
+            btn_close = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            go_prm = uiHolder.elementTrsLst[6].gameObject;
+            sub_prm = (UiPrmCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            go_event = uiHolder.elementTrsLst[8].gameObject;
+            sub_event = (UiEventCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -118,8 +174,10 @@ namespace Ui.ModStoryEventTriggerWindow
             model=new UiModStoryEventTriggerWindowModel();
 
 
+            view.sub_prm = new UiPrmCtrl();
+            view.sub_prm.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_event = new UiEventCtrl();
-            view.sub_event.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_event.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

@@ -1,22 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine;
-using static UnityEditor.Progress;
-using Z_Code;
-using Z_CodeVisual;
-using Z_Ui.Base;
-using Z_String;
-using static UnityEngine.EventSystems.EventTrigger;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using Z_Code.Form;
-using System;
-using Z_Ui.Notify;
-using Z_Text;
-using UnityEditor.Hardware;
 using Form;
-using System.Numerics;
+using System;
+using Z_Code;
+using Z_Code.Form;
+using Z_String;
+using Z_Ui.Base;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiItemParam
@@ -132,12 +119,12 @@ namespace Ui.ModStoryEventEditWindow
                             {
                                 res = res.Replace($"{{{i}}}", GetNodeDesc(node.subNodes[i]));
                             }
-                            for (; i< form.prmNames.Count;i++)
+                            for (; i < form.prmNames.Count; i++)
                             {
-                                res = res.Replace($"{{{i}}}","");
+                                res = res.Replace($"{{{i}}}", "");
                             }
                         }
-                            
+
                     }
                     else
                     {

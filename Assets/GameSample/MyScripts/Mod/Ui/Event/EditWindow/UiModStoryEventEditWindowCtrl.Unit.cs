@@ -1,19 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Progress;
 using Z_Code;
-using Z_CodeVisual;
-using Z_Ui.Base;
-using static UnityEngine.EventSystems.EventTrigger;
-using UnityEngine.UI;
 using Z_Code.Form;
+using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
-using Z_DataSystem;
-using Z_Ui;
+using Z_Ui.Base;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiUnitParam
@@ -57,7 +48,7 @@ namespace Ui.ModStoryEventEditWindow
 
         public void Refresh()
         {
-            view.sta_.ChangeState(parent.model.selUnit!=null&& parent.model.selUnit == model.node?1:0) ;
+            view.sta_.ChangeState(parent.model.selUnit != null && parent.model.selUnit == model.node ? 1 : 0);
             gameObject.transform.parent = model.parent;
             float height = 200f - 20 * model.deepth;
             if (model.node == null)
@@ -85,7 +76,7 @@ namespace Ui.ModStoryEventEditWindow
                                 if (ch == '}')
                                 {
                                     int id = int.Parse(cur);
-                                    if(id< model.node.subNodes.Count)
+                                    if (id < model.node.subNodes.Count)
                                         CreateNode(model.node.subNodes[id]);
                                     cur = "";
                                 }
@@ -125,7 +116,7 @@ namespace Ui.ModStoryEventEditWindow
             var size = view.rtf_root.sizeDelta;
             size.y = height;
             view.rtf_root.sizeDelta = size;
-            view.img_.rectTransform.sizeDelta = new Vector2(height,height);
+            view.img_.rectTransform.sizeDelta = new Vector2(height, height);
 
 
         }

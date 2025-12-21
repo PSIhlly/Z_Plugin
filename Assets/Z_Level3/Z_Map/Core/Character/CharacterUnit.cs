@@ -1,18 +1,8 @@
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Runtime.ConstrainedExecution;
 using UnityEngine;
-using Z_ByteSerialize;
-using Z_Map;
-using Z_Map.Analysis;
 using Z_Map.Form;
-using Z_Math;
-using Z_UnitSystem;
 using Z_UnitSystem.Form;
-using static UnityEditor.Progress;
 
 namespace Z_Map
 {
@@ -50,6 +40,7 @@ namespace Z_Map
             if (lastUpdateFrame == Time.frameCount)
                 return;
             lastUpdateFrame = Time.frameCount;
+
 
             if (data.updateType == UpdateType.Always || isShowing)
             {
@@ -158,9 +149,10 @@ namespace Z_Map
                         var realO = o * dot;
                         if ((curDir - realO).sqrMagnitude < 0.0001f)
                             continue;
-         /*               if (dir.x != 0 && dir.z != 0)
-                            Debug.Log(Time.frameCount + " " + realO.magnitude + " " + curDir.magnitude + " " + (curDir - realO).magnitude + " " + dir.magnitude);
-      */                  dirQue.Enqueue(curDir - realO);
+                        /*               if (dir.x != 0 && dir.z != 0)
+                                           Debug.Log(Time.frameCount + " " + realO.magnitude + " " + curDir.magnitude + " " + (curDir - realO).magnitude + " " + dir.magnitude);
+                     */
+                        dirQue.Enqueue(curDir - realO);
                     }
                 }
                 firstTry = false;

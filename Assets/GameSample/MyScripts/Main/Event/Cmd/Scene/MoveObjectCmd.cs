@@ -57,7 +57,6 @@ namespace Z_Code
                     }
                 }
                 var realStep = (unit.data.pos - oldPos);
-                Debug.Log(prm[1].num + " " + time+" "+ realStep.x);
                 prm[1].num -= realStep.x;
                 prm[2].num -= realStep.z;
                 prm[3].num -= realStep.y;

@@ -1,12 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using UnityEditor.SceneTemplate;
 using UnityEngine;
-using UnityEngine.Windows;
 using Z_Math;
-using static UnityEditor.PlayerSettings;
 using static Z_Math.Graph;
 namespace Z_Mesh
 {
@@ -21,7 +15,7 @@ namespace Z_Mesh
         public MeshType type;
         public Vector3[] positions;
         public Vector3 center;
-        
+
     }
     public static class Mesh
     {
@@ -58,20 +52,20 @@ namespace Z_Mesh
             float length = step.magnitude;
             dis = length;
             var assist = new Graph.IntersectAssisant(false);
-            switch(o.type)
+            switch (o.type)
             {
                 case MeshType.Cube:
                     switch (tar.type)
                     {
                         case Z_Mesh.MeshType.Cube:
                             {
-                                assist.Add(Graph.CubeIntersectCube(o.positions,tar.positions, step, out curDis,out avoidDir));
+                                assist.Add(Graph.CubeIntersectCube(o.positions, tar.positions, step, out curDis, out avoidDir));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
                         case Z_Mesh.MeshType.Sphere:
                             {
-                                assist.Add(Graph.SphereIntersectCube(tar.positions,o.positions, -step, out curDis, out avoidDir));
+                                assist.Add(Graph.SphereIntersectCube(tar.positions, o.positions, -step, out curDis, out avoidDir));
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
@@ -95,7 +89,7 @@ namespace Z_Mesh
                     }
                     break;
             }
-           
+
             return assist.GetRes();
         }
 

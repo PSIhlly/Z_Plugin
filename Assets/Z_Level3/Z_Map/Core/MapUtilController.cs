@@ -1,14 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map.Form;
 using Z_Math;
 using Z_Mesh;
-using static UnityEditor.PlayerSettings;
 using Mesh = Z_Mesh.Mesh;
 namespace Z_Map
 {
@@ -231,7 +227,7 @@ namespace Z_Map
             switch (DynamicGlobalSettings.cameraMode)
             {
                 case CameraMode.Overhead:
-                    imgTrs.position = rootTrs.position+ Vector3.up * rootTrs.localScale.y / 2 + Vector3.down * deepth;
+                    imgTrs.position = rootTrs.position + Vector3.up * rootTrs.localScale.y / 2 + Vector3.down * deepth;
                     imgTrs.localScale = Vector3.one;
                     break;
                 case CameraMode.Isometric:

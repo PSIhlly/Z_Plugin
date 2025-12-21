@@ -32,7 +32,7 @@ namespace Z_DataSystem.Form
             {
                 if (_clip == null)
                 {
-                    asset = AudioHelper.GetAudioByPath(path).Result;
+                    asset = AudioHelper.GetAudioByPath(path);
                 }
                 return _clip;
             }

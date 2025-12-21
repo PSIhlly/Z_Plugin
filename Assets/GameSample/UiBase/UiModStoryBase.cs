@@ -11,6 +11,9 @@ namespace Ui.ModStory
 
 {
 
+using Ui.AnimChoose;
+using Ui.EventChoose;
+using Ui.Axis;
 
 
 
@@ -941,7 +944,6 @@ namespace ModStoryCharacterUnitAppearanceUnit
 
 {
 
-using Ui.Axis;
 
 
 
@@ -1327,8 +1329,6 @@ namespace ModStoryCharacterUnitConfig
 
 {
 
-using Ui.AnimChoose;
-using Ui.EventChoose;
 
 
 
@@ -1357,6 +1357,7 @@ using Ui.EventChoose;
             public UiEventChooseCtrl model_EventChooseObjectTouch;
             public UiEventChooseCtrl model_EventChooseObjectLeave;
             public UiEventChooseCtrl model_EventChooseShow;
+            public UiEventChooseCtrl model_EventChoosePerSecond;
             public Txt txt_hpArgument;
             public Txt txt_moveSpeedParameter;
             public Txt txt_faceType;
@@ -1381,9 +1382,10 @@ using Ui.EventChoose;
             model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
             model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
             model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
-            txt_hpArgument = uiHolder.elementTrsLst[18].GetComponent<Txt>();
-            txt_moveSpeedParameter = uiHolder.elementTrsLst[19].GetComponent<Txt>();
-            txt_faceType = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            txt_hpArgument = uiHolder.elementTrsLst[19].GetComponent<Txt>();
+            txt_moveSpeedParameter = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            txt_faceType = uiHolder.elementTrsLst[21].GetComponent<Txt>();
         }
 
     }
@@ -1434,6 +1436,8 @@ using Ui.EventChoose;
             view.model_EventChooseObjectLeave.BindHolderRecursively(uiHolder.subUiHolderLst[11]);
             view.model_EventChooseShow = new UiEventChooseCtrl();
             view.model_EventChooseShow.BindHolderRecursively(uiHolder.subUiHolderLst[12]);
+            view.model_EventChoosePerSecond = new UiEventChooseCtrl();
+            view.model_EventChoosePerSecond.BindHolderRecursively(uiHolder.subUiHolderLst[13]);
         }
 
     }
@@ -2273,7 +2277,6 @@ namespace ModStoryItemUnitAppearance
 
 {
 
-using Ui.Axis;
 
 
 
@@ -2484,7 +2487,6 @@ namespace ModStoryItemUnitConfig
 
 {
 
-using Ui.EventChoose;
 
 
 
@@ -2508,6 +2510,7 @@ using Ui.EventChoose;
             public UiEventChooseCtrl model_EventChooseObjectTouch;
             public UiEventChooseCtrl model_EventChooseObjectLeave;
             public UiEventChooseCtrl model_EventChooseShow;
+            public UiEventChooseCtrl model_EventChoosePerSecond;
             public Txt txt_part;
         public UiModStoryItemUnitConfigView(UiHolder uiHolder):base(uiHolder)
         {
@@ -2525,7 +2528,8 @@ using Ui.EventChoose;
             model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
             model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
             model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
-            txt_part = uiHolder.elementTrsLst[13].GetComponent<Txt>();
+            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            txt_part = uiHolder.elementTrsLst[14].GetComponent<Txt>();
         }
 
     }
@@ -2566,6 +2570,8 @@ using Ui.EventChoose;
             view.model_EventChooseObjectLeave.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
             view.model_EventChooseShow = new UiEventChooseCtrl();
             view.model_EventChooseShow.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
+            view.model_EventChoosePerSecond = new UiEventChooseCtrl();
+            view.model_EventChoosePerSecond.BindHolderRecursively(uiHolder.subUiHolderLst[8]);
         }
 
     }
@@ -3095,7 +3101,6 @@ namespace ModStoryMapObjectTextureConfig
 
 {
 
-using Ui.EventChoose;
 
 
 
@@ -3111,6 +3116,7 @@ using Ui.EventChoose;
             public UiEventChooseCtrl model_EventChooseObjectTouch;
             public UiEventChooseCtrl model_EventChooseObjectLeave;
             public UiEventChooseCtrl model_EventChooseShow;
+            public UiEventChooseCtrl model_EventChoosePerSecond;
         public UiModStoryMapObjectTextureConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3119,6 +3125,7 @@ using Ui.EventChoose;
             model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -3153,6 +3160,8 @@ using Ui.EventChoose;
             view.model_EventChooseObjectLeave.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.model_EventChooseShow = new UiEventChooseCtrl();
             view.model_EventChooseShow.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.model_EventChoosePerSecond = new UiEventChooseCtrl();
+            view.model_EventChoosePerSecond.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
         }
 
     }
@@ -3376,7 +3385,6 @@ namespace ModStoryMapObjectObjectAppearance
 
 {
 
-using Ui.Axis;
 
 
 
@@ -3525,7 +3533,6 @@ namespace ModStoryMapObjectObjectConfig
 
 {
 
-using Ui.EventChoose;
 
 
 
@@ -3543,6 +3550,7 @@ using Ui.EventChoose;
             public UiEventChooseCtrl model_EventChooseObjectTouch;
             public UiEventChooseCtrl model_EventChooseObjectLeave;
             public UiEventChooseCtrl model_EventChooseShow;
+            public UiEventChooseCtrl model_EventChoosePerSecond;
         public UiModStoryMapObjectObjectConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3553,6 +3561,7 @@ using Ui.EventChoose;
             model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
             model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -3587,6 +3596,8 @@ using Ui.EventChoose;
             view.model_EventChooseObjectLeave.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.model_EventChooseShow = new UiEventChooseCtrl();
             view.model_EventChooseShow.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.model_EventChoosePerSecond = new UiEventChooseCtrl();
+            view.model_EventChoosePerSecond.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
         }
 
     }
@@ -4365,9 +4376,170 @@ namespace ModStoryEventConfig
 
 {
 
-using Ui.EventChoose;
 
 
+
+namespace CharacterParam
+
+{
+
+
+
+
+    public partial class UiCharacterParamParam:UiParam
+    {
+    }
+
+    public partial class UiCharacterParamView:UiView
+    {
+
+            public GameObject go_characterParam;
+            public Btn btn_;
+        public UiCharacterParamView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_characterParam = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+        }
+
+    }
+    public partial class UiCharacterParamCtrl:UiCtrl
+    {
+        public UiCharacterParamView view;
+        public UiCharacterParamModel model;
+        public UiCharacterParamParam param;
+        public UiModStoryEventConfigCtrl parent=>(UiModStoryEventConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiCharacterParamParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiCharacterParamView(uiHolder);
+            model=new UiCharacterParamModel();
+
+
+        }
+
+    }
+    public partial class UiCharacterParamModel:UiModel
+    {
+        
+    }
+}
+
+namespace ItemLost
+
+{
+
+
+
+
+    public partial class UiItemLostParam:UiParam
+    {
+    }
+
+    public partial class UiItemLostView:UiView
+    {
+
+            public GameObject go_itemLost;
+            public Btn btn_;
+        public UiItemLostView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_itemLost = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+        }
+
+    }
+    public partial class UiItemLostCtrl:UiCtrl
+    {
+        public UiItemLostView view;
+        public UiItemLostModel model;
+        public UiItemLostParam param;
+        public UiModStoryEventConfigCtrl parent=>(UiModStoryEventConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiItemLostParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiItemLostView(uiHolder);
+            model=new UiItemLostModel();
+
+
+        }
+
+    }
+    public partial class UiItemLostModel:UiModel
+    {
+        
+    }
+}
+
+namespace ItemGain
+
+{
+
+
+
+
+    public partial class UiItemGainParam:UiParam
+    {
+    }
+
+    public partial class UiItemGainView:UiView
+    {
+
+            public GameObject go_itemGain;
+            public Btn btn_;
+        public UiItemGainView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_itemGain = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+        }
+
+    }
+    public partial class UiItemGainCtrl:UiCtrl
+    {
+        public UiItemGainView view;
+        public UiItemGainModel model;
+        public UiItemGainParam param;
+        public UiModStoryEventConfigCtrl parent=>(UiModStoryEventConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiItemGainParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiItemGainView(uiHolder);
+            model=new UiItemGainModel();
+
+
+        }
+
+    }
+    public partial class UiItemGainModel:UiModel
+    {
+        
+    }
+}
 
     public partial class UiModStoryEventConfigParam:UiParam
     {
@@ -4377,10 +4549,30 @@ using Ui.EventChoose;
     {
 
             public UiEventChooseCtrl model_EventChooseBegin;
+            public UiEventChooseCtrl model_EventChoosePerSecond;
+            public UiEventChooseCtrl model_EventChooseCharacterParamChange;
+            public UiEventChooseCtrl model_EventChooseLostItem;
+            public UiEventChooseCtrl model_EventChooseGainItem;
+            public GameObject go_characterParam;
+            public CharacterParam.UiCharacterParamCtrl page_characterParam;
+            public GameObject go_itemLost;
+            public ItemLost.UiItemLostCtrl page_itemLost;
+            public GameObject go_itemGain;
+            public ItemGain.UiItemGainCtrl page_itemGain;
         public UiModStoryEventConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             model_EventChooseBegin = (UiEventChooseCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
+            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            model_EventChooseCharacterParamChange = (UiEventChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            model_EventChooseLostItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            model_EventChooseGainItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            go_characterParam = uiHolder.elementTrsLst[5].gameObject;
+            page_characterParam = (CharacterParam.UiCharacterParamCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_itemLost = uiHolder.elementTrsLst[7].gameObject;
+            page_itemLost = (ItemLost.UiItemLostCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            go_itemGain = uiHolder.elementTrsLst[9].gameObject;
+            page_itemGain = (ItemGain.UiItemGainCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -4407,6 +4599,20 @@ using Ui.EventChoose;
 
             view.model_EventChooseBegin = new UiEventChooseCtrl();
             view.model_EventChooseBegin.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_EventChoosePerSecond = new UiEventChooseCtrl();
+            view.model_EventChoosePerSecond.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.model_EventChooseCharacterParamChange = new UiEventChooseCtrl();
+            view.model_EventChooseCharacterParamChange.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_EventChooseLostItem = new UiEventChooseCtrl();
+            view.model_EventChooseLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.model_EventChooseGainItem = new UiEventChooseCtrl();
+            view.model_EventChooseGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.page_characterParam = new CharacterParam.UiCharacterParamCtrl();
+            view.page_characterParam.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.page_itemLost = new ItemLost.UiItemLostCtrl();
+            view.page_itemLost.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
+            view.page_itemGain = new ItemGain.UiItemGainCtrl();
+            view.page_itemGain.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
         }
 
     }
@@ -4486,7 +4692,6 @@ namespace ModStoryMapMap
 
 {
 
-using Ui.Axis;
 
 
 

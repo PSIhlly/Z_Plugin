@@ -1,15 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Progress;
-using Z_Code;
-using Z_CodeVisual;
-using Z_Ui.Base;
-using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.UI;
+using Z_Code;
 using Z_Code.Form;
+using Z_Ui.Base;
 namespace Ui.ZCodeEntry
 {
     public partial class UiUnitParam
@@ -99,7 +92,7 @@ namespace Ui.ZCodeEntry
                         }
                         else
                         {
-                            view.txt_.text =model.node.desc.code;
+                            view.txt_.text = model.node.desc.code;
                         }
                         break;
                     default:

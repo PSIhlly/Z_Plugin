@@ -14,7 +14,7 @@ public class Z_Audio_Sample : MonoBehaviour
         var path = Application.dataPath + "/Z_Level0/Z_Audio/Sample/test.mp3";
         if (File.Exists(path))
         {
-            var clip = await AudioHelper.GetAudioByPath(path);
+            var clip = AudioHelper.GetAudioByPath(path);
             Debug.Log(clip.length);
             audioSource.clip = clip;
             audioSource.Play();

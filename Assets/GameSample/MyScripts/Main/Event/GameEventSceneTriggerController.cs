@@ -107,7 +107,7 @@ namespace Z_Map
 
     }
 }
-public class GameEventSceneTriggerController : Z_Controller<GameEventController>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ItemEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>
+public class GameEventSceneTriggerController : Z_Controller<GameEventController>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ItemEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>, IZ_Listener<StoryLifeEvent>
 {
 
     public GameEventSceneTriggerController(GameEventController super) : base(super)
@@ -117,6 +117,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
         Z_EventHelper.Register<ItemEvent>(this);
         Z_EventHelper.Register<ObjectEvent>(this);
         Z_EventHelper.Register<CharacterEvent>(this);
+        Z_EventHelper.Register<StoryLifeEvent>(this);
     }
     public void OnEvent(CollideEvent evt)
     {
@@ -157,7 +158,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
             var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
             switch (evt.type)
             {
-                case MapEventType.Show:
+                case MapEventType.Create:
                     mapUnit.ExecuteEvt("onShowEvent", args);
                     break;
             }
@@ -170,7 +171,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
             var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
             switch (evt.type)
             {
-                case MapEventType.Show:
+                case MapEventType.Create:
                     mapUnit.ExecuteEvt("onShowEvent", args);
                     break;
             }
@@ -184,7 +185,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
             switch (evt.type)
             {
-                case MapEventType.Show:
+                case MapEventType.Create:
                     mapUnit.ExecuteEvt("onShowEvent", args);
                     break;
             }
@@ -199,9 +200,31 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
             switch (evt.type)
             {
-                case MapEventType.Show:
+                case MapEventType.Create:
                     mapUnit.ExecuteEvt("onShowEvent", args);
                     break;
+            }
+        }
+    }
+
+    public void OnEvent(StoryLifeEvent evt)
+    {
+        if(evt.type == StoryLifeEventType.EverySecond)
+        {
+            foreach (var data in ItemUnitForm.DataByUid.Values)
+            {
+                var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(data.uid) };
+                data.unit.ExecuteEvt("onPerSecondEvent", args);
+            }
+            foreach (var data in CharacterUnitForm.DataByUid.Values)
+            {
+                var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(data.uid) };
+                data.unit.ExecuteEvt("onPerSecondEvent", args);
+            }
+            foreach (var data in ObjectUnitForm.DataByUid.Values)
+            {
+                var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(data.uid) };
+                data.unit.ExecuteEvt("onPerSecondEvent", args);
             }
         }
     }

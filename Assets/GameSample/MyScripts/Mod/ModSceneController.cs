@@ -1,29 +1,20 @@
 using Form;
-using Microsoft.Win32;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Ui;
 using Ui.ModSceneBehaviourUnit;
 using Ui.ModSceneMain;
 using Ui.ModSceneUnit;
 using Ui.ModStory;
-using Unity.Burst.CompilerServices;
-using Unity.VisualScripting.FullSerializer;
-using UnityEditor;
 using UnityEngine;
 using Z_DataSystem;
-using Z_Debug;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
-using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_Time;
 using Z_Ui;
 using Z_UnitSystem;
-using static UnityEditor.PlayerSettings;
 public enum DesignType
 {
     MapObject,
@@ -167,15 +158,16 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         var hits = new List<RaycastHit>(Physics.RaycastAll(worldPosition + CameraInstance.instance.cam.transform.up * 100, -CameraInstance.instance.cam.transform.up));
     */
-        var hits = new List<RaycastHit>(Physics.RaycastAll(ray , 100));
+        var hits = new List<RaycastHit>(Physics.RaycastAll(ray, 100));
         hits.Sort((a, b) =>
         {
             return a.distance.CompareTo(b.distance);
         });
-        if(hits.Count>0)
+        if (hits.Count > 0)
         {
             worldPosition = new Vector3(hits[0].transform.position.x, CameraInstance.instance.tarTrs.position.y, hits[0].transform.position.z);
-        }else
+        }
+        else
         {
             worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         }
@@ -411,7 +403,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     {
                         foreach (var hit in hits)
                         {
-                            
+
                             var ins = hit.transform.GetComponentInParent<MapInstance>();
                             if (ins != null && (ins is ObjectInstance || ins is ItemInstance || ins is CharacterInstance))
                             {

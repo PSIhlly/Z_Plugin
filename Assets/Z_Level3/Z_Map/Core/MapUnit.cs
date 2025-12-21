@@ -15,6 +15,11 @@ namespace Z_Map
         {
             get
             {
+                if (this is TileUnit tile)
+                {
+                    return tile;
+                }
+                else
                 if (this is ObjectUnit obj)
                 {
                     return MapManager.instance.updateCtrl.objectTileDic.Get(obj)[0];
@@ -31,12 +36,64 @@ namespace Z_Map
             }
 
         }
+        public void Create()
+        {
+            if (this is TileUnit tile)
+            {
+                if (!tile.data.enteredScene)
+                {
+                    tile.data.enteredScene = true;
+                    Z_EventHelper.Invoke(new TileEvent()
+                    {
+                        type = MapEventType.Create,
+                        unit = tile
+                    });
+                }
+            }
+            else
+            if (this is ObjectUnit obj)
+            {
+                if (!obj.data.enteredScene)
+                {
+                    obj.data.enteredScene = true;
+                    Z_EventHelper.Invoke(new ObjectEvent()
+                    {
+                        type = MapEventType.Create,
+                        unit = obj
+                    });
+                }
+            }
+            else if (this is ItemUnit item)
+            {
+                if (!item.data.enteredScene)
+                {
+                    item.data.enteredScene = true;
+                    Z_EventHelper.Invoke(new ItemEvent()
+                    {
+                        type = MapEventType.Create,
+                        unit = item
+                    });
+                }
+            }
+            else if (this is CharacterUnit character)
+            {
+                if (!character.data.enteredScene)
+                {
+                    character.data.enteredScene = true;
+                    Z_EventHelper.Invoke(new CharacterEvent()
+                    {
+                        type = MapEventType.Create,
+                        unit = character
+                    });
+                }
+            }
 
+        }
         public MapInstance ins
         {
             set { base.ins = value; }
             get { return (MapInstance)base.ins; }
         }
-        
+
     }
 }

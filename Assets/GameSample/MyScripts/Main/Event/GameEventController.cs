@@ -60,10 +60,29 @@ public static partial class GlobalEventHelper
 
         return res;
     }
+    public static bool IsSceneTrigger(string triggerName,int user)
+    {
+        if(user<=0)
+        {
+            return false;
+        }
+        switch (triggerName)
+        {
+            case "onCharacterTouchEvent":
+            case "onCharacterLeaveEvent":
+            case "onObjectTouchEvent":
+            case "onObjectLeaveEvent":
+            case "onShowEvent":
+            case "onPerSecondEvent":
+                return true;
+        }
+        return false;
+    }
 }
 public static partial class GlobalSettings
 {
     public static int CUSTOM_EVENT_MAX => 1000000;
+
 }
 public class GameEventController : Z_Controller<GameManager>
 {
@@ -84,6 +103,21 @@ public class GameEventController : Z_Controller<GameManager>
         EventInterpretDataForm.Clear();
         tasks.Clear();
         releaseTriggerTuple.Clear();
+    }
+    public void ClearSceneEvent()
+    {
+        var clearLst = new List<int>();
+        foreach (var data in EventInterpretDataForm.DataByUid.Values)
+        {
+            if (GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user))
+            {
+                clearLst.Add(data.uid);
+            }
+        }
+        foreach (var id in clearLst)
+        {
+            EventInterpretDataForm.RemoveData(id);
+        }
     }
     public void StartTask(Func<bool> func)
     {
@@ -138,7 +172,8 @@ public class GameEventController : Z_Controller<GameManager>
         }
         foreach (var trigger in releaseTriggerTuple)
         {
-            GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
+            if (GameManager.instance.curProgress.triggeredOnceEvts.ContainsKey(trigger.Item1))
+                GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
         }
     }
 
@@ -146,7 +181,7 @@ public class GameEventController : Z_Controller<GameManager>
 
     public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, List<BoxDataForm.Data> args)
     {
-        if(trigger==null)
+        if (trigger == null)
         {
             return;
         }
@@ -165,9 +200,9 @@ public class GameEventController : Z_Controller<GameManager>
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                foreach(var nm in trigger.evt)
+                foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args, trigger.name);
                 }
                 break;
             case TriggerType.OnceDuring:
@@ -189,7 +224,7 @@ public class GameEventController : Z_Controller<GameManager>
             default:
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args, trigger.name);
                 }
                 break;
         }

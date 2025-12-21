@@ -35,6 +35,7 @@ namespace Z_Map
         }
         public override void UpdateInfo()
         {
+            
             if (isShowing)
             {
                 if (_data.pos != ins.transform.position || _data.euler != ins.transform.eulerAngles)

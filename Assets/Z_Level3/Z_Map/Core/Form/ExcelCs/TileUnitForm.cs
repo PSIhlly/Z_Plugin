@@ -87,6 +87,8 @@ namespace Z_Map.Form
                 
         public static Action<Data,string,string> changeExtraAction;
                 
+        public static Action<Data,bool,bool> changeEnteredsceneAction;
+                
 
 
         public partial class Data : UnitForm.Data
@@ -139,11 +141,29 @@ namespace Z_Map.Form
                  
                      }
                     
+                    private bool  _enteredScene;
+                    /// <summary>
+                    ///进入过所属scene
+                    ///</summary>
+                    public bool  enteredScene{
+                                get{return _enteredScene;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEnteredscene(this,_enteredScene,value); 
+                    }
+        
+                _enteredScene = value;
+                }
+                 
+                     }
+                    
             public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
             
-            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
+            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -157,6 +177,7 @@ namespace Z_Map.Form
              this.updateType = updateType;
              this.collidingUnitUid = collidingUnitUid;
              this.extra = extra;
+             this.enteredScene = enteredScene;
 
                     _unit=new TileUnit(this);
 
@@ -164,12 +185,12 @@ namespace Z_Map.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<int,string>(texNameDic),mapPos,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<int,string>(texNameDic),mapPos,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra,enteredScene);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"");
+                   private static Data _defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -282,7 +303,9 @@ namespace Z_Map.Form
 
                 jo.Get<List<int>>("collidingUnitUid"),
 
-                jo.Get<string>("extra")
+                jo.Get<string>("extra"),
+
+                jo.Get<bool>("enteredScene")
                     );
 
             return data;
@@ -315,6 +338,8 @@ namespace Z_Map.Form
             jo.Set<List<int>>("collidingUnitUid",data.collidingUnitUid);
 
             jo.Set<string>("extra",data.extra);
+
+            jo.Set<bool>("enteredScene",data.enteredScene);
 
             return jo;
         }
@@ -508,6 +533,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeExtraAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnteredscene(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnteredsceneAction?.Invoke(data,oldV,newV);
                 }
                     
             }

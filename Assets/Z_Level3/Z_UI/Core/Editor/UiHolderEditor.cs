@@ -289,6 +289,7 @@ using UnityEngine.Video;
                             break;
                         case UiType.Model:
                             namespaceContent += $"using Ui.{subHolder.uiName};\n";
+
                             bindContent += $@"
             view.model_{realName} = new Ui{subHolder.uiName}Ctrl();
             view.model_{realName}.BindHolderRecursively(uiHolder.subUiHolderLst[{uiHolder.subUiHolderLst.Count - 1}]);";
@@ -316,6 +317,7 @@ using UnityEngine.Video;
                             Debug.LogError("can't analysis uiType " + subHolder.uiType);
                             break;
                     }
+
                 }
                 else
                 {
@@ -495,14 +497,12 @@ namespace {uiHolder.uiName}
         string GetCoreCode(string parent)
         {
             int id = subContent.IndexOf("using ");
-            int times = 0;
-            while (id != -1 && times < 10)
+            while (id != -1)
             {
-                int end = subContent.IndexOf("\n", id) + 2;
+                int end = subContent.IndexOf("\n", id) + 1;
                 namespaceContent += subContent.Substring(id, end - id);
                 subContent = subContent.Remove(id, end - id);
                 id = subContent.IndexOf("using ");
-                times++;
             }
             var res = $@"
 {StringHelper.RemoveMultiLine(namespaceContent)}

@@ -1,25 +1,13 @@
 using Form;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting.FullSerializer;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.TextCore.Text;
-using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
-using Z_Map;
 using Z_String;
 using Z_Text;
 using Z_Ui.Notify;
-using static UnityEditor.Progress;
-using static UnityEngine.Rendering.DebugUI.MessageBox;
 namespace Form
 {
     public static partial class StoryTexAssetForm
@@ -50,7 +38,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             GameManager.instance.saveCtrl.AddTex(form);
         });
     }
-   
+
 
     #endregion
 
@@ -303,8 +291,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         CharacterParamForm.DataByName[oldName].name = newName;
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            var prm = character.paramDic.GetDv(oldName,null);
-            if (prm!=null)
+            var prm = character.paramDic.GetDv(oldName, null);
+            if (prm != null)
             {
                 character.paramDic[newName] = prm;
                 prm.name = newName;
@@ -375,7 +363,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(),false));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, true, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false));
     }
     public void DeleteCharacter(int uid)
     {
@@ -442,9 +430,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region effect
     public EffectClipForm.Data CreateEffectClip(string texName)
     {
-        return new EffectClipForm.Data(-1, texName, 1,Vector3.zero,0,Vector3.one,1,true);
+        return new EffectClipForm.Data(-1, texName, 1, Vector3.zero, 0, Vector3.one, 1, true);
     }
-    public void DeleteEffectClip(int effectUid,int id)
+    public void DeleteEffectClip(int effectUid, int id)
     {
         EffectForm.DataByUid[effectUid].clips.RemoveAt(id);
     }
@@ -466,7 +454,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = EffectForm.DataByUid[effectUid];
-            foreach(var clip in data.clips)
+            foreach (var clip in data.clips)
             {
                 clip.tex = form.name;
             }
@@ -476,11 +464,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ChooseEffectr(string title, Action<EffectForm.Data> act)
     {
         var items = new EntryItem();
-        
-            foreach (var data in EffectForm.DataByUid.Values)
-            {
-                items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].GetSprite());
-            }
+
+        foreach (var data in EffectForm.DataByUid.Values)
+        {
+            items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].GetSprite());
+        }
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>
             {
@@ -496,7 +484,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(SkillForm.DataByName.Keys);
         }
-        SkillForm.AddData(new SkillForm.Data(-1,name,"",GlobalNameHelper.GetDefaultTexName(),new List<SkillType>(),1,new Dictionary<string, EventTriggerForm.Data>(),0));
+        SkillForm.AddData(new SkillForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), new List<SkillType>(), 1, new Dictionary<string, EventTriggerForm.Data>(), 0));
     }
     public void DeleteSkill(int uid)
     {
@@ -507,7 +495,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
         {
             var data = SkillForm.DataByUid[skillUid];
-            data.icon= form.name;
+            data.icon = form.name;
             GameManager.instance.saveCtrl.AddStoryTex(form);
         });
     }
@@ -551,9 +539,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ChooseEventTriggerType(Action<TriggerType> act)
     {
         var items = new EntryItem();
-        foreach(TriggerType tp in Enum.GetValues(typeof(TriggerType)))
+        foreach (TriggerType tp in Enum.GetValues(typeof(TriggerType)))
         {
-            items.Add(TextManager.instance.GetTxt(tp.ToString()),null,(int)tp);
+            items.Add(TextManager.instance.GetTxt(tp.ToString()), null, (int)tp);
         }
         NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose trigger condition"), true, (res) =>
         {
@@ -562,7 +550,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }, items);
     }
 
-    public void ChooseTriggerCondition(string title,Action<EntryItem> act)
+    public void ChooseTriggerCondition(string title, Action<EntryItem> act)
     {
         var items = GameManager.instance.evtCtrl.GetTriggerConditionEntry();
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
@@ -571,9 +559,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return true;
         }, items);
     }
-    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act,bool createOnly=false)
+    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act, bool createOnly = false)
     {
-        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType, createOnly,out var defaultItem);
+        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType, createOnly, out var defaultItem);
         NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>
         {
             act?.Invoke(res);
@@ -733,10 +721,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region scene
     public void ImportMapMiniMap()
     {
-/*        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
-        {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-        });*/
+        /*        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
+                {
+                    GameManager.instance.saveCtrl.AddStoryTex(form);
+                });*/
 
     }
 

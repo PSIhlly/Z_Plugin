@@ -508,9 +508,9 @@ namespace Form
 
                 {1000186,new Data(1000186,"MoveObject","Move object","移动物体")},
 
-                {1000187,new Data(1000187,"GetSelfObject","Get self object","获取物体自己")},
+                {1000187,new Data(1000187,"GetSelfObjectID","Get self object ID","获取物体自己ID")},
 
-                {1000188,new Data(1000188,"GetTriggerObject","Get trigger object","获取触发物体")},
+                {1000188,new Data(1000188,"GetTriggerObjectID","Get trigger object ID","获取触发物体ID")},
 
                 {1000189,new Data(1000189,"Num","Number","数字")},
 
@@ -577,6 +577,34 @@ namespace Form
                 {1000220,new Data(1000220,"onLostItemEvent","On lost item event","失去道具事件")},
 
                 {1000221,new Data(1000221,"onCharacterParamChangeEvent","On character param change event","玩家属性变化事件")},
+
+                {1000222,new Data(1000222,"Choose character","Choose character","选择人物")},
+
+                {1000223,new Data(1000223,"Choose item","Choose item","选择道具")},
+
+                {1000224,new Data(1000224,"Choose param","Choose param","选择参数")},
+
+                {1000225,new Data(1000225,"Any item","Any item","任意道具")},
+
+                {1000226,new Data(1000226,"Any character","Any character","任意人物")},
+
+                {1000227,new Data(1000227,"Any param","Any param","任意参数")},
+
+                {1000228,new Data(1000228,"Any","Any","任意")},
+
+                {1000229,new Data(1000229,"GainItem","Gain item","获得道具")},
+
+                {1000230,new Data(1000230,"LostItem","Lost item","失去道具")},
+
+                {1000231,new Data(1000231,"system","System","系统")},
+
+                {1000232,new Data(1000232,"GetSelfCharacterID","Get self character ID","获取人物自己ID")},
+
+                {1000233,new Data(1000233,"GetTriggerCharacterID","Get trigger character ID","获取触发人物ID")},
+
+                {1000234,new Data(1000234,"SetCharacterParameter","Set character's Parameter","设置人物参数")},
+
+                {1000235,new Data(1000235,"GetCurrentCharacterID","Get current character ID","获取当前操作人物ID")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -953,9 +981,9 @@ namespace Form
     
                         {"MoveObject",_DataById[1000186]},
     
-                        {"GetSelfObject",_DataById[1000187]},
+                        {"GetSelfObjectID",_DataById[1000187]},
     
-                        {"GetTriggerObject",_DataById[1000188]},
+                        {"GetTriggerObjectID",_DataById[1000188]},
     
                         {"Num",_DataById[1000189]},
     
@@ -1022,6 +1050,34 @@ namespace Form
                         {"onLostItemEvent",_DataById[1000220]},
     
                         {"onCharacterParamChangeEvent",_DataById[1000221]},
+    
+                        {"Choose character",_DataById[1000222]},
+    
+                        {"Choose item",_DataById[1000223]},
+    
+                        {"Choose param",_DataById[1000224]},
+    
+                        {"Any item",_DataById[1000225]},
+    
+                        {"Any character",_DataById[1000226]},
+    
+                        {"Any param",_DataById[1000227]},
+    
+                        {"Any",_DataById[1000228]},
+    
+                        {"GainItem",_DataById[1000229]},
+    
+                        {"LostItem",_DataById[1000230]},
+    
+                        {"system",_DataById[1000231]},
+    
+                        {"GetSelfCharacterID",_DataById[1000232]},
+    
+                        {"GetTriggerCharacterID",_DataById[1000233]},
+    
+                        {"SetCharacterParameter",_DataById[1000234]},
+    
+                        {"GetCurrentCharacterID",_DataById[1000235]},
     
                     };
     

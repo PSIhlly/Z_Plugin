@@ -271,7 +271,7 @@ using UnityEngine.Video;
                     string realName = tmp[tmp.Length - 1];
                     uiHolder.subUiHolderLst.Add(subHolder);
                     subHolder.parent = uiHolder;
-
+                    Debug.Log(subHolder.name + " +" + uiHolder.name);
                     uiHolder.elementTrsLst.Add(o);
                     var subEditor = (UiHolderEditor)CreateEditor(subHolder);
                     switch (subHolder.uiType)

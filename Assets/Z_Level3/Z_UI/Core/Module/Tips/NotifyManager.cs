@@ -27,6 +27,10 @@ namespace Z_Ui.Notify
                 id = id
             };
         }
+        public void Add(EntryItem item)
+        {
+            subs[item.content] = item;
+        }
         public bool IsChildOf(EntryItem item)
         {
             var tmp = this;

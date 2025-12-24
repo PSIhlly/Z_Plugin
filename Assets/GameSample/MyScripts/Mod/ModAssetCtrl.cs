@@ -241,9 +241,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region character
-    public void ChooseCharacterParam(string title, Action<EntryItem> act)
+    public void ChooseCharacterParam(string title, Action<EntryItem> act,EntryItem addItem=null)
     {
         var items = new EntryItem();
+        if(addItem!=null)
+        {
+            items.Add(addItem);
+        }
         foreach (var data in CharacterParamForm.DataByName.Values)
         {
             items.Add(data.name);
@@ -269,11 +273,15 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
-    public void ChooseCharacter(string title, Action<CharacterProductForm.Data> act)
+    public void ChooseCharacter(string title, Action<CharacterProductForm.Data> act, EntryItem addItem = null)
     {
         var items = new EntryItem();
         if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
         {
+            if (addItem != null)
+            {
+                items.Add(addItem);
+            }
             foreach (var data in CharacterProductForm.DatasByIsproto[true])
             {
                 items.Add(data.name, TexAssetForm.DataByName[data.avatarTexName].GetSprite());
@@ -282,7 +290,14 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>
             {
-                act?.Invoke(CharacterProductForm.DataByName[item.content]);
+                if (item == addItem)
+                {
+                    act?.Invoke(null);
+                }
+                else
+                {
+                    act?.Invoke(CharacterProductForm.DataByNameIsproto.GetDv((item.content, true), null));
+                }
                 return true;
             }, items);
     }
@@ -714,7 +729,34 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     }
 
-
+    public void ChooseItem(string title, Action<ItemProductForm.Data> act, EntryItem addItem = null)
+    {
+        var items = new EntryItem();
+        if (ItemProductForm.DatasByIsproto.ContainsKey(true))
+        {
+            if (addItem != null)
+            {
+                items.Add(addItem);
+            }
+            foreach (var data in ItemProductForm.DatasByIsproto[true])
+            {
+                items.Add(data.name, TexAssetForm.DataByName[data.iconTexName].GetSprite());
+            }
+        }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+            true, (item) =>
+            {
+                if (item == addItem)
+                {
+                    act?.Invoke(null);
+                }
+                else
+                {
+                    act?.Invoke(ItemProductForm.DataByNameIsproto.GetDv((item.content, true), null));
+                }
+                return true;
+            }, items);
+    }
 
     #endregion
 

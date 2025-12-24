@@ -55,10 +55,10 @@ public class GameMapData : MapInfo
     }
     public override bool CheckItemUnit(ItemUnitForm.Data item)
     {
-        int id = AssetManager.GetKeyId(item.name);
+        int id = item.unit.productInfo.Item1;
         if (ItemProductForm.DataByUid.ContainsKey(id))
         {
-            if (ItemProductForm.DataByUid[id].name == AssetManager.GetKeyName(item.name))
+            if (ItemProductForm.DataByUid[id].name == item.name)
                 return base.CheckItemUnit(item);
         }
         return false;
@@ -69,10 +69,10 @@ public class GameMapData : MapInfo
     }
     public override bool CheckCharacterUnit(CharacterUnitForm.Data ch)
     {
-        int id = AssetManager.GetKeyId(ch.name);
+        int id = ch.unit.productInfo.Item1;
         if (CharacterProductForm.DataByUid.ContainsKey(id))
         {
-            if (CharacterProductForm.DataByUid[id].name == AssetManager.GetKeyName(ch.name))
+            if (CharacterProductForm.DataByUid[id].name == ch.name)
                 return base.CheckCharacterUnit(ch);
         }
         return false;

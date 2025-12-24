@@ -83,16 +83,15 @@ namespace Z_Map
             }
             else
             {
-                int id = AssetManager.GetKeyId(data.name);
-                if (this is CharacterUnit && CharacterProductForm.DataByUid.TryGetValue(id, out var ch) && ch.events.ContainsKey(name))
+                if (this is CharacterUnit chU&& CharacterProductForm.DataByUid.TryGetValue(chU.productInfo.Item1, out var ch) && ch.events.ContainsKey(name))
                 {
                     trigger = ch.events[name];
                 }
-                else if (this is ObjectUnit && MapObjectForm.DataById.TryGetValue(id, out var ob) && ob.events.ContainsKey(name))
+                else if (this is ObjectUnit oU&& MapObjectForm.DataById.TryGetValue(oU.productInfo.Item1, out var ob) && ob.events.ContainsKey(name))
                 {
                     trigger = ob.events[name];
                 }
-                else if (this is ItemUnit && ItemProductForm.DataByUid.TryGetValue(id, out var it) && it.events.ContainsKey(name))
+                else if (this is ItemUnit iU&& ItemProductForm.DataByUid.TryGetValue(iU.productInfo.Item1, out var it) && it.events.ContainsKey(name))
                 {
                     trigger = it.events[name];
                 }

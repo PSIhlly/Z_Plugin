@@ -35,7 +35,7 @@ namespace Ui.ModStoryEventEditWindow
 
             });
         }
-        public override void OnShow()
+        public override void OnEnable()
         {
             model.parent = param.parent;
             model.node = param.node;

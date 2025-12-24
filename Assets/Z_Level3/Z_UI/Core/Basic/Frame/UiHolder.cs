@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
+using Z_Time;
 using Object = UnityEngine.Object;
 
 namespace Z_Ui.Base
@@ -113,7 +115,11 @@ namespace Z_Ui.Base
                 }
                 firstEnter = false;
                 ctrl.OnEnable();
-                ctrl.OnShow();
+                UiManager.instance.uiOnShowEventLst.Add(() =>
+                {
+                    if (ctrl.active)
+                        ctrl.OnShow();
+                });
             }
         }
         protected void OnDisable()

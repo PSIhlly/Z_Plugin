@@ -82,7 +82,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
-        
+
         setPlayerRot = null;
         downPos = Vector2.zero;
 
@@ -113,12 +113,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         foreach (var data in CharacterUnitForm.DataByUid.Values)
         {
-            var ch = CharacterProductForm.DataByUid[AssetManager.GetKeyId(data.name)];
+            var ch = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
             if (ch.isProto && !ch.unique)
             {
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct();
-                data.name = AssetManager.GetIdNameKey(newCharacter.uid, newCharacter.name);
+                data.name = newCharacter.name;
+                data.unit.productInfo = (newCharacter.uid,-1);
                 GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
             }
         }
@@ -255,17 +256,18 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
     {
         CharacterUnitForm.Data unitData = null;
-        foreach (var unit in CharacterUnitForm.DataByUid.Values)
+        foreach (var curData in CharacterUnitForm.DataByUid.Values)
         {
-            if (unit.name == AssetManager.GetIdNameKey(data.uid, data.name))
+            if (curData.unit.productInfo.Item1 == data.uid && unitData.name == data.name)
             {
-                unitData = unit;
+                unitData = curData;
                 break;
             }
         }
         if (unitData == null)
         {
-            unitData=MapManager.instance.AddCharacter(AssetManager.GetIdNameKey(data.uid, data.name), GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true); ;
+            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true); ;
+            unitData.unit.productInfo = (data.uid, -1);
         }
         _characterDic[unitData] = data;
         return unitData;
@@ -301,9 +303,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return;
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-        setPlayerRot= Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
-        
-        
+        setPlayerRot = Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
+
+
     }
     public void AddMessage(string content)
     {
@@ -318,30 +320,30 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     #region op
     public void OnEvent(InputKeyEvent evt)
     {
-        if (!enable || GameManager.instance.curProgress.blockProgramUid >0)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
         var cur = evt.key.Where((o) => o == KeyCode.W || o == KeyCode.S || o == KeyCode.A || o == KeyCode.D);
         var step = Vector3.zero;
-        foreach(var c in cur)
+        foreach (var c in cur)
         {
-            switch(c)
+            switch (c)
             {
                 case KeyCode.W:
-                    step+= Vector3.forward;
+                    step += Vector3.forward;
                     break;
                 case KeyCode.S:
                     step += Vector3.back;
                     break;
 
                 case KeyCode.A:
-                    step +=Vector3.left;
+                    step += Vector3.left;
                     break;
                 case KeyCode.D:
-                    step +=  Vector3.right;
+                    step += Vector3.right;
                     break;
             }
         }
-        SetPlayerMove(step.normalized* 0.02f);
+        SetPlayerMove(step.normalized * 0.02f);
     }
 
     public void OnEvent(InputMouseEvent evt)

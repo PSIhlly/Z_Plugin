@@ -311,7 +311,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
     public void LoadModel(CharacterInstance ins)
     {
         var data = ins.unit.data;
-        var form = CharacterProductForm.DataByUid[AssetManager.GetKeyId(data.name)];
+        var form = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
         if (form == null)
         {
             Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);
@@ -333,7 +333,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
     public void CheckAnim(CharacterInstance ins)
     {
         var data = ins.unit.data;
-        var form = CharacterProductForm.DataByUid[AssetManager.GetKeyId(ins.unit.data.name)];
+        var form = CharacterProductForm.DataByUid[ins.unit.productInfo.Item1];
         if (form == null)
         {
             Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);

@@ -370,13 +370,13 @@ namespace Form
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
+            static Dictionary<(string,bool), Data> _DataByNameIsproto;
+            public static Dictionary<(string,bool), Data> DataByNameIsproto
             {
                 get
                 {
                     Init();
-                    return _DataByName;
+                    return _DataByNameIsproto;
                 }
             }
     
@@ -398,7 +398,7 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DataByNameIsproto = new Dictionary<(string,bool), Data>() {
     
                     };
     
@@ -551,7 +551,7 @@ namespace Form
 
         DataByUid[data.uid]=data;
     
-                    DataByName[data.name]=data;
+                    DataByNameIsproto[(data.name,data.isProto)]=data;
     
                     if(!DatasByLabelIsproto.ContainsKey((data.label,data.isProto)))
                         DatasByLabelIsproto[(data.label,data.isProto)]=new List<Data>();
@@ -580,7 +580,7 @@ ProductForm.AddData(data);
 
                     DataByUid.Remove(data.uid);
     
-                    DataByName.Remove(data.name);
+                    DataByNameIsproto.Remove((data.name,data.isProto));
     
                     DatasByLabelIsproto[(data.label,data.isProto)].Remove(data);
                     if(DatasByLabelIsproto[(data.label,data.isProto)].Count==0)
@@ -653,8 +653,8 @@ ProductForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DataByNameIsproto.Remove((oldV,data.isProto));
+                    DataByNameIsproto[(newV,data.isProto)]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
@@ -716,6 +716,9 @@ ProductForm.RemoveData(uid);
                     if(!DatasByIsproto.ContainsKey(newV))
                         DatasByIsproto[newV]=new List<Data>();
                     DatasByIsproto[newV].Add(data);
+ 
+                    DataByNameIsproto.Remove((data.name,oldV));
+                    DataByNameIsproto[(data.name,newV)]=data;
  
                     DatasByLabelIsproto[(data.label,oldV)].Remove(data);
                     if(DatasByLabelIsproto[(data.label,oldV)].Count==0)

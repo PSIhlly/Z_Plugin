@@ -57,24 +57,28 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryItemEventType.Add:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onAddItemEvent", null), 0, args);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onAddItem{evt.data.name}Event", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onGainItemEvent", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent${evt.data.uid}", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent$", null), 0, args);
                 break;
             case StoryItemEventType.Remove:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onRemoveItemEvent", null), 0, args);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onRemoveItem{evt.data.name}Event", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onLostItemEvent", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent${evt.data.uid}", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent$", null), 0, args);
                 break;
         }
     }
 
     public void OnEvent(StoryCharacterEvent evt)
     {
-        var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.data.uid) };
+        var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.data.uid), CodeHelper.CreateBoxByStr(evt.name) };
         switch (evt.type)
         {
             case StoryCharacterEventType.ParamChange:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onAddItemEvent", null), 0, args);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onAddItem{evt.data.name}Event", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onCharacterParamChangeEvent", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}$", null), 0, args);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}${evt.name}", null), 0, args);
                 break;
 
         }

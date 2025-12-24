@@ -20,7 +20,10 @@ using Z_DataSystem.Form;
 using System.Runtime.ConstrainedExecution;
 namespace Form
 {
+    public class EventModifyEvent:Z_Event
+    {
 
+    }
     public static partial class EventInterpretDataForm
     {
         public partial class Data

@@ -27,8 +27,9 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             var data = MapObjectForm.DataByName[prm[0].str];
-            var key = AssetManager.GetIdNameKey(data.id, data.name);
+            var key = data.id.ToString();
                 var newObjectData = MapManager.instance.AddObject(key, Vector3.one*99999f, data.name, null);
+            newObjectData.unit.productInfo = (data.id, -1);
                 newObjectData.unit.evtDic = data.events;
             asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(newObjectData.uid) };
 

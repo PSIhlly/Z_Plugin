@@ -38,7 +38,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.ipt_name.onFinishInput+=(s)=>
             {
                 var lst = new List<string>();
-                foreach(var data in CharacterProductForm.DataByName.Values)
+                foreach(var data in CharacterProductForm.DataByNameIsproto.Values)
                     lst.Add(data.name);
 
                 if(StringHelper.IsUniqueName(lst, s))

@@ -13,6 +13,7 @@ namespace Ui.ModStory
 
 using Ui.AnimChoose;
 using Ui.EventChoose;
+using Ui.EventCustomTrigger;
 using Ui.Axis;
 
 
@@ -4379,168 +4380,6 @@ namespace ModStoryEventConfig
 
 
 
-namespace CharacterParam
-
-{
-
-
-
-
-    public partial class UiCharacterParamParam:UiParam
-    {
-    }
-
-    public partial class UiCharacterParamView:UiView
-    {
-
-            public GameObject go_characterParam;
-            public Btn btn_;
-        public UiCharacterParamView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_characterParam = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-        }
-
-    }
-    public partial class UiCharacterParamCtrl:UiCtrl
-    {
-        public UiCharacterParamView view;
-        public UiCharacterParamModel model;
-        public UiCharacterParamParam param;
-        public UiModStoryEventConfigCtrl parent=>(UiModStoryEventConfigCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiCharacterParamParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiCharacterParamView(uiHolder);
-            model=new UiCharacterParamModel();
-
-
-        }
-
-    }
-    public partial class UiCharacterParamModel:UiModel
-    {
-        
-    }
-}
-
-namespace ItemLost
-
-{
-
-
-
-
-    public partial class UiItemLostParam:UiParam
-    {
-    }
-
-    public partial class UiItemLostView:UiView
-    {
-
-            public GameObject go_itemLost;
-            public Btn btn_;
-        public UiItemLostView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_itemLost = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-        }
-
-    }
-    public partial class UiItemLostCtrl:UiCtrl
-    {
-        public UiItemLostView view;
-        public UiItemLostModel model;
-        public UiItemLostParam param;
-        public UiModStoryEventConfigCtrl parent=>(UiModStoryEventConfigCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiItemLostParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiItemLostView(uiHolder);
-            model=new UiItemLostModel();
-
-
-        }
-
-    }
-    public partial class UiItemLostModel:UiModel
-    {
-        
-    }
-}
-
-namespace ItemGain
-
-{
-
-
-
-
-    public partial class UiItemGainParam:UiParam
-    {
-    }
-
-    public partial class UiItemGainView:UiView
-    {
-
-            public GameObject go_itemGain;
-            public Btn btn_;
-        public UiItemGainView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_itemGain = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-        }
-
-    }
-    public partial class UiItemGainCtrl:UiCtrl
-    {
-        public UiItemGainView view;
-        public UiItemGainModel model;
-        public UiItemGainParam param;
-        public UiModStoryEventConfigCtrl parent=>(UiModStoryEventConfigCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiItemGainParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiItemGainView(uiHolder);
-            model=new UiItemGainModel();
-
-
-        }
-
-    }
-    public partial class UiItemGainModel:UiModel
-    {
-        
-    }
-}
-
     public partial class UiModStoryEventConfigParam:UiParam
     {
     }
@@ -4551,28 +4390,22 @@ namespace ItemGain
             public UiEventChooseCtrl model_EventChooseBegin;
             public UiEventChooseCtrl model_EventChoosePerSecond;
             public UiEventChooseCtrl model_EventChooseCharacterParamChange;
+            public UiEventCustomTriggerCtrl model_EventCustomTriggerCharacterParam;
             public UiEventChooseCtrl model_EventChooseLostItem;
+            public UiEventCustomTriggerCtrl model_EventCustomTriggerLostItem;
             public UiEventChooseCtrl model_EventChooseGainItem;
-            public GameObject go_characterParam;
-            public CharacterParam.UiCharacterParamCtrl page_characterParam;
-            public GameObject go_itemLost;
-            public ItemLost.UiItemLostCtrl page_itemLost;
-            public GameObject go_itemGain;
-            public ItemGain.UiItemGainCtrl page_itemGain;
+            public UiEventCustomTriggerCtrl model_EventCustomTriggerGainItem;
         public UiModStoryEventConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
             model_EventChooseBegin = (UiEventChooseCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
             model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
             model_EventChooseCharacterParamChange = (UiEventChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            model_EventChooseLostItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            model_EventChooseGainItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            go_characterParam = uiHolder.elementTrsLst[5].gameObject;
-            page_characterParam = (CharacterParam.UiCharacterParamCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            go_itemLost = uiHolder.elementTrsLst[7].gameObject;
-            page_itemLost = (ItemLost.UiItemLostCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            go_itemGain = uiHolder.elementTrsLst[9].gameObject;
-            page_itemGain = (ItemGain.UiItemGainCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            model_EventCustomTriggerCharacterParam = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            model_EventChooseLostItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            model_EventCustomTriggerLostItem = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            model_EventChooseGainItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            model_EventCustomTriggerGainItem = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -4603,16 +4436,16 @@ namespace ItemGain
             view.model_EventChoosePerSecond.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.model_EventChooseCharacterParamChange = new UiEventChooseCtrl();
             view.model_EventChooseCharacterParamChange.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_EventCustomTriggerCharacterParam = new UiEventCustomTriggerCtrl();
+            view.model_EventCustomTriggerCharacterParam.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.model_EventChooseLostItem = new UiEventChooseCtrl();
-            view.model_EventChooseLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.model_EventChooseLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.model_EventCustomTriggerLostItem = new UiEventCustomTriggerCtrl();
+            view.model_EventCustomTriggerLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
             view.model_EventChooseGainItem = new UiEventChooseCtrl();
-            view.model_EventChooseGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
-            view.page_characterParam = new CharacterParam.UiCharacterParamCtrl();
-            view.page_characterParam.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
-            view.page_itemLost = new ItemLost.UiItemLostCtrl();
-            view.page_itemLost.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
-            view.page_itemGain = new ItemGain.UiItemGainCtrl();
-            view.page_itemGain.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
+            view.model_EventChooseGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
+            view.model_EventCustomTriggerGainItem = new UiEventCustomTriggerCtrl();
+            view.model_EventCustomTriggerGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
         }
 
     }

@@ -282,12 +282,11 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                         ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
                         {
                             bool allow = true;
-                            var key = AssetManager.GetIdNameKey(objectData.id, objectData.name);
                             //放置去重
                             foreach (var cur in mapMgr.updateCtrl.objectTileDic.Get(mapData.unit))
                             {
                                 var curData = cur.data;
-                                if (curData.name == key && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
+                                if (curData.name == objectData.name && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
                                 {
                                     allow = false;
                                     break;
@@ -296,7 +295,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newObjectData = mapMgr.AddObject(key, finalPos, objectData.name, prms);
+                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos, objectData.name, prms);
+                                newObjectData.unit.productInfo = (objectData.id, -1);
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
 
@@ -307,7 +307,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     {
                         var data = ItemProductForm.DataByUid[itemData.itemUid];
 
-                        var key = AssetManager.GetIdNameKey(data.uid, data.name);
                         ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
                         {
                             bool allow = true;
@@ -316,7 +315,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             foreach (var cur in mapMgr.updateCtrl.itemTileDic.Get(mapData.unit))
                             {
                                 var curData = cur.data;
-                                if (curData.name == key && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
+                                if (curData.name == data.name && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
                                 {
                                     allow = false;
                                     break;
@@ -325,7 +324,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newItemData = mapMgr.AddItem(key, finalPos, data.name, prms);
+                                var newItemData = mapMgr.AddItem(data.name, finalPos, data.name, prms);
                                 newItemData.unit.productInfo = (data.uid, -1);
                                 newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
                             }
@@ -335,7 +334,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     {
                         var data = CharacterProductForm.DataByUid[characterData.characterUid];
 
-                        var key = AssetManager.GetIdNameKey(data.uid, data.name);
                         ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
                         {
                             bool allow = true;
@@ -343,7 +341,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             foreach (var cur in mapMgr.updateCtrl.characterTileDic.Get(mapData.unit))
                             {
                                 var curData = cur.data;
-                                if (curData.name == key && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
+                                if (curData.name == data.name && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
                                 {
                                     allow = false;
                                     break;
@@ -352,7 +350,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newCharacerData = mapMgr.AddCharacter(key, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false);
+                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false);
                                 newCharacerData.unit.productInfo = (data.uid, -1);
                                 newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
                             }

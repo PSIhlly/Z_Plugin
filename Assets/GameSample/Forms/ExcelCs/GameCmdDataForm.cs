@@ -337,9 +337,21 @@ namespace Form
 
                 {100044,new Data(100044,"MoveObject",new List<string>(){"objectID","x","y","height","transitionTime",},new List<string>(){"num","num","num","num.num",},null,new List<string>(){"void",},"object ID {0} : Move x {1} y{2} height{3}, last {4} seconds","MoveObject(0,1,1,0,1);","scene","object",true)},
 
-                {100045,new Data(100045,"GetSelfObject",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get object self","objectSelfID = GetSelfObject();","scene","object",true)},
+                {100045,new Data(100045,"GetSelfObjectID",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get object self ID","objectSelfID = GetSelfObjectID();","scene","object",true)},
 
-                {100046,new Data(100046,"GetTriggerObject",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get trigger object","objectTriggerID = GetTriggerObject();","scene","object",true)},
+                {100046,new Data(100046,"GetTriggerObjectID",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get trigger object ID","objectTriggerID = GetTriggerObjectID();","scene","object",true)},
+
+                {100047,new Data(100047,"GainItem",new List<string>(){"name","amount",},new List<string>(){"string","num",},null,new List<string>(){"void",},"Gain {0} x {1}","GainItem(\"empty\",1);","item","backpack",true)},
+
+                {100048,new Data(100048,"LostItem",new List<string>(){"name","amount",},new List<string>(){"string","num",},null,new List<string>(){"void",},"Lost {0} x {1}","LostItem(\"empty\",1);","item","backpack",true)},
+
+                {100049,new Data(100049,"GetSelfCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get character self ID","characterSelfID = GetSelfCharacterID();","scene","character",true)},
+
+                {100050,new Data(100050,"GetTriggerCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get trigger character ID","characterTriggerID = GetTriggerCharacterID();","scene","character",true)},
+
+                {100051,new Data(100051,"SetCharacterParameter",new List<string>(){"characterID","paramName","value",},new List<string>(){"num","string","num",},null,new List<string>(){"void",},"Set Character ID {0} 's {1} = {2}","SetCharacterParameter(characterSelfID,\"empty\",1);","character","parameter",true)},
+
+                {100052,new Data(100052,"GetCurrentCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get currently used character ID","currentCharacterID = GetCurrentCharacterID();","character","system",true)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -432,9 +444,21 @@ namespace Form
     
                         {"MoveObject",_DataByUid[100044]},
     
-                        {"GetSelfObject",_DataByUid[100045]},
+                        {"GetSelfObjectID",_DataByUid[100045]},
     
-                        {"GetTriggerObject",_DataByUid[100046]},
+                        {"GetTriggerObjectID",_DataByUid[100046]},
+    
+                        {"GainItem",_DataByUid[100047]},
+    
+                        {"LostItem",_DataByUid[100048]},
+    
+                        {"GetSelfCharacterID",_DataByUid[100049]},
+    
+                        {"GetTriggerCharacterID",_DataByUid[100050]},
+    
+                        {"SetCharacterParameter",_DataByUid[100051]},
+    
+                        {"GetCurrentCharacterID",_DataByUid[100052]},
     
                     };
     
@@ -461,6 +485,14 @@ namespace Form
                             {("basic","process"),new List<Data>()},
         
                             {("scene","object"),new List<Data>()},
+        
+                            {("item","backpack"),new List<Data>()},
+        
+                            {("scene","character"),new List<Data>()},
+        
+                            {("character","parameter"),new List<Data>()},
+        
+                            {("character","system"),new List<Data>()},
         
                 };
 
@@ -556,6 +588,18 @@ namespace Form
 
                     _DatasByCategoryType[("scene","object")].Add(_DataByUid[100046]);
 
+                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100047]);
+
+                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100048]);
+
+                    _DatasByCategoryType[("scene","character")].Add(_DataByUid[100049]);
+
+                    _DatasByCategoryType[("scene","character")].Add(_DataByUid[100050]);
+
+                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100051]);
+
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100052]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -563,6 +607,10 @@ namespace Form
                             {"basic",new List<Data>()},
         
                             {"scene",new List<Data>()},
+        
+                            {"item",new List<Data>()},
+        
+                            {"character",new List<Data>()},
         
                 };
 
@@ -657,6 +705,18 @@ namespace Form
                     _DatasByCategory["scene"].Add(_DataByUid[100045]);
 
                     _DatasByCategory["scene"].Add(_DataByUid[100046]);
+
+                    _DatasByCategory["item"].Add(_DataByUid[100047]);
+
+                    _DatasByCategory["item"].Add(_DataByUid[100048]);
+
+                    _DatasByCategory["scene"].Add(_DataByUid[100049]);
+
+                    _DatasByCategory["scene"].Add(_DataByUid[100050]);
+
+                    _DatasByCategory["character"].Add(_DataByUid[100051]);
+
+                    _DatasByCategory["character"].Add(_DataByUid[100052]);
 
                     _DatasByCancreate = new Dictionary<bool, List<Data>>() {
     
@@ -757,6 +817,18 @@ namespace Form
                     _DatasByCancreate[true].Add(_DataByUid[100045]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100046]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100047]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100048]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100049]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100050]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100051]);
+
+                    _DatasByCancreate[true].Add(_DataByUid[100052]);
 
 
             childInitAction?.Invoke();

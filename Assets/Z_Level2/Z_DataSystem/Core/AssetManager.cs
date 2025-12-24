@@ -151,26 +151,6 @@ namespace Z_DataSystem
 
         }
 
-      
-
-
-        public static string GetIdNameKey(int id, string name)
-        {
-            return id + "$￥$" + name;
-        }
-        public static int GetKeyId(string key)
-        {
-            if (int.TryParse(key.Split("$￥$")[0], out int id))
-                return id;
-            return 0;
-        }
-        public static string GetKeyName(string key)
-        {
-            var res = key.Split("$￥$");
-            if (res.Length > 1)
-                return res[1];
-            return "";
-        }
 
     }
 }

@@ -20,14 +20,12 @@ namespace Ui.ModStoryEventTriggerWindow
 {
     public class TriggerConfig
     {
-        public string prmName;
-        public Action<Dictionary<string, EventTriggerForm.Data>> prmChangeAct;
+        public Action<EventTriggerForm.Data> prmChangeAct;
         public Func<string,string> GetNameFunc;
     }
     public partial class UiModStoryEventTriggerWindowParam
     {
         public EventTriggerForm.Data trigger;
-        public Action onHide;
 
         public Dictionary<string, EventTriggerForm.Data> dic;
         public List<TriggerConfig> configs;
@@ -38,12 +36,13 @@ namespace Ui.ModStoryEventTriggerWindow
         
     }
 
-    public partial class UiModStoryEventTriggerWindowCtrl
+    public partial class UiModStoryEventTriggerWindowCtrl:IZ_Listener<EventModifyEvent>
     {
         UiContainer<UiEventCtrl> evtCon;
         UiContainer<UiPrmCtrl> prmCon;
         public override void OnCreate()
         {
+            this.Register();
             evtCon = new UiContainer<UiEventCtrl>(view.go_event);
             prmCon = new UiContainer<UiPrmCtrl>(view.go_prm);
             view.btn_bbg.onClick.AddListener(() =>
@@ -66,36 +65,37 @@ namespace Ui.ModStoryEventTriggerWindow
             Refresh();
 
         }
-        public override void OnHide()
-        {
-            model.prm.onHide?.Invoke();
-        }
         public void Refresh()
         {
             bool existParams = model.prm.configs != null && model.prm.configs.Count > 0;
-            view.go_prm.SetActive(existParams);
+            view.go_params.SetActive(existParams);
 
             prmCon.Clear();
             if (existParams)
             {
                 foreach (var config in model.prm.configs)
                 {
-                    evtCon.Add(new UiPrmParam() { config = config });
+                    prmCon.Add(new UiPrmParam() { config = config });
                 }
             }
             prmCon.Refresh();
 
-            view.txt_name.text = AssetManager.GetKeyName(model.prm.trigger.name);
+            view.txt_name.text = model.prm.trigger.name;
             evtCon.Clear();
             foreach(var nm in model.prm.trigger.evt)
             {
                 evtCon.Add(new UiEventParam() { nm = nm });
             }
+            
             evtCon.Add(new UiEventParam() { nm = null });
             evtCon.Refresh();
-
+            UiManager.Rebuild(gameObject, true);
         }
-       
+
+        public void OnEvent(EventModifyEvent evt)
+        {
+            Refresh();
+        }
     }
 
 
@@ -114,7 +114,7 @@ namespace Ui.ModStoryEventTriggerWindow
         {
             view.btn_edit.onClick.AddListener(() =>
             {
-                model.prm.config.prmChangeAct(parent.model.prm.dic);
+                model.prm.config.prmChangeAct(parent.model.prm.trigger);
             });
             
         }
@@ -147,15 +147,13 @@ namespace Ui.ModStoryEventTriggerWindow
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
                 {
                     parent.model.prm.trigger.evt.Add(res.content);
-                    parent.model.prm.onHide?.Invoke();
-                    parent.Refresh();
+                    Z_EventHelper.Invoke(new EventModifyEvent());
                 });
             });
             view.btn_delete.onClick.AddListener(() =>
             {
                 parent.model.prm.trigger.evt.Remove(model.prm.nm);
-                parent.model.prm.onHide?.Invoke();
-                parent.Refresh();
+                Z_EventHelper.Invoke(new EventModifyEvent());
             });
             view.btn_edit.onClick.AddListener(() =>
             {
@@ -163,8 +161,7 @@ namespace Ui.ModStoryEventTriggerWindow
                 {
                     int pos=parent.model.prm.trigger.evt.IndexOf(model.prm.nm);
                     parent.model.prm.trigger.evt[pos] = res.content;
-                    parent.model.prm.onHide?.Invoke();
-                    parent.Refresh();
+                    Z_EventHelper.Invoke(new EventModifyEvent());
                 });
             });
         }

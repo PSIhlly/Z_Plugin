@@ -69,7 +69,7 @@ namespace Ui.ModSceneBehaviourUnit
         }
         public void Refresh()
         {
-            view.txt_name.text = AssetManager.GetKeyName(model.data.name);
+            view.txt_name.text =model.data.name;
 
         }
        

@@ -24,17 +24,17 @@ namespace Ui.ModSceneUnit
     public partial class UiModSceneUnitModel
     {
         public UnitForm.Data data;
-        
-      
+
+
         public string posX
         {
             set
             {
-                float.TryParse(value, out float v); 
-                var x = (v + ModManager.instance.sceneCtrl.offset)* MapManager.instance.data.mainData.mapUnitSize.x;
+                float.TryParse(value, out float v);
+                var x = (v + ModManager.instance.sceneCtrl.offset) * MapManager.instance.data.mainData.mapUnitSize.x;
                 var newPos = new Vector3(x, data.pos.y, data.pos.z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
-                { 
+                {
                     data.pos = newPos;
                     ModManager.instance.sceneCtrl.ForceUpdate();
                 }
@@ -51,10 +51,10 @@ namespace Ui.ModSceneUnit
                 float.TryParse(value, out float v);
 
                 TileUnitForm.Data belongMap = ((MapUnit)data.unit).belongTile.data;
-                
+
 
                 float minV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset;
-                float maxV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset+0.9f;
+                float maxV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset + 0.9f;
 
                 if (v < minV)
                 {
@@ -76,7 +76,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return (data.pos.y/ MapManager.instance.data.mainData.mapUnitSize.y - ModManager.instance.sceneCtrl.offset).ToString("0.##");
+                return (data.pos.y / MapManager.instance.data.mainData.mapUnitSize.y - ModManager.instance.sceneCtrl.offset).ToString("0.##");
             }
         }
         public string posZ
@@ -104,7 +104,7 @@ namespace Ui.ModSceneUnit
             {
                 int.TryParse(value, out int v);
                 v = (v % 360 + 360) % 360;
-                data.euler = new Vector3(data.euler.x,v,data.euler.z);
+                data.euler = new Vector3(data.euler.x, v, data.euler.z);
                 ModManager.instance.sceneCtrl.ForceUpdate();
             }
             get
@@ -141,7 +141,7 @@ namespace Ui.ModSceneUnit
             });
             view.btn_delete.onClick.AddListener(() =>
             {
-                if(model.data is ItemUnitForm.Data itemData)
+                if (model.data is ItemUnitForm.Data itemData)
                 {
                     MapManager.instance.RemoveItem(itemData);
                 }
@@ -158,15 +158,15 @@ namespace Ui.ModSceneUnit
 
             view.btn_aligh.onClick.AddListener(() =>
             {
-                TileUnitForm.Data mapData= (TileUnitForm.Data)model.data.unit.superUnit.data;
-                model.posX = (mapData.mapPos.x- ModManager.instance.sceneCtrl.offset).ToString();
-                model.posY = (mapData.mapPos.y  - ModManager.instance.sceneCtrl.offset).ToString();
+                TileUnitForm.Data mapData = (TileUnitForm.Data)model.data.unit.superUnit.data;
+                model.posX = (mapData.mapPos.x - ModManager.instance.sceneCtrl.offset).ToString();
+                model.posY = (mapData.mapPos.y - ModManager.instance.sceneCtrl.offset).ToString();
                 model.posZ = (mapData.mapPos.z - ModManager.instance.sceneCtrl.offset).ToString();
                 Refresh();
 
             });
 
-            
+
             view.ipt_posSetX.onInput = ((v) =>
             {
                 model.posX = v;
@@ -200,13 +200,13 @@ namespace Ui.ModSceneUnit
         }
         public void Refresh()
         {
-            view.txt_name.text = AssetManager.GetKeyName(model.data.name);
-            
+            view.txt_name.text = model.data.name;
+
             view.ipt_posSetX.Set(model.posX);
             view.ipt_posSetY.Set(model.posY);
             view.ipt_posSetZ.Set(model.posZ);
             view.ipt_rotateSet.Set(model.angle);
         }
-       
+
     }
 }

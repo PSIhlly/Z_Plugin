@@ -37,7 +37,7 @@ namespace Z_Code
             }
             else if (unit is CharacterUnit c)
             {
-                var form=CharacterProductForm.DataByUid.GetDv(AssetManager.GetKeyId(c.data.name),null);
+                var form=CharacterProductForm.DataByUid.GetDv(c.productInfo.Item1,null);
                 if(form!=null&&!form.unique)
                 {
                     CharacterProductForm.RemoveData(form.uid);

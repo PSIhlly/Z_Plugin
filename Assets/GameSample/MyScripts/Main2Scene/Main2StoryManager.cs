@@ -47,7 +47,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
             CharacterProductForm.Clear();
             ModManager.instance.assetCtrl.CreateCharacter("Player");
-            var player = CharacterProductForm.DataByName["Player"];
+            var player = CharacterProductForm.DataByNameIsproto[("Player",true)];
             player.hpParamName = "Hp";
             player.speedParamName = "Speed";
             player.unique = true;

@@ -150,6 +150,8 @@ namespace Form
 
                 {7,new Data(7,"gain","Gain","获得")},
 
+                {8,new Data(8,"lost","Lost","失去")},
+
                 {10001,new Data(10001,"savePopupTitle","Do you need Save?","需要保存吗?")},
 
                 {20001,new Data(20001,"play_2","Start","开始游戏")},
@@ -252,6 +254,8 @@ namespace Form
                         {"custom",_DataById[6]},
     
                         {"gain",_DataById[7]},
+    
+                        {"lost",_DataById[8]},
     
                         {"savePopupTitle",_DataById[10001]},
     

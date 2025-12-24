@@ -52,6 +52,9 @@ public interface InternalPlayInfoController
 }
 public interface ExternalPlayInfoController
 {
+    public void GainItem(string name, int amount, bool toast = true, bool message = true);
+    public void LostItem(string name, int amount, bool toast = true, bool message = true);
+    public void ChangeCharacterParam(int characterUid, string name, float value);
 }
 public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>
 {
@@ -98,25 +101,76 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         }
     }
 
-    public void ChangeParam(int characterUid,string name, float value)
+    public void ChangeCharacterParam(int characterUid, string name, float value)
     {
-       var data= CharacterProductForm.DataByUid.GetDv(characterUid, null);
-        if(data!=null)
+        var data = CharacterProductForm.DataByUid.GetDv(characterUid, null);
+        if (data != null)
         {
             var prm = data.paramDic.GetDv(name, null);
-            if(prm!=null)
+            if (prm != null)
             {
-                prm.v = Mathf.Min(Mathf.Max(prm.v, prm.min), prm.max);
-                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.ParamChange, data = data, name=name });
-
+                prm.v = Mathf.Min(Mathf.Max(value, prm.min), prm.max);
+                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.ParamChange, data = data, name = name });
             }
         }
     }
-
-    public void GainItem(int uid, bool toast = true, bool message = true)
+    public void LostItem(string name,int amount ,bool toast = true, bool message = true)
     {
-        var newItem = ItemProductForm.DataByUid[uid].Copy(false);
+        var item = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        if(item==null)
+        {
+            return;
+        }
+        item = item.Copy();
+        item.amount = amount;
+
+        if (!bagName2UidDic.ContainsKey(item.name))
+            bagName2UidDic[item.name] = new List<int>();
+
+        foreach (var uid in bagName2UidDic[item.name])
+        {
+            var old = ItemProductForm.DataByUid[uid];
+            var lost = Mathf.Min(old.amount, item.amount);
+            item.amount -= lost;
+            old.amount -= lost;
+            
+            if (old.amount <=0 )
+            {
+                bagName2UidDic[item.name].Remove(old.uid);
+                GameManager.instance.curProgress.bag.Remove(old.uid);
+                old.DestroyProduct();
+            }
+        }
+        item.amount = (amount - item.amount);
+        var content = TextManager.instance.GetTxt("lost") + " " + item.name + " x" + item.amount;
+        if (toast)
+        {
+            NotifyManager.instance.AddTip(content);
+        }
+        if (message)
+        {
+            _super.sceneCtrl.AddMessage(content);
+        }
+        Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Remove, data = item });
+    }
+    public void GainItem(string name,int amount, bool toast = true, bool message = true)
+    {
+        var newItem = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        if (newItem == null)
+            return;
+        newItem = newItem.Copy(false);
         newItem.ToProduct();
+        newItem.amount = amount;
+        GainItem(newItem, toast, message);
+    }
+    public void GainItem(int uid,bool toast = true, bool message = true)
+    {
+        var newItem = ItemProductForm.DataByUid[uid];
+        if(newItem.isProto)
+        {
+            newItem= newItem.Copy(false);
+            newItem.ToProduct();
+        }
         GainItem(newItem, toast, message);
     }
     public void GainItem(ItemProductForm.Data data, bool toast = true, bool message = true)
@@ -146,14 +200,18 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
                 old.amount += addition;
             }
         }
-        if (data.amount == 0)
+        while (data.amount > 0)
         {
-            data.DestroyProduct();
-            return;
+            var newData = data.Copy();
+            newData.amount = Mathf.Min(newData.maxAmountPer, data.amount);
+            data.amount -= newData.amount;
+
+            bagName2UidDic[newData.name].Add(newData.uid);
+            GameManager.instance.curProgress.bag.Add(newData.uid);
         }
 
-        bagName2UidDic[data.name].Add(data.uid);
-        GameManager.instance.curProgress.bag.Add(data.uid);
+        data.DestroyProduct();
+
 
     }
 

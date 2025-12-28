@@ -11,7 +11,7 @@ namespace Z_Ui.Dialog
     public class Settings
     {
         public float autoPlaySpeed;//0~2
-        public float textDisplaySpeed;//1~10
+        public float textDisplaySpeed;//1~50
         public int historyMax;//1~10
     }
     public enum PlayType
@@ -58,7 +58,7 @@ namespace Z_Ui.Dialog
             settings = new Settings()
             {
                 autoPlaySpeed = 0,
-                textDisplaySpeed = 5,
+                textDisplaySpeed = 20,
                 historyMax = 10,
             };
 

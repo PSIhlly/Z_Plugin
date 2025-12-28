@@ -1,3 +1,4 @@
+using RenderHeads.Media.AVProVideo;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,23 +15,15 @@ using Z_Os.File;
 using Z_Texture;
 using Z_Time;
 using Z_UnitSystem;
-using Z_Video;
 namespace Z_DataSystem.Form
 {
     public partial class VideoAssetForm
     {
         public partial class Data
         {
-            public void Play(VideoPlayer player)
+            public void Play(MediaPlayer player)
             {
-                if (bytes!=null)
-                {
-                    player.PlayVideoByByte(bytes);
-                }
-                else if(!string.IsNullOrEmpty(path))
-                {
-                    player.PlayVideoByPath(path);
-                }
+                player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);
             }
         }
     }
@@ -71,8 +64,9 @@ namespace Z_DataSystem
             {
                 if (data != null)
                 {
-                    var nm = ctrl.GetName( BytesSerialize.GetHash(data) );
-                    var form = ctrl.CreateDataByBytes(data, nm);
+                    var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
+                    File.WriteAllBytes(AssetManager.cachePath + nm, data);
+                    var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {

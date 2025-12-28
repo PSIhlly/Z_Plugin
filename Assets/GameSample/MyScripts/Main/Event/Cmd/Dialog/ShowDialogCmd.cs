@@ -21,13 +21,6 @@ namespace Z_Code
         {
 
             var cache = GameManager.instance.curProgress.dialogCache;
-            cache.mainAudioName = "";
-            cache.title = prm[2].str;
-            cache.mainText = prm[3].str;
-            cache.mainPictureName = prm[0].str;
-            cache.mainVideoName = "";
-            cache.mainPictureName = prm[1].str;
-            cache.mainAudioName = "";
             DialogManager.instance.Begin(prm[2].str,  prm[3].str , prm[0].str ,"", prm[1].str,"", () =>
             {
                 asyncTask.Complete();

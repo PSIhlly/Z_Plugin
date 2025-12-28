@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
-using Z_Video;
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.PlayAsset
 
 {
@@ -25,12 +23,12 @@ namespace Ui.PlayAsset
     {
 
             public GameObject go_image;
-            public Img img_image;
+            public Img img_;
         public UiImageView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_image = uiHolder.elementTrsLst[0].gameObject;
-            img_image = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
         }
 
     }
@@ -70,14 +68,12 @@ namespace Ui.PlayAsset
     {
 
             public GameObject go_image;
-            public Img img_image;
-            public UiImageCtrl sub_Image;
+            public UiImageCtrl sub_image;
         public UiPlayAssetView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_image = uiHolder.elementTrsLst[0].gameObject;
-            img_image = uiHolder.elementTrsLst[1].GetComponent<Img>();
-            sub_Image = (UiImageCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            sub_image = (UiImageCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -102,8 +98,8 @@ namespace Ui.PlayAsset
             model=new UiPlayAssetModel();
 
 
-            view.sub_Image = new UiImageCtrl();
-            view.sub_Image.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_image = new UiImageCtrl();
+            view.sub_image.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }

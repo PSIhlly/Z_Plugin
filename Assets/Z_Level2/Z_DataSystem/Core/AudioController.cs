@@ -1,3 +1,4 @@
+using RenderHeads.Media.AVProVideo;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using Z_Audio;
 using Z_ByteSerialize;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -21,20 +21,9 @@ namespace Z_DataSystem.Form
     {
         public partial class Data
         {
-            private AudioClip _clip => (AudioClip)asset;
-
-            Z_MultiTask<AudioClip> clipTask = new Z_MultiTask<AudioClip>();
-            public void GetClipAsync(Action<AudioClip> onLoaded)
+            public void Play(MediaPlayer player)
             {
-                clipTask.Run(_clip, GetClip, onLoaded);
-            }
-            public AudioClip GetClip()
-            {
-                if (_clip == null)
-                {
-                    asset = AudioHelper.GetAudioByPath(path);
-                }
-                return _clip;
+                player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);
             }
         }
     }
@@ -76,7 +65,8 @@ namespace Z_DataSystem
                 if (data != null)
                 {
                     var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
-                    var form = ctrl.CreateDataByBytes(data, nm);
+                    File.WriteAllBytes(AssetManager.cachePath+ nm, data);
+                    var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {

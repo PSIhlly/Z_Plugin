@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using Z_Audio;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Os.File;
 using Z_Texture;
 using Z_Time;
 using Z_UnitSystem;
-using static System.Net.Mime.MediaTypeNames;
 namespace Z_DataSystem.Form
 {
     public enum ValType
@@ -84,6 +82,7 @@ namespace Z_DataSystem
 
     public class AssetManager : Z_MonoManager<AssetManager>
     {
+        public static string cachePath=>Application.temporaryCachePath+"/DataSystem/";
         AssetCacheCtroller cacheCtrl;
         public TexController texCtrl;
         public AudioController audioCtrl;

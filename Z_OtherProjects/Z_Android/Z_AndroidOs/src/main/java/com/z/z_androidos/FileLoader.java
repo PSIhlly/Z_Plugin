@@ -12,11 +12,17 @@ import com.unity3d.player.UnityPlayer;
 
 
 public class FileLoader extends Activity {
-
+    public enum Type{
+        IMAGE,
+        VIDEO,
+        AUDIO
+    };
     public static final int NONE = 0;
     public static String UNSPECIFIED = "image/*";//划重点，这里指定视频或图片
 
     private int callbackId;
+    private Type type;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,8 +30,10 @@ public class FileLoader extends Activity {
         Bundle extras = getIntent().getExtras();
 
         callbackId=extras.getInt("callbackId");
+        callbackId=extras.getInt("callbackId");
 
         Intent intent = new Intent(Intent.ACTION_PICK, null);
+
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, UNSPECIFIED);
         startActivityForResult(intent, callbackId);
     }

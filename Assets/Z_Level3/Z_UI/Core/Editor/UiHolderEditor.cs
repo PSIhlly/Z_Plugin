@@ -100,10 +100,10 @@ namespace Z_Ui_Editor
                     refreshCode += $@"
             view.rimg_{o.name.Split("_")[1]}.sprite=TextureHelper.transparentSprite;";
                 }
-                else if (o.name.Split("_")[0].Split("|").Contains("vp"))
+                else if (o.name.Split("_")[0].Split("|").Contains("mp"))
                 {
                     initCode += $@"
-            view.vp_{o.name.Split("_")[1]}.PlayVideoByPath("");";
+            view.mp_{o.name.Split("_")[1]}.OpenMedia(new MediaPath(Path.Combine(Application.persistentDataPath, "".mp4""), MediaPathType.AbsolutePathOrURL), true); ";
                 }
                 else if (o.name.Split("_")[0].Split("|").Contains("as"))
                 {
@@ -163,7 +163,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
-using Z_Video;
+ 
 using UnityEngine.Video;
 {namespaceContent}
 {namespaceStr}
@@ -352,11 +352,11 @@ using UnityEngine.Video;
                             initContent += $@"
             btn_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<Btn>();";
                             break;
-                        case "vp":
+                        case "mp":
                             declareContent += $@"
-            public VideoPlayer vp_{realName};";
+            public MediaPlayer mp_{realName};";
                             initContent += $@"
-            vp_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<VideoPlayer>();";
+            mp_{realName} = uiHolder.elementTrsLst[{uiHolder.elementTrsLst.Count - 1}].GetComponent<MediaPlayer>();";
                             break;
                         case "txt":
                             declareContent += $@"
@@ -463,9 +463,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
-using Z_Video;
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.{uiHolder.uiName}
 ";
             }

@@ -169,7 +169,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         Main2StoryManager.instance.UnloadStoryPlay();
         if (instance.boxPlay)
         {
-            Main2StoryManager.instance.StartLoadStoryUgc(curId);
+            Main2StoryManager.instance.StartLoadStoryUgc(curId, default);
         }
         else
         {

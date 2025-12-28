@@ -77,6 +77,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,int,int> changeBlockprogramuidAction;
                 
+        public static Action<Data,EditorStyle,EditorStyle> changeEditorstyleAction;
+                
 
 
         public partial class Data
@@ -352,7 +354,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid)
+                    private EditorStyle  _editorStyle;
+                    /// <summary>
+                    ///�༭ģʽ
+                    ///</summary>
+                    public EditorStyle  editorStyle{
+                                get{return _editorStyle;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEditorstyle(this,_editorStyle,value); 
+                    }
+        
+                _editorStyle = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid,EditorStyle editorStyle)
             {
 
              this.uid = uid;
@@ -370,17 +390,18 @@ public static readonly int autoUidCnt=100;
              this.triggeredOnceEvts = triggeredOnceEvts;
              this.notFirstTime = notFirstTime;
              this.blockProgramUid = blockProgramUid;
+             this.editorStyle = editorStyle;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0);
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -479,7 +500,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<bool>("notFirstTime"),
 
-                jo.Get<int>("blockProgramUid")
+                jo.Get<int>("blockProgramUid"),
+
+                jo.Get<EditorStyle>("editorStyle")
                     );
 
             return data;
@@ -520,6 +543,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("notFirstTime",data.notFirstTime);
 
             jo.Set<int>("blockProgramUid",data.blockProgramUid);
+
+            jo.Set<EditorStyle>("editorStyle",data.editorStyle);
 
             return jo;
         }
@@ -746,6 +771,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeBlockprogramuidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEditorstyle(Data superData,EditorStyle oldV,EditorStyle newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEditorstyleAction?.Invoke(data,oldV,newV);
                 }
                     
             }

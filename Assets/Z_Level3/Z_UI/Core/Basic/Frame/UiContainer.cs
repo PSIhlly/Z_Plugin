@@ -42,7 +42,8 @@ namespace Z_Ui.Base
         {
             ori.SetActive(false);
             this.ori = ori;
-            if(cycle)
+            this.cycle = cycle;
+            if (cycle)
             {
                 uiPool = new UiPool()
                 {

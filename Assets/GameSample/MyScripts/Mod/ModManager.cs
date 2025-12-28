@@ -12,7 +12,13 @@ using Z_DesignStyle;
 using Z_Map;
 using Z_Ui;
 using Z_UnitSystem;
-
+public enum EditorStyle
+{
+    Avg,
+    AvgAdvanced,
+    Rpg,
+    RpgAdvanced,
+}
 public class ModManager : Z_MonoManager<ModManager>
 {
 

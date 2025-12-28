@@ -95,7 +95,7 @@ namespace Form
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"select editor style","Select editor style","选择编辑器模式");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -606,6 +606,22 @@ namespace Form
 
                 {1000235,new Data(1000235,"GetCurrentCharacterID","Get current character ID","获取当前操作人物ID")},
 
+                {1000236,new Data(1000236,"Avg","AVG","文字图片游戏")},
+
+                {1000237,new Data(1000237,"AvgAdvanced","AVG(Advanced)","文字图片游戏（进阶）")},
+
+                {1000238,new Data(1000238,"Rpg","RPG","角色扮演游戏")},
+
+                {1000239,new Data(1000239,"RpgAdvanced","RPG(Advanced)","角色扮演游戏（进阶）")},
+
+                {1000240,new Data(1000240,"Avg_desc","Text adventure game (AVG) editor mode is the easiest to use; the creator only needs to create text and illustrations to complete the game.","文字图片游戏(AVG)模式是最容易使用的，作者只需制作文字和插图，即可完成游戏")},
+
+                {1000241,new Data(1000241,"AvgAdvanced_desc","An advanced version of the text adventure image game editor mode, allowing customization of pop-up images, videos, and music, as well as making certain choices and logical decisions.","文字图片游戏模式的进阶版，可自定义弹出图片、视频、音乐，也可以进行一些选择和逻辑判断")},
+
+                {1000242,new Data(1000242,"Rpg_desc","The role-playing game (RPG) mode includes the full set of features from text-based and image-based games, with the additional concepts of players, items, scenes, and maps.","角色扮演游戏(RPG)模式包含文字图片游戏的全套功能，额外引入了玩家、物品、场景、地图等概念")},
+
+                {1000243,new Data(1000243,"RpgAdvanced_desc","An advanced version of the role-playing game mode, additionally introducing concepts such as skills, equipment, special effects, and scene transitions.","角色扮演游戏模式的进阶版，额外引入了技能、装备、特效、场景切换等概念")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -1078,6 +1094,22 @@ namespace Form
                         {"SetCharacterParameter",_DataById[1000234]},
     
                         {"GetCurrentCharacterID",_DataById[1000235]},
+    
+                        {"Avg",_DataById[1000236]},
+    
+                        {"AvgAdvanced",_DataById[1000237]},
+    
+                        {"Rpg",_DataById[1000238]},
+    
+                        {"RpgAdvanced",_DataById[1000239]},
+    
+                        {"Avg_desc",_DataById[1000240]},
+    
+                        {"AvgAdvanced_desc",_DataById[1000241]},
+    
+                        {"Rpg_desc",_DataById[1000242]},
+    
+                        {"RpgAdvanced_desc",_DataById[1000243]},
     
                     };
     

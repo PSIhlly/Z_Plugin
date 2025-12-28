@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
-using Z_Video;
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.DialogBg
 
 {
@@ -22,12 +20,12 @@ namespace Ui.DialogBg
     {
 
             public Img img_;
-            public VideoPlayer vp_;
+            public MediaPlayer mp_;
         public UiDialogBgView(UiHolder uiHolder):base(uiHolder)
         {
 
             img_ = uiHolder.elementTrsLst[0].GetComponent<Img>();
-            vp_ = uiHolder.elementTrsLst[1].GetComponent<VideoPlayer>();
+            mp_ = uiHolder.elementTrsLst[1].GetComponent<MediaPlayer>();
         }
 
     }

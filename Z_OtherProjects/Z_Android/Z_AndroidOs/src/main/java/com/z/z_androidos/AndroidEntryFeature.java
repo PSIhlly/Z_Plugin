@@ -13,6 +13,15 @@ public class AndroidEntryFeature {
         activity.startActivity(intent);
 
     }
+
+    public void LoadAudio(Activity activity,int callbackId) {
+        Intent intent=new Intent(activity,FileLoader.class);
+
+        intent.putExtra("callbackId", callbackId);
+        intent.putExtra("type", FileLoader.);
+        activity.startActivity(intent);
+
+    }
     public void LoadVideo(Activity activity,int callbackId) {
         Intent intent=new Intent(activity,FileLoader.class);
 

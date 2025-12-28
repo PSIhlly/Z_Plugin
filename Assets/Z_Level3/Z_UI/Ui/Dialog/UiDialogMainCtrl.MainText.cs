@@ -49,7 +49,7 @@ namespace Ui.DialogMain
                 var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
                 if (audioData != null)
                 {
-                    view.as_.PlayOneShot(audioData.GetClip());
+                    audioData.Play(view.mp_);
                 }
 
                 if (!string.IsNullOrEmpty(model.prm.clip.mainText))
@@ -72,7 +72,7 @@ namespace Ui.DialogMain
             private void DelayForOver(float delay)
             {
                 TimeManager.instance.CancelTimer(model.overTimer);
-                view.as_.Stop();
+                view.mp_.Stop();
                 model.overTimer = TimeManager.instance.StartTimer(delay, 0, () =>
                 {
                     Z_EventHelper.Invoke(new ClipPlayEvent()

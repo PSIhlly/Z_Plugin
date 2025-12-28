@@ -9,7 +9,7 @@ using Z_Time;
 using Z_Ui.Base;
 namespace Z_Ui
 {
-    [DefaultExecutionOrder(-1)]
+    [DefaultExecutionOrder(-20)]
     public class UiManager : Z_MonoManager<UiManager>
     {
         public List<GameObject> preloadUis;

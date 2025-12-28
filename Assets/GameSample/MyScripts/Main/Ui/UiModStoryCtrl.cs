@@ -11,6 +11,7 @@ using Ui.Mod;
 using Ui.Loading;
 using Z_Ui.Notify;
 using Z_Text;
+using Ui.ModStoryEditorStyleWindow;
 
 namespace Ui.ModStory
 {
@@ -89,7 +90,17 @@ namespace Ui.ModStory
                 model.curUi = view.page_ModStoryMap;
                 Refresh();
             });
-
+            view.btn_style.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModStoryEditorStyleWindowCtrl>(new UiModStoryEditorStyleWindowParam()
+                {
+                    onSelect = (type) =>
+                    {
+                        GameManager.instance.curProgress.editorStyle = type;
+                        Refresh();
+                    }
+                });
+            });
         }
 
         public override void OnShow()
@@ -99,30 +110,39 @@ namespace Ui.ModStory
         }
         public void Refresh()
         {
+            view.txt_style.oriText = GameManager.instance.curProgress.editorStyle.ToString();
+
             view.page_ModStoryOverview.SetShow(model.curUi == view.page_ModStoryOverview);
             view.sta_overview.ChangeState(model.curUi == view.page_ModStoryOverview ? 1 : 0);
 
+            view.btn_parameter.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 2);
             view.page_ModStoryParameter.SetShow(model.curUi == view.page_ModStoryParameter);
             view.sta_parameter.ChangeState(model.curUi == view.page_ModStoryParameter ? 1 : 0);
 
+            view.btn_character.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 2);
             view.page_ModStoryCharacter.SetShow(model.curUi == view.page_ModStoryCharacter);
             view.sta_character.ChangeState(model.curUi == view.page_ModStoryCharacter ? 1 : 0);
 
+            view.btn_skill.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3);
             view.page_ModStorySkill.SetShow(model.curUi == view.page_ModStorySkill);
             view.sta_skill.ChangeState(model.curUi == view.page_ModStorySkill ? 1 : 0);
 
+            view.btn_item.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 2);
             view.page_ModStoryItem.SetShow(model.curUi == view.page_ModStoryItem);
             view.sta_item.ChangeState(model.curUi == view.page_ModStoryItem ? 1 : 0);
 
+            view.btn_mapObject.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 2);
             view.page_ModStoryMapObject.SetShow(model.curUi == view.page_ModStoryMapObject);
             view.sta_mapObject.ChangeState(model.curUi == view.page_ModStoryMapObject ? 1 : 0);
 
+            view.btn_effect.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3);
             view.page_ModStoryEffect.SetShow(model.curUi == view.page_ModStoryEffect);
             view.sta_effect.ChangeState(model.curUi == view.page_ModStoryEffect ? 1 : 0);
 
             view.page_ModStoryEvent.SetShow(model.curUi == view.page_ModStoryEvent);
             view.sta_event.ChangeState(model.curUi == view.page_ModStoryEvent ? 1 : 0);
 
+            view.btn_map.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 2);
             view.page_ModStoryMap.SetShow(model.curUi == view.page_ModStoryMap);
             view.sta_map.ChangeState(model.curUi == view.page_ModStoryMap ? 1 : 0);
 

@@ -54,6 +54,7 @@ public static class GlobalNameHelper
     }
 
     public static string GetDefaultStoryTexName() => GetDefaultTexName("story");
+    public static string GetDefaultEventTexName() => GetDefaultTexName("event");
     public static string GetDefaultCharacterTexName() => GetDefaultTexName("character");
     public static string GetDefaultItemTexName() => GetDefaultTexName("item");
     public static string GetDefaultModelTexName() => GetDefaultTexName("model");
@@ -73,7 +74,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public StoryForm.Data curStory;
     public SceneForm.Data curScene;
-    public ProgressForm.Data curProgress => ProgressForm.DataByUid[1];
+    public ProgressForm.Data curProgress => ProgressForm.DataByUid.ContainsKey(1) ? ProgressForm.DataByUid[1] : null;
 
     public override void Init()
     {
@@ -96,6 +97,8 @@ public class GameManager : Z_MonoManager<GameManager>
 
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName("")));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultStoryTexName()));
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(Texture2D.whiteTexture, GlobalNameHelper.GetDefaultEventTexName()));
+        
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultCharacterTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(new Texture2D(1, 1), GlobalNameHelper.GetDefaultModelTexName()));

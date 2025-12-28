@@ -91,6 +91,8 @@ namespace Form
                 
         public static Action<Data,bool,bool> changeCancreateAction;
                 
+        public static Action<Data,EditorStyle,EditorStyle> changeLowesteditorstyleAction;
+                
 
 
         public partial class Data : CmdDataForm.Data
@@ -150,11 +152,29 @@ namespace Form
                  
                      }
                     
+                    private EditorStyle  _lowestEditorStyle;
+                    /// <summary>
+                    ///最低许可编辑模式
+                    ///</summary>
+                    public EditorStyle  lowestEditorStyle{
+                                get{return _lowestEditorStyle;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeLowesteditorstyle(this,_lowestEditorStyle,value); 
+                    }
+        
+                _lowestEditorStyle = value;
+                }
+                 
+                     }
+                    
             public Data(CmdDataForm.Data data):base(data.uid,data.name,data.prmNames,data.prmTypes,data.retNames,data.retTypes,data.desc,data.defaultCode)
             {
             }
             
-            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode,string category,string type,bool canCreate):base(uid,name,prmNames,prmTypes,retNames,retTypes,desc,defaultCode)
+            public Data(int uid,string name,List<string> prmNames,List<string> prmTypes,List<string> retNames,List<string> retTypes,string desc,string defaultCode,string category,string type,bool canCreate,EditorStyle lowestEditorStyle):base(uid,name,prmNames,prmTypes,retNames,retTypes,desc,defaultCode)
             {
 
              this.uid = uid;
@@ -168,17 +188,18 @@ namespace Form
              this.category = category;
              this.type = type;
              this.canCreate = canCreate;
+             this.lowestEditorStyle = lowestEditorStyle;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode,category,type,canCreate);
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode,category,type,canCreate,lowestEditorStyle);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","","","",false);
+                   private static Data _defaultData=new Data(0,"",null,null,null,null,"","","","",false,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -249,109 +270,95 @@ namespace Form
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"ShowTip",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Show Tip: {0}","ShowTip(\"empty\");","ui","notice",true)},
+                {100001,new Data(100001,"ShowTip",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Show Tip: {0}","ShowTip(\"empty\");","ui","notice",true,EditorStyle.AvgAdvanced)},
 
-                {100002,new Data(100002,"Text",null,null,null,new List<string>(){"string",},"","\"\"","basic","const",false)},
+                {100002,new Data(100002,"Text",null,null,null,new List<string>(){"string",},"","\"\"","basic","const",false,EditorStyle.Avg)},
 
-                {100003,new Data(100003,"Num",null,null,null,new List<string>(){"num",},"","1","basic","const",false)},
+                {100003,new Data(100003,"Num",null,null,null,new List<string>(){"num",},"","1","basic","const",false,EditorStyle.AvgAdvanced)},
 
-                {100004,new Data(100004,"Image",null,null,null,new List<string>(){"img",},"","\"$i$$i$\"","basic","const",false)},
+                {100004,new Data(100004,"Image",null,null,null,new List<string>(){"img",},"","\"$i$$i$\"","basic","const",false,EditorStyle.Avg)},
 
-                {100005,new Data(100005,"Video",null,null,null,new List<string>(){"video",},"","\"$v$$v$\"","basic","const",false)},
+                {100005,new Data(100005,"Video",null,null,null,new List<string>(){"video",},"","\"$v$$v$\"","basic","const",false,EditorStyle.AvgAdvanced)},
 
-                {100006,new Data(100006,"Audio",null,null,null,new List<string>(){"audio",},"","\"$a$$a$\"","basic","const",false)},
+                {100006,new Data(100006,"Audio",null,null,null,new List<string>(){"audio",},"","\"$a$$a$\"","basic","const",false,EditorStyle.AvgAdvanced)},
 
-                {100007,new Data(100007,"LocalVar",null,null,null,new List<string>(){"var",},"","a","basic","variable",false)},
+                {100007,new Data(100007,"LocalVar",null,null,null,new List<string>(){"var",},"","a","basic","variable",false,EditorStyle.AvgAdvanced)},
 
-                {100008,new Data(100008,"SetLocalVar",null,null,null,new List<string>(){"void",},"","a = 0;","basic","variable",true)},
+                {100008,new Data(100008,"SetLocalVar",null,null,null,new List<string>(){"void",},"","a = 0;","basic","variable",true,EditorStyle.AvgAdvanced)},
 
-                {100009,new Data(100009,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog",true)},
+                {100009,new Data(100009,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog",true,EditorStyle.AvgAdvanced)},
 
-                {100010,new Data(100010,"ShowEffect",new List<string>(){"uid","x","y","height","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} x {1} y {2} height:{3}, angle{4}","ShowEffect(0,0,0,0,0);","scene","effect",true)},
+                {100010,new Data(100010,"ShowEffect",new List<string>(){"uid","x","y","height","angle",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Show Effect{0} x {1} y {2} height:{3}, angle{4}","ShowEffect(0,0,0,0,0);","scene","effect",true,EditorStyle.RpgAdvanced)},
 
-                {100011,new Data(100011,"ShowCurrentDialog",new List<string>(){"canClickOver",},new List<string>(){"bool",},null,new List<string>(){"void",},"Show Current Dialog, over when click?{0}","ShowCurrentDialog(1);","ui","dialogAdvanced",true)},
+                {100011,new Data(100011,"CloseCurrentDialog",null,null,null,new List<string>(){"void",},"Close Current Dialog","CloseCurrentDialog();","ui","dialogAdvanced",true,EditorStyle.AvgAdvanced)},
 
-                {100012,new Data(100012,"CloseCurrentDialog",null,null,null,new List<string>(){"void",},"Close Current Dialog","CloseCurrentDialog();","ui","dialogAdvanced",true)},
+                {100012,new Data(100012,"ShowAdvancedDialog",new List<string>(){"background","avatar","title","content","audio","video","canClickPass",},new List<string>(){"img","img","string","string","audio","video","bool",},new List<string>(){"dialogID",},new List<string>(){"num",},"Show Dialog{1}{2}:{3} bg:{0},can click pass?{6},audio:{4} video:{5}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\",\"$a$$a$\",\"$v$$v$\",true);","ui","dialogAdvanced",true,EditorStyle.AvgAdvanced)},
 
-                {100013,new Data(100013,"SetDialogBackground",new List<string>(){"background",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog bg:{0}","SetDialogBackground(\"$i$$i$\");","ui","dialogAdvanced",true)},
+                {100014,new Data(100014,"ShowImage",new List<string>(){"image","width","height","showTime",},new List<string>(){"img","num","num","num",},new List<string>(){"imageID",},new List<string>(){"num",},"Show Image:{0} ,width {1},height {2}, last {3} seconds","imageID = ShowImage(\"$i$$i$\",400,400,1);","ui","image",true,EditorStyle.Avg)},
 
-                {100014,new Data(100014,"SetDialogContent",new List<string>(){"content",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog content:{0}","SetDialogContent(\"empty\")","ui","dialogAdvanced",true)},
+                {100015,new Data(100015,"ShowImagePermanently",new List<string>(){"image","width","height",},new List<string>(){"img","num","num",},new List<string>(){"imageID",},new List<string>(){"num",},"Show Image Permanently {0},width {1},height {2}","imageID = ShowImagePermanently(\"$i$$i$\",400,400);","ui","imageAdvanced",true,EditorStyle.Avg)},
 
-                {100015,new Data(100015,"SetDialogAvatar",new List<string>(){"avatar",},new List<string>(){"img",},null,new List<string>(){"void",},"Set Dialog avatar:{0}","SetDialogAvatar(\"$i$$i$\");","ui","dialogAdvanced",true)},
+                {100016,new Data(100016,"DeleteImage",new List<string>(){"imageID","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(imageID,1);","ui","imageAdvanced",true,EditorStyle.Avg)},
 
-                {100016,new Data(100016,"SetDialogTitle",new List<string>(){"title",},new List<string>(){"string",},null,new List<string>(){"void",},"Set Dialog title:{0}","SetDialogTitle(\"empty\");","ui","dialogAdvanced",true)},
+                {100017,new Data(100017,"SetImagePos",new List<string>(){"imageID","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(imageID,0.5,0.5,1);","ui","imageAdvanced",true,EditorStyle.AvgAdvanced)},
 
-                {100017,new Data(100017,"SetDialogVideo",new List<string>(){"video",},new List<string>(){"video",},null,new List<string>(){"void",},"Set Dialog video:{0}","SetDialogVideo(\"$v$$v$\");","ui","dialogAdvanced",true)},
+                {100018,new Data(100018,"SetImageOpacity",new List<string>(){"imageID","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(imageID,1,1);","ui","imageAdvanced",true,EditorStyle.AvgAdvanced)},
 
-                {100018,new Data(100018,"SetDialogAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Set Dialog audio:{0}","SetDialogAudio(\"$a$$a$\")","ui","dialogAdvanced",true)},
+                {100019,new Data(100019,"SetImageRotate",new List<string>(){"imageID","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(imageID,0,1);","ui","imageAdvanced",true,EditorStyle.AvgAdvanced)},
 
-                {100019,new Data(100019,"ResetDialog",null,null,null,new List<string>(){"void",},"Reset Dialog","ResetDialog();","ui","dialogAdvanced",true)},
+                {100020,new Data(100020,"Add",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 + 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100020,new Data(100020,"ShowImage",new List<string>(){"image","width","height","showTime",},new List<string>(){"img","num","num","num",},new List<string>(){"imageID",},new List<string>(){"num",},"Show Image:{0} ,width {1},height {2}, last {3} seconds","imageID = ShowImage(\"$i$$i$\",400,400,1);","ui","image",true)},
+                {100021,new Data(100021,"Subtract",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 - 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100021,new Data(100021,"CreateImage",new List<string>(){"image","width","height",},new List<string>(){"img","num","num",},new List<string>(){"imageID",},new List<string>(){"num",},"Create Image {0},width {1},height {2}","imageID = CreateImage(\"$i$$i$\",400,400);","ui","imageAdvanced",true)},
+                {100022,new Data(100022,"Multiply",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 * 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100022,new Data(100022,"DeleteImage",new List<string>(){"imageID","afterTime",},new List<string>(){"num","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(imageID,1);","ui","imageAdvanced",true)},
+                {100023,new Data(100023,"Divide",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 / 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100023,new Data(100023,"SetImagePos",new List<string>(){"imageID","x","y","transitionTime",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePos(imageID,0.5,0.5,1);","ui","imageAdvanced",true)},
+                {100024,new Data(100024,"Wait",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Wait {0} seconds","Wait(1);","basic","process",true,EditorStyle.AvgAdvanced)},
 
-                {100024,new Data(100024,"SetImageOpacity",new List<string>(){"imageID","opacity","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(imageID,1,1);","ui","imageAdvanced",true)},
+                {100025,new Data(100025,"If",null,null,null,new List<string>(){"void",},"","if(1){ }else{ }","basic","process",true,EditorStyle.AvgAdvanced)},
 
-                {100025,new Data(100025,"SetImageRotate",new List<string>(){"imageID","angle","transitionTime",},new List<string>(){"num","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(imageID,0,1);","ui","imageAdvanced",true)},
+                {100026,new Data(100026,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i=i+1){ }","basic","process",true,EditorStyle.AvgAdvanced)},
 
-                {100026,new Data(100026,"Add",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 + 1","basic","math",false)},
+                {100027,new Data(100027,"Greater",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 > 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100027,new Data(100027,"Subtract",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 - 1","basic","math",false)},
+                {100028,new Data(100028,"Less",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 < 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100028,new Data(100028,"Multiply",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 * 1","basic","math",false)},
+                {100029,new Data(100029,"Equal",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 == 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100029,new Data(100029,"Divide",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 / 1","basic","math",false)},
+                {100030,new Data(100030,"NotEqual",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 != 1","basic","math",false,EditorStyle.AvgAdvanced)},
 
-                {100030,new Data(100030,"Wait",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Wait {0} seconds","Wait(1);","basic","process",true)},
+                {100031,new Data(100031,"Pause",null,null,null,new List<string>(){"void",},"Pause","Pause();","basic","process",true,EditorStyle.Rpg)},
 
-                {100031,new Data(100031,"If",null,null,null,new List<string>(){"void",},"","if(1){ }else{ }","basic","process",true)},
+                {100032,new Data(100032,"Continue",null,null,null,new List<string>(){"void",},"Continue","Continue();","basic","process",true,EditorStyle.Rpg)},
 
-                {100032,new Data(100032,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i=i+1){ }","basic","process",true)},
+                {100033,new Data(100033,"GameOver",null,null,null,new List<string>(){"void",},"Game over","GameOver();","basic","process",true,EditorStyle.Avg)},
 
-                {100033,new Data(100033,"Greater",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 > 1","basic","math",false)},
+                {100034,new Data(100034,"Save",null,null,null,new List<string>(){"void",},"Save","Save();","basic","process",true,EditorStyle.Avg)},
 
-                {100034,new Data(100034,"Less",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 < 1","basic","math",false)},
+                {100035,new Data(100035,"Load",null,null,null,new List<string>(){"void",},"Load","Load();","basic","process",true,EditorStyle.Avg)},
 
-                {100035,new Data(100035,"Equal",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 == 1","basic","math",false)},
+                {100036,new Data(100036,"DestroyObject",new List<string>(){"objectID",},new List<string>(){"num",},null,new List<string>(){"void",},"object ID {0}: Destroy","DestroyObject(objectSelfID);","scene","object",true,EditorStyle.Rpg)},
 
-                {100036,new Data(100036,"NotEqual",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 != 1","basic","math",false)},
+                {100037,new Data(100037,"GenerateObject",new List<string>(){"name",},new List<string>(){"string",},new List<string>(){"objectID",},new List<string>(){"num",},"object name {0}: Generate:","newObjectID = GenerateObject(\"empty\");","scene","object",true,EditorStyle.Rpg)},
 
-                {100037,new Data(100037,"Pause",null,null,null,new List<string>(){"void",},"Pause","Pause();","basic","process",true)},
+                {100038,new Data(100038,"MoveObject",new List<string>(){"objectID","x","y","height","transitionTime",},new List<string>(){"num","num","num","num.num",},null,new List<string>(){"void",},"object ID {0} : Move x {1} y{2} height{3}, last {4} seconds","MoveObject(0,1,1,0,1);","scene","object",true,EditorStyle.Rpg)},
 
-                {100038,new Data(100038,"Continue",null,null,null,new List<string>(){"void",},"Continue","Continue();","basic","process",true)},
+                {100039,new Data(100039,"GetSelfObjectID",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get object self ID","objectSelfID = GetSelfObjectID();","scene","object",true,EditorStyle.Rpg)},
 
-                {100039,new Data(100039,"GameOver",null,null,null,new List<string>(){"void",},"Game over","GameOver();","basic","process",true)},
+                {100040,new Data(100040,"GetTriggerObjectID",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get trigger object ID","objectTriggerID = GetTriggerObjectID();","scene","object",true,EditorStyle.Rpg)},
 
-                {100040,new Data(100040,"Save",null,null,null,new List<string>(){"void",},"Save","Save();","basic","process",true)},
+                {100041,new Data(100041,"GainItem",new List<string>(){"name","amount",},new List<string>(){"string","num",},null,new List<string>(){"void",},"Gain {0} x {1}","GainItem(\"empty\",1);","item","backpack",true,EditorStyle.Rpg)},
 
-                {100041,new Data(100041,"Load",null,null,null,new List<string>(){"void",},"Load","Load();","basic","process",true)},
+                {100042,new Data(100042,"LostItem",new List<string>(){"name","amount",},new List<string>(){"string","num",},null,new List<string>(){"void",},"Lost {0} x {1}","LostItem(\"empty\",1);","item","backpack",true,EditorStyle.Rpg)},
 
-                {100042,new Data(100042,"DestroyObject",new List<string>(){"objectID",},new List<string>(){"num",},null,new List<string>(){"void",},"object ID {0}: Destroy","DestroyObject(objectSelfID);","scene","object",true)},
+                {100043,new Data(100043,"GetSelfCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get character self ID","characterSelfID = GetSelfCharacterID();","scene","character",true,EditorStyle.Rpg)},
 
-                {100043,new Data(100043,"GenerateObject",new List<string>(){"name",},new List<string>(){"string",},new List<string>(){"objectID",},new List<string>(){"num",},"object name {0}: Generate:","newObjectID = GenerateObject(\"empty\");","scene","object",true)},
+                {100044,new Data(100044,"GetTriggerCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get trigger character ID","characterTriggerID = GetTriggerCharacterID();","scene","character",true,EditorStyle.Rpg)},
 
-                {100044,new Data(100044,"MoveObject",new List<string>(){"objectID","x","y","height","transitionTime",},new List<string>(){"num","num","num","num.num",},null,new List<string>(){"void",},"object ID {0} : Move x {1} y{2} height{3}, last {4} seconds","MoveObject(0,1,1,0,1);","scene","object",true)},
+                {100045,new Data(100045,"SetCharacterParameter",new List<string>(){"characterID","paramName","value",},new List<string>(){"num","string","num",},null,new List<string>(){"void",},"Set Character ID {0} 's {1} = {2}","SetCharacterParameter(characterSelfID,\"empty\",1);","character","parameter",true,EditorStyle.Rpg)},
 
-                {100045,new Data(100045,"GetSelfObjectID",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get object self ID","objectSelfID = GetSelfObjectID();","scene","object",true)},
-
-                {100046,new Data(100046,"GetTriggerObjectID",null,null,new List<string>(){"objectID",},new List<string>(){"num",},"Get trigger object ID","objectTriggerID = GetTriggerObjectID();","scene","object",true)},
-
-                {100047,new Data(100047,"GainItem",new List<string>(){"name","amount",},new List<string>(){"string","num",},null,new List<string>(){"void",},"Gain {0} x {1}","GainItem(\"empty\",1);","item","backpack",true)},
-
-                {100048,new Data(100048,"LostItem",new List<string>(){"name","amount",},new List<string>(){"string","num",},null,new List<string>(){"void",},"Lost {0} x {1}","LostItem(\"empty\",1);","item","backpack",true)},
-
-                {100049,new Data(100049,"GetSelfCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get character self ID","characterSelfID = GetSelfCharacterID();","scene","character",true)},
-
-                {100050,new Data(100050,"GetTriggerCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get trigger character ID","characterTriggerID = GetTriggerCharacterID();","scene","character",true)},
-
-                {100051,new Data(100051,"SetCharacterParameter",new List<string>(){"characterID","paramName","value",},new List<string>(){"num","string","num",},null,new List<string>(){"void",},"Set Character ID {0} 's {1} = {2}","SetCharacterParameter(characterSelfID,\"empty\",1);","character","parameter",true)},
-
-                {100052,new Data(100052,"GetCurrentCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get currently used character ID","currentCharacterID = GetCurrentCharacterID();","character","system",true)},
+                {100046,new Data(100046,"GetCurrentCharacterID",null,null,new List<string>(){"characterID",},new List<string>(){"num",},"Get currently used character ID","currentCharacterID = GetCurrentCharacterID();","character","system",true,EditorStyle.Rpg)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -376,89 +383,75 @@ namespace Form
     
                         {"ShowEffect",_DataByUid[100010]},
     
-                        {"ShowCurrentDialog",_DataByUid[100011]},
+                        {"CloseCurrentDialog",_DataByUid[100011]},
     
-                        {"CloseCurrentDialog",_DataByUid[100012]},
+                        {"ShowAdvancedDialog",_DataByUid[100012]},
     
-                        {"SetDialogBackground",_DataByUid[100013]},
+                        {"ShowImage",_DataByUid[100014]},
     
-                        {"SetDialogContent",_DataByUid[100014]},
+                        {"ShowImagePermanently",_DataByUid[100015]},
     
-                        {"SetDialogAvatar",_DataByUid[100015]},
+                        {"DeleteImage",_DataByUid[100016]},
     
-                        {"SetDialogTitle",_DataByUid[100016]},
+                        {"SetImagePos",_DataByUid[100017]},
     
-                        {"SetDialogVideo",_DataByUid[100017]},
+                        {"SetImageOpacity",_DataByUid[100018]},
     
-                        {"SetDialogAudio",_DataByUid[100018]},
+                        {"SetImageRotate",_DataByUid[100019]},
     
-                        {"ResetDialog",_DataByUid[100019]},
+                        {"Add",_DataByUid[100020]},
     
-                        {"ShowImage",_DataByUid[100020]},
+                        {"Subtract",_DataByUid[100021]},
     
-                        {"CreateImage",_DataByUid[100021]},
+                        {"Multiply",_DataByUid[100022]},
     
-                        {"DeleteImage",_DataByUid[100022]},
+                        {"Divide",_DataByUid[100023]},
     
-                        {"SetImagePos",_DataByUid[100023]},
+                        {"Wait",_DataByUid[100024]},
     
-                        {"SetImageOpacity",_DataByUid[100024]},
+                        {"If",_DataByUid[100025]},
     
-                        {"SetImageRotate",_DataByUid[100025]},
+                        {"For",_DataByUid[100026]},
     
-                        {"Add",_DataByUid[100026]},
+                        {"Greater",_DataByUid[100027]},
     
-                        {"Subtract",_DataByUid[100027]},
+                        {"Less",_DataByUid[100028]},
     
-                        {"Multiply",_DataByUid[100028]},
+                        {"Equal",_DataByUid[100029]},
     
-                        {"Divide",_DataByUid[100029]},
+                        {"NotEqual",_DataByUid[100030]},
     
-                        {"Wait",_DataByUid[100030]},
+                        {"Pause",_DataByUid[100031]},
     
-                        {"If",_DataByUid[100031]},
+                        {"Continue",_DataByUid[100032]},
     
-                        {"For",_DataByUid[100032]},
+                        {"GameOver",_DataByUid[100033]},
     
-                        {"Greater",_DataByUid[100033]},
+                        {"Save",_DataByUid[100034]},
     
-                        {"Less",_DataByUid[100034]},
+                        {"Load",_DataByUid[100035]},
     
-                        {"Equal",_DataByUid[100035]},
+                        {"DestroyObject",_DataByUid[100036]},
     
-                        {"NotEqual",_DataByUid[100036]},
+                        {"GenerateObject",_DataByUid[100037]},
     
-                        {"Pause",_DataByUid[100037]},
+                        {"MoveObject",_DataByUid[100038]},
     
-                        {"Continue",_DataByUid[100038]},
+                        {"GetSelfObjectID",_DataByUid[100039]},
     
-                        {"GameOver",_DataByUid[100039]},
+                        {"GetTriggerObjectID",_DataByUid[100040]},
     
-                        {"Save",_DataByUid[100040]},
+                        {"GainItem",_DataByUid[100041]},
     
-                        {"Load",_DataByUid[100041]},
+                        {"LostItem",_DataByUid[100042]},
     
-                        {"DestroyObject",_DataByUid[100042]},
+                        {"GetSelfCharacterID",_DataByUid[100043]},
     
-                        {"GenerateObject",_DataByUid[100043]},
+                        {"GetTriggerCharacterID",_DataByUid[100044]},
     
-                        {"MoveObject",_DataByUid[100044]},
+                        {"SetCharacterParameter",_DataByUid[100045]},
     
-                        {"GetSelfObjectID",_DataByUid[100045]},
-    
-                        {"GetTriggerObjectID",_DataByUid[100046]},
-    
-                        {"GainItem",_DataByUid[100047]},
-    
-                        {"LostItem",_DataByUid[100048]},
-    
-                        {"GetSelfCharacterID",_DataByUid[100049]},
-    
-                        {"GetTriggerCharacterID",_DataByUid[100050]},
-    
-                        {"SetCharacterParameter",_DataByUid[100051]},
-    
-                        {"GetCurrentCharacterID",_DataByUid[100052]},
+                        {"GetCurrentCharacterID",_DataByUid[100046]},
     
                     };
     
@@ -520,33 +513,31 @@ namespace Form
 
                     _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100012]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100013]);
+                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100014]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100014]);
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100015]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100015]);
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100016]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100016]);
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100017]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100017]);
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100018]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100018]);
+                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100019]);
 
-                    _DatasByCategoryType[("ui","dialogAdvanced")].Add(_DataByUid[100019]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100020]);
 
-                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100020]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100021]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100021]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100022]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100022]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100023]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100023]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100024]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100024]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100025]);
 
-                    _DatasByCategoryType[("ui","imageAdvanced")].Add(_DataByUid[100025]);
-
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100026]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100026]);
 
                     _DatasByCategoryType[("basic","math")].Add(_DataByUid[100027]);
 
@@ -554,51 +545,39 @@ namespace Form
 
                     _DatasByCategoryType[("basic","math")].Add(_DataByUid[100029]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100030]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100030]);
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100031]);
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100032]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100033]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100033]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100034]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100034]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100035]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100035]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100036]);
+                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100036]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100037]);
+                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100037]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100038]);
+                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100038]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100039]);
+                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100039]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100040]);
+                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100040]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100041]);
+                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100041]);
 
-                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100042]);
+                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100042]);
 
-                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100043]);
+                    _DatasByCategoryType[("scene","character")].Add(_DataByUid[100043]);
 
-                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100044]);
+                    _DatasByCategoryType[("scene","character")].Add(_DataByUid[100044]);
 
-                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100045]);
+                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100045]);
 
-                    _DatasByCategoryType[("scene","object")].Add(_DataByUid[100046]);
-
-                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100047]);
-
-                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100048]);
-
-                    _DatasByCategoryType[("scene","character")].Add(_DataByUid[100049]);
-
-                    _DatasByCategoryType[("scene","character")].Add(_DataByUid[100050]);
-
-                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100051]);
-
-                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100052]);
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100046]);
 
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
@@ -638,8 +617,6 @@ namespace Form
 
                     _DatasByCategory["ui"].Add(_DataByUid[100012]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100013]);
-
                     _DatasByCategory["ui"].Add(_DataByUid[100014]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100015]);
@@ -652,17 +629,17 @@ namespace Form
 
                     _DatasByCategory["ui"].Add(_DataByUid[100019]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100020]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100020]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100021]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100021]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100022]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100022]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100023]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100023]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100024]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100024]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100025]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100025]);
 
                     _DatasByCategory["basic"].Add(_DataByUid[100026]);
 
@@ -684,39 +661,27 @@ namespace Form
 
                     _DatasByCategory["basic"].Add(_DataByUid[100035]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100036]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100036]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100037]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100037]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100038]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100038]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100039]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100039]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100040]);
+                    _DatasByCategory["scene"].Add(_DataByUid[100040]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100041]);
+                    _DatasByCategory["item"].Add(_DataByUid[100041]);
 
-                    _DatasByCategory["scene"].Add(_DataByUid[100042]);
+                    _DatasByCategory["item"].Add(_DataByUid[100042]);
 
                     _DatasByCategory["scene"].Add(_DataByUid[100043]);
 
                     _DatasByCategory["scene"].Add(_DataByUid[100044]);
 
-                    _DatasByCategory["scene"].Add(_DataByUid[100045]);
+                    _DatasByCategory["character"].Add(_DataByUid[100045]);
 
-                    _DatasByCategory["scene"].Add(_DataByUid[100046]);
-
-                    _DatasByCategory["item"].Add(_DataByUid[100047]);
-
-                    _DatasByCategory["item"].Add(_DataByUid[100048]);
-
-                    _DatasByCategory["scene"].Add(_DataByUid[100049]);
-
-                    _DatasByCategory["scene"].Add(_DataByUid[100050]);
-
-                    _DatasByCategory["character"].Add(_DataByUid[100051]);
-
-                    _DatasByCategory["character"].Add(_DataByUid[100052]);
+                    _DatasByCategory["character"].Add(_DataByUid[100046]);
 
                     _DatasByCancreate = new Dictionary<bool, List<Data>>() {
     
@@ -750,8 +715,6 @@ namespace Form
 
                     _DatasByCancreate[true].Add(_DataByUid[100012]);
 
-                    _DatasByCancreate[true].Add(_DataByUid[100013]);
-
                     _DatasByCancreate[true].Add(_DataByUid[100014]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100015]);
@@ -764,19 +727,19 @@ namespace Form
 
                     _DatasByCancreate[true].Add(_DataByUid[100019]);
 
-                    _DatasByCancreate[true].Add(_DataByUid[100020]);
+                    _DatasByCancreate[false].Add(_DataByUid[100020]);
 
-                    _DatasByCancreate[true].Add(_DataByUid[100021]);
+                    _DatasByCancreate[false].Add(_DataByUid[100021]);
 
-                    _DatasByCancreate[true].Add(_DataByUid[100022]);
+                    _DatasByCancreate[false].Add(_DataByUid[100022]);
 
-                    _DatasByCancreate[true].Add(_DataByUid[100023]);
+                    _DatasByCancreate[false].Add(_DataByUid[100023]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100024]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100025]);
 
-                    _DatasByCancreate[false].Add(_DataByUid[100026]);
+                    _DatasByCancreate[true].Add(_DataByUid[100026]);
 
                     _DatasByCancreate[false].Add(_DataByUid[100027]);
 
@@ -784,19 +747,19 @@ namespace Form
 
                     _DatasByCancreate[false].Add(_DataByUid[100029]);
 
-                    _DatasByCancreate[true].Add(_DataByUid[100030]);
+                    _DatasByCancreate[false].Add(_DataByUid[100030]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100031]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100032]);
 
-                    _DatasByCancreate[false].Add(_DataByUid[100033]);
+                    _DatasByCancreate[true].Add(_DataByUid[100033]);
 
-                    _DatasByCancreate[false].Add(_DataByUid[100034]);
+                    _DatasByCancreate[true].Add(_DataByUid[100034]);
 
-                    _DatasByCancreate[false].Add(_DataByUid[100035]);
+                    _DatasByCancreate[true].Add(_DataByUid[100035]);
 
-                    _DatasByCancreate[false].Add(_DataByUid[100036]);
+                    _DatasByCancreate[true].Add(_DataByUid[100036]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100037]);
 
@@ -817,18 +780,6 @@ namespace Form
                     _DatasByCancreate[true].Add(_DataByUid[100045]);
 
                     _DatasByCancreate[true].Add(_DataByUid[100046]);
-
-                    _DatasByCancreate[true].Add(_DataByUid[100047]);
-
-                    _DatasByCancreate[true].Add(_DataByUid[100048]);
-
-                    _DatasByCancreate[true].Add(_DataByUid[100049]);
-
-                    _DatasByCancreate[true].Add(_DataByUid[100050]);
-
-                    _DatasByCancreate[true].Add(_DataByUid[100051]);
-
-                    _DatasByCancreate[true].Add(_DataByUid[100052]);
 
 
             childInitAction?.Invoke();
@@ -897,7 +848,9 @@ namespace Form
 
                 jo.Get<string>("type"),
 
-                jo.Get<bool>("canCreate")
+                jo.Get<bool>("canCreate"),
+
+                jo.Get<EditorStyle>("lowestEditorStyle")
                     );
 
             return data;
@@ -930,6 +883,8 @@ namespace Form
             jo.Set<string>("type",data.type);
 
             jo.Set<bool>("canCreate",data.canCreate);
+
+            jo.Set<EditorStyle>("lowestEditorStyle",data.lowestEditorStyle);
 
             return jo;
         }
@@ -1175,6 +1130,16 @@ CmdDataForm.RemoveData(uid);
                     DatasByCancreate[newV].Add(data);
  
                 changeCancreateAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLowesteditorstyle(Data superData,EditorStyle oldV,EditorStyle newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLowesteditorstyleAction?.Invoke(data,oldV,newV);
                 }
                     
             }

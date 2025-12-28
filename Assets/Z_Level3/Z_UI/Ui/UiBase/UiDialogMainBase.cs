@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
-using Z_Video;
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.DialogMain
 
 {
@@ -30,14 +28,14 @@ namespace MainText
 
             public Img img_bg;
             public GameObject go_bg;
-            public AudioSource as_;
+            public MediaPlayer mp_;
             public Txt txt_;
         public UiMainTextView(UiHolder uiHolder):base(uiHolder)
         {
 
             img_bg = uiHolder.elementTrsLst[0].GetComponent<Img>();
             go_bg = uiHolder.elementTrsLst[1].gameObject;
-            as_ = uiHolder.elementTrsLst[2].GetComponent<AudioSource>();
+            mp_ = uiHolder.elementTrsLst[2].GetComponent<MediaPlayer>();
             txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
         }
 

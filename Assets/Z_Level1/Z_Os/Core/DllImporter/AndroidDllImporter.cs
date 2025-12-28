@@ -11,6 +11,7 @@ namespace Z_Os.DllImporter
     {
         public const int LOADFILE_IMAGE = 11;
         public const int LOADFILE_VIDEO = 12;
+        public const int LOADFILE_AUDIO = 13;
     }
 
 
@@ -38,6 +39,9 @@ namespace Z_Os.DllImporter
                     break;
                 case "video":
                     jo.Call("LoadVideo", current, AndroidCallbackParams.LOADFILE_VIDEO);
+                    break;
+                case "audio":
+                    jo.Call("LoadAudio", current, AndroidCallbackParams.LOADFILE_AUDIO);
                     break;
             }
         }

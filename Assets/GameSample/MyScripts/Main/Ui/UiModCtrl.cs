@@ -10,6 +10,7 @@ using Ui.Start;
 using Ui.EnterMain;
 using Z_Text;
 using Z_DataSystem.Form;
+using Ui.ModStoryEditorStyleWindow;
 
 namespace Ui.Mod
 {
@@ -65,13 +66,19 @@ namespace Ui.Mod
         {
             view.btn_new.onClick.AddListener(() =>
             {
-                Main2StoryManager.instance.StartLoadStoryUgc(StoryForm.idChain.PeekId());
-                parent.Close();
+                UiManager.instance.ShowUi<UiModStoryEditorStyleWindowCtrl>(new UiModStoryEditorStyleWindowParam()
+                {
+                     onSelect = (type) =>
+                     {
+                         Main2StoryManager.instance.StartLoadStoryUgc(StoryForm.idChain.PeekId(), type);
+                         parent.Close();
+                     }
+                });
             });
             view.btn_.onClick.AddListener(() =>
             {
 
-                Main2StoryManager.instance.StartLoadStoryUgc(model.data.id);
+                Main2StoryManager.instance.StartLoadStoryUgc(model.data.id,default);
 
                 parent.Close();
             });

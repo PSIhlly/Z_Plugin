@@ -109,7 +109,7 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
             data.tarOpacity = tar;
             data.opacityTime = time;
             data.opacityProgress = 0;
-            data.oldOpacity = data.ctrl == null ? 1 : data.ctrl.view.img_image.color.a;
+            data.oldOpacity = data.ctrl == null ? 1 : data.ctrl.view.img_.color.a;
         }
     }
     public void SetRemoveTime(int id, float time)

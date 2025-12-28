@@ -20,7 +20,7 @@ using Z_DataSystem.Form;
 using System.Runtime.ConstrainedExecution;
 namespace Form
 {
-    public class EventModifyEvent:Z_Event
+    public class EventModifyEvent : Z_Event
     {
 
     }
@@ -63,9 +63,9 @@ public static partial class GlobalEventHelper
 
         return res;
     }
-    public static bool IsSceneTrigger(string triggerName,int user)
+    public static bool IsSceneTrigger(string triggerName, int user)
     {
-        if(user<=0)
+        if (user <= 0)
         {
             return false;
         }
@@ -274,6 +274,10 @@ public class GameEventController : Z_Controller<GameManager>
         var res = new EntryItem();
         foreach (var data in GameCmdDataForm.DataByName.Values)
         {
+            if (data.lowestEditorStyle > GameManager.instance.curProgress.editorStyle)
+            {
+                continue;
+            }
             if (createOnly && !data.canCreate)
             {
                 continue;

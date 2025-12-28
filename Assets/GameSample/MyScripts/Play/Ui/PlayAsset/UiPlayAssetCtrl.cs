@@ -1,7 +1,6 @@
 using Form;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ using Z_DesignStyle;
 using Z_Math;
 using Z_Texture;
 using Z_Ui.Base;
-using Z_Video;
+
 
 
 namespace Ui.PlayAsset
@@ -30,6 +29,7 @@ namespace Ui.PlayAsset
     {
 
         UiContainer<UiImageCtrl> imageCon;
+        float time;
         public override void OnCreate()
         {
 
@@ -41,11 +41,11 @@ namespace Ui.PlayAsset
         }
         public override void OnUpdate()
         {
-            Refresh();
+
+                Refresh(); 
         }
         public void Refresh()
         {
-
             imageCon.Clear();
             foreach (var data in ImageUiItemForm.DataByUid.Values)
             {
@@ -71,14 +71,15 @@ namespace Ui.PlayAsset
 
         public override void OnCreate()
         {
+            model.prm = param;
+            rect.sizeDelta=new Vector2( model.prm.data.size.x, model.prm.data.size.y);
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultEventTexName()).GetSprite();
 
 
         }
         public override void OnShow()
         {
-            model.prm = param;
-            rect.rect.Set(0, 0, model.prm.data.size.x, model.prm.data.size.y);
-            view.img_image.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultTexName()).GetSprite();
+
             Refresh();
         }
         public void Refresh()
@@ -108,18 +109,21 @@ namespace Ui.PlayAsset
             data.opacityProgress += Time.deltaTime;
             if (data.posTime == 0)
             {
-                view.img_image.color.NewSetA(data.tarOpacity);
+                view.img_.color.NewSetA(data.tarOpacity);
             }
             else
             {
-                view.img_image.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * (data.opacityProgress / data.opacityTime));
+                view.img_.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * (data.opacityProgress / data.opacityTime));
+            }
+            if (data.removeTime < int.MaxValue)
+            {
+                data.removeTime -= Time.deltaTime;
+                if (data.removeTime <= 0)
+                {
+                    PlayManager.instance.assetCtrl.Remove(data.uid);
+                }
             }
 
-            data.removeTime -= Time.deltaTime;
-            if (data.removeTime <= 0)
-            {
-                PlayManager.instance.assetCtrl.Remove(data.uid);
-            }
         }
     }
 

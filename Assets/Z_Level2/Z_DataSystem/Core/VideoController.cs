@@ -11,7 +11,6 @@ using UnityEngine.Video;
 using Z_ByteSerialize;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
-using Z_Os.File;
 using Z_Texture;
 using Z_Time;
 using Z_UnitSystem;
@@ -58,7 +57,7 @@ namespace Z_DataSystem
             public override void Run(VideoController ctrl)
             {
                 base.Run(ctrl);
-                FileImporter.ImportVideoBytes(OnImportComplete);
+                NativeGallery.GetVideoFromGallery((path) => OnImportComplete(string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path)));
             }
             public override void OnImportComplete(byte[] data)
             {

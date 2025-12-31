@@ -1,10 +1,9 @@
 {
-    "name": "Z_Os",
-    "rootNamespace": "",
-    "references": [
-        "GUID:6e5063adab271564ba0098a06a8cebda"
+    "name": "NativeGallery.Editor",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
     ],
-    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

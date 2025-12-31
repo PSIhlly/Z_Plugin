@@ -53,7 +53,8 @@ namespace Z_DataSystem
         private static Dictionary<string, Texture> textureCache = new Dictionary<string, Texture>();
         private static Dictionary<Texture, Sprite> spriteCache = new Dictionary<Texture, Sprite>();
     }
-    public interface IAssetController {
+    public interface IAssetController
+    {
 
         public abstract string GetMark();
         public abstract string[] GetSupportedExtensions();
@@ -63,7 +64,7 @@ namespace Z_DataSystem
         public abstract bool IsAsset(string name);
     }
 
-    public abstract class SelectTask<T>where T : IAssetController
+    public abstract class SelectTask<T> where T : IAssetController
     {
         protected T ctrl;
         public virtual void Run(T ctrl)
@@ -81,7 +82,27 @@ namespace Z_DataSystem
 
     public class AssetManager : Z_MonoManager<AssetManager>
     {
-        public static string cachePath=>Application.temporaryCachePath+"/DataSystem/";
+
+        public static string externPatn{
+            get
+            {
+                var path = "";
+#if UNITY_EDITOR_WIN
+                path = $"{Application.dataPath}/HlzyAssets";
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+#elif UNITY_ANDROID
+                var id = Application.persistentDataPath.IndexOf("Android");
+                path = Application.persistentDataPath.Remove(id)+ "HlzyAssets";
+#endif
+                
+                return path;
+            }
+            
+        }
+        public static string cachePath => Application.temporaryCachePath + "/DataSystem/";
         AssetCacheCtroller cacheCtrl;
         public TexController texCtrl;
         public AudioController audioCtrl;
@@ -97,11 +118,11 @@ namespace Z_DataSystem
         }
         #region all
         public class AssetsRes
-        {
-            public List<(string, TexAssetForm.Data)> texs = new List<(string, TexAssetForm.Data)>();
-            public List<(string, AudioAssetForm.Data)> auds = new List<(string, AudioAssetForm.Data)>();
-            public List<(string, VideoAssetForm.Data)> vids = new List<(string, VideoAssetForm.Data)>();
-            public List<(string, GameObjectAssetForm.Data)> gos = new List<(string, GameObjectAssetForm.Data)>();
+    {
+        public List<(string, TexAssetForm.Data)> texs = new List<(string, TexAssetForm.Data)>();
+        public List<(string, AudioAssetForm.Data)> auds = new List<(string, AudioAssetForm.Data)>();
+        public List<(string, VideoAssetForm.Data)> vids = new List<(string, VideoAssetForm.Data)>();
+        public List<(string, GameObjectAssetForm.Data)> gos = new List<(string, GameObjectAssetForm.Data)>();
         }
 
         public AssetsRes LoadAssetsByFolder(string path, bool isRes)
@@ -112,7 +133,7 @@ namespace Z_DataSystem
                 Texture2D[] textures = Resources.LoadAll<Texture2D>(path);
                 foreach (var tex in textures)
                 {
-                    res.texs.Add((tex.name, new TexAssetForm.Data(-1,tex.name,"",null,"", tex)));
+                    res.texs.Add((tex.name, new TexAssetForm.Data(-1, tex.name, "", null, "", tex)));
                 }
 
                 GameObject[] gos = Resources.LoadAll<GameObject>(path);
@@ -132,7 +153,7 @@ namespace Z_DataSystem
                     string extension = Path.GetExtension(file).ToLower();
                     if (Array.Exists(texCtrl.GetSupportedExtensions(), ext => ext == extension))
                     {
-                        res.texs.Add((Path.GetFileNameWithoutExtension(file), new TexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(file), Path.GetFullPath(file), null, null, null) ));
+                        res.texs.Add((Path.GetFileNameWithoutExtension(file), new TexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(file), Path.GetFullPath(file), null, null, null)));
                     }
                 }
             }

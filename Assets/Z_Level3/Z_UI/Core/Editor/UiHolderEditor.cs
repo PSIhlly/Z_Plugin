@@ -163,8 +163,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
- 
-using UnityEngine.Video;
+
 {namespaceContent}
 {namespaceStr}
 {{

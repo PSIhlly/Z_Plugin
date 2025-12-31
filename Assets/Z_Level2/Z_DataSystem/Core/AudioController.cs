@@ -102,7 +102,7 @@ namespace Z_DataSystem
             return res;
         }
 
-        public void Select(Vector2Int forceSize = default, Action<AudioAssetForm.Data> callback = null)
+        public void Select(Action<AudioAssetForm.Data> callback = null)
         {
             SelectAudioTask task = new SelectAudioTask();
             task.callback = callback;

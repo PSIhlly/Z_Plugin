@@ -1,13 +1,17 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using Ui.ModAssetSelectWindow;
 using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Map;
 using Z_String;
 using Z_Text;
+using Z_Ui;
 using Z_Ui.Notify;
+using static UnityEngine.Rendering.DebugUI.MessageBox;
 namespace Form
 {
     public static partial class StoryTexAssetForm
@@ -27,15 +31,17 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public int modId;
 
-
-
     #region story
     public void ImportStoryTex()
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            GameManager.instance.curStory.icon = form.name;
-            GameManager.instance.saveCtrl.AddTex(form);
+              onComplete = (data) =>
+              {
+                  GameManager.instance.curStory.icon = data.name;
+                  GameManager.instance.saveCtrl.AddTex(data);
+              },
+              sizeLimit = new Vector2Int(400, 400)
         });
     }
 
@@ -112,20 +118,22 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportTex(string name, int id = -1)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
-         {
-             if (id != -1 && MapTextureForm.DataByName[name].texsName.Count > id)
-             {
-                 MapTextureForm.DataByName[name].texsName[id] = form.name;
-             }
-             else
-             {
-                 MapTextureForm.DataByName[name].texsName.Add(form.name);
-             }
-             GameManager.instance.saveCtrl.AddStoryTex(form);
-
-         });
-
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
+        {
+            onComplete = (data) =>
+            {
+                if (id != -1 && MapTextureForm.DataByName[name].texsName.Count > id)
+                {
+                    MapTextureForm.DataByName[name].texsName[id] = data.name;
+                }
+                else
+                {
+                    MapTextureForm.DataByName[name].texsName.Add(data.name);
+                }
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
+        });
     }
 
 
@@ -150,19 +158,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportMask(string name, int id)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-
-
-            if (MapMaskForm.DataByName[name].texsName.Count > id)
+            onComplete = (data) =>
             {
-                MapMaskForm.DataByName[name].texsName[id] = form.name;
-            }
-            else
-            {
-                MapMaskForm.DataByName[name].texsName.Add(form.name);
-            }
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+                if (MapMaskForm.DataByName[name].texsName.Count > id)
+                {
+                    MapMaskForm.DataByName[name].texsName[id] = data.name;
+                }
+                else
+                {
+                    MapMaskForm.DataByName[name].texsName.Add(data.name);
+                }
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
@@ -222,19 +232,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportObjectUnitTex(int uid, int id)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-
-            if (MapObjectForm.DataById[uid].model.subUnitTexsName.Count > id)
+            onComplete = (data) =>
             {
-                MapObjectForm.DataById[uid].model.subUnitTexsName[id] = form.name;
-            }
-            else
-            {
-                MapObjectForm.DataById[uid].model.subUnitTexsName.Add(form.name);
-            }
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+                if (MapObjectForm.DataById[uid].model.subUnitTexsName.Count > id)
+                {
+                    MapObjectForm.DataById[uid].model.subUnitTexsName[id] = data.name;
+                }
+                else
+                {
+                    MapObjectForm.DataById[uid].model.subUnitTexsName.Add(data.name);
+                }
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
@@ -319,21 +331,26 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public void ImportCharacterAvatar(int uid)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            CharacterProductForm.DataByUid[uid].avatarTexName = form.name;
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+            onComplete = (data) =>
+            {
+                CharacterProductForm.DataByUid[uid].avatarTexName = data.name;
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
-
     }
     public void ImportCharacterTachie(int characterUid)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            CharacterProductForm.DataByUid[characterUid].tachie = form.name;
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+            onComplete = (data) =>
+            {
+                CharacterProductForm.DataByUid[characterUid].tachie = data.name;
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
@@ -410,16 +427,19 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportCharacterAnim(int characterUid, string animNm, BodyPartType part, int id)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            var data = CharacterProductForm.DataByUid[characterUid];
-            var anim = data.animDic[animNm];
-            if (anim.animClip.Count > id)
+            onComplete = (data) =>
             {
-                anim.animClip[id].partTex[part] = form.name;
-            }
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+                var chracterData = CharacterProductForm.DataByUid[characterUid];
+                var anim = chracterData.animDic[animNm];
+                if (anim.animClip.Count > id)
+                {
+                    anim.animClip[id].partTex[part] = data.name;
+                }
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
     }
     public void CreateCharacterAnim(int characterUid, string animName = null)
@@ -465,15 +485,18 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportEffectImage(int effectUid)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            var data = EffectForm.DataByUid[effectUid];
-            foreach (var clip in data.clips)
+            onComplete = (data) =>
             {
-                clip.tex = form.name;
-            }
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+                var effectData = EffectForm.DataByUid[effectUid];
+                foreach (var clip in effectData.clips)
+                {
+                    clip.tex = data.name;
+                }
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
     }
     public void ChooseEffectr(string title, Action<EffectForm.Data> act)
@@ -507,11 +530,15 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportSkillIcon(int skillUid)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            var data = SkillForm.DataByUid[skillUid];
-            data.icon = form.name;
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+            onComplete = (data) =>
+            {
+                var skillData = SkillForm.DataByUid[skillUid];
+                skillData.icon = data.name;
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
     }
     #endregion
@@ -520,26 +547,35 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region event
     public void ImportImage(Action<TexAssetForm.Data> act)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-            act?.Invoke(form);
+            onComplete = (data) =>
+            {
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+                act?.Invoke(data);
+            },
         });
     }
     public void ImportVideo(Action<VideoAssetForm.Data> act)
     {
-        AssetManager.instance.videoCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectVideoWindowParam()
         {
-            GameManager.instance.saveCtrl.AddStoryVideo(form);
-            act?.Invoke(form);
+            onComplete = (data) =>
+            {
+                GameManager.instance.saveCtrl.AddStoryVideo(data);
+                act?.Invoke(data);
+            },
         });
     }
     public void ImportAudio(Action<AudioAssetForm.Data> act)
     {
-        AssetManager.instance.audioCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectAudioWindowParam()
         {
-            GameManager.instance.saveCtrl.AddStoryAudio(form);
-            act?.Invoke(form);
+            onComplete = (data) =>
+            {
+                GameManager.instance.saveCtrl.AddStoryAudio(data);
+                act?.Invoke(data);
+            },
         });
     }
     public void ChooseEvent(SceneEventType type, string retType, string title, Action<EntryItem> act)
@@ -603,10 +639,14 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportClipTex(Action<string> callback)
     {
-        AssetManager.instance.texCtrl.Select(callback: (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            callback?.Invoke(form.name);
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+            onComplete = (data) =>
+            {
+                callback?.Invoke(data.name);
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
@@ -648,11 +688,14 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public void ImportItemIcon(int itemUid)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            ItemProductForm.DataByUid[itemUid].iconTexName = form.name;
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+            onComplete = (data) =>
+            {
+                ItemProductForm.DataByUid[itemUid].iconTexName = data.name;
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
@@ -701,30 +744,36 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ImportItemModelUnitTex(int itemUid, int id)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            var data = ItemProductForm.DataByUid[itemUid];
-            if (data.model.subUnitTexsName.Count > id)
+            onComplete = (data) =>
             {
-                data.model.subUnitTexsName[id] = form.name;
-            }
-            else
-            {
-                data.model.subUnitTexsName.Add(form.name);
-            }
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
+                var itemData = ItemProductForm.DataByUid[itemUid];
+                if (itemData.model.subUnitTexsName.Count > id)
+                {
+                    itemData.model.subUnitTexsName[id] = data.name;
+                }
+                else
+                {
+                    itemData.model.subUnitTexsName.Add(data.name);
+                }
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
     public void ImportItemStyleTex(int itemUid, ItemStyle style)
     {
-
-        AssetManager.instance.texCtrl.Select(new Vector2Int(100, 100), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            var data = ItemProductForm.DataByUid[itemUid];
-            data.styleTex[style] = form.name;
-            GameManager.instance.saveCtrl.AddStoryTex(form);
+            onComplete = (data) =>
+            {
+                var itemData = ItemProductForm.DataByUid[itemUid];
+                itemData.styleTex[style] = data.name;
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }
@@ -763,10 +812,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region scene
     public void ImportMapMiniMap()
     {
-        /*        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
-                {
-                    GameManager.instance.saveCtrl.AddStoryTex(form);
-                });*/
+
 
     }
 
@@ -781,11 +827,14 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public void ImportSceneMiniMap(string name)
     {
-        AssetManager.instance.texCtrl.Select(new Vector2Int(1000, 1000), (form) =>
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            var data = SceneForm.DataByName[name].miniMap = form.name;
-            GameManager.instance.saveCtrl.AddStoryTex(form);
-
+            onComplete = (data) =>
+            {
+                SceneForm.DataByName[name].miniMap = data.name;
+                GameManager.instance.saveCtrl.AddStoryTex(data);
+            },
+            sizeLimit = new Vector2Int(100, 100)
         });
 
     }

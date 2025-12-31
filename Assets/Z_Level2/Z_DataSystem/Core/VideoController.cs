@@ -102,7 +102,7 @@ namespace Z_DataSystem
             return res;
         }
 
-        public void Select(Vector2Int forceSize = default, Action<VideoAssetForm.Data> callback = null)
+        public void Select(Action<VideoAssetForm.Data> callback = null)
         {
             SelectVideoTask task = new SelectVideoTask();
             task.callback = callback;

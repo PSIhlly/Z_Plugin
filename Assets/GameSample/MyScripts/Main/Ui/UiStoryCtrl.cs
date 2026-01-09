@@ -1,15 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Form;
 using Item;
-using Z_Texture;
-using Z_Ui.Base;
-using Z_Ui;
-using Ui.Start;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using Ui.EnterMain;
-using Z_Text;
+using Ui.Start;
+using UnityEngine;
+using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_Text;
+using Z_Texture;
+using Z_Ui;
+using Z_Ui.Base;
+using static UnityEngine.Rendering.ReloadAttribute;
 
 namespace Ui.Story
 {
@@ -70,7 +73,7 @@ namespace Ui.Story
         {
             view.btn_.onClick.AddListener(() =>
             {
-                Main2StoryManager.instance.StartLoadStoryPlay(model.data.id,false);
+                Main2StoryManager.instance.StartLoadStoryPlay(model.data.id, false);
                 parent.Close();
             });
         }

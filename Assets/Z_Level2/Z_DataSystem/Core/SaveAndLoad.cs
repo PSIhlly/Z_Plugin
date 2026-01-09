@@ -1,7 +1,9 @@
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Z_DataSystem;
 
 namespace Z_UnitSystem
 {
@@ -10,6 +12,57 @@ namespace Z_UnitSystem
         public static string perPath = Application.persistentDataPath;
         static SaveAndLoad()
         {
+        }
+        public static string Package(string rootPath)
+        {
+            rootPath = GetRealPath(rootPath);
+            Dictionary<string, JObject> joDic = new Dictionary<string, JObject>();
+            JObject root = new JObject();
+            Queue<string> pathQueue = new Queue<string>();
+            pathQueue.Enqueue(rootPath);
+            joDic[rootPath] = root;
+            while (pathQueue.Count > 0)
+            {
+                var path = pathQueue.Dequeue();
+                var jo = joDic[path];
+                foreach (var file in Directory.EnumerateFiles(path))
+                {
+                    var key = file.Replace(rootPath, "");
+                    root[key] = File.ReadAllBytes(file);
+                }
+                foreach (var subPath in Directory.EnumerateDirectories(path))
+                {
+                    pathQueue.Enqueue(subPath);
+                    joDic[subPath] = new JObject();
+                    var key = subPath.Replace(rootPath, "/");
+                    root[key] = joDic[subPath];
+                }
+            }
+            return root.ToString();
+        }
+        public static void Unpackage(string content, string rootPath)
+        {
+            rootPath = GetRealPath(rootPath);
+            var root = JObject.Parse(content);
+
+            Queue<JObject> joQueue = new Queue<JObject>();
+            joQueue.Enqueue(root);
+            while (joQueue.Count > 0)
+            {
+                var jo = joQueue.Dequeue();
+                foreach (var subJo in jo)
+                {
+                    if (subJo.Key.StartsWith("/"))
+                    {
+                        joQueue.Enqueue((JObject)subJo.Value);
+                    }
+                    else
+                    {
+                        var key = rootPath + subJo.Key;
+                        Save(key, (byte[])subJo.Value);
+                    }
+                }
+            }
         }
         public static void Save(string key, byte[] content)
         {

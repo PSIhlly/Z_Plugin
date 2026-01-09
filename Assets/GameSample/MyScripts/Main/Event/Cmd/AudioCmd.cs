@@ -15,7 +15,7 @@ namespace Z_Code
         {
             Register(new AudioCmd());
         }
-        public override void GetUnitChooseCode(Action<string> act)
+        public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             ModManager.instance.assetCtrl.ImportAudio((form) =>
             {

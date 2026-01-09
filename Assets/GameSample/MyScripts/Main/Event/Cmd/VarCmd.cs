@@ -15,13 +15,13 @@ namespace Z_Code
         {
             Register(new LocalVarCmd());
         }
-        public override void GetUnitChooseCode(Action<string> act)
+        public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input local variable name"), true, (res) =>
             {
                 act?.Invoke($"{res}");
                 return true;
-            });
+            }, cur.desc.code);
         }
         public override string GetName() => "LocalVar";
         public override CmdBase GetNew() => new LocalVarCmd();

@@ -21,7 +21,7 @@ namespace Ui.ModAssetSelectWindow
     {
         public Action<VideoAssetForm.Data> onComplete;
     }
-    public partial class UiModAssetSelectTexWindowParam: UiModAssetSelectWindowParam
+    public partial class UiModAssetSelectTexWindowParam : UiModAssetSelectWindowParam
     {
         public Action<TexAssetForm.Data> onComplete;
         public Vector2Int sizeLimit;
@@ -29,6 +29,7 @@ namespace Ui.ModAssetSelectWindow
     public partial class UiModAssetSelectWindowModel
     {
         public UiModAssetSelectWindowParam prm;
+        public AssetForm.Data sel;
     }
     public partial class UiModAssetSelectWindowCtrl
     {
@@ -37,29 +38,33 @@ namespace Ui.ModAssetSelectWindow
         public override void OnCreate()
         {
 
-            view.btn_bbg.onClick.AddListener(() =>
+            view.btn_bg.onClick.AddListener(() =>
             {
 
             });
             view.btn_.onClick.AddListener(() =>
             {
-
+                if (model.prm is UiModAssetSelectTexWindowParam texPrm)
+                {
+                    texPrm.onComplete?.Invoke((TexAssetForm.Data)model.sel);
+                }
+                else if (model.prm is UiModAssetSelectAudioWindowParam audioPrm)
+                {
+                    audioPrm.onComplete?.Invoke((AudioAssetForm.Data)model.sel);
+                }
+                else if (model.prm is UiModAssetSelectVideoWindowParam videoPrm)
+                {
+                     videoPrm.onComplete?.Invoke((VideoAssetForm.Data)model.sel);
+                }
+                Close();
             });
             view.btn_close.onClick.AddListener(() =>
             {
-
-            });
-            view.btn_extern.onClick.AddListener(() =>
-            {
-
-            });
-            view.btn_internal.onClick.AddListener(() =>
-            {
-
+                Close();
             });
             view.btn_import.onClick.AddListener(() =>
             {
-                if(model.prm is UiModAssetSelectTexWindowParam texPrm)
+                if (model.prm is UiModAssetSelectTexWindowParam texPrm)
                 {
                     AssetManager.instance.texCtrl.Select(texPrm.sizeLimit, (data) =>
                     {
@@ -80,9 +85,75 @@ namespace Ui.ModAssetSelectWindow
                         videoPrm.onComplete?.Invoke(data);
                     });
                 }
+                Close();
             });
             itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
 
+        }
+        public override void OnShow()
+        {
+            model.sel = null;
+            model.prm = param;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            itemCon.Clear();
+            if (model.prm is UiModAssetSelectTexWindowParam texPrm)
+            {
+                foreach (var data in StoryTexAssetForm.DataById.Values)
+                {
+                    itemCon.Add(new UiItemParam()
+                    {
+                        data = data
+                    });
+                }
+            }
+            else if (model.prm is UiModAssetSelectAudioWindowParam audioPrm)
+            {
+                foreach (var data in AudioAssetForm.DataById.Values)
+                {
+                    itemCon.Add(new UiItemParam()
+                    {
+                        data = data
+                    });
+                }
+            }
+            else if (model.prm is UiModAssetSelectVideoWindowParam videoPrm)
+            {
+                foreach (var data in VideoAssetForm.DataById.Values)
+                {
+                    itemCon.Add(new UiItemParam()
+                    {
+                        data = data
+                    });
+                }
+            }
+            
+            itemCon.Refresh();
+
+            view.btn_.gameObject.SetActive(model.sel!=null);
+        }
+    }
+
+    public partial class UiItemParam
+    {
+        public AssetForm.Data data;
+    }
+    public partial class UiItemModel
+    {
+        public UiItemParam prm;
+    }
+    public partial class UiItemCtrl
+    {
+
+        public override void OnCreate()
+        {
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.model.sel = model.prm.data;
+                parent.Refresh();
+            });
         }
         public override void OnShow()
         {
@@ -91,50 +162,20 @@ namespace Ui.ModAssetSelectWindow
         }
         public void Refresh()
         {
-
-            view.txt_externPath.text = "";
-            itemCon.Clear();
-            for (int i = 0, icnt = ; i < icnt; i++)
+            if (parent.model.prm is UiModAssetSelectTexWindowParam texPrm)
             {
-                itemCon.Add(new UiItemParam()
-                {
-
-                });
+                view.img_.sprite = ((TexAssetForm.Data)model.prm.data).GetSprite();
             }
-            itemCon.Refresh();
-        }
-    }
-
-    public partial class UiitemParam
-    {
-
-    }
-    public partial class UiitemModel
-    {
-
-    }
-    public partial class UiItemCtrl
-    {
-
-        public override void OnCreate()
-        {
-
-            view.btn_.onClick.AddListener(() =>
+            else if (parent.model.prm is UiModAssetSelectAudioWindowParam audioPrm)
             {
-
-            });
-
-        }
-        public override void OnShow()
-        {
-
-            Refresh();
-        }
-        public void Refresh()
-        {
-
-            view.img_.sprite = TextureHelper.transparentSprite;
+                view.img_.sprite = TextureHelper.transparentSprite;
+            }
+            else if (parent.model.prm is UiModAssetSelectVideoWindowParam videoPrm)
+            {
+                view.img_.sprite = TextureHelper.transparentSprite;
+            }
             view.txt_.text = "";
+            view.sta_.ChangeState(parent.model.sel == model.prm.data?1:0);
         }
     }
 

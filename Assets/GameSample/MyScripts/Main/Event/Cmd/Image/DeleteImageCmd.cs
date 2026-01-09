@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new DeleteImageCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.assetCtrl.SetRemoveTime((int)prm[0].num, prm[1].num);
+            PlayManager.instance.assetCtrl.SetRemoveTime(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.UIIMAGE), prm[1].num);
             return true;
         }
     }

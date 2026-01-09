@@ -28,10 +28,10 @@ namespace Z_Code
         {
             var data = MapObjectForm.DataByName[prm[0].str];
             var key = data.id.ToString();
-                var newObjectData = MapManager.instance.AddObject(key, Vector3.one*99999f, data.name, null);
+                var newObjectData = MapManager.instance.AddObject(key, Vector3.one*int.MaxValue, data.name, null);
             newObjectData.unit.productInfo = (data.id, -1);
                 newObjectData.unit.evtDic = data.events;
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(newObjectData.uid) };
+            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName( GlobalEventHelper.SCENEOBJECT,newObjectData.uid.ToString())) };
 
             return true;
         }

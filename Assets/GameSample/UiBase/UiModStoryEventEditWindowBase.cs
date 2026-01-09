@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
- 
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.ModStoryEventEditWindow
 
 {
@@ -29,6 +27,7 @@ namespace Ui.ModStoryEventEditWindow
             public Sta sta_;
             public Sta sta_isEmpty;
             public Txt txt_;
+            public Txt txt_new;
         public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -37,6 +36,7 @@ namespace Ui.ModStoryEventEditWindow
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
             sta_isEmpty = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+            txt_new = uiHolder.elementTrsLst[5].GetComponent<Txt>();
         }
 
     }
@@ -137,7 +137,6 @@ namespace Ui.ModStoryEventEditWindow
             public Txt txt_title;
             public GameObject go_close;
             public Btn btn_close;
-            public Btn btn_apply;
             public GameObject go_items;
             public ScrView scr_items;
             public Ipt ipt_code;
@@ -147,17 +146,18 @@ namespace Ui.ModStoryEventEditWindow
             public Ipt ipt_category;
             public Ipt ipt_type;
             public Sta sta_item;
+            public Btn btn_apply;
             public RectTransform rtf_itemRoot;
             public ScrView scr_units;
             public Sta sta_unit;
             public GameObject go_item;
-            public UiItemCtrl sub_Item;
+            public UiItemCtrl sub_item;
             public Btn btn_del;
             public Btn btn_insert;
             public RectTransform rtf_unitRoot;
             public GameObject go_unit;
             public RectTransform rtf_unit;
-            public UiUnitCtrl sub_Unit;
+            public UiUnitCtrl sub_unit;
             public Btn btn_edit;
         public UiModStoryEventEditWindowView(UiHolder uiHolder):base(uiHolder)
         {
@@ -166,27 +166,27 @@ namespace Ui.ModStoryEventEditWindow
             txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             go_close = uiHolder.elementTrsLst[2].gameObject;
             btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_apply = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            go_items = uiHolder.elementTrsLst[5].gameObject;
-            scr_items = uiHolder.elementTrsLst[6].GetComponent<ScrView>();
-            ipt_code = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
-            btn_switchMod = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_switchMod = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            ipt_name = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            ipt_category = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
-            ipt_type = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
-            sta_item = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            go_items = uiHolder.elementTrsLst[4].gameObject;
+            scr_items = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
+            ipt_code = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
+            btn_switchMod = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_switchMod = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            ipt_name = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            ipt_category = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_type = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            sta_item = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_apply = uiHolder.elementTrsLst[13].GetComponent<Btn>();
             rtf_itemRoot = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
             scr_units = uiHolder.elementTrsLst[15].GetComponent<ScrView>();
             sta_unit = uiHolder.elementTrsLst[16].GetComponent<Sta>();
             go_item = uiHolder.elementTrsLst[17].gameObject;
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
             btn_del = uiHolder.elementTrsLst[19].GetComponent<Btn>();
             btn_insert = uiHolder.elementTrsLst[20].GetComponent<Btn>();
             rtf_unitRoot = uiHolder.elementTrsLst[21].GetComponent<RectTransform>();
             go_unit = uiHolder.elementTrsLst[22].gameObject;
             rtf_unit = uiHolder.elementTrsLst[23].GetComponent<RectTransform>();
-            sub_Unit = (UiUnitCtrl) uiHolder.elementTrsLst[24].GetComponent<UiHolder>().ctrl;
+            sub_unit = (UiUnitCtrl) uiHolder.elementTrsLst[24].GetComponent<UiHolder>().ctrl;
             btn_edit = uiHolder.elementTrsLst[25].GetComponent<Btn>();
         }
 
@@ -212,10 +212,10 @@ namespace Ui.ModStoryEventEditWindow
             model=new UiModStoryEventEditWindowModel();
 
 
-            view.sub_Item = new UiItemCtrl();
-            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_Unit = new UiUnitCtrl();
-            view.sub_Unit.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_item = new UiItemCtrl();
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_unit = new UiUnitCtrl();
+            view.sub_unit.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

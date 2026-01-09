@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Z_Code.Form;
 using Z_Map;
-using Z_Map.Form;
 using Z_Text;
 using Z_Ui.Dialog;
 using Z_Ui.Notify;
@@ -15,23 +14,18 @@ using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class GetSelfCharacterIDCmd : CmdBase
+    public class GetCurrentCharacterCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new GetSelfCharacterIDCmd());
+            Register(new GetCurrentCharacterCmd());
         }
-        public override string GetName() => "GetSelfCharacterID";
-        public override CmdBase GetNew() => new GetSelfCharacterIDCmd();
+        public override string GetName() => "GetCurrentCharacter";
+        public override CmdBase GetNew() => new GetCurrentCharacterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            int unitUid = (int)((EventInterpretDataForm.Data)asyncTask.interpreter.data).args[0].num;
-            var data = CharacterUnitForm.DataByUid[unitUid];
-            if(data!=null)
-            {
-                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(data.uid) };
-            }
+            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString())) };
             return true;
         }
     }

@@ -49,11 +49,12 @@ namespace Ui.Notify
         }
         public override void OnShow()
         {
-            view.ipt_.Set("");
             if (param != null)
             {
                 model.info = param.info;
             }
+            view.ipt_.Set(param.info.defaultText);
+            
             Refresh();
 
         }

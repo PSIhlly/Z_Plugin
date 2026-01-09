@@ -16,9 +16,10 @@ namespace Z_Debug
                 var trs = go.transform;
                 while (trs != null)
                 {
-                    res =  trs.name + "/" + res;
+                    res =  trs.name + $"({trs.GetSiblingIndex()})/" + res;
                     trs = trs.parent;
                 }
+                
             }
             
             Log(res);

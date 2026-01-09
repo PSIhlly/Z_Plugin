@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetImageAngleCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.assetCtrl.SetEuler((int)prm[0].num, prm[1].num, prm[2].num);
+            PlayManager.instance.assetCtrl.SetEuler(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.UIIMAGE), prm[1].num, prm[2].num);
             return true;
         }
     }

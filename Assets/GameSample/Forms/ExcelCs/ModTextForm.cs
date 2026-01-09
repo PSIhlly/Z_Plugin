@@ -95,7 +95,7 @@ namespace Form
             
         }
 
-                   private static Data _defaultData=new Data(0,"select editor style","Select editor style","选择编辑器模式");
+                   private static Data _defaultData=new Data(0,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -418,7 +418,7 @@ namespace Form
 
                 {1000141,new Data(1000141,"Isometric","Isometric","斜视")},
 
-                {1000142,new Data(1000142,"dialogAdvanced","Dialog(Advanced)","对话(高级)")},
+                {1000142,new Data(1000142,"ShowAdvancedDialog","Show dialog(advanced)","显示对话(高级)")},
 
                 {1000143,new Data(1000143,"const","Const","常量")},
 
@@ -621,6 +621,12 @@ namespace Form
                 {1000242,new Data(1000242,"Rpg_desc","The role-playing game (RPG) mode includes the full set of features from text-based and image-based games, with the additional concepts of players, items, scenes, and maps.","角色扮演游戏(RPG)模式包含文字图片游戏的全套功能，额外引入了玩家、物品、场景、地图等概念")},
 
                 {1000243,new Data(1000243,"RpgAdvanced_desc","An advanced version of the role-playing game mode, additionally introducing concepts such as skills, equipment, special effects, and scene transitions.","角色扮演游戏模式的进阶版，额外引入了技能、装备、特效、场景切换等概念")},
+
+                {1000244,new Data(1000244,"select editor style","Select editor style","选择编辑器模式")},
+
+                {1000245,new Data(1000245,"extern","Extern","外部的")},
+
+                {1000246,new Data(1000246,"internal","Internal","内部的")},
 
                 };
                     _DataByKey = new Dictionary<string, Data>() {
@@ -907,7 +913,7 @@ namespace Form
     
                         {"Isometric",_DataById[1000141]},
     
-                        {"dialogAdvanced",_DataById[1000142]},
+                        {"ShowAdvancedDialog",_DataById[1000142]},
     
                         {"const",_DataById[1000143]},
     
@@ -1110,6 +1116,12 @@ namespace Form
                         {"Rpg_desc",_DataById[1000242]},
     
                         {"RpgAdvanced_desc",_DataById[1000243]},
+    
+                        {"select editor style",_DataById[1000244]},
+    
+                        {"extern",_DataById[1000245]},
+    
+                        {"internal",_DataById[1000246]},
     
                     };
     

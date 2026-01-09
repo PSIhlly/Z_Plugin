@@ -48,7 +48,33 @@ public enum TriggerType
 
 public static partial class GlobalEventHelper
 {
+    public static string CHARACTER="$ch$";
+    public static string ITEM="$it$";
+    public static string SCENEOBJECT="$so$";
+    public static string EFFECT="$ef$";
+    public static string UIIMAGE = "$ui$";
 
+    public static string GetName(string mark, string name = "")
+    {
+        return $"{mark}{name}{mark}";
+    }
+    public static int GetId(string name,string mark)
+    {
+        if(IsAsset(name,mark))
+        {
+            return int.Parse(name.Split(mark)[1]);
+        }
+        return 0;
+    }
+    public static bool IsAsset(string name,string mark)
+    {
+        var parts = name.Split(mark);
+        if ( parts.Length == 3 && string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[2]))
+        {
+            return true;
+        }
+        return false;
+    }
     public static string GetGameRetType(Desc desc)
     {
         var res = desc.retType;
@@ -60,7 +86,16 @@ public static partial class GlobalEventHelper
             res = "video";
         else if (AssetManager.instance.audioCtrl.IsAsset(desc.code))
             res = "audio";
-
+        else if (IsAsset(desc.code, CHARACTER))
+            res = "character";
+        else if (IsAsset(desc.code, ITEM))
+            res = "item";
+        else if (IsAsset(desc.code, SCENEOBJECT))
+            res = "sceneObject";
+        else if (IsAsset(desc.code, EFFECT))
+            res = "effect";
+        else if (IsAsset(desc.code, UIIMAGE))
+            res = "uiImg";
         return res;
     }
     public static bool IsSceneTrigger(string triggerName, int user)
@@ -89,7 +124,7 @@ public static partial class GlobalSettings
 }
 public class GameEventController : Z_Controller<GameManager>
 {
-
+    
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
     List<Func<bool>> tasks;
@@ -103,6 +138,7 @@ public class GameEventController : Z_Controller<GameManager>
     }
     public void Reset()
     {
+        sceneTriggerCtrl.evts -= sceneTriggerCtrl.evts;
         EventInterpretDataForm.Clear();
         tasks.Clear();
         releaseTriggerTuple.Clear();
@@ -182,7 +218,7 @@ public class GameEventController : Z_Controller<GameManager>
 
 
 
-    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, List<BoxDataForm.Data> args)
+    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, List<BoxDataForm.Data> args)
     {
         if (trigger == null)
         {
@@ -205,7 +241,7 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, args, trigger.name);
                 }
                 break;
             case TriggerType.OnceDuring:
@@ -221,23 +257,23 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, args, trigger.name);
                 }
                 break;
             default:
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, args, trigger.name);
                 }
                 break;
         }
     }
 
-    public void Execute(EventProgramDataForm.Data evt, int user, List<BoxDataForm.Data> args, string releaseTrigger = "")
+    public void Execute(EventProgramDataForm.Data evt, int user,Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, List<BoxDataForm.Data> args, string releaseTrigger = "")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), evt.Copy(), 0, -1, user, args, releaseTrigger, 0));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap==null?new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(): defaultHeap, evt.Copy(), 0, -1, user, args, releaseTrigger, 0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {

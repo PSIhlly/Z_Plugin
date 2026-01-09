@@ -297,6 +297,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 object[] prms = null;
                                 var newObjectData = mapMgr.AddObject(objectData.name, finalPos, objectData.name, prms);
                                 newObjectData.unit.productInfo = (objectData.id, -1);
+                                newObjectData.isObstacle = true;
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
 

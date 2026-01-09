@@ -5,7 +5,7 @@ using Z_DesignStyle;
 
 namespace Z_Map.Analysis
 {
-    public class Bfs
+    public class Bfs: NaviComponent
     {
         NavigationController nc;
         Dictionary<NavUnit, int> steps = new Dictionary<NavUnit, int>();
@@ -139,9 +139,9 @@ namespace Z_Map.Analysis
                         back = tryPos.z;
                         checkForward = checkBack = back;
                     }
-
-                    //换层先断
-                    if (!Check(checkLeft, checkRight, nxt.y, y, checkBack, checkForward))
+                    
+                    //换层 先断
+                    if (!Check(checkLeft-1, checkRight+1, nxt.y, y, checkBack-1, checkForward+1))
                     {
                         //那就只走第一步
                         if (i == path.Count - 2)
@@ -167,8 +167,7 @@ namespace Z_Map.Analysis
         public bool CanPass(NavUnit from, NavUnit tar)
         {
             return !steps.ContainsKey(tar)
-                && tar.cantPassParts.Count == 0;//Contains(nc.GetDir(tar, from))
-                                                //&& !nc.navUnits[from.x, from.y, from.z].cantPassDirs.Contains(nc.GetDir(from, tar ));
+                && tar.cantPassParts.Count == 0;
         }
 
         public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ)
@@ -176,7 +175,7 @@ namespace Z_Map.Analysis
             for (int i = startX; i <= endX; i++)
                 for (int k = startZ; k <= endZ; k++)
                 {
-                    if (nc.navUnits[(i, mapY, k)].cantPassParts.Count > 0 || Mathf.Abs(nc.navUnits[(i, mapY, k)].realPos.y - realY) > nc.step)
+                    if (!nc.navUnits.ContainsKey((i, mapY, k)) ||nc.navUnits[(i, mapY, k)].cantPassParts.Count > 0 || Mathf.Abs(nc.navUnits[(i, mapY, k)].realPos.y - realY) > nc.step)
                     {
                         return false;
                     }

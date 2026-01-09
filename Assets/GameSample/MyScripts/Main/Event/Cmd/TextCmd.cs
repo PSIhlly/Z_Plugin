@@ -15,13 +15,13 @@ namespace Z_Code
         {
             Register(new TextCmd());
         }
-        public override void GetUnitChooseCode(Action<string> act)
+        public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), true, (res) =>
             {
                 act?.Invoke($"\"{res}\"");
                 return true;
-            });
+            }, cur.desc.code);
         }
         public override string GetName() => "Text";
         public override CmdBase GetNew() => new TextCmd();

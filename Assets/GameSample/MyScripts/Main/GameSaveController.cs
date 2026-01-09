@@ -34,6 +34,25 @@ public class GameSaveController : Z_Controller<GameManager>
     public GameSaveController(GameManager super) : base(super)
     {
     }
+
+    #region package
+
+    public void Package(int storyId)
+    {
+        File.WriteAllText(AssetManager.externPatn + storyId + ".png",SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)));
+    }
+
+    #endregion
+
+    #region unpackage
+
+    public void Unpackage(string content,int storyId)
+    {
+        SaveAndLoad.Unpackage(content, Main2StoryManager.GetStoryCoreFolder(storyId));
+    }
+
+    #endregion
+
     #region save
     public void SaveSceneMap(string scenePath)
     {

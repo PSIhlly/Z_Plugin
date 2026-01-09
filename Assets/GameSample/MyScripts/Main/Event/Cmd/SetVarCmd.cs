@@ -15,7 +15,7 @@ namespace Z_Code
         {
             Register(new SetLocalVarCmd());
         }
-        public override void GetUnitChooseCode(Action<string> act)
+        public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input local variable name"), true, (res) =>
             {

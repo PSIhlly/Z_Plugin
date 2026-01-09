@@ -165,10 +165,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic6(maskData.name, raws);
         }
 
-        foreach (var character in CharacterProductForm.DataByUid.Values)
-        {
-            GameManager.instance.characterCtrl.RegisterAnim(character);
-        }
+
         return true;
     }
     public void UnloadSceneUgc()

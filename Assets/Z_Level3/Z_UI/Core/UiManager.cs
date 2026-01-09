@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Z_Debug;
 using Z_DesignStyle;
 using Z_Math;
 using Z_Time;
@@ -19,7 +20,7 @@ namespace Z_Ui
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
         public Dictionary<string, List<UiHolder>> uiCtrlName2Uis = new Dictionary<string, List<UiHolder>>();
-        public List<Action> uiOnShowEventLst=new List<Action>();
+        public List<Action> uiOnShowEventLst = new List<Action>();
         protected override void Awake()
         {
             base.Awake();
@@ -113,8 +114,11 @@ namespace Z_Ui
         }
         public static void Jump(RectTransform tar, ScrollRect scr)
         {
+            var oldInertia = scr.inertia;
+            scr.inertia = false;
             Vector3 dir = scr.viewport.GetCenterWorldPos() - tar.GetCenterWorldPos();
             scr.content.position = scr.content.position + dir;
+            scr.inertia = oldInertia;
         }
         public static void Rebuild(GameObject go, bool recursion = false)
         {
@@ -139,7 +143,7 @@ namespace Z_Ui
         }
         public void InvokeEvents()
         {
-            for(int id=0;id<uiOnShowEventLst.Count;id++)
+            for (int id = 0; id < uiOnShowEventLst.Count; id++)
             {
                 uiOnShowEventLst[id]();
             }

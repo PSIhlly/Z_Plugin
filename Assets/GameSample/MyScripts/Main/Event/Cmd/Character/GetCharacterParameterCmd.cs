@@ -6,8 +6,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Z_Code.Form;
+using Z_DesignStyle;
 using Z_Map;
-using Z_Map.Form;
 using Z_Text;
 using Z_Ui.Dialog;
 using Z_Ui.Notify;
@@ -15,22 +15,21 @@ using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class GetTriggerCharacterIDCmd : CmdBase
+    public class GetCharacterParameterCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new GetTriggerCharacterIDCmd());
+            Register(new GetCharacterParameterCmd());
         }
-        public override string GetName() => "GetTriggerCharacterID";
-        public override CmdBase GetNew() => new GetTriggerCharacterIDCmd();
+        public override string GetName() => "GetCharacterParameter";
+        public override CmdBase GetNew() => new GetCharacterParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            int unitUid = (int)((EventInterpretDataForm.Data)asyncTask.interpreter.data).args[1].num;
-            var data = CharacterUnitForm.DataByUid[unitUid];
-            if(data!=null)
+            var data = CharacterProductForm.DataByUid.GetDv( GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), null);
+            if (data != null && data.paramDic.ContainsKey(prm[1].str))
             {
-                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(data.unit.productInfo.Item1) };
+                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(data.paramDic[prm[1].str].v) };
             }
             return true;
         }

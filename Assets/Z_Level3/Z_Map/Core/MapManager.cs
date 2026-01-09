@@ -34,6 +34,7 @@ namespace Z_Map
         public const bool MAP_SHOW_DEBUG = false;
         public const bool OVERLAY_HIDE = true;
         public const bool UPDATE_TILE_ALWAYS = false;
+        public const bool UPDATE_ALL_CHARACTER = true;
     }
     public static class DynamicGlobalSettings
     {

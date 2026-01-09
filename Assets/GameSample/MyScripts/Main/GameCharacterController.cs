@@ -97,7 +97,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
     {
         Z_EventHelper.Register(this);
     }
-    public Dictionary<CharacterProductForm.Data, AnimController> animControllerDic = new Dictionary<CharacterProductForm.Data, AnimController>();
+    public Dictionary<CharacterUnitForm.Data, AnimController> animControllerDic = new Dictionary<CharacterUnitForm.Data, AnimController>();
 
     public class AnimController
     {
@@ -111,8 +111,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         {
             Reset();
         }
-        public CharacterProductForm.Data form;
-        public CharacterInstance ins;
+        public CharacterUnitForm.Data data;
+        public CharacterProductForm.Data productData=> CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
         public CharacterAnimForm.Data[] idleAnim;
         public CharacterAnimForm.Data[] moveAnim;
 
@@ -134,10 +134,10 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         }
         private FourDirecton GetDir()
         {
-            switch (form.faceType)
+            switch (productData.faceType)
             {
                 case FaceType.FourDirection:
-                    var angle = ins.transform.eulerAngles.y % 360 + 360 % 360;
+                    var angle = data.unit.ins.transform.eulerAngles.y % 360 + 360 % 360;
                     if (angle >= 45 && angle < 135)
                     {
                         return FourDirecton.Right;
@@ -180,11 +180,11 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 var anim = GetAnim(stateCur[part]);
                 if (anim.partEnable.ContainsKey(part) && anim.partEnable[part])
                 {
-                    ins.renderers[(int)part - 1].enabled = true;
+                    data.unit.ins.renderers[(int)part - 1].enabled = true;
                 }
                 else
                 {
-                    ins.renderers[(int)part - 1].enabled = false;
+                    data.unit.ins.renderers[(int)part - 1].enabled = false;
                 }
             }
         }
@@ -216,7 +216,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             }
             stateCur[part] = tar;
 
-            UpdateAnim(part, ins.renderers[(int)part - 1], ins.unit.data, anim, forceReplay);
+            UpdateAnim(part, data.unit.ins.renderers[(int)part - 1], data, anim, forceReplay);
         }
 
 
@@ -271,40 +271,45 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         }
     }
 
-    public void RegisterAnim(CharacterProductForm.Data character)
+    public void RegisterAnim(CharacterUnitForm.Data data)
     {
+        if(animControllerDic.ContainsKey(data))
+        {
+            return;
+        }
+        var productData = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
         CharacterAnimForm.Data[] idleAnim = new CharacterAnimForm.Data[4];
         CharacterAnimForm.Data[] moveAnim = new CharacterAnimForm.Data[4];
 
-        switch (character.faceType)
+        switch (productData.faceType)
         {
             case FaceType.Fixed:
             case FaceType.Flexible:
-                idleAnim[0] = character.animDic.GetDv(character.defaultAnimName.GetDv("idle", null), null);
-                moveAnim[0] = character.animDic.GetDv(character.defaultAnimName.GetDv("move", null), null);
+                idleAnim[0] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("idle", null), null);
+                moveAnim[0] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("move", null), null);
                 break;
             case FaceType.FourDirection:
                 for (int i = 0; i < 4; i++)
                 {
-                    idleAnim[i] = character.animDic.GetDv(character.defaultAnimName.GetDv("idle" + i, null), null);
-                    moveAnim[i] = character.animDic.GetDv(character.defaultAnimName.GetDv("move" + i, null), null);
+                    idleAnim[i] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("idle" + i, null), null);
+                    moveAnim[i] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("move" + i, null), null);
                 }
                 break;
         }
 
-        GameManager.instance.characterCtrl.CreateAnim(character, idleAnim, moveAnim);
+        GameManager.instance.characterCtrl.CreateAnim(data, idleAnim, moveAnim);
     }
     public void Reset()
     {
         animControllerDic.Clear();
     }
-    public void CreateAnim(CharacterProductForm.Data key, CharacterAnimForm.Data[] idleAnim, CharacterAnimForm.Data[] moveAnim)
+    public void CreateAnim(CharacterUnitForm.Data key, CharacterAnimForm.Data[] idleAnim, CharacterAnimForm.Data[] moveAnim)
     {
         animControllerDic[key] = new AnimController()
         {
             idleAnim = idleAnim,
             moveAnim = moveAnim,
-            form = key
+            data = key
         };
     }
 
@@ -318,8 +323,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             return;
         }
 
-        animControllerDic[form].Reset();
-        animControllerDic[form].ins = ins;
+        animControllerDic[data].Reset();
 
         foreach(var keeper in ins.keepers)
         {
@@ -332,6 +336,10 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
     public void CheckAnim(CharacterInstance ins)
     {
+        if(ins == null)
+        {
+            return;
+        }
         var data = ins.unit.data;
         var form = CharacterProductForm.DataByUid[ins.unit.productInfo.Item1];
         if (form == null)
@@ -339,7 +347,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);
             return;
         }
-        var status = animControllerDic[form];
+        var status = animControllerDic[data];
 
         if (ins.step != Vector3.zero)
         {

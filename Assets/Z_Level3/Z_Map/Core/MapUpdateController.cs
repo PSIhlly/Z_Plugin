@@ -213,6 +213,7 @@ namespace Z_Map
                     map.unit.UpdateInfo();
                 }
             }
+
             foreach (var map in curObjectLst)
             {
                 map.unit.UpdateInfo();
@@ -221,9 +222,20 @@ namespace Z_Map
             {
                 map.unit.UpdateInfo();
             }
-            foreach (var map in curCharacterLst)
+
+            if (GlobalSettings.UPDATE_ALL_CHARACTER)
             {
-                map.unit.UpdateInfo();
+                foreach (var cData in CharacterUnitForm.DataByUid.Values)
+                {
+                    cData.unit.UpdateInfo();
+                }
+            }
+            else
+            {
+                foreach (var map in curCharacterLst)
+                {
+                    map.unit.UpdateInfo();
+                }
             }
 
 
@@ -373,15 +385,18 @@ namespace Z_Map
                 unit.VisOff();
                 foreach (var curObj in objectTileDic.Get(unit))
                 {
+                    if(curObj.belongTile == unit)
                     curObj.VisOff();
                 }
                 foreach (var curItem in itemTileDic.Get(unit))
                 {
-                    curItem.VisOff();
+                    if (curItem.belongTile == unit)
+                        curItem.VisOff();
                 }
                 foreach (var curCh in characterTileDic.Get(unit))
                 {
-                    curCh.VisOff();
+                    if (curCh.belongTile == unit)
+                        curCh.VisOff();
                 }
             }
             else if (degree >= 1)
@@ -391,18 +406,29 @@ namespace Z_Map
                 unit.VisDegree(1f);
                 foreach (var curObj in objectTileDic.Get(unit))
                 {
-                    curObj.VisOn();
-                    curObj.VisDegree(1f);
+                    if (curObj.belongTile == unit)
+                    {
+
+                        curObj.VisOn();
+                        curObj.VisDegree(1f);
+                    }
                 }
                 foreach (var curItem in itemTileDic.Get(unit))
                 {
-                    curItem.VisOn();
-                    curItem.VisDegree(1f);
+                    if (curItem.belongTile == unit)
+                    {
+
+                        curItem.VisOn();
+                        curItem.VisDegree(1f);
+                    }
                 }
                 foreach (var curCh in characterTileDic.Get(unit))
                 {
-                    curCh.VisOn();
-                    curCh.VisDegree(1f);
+                    if (curCh.belongTile == unit)
+                    {
+                        curCh.VisOn();
+                        curCh.VisDegree(1f);
+                    }
                 }
             }
             else
@@ -410,20 +436,29 @@ namespace Z_Map
                 unit.VisDegree(degree);
                 foreach (var curObj in objectTileDic.Get(unit))
                 {
-                    curObj.VisDegree(degree);
+                    if (curObj.belongTile == unit)
+                    {
+                        curObj.VisDegree(degree);
+                    }
                 }
                 foreach (var curItem in itemTileDic.Get(unit))
                 {
-                    curItem.VisDegree(degree);
+                    if (curItem.belongTile == unit)
+                    {
+                        curItem.VisDegree(degree);
+                    }
                 }
                 foreach (var curCh in characterTileDic.Get(unit))
                 {
-                    curCh.VisDegree(degree);
+                    if (curCh.belongTile == unit)
+                    {
+                        curCh.VisDegree(degree);
+                    }
                 }
             }
 
         }
-        public void ApplyMove(Unit unit, Vector3 newPos, Vector3 euler)
+        public void ApplyMove(Unit unit, Vector3 newPos, Vector3 euler,bool teleport=false)
         {
             var newMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
@@ -462,7 +497,7 @@ namespace Z_Map
             unit.data.euler = euler;
             if (oldPos != newPos)
             {
-                MapManager.instance.updateCtrl.ChechCollideEvent(unit, Vector3.zero);
+                MapManager.instance.updateCtrl.ChechCollideEvent(unit, teleport?newPos-oldPos:Vector3.zero);
             }
 
 
@@ -484,7 +519,7 @@ namespace Z_Map
             }
             HashSet<int> exist = new HashSet<int>() { unit.data.uid };
 
-            foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z)))
+            foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z),dir.magnitude))
             {
                 var lst = new List<Unit>(objectTileDic.Get(tile));
                 lst.AddRange(itemTileDic.Get(tile));
@@ -531,9 +566,9 @@ namespace Z_Map
             avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
             var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
-            foreach (var tar in _super.utilCtrl.GetCollidersMesh(unit.prefab, unit.data.pos, unit.data.euler, unit.data.scale, type))
+            foreach (var tar in unit.GetMeshes(type))
             {
-                foreach (var cur in _super.utilCtrl.GetCollidersMesh(trigger.prefab, trigger.data.pos, trigger.data.euler, trigger.data.scale, type))
+                foreach (var cur in trigger.GetMeshes(type))
                 {
                     float dis = 0;
                     var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis, out var avoid);

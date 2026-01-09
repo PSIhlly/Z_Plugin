@@ -1,25 +1,26 @@
 using Form;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
-using Z_DataSystem;
-using Z_DesignStyle;
-using Z_Map;
-using Z_UnitSystem;
-using Z_Debug;
-using Z_Code.Form;
-using Z_Ui.Notify;
-using Z_Text;
-using System;
 using Z_ByteSerialize;
 using Z_Code;
-using Unity.VisualScripting;
+using Z_Code.Form;
+using Z_DataSystem;
 using Z_DataSystem.Form;
-using Z_Time;
-using Z_Math;
+using Z_Debug;
+using Z_DesignStyle;
+using Z_Map;
 using Z_Map.Form;
-using System.Xml.Linq;
+using Z_Math;
+using Z_Text;
+using Z_Time;
+using Z_Ui.Notify;
+using Z_UnitSystem;
 
 public enum SceneEventType
 {
@@ -74,41 +75,44 @@ namespace Z_Map
             }
 
         }
-        public bool ExecuteEvt(string name, List<BoxDataForm.Data> args)
+        public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap, List<BoxDataForm.Data> args)
         {
+
             EventTriggerForm.Data trigger = null;
-            if (evtDic.ContainsKey(name)&& evtDic[name].evt.Count>0)
+            if (evtDic.ContainsKey(name) && evtDic[name].evt.Count > 0)
             {
                 trigger = evtDic[name];
             }
             else
             {
-                if (this is CharacterUnit chU&& CharacterProductForm.DataByUid.TryGetValue(chU.productInfo.Item1, out var ch) && ch.events.ContainsKey(name))
+                if (this is CharacterUnit chU && CharacterProductForm.DataByUid.TryGetValue(chU.productInfo.Item1, out var ch) && ch.events.ContainsKey(name))
                 {
                     trigger = ch.events[name];
                 }
-                else if (this is ObjectUnit oU&& MapObjectForm.DataById.TryGetValue(oU.productInfo.Item1, out var ob) && ob.events.ContainsKey(name))
+                else if (this is ObjectUnit oU && MapObjectForm.DataById.TryGetValue(oU.productInfo.Item1, out var ob) && ob.events.ContainsKey(name))
                 {
                     trigger = ob.events[name];
                 }
-                else if (this is ItemUnit iU&& ItemProductForm.DataByUid.TryGetValue(iU.productInfo.Item1, out var it) && it.events.ContainsKey(name))
+                else if (this is ItemUnit iU && ItemProductForm.DataByUid.TryGetValue(iU.productInfo.Item1, out var it) && it.events.ContainsKey(name))
                 {
                     trigger = it.events[name];
                 }
             }
             if (trigger != null)
             {
-                GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, args);
-                return true;
+
+                GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, defaultHeap, args);
+
             }
-            return false;
+
+            return true;
         }
 
     }
 }
 public class GameEventSceneTriggerController : Z_Controller<GameEventController>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ItemEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>, IZ_Listener<StoryLifeEvent>
 {
-
+    public Action evts;
     public GameEventSceneTriggerController(GameEventController super) : base(super)
     {
         Z_EventHelper.Register<CollideEvent>(this);
@@ -120,111 +124,158 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     }
     public void OnEvent(CollideEvent evt)
     {
-        if (evt.a is MapUnit mapUnit)
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.a.data.uid), CodeHelper.CreateBoxByNum(evt.b.data.uid) };
-
-            switch (evt.type)
+            if (evt.a is MapUnit mapUnit)
             {
-                case CollideEventType.TriggerEnter:
-                    if (evt.b is CharacterUnit)
-                    {
-                        mapUnit.ExecuteEvt("onCharacterTouchEvent", args);
-                    }
-                    else if (evt.b is ObjectUnit)
-                    {
-                        mapUnit.ExecuteEvt("onObjectTouchEvent", args);
-                    }
-                    break;
-                case CollideEventType.TriggerExit:
-                    if (evt.b is CharacterUnit)
-                    {
-                        mapUnit.ExecuteEvt("onCharacterLeaveEvent", args);
-                    }
-                    else if (evt.b is ObjectUnit)
-                    {
-                        mapUnit.ExecuteEvt("onObjectLeaveEvent", args);
+                var heap = new Dictionary<string, BoxDataForm.Data>();
+                if (evt.a is CharacterUnit ch)
+                {
+                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch.productInfo.Item1.ToString()));
+                }
+                else if (evt.a is ObjectUnit o)
+                {
+                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, o.data.uid.ToString()));
+                }
 
-                    }
-                    break;
+                if (evt.b is CharacterUnit ch2)
+                {
+                    heap["trigger"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch2.productInfo.Item1.ToString()));
+                }
+                else if (evt.b is ObjectUnit o2)
+                {
+                    heap["trigger"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, o2.data.uid.ToString()));
+                }
+
+                switch (evt.type)
+                {
+                    case CollideEventType.TriggerEnter:
+                        if (evt.b is CharacterUnit)
+                        {
+                            mapUnit.ExecuteEvt("onCharacterTouchEvent", heap, null);
+                        }
+                        else if (evt.b is ObjectUnit)
+                        {
+                            mapUnit.ExecuteEvt("onObjectTouchEvent", heap, null);
+                        }
+                        break;
+                    case CollideEventType.TriggerExit:
+                        if (evt.b is CharacterUnit)
+                        {
+                            mapUnit.ExecuteEvt("onCharacterLeaveEvent", heap, null);
+                        }
+                        else if (evt.b is ObjectUnit)
+                        {
+                            mapUnit.ExecuteEvt("onObjectLeaveEvent", heap, null);
+
+                        }
+                        break;
+                }
             }
-        }
+        };
     }
     public void OnEvent(TileEvent evt)
     {
-        if (evt.unit is MapUnit mapUnit)
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
-            switch (evt.type)
+            if (evt.unit is MapUnit mapUnit)
             {
-                case MapEventType.Create:
-                    mapUnit.ExecuteEvt("onShowEvent", args);
-                    break;
+                var heap = new Dictionary<string, BoxDataForm.Data>();
+                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
+
+                switch (evt.type)
+                {
+                    case MapEventType.Create:
+                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        break;
+                }
             }
-        }
+        };
     }
     public void OnEvent(CharacterEvent evt)
     {
-        if (evt.unit is MapUnit mapUnit)
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
-            switch (evt.type)
+            if (evt.unit is MapUnit mapUnit)
             {
-                case MapEventType.Create:
-                    mapUnit.ExecuteEvt("onShowEvent", args);
-                    break;
+                var heap = new Dictionary<string, BoxDataForm.Data>();
+                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.unit.productInfo.Item1.ToString()));
+
+                switch (evt.type)
+                {
+                    case MapEventType.Create:
+                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        break;
+                }
             }
-        }
+        };
     }
     public void OnEvent(ItemEvent evt)
     {
-        if (evt.unit is MapUnit mapUnit)
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
-
-            switch (evt.type)
+            if (evt.unit is MapUnit mapUnit)
             {
-                case MapEventType.Create:
-                    mapUnit.ExecuteEvt("onShowEvent", args);
-                    break;
+                var heap = new Dictionary<string, BoxDataForm.Data>();
+                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
+
+                switch (evt.type)
+                {
+                    case MapEventType.Create:
+                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        break;
+                }
             }
-        }
+        };
     }
     public void OnEvent(ObjectEvent evt)
     {
-        if (evt.unit is MapUnit mapUnit)
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
         {
-            var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(evt.unit.data.uid) };
-
-
-            switch (evt.type)
+            if (evt.unit is MapUnit mapUnit)
             {
-                case MapEventType.Create:
-                    mapUnit.ExecuteEvt("onShowEvent", args);
-                    break;
+                var heap = new Dictionary<string, BoxDataForm.Data>();
+                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
+
+
+                switch (evt.type)
+                {
+                    case MapEventType.Create:
+                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        break;
+                }
             }
-        }
+        };
     }
 
     public void OnEvent(StoryLifeEvent evt)
     {
-        if(evt.type == StoryLifeEventType.EverySecond)
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
         {
-            foreach (var data in ItemUnitForm.DataByUid.Values)
+            if (evt.type == StoryLifeEventType.EverySecond)
             {
-                var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(data.uid) };
-                data.unit.ExecuteEvt("onPerSecondEvent", args);
+                foreach (var data in ItemUnitForm.DataByUid.Values)
+                {
+                    var heap = new Dictionary<string, BoxDataForm.Data>();
+                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, data.uid.ToString()));
+
+                    data.unit.ExecuteEvt("onPerSecondEvent", heap, null);
+                }
+                foreach (var data in CharacterUnitForm.DataByUid.Values)
+                {
+                    var heap = new Dictionary<string, BoxDataForm.Data>();
+                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, data.unit.productInfo.Item1.ToString()));
+
+                    data.unit.ExecuteEvt("onPerSecondEvent", heap, null);
+                }
+                foreach (var data in ObjectUnitForm.DataByUid.Values)
+                {
+                    var heap = new Dictionary<string, BoxDataForm.Data>();
+                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, data.uid.ToString()));
+
+                    data.unit.ExecuteEvt("onPerSecondEvent", heap, null);
+                }
             }
-            foreach (var data in CharacterUnitForm.DataByUid.Values)
-            {
-                var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(data.uid) };
-                data.unit.ExecuteEvt("onPerSecondEvent", args);
-            }
-            foreach (var data in ObjectUnitForm.DataByUid.Values)
-            {
-                var args = new List<BoxDataForm.Data>() { CodeHelper.CreateBoxByNum(data.uid) };
-                data.unit.ExecuteEvt("onPerSecondEvent", args);
-            }
-        }
+        };
     }
 }

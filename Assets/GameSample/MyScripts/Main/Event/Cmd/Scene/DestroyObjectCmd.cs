@@ -26,7 +26,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new DestroyObjectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var unit = UnitForm.DataByUid[(int)prm[0].num].unit;
+            var unit = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)].unit;
             if (unit is ObjectUnit o)
             {
                 MapManager.instance.RemoveObject(o.data);

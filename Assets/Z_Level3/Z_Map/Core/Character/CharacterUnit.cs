@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using Z_Map.Form;
 using Z_UnitSystem.Form;
 
@@ -28,6 +29,7 @@ namespace Z_Map
         }
         public override void Show()
         {
+            GameManager.instance.characterCtrl.RegisterAnim(data);
             base.Show();
             Z_EventHelper.Invoke(new CharacterEvent()
             {
@@ -50,7 +52,7 @@ namespace Z_Map
                     if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
                     {
                         Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis);
-                        Move(data.pos + dir * Time.deltaTime * data.speed);
+                        Move(dir * Mathf.Min(Time.deltaTime * data.speed, (data.destination - data.pos).magnitude));
                     }
 
                 }
@@ -70,7 +72,7 @@ namespace Z_Map
         public void Move(Vector3 dir)
         {
             /*
-            var floor = manager.updateCtrl.CheckCollide(this, belongTile, dir, CollideType.CollideOnly,out _);
+            var floor = manager.updateCtrl.g(this, belongTile, dir, CollideType.CollideOnly,out _);
 
             if (dir.y < 0 && floor <= 0.01f)
             {
@@ -96,7 +98,7 @@ namespace Z_Map
                 if (dir != Vector3.zero)
                 {
                     existUnit.Clear();
-                    foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z)))
+                    foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z),mag))
                     {
                         if ((tile.data.pos - data.pos).sqrMagnitude > 1.69f)
                             continue;
@@ -113,6 +115,7 @@ namespace Z_Map
                             if (existUnit.Contains(obj) || obj == this)
                                 continue;
                             existUnit.Add(obj);
+                            //Debug.Log(data.uid + "   " + Time.frameCount + " " + obj.data.uid + " " + dir+"  : "+obj.belongTile.data.uid);
                             var cur = manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly, out avoid);
                             if (Mathf.Abs(cur - res) < 0.01f && MathF.Abs(cur) < 0.01f)
                             {

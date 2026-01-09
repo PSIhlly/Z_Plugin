@@ -25,7 +25,10 @@ namespace Z_UnitSystem
         }
         public override void Clear(GameObject obj)
         {
-            obj.GetComponent<Instance>().unit = null;
+            if(obj.TryGetComponent<Instance>(out var ins))
+            {
+                ins.unit = null;
+            }
             obj.gameObject.SetActive(false);
         }
         public override void Destroy()

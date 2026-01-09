@@ -24,11 +24,15 @@ namespace Z_Map.Analysis
         public HashSet<Dir> cantPassParts;
         public List<NavUnit> links;
     }
+    public interface NaviComponent
+    {
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep);
+    }
     public class NavigationController : Z_Controller<MapManager>
     {
         public NavigationController(MapManager super):base(super)
         { }
-        Bfs bfs;
+        NaviComponent bfs;
         public Dictionary<(int, int, int), NavUnit> navUnits;
         public float step;
         public void Build()
@@ -91,19 +95,20 @@ namespace Z_Map.Analysis
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
                         Vector3[] points = Mesh.GetMesh(bc, obs.pos+Vector3.up * obs.scale.y / 2, obs.euler, obs.scale).positions;
-                        var overlapMaps = Z_Math.Graph.GetRoughOverlapIntPos(points);
+                        var overlapPoses = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.RightDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.RightDownForward].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.RightDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.RightDownBack].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].z) };
-                        foreach (var map in overlapMaps)
+                        foreach (var pos in overlapPoses)
                         {
+                            var mapPos = RealPos2MapPos(pos);
                             for (int i = 0, icnt = offset.Length; i < icnt; i++)
                             {
-                                if (InArea(map) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(map.x, map.z) + offset[i]))
+                                if (InArea(mapPos) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(pos.x, pos.z) + offset[i]))
                                 {
-                                    navUnits[(map.x, map.y, map.z)].cantPassParts.Add((Dir)i);
+                                    navUnits[(mapPos.x, mapPos.y, mapPos.z)].cantPassParts.Add((Dir)i);
                                 }
                             }
                         }

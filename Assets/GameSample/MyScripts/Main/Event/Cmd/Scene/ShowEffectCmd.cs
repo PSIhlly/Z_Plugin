@@ -1,3 +1,4 @@
+using Form;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,17 +18,17 @@ namespace Z_Code
             Register(new ShowEffectCmd());
         }
         public override string GetName() => "ShowEffect";
-        public override void GetUnitChooseCode(Action<string> act)
+        public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
-            ModManager.instance.assetCtrl.ChooseEffectr(TextManager.instance.GetTxt("Choose effect"),(form) => 
+            ModManager.instance.assetCtrl.ChooseEffect(TextManager.instance.GetTxt("Choose effect"),(form) => 
             {
-                act.Invoke($"{form.uid}");
+                act.Invoke($"{form.name}");
             });
         }
         public override CmdBase GetNew() => new ShowEffectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            GameManager.instance.effectCtrl.CreatEffect((int)prm[0].num, new Vector3(prm[1].num, prm[3].num, prm[2].num ), prm[4].num);
+            GameManager.instance.effectCtrl.CreatEffect(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.EFFECT), MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].num, prm[3].num, prm[2].num )), prm[4].num);
 
             return true;
         }

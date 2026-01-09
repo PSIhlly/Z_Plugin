@@ -1,11 +1,16 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
+using UnityEngine.UI;
 using Z_Code;
+using Z_Code.Form;
 using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
+using static UnityEditor.Progress;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiModStoryEventEditWindowParam
@@ -35,7 +40,7 @@ namespace Ui.ModStoryEventEditWindow
         {
 
             unitCon = new UiContainer<UiUnitCtrl>(view.go_unit, false);
-            itemCon = new UiContainer<UiItemCtrl>(view.go_item);
+            itemCon = new UiContainer<UiItemCtrl>(view.go_item, false);
 
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();
@@ -85,7 +90,14 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_edit.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, GlobalEventHelper.GetGameRetType(model.selUnit.desc), (item) =>
+                var tp = GlobalEventHelper.GetGameRetType(model.selUnit.desc);
+                if (model.selUnit.parentNode != null && model.selUnit.parentNode.desc.type == CodeType.FuncName && CmdDataForm.DataByName.ContainsKey(model.selUnit.parentNode.desc.code))
+                {
+                    var data = CmdDataForm.DataByName[model.selUnit.parentNode.desc.code];
+                    var prmId = model.selUnit.parentNode.subNodes.IndexOf(model.selUnit);
+                    tp = data.prmTypes[prmId];
+                }
+                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, tp, (item) =>
                 {
                     var data = GameCmdDataForm.DataByUid[item.id];
                     BaseData.cmdDic[data.name].GetUnitChooseCode((code) =>
@@ -93,7 +105,7 @@ namespace Ui.ModStoryEventEditWindow
                         model.cpr.Compile(code, out var res);
                         ReplaceNode(model.selUnit, res[0]);
                         ApplyEntry();
-                    });
+                    }, model.selUnit);
                 });
 
             });
@@ -156,6 +168,10 @@ namespace Ui.ModStoryEventEditWindow
         }
         public void Refresh()
         {
+            int cnt = -1;
+
+            view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
+            view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
 
             itemCon.Clear();
             foreach (var node in model.curEntry)
@@ -165,6 +181,7 @@ namespace Ui.ModStoryEventEditWindow
                     con = itemCon,
                     node = node,
                     deepth = 0,
+                    targetNewList = model.curEntry,
                 });
             }
             itemCon.Add(new UiItemParam()
@@ -172,8 +189,10 @@ namespace Ui.ModStoryEventEditWindow
                 con = itemCon,
                 node = null,
                 deepth = 0,
+                targetNewList = model.curEntry,
             });
             itemCon.Refresh();
+
             //
             view.txt_title.text = model.data.name;
 
@@ -181,8 +200,7 @@ namespace Ui.ModStoryEventEditWindow
             view.ipt_category.Set(model.data.category);
             view.ipt_type.Set(model.data.type);
 
-            view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
-            view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
+
             RefreshUnitDetail();
             RefreshUnit();
 
@@ -230,9 +248,9 @@ namespace Ui.ModStoryEventEditWindow
         {
             model.selUnit = node;
             Refresh();
+            UiManager.Rebuild(view.scr_units.gameObject, true);
             if (node != null)
             {
-
                 TimeManager.instance.AddCurLateUpdateAction(() =>
                 {
                     for (int i = 0, icnt = unitCon.paramLst.Count; i < icnt; i++)
@@ -243,7 +261,6 @@ namespace Ui.ModStoryEventEditWindow
                         }
                     }
                 }, gameObject);
-
             }
         }
         public void ReplaceNode(SyntaxNode nodeNow, SyntaxNode nodeNew)

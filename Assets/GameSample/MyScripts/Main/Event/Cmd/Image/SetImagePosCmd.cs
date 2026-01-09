@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetImagePosCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.assetCtrl.SetPos((int)prm[0].num,new Vector2(prm[1].num, prm[2].num), prm[3].num);
+            PlayManager.instance.assetCtrl.SetPos(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.UIIMAGE), new Vector2(prm[1].num, prm[2].num), prm[3].num);
             return true;
         }
     }

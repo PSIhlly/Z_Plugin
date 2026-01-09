@@ -147,7 +147,6 @@ public class PlayManager : Z_MonoManager<PlayManager>
             {
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct();
-                GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
 
                 characters.Add(newCharacter.uid);
                 foreach (var uidActive in progress.teamActive)

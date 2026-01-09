@@ -107,8 +107,8 @@ namespace Z_Ui.Base
                 TimeManager.instance.CancelTimer(timer);
                 timer = TimeManager.instance.StartTimer(0, 0, () =>
                 {
-                    if (curText != text || textInfo.characterCount != text.Length)
-                        return false;
+                    if (curText != text)
+                        return true;
 
                     var parts = text.Split(AssetManager.instance.texCtrl.GetMark());
                     int cnt = 0;
@@ -126,6 +126,10 @@ namespace Z_Ui.Base
                             var img = go.AddComponent<Img>();
                             go.transform.parent = transform;
                             images.Add(img);
+                        }
+                        if (textInfo.characterCount <= cnt + 1)
+                        {
+                            break;
                         }
                         var info = textInfo.characterInfo[cnt + 1];
                         images[i].transform.localPosition = (info.topLeft + info.bottomRight) / 2;

@@ -42,7 +42,7 @@ public interface ExternalPlaySceneController
     public void AddMessage(string content);
     public void ForceUpdate();
 
-    public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data);
+    public CharacterUnitForm.Data GetCharacterUnit(int productUid);
 }
 public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
 {
@@ -66,7 +66,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     Vector2 downPos;
     private CharacterUnitForm.Data _playerM;
     private CharacterProductForm.Data _playerG;
-    private Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data> _characterDic;
+    private Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data> _characterDic;
 
     #region internal Var
     private string _fileName;
@@ -104,12 +104,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         setPlayerMove = Vector3.zero;
         enable = true;
         waitForActive = false;
-        _characterDic = new Dictionary<CharacterUnitForm.Data, CharacterProductForm.Data>();
+        _characterDic = new Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data>();
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
         _playerM = null;
-        _playerG = null;
 
         //character Reflect
+
+        _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
 
         foreach (var data in CharacterUnitForm.DataByUid.Values)
         {
@@ -119,12 +120,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct();
                 data.name = newCharacter.name;
-                data.unit.productInfo = (newCharacter.uid,-1);
-                GameManager.instance.characterCtrl.RegisterAnim(newCharacter);
+                data.unit.productInfo = (newCharacter.uid, -1);
+                _characterDic[newCharacter] = data;
             }
         }
-
-
+        _playerM = GetOrNewCharacter(_playerG);
     }
     public void End()
     {
@@ -192,14 +192,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         if (!enable)
             return;
-        if (_playerG == null)
-        {
-            _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
-        }
-        if (_playerM == null)
-        {
-            _playerM = CreateCharacter(_playerG);
-        }
+
         {
             MapManager.instance.updateCtrl.UpdateInfo();
             {
@@ -221,8 +214,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             _playerM.unit.ins.transform.rotation = (Quaternion)setPlayerRot;
 
 #if PLATFORM_ANDROID
-            rotHoldingSeconds-=Time.deltaTime;
-            if(rotHoldingSeconds < 0)
+            rotHoldingSeconds -= Time.deltaTime;
+            if (rotHoldingSeconds < 0)
             {
                 setPlayerRot = null;
                 rotHoldingSeconds = 2f;
@@ -234,6 +227,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
 
         GameManager.instance.curProgress.pos = _playerM.pos;
+
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts?.Invoke();
+        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts -= GameManager.instance.evtCtrl.sceneTriggerCtrl.evts;
     }
     public void SetCamera(float x, float y, float z)
     {
@@ -246,14 +242,15 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         Main2StoryManager.instance.UnloadScenePlay();
         Main2StoryManager.instance.StartLoadScenePlay(sceneId);
     }
-    public CharacterProductForm.Data GetCharacterProduct(CharacterUnitForm.Data data)
+    public CharacterUnitForm.Data GetCharacterUnit(int productUid)
     {
-        if (!_characterDic.ContainsKey(data))
+        var data = CharacterProductForm.DataByUid.GetDv(productUid, null);
+        if (data == null || !_characterDic.ContainsKey(data))
             return null;
         return _characterDic[data];
     }
 
-    public CharacterUnitForm.Data CreateCharacter(CharacterProductForm.Data data)
+    public CharacterUnitForm.Data GetOrNewCharacter(CharacterProductForm.Data data)
     {
         CharacterUnitForm.Data unitData = null;
         foreach (var curData in CharacterUnitForm.DataByUid.Values)
@@ -269,7 +266,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true); ;
             unitData.unit.productInfo = (data.uid, -1);
         }
-        _characterDic[unitData] = data;
+        _characterDic[data] = unitData;
         return unitData;
     }
 

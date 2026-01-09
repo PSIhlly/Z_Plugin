@@ -26,7 +26,7 @@ namespace Z_UnitSystem
         }
         protected readonly UnitForm.Data _data;
         public UnitForm.Data data => (UnitForm.Data)_data;
-
+        
         public GameObject prefab => InstancePoolManager.instance.GetPrefab(_data.prefabName);
 
         public Instance ins;

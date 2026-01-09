@@ -15,7 +15,7 @@ namespace Z_Code
         {
             Register(new NumCmd());
         }
-        public override void GetUnitChooseCode(Action<string> act)
+        public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), true, (res) =>
             {
@@ -24,7 +24,7 @@ namespace Z_Code
                     act?.Invoke(val.ToString());
                 }
                 return true;
-            });
+            }, cur.desc.code);
         }
         public override string GetName() => "Num";
         public override CmdBase GetNew() => new NumCmd();

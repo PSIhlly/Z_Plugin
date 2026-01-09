@@ -22,7 +22,7 @@ using Z_Math;
 
 public class GameEffectController : Z_Controller<GameManager>
 {
-    private GameObject prefab => InstancePoolManager.instance.GetPrefab(GlobalNameHelper.GetInternalPrefabName(MapInfo.imgName));
+    private GameObject prefab => InstancePoolManager.instance.GetPrefab(MapInfo.imgName);
 
     public GameEffectController(GameManager super) : base(super)
     {
@@ -35,7 +35,7 @@ public class GameEffectController : Z_Controller<GameManager>
         var img = InstancePoolManager.instance.CreateInstance(prefab).GetComponentInChildren<ImageHolder>();
 
         TimeManager.instance.CancelTimer(img.animTimer);
-        int cur = 0;
+        int cur = -1;
         float startTime = Time.time;
 
         img.oriPos = pos;
@@ -45,18 +45,17 @@ public class GameEffectController : Z_Controller<GameManager>
         img.trs.position = pos;
         img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
         img.trs.localScale = Vector3.one;
-
         img.animTimer = TimeManager.instance.StartTimer(0, 0.02f, () =>
         {
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             float progress = Time.time - startTime;
             var clips = EffectForm.DataByUid[uid].clips;
 
-            var clip = clips[cur];
-            if (progress > clips[cur].time)
+            var clip = cur == -1 ? null : clips[cur];
+            if (cur == -1 || progress > clips[cur].time)
             {
                 cur++;
-                if (clips.Count > cur)
+                if (clips.Count <= cur)
                 {
                     InstancePoolManager.instance.DeleteInstance(img.gameObject, prefab);
                     return true;
@@ -65,7 +64,7 @@ public class GameEffectController : Z_Controller<GameManager>
                 clip = clips[cur];
                 img.render.GetPropertyBlock(propBlock);
                 propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
-
+                
                 img.trs.position = img.oriPos + clip.pos;
                 img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
                 img.trs.localScale = img.oriScale + clip.scale;

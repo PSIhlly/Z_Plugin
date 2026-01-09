@@ -132,6 +132,16 @@ namespace Form
 
                 {10003,new Data(10003,"audio")},
 
+                {10004,new Data(10004,"character")},
+
+                {10005,new Data(10005,"item")},
+
+                {10006,new Data(10006,"sceneObject")},
+
+                {10007,new Data(10007,"effect")},
+
+                {10008,new Data(10008,"uiImg")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -140,6 +150,16 @@ namespace Form
                         {"video",_DataByUid[10002]},
     
                         {"audio",_DataByUid[10003]},
+    
+                        {"character",_DataByUid[10004]},
+    
+                        {"item",_DataByUid[10005]},
+    
+                        {"sceneObject",_DataByUid[10006]},
+    
+                        {"effect",_DataByUid[10007]},
+    
+                        {"uiImg",_DataByUid[10008]},
     
                     };
     

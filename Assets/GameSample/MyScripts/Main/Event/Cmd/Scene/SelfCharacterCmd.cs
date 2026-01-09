@@ -15,18 +15,17 @@ using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class GetTriggerObjectIDCmd : CmdBase
+    public class SelfCharacterCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new GetTriggerObjectIDCmd());
+            Register(new SelfCharacterCmd());
         }
-        public override string GetName() => "GetTriggerObjectID";
-        public override CmdBase GetNew() => new GetTriggerObjectIDCmd();
+        public override string GetName() => "SelfCharacter";
+        public override CmdBase GetNew() => new SelfCharacterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(((EventInterpretDataForm.Data)asyncTask.interpreter.data).args[1].num) };
             return true;
         }
     }

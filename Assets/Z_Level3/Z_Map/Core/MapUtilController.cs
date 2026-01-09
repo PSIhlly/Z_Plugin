@@ -19,11 +19,12 @@ namespace Z_Map
         public MapUtilController(MapManager super) : base(super)
         {
         }
-        public List<TileUnit> GetNineTile((int, int, int) mapPos)
+        public List<TileUnit> GetNineTile((int, int, int) mapPos,float length)
         {
             List<TileUnit> res = new List<TileUnit>();
-            for (int i = mapPos.Item1 - 1; i <= mapPos.Item1 + 1; i++)
-                for (int j = mapPos.Item3 - 1; j <= mapPos.Item3 + 1; j++)
+            int area=(int)Math.Max(1, length);
+            for (int i = mapPos.Item1 - area; i <= mapPos.Item1 + area; i++)
+                for (int j = mapPos.Item3 - area; j <= mapPos.Item3 + area; j++)
                 {
                     if (_super.data.maps.ContainsKey((i, mapPos.Item2, j)))
                     {
@@ -53,6 +54,10 @@ namespace Z_Map
             pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
             return new Vector3Int((int)Math.Round(pos.x), (int)(pos.y), (int)Math.Round(pos.z));
         }
+        public Vector3 MapPos2RealPos(Vector3 pos)
+        {
+            return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
+        }
         public Vector3 MapPos2RealPos(Vector3Int pos)
         {
             return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
@@ -60,7 +65,7 @@ namespace Z_Map
 
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {
-            var newPos = SearchClosedValid(pos);
+            var newPos = SearchClosedValid(MapPos2RealPos(pos));
             return RealPos2MapPos(newPos);
         }
         public Vector3 GetClosestInArea(Vector3 pos)
@@ -204,7 +209,7 @@ namespace Z_Map
         public List<TileUnit> GetOverlap(ObjectUnitForm.Data oData)
         {
             var all = new List<List<Vector3Int>>();
-            foreach (var c in GetCollidersMesh(oData.unit.prefab, oData.pos, oData.euler, oData.scale, CollideType.CollideOnly))
+            foreach (var c in oData.unit.GetMeshes(CollideType.CollideOnly))
             {
                 all.Add(Graph.GetRoughOverlapIntPos(c.positions));
             }

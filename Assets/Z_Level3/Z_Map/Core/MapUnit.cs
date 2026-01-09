@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Z_Math;
+using Z_Mesh;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
@@ -36,6 +38,24 @@ namespace Z_Map
             }
 
         }
+        private Vector3 lastPos;
+
+        public Dictionary<CollideType,List<MeshInfo>> _zMeshes;
+        public List<MeshInfo> GetMeshes(CollideType type)
+        {
+            if (_zMeshes == null)
+            {
+                _zMeshes = new Dictionary<CollideType, List<MeshInfo>>();
+            }
+            if(lastPos != data.pos)
+            {
+                lastPos = data.pos;
+                _zMeshes[CollideType.CollideOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.CollideOnly);
+                _zMeshes[CollideType.TriggerOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.TriggerOnly);
+            }
+            return _zMeshes[type];
+        }
+        
         public void Create()
         {
             if (this is TileUnit tile)

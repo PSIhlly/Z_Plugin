@@ -23,7 +23,6 @@ namespace Ui.ModAssetSelectWindow
     {
 
             public GameObject go_item;
-            public Sta sta_item;
             public Btn btn_;
             public Sta sta_;
             public Img img_;
@@ -32,11 +31,10 @@ namespace Ui.ModAssetSelectWindow
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            img_ = uiHolder.elementTrsLst[4].GetComponent<Img>();
-            txt_ = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
     }
@@ -75,39 +73,27 @@ namespace Ui.ModAssetSelectWindow
     public partial class UiModAssetSelectWindowView:UiView
     {
 
-            public Btn btn_bbg;
-            public Txt txt_externPath;
-            public ScrView scr_bigItems;
+            public Btn btn_bg;
+            public ScrView scr_items;
+            public Btn btn_import;
+            public Sta sta_import;
             public Btn btn_;
             public Sta sta_;
             public Btn btn_close;
-            public Btn btn_extern;
-            public Sta sta_extern;
-            public Btn btn_internal;
-            public Sta sta_internal;
-            public Btn btn_import;
-            public Sta sta_import;
             public GameObject go_item;
-            public Sta sta_item;
             public UiItemCtrl sub_item;
         public UiModAssetSelectWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_bbg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            txt_externPath = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            scr_bigItems = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            btn_close = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            btn_extern = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_extern = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_internal = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_internal = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            btn_import = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            sta_import = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            go_item = uiHolder.elementTrsLst[12].gameObject;
-            sta_item = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            btn_bg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            scr_items = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            btn_import = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            sta_import = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            btn_close = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            go_item = uiHolder.elementTrsLst[7].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }

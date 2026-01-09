@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
 using UnityEngine;
 using Z_Code.Form;
@@ -14,7 +15,7 @@ namespace Z_Code
         {
             BaseData.cmdDic[cmd.GetName()] = cmd;
         }
-        public virtual void GetUnitChooseCode(Action<string> act)
+        public virtual void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             act?.Invoke(CmdDataForm.DataByName[GetName()].defaultCode);
         }

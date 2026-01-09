@@ -21,7 +21,7 @@ namespace Z_Code
         {
             var handle = PlayManager.instance.assetCtrl.Add(prm[0].str, new Vector2(prm[1].num, prm[2].num));
             PlayManager.instance.assetCtrl.SetRemoveTime(handle, prm[3].num);
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(handle) };
+            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(prm[0].str) };
             return true;
         }
     }

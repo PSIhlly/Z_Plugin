@@ -1,3 +1,5 @@
+using Mono.Cecil.Cil;
+using System;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Debug;
@@ -110,6 +112,7 @@ namespace Z_Code
             int cnt = data.program.zCode.Count;
             BoxDataForm.Data box = null;
             BoxDataForm.Data realBox = null;
+
             for (; data.p < cnt; data.p++)
             {
                 if (DEBUG)
@@ -132,35 +135,42 @@ namespace Z_Code
                         Push(CodeHelper.CreateBoxByVal(nm));
                         break;
                     case Op.Call:
-                        var cmd = BaseData.cmdDic[data.program.zCode[data.p + 1]].GetNew();
-                        var form = cmd.GetForm();
-                        var prm = new BoxDataForm.Data[form.prmNames == null ? 0 : form.prmNames.Count];
-                        for (int i = 0; i < prm.Length; i++)
-                        {
-                            prm[i] = GetBox(data.stack[data.top - i]);
-                        }
-                        if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
-                        {
-                            cmd.Execute(prm, data.heap, asyncTask);
-                        }
 
-                        if (asyncTask.IsComplete())
+                        var cmd = BaseData.cmdDic[data.program.zCode[data.p + 1]].GetNew(); try
                         {
-                            //Delay
-                            data.p++;
+                            var form = cmd.GetForm();
+                            var prm = new BoxDataForm.Data[form.prmNames == null ? 0 : form.prmNames.Count];
                             for (int i = 0; i < prm.Length; i++)
                             {
-                                Pop();
+                                prm[i] = GetBox(data.stack[data.top - i]);
                             }
-                            for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                            if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
                             {
-                                Push(asyncTask.res[i]);
+                                cmd.Execute(prm, data.heap, asyncTask);
                             }
-                            asyncTask.Reset();
+
+                            if (asyncTask.IsComplete())
+                            {
+                                //Delay
+                                data.p++;
+                                for (int i = 0; i < prm.Length; i++)
+                                {
+                                    Pop();
+                                }
+                                for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                                {
+                                    Push(asyncTask.res[i]);
+                                }
+                                asyncTask.Reset();
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            return false;
+                            Debug.LogError(cmd.GetName() + " " + e);
                         }
 
                         break;
@@ -258,6 +268,8 @@ namespace Z_Code
 
 
             }
+
+
             return true;
         }
 

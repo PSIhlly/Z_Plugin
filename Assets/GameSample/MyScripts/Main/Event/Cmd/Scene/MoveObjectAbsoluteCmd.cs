@@ -16,26 +16,26 @@ using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class MoveObjectCmd : CmdBase
+    public class MoveObjectAbsoluteCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new MoveObjectCmd());
+            Register(new MoveObjectAbsoluteCmd());
         }
-        public override string GetName() => "MoveObject";
-        public override CmdBase GetNew() => new MoveObjectCmd();
+        public override string GetName() => "MoveObjectAbsolute";
+        public override CmdBase GetNew() => new MoveObjectAbsoluteCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var unit = UnitForm.DataByUid[(int)prm[0].num].unit;
+            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
             GameManager.instance.evtCtrl.StartTask(() =>
             {
-                var relaPos = new Vector3(prm[1].num, prm[3].num, prm[2].num);
+                var pos = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].num, prm[3].num, prm[2].num));
                 var time = prm[4].num;
-                var step = Mathf.Min(1,Time.deltaTime / time) * relaPos;
+                var oldPos = data.pos;
+                var step = Mathf.Min(1,Time.deltaTime / time) * (pos - oldPos)+ oldPos;
 
 
-                var oldPos = unit.data.pos;
                 if (time <= 0)
                 {
                     asyncTask.Complete();
@@ -43,23 +43,11 @@ namespace Z_Code
                 }
                 else
                 {
-                    if (unit is ObjectUnit o)
+                    if (data.unit is ObjectUnit o)
                     {
                         o.Move(step);
                     }
-                    /*else if (unit is ItemUnit i)
-                    {
-                        i.Move(step);
-                    }*/
-                    else if (unit is CharacterUnit c)
-                    {
-                        c.Move(step);
-                    }
                 }
-                var realStep = (unit.data.pos - oldPos);
-                prm[1].num -= realStep.x;
-                prm[2].num -= realStep.z;
-                prm[3].num -= realStep.y;
                 prm[4].num -= Time.deltaTime;
                 return false;
             });

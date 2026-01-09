@@ -57,6 +57,13 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             model.cat = null;
             model.type = null;
             model.data = null;
+            if(EventProgramDataForm.DataByUid.Count>0)
+            {
+                var defaultData = EventProgramDataForm.DataByUid.First().Value;
+                model.cat = defaultData.category;
+                model.type = defaultData.type;
+                model.data = defaultData;
+            }
             Refresh();
         }
         public void Refresh()

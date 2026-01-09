@@ -344,11 +344,9 @@ namespace Z_Math
             bool toIn = false;
             var mag = dir.magnitude;
             dis = mag;
-            
-            var sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
-            var disDir = GetPointToCube(sphereCenter, cubeEightPoints,out fromIn);
 
-            var newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
+            var sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
+            var disDir = GetPointToCube(sphereCenter, cubeEightPoints, out fromIn);
 
             if (fromIn)
             {
@@ -358,6 +356,10 @@ namespace Z_Math
                 }
             }
 
+            var newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
+
+
+
             float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
             var cubeCenter = (cubeEightPoints[(int)CubeEightPoint.LeftDownBack] + cubeEightPoints[(int)CubeEightPoint.RightUpForward]) / 2;
 
@@ -365,7 +367,7 @@ namespace Z_Math
             float avoidTime = 1;
 
             var axis = disDir.normalized;
-            
+
             // 1. 初始投影区间
             float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
             float sphereMin = sphereCenterProj - sphereRadius;
@@ -384,7 +386,7 @@ namespace Z_Math
                 //Debug.Log(Time.frameCount);
             }
             //Debug.Log(Time.frameCount + " : " + axis + " " + sphereMin + " " + sphereMax + " " + cubeMin + " " + cubeMax + "  " + dir + "  " + dirProj + " " + " --- " + touchTime + " " + avoidTime);
-            
+
             if ((fromIn && !newInner) ||
     (fromIn && newInner && newDisDir.sqrMagnitude < disDir.sqrMagnitude)
     || (!fromIn && !newInner && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
@@ -527,8 +529,8 @@ namespace Z_Math
             var forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
             var up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
             var right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
-            to = GetNewCoordinateVector(to, right, up, forward ) - eightPoints[(int)CubeEightPoint.LeftDownBack];
-            from = GetNewCoordinateVector(from, right , up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            to = GetNewCoordinateVector(to, right, up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            from = GetNewCoordinateVector(from, right, up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
 
             var x = right.magnitude;
             var y = up.magnitude;
@@ -611,7 +613,7 @@ namespace Z_Math
 
             return GetIntersectRes(fromIn, toIn, dis < mag);
         }
-        public static IntersectType PointIntersectCube(Vector3[] eightPoints, Vector3 point,out float dis)
+        public static IntersectType PointIntersectCube(Vector3[] eightPoints, Vector3 point, out float dis)
         {
             dis = 0;
             var forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
@@ -836,11 +838,11 @@ namespace Z_Math
 
         public static bool IsSphereAndCubeOverlap(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints)
         {
-            
+
 
             var aCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
             var aRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
-            var axis = GetPointToCube(aCenter, cubeEightPoints,out var inner).normalized;
+            var axis = GetPointToCube(aCenter, cubeEightPoints, out var inner).normalized;
             if (inner)
                 return true;
             // 对每个轴检查投影重叠
@@ -869,7 +871,7 @@ namespace Z_Math
             return (bCenter - aCenter).magnitude <= (aSphereSixPoints[(int)SphereSixPoint.Left] - aCenter).magnitude + (bSphereSixPoints[(int)SphereSixPoint.Left] - bCenter).magnitude; // 所有轴都重叠，判定碰撞
         }
 
-        public static Vector3 GetPointToCube(Vector3 point, Vector3[] cubeEightPoints,out bool inner)
+        public static Vector3 GetPointToCube(Vector3 point, Vector3[] cubeEightPoints, out bool inner)
         {
             inner = false;
             var boxCenter = (cubeEightPoints[(int)CubeEightPoint.LeftUpBack] + cubeEightPoints[(int)CubeEightPoint.RightDownForward]) / 2;
@@ -890,13 +892,14 @@ namespace Z_Math
             axis[1] = (cubeEightPoints[id] - axis[1]).normalized;
             axis[2] = (cubeEightPoints[id] - axis[2]).normalized;
             var res = GetNewCoordinateVector(point - cubeEightPoints[id], axis[0], axis[1], axis[2]);
-            if(res.x<=0&&res.y<=0&&res.z<=0)
+            if (res.x <= 0 && res.y <= 0 && res.z <= 0)
             {
                 inner = true;
-                if (res.x > res.y&& res.x > res.z)
+                if (res.x > res.y && res.x > res.z)
                 {
-                    res.y = 0;res.z = 0;
-                }else if(res.y > res.z && res.y > res.z)
+                    res.y = 0; res.z = 0;
+                }
+                else if (res.y > res.z && res.y > res.z)
                 {
                     res.x = 0; res.z = 0;
                 }
@@ -904,7 +907,8 @@ namespace Z_Math
                 {
                     res.x = 0; res.y = 0;
                 }
-            }else
+            }
+            else
             {
                 if (res.x < 0) res.x = 0;
                 if (res.y < 0) res.y = 0;
@@ -917,7 +921,7 @@ namespace Z_Math
         }
 
 
-        public static Vector3 GetNewCoordinateVector(Vector3 old,Vector3 right, Vector3 up, Vector3 forward)
+        public static Vector3 GetNewCoordinateVector(Vector3 old, Vector3 right, Vector3 up, Vector3 forward)
         {
             float x = Vector3.Dot(old, right.normalized);
             float y = Vector3.Dot(old, up.normalized);

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
 using Z_ObjectAnimator.Base;
@@ -429,7 +430,7 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon,GlobalNameHelper.GetDefaultTexName()).GetSprite();
 
             view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
 

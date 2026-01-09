@@ -87,6 +87,7 @@ namespace Z_Ui.Notify
         public Func<string, bool> func;
         public bool canClose;
         public int id;
+        public string defaultText;
     }
     public class NotifyManager: NotifyManagerBase<UiNotifyCtrl, UiTipCtrl, UiChooseCtrl, UiQuickChooseCtrl, UiMultipleChooseCtrl, UiPopupCtrl, UiInputAreaCtrl>
     {
@@ -217,14 +218,15 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddInputArea(string title, bool canClose, Func<string, bool> func)
+        public void AddInputArea(string title, bool canClose, Func<string, bool> func,string defaultText="")
         {
             var info = new InputAreaInfo()
             {
                 title = title,
                 canClose = canClose,
                 func = func,
-                id = popupIdCnt++
+                id = popupIdCnt++,
+                defaultText = defaultText
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
             if (ctrl != null && ctrl.active)

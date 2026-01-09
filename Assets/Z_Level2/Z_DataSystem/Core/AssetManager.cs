@@ -88,7 +88,7 @@ namespace Z_DataSystem
             {
                 var path = "";
 #if UNITY_EDITOR_WIN
-                path = $"{Application.dataPath}/HlzyAssets";
+                path = $"{Application.dataPath}/HlzyAssets/";
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);

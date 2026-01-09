@@ -499,7 +499,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             sizeLimit = new Vector2Int(100, 100)
         });
     }
-    public void ChooseEffectr(string title, Action<EffectForm.Data> act)
+    public void ChooseEffect(string title, Action<EffectForm.Data> act)
     {
         var items = new EntryItem();
 

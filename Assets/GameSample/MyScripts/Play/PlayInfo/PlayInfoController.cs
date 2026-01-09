@@ -20,6 +20,7 @@ using Z_Time;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
+using static UnityEditor.Progress;
 public enum StoryItemEventType
 {
     Add,
@@ -52,8 +53,8 @@ public interface InternalPlayInfoController
 }
 public interface ExternalPlayInfoController
 {
-    public void GainItem(string name, int amount, bool toast = true, bool message = true);
-    public void LostItem(string name, int amount, bool toast = true, bool message = true);
+    public void GainItem(int uid, int amount, bool toast = true, bool message = true);
+    public void LostItem(int uid, int amount, bool toast = true, bool message = true);
     public void ChangeCharacterParam(int characterUid, string name, float value);
 }
 public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>
@@ -114,27 +115,24 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             }
         }
     }
-    public void LostItem(string name,int amount ,bool toast = true, bool message = true)
+    public void LostItem(int uid, int amount, bool toast = true, bool message = true)
     {
-        var item = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
-        if(item==null)
-        {
-            return;
-        }
+        var item = ItemProductForm.DataByUid.GetDv(uid, null);
+
         item = item.Copy();
         item.amount = amount;
 
         if (!bagName2UidDic.ContainsKey(item.name))
             bagName2UidDic[item.name] = new List<int>();
 
-        foreach (var uid in bagName2UidDic[item.name])
+        foreach (var mineUid in bagName2UidDic[item.name])
         {
-            var old = ItemProductForm.DataByUid[uid];
+            var old = ItemProductForm.DataByUid[mineUid];
             var lost = Mathf.Min(old.amount, item.amount);
             item.amount -= lost;
             old.amount -= lost;
-            
-            if (old.amount <=0 )
+
+            if (old.amount <= 0)
             {
                 bagName2UidDic[item.name].Remove(old.uid);
                 GameManager.instance.curProgress.bag.Remove(old.uid);
@@ -153,15 +151,34 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         }
         Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Remove, data = item });
     }
-    public void GainItem(string name,int amount, bool toast = true, bool message = true)
+    public void LostItem(string name,int amount ,bool toast = true, bool message = true)
     {
-        var newItem = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        var item = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        if(item==null)
+        {
+            return;
+        }
+        LostItem(item.uid, amount, toast, message);
+    }
+    public void GainItem(int uid, int amount, bool toast = true, bool message = true)
+    {
+        var newItem = ItemProductForm.DataByUid.GetDv(uid, null);
+
         if (newItem == null)
             return;
         newItem = newItem.Copy(false);
         newItem.ToProduct();
         newItem.amount = amount;
         GainItem(newItem, toast, message);
+    }
+    public void GainItem(string name,int amount, bool toast = true, bool message = true)
+    {
+        var newItem = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        if (newItem == null)
+        {
+            return;
+        }
+        GainItem(newItem.uid, amount, toast, message);
     }
     public void GainItem(int uid,bool toast = true, bool message = true)
     {

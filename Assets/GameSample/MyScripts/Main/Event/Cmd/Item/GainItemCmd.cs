@@ -25,7 +25,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new GainItemCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.infoCtrl.GainItem(prm[0].str, (int)prm[1].num);
+            PlayManager.instance.infoCtrl.GainItem(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.ITEM), (int)prm[1].num);
             return true;
         }
     }

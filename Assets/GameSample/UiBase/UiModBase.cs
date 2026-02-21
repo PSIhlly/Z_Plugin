@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.Mod
 
 {
@@ -83,7 +84,7 @@ namespace Ui.Mod
             public ScrView scr_items;
             public GameObject go_item;
             public Sta sta_item;
-            public UiItemCtrl sub_Item;
+            public UiItemCtrl sub_item;
         public UiModView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -92,7 +93,7 @@ namespace Ui.Mod
             scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             go_item = uiHolder.elementTrsLst[3].gameObject;
             sta_item = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -117,8 +118,8 @@ namespace Ui.Mod
             model=new UiModModel();
 
 
-            view.sub_Item = new UiItemCtrl();
-            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_item = new UiItemCtrl();
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }

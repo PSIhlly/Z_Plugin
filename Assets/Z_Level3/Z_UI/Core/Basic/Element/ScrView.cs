@@ -25,6 +25,9 @@ namespace Z_Ui.Base
         public float xSpacing;
         public float ySpacing;
 
+        public float top;
+        public float left;
+
         private int cnt;
         private bool inited;
         private List<Vector3> offsets;
@@ -38,7 +41,7 @@ namespace Z_Ui.Base
         {
             get
             {
-                int v = (int)((height) / (cell.rect.height + ySpacing));
+                int v = (int)((height - top) / (cell.rect.height + ySpacing));
                 if (v == 0)
                     return 1;
                 return v;
@@ -48,7 +51,7 @@ namespace Z_Ui.Base
         {
             get
             {
-                int v = (int)((width) / (cell.rect.width + xSpacing));
+                int v = (int)((width - left) / (cell.rect.width + xSpacing));
                 if (v == 0)
                     return 1;
                 return v;
@@ -59,7 +62,7 @@ namespace Z_Ui.Base
 
         HashSet<int> needs = new HashSet<int>();
         List<int> lastShows = new List<int>();
-
+        const bool DEBUG=false;
 
         protected override void Start()
         {
@@ -87,15 +90,12 @@ namespace Z_Ui.Base
                     offsetMax = Math.Max(offsetMax, offset.x);
                 }
                 int totRow = (cnt / columnCnt) + (cnt % columnCnt != 0 ? 1 : 0);
-                if (fiilType == FillType.Average)
-                {
+                if (DEBUG)
+                    Debug.Log("[sv]行数：" + totRow);
 
-                    content.sizeDelta += new Vector2(width - content.rect.width, Mathf.Max(totRow, rowCnt) * averageCellSize.y - (content.rect.height));
-                }
-                else
-                {
                     content.sizeDelta += new Vector2(width - content.rect.width, Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
-                }
+       
+                
                 content.sizeDelta += Vector2.right * offsetMax * 2.5f;
 
             }
@@ -106,15 +106,11 @@ namespace Z_Ui.Base
                     offsetMax = Math.Min(offsetMax, offset.y);
                 }
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
-                if (fiilType == FillType.Average)
-                {
-                    content.sizeDelta += new Vector2(Mathf.Max(totColumn, columnCnt) * averageCellSize.x - content.rect.width, height - content.rect.height);
+ 
+      
+                content.sizeDelta += new Vector2(Mathf.Max(totColumn, columnCnt) * (cell.rect.width + xSpacing) - content.rect.width, height - content.rect.height);
+             
 
-                }
-                else
-                {
-                    content.sizeDelta += new Vector2(Mathf.Max(totColumn, columnCnt) * (cell.rect.width + xSpacing) - content.rect.width, height - content.rect.height);
-                }
                 content.sizeDelta += Vector2.up * offsetMax * 2.5f;
             }
 
@@ -126,6 +122,10 @@ namespace Z_Ui.Base
             //stretch back
             cell.sizeDelta += cellSize - new Vector2(cell.rect.width, cell.rect.height);
 
+            if(DEBUG)
+            {
+                Debug.Log("[sv]原始项尺寸：" + cell.rect.width + "*" + cell.rect.height + "  可容纳" + columnCnt + "列" + $",({height} - {top}) / ({cell.rect.height} + {ySpacing})"+"="+ rowCnt + "行，布尺寸：" + content.rect.width + "*" + content.rect.height);
+            }
             UpdateInfo(normalizedPosition);
         }
 
@@ -147,7 +147,15 @@ namespace Z_Ui.Base
 
             if (fiilType == FillType.Average)
             {
-                unitSize = new Vector2(width / columnCnt * content.lossyScale.x, height / rowCnt * content.lossyScale.y);
+                if (dir == Direction.Vertical)
+                {
+                    unitSize = new Vector2(width / columnCnt * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
+                    
+                }
+                else
+                {
+                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, height / rowCnt * content.lossyScale.y);
+                }
 
             }
             else
@@ -169,7 +177,7 @@ namespace Z_Ui.Base
 
                 int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / (unitSize.y + ySpacing));
                 needs.Clear();
-                while (contentCorners[1].y - curRowId * (unitSize.y + ySpacing) > viewPortCorners[0].y)
+                while (contentCorners[1].y - curRowId * (unitSize.y + ySpacing)-top > viewPortCorners[0].y)
                 {
                     for (int i = 0; i < columnCnt; i++)
                     {
@@ -188,11 +196,9 @@ namespace Z_Ui.Base
                     int column = id % columnCnt;
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
 
-                    if (column > 0)
-                        relaPos.x += xSpacing * (column);
-                    if (row > 0)
-                        relaPos.y -= ySpacing * (row);
 
+                    relaPos.x +=( xSpacing * (column) + left) * content.lossyScale.x;
+                    relaPos.y -=( ySpacing * (row) + top) * content.lossyScale.y;
                     Add(id, contentCorners[1] + relaPos);
                 }
             }
@@ -200,7 +206,7 @@ namespace Z_Ui.Base
             {
                 int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / (unitSize.x + xSpacing));
                 needs.Clear();
-                while (contentCorners[1].x + curColumnId * (unitSize.x + xSpacing) < viewPortCorners[2].x)
+                while (contentCorners[1].x + curColumnId * (unitSize.x + xSpacing)+left < viewPortCorners[2].x)
                 {
                     for (int i = 0; i < rowCnt; i++)
                     {
@@ -218,10 +224,10 @@ namespace Z_Ui.Base
                     int column = id / rowCnt;
                     int row = id % rowCnt;
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
-                    if (column > 0)
-                        relaPos.x += xSpacing * (column);
-                    if (row > 0)
-                        relaPos.y -= ySpacing * (row);
+
+                    relaPos.x += (xSpacing * (column) + left)* content.lossyScale.x;
+
+                    relaPos.y -= (ySpacing * (row) + top)*content.lossyScale.y;
 
                     Add(id, contentCorners[1] + relaPos);
                 }

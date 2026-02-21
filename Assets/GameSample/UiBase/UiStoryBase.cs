@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.Story
 
 {
@@ -85,7 +84,7 @@ namespace Ui.Story
             public ScrView scr_items;
             public GameObject go_item;
             public Sta sta_item;
-            public UiItemCtrl sub_Item;
+            public UiItemCtrl sub_item;
         public UiStoryView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -94,7 +93,7 @@ namespace Ui.Story
             scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             go_item = uiHolder.elementTrsLst[3].gameObject;
             sta_item = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            sub_Item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -119,8 +118,8 @@ namespace Ui.Story
             model=new UiStoryModel();
 
 
-            view.sub_Item = new UiItemCtrl();
-            view.sub_Item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_item = new UiItemCtrl();
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }

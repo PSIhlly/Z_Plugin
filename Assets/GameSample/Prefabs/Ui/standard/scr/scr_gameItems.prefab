@@ -204,8 +204,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   dir: 1
-  viewPort: {fileID: 2902909130598599603}
-  spacing: 30
+  xSpacing: 0
+  ySpacing: 0
+  top: 0
+  left: 0
   cell: {fileID: 1663243550316920546}
   fiilType: 1
 --- !u!114 &2223912217680300673
@@ -416,7 +418,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3975392061340340404, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -2.9999886
+      value: -2.9999924
       objectReference: {fileID: 0}
     - target: {fileID: 3975392061340340404, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -480,27 +482,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.19745064
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.98037386
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.014
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.67578036
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -16.721401
+      value: 196.0834
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.y
-      value: -28.3973
+      value: 188.1565
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_LocalPosition.x
@@ -532,11 +534,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 117.6196
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: -122.23037
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

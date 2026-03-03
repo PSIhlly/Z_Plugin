@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.PlayData
 
 {
@@ -199,15 +200,15 @@ namespace PlayDataBackpack
             public Txt txt_name;
             public Txt txt_amount;
             public GameObject go_lab;
-            public UiLabCtrl sub_Lab;
+            public UiLabCtrl sub_lab;
             public GameObject go_gameItem;
-            public UiGameItemCtrl sub_GameItem;
+            public UiGameItemCtrl sub_gameItem;
             public Btn btn_drop;
             public Btn btn_equip;
             public Btn btn_use;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
-            public UiGameArgsCtrl sub_GameArgs;
+            public UiGameArgsCtrl sub_gameArgs;
         public UiPlayDataBackpackView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -221,15 +222,15 @@ namespace PlayDataBackpack
             txt_name = uiHolder.elementTrsLst[7].GetComponent<Txt>();
             txt_amount = uiHolder.elementTrsLst[8].GetComponent<Txt>();
             go_lab = uiHolder.elementTrsLst[9].gameObject;
-            sub_Lab = (UiLabCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
             go_gameItem = uiHolder.elementTrsLst[11].gameObject;
-            sub_GameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
             btn_drop = uiHolder.elementTrsLst[13].GetComponent<Btn>();
             btn_equip = uiHolder.elementTrsLst[14].GetComponent<Btn>();
             btn_use = uiHolder.elementTrsLst[15].GetComponent<Btn>();
             go_gameArgs = uiHolder.elementTrsLst[16].gameObject;
             sta_gameArgs = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            sub_GameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -254,12 +255,12 @@ namespace PlayDataBackpack
             model=new UiPlayDataBackpackModel();
 
 
-            view.sub_Lab = new UiLabCtrl();
-            view.sub_Lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_GameItem = new UiGameItemCtrl();
-            view.sub_GameItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
-            view.sub_GameArgs = new UiGameArgsCtrl();
-            view.sub_GameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_gameItem = new UiGameItemCtrl();
+            view.sub_gameItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_gameArgs = new UiGameArgsCtrl();
+            view.sub_gameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }
@@ -346,7 +347,7 @@ namespace PlayDataCharacterData
             public Img img_tachie;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
-            public UiGameArgsCtrl sub_GameArgs;
+            public UiGameArgsCtrl sub_gameArgs;
         public UiPlayDataCharacterDataView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -356,7 +357,7 @@ namespace PlayDataCharacterData
             img_tachie = uiHolder.elementTrsLst[3].GetComponent<Img>();
             go_gameArgs = uiHolder.elementTrsLst[4].gameObject;
             sta_gameArgs = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            sub_GameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -381,8 +382,8 @@ namespace PlayDataCharacterData
             model=new UiPlayDataCharacterDataModel();
 
 
-            view.sub_GameArgs = new UiGameArgsCtrl();
-            view.sub_GameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_gameArgs = new UiGameArgsCtrl();
+            view.sub_gameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -519,11 +520,11 @@ namespace PlayDataCharacterEquip
             public Txt txt_name;
             public ScrView scr_gameArgs;
             public GameObject go_gameEquip;
-            public UiGameEquipCtrl sub_GameEquip;
+            public UiGameEquipCtrl sub_gameEquip;
             public Btn btn_disequip;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
-            public UiGameArgsCtrl sub_GameArgs;
+            public UiGameArgsCtrl sub_gameArgs;
         public UiPlayDataCharacterEquipView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -534,11 +535,11 @@ namespace PlayDataCharacterEquip
             txt_name = uiHolder.elementTrsLst[4].GetComponent<Txt>();
             scr_gameArgs = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
             go_gameEquip = uiHolder.elementTrsLst[6].gameObject;
-            sub_GameEquip = (UiGameEquipCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            sub_gameEquip = (UiGameEquipCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
             btn_disequip = uiHolder.elementTrsLst[8].GetComponent<Btn>();
             go_gameArgs = uiHolder.elementTrsLst[9].gameObject;
             sta_gameArgs = uiHolder.elementTrsLst[10].GetComponent<Sta>();
-            sub_GameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -563,10 +564,10 @@ namespace PlayDataCharacterEquip
             model=new UiPlayDataCharacterEquipModel();
 
 
-            view.sub_GameEquip = new UiGameEquipCtrl();
-            view.sub_GameEquip.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_GameArgs = new UiGameArgsCtrl();
-            view.sub_GameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_gameEquip = new UiGameEquipCtrl();
+            view.sub_gameEquip.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_gameArgs = new UiGameArgsCtrl();
+            view.sub_gameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -698,7 +699,7 @@ namespace PlayDataCharacterSkill
             public PlayDataCharacterEquip.UiPlayDataCharacterEquipCtrl page_PlayDataCharacterEquip;
             public PlayDataCharacterSkill.UiPlayDataCharacterSkillCtrl page_PlayDataCharacterSkill;
             public GameObject go_gameItem;
-            public UiGameItemCtrl sub_GameItem;
+            public UiGameItemCtrl sub_gameItem;
             public Btn btn_data;
             public Sta sta_data;
             public Btn btn_equip;
@@ -713,7 +714,7 @@ namespace PlayDataCharacterSkill
             page_PlayDataCharacterEquip = (PlayDataCharacterEquip.UiPlayDataCharacterEquipCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             page_PlayDataCharacterSkill = (PlayDataCharacterSkill.UiPlayDataCharacterSkillCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             go_gameItem = uiHolder.elementTrsLst[4].gameObject;
-            sub_GameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
             btn_data = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             sta_data = uiHolder.elementTrsLst[7].GetComponent<Sta>();
             btn_equip = uiHolder.elementTrsLst[8].GetComponent<Btn>();
@@ -750,8 +751,8 @@ namespace PlayDataCharacterSkill
             view.page_PlayDataCharacterEquip.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.page_PlayDataCharacterSkill = new PlayDataCharacterSkill.UiPlayDataCharacterSkillCtrl();
             view.page_PlayDataCharacterSkill.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
-            view.sub_GameItem = new UiGameItemCtrl();
-            view.sub_GameItem.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.sub_gameItem = new UiGameItemCtrl();
+            view.sub_gameItem.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
         }
 
     }

@@ -56,3 +56,6 @@ Assembly-CSharp.csproj
 Assets/TextMesh Pro/Resources/Fonts & Materials/Alibaba-PuHuiTi-Light SDF.asset
 MerryYellow.CodeAssist.Editor.csproj
 /Assets/Samples/Universal RP/13.1.9
+/.plastic
+/.vs
+/.vscode

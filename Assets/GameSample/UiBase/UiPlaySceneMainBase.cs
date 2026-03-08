@@ -244,6 +244,7 @@ namespace PlayerTouchOpt
 
             public PlaySceneMessage.UiPlaySceneMessageCtrl page_PlaySceneMessage;
             public PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt;
+            public GameObject go_noScene;
             public GameObject go_map;
             public GameObject go_menu;
             public UiParamShowCtrl model_ParamShow;
@@ -258,15 +259,16 @@ namespace PlayerTouchOpt
 
             page_PlaySceneMessage = (PlaySceneMessage.UiPlaySceneMessageCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
             page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            go_map = uiHolder.elementTrsLst[2].gameObject;
-            go_menu = uiHolder.elementTrsLst[3].gameObject;
-            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            go_teamer = uiHolder.elementTrsLst[5].gameObject;
-            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            go_func = uiHolder.elementTrsLst[7].gameObject;
-            btn_map = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_menu = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            btn_data = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            go_noScene = uiHolder.elementTrsLst[2].gameObject;
+            go_map = uiHolder.elementTrsLst[3].gameObject;
+            go_menu = uiHolder.elementTrsLst[4].gameObject;
+            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            go_teamer = uiHolder.elementTrsLst[6].gameObject;
+            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            go_func = uiHolder.elementTrsLst[8].gameObject;
+            btn_map = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            btn_data = uiHolder.elementTrsLst[11].GetComponent<Btn>();
         }
 
     }

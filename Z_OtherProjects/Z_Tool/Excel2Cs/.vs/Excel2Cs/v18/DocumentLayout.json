@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:formBaseInfo.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\dataAnalysis.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:dataAnalysis.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\Excel2Cs.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:Excel2Cs.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "formBaseInfo.py",
+              "DocumentMoniker": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py",
+              "RelativeDocumentMoniker": "formBaseInfo.py",
+              "ToolTip": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py",
+              "RelativeToolTip": "formBaseInfo.py",
+              "ViewState": "AgIAABMBAAAAAAAAAAAAAAsAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-08T11:07:00.172Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "dataAnalysis.py",
+              "DocumentMoniker": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\dataAnalysis.py",
+              "RelativeDocumentMoniker": "dataAnalysis.py",
+              "ToolTip": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\dataAnalysis.py",
+              "RelativeToolTip": "dataAnalysis.py",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwkAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-08T11:06:58.213Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Excel2Cs.py",
+              "DocumentMoniker": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\Excel2Cs.py",
+              "RelativeDocumentMoniker": "Excel2Cs.py",
+              "ToolTip": "D:\\Works\\Game\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\Excel2Cs.py",
+              "RelativeToolTip": "Excel2Cs.py",
+              "ViewState": "AgIAAHgAAAAAAAAAAADwv4YAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-08T11:06:36.55Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

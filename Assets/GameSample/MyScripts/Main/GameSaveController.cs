@@ -1,10 +1,11 @@
-using Form;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Form;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.WSA;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -346,6 +347,7 @@ public class GameSaveController : Z_Controller<GameManager>
     #region load
     public void LoadCoreStory(int id)
     {
+        ResetStory();
         var folder = Main2StoryManager.GetStoryCoreFolder(id);
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
         LoadScene(folder, assetFolder);
@@ -362,6 +364,21 @@ public class GameSaveController : Z_Controller<GameManager>
 
         DeleteCache(id);
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
+    }
+    public void ResetStory()
+    {
+        LoadScene(null, null);
+        LoadMaterial(null, null);
+        LoadObject(null, null);
+        LoadCharacter(null, null);
+        LoadSkill(null, null);
+
+        LoadItem(null, null);
+        LoadEffect(null, null);
+
+        LoadEvent(null, null);
+        LoadProgress(null, null);
+        LoadUiItem(null);
     }
     public void LoadSaveStory(int id)
     {
@@ -407,7 +424,6 @@ public class GameSaveController : Z_Controller<GameManager>
     public void LoadMaterial(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + mapTextureFormFileName;
-        MapMaskForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -427,7 +443,6 @@ public class GameSaveController : Z_Controller<GameManager>
         }
 
         pathForm = folder + "/" + mapMaskFormFileName;
-        MapMaskForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in MapMaskForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))

@@ -75,6 +75,8 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
+        public static Action<Data,Dictionary<string,MapObjectParamForm.Data>,Dictionary<string,MapObjectParamForm.Data>> changeParamdicAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -134,11 +136,29 @@ namespace Form
                  
                      }
                     
+                    private Dictionary<string,MapObjectParamForm.Data>  _paramDic;
+                    /// <summary>
+                    ///Êý¾Ý
+                    ///</summary>
+                    public Dictionary<string,MapObjectParamForm.Data>  paramDic{
+                                get{return _paramDic;}
+ set{
+
+                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    {
+                       ChangeParamdic(this,_paramDic,value); 
+                    }
+        
+                _paramDic = value;
+                }
+                 
+                     }
+                    
             public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.label)
             {
             }
             
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool isFixed,Dictionary<string,EventTriggerForm.Data> events):base(id,name,icon,label)
+            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool isFixed,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -148,17 +168,18 @@ namespace Form
              this.label = label;
              this.isFixed = isFixed;
              this.events = events;
+             this.paramDic = paramDic;
 
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,isFixed,new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,isFixed,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<string,MapObjectParamForm.Data>(paramDic));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",false,new Dictionary<string,EventTriggerForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -209,7 +230,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",false,new Dictionary<string,EventTriggerForm.Data>(){})},
+                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){})},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -285,7 +306,9 @@ namespace Form
 
                 jo.Get<bool>("isFixed"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
+                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+
+                jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic")
                     );
 
             return data;
@@ -310,6 +333,8 @@ namespace Form
             jo.Set<bool>("isFixed",data.isFixed);
 
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+
+            jo.Set<Dictionary<string,MapObjectParamForm.Data>>("paramDic",data.paramDic);
 
             return jo;
         }
@@ -478,6 +503,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeEventsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeParamdic(Data superData,Dictionary<string,MapObjectParamForm.Data> oldV,Dictionary<string,MapObjectParamForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeParamdicAction?.Invoke(data,oldV,newV);
                 }
                     
             }

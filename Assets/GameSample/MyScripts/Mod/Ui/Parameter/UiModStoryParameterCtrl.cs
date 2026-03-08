@@ -37,9 +37,14 @@ namespace Ui.ModStory.ModStoryParameter
                 model.selPage = 1;
                 Refresh();
             });
-            view.btn_config.onClick.AddListener(() =>
+            view.btn_sceneObjectParameter.onClick.AddListener(() =>
             {
                 model.selPage = 2;
+                Refresh();
+            });
+            view.btn_config.onClick.AddListener(() =>
+            {
+                model.selPage = 3;
                 Refresh();
             });
 
@@ -60,8 +65,11 @@ namespace Ui.ModStory.ModStoryParameter
             view.page_ModStoryItemParameter.SetShow(model.selPage == 1);
             view.sta_itemParameter.ChangeState(model.selPage == 1 ? 1 : 0);
 
-            view.page_ModStoryConfig.SetShow(model.selPage == 2);
-            view.sta_config.ChangeState(model.selPage == 2 ? 1 : 0);
+            view.page_ModStorySceneObjectParameter.SetShow(model.selPage == 2);
+            view.sta_sceneObjectParameter.ChangeState(model.selPage == 2 ? 1 : 0);
+
+            view.page_ModStoryConfig.SetShow(model.selPage == 3);
+            view.sta_config.ChangeState(model.selPage == 3 ? 1 : 0);
 
         }
     }

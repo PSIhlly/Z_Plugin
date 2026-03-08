@@ -11,7 +11,7 @@ using Z_Ui.Base;
 namespace Ui.PlaySceneMain
 {
 
-    public partial class UiPlaySceneMainCtrl:IZ_Listener<StoryCharacterEvent>
+    public partial class UiPlaySceneMainCtrl : IZ_Listener<StoryCharacterEvent>
     {
         Color[] colors = new Color[] { Color.red, Color.blue, Color.yellow };
         UiContainer<UiTeamerCtrl> teamerCon;
@@ -42,7 +42,7 @@ namespace Ui.PlaySceneMain
 
         public void OnEvent(StoryCharacterEvent evt)
         {
-            if(GameManager.instance.curProgress.teamActive.Contains(evt.data.uid))
+            if (GameManager.instance.curProgress.teamActive.Contains(evt.data.uid))
             {
                 Refresh();
             }
@@ -80,6 +80,8 @@ namespace Ui.PlaySceneMain
                 }
             }
             prmCon.Refresh();
+
+            view.go_noScene.SetActive((int)GameManager.instance.curProgress.editorStyle < 2);
         }
     }
     public partial class UiTeamerParam

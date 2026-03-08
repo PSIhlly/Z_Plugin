@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine;
+using Z_ByteSerialize;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
@@ -20,14 +21,14 @@ namespace Z_Map
     public partial class MapUnit
     {
         public static string productKey = "pdt";
-        private (int,int) _productInfo;
+        private (int, int) _productInfo;
         public (int, int) productInfo
         {
             get
             {
                 if (_productInfo == default)
                 {
-                    _productInfo = (0,0);
+                    _productInfo = (0, 0);
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
@@ -42,11 +43,11 @@ namespace Z_Map
             }
             set
             {
-                
+
                 var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
                 var ja = new JArray();
-                ja.Add( value.Item1);
-                ja.Add( value.Item2);
+                ja.Add(value.Item1);
+                ja.Add(value.Item2);
                 jo[productKey] = ja;
 
                 data.extra = jo.ToString();
@@ -55,12 +56,45 @@ namespace Z_Map
 
         }
 
+        public static string paramKey = "prm";
+        private Dictionary<string, MapObjectParamForm.Data> _paramInfo;
+        public Dictionary<string, MapObjectParamForm.Data> paramInfo
+        {
+            get
+            {
+                if (_paramInfo == default)
+                {
+                    _paramInfo = new Dictionary<string, MapObjectParamForm.Data>();
+                    if (!string.IsNullOrEmpty(data.extra))
+                    {
+                        var jo = JObject.Parse(data.extra);
+                        if (jo != null && jo[paramKey] != null)
+                        {
+                            _paramInfo = jo.Get<Dictionary<string, MapObjectParamForm.Data>>(paramKey);
+                        }
+                    }
+                }
+                return _paramInfo;
+            }
+            set
+            {
 
+                var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
+
+                jo.Set<Dictionary<string, MapObjectParamForm.Data>>(paramKey, value);
+
+                data.extra = jo.ToString();
+                _paramInfo = value;
+            }
+
+
+
+        }
 
     }
 }
 
-//×óÏÂÎª0
+//ï¿½ï¿½ï¿½ï¿½Îª0
 public enum AlphaTexBasic6
 {
     OOOOXOOOO,
@@ -84,7 +118,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         alphaTextureDic.Clear();
         animCurCache.Clear();
     }
-   
+
     public void CreateAlphaVariantsByBasic6(string name, Texture2D[] rawAlphaTex)
     {
         if (rawAlphaTex == null || rawAlphaTex.Length == 0 || rawAlphaTex[0] == null)
@@ -705,7 +739,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         //8*
         alphaTextureDic[(name, (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9))] = rawAlphaTex[(int)AlphaTexBasic6.XXXXXXXXX];
 
-    
+
     }
     public void ShowFinalMat(TileInstance ins)
     {
@@ -720,7 +754,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             ins.renderers[i].GetPropertyBlock(propBlock);
 
-            if (data.texNameDic.ContainsKey(i)&& MapTextureForm.DataByName.ContainsKey(data.texNameDic[i]))
+            if (data.texNameDic.ContainsKey(i) && MapTextureForm.DataByName.ContainsKey(data.texNameDic[i]))
             {
 
                 int maskId = i + GlobalSettings.TERRAIN_LAYER_MAX;
@@ -771,7 +805,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     animCurCache[data][i] = cur;
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].GetTex());
                     int renderId = i;
-                    ins.animTimer[i] =TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
+                    ins.animTimer[i] = TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         ins.renderers[renderId].GetPropertyBlock(propBlock);
@@ -786,14 +820,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 {
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[0]].GetTex());
                 }
-            }else
+            }
+            else
             {
                 ins.renderers[i].enabled = false;
                 propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
             }
 
 
-           
+
             ins.renderers[i].SetPropertyBlock(propBlock);
         }
     }

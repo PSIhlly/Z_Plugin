@@ -61,6 +61,11 @@ namespace Ui.PlaySceneMenu
         }
         public void Save()
         {
+            if(PlayManager.instance.boxPlay)
+            {
+                NotifyManager.instance.AddTip(TextManager.instance.GetTxt("cantSaveWhenTest"));
+                return;
+            }
             model.lastSaveTime = Time.time;
             GameManager.instance.saveCtrl.SaveSaveStory(GameManager.instance.curStory.id);
         }

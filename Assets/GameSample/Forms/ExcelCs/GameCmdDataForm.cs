@@ -342,9 +342,9 @@ namespace Form
 
                 {100036,new Data(100036,"GenerateObject",new List<string>(){"name",},new List<string>(){"string",},new List<string>(){"name",},new List<string>(){"string",},"object name {0}: Generate:","newObjectID = GenerateObject(\"empty\");","scene","object",true,EditorStyle.Rpg)},
 
-                {100037,new Data(100037,"MoveObjectRelative",new List<string>(){"object","x","y","height","transitionTime",},new List<string>(){"sceneObject","num","num","num","num",},null,new List<string>(){"void",},"object {0} : Move to relative coordinates(x {1} y{2} height{3}), last {4} seconds","MoveObjectRelative(self,1,1,0,1);","scene","object",true,EditorStyle.Rpg)},
+                {100037,new Data(100037,"MoveObjectRelative",new List<string>(){"object","x","y","height","transitionTime",},new List<string>(){"sceneObject","pos","num",},null,new List<string>(){"void",},"object {0} : Move to relative coordinates({1}), last {2} seconds","MoveObjectRelative(self,1,1,0,1);","scene","object",true,EditorStyle.Rpg)},
 
-                {100038,new Data(100038,"MoveObjectAbsolute",new List<string>(){"object","x","y","height","transitionTime",},new List<string>(){"sceneObject","num","num","num","num",},null,new List<string>(){"void",},"object {0} : Move to absolute coordinates(x {1} y{2} height{3}), last {4} seconds","MoveObjectAbsolute(self,1,1,0,1);","scene","object",true,EditorStyle.Rpg)},
+                {100038,new Data(100038,"MoveObjectAbsolute",new List<string>(){"object","x","y","height","transitionTime",},new List<string>(){"sceneObject","pos","num",},null,new List<string>(){"void",},"object {0} : Move to absolute coordinates({1}), last {2} seconds","MoveObjectAbsolute(self,1,1,0,1);","scene","object",true,EditorStyle.Rpg)},
 
                 {100039,new Data(100039,"GainItem",new List<string>(){"item","amount",},new List<string>(){"item","num",},null,new List<string>(){"void",},"Gain {0} x {1}","GainItem(\"empty\",1);","item","backpack",true,EditorStyle.Rpg)},
 
@@ -354,13 +354,13 @@ namespace Form
 
                 {100042,new Data(100042,"GetCurrentCharacter",null,null,new List<string>(){"character",},new List<string>(){"character",},"Get currently used character ID","GetCurrentCharacter()","character","system",false,EditorStyle.Rpg)},
 
-                {100043,new Data(100043,"MoveCharacterRelative",new List<string>(){"character","x","y","height","transitionTime",},new List<string>(){"character","num","num","num","num",},null,new List<string>(){"void",},"character {0} : Move to relative coordinates(x {1} y{2} height{3}),last {4} seconds","MoveCharacterRelative(self,1,1,0,1);","scene","character",true,EditorStyle.RpgAdvanced)},
+                {100043,new Data(100043,"MoveCharacterRelative",new List<string>(){"character","x","y","height","transitionTime",},new List<string>(){"character","pos","num",},null,new List<string>(){"void",},"character {0} : Move to relative coordinates({1}),last {2} seconds","MoveCharacterRelative(self,1,1,0,1);","scene","character",true,EditorStyle.RpgAdvanced)},
 
-                {100044,new Data(100044,"MoveCharacterAbsolute",new List<string>(){"character","x","y","height","transitionTime",},new List<string>(){"character","num","num","num","num",},null,new List<string>(){"void",},"character {0} : Move to absolute coordinates(x {1} y{2} height{3}),last {4} seconds","MoveCharacterAbsolute(self,1,1,0,1);","scene","character",true,EditorStyle.RpgAdvanced)},
+                {100044,new Data(100044,"MoveCharacterAbsolute",new List<string>(){"character","x","y","height","transitionTime",},new List<string>(){"character","pos","num",},null,new List<string>(){"void",},"character {0} : Move to absolute coordinates({1}),last {2} seconds","MoveCharacterAbsolute(self,1,1,0,1);","scene","character",true,EditorStyle.RpgAdvanced)},
 
-                {100045,new Data(100045,"SetCharacterNavigateRelative",new List<string>(){"characterID","x","y","height",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"character {0} : Navigate to relative coordinates(x {1} y{2} height{3})","SetCharacterNavigateRelative(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
+                {100045,new Data(100045,"SetCharacterNavigateRelative",new List<string>(){"character","x","y","height",},new List<string>(){"character","pos",},null,new List<string>(){"void",},"character {0} : Navigate to relative coordinates({1})","SetCharacterNavigateRelative(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
 
-                {100046,new Data(100046,"SetCharacterNavigateAbsolute",new List<string>(){"characterID","x","y","height",},new List<string>(){"num","num","num","num",},null,new List<string>(){"void",},"character {0} : Navigate to absolute coordinates(x {1} y{2} height{3})","SetCharacterNavigateAbsolute(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
+                {100046,new Data(100046,"SetCharacterNavigateAbsolute",new List<string>(){"character","x","y","height",},new List<string>(){"character","pos",},null,new List<string>(){"void",},"character {0} : Navigate to absolute coordinates({1})","SetCharacterNavigateAbsolute(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
 
                 {100047,new Data(100047,"GetCharacterPosX",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"x",},new List<string>(){"num",},"character {0} position X","GetCharacterPosX(self)","scene","character",false,EditorStyle.RpgAdvanced)},
 
@@ -370,9 +370,9 @@ namespace Form
 
                 {100050,new Data(100050,"StopCharacterNavigate",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0} : Navigate stop","StopCharacterNavigate(self)","scene","character",true,EditorStyle.RpgAdvanced)},
 
-                {100051,new Data(100051,"SetCharacterPositionRelative",new List<string>(){"character","x","y","height",},new List<string>(){"character","num","num","num",},null,new List<string>(){"void",},"character {0} : Set relative position (x {1} y{2} height{3})","SetCharacterPositionRelative(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
+                {100051,new Data(100051,"SetCharacterPositionRelative",new List<string>(){"character","x","y","height",},new List<string>(){"character","pos",},null,new List<string>(){"void",},"character {0} : Set relative position ({1})","SetCharacterPositionRelative(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
 
-                {100052,new Data(100052,"SetCharacterPositionAbsolute",new List<string>(){"character","x","y","height",},new List<string>(){"character","num","num","num",},null,new List<string>(){"void",},"character {0} : Set absolute position (x {1} y{2} height{3})","SetCharacterPositionAbsolute(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
+                {100052,new Data(100052,"SetCharacterPositionAbsolute",new List<string>(){"character","x","y","height",},new List<string>(){"character","pos",},null,new List<string>(){"void",},"character {0} : Set absolute position ({1})","SetCharacterPositionAbsolute(self,1,1,0);","scene","character",true,EditorStyle.RpgAdvanced)},
 
                 {100053,new Data(100053,"GetCharacterParameter",new List<string>(){"character","paramName",},new List<string>(){"character","string",},new List<string>(){"value",},new List<string>(){"num",},"Get Character {0} 's {1}","GetCharacterParameter(self,\"empty\")","character","parameter",false,EditorStyle.Rpg)},
 
@@ -383,6 +383,8 @@ namespace Form
                 {100056,new Data(100056,"SelfCharacter",null,null,null,new List<string>(){"character",},"","self","scene","character",false,EditorStyle.Rpg)},
 
                 {100057,new Data(100057,"TriggerCharacter",null,null,null,new List<string>(){"character",},"","trigger","scene","character",false,EditorStyle.Rpg)},
+
+                {100058,new Data(100058,"Pos",new List<string>(){"x","y","height",},new List<string>(){"num","num","num",},new List<string>(){"pos",},new List<string>(){"pos",},"Position(x:{0},y:{1},height:{2})","Pos(0,0,0)","basic","const",false,EditorStyle.Rpg)},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -500,6 +502,8 @@ namespace Form
                         {"SelfCharacter",_DataByUid[100056]},
     
                         {"TriggerCharacter",_DataByUid[100057]},
+    
+                        {"Pos",_DataByUid[100058]},
     
                     };
     
@@ -647,6 +651,8 @@ namespace Form
 
                     _DatasByCategoryType[("scene","character")].Add(_DataByUid[100057]);
 
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100058]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -775,6 +781,8 @@ namespace Form
 
                     _DatasByCategory["scene"].Add(_DataByUid[100057]);
 
+                    _DatasByCategory["basic"].Add(_DataByUid[100058]);
+
                     _DatasByCancreate = new Dictionary<bool, List<Data>>() {
     
                             {true,new List<Data>()},
@@ -896,6 +904,8 @@ namespace Form
                     _DatasByCancreate[false].Add(_DataByUid[100056]);
 
                     _DatasByCancreate[false].Add(_DataByUid[100057]);
+
+                    _DatasByCancreate[false].Add(_DataByUid[100058]);
 
 
             childInitAction?.Invoke();

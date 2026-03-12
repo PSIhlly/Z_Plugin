@@ -318,6 +318,25 @@ namespace Form
              this.events = events;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.label = data.label;
+             this.iconTexName = data.iconTexName;
+             this.paramDic = data.paramDic;
+             this.isProto = data.isProto;
+             this.model = data.model;
+             this.desc = data.desc;
+             this.amount = data.amount;
+             this.maxAmountPer = data.maxAmountPer;
+             this.equip = data.equip;
+             this.styleTex = data.styleTex;
+             this.price = data.price;
+             this.canEquipe = data.canEquipe;
+             this.events = data.events;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

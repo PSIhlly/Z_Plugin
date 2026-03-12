@@ -225,6 +225,18 @@ public static readonly int autoUidCnt=100;
              this.transition = transition;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.tex = data.tex;
+             this.time = data.time;
+             this.pos = data.pos;
+             this.rot = data.rot;
+             this.scale = data.scale;
+             this.opacity = data.opacity;
+             this.transition = data.transition;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

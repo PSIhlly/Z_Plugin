@@ -99,6 +99,13 @@ private set{
              this.icon = icon;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -120,6 +120,14 @@ private set{
              this.count = count;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.count = data.count;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -141,6 +141,14 @@ public static readonly int autoUidCnt=100;
              this.partTex = partTex;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.equipStyle = data.equipStyle;
+             this.equipTrs = data.equipTrs;
+             this.partTex = data.partTex;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

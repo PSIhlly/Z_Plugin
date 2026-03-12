@@ -339,6 +339,26 @@ namespace Form
              this.unique = unique;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.label = data.label;
+             this.avatarTexName = data.avatarTexName;
+             this.paramDic = data.paramDic;
+             this.isProto = data.isProto;
+             this.animDic = data.animDic;
+             this.defaultAnimName = data.defaultAnimName;
+             this.faceType = data.faceType;
+             this.speedParamName = data.speedParamName;
+             this.hpParamName = data.hpParamName;
+             this.events = data.events;
+             this.equips = data.equips;
+             this.desc = data.desc;
+             this.tachie = data.tachie;
+             this.unique = data.unique;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

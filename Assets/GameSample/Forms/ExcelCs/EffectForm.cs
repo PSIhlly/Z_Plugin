@@ -141,6 +141,14 @@ public static readonly int autoUidCnt=100;
              this.clips = clips;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.label = data.label;
+             this.clips = data.clips;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

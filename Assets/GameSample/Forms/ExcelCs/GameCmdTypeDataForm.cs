@@ -77,6 +77,12 @@ namespace Form
              this.name = name;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+            }
 
                 public Data Copy(bool sameId = true)
                 {
@@ -142,7 +148,7 @@ namespace Form
 
                 {10008,new Data(10008,"uiImg")},
 
-                {10009,new Data(10009,"pos")},
+                {10009,new Data(10009,"vector")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -163,7 +169,7 @@ namespace Form
     
                         {"uiImg",_DataByUid[10008]},
     
-                        {"pos",_DataByUid[10009]},
+                        {"vector",_DataByUid[10009]},
     
                     };
     

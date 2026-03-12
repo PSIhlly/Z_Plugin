@@ -183,6 +183,16 @@ public static readonly int autoUidCnt=100;
              this.partEnable = partEnable;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.animClip = data.animClip;
+             this.animTimeInterval = data.animTimeInterval;
+             this.scale = data.scale;
+             this.partEnable = data.partEnable;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

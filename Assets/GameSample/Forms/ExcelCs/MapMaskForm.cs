@@ -108,6 +108,15 @@ namespace Form
              this.label = label;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.texsName = data.texsName;
+             this.label = data.label;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -150,6 +150,17 @@ namespace Form
              this.events = events;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.animTimeInterval = data.animTimeInterval;
+             this.texsName = data.texsName;
+             this.label = data.label;
+             this.events = data.events;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -171,6 +171,18 @@ namespace Form
              this.paramDic = paramDic;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.model = data.model;
+             this.label = data.label;
+             this.isFixed = data.isFixed;
+             this.events = data.events;
+             this.paramDic = data.paramDic;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

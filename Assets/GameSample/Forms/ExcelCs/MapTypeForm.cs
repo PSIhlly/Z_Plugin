@@ -113,6 +113,14 @@ private set{
              this.needLayer = needLayer;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.NameKey = data.NameKey;
+             this.icon = data.icon;
+             this.needLayer = data.needLayer;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

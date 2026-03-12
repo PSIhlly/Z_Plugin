@@ -129,6 +129,16 @@ namespace Form
              this.type = type;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.code = data.code;
+             this.zCode = data.zCode;
+             this.category = data.category;
+             this.type = data.type;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

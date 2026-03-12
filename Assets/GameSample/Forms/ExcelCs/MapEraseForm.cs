@@ -157,6 +157,19 @@ private set{
              this.texture = texture;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.label = data.label;
+             this.terrain = data.terrain;
+             this.mObject = data.mObject;
+             this.item = data.item;
+             this.character = data.character;
+             this.texture = data.texture;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

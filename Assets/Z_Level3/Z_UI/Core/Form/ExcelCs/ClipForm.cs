@@ -198,6 +198,17 @@ public static readonly int autoUidCnt=100;
              this.mainAudioName = mainAudioName;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.title = data.title;
+             this.mainText = data.mainText;
+             this.mainPictureName = data.mainPictureName;
+             this.mainVideoName = data.mainVideoName;
+             this.profilePictureName = data.profilePictureName;
+             this.mainAudioName = data.mainAudioName;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

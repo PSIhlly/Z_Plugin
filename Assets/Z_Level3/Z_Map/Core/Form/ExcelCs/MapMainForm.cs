@@ -219,6 +219,18 @@ public static readonly int autoUidCnt=1000000;
              this.itemJa = itemJa;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.mapUnitSize = data.mapUnitSize;
+             this.logicSize = data.logicSize;
+             this.viewSize = data.viewSize;
+             this.mapJa = data.mapJa;
+             this.objectJa = data.objectJa;
+             this.characterJa = data.characterJa;
+             this.itemJa = data.itemJa;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

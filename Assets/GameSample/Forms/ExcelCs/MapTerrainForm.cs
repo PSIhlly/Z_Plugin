@@ -122,6 +122,16 @@ private set{
              this.label = label;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.prefabName = data.prefabName;
+             this.icon = data.icon;
+             this.step = data.step;
+             this.label = data.label;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

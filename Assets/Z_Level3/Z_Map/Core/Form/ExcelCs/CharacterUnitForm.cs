@@ -266,6 +266,26 @@ namespace Z_Map.Form
                     _unit=new CharacterUnit(this);
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.navEnabled = data.navEnabled;
+             this.destination = data.destination;
+             this.speed = data.speed;
+             this.alertDis = data.alertDis;
+             this.pathDis = data.pathDis;
+             this.isMine = data.isMine;
+             this.name = data.name;
+             this.prefabName = data.prefabName;
+             this.pos = data.pos;
+             this.euler = data.euler;
+             this.scale = data.scale;
+             this.updateType = data.updateType;
+             this.collidingUnitUid = data.collidingUnitUid;
+             this.extra = data.extra;
+             this.enteredScene = data.enteredScene;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

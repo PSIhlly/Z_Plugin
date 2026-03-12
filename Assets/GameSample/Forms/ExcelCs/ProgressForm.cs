@@ -393,6 +393,26 @@ public static readonly int autoUidCnt=100;
              this.editorStyle = editorStyle;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.seconds = data.seconds;
+             this.sceneId = data.sceneId;
+             this.pos = data.pos;
+             this.characterUid = data.characterUid;
+             this.bag = data.bag;
+             this.team = data.team;
+             this.teamActive = data.teamActive;
+             this.uiStyleImageName = data.uiStyleImageName;
+             this.events = data.events;
+             this.cameraMode = data.cameraMode;
+             this.dialogCache = data.dialogCache;
+             this.triggeredOnceEvts = data.triggeredOnceEvts;
+             this.notFirstTime = data.notFirstTime;
+             this.blockProgramUid = data.blockProgramUid;
+             this.editorStyle = data.editorStyle;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

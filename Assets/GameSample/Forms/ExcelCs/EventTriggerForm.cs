@@ -141,6 +141,14 @@ public static readonly int autoUidCnt=1000000;
              this.type = type;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.evt = data.evt;
+             this.type = data.type;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -141,6 +141,14 @@ public static readonly int autoUidCnt=100;
              this.pos = pos;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.miniMap = data.miniMap;
+             this.pos = data.pos;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

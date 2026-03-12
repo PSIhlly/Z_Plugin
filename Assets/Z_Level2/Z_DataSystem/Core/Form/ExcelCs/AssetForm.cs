@@ -176,6 +176,16 @@ public static readonly int autoIdCnt=10000;
              this.asset = asset;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.path = data.path;
+             this.bytes = data.bytes;
+             this.hash = data.hash;
+             this.asset = data.asset;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

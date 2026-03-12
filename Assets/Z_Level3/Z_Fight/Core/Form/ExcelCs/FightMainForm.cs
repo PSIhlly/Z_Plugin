@@ -177,6 +177,16 @@ public static readonly int autoUidCnt=100;
              this.weaponBulletJa = weaponBulletJa;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.uidCnt = data.uidCnt;
+             this.fightJa = data.fightJa;
+             this.weaponJa = data.weaponJa;
+             this.bulletJa = data.bulletJa;
+             this.weaponBulletJa = data.weaponBulletJa;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

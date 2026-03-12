@@ -141,6 +141,14 @@ public static readonly int autoIdCnt=10000;
              this.label = label;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.label = data.label;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

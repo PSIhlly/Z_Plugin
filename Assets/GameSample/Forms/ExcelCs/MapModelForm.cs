@@ -183,6 +183,16 @@ public static readonly int autoIdCnt=100;
              this.isObstacle = isObstacle;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.subPrefabUnitName = data.subPrefabUnitName;
+             this.subPrefabUnitPos = data.subPrefabUnitPos;
+             this.subPrefabUnitScale = data.subPrefabUnitScale;
+             this.subUnitTexsName = data.subUnitTexsName;
+             this.isObstacle = data.isObstacle;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

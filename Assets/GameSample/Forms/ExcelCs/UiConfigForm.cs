@@ -393,6 +393,26 @@ public static readonly int autoUidCnt=100;
              this.removeTime = removeTime;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.texName = data.texName;
+             this.size = data.size;
+             this.oldPos = data.oldPos;
+             this.posProgress = data.posProgress;
+             this.posTime = data.posTime;
+             this.tarPos = data.tarPos;
+             this.oldOpacity = data.oldOpacity;
+             this.opacityProgress = data.opacityProgress;
+             this.opacityTime = data.opacityTime;
+             this.tarOpacity = data.tarOpacity;
+             this.oldEuler = data.oldEuler;
+             this.eulerProgress = data.eulerProgress;
+             this.eulerTime = data.eulerTime;
+             this.tarEuler = data.tarEuler;
+             this.removeTime = data.removeTime;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

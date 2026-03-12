@@ -345,6 +345,24 @@ public static readonly int autoIdCnt=100;
              this.bulletsPer = bulletsPer;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.itemId = data.itemId;
+             this.damage = data.damage;
+             this.prefabName = data.prefabName;
+             this.magazineCapacity = data.magazineCapacity;
+             this.cdTime = data.cdTime;
+             this.reloadTime = data.reloadTime;
+             this.speed = data.speed;
+             this.range = data.range;
+             this.attackPos = data.attackPos;
+             this.attackDir = data.attackDir;
+             this.selfHurt = data.selfHurt;
+             this.accuracy = data.accuracy;
+             this.bulletsPer = data.bulletsPer;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

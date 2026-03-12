@@ -225,6 +225,18 @@ public static readonly int autoUidCnt=100;
              this.triggerConditionUid = triggerConditionUid;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.label = data.label;
+             this.icon = data.icon;
+             this.skillTypes = data.skillTypes;
+             this.cd = data.cd;
+             this.events = data.events;
+             this.triggerConditionUid = data.triggerConditionUid;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

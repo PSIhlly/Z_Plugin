@@ -132,6 +132,18 @@ private set{
              this.showType = showType;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.valueType = data.valueType;
+             this.min = data.min;
+             this.v = data.v;
+             this.max = data.max;
+             this.specialType = data.specialType;
+             this.showType = data.showType;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

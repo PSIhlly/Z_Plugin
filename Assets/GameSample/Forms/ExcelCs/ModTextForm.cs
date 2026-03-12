@@ -87,6 +87,14 @@ namespace Form
              this.contentCn = contentCn;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.key = data.key;
+             this.contentEn = data.contentEn;
+             this.contentCn = data.contentCn;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

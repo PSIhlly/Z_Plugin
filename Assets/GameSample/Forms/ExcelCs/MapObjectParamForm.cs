@@ -97,6 +97,16 @@ namespace Form
              this.max = max;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.valueType = data.valueType;
+             this.min = data.min;
+             this.v = data.v;
+             this.max = data.max;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

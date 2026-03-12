@@ -140,6 +140,20 @@ namespace Z_Map.Form
                     _unit=new ItemUnit(this);
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.prefabName = data.prefabName;
+             this.pos = data.pos;
+             this.euler = data.euler;
+             this.scale = data.scale;
+             this.updateType = data.updateType;
+             this.collidingUnitUid = data.collidingUnitUid;
+             this.extra = data.extra;
+             this.enteredScene = data.enteredScene;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

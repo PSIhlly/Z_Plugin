@@ -46,6 +46,10 @@ namespace Form
 
             InterpretDataForm.changeTopAction+=ChangeTop;
 
+            InterpretDataForm.changeUserAction+=ChangeUser;
+
+            InterpretDataForm.changeSubinterpretAction+=ChangeSubinterpret;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -79,7 +83,7 @@ namespace Form
                 
         public static Action<Data,int,int> changeUserAction;
                 
-        public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeArgsAction;
+        public static Action<Data,InterpretDataForm.Data,InterpretDataForm.Data> changeSubinterpretAction;
                 
         public static Action<Data,string,string> changeReleasetriggerAction;
                 
@@ -90,42 +94,6 @@ namespace Form
         public partial class Data : InterpretDataForm.Data
         {
 
-                    private int  _user;
-                    /// <summary>
-                    ///调用者id
-                    ///</summary>
-                    public int  user{
-                                get{return _user;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeUser(this,_user,value); 
-                    }
-        
-                _user = value;
-                }
-                 
-                     }
-                    
-                    private List<BoxDataForm.Data>  _args;
-                    /// <summary>
-                    ///参数
-                    ///</summary>
-                    public List<BoxDataForm.Data>  args{
-                                get{return _args;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeArgs(this,_args,value); 
-                    }
-        
-                _args = value;
-                }
-                 
-                     }
-                    
                     private string  _releaseTrigger;
                     /// <summary>
                     ///结束释放的trigger
@@ -162,11 +130,11 @@ namespace Form
                  
                      }
                     
-            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top)
+            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top,data.user,data.subInterpret)
             {
             }
             
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,List<BoxDataForm.Data> args,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top)
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top,user,subInterpret)
             {
 
              this.uid = uid;
@@ -176,15 +144,29 @@ namespace Form
              this.p = p;
              this.top = top;
              this.user = user;
-             this.args = args;
+             this.subInterpret = subInterpret;
              this.releaseTrigger = releaseTrigger;
              this.blockProgramUid = blockProgramUid;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.stack = data.stack;
+             this.heap = data.heap;
+             this.program = data.program;
+             this.p = data.p;
+             this.top = data.top;
+             this.user = data.user;
+             this.subInterpret = data.subInterpret;
+             this.releaseTrigger = data.releaseTrigger;
+             this.blockProgramUid = data.blockProgramUid;
+            }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,new List<BoxDataForm.Data>(args),releaseTrigger,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,releaseTrigger,blockProgramUid);
                 }
             
         }
@@ -282,7 +264,7 @@ namespace Form
 
                 jo.Get<int>("user"),
 
-                jo.Get<List<BoxDataForm.Data>>("args"),
+                jo.Get<InterpretDataForm.Data>("subInterpret"),
 
                 jo.Get<string>("releaseTrigger"),
 
@@ -312,7 +294,7 @@ namespace Form
 
             jo.Set<int>("user",data.user);
 
-            jo.Set<List<BoxDataForm.Data>>("args",data.args);
+            jo.Set<InterpretDataForm.Data>("subInterpret",data.subInterpret);
 
             jo.Set<string>("releaseTrigger",data.releaseTrigger);
 
@@ -457,7 +439,7 @@ InterpretDataForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeUser(Data superData,int oldV,int newV)
+            public static void ChangeUser(InterpretDataForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -467,12 +449,12 @@ InterpretDataForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeArgs(Data superData,List<BoxDataForm.Data> oldV,List<BoxDataForm.Data> newV)
+            public static void ChangeSubinterpret(InterpretDataForm.Data superData,InterpretDataForm.Data oldV,InterpretDataForm.Data newV)
             {
                 if(superData is Data data)
                 {
 
-                changeArgsAction?.Invoke(data,oldV,newV);
+                changeSubinterpretAction?.Invoke(data,oldV,newV);
                 }
                     
             }

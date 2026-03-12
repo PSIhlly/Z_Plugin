@@ -11,7 +11,7 @@ using Z_Debug;
 namespace Z_Code
 {
 
-    public class LexicalNode: Node
+    public class LexicalNode : Node
     {
         public LexicalNode(string code)
         {
@@ -32,7 +32,7 @@ namespace Z_Code
         {
             get
             {
-                switch(type)
+                switch (type)
                 {
                     case CodeType.Num:
                         return "num";
@@ -56,7 +56,7 @@ namespace Z_Code
 
         public List<LexicalNode> Execute(string code)
         {
-            var lst=ManageString(code);
+            var lst = ManageString(code);
             ManageDesc(lst);
             if (DEBUG)
             {
@@ -64,28 +64,29 @@ namespace Z_Code
             }
             return lst;
         }
-            public List<LexicalNode> ManageString(string code)
+        public List<LexicalNode> ManageString(string code)
         {
             StringBuilder sb = new StringBuilder();
             List<LexicalNode> lst = new List<LexicalNode>();
-            bool isStringNow=false;
+            bool isStringNow = false;
             for (int i = 0, icnt = code.Length; i < icnt; i++)
             {
 
                 if (IsString(code[i]))
                 {
                     isStringNow = !isStringNow;
-                    if(!isStringNow)
+                    if (!isStringNow)
                     {
                         sb.Append(code[i]);
                         End(lst, sb);
-                    }else
+                    }
+                    else
                     {
                         End(lst, sb);
                         sb.Append(code[i]);
                     }
                 }
-                else if(isStringNow)
+                else if (isStringNow)
                 {
                     sb.Append(code[i]);
                 }
@@ -96,7 +97,7 @@ namespace Z_Code
                 else if (IsSplit(code[i]))
                 {
                     End(lst, sb);
-                    if (code[i]==';')
+                    if (code[i] == ';')
                     {
                         sb.Append(code[i]);
                         End(lst, sb);
@@ -114,10 +115,10 @@ namespace Z_Code
                 {
                     if (IsNum(sb.ToString()))
                     {
-                        if(!IsNum (sb.ToString()+code[i]))
+                        if (!IsNum(sb.ToString() + code[i]))
                             End(lst, sb);
                     }
-                    else if(!IsOperator(sb.ToString()+ code[i]))
+                    else if (!IsOperator(sb.ToString() + code[i]))
                     {
                         End(lst, sb);
                     }
@@ -125,7 +126,7 @@ namespace Z_Code
                 }
                 else
                 {
-                    if (IsNum(sb.ToString())||IsOperator(sb.ToString()))
+                    if (IsNum(sb.ToString()) || IsOperator(sb.ToString()))
                     {
                         End(lst, sb);
                         sb.Append(code[i]);
@@ -153,7 +154,7 @@ namespace Z_Code
                 }
                 else if (IsNum(nodes[i].rawCode))
                 {
-                     nodes[i].desc= new Desc(nodes[i].rawCode, CodeType.Num);
+                    nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Num);
                 }
                 else
                 {
@@ -169,7 +170,7 @@ namespace Z_Code
                     {
                         nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Reserved);
                     }
-                    else if(IsFunc(nodes[i].rawCode))
+                    else if (IsCmd(nodes[i].rawCode) || (i + 1 < icnt && nodes[i + 1].rawCode == "("))
                     {
                         nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.FuncName);
                     }
@@ -177,7 +178,7 @@ namespace Z_Code
                     {
                         nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.VarName);
                     }
-                    
+
                 }
             }
         }
@@ -237,12 +238,14 @@ namespace Z_Code
         }
         public static bool IsNum(string str)
         {
+            if (str.StartsWith('.'))
+                return false;
             bool hasDot = false;
             foreach (var ch in str)
             {
                 if (!IsNum(ch))
                 {
-                    if(hasDot)
+                    if (hasDot)
                         return false;
                     if (ch == '.')
                     {
@@ -283,7 +286,7 @@ namespace Z_Code
         {
             return BaseData.reserved.Contains(str);
         }
-        public static bool IsFunc(string str)
+        public static bool IsCmd(string str)
         {
             return BaseData.cmdDic.ContainsKey(str);
         }

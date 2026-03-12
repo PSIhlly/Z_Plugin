@@ -225,6 +225,8 @@ def create_data_handle():
                 {{
         return new Data(sameId? {formInfo.id_str}:{formInfo.id_str}Chain.GetId(),'''
         con_set_str = ''
+        con_reset_str = ''
+
         for key,val in formInfo.var_type_dic.items():
             if key is not formInfo.id_str:
                 if val.startswith('List') or val.startswith('Dictionary'):
@@ -237,6 +239,8 @@ def create_data_handle():
             con_arg_str+=val + ' ' + key + ','
             con_set_str+=f'''
              this.{key} = {key};'''
+            con_reset_str+=f'''
+             this.{key} = data.{key};'''
         con_copy_str=con_copy_str[0:-1]+f''');
                 }}'''
         con_extend_str=con_extend_str[0:-1]+')'
@@ -256,6 +260,10 @@ def create_data_handle():
             {{
 {con_set_str}
 {formInfo.declare_sub_str}
+            }}
+            public void Reset(Data data)
+            {{
+{con_reset_str}
             }}
 {con_copy_str}
             '''

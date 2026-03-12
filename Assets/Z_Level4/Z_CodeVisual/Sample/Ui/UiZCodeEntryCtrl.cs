@@ -28,7 +28,7 @@ namespace Ui.ZCodeEntry
             model.dcpr = new Decompiler();
             model.curEntry = new List<SyntaxNode>();
             var pg = new ProgramDataForm.Data(-1, "", view.ipt_code.text, model.cpr.Compile(view.ipt_code.text, out var syntaxs));
-            model.interpreter = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), pg, 0, -1);
+            model.interpreter = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), pg, 0, -1,0, null);
 
             view.btn_run.onClick.AddListener(() =>
             {

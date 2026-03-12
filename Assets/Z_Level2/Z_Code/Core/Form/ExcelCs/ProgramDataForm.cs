@@ -134,6 +134,14 @@ public static readonly int autoUidCnt=1000000;
              this.zCode = zCode;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.code = data.code;
+             this.zCode = data.zCode;
+            }
 
                 public Data Copy(bool sameId = true)
                 {
@@ -156,6 +164,16 @@ public static readonly int autoUidCnt=1000000;
                 }
             }
     
+            static Dictionary<string, Data> _DataByName;
+            public static Dictionary<string, Data> DataByName
+            {
+                get
+                {
+                    Init();
+                    return _DataByName;
+                }
+            }
+    
 
         static public void Init()
         {
@@ -174,6 +192,12 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 {1,new Data(1,"","",null)},
 
                 };
+                    _DataByName = new Dictionary<string, Data>() {
+    
+                        {"",_DataByUid[1]},
+    
+                    };
+    
 
             childInitAction?.Invoke();
             
@@ -261,6 +285,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
+                    DataByName[data.name]=data;
+    
 
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
@@ -275,6 +301,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             var data=DataByUid[uid];
 
                     DataByUid.Remove(data.uid);
+    
+                    DataByName.Remove(data.name);
     
 
             uidChain.PushId(data.uid);
@@ -335,6 +363,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 if(superData is Data data)
                 {
 
+                    DataByName.Remove(oldV);
+                    DataByName[newV]=data;
+ 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     

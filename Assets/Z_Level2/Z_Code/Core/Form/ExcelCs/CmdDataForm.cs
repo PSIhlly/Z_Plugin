@@ -218,6 +218,18 @@ public static readonly int autoUidCnt=100;
              this.defaultCode = defaultCode;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.prmNames = data.prmNames;
+             this.prmTypes = data.prmTypes;
+             this.retNames = data.retNames;
+             this.retTypes = data.retTypes;
+             this.desc = data.desc;
+             this.defaultCode = data.defaultCode;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -345,10 +345,6 @@ namespace Z_Code
             return null;
 
         }
-        private bool IsFunc(Desc desc)
-        {
-            return desc.type == CodeType.FuncName;
-        }
 
 
 

@@ -15,21 +15,26 @@ using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class GetCharacterPosYCmd : CmdBase
+    public class GetCharacterPosCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new GetCharacterPosYCmd());
+            Register(new GetCharacterPosCmd());
         }
-        public override string GetName() => "GetCharacterPosY";
-        public override CmdBase GetNew() => new GetCharacterPosYCmd();
+        public override string GetName() => "GetCharacterPos";
+        public override CmdBase GetNew() => new GetCharacterPosCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER));
             if(data!=null)
             {
-                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos).z) };
+                var box=CodeHelper.CreateBox();
+                var vec = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
+                box.dic["x"] = CodeHelper.CreateBoxByNum(vec.x);
+                box.dic["height"] = CodeHelper.CreateBoxByNum(vec.y);
+                box.dic["y"] = CodeHelper.CreateBoxByNum(vec.z);
+                asyncTask.res = new BoxDataForm.Data[] { box };
             }
             return true;
         }

@@ -52,6 +52,10 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,int,int> changeTopAction;
                 
+        public static Action<Data,int,int> changeUserAction;
+                
+        public static Action<Data,InterpretDataForm.Data,InterpretDataForm.Data> changeSubinterpretAction;
+                
 
 
         public partial class Data
@@ -165,7 +169,43 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top)
+                    private int  _user;
+                    /// <summary>
+                    ///调用者id
+                    ///</summary>
+                    public int  user{
+                                get{return _user;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeUser(this,_user,value); 
+                    }
+        
+                _user = value;
+                }
+                 
+                     }
+                    
+                    private InterpretDataForm.Data  _subInterpret;
+                    /// <summary>
+                    ///子解释器
+                    ///</summary>
+                    public InterpretDataForm.Data  subInterpret{
+                                get{return _subInterpret;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeSubinterpret(this,_subInterpret,value); 
+                    }
+        
+                _subInterpret = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret)
             {
 
              this.uid = uid;
@@ -174,17 +214,31 @@ public static readonly int autoUidCnt=1000000;
              this.program = program;
              this.p = p;
              this.top = top;
+             this.user = user;
+             this.subInterpret = subInterpret;
 
+            }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.stack = data.stack;
+             this.heap = data.heap;
+             this.program = data.program;
+             this.p = data.p;
+             this.top = data.top;
+             this.user = data.user;
+             this.subInterpret = data.subInterpret;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -265,7 +319,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<int>("p"),
 
-                jo.Get<int>("top")
+                jo.Get<int>("top"),
+
+                jo.Get<int>("user"),
+
+                jo.Get<InterpretDataForm.Data>("subInterpret")
                     );
 
             return data;
@@ -288,6 +346,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("p",data.p);
 
             jo.Set<int>("top",data.top);
+
+            jo.Set<int>("user",data.user);
+
+            jo.Set<InterpretDataForm.Data>("subInterpret",data.subInterpret);
 
             return jo;
         }
@@ -424,6 +486,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeTopAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUser(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUserAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSubinterpret(Data superData,InterpretDataForm.Data oldV,InterpretDataForm.Data newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSubinterpretAction?.Invoke(data,oldV,newV);
                 }
                     
             }

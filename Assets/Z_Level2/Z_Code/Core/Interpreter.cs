@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Debug;
+using static Z_Code.Form.InterpretDataForm;
 namespace Z_Code
 {
     public enum Op
@@ -34,10 +36,15 @@ namespace Z_Code
 
         public static partial class InterpretDataForm
         {
+            public class RetInfo
+            {
+                public bool complete;
+                public BoxDataForm.Data ret= CodeHelper.CreateBox();
+            }
             public partial class Data
             {
                 protected Interpreter _interpreter;
-                public virtual bool Interpret()
+                public virtual RetInfo Interpret()
                 {
                     if (_interpreter == null)
                     {
@@ -105,7 +112,7 @@ namespace Z_Code
             asyncTask = new InterpretAsyncTask(this);
         }
 
-        public bool Interpret()
+        public RetInfo Interpret()
         {
 
             int cnt = data.program.zCode.Count;
@@ -134,42 +141,91 @@ namespace Z_Code
                         Push(CodeHelper.CreateBoxByVal(nm));
                         break;
                     case Op.Call:
-
-                        var cmd = BaseData.cmdDic[data.program.zCode[data.p + 1]].GetNew(); try
+                        string funcName = data.program.zCode[data.p + 1];
+                        try
                         {
-                            var form = cmd.GetForm();
-                            var prm = new BoxDataForm.Data[form.prmNames == null ? 0 : form.prmNames.Count];
-                            for (int i = 0; i < prm.Length; i++)
+                            if (BaseData.cmdDic.ContainsKey(funcName))
                             {
-                                prm[i] = GetBox(data.stack[data.top - i]);
-                            }
-                            if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
-                            {
-                                cmd.Execute(prm, data.heap, asyncTask);
-                            }
-
-                            if (asyncTask.IsComplete())
-                            {
-                                //Delay
-                                data.p++;
+                                var cmd = BaseData.cmdDic[funcName].GetNew();
+                                var form = cmd.GetForm();
+                                var prmCount = (int)GetNum(data.stack[data.top]);
+                                var prm = new BoxDataForm.Data[prmCount];
                                 for (int i = 0; i < prm.Length; i++)
                                 {
-                                    Pop();
+                                    prm[i] = GetBox(data.stack[data.top - i - 1]);
                                 }
-                                for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                                if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
                                 {
-                                    Push(asyncTask.res[i]);
+                                    cmd.Execute(prm, data.heap, asyncTask);
                                 }
-                                asyncTask.Reset();
+
+                                if (asyncTask.IsComplete())
+                                {
+                                    //Delay
+                                    data.p++;
+                                    for (int i = 0; i <= prm.Length; i++)
+                                    {
+                                        Pop();
+                                    }
+                                    for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                                    {
+                                        Push(asyncTask.res[i]);
+                                    }
+                                    asyncTask.Reset();
+                                }
+                                else
+                                {
+                                    return new RetInfo();
+                                }
+
+                            }
+                            else if (ProgramDataForm.DataByName.ContainsKey(funcName))
+                            {
+                                var func = ProgramDataForm.DataByName[funcName];
+
+                                var prmCount = (int)GetNum(data.stack[data.top]);
+                                var prm = new BoxDataForm.Data[prmCount];
+                                var newHeap = new Dictionary<string, BoxDataForm.Data>();
+                                for (int i = 0; i < prm.Length; i++)
+                                {
+                                    newHeap[$"param{data.top - i}"] = GetBox(data.stack[data.top - i - 1]).Copy();
+                                }
+                                if (data.subInterpret == null)
+                                {
+                                    data.subInterpret = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), newHeap, func, 0, -1, 0, null);
+                                }
+                                var ret = data.subInterpret.Interpret();
+
+                                if (ret.complete)
+                                {
+                                    //Delay
+                                    data.p++;
+                                    for (int i = 0; i < prm.Length; i++)
+                                    {
+                                        GetBox(data.stack[data.top - i - 1]).Reset(data.subInterpret.heap[$"param{data.top - i}"]);
+                                    }
+                                    for (int i = 0; i <= prm.Length; i++)
+                                    {
+                                        Pop();
+                                    }
+                                    Push(ret.ret);
+
+                                    asyncTask.Reset();
+                                    data.subInterpret = null;
+                                }
+                                else
+                                {
+                                    return new RetInfo();
+                                }
                             }
                             else
                             {
-                                return false;
+                                throw new Exception("can't find");
                             }
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError(cmd.GetName() + " " + e);
+                            Debug.LogError(funcName + " " + e);
                         }
 
                         break;
@@ -193,14 +249,12 @@ namespace Z_Code
                         break;
                     case Op.Take:
                         box = Pop();
-                        realBox = GetBox(box);
                         var key = GetStr(Pop());
                         box = CodeHelper.CreateBoxByVal(box.valName);
                         box.str = key;
                         Push(box);
                         break;
                     case Op.Assign:
-
                         box = Pop();
                         realBox = GetBox(box);
                         if (box.str != null)
@@ -241,11 +295,13 @@ namespace Z_Code
                             data.p = int.Parse(data.program.zCode[data.p]) - 1;
                         }
                         break;
-                    /* case Op.Sub:
-                         p++;
-                         heap[Pop().valName]
-
-                         break;*/
+                    case Op.Sub://take same
+                        box = Pop();
+                        string paramName = Pop().valName;
+                        box = CodeHelper.CreateBoxByVal(box.valName);
+                        box.str = paramName;
+                        Push(box);
+                        break;
                     case Op.Wait:
                         box = Pop();
                         if (box.valName != null && box.num == 0)
@@ -256,7 +312,7 @@ namespace Z_Code
                         if (box.num > 0)
                         {
                             Push(box);
-                            return false;
+                            return new RetInfo();
                         }
                         break;
                     default:
@@ -269,7 +325,7 @@ namespace Z_Code
             }
 
 
-            return true;
+            return new RetInfo() { complete = true };
         }
 
         private BoxDataForm.Data Pop()

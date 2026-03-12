@@ -35,7 +35,7 @@ namespace Z_Code
                 data.speed = productData.paramDic[productData.speedParamName].v;
                 data.pathDis = 999;
                 data.alertDis = 999;
-                data.destination = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].num, prm[3].num, prm[2].num));
+                data.destination = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
                 data.navEnabled = true;
             }
             return true;

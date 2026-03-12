@@ -75,7 +75,7 @@ namespace Z_Map
             }
 
         }
-        public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap, List<BoxDataForm.Data> args)
+        public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap)
         {
 
             EventTriggerForm.Data trigger = null;
@@ -101,7 +101,7 @@ namespace Z_Map
             if (trigger != null)
             {
 
-                GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, defaultHeap, args);
+                GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, defaultHeap);
 
             }
 
@@ -152,21 +152,21 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                     case CollideEventType.TriggerEnter:
                         if (evt.b is CharacterUnit)
                         {
-                            mapUnit.ExecuteEvt("onCharacterTouchEvent", heap, null);
+                            mapUnit.ExecuteEvt("onCharacterTouchEvent", heap);
                         }
                         else if (evt.b is ObjectUnit)
                         {
-                            mapUnit.ExecuteEvt("onObjectTouchEvent", heap, null);
+                            mapUnit.ExecuteEvt("onObjectTouchEvent", heap);
                         }
                         break;
                     case CollideEventType.TriggerExit:
                         if (evt.b is CharacterUnit)
                         {
-                            mapUnit.ExecuteEvt("onCharacterLeaveEvent", heap, null);
+                            mapUnit.ExecuteEvt("onCharacterLeaveEvent", heap);
                         }
                         else if (evt.b is ObjectUnit)
                         {
-                            mapUnit.ExecuteEvt("onObjectLeaveEvent", heap, null);
+                            mapUnit.ExecuteEvt("onObjectLeaveEvent", heap);
 
                         }
                         break;
@@ -186,7 +186,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 switch (evt.type)
                 {
                     case MapEventType.Create:
-                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        mapUnit.ExecuteEvt("onShowEvent", heap);
                         break;
                 }
             }
@@ -204,7 +204,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 switch (evt.type)
                 {
                     case MapEventType.Create:
-                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        mapUnit.ExecuteEvt("onShowEvent", heap);
                         break;
                 }
             }
@@ -222,7 +222,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 switch (evt.type)
                 {
                     case MapEventType.Create:
-                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        mapUnit.ExecuteEvt("onShowEvent", heap);
                         break;
                 }
             }
@@ -241,7 +241,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 switch (evt.type)
                 {
                     case MapEventType.Create:
-                        mapUnit.ExecuteEvt("onShowEvent", heap, null);
+                        mapUnit.ExecuteEvt("onShowEvent", heap);
                         break;
                 }
             }
@@ -259,21 +259,21 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                     var heap = new Dictionary<string, BoxDataForm.Data>();
                     heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, data.uid.ToString()));
 
-                    data.unit.ExecuteEvt("onPerSecondEvent", heap, null);
+                    data.unit.ExecuteEvt("onPerSecondEvent", heap);
                 }
                 foreach (var data in CharacterUnitForm.DataByUid.Values)
                 {
                     var heap = new Dictionary<string, BoxDataForm.Data>();
                     heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, data.unit.productInfo.Item1.ToString()));
 
-                    data.unit.ExecuteEvt("onPerSecondEvent", heap, null);
+                    data.unit.ExecuteEvt("onPerSecondEvent", heap);
                 }
                 foreach (var data in ObjectUnitForm.DataByUid.Values)
                 {
                     var heap = new Dictionary<string, BoxDataForm.Data>();
                     heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, data.uid.ToString()));
 
-                    data.unit.ExecuteEvt("onPerSecondEvent", heap, null);
+                    data.unit.ExecuteEvt("onPerSecondEvent", heap);
                 }
             }
         };

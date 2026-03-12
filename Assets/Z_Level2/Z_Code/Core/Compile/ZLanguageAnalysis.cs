@@ -98,6 +98,8 @@ namespace Z_Code
                     {
                         BuildZl(cmds, node.subNodes[i]);
                     }
+                    cmds.Add(GetOpName(Op.PushNum));
+                    cmds.Add(node.subNodes.Count.ToString());
                     cmds.Add(GetOpName(Op.Call));
                     cmds.Add(node.desc.code);
                     break;

@@ -34,8 +34,8 @@ namespace Z_Code
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
             GameManager.instance.evtCtrl.StartTask(() =>
             {
-                var relaPos = new Vector3(prm[1].num, prm[3].num, prm[2].num);
-                var time = prm[4].num;
+                var relaPos = new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
+                var time = prm[2].num;
                 var step = Mathf.Min(1, Time.deltaTime / time) * relaPos;
 
 
@@ -53,10 +53,10 @@ namespace Z_Code
                     }
                 }
                 var realStep = (data.pos - oldPos);
-                prm[1].num -= realStep.x;
-                prm[2].num -= realStep.z;
-                prm[3].num -= realStep.y;
-                prm[4].num -= Time.deltaTime;
+                prm[1].dic["x"].num -= realStep.x;
+                prm[1].dic["z"].num -= realStep.z;
+                prm[1].dic["height"].num -= realStep.y;
+                prm[2].num -= Time.deltaTime;
                 return false;
             });
 

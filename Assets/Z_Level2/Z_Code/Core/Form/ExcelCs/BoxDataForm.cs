@@ -155,6 +155,15 @@ public static readonly int autoUidCnt=100;
              this.dic = dic;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.str = data.str;
+             this.valName = data.valName;
+             this.num = data.num;
+             this.dic = data.dic;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

@@ -16,10 +16,16 @@ public class Z_Code_Sample : MonoBehaviour
         var cpr = new Compiler();
         var dcpr = new Decompiler();
 
+        /*var testCode = "Print(\"jiba\");";
+        ProgramDataForm.AddData(new ProgramDataForm.Data(-1, "Test", testCode, cpr.Compile(testCode, out _)));
+*/
+
         var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
         var res = cpr.Compile(code, out var syntaxs);
         var program = new ProgramDataForm.Data(-1, "", code, res);
-        var itp = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1);
+
+
+        var itp = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1, 0, null);
         StartCoroutine(Interpret(itp));
 
         runBtn.onClick.AddListener(() =>
@@ -41,11 +47,11 @@ public class Z_Code_Sample : MonoBehaviour
         while (true)
         {
             var res = itp.Interpret();
-            if(res)
+            if (res.complete)
             {
                 break;
             }
             yield return null;
-        } 
+        }
     }
 }

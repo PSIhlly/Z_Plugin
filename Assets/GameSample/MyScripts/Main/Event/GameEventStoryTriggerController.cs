@@ -44,10 +44,10 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryLifeEventType.FirstEnter:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onBeginEvent", null), 0, null, null);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onBeginEvent", null), 0, null);
                 break;
             case StoryLifeEventType.EverySecond:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onPerSecondEvent", null), 0, null, null);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onPerSecondEvent", null), 0, null);
                 break;
         }
     }
@@ -58,14 +58,14 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryItemEventType.Add:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onGainItemEvent", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent${evt.data.uid}", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent$", null), 0, heap, null);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onGainItemEvent", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent${evt.data.uid}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent$", null), 0, heap);
                 break;
             case StoryItemEventType.Remove:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onLostItemEvent", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent${evt.data.uid}", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent$", null), 0, heap, null);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onLostItemEvent", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent${evt.data.uid}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent$", null), 0, heap);
                 break;
         }
     }
@@ -77,10 +77,10 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryCharacterEventType.ParamChange:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onCharacterParamChangeEvent", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}$", null), 0, heap, null);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}${evt.name}", null), 0, heap, null);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onCharacterParamChangeEvent", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}$", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}${evt.name}", null), 0, heap);
                 break;
 
         }

@@ -1,23 +1,24 @@
 using Form;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
+using Ui.ModStoryEventTrigger;
+using Unity.VisualScripting;
 using UnityEngine;
-using Z_DataSystem;
-using Z_DesignStyle;
-using Z_Map;
-using Z_UnitSystem;
-using Z_Debug;
-using Z_Code.Form;
-using Z_Ui.Notify;
-using Z_Text;
-using System;
 using Z_ByteSerialize;
 using Z_Code;
-using Unity.VisualScripting;
-using Ui.ModStoryEventTrigger;
+using Z_Code.Form;
+using Z_DataSystem;
 using Z_DataSystem.Form;
-using System.Runtime.ConstrainedExecution;
+using Z_Debug;
+using Z_DesignStyle;
+using Z_Map;
+using Z_Text;
+using Z_Ui.Notify;
+using Z_UnitSystem;
+using static Z_Code.Form.InterpretDataForm;
 namespace Form
 {
     public class EventModifyEvent : Z_Event
@@ -28,7 +29,7 @@ namespace Form
     {
         public partial class Data
         {
-            public override bool Interpret()
+            public override RetInfo Interpret()
             {
                 if (_interpreter == null)
                 {
@@ -180,7 +181,7 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 continue;
             }
-            if (data.Interpret())
+            if (data.Interpret().complete)
             {
                 if (!string.IsNullOrEmpty(data.releaseTrigger))
                 {
@@ -218,7 +219,7 @@ public class GameEventController : Z_Controller<GameManager>
 
 
 
-    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, List<BoxDataForm.Data> args)
+    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap)
     {
         if (trigger == null)
         {
@@ -241,7 +242,7 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, trigger.name);
                 }
                 break;
             case TriggerType.OnceDuring:
@@ -257,23 +258,23 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap,trigger.name);
                 }
                 break;
             default:
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, args, trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, trigger.name);
                 }
                 break;
         }
     }
 
-    public void Execute(EventProgramDataForm.Data evt, int user,Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, List<BoxDataForm.Data> args, string releaseTrigger = "")
+    public void Execute(EventProgramDataForm.Data evt, int user,Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap==null?new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(): defaultHeap, evt.Copy(), 0, -1, user, args, releaseTrigger, 0));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap==null?new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(): defaultHeap, evt.Copy(), 0, -1, user, null, releaseTrigger, 0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {

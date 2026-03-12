@@ -113,6 +113,13 @@ public static readonly int autoUidCnt=1000000;
              this.data = data;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.uid = data.uid;
+             this.name = data.name;
+             this.data = data.data;
+            }
 
                 public Data Copy(bool sameId = true)
                 {

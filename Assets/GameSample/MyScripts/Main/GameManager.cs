@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Ui;
 using Ui.EnterMain;
 using Ui.ModStory.ModStoryEffect.ModStoryEffectUnit;
+using Ui.PlaySceneMenu;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Z_ByteSerialize;
@@ -22,6 +23,7 @@ using Z_Language;
 using Z_Map;
 using Z_Texture;
 using Z_Ui;
+using Z_Ui.Dialog;
 using Z_UnitSystem;
 
 
@@ -127,9 +129,12 @@ public class GameManager : Z_MonoManager<GameManager>
         saveCtrl.LoadOverview();
 
 
-
-
         RegisterInputDefault();
+
+        DialogManager.instance.SetMenuAct(() =>
+        {
+            UiManager.instance.ShowUi<UiPlaySceneMenuCtrl>();
+        });
     }
 
     public void Start()

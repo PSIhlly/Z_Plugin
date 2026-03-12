@@ -18,7 +18,7 @@ using Z_Ui.Form;
 
 namespace Ui.DialogMain
 {
-   
+
     public partial class UiDialogMainModel
     {
         public UiDialogMainParam prm;
@@ -34,10 +34,11 @@ namespace Ui.DialogMain
         public override void OnCreate()
         {
             this.Register<ShowTypeEvent>();
-            view.btn_back.onClick.AddListener(()=>{
+            view.btn_back.onClick.AddListener(() =>
+            {
                 Z_EventHelper.Invoke(new ShowTypeEvent()
                 {
-                     showType = ShowType.Normal
+                    showType = ShowType.Normal
                 });
             });
         }
@@ -62,6 +63,7 @@ namespace Ui.DialogMain
                     view.page_Title.SetShow(true, new UiTitleParam() { clip = model.prm.clip });
                     view.page_Profile.SetShow(true, new UiProfileParam() { clip = model.prm.clip });
                     view.btn_back.gameObject.SetActive(false);
+                    DialogManager.instance.CloseHistory();
                     break;
                 case ShowType.Hide:
                     view.page_MainText.SetShow(false);
@@ -77,6 +79,6 @@ namespace Ui.DialogMain
             SetSubShow(e.showType);
         }
     }
-  
+
 
 }

@@ -9,6 +9,7 @@ using Z_Texture;
 using Ui.ModStory.ModStoryOverview;
 using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjectObjectAppearance;
 using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjectObjectConfig;
+using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjectObjectParameter;
 
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
 {
@@ -38,9 +39,14 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
                 model.selPage = 0;
                 Refresh();
             });
-            view.btn_config.onClick.AddListener(() =>
+            view.btn_parameter.onClick.AddListener(() =>
             {
                 model.selPage = 1;
+                Refresh();
+            });
+            view.btn_config.onClick.AddListener(() =>
+            {
+                model.selPage = 2;
                 Refresh();
             });
             
@@ -63,11 +69,18 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
                 data = model.data
             });
             view.sta_appearance.ChangeState(model.selPage == 0 ? 1 : 0);
-            view.page_ModStoryMapObjectObjectConfig.SetShow(model.selPage == 1, new UiModStoryMapObjectObjectConfigParam()
+
+            view.page_ModStoryMapObjectObjectParameter.SetShow(model.selPage == 1, new UiModStoryMapObjectObjectParameterParam()
             {
                 data = model.data
             });
-            view.sta_config.ChangeState(model.selPage == 1 ? 1 : 0);
+            view.sta_parameter.ChangeState(model.selPage == 1 ? 1 : 0);
+
+            view.page_ModStoryMapObjectObjectConfig.SetShow(model.selPage == 2, new UiModStoryMapObjectObjectConfigParam()
+            {
+                data = model.data
+            });
+            view.sta_config.ChangeState(model.selPage == 2 ? 1 : 0);
 
         }
     }

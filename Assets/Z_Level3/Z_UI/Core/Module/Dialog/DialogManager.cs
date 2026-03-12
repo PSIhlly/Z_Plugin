@@ -13,6 +13,7 @@ namespace Z_Ui.Dialog
         public float autoPlaySpeed;//0~2
         public float textDisplaySpeed;//1~50
         public int historyMax;//1~10
+        public Action menuAct;
     }
     public enum PlayType
     {
@@ -59,12 +60,17 @@ namespace Z_Ui.Dialog
             {
                 autoPlaySpeed = 0,
                 textDisplaySpeed = 20,
-                historyMax = 10,
+                historyMax = 10
             };
 
         }
 
         #region 开始方法
+
+        public void SetMenuAct(Action menuAct)
+        {
+            settings.menuAct = menuAct;
+        }
 
         public void Begin(string title, string mainText, string mainPicture, string mainVideo, string profilePicture, string mainAudio, Action onComplete, bool autoClose = true)
         {
@@ -116,6 +122,11 @@ namespace Z_Ui.Dialog
             {
                 historyClips = historyClips
             });
+        }
+        public void CloseHistory()
+        {
+
+            UiManager.instance.CloseUi<UiDialogHistoryCtrl>();
         }
         #endregion
         public void End()

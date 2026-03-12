@@ -20,6 +20,7 @@ public static partial class GlobalSettings
     public const int CHARACTER_PARAM_MAX = 100000;
     public const int GLOBAL_PARAM_MAX = 100000;
     public const int ITEM_PARAM_MAX = 100000;
+    public const int SCENE_PARAM_MAX = 100000;
 
 }
 public static partial class GlobalDataHelper

@@ -23,7 +23,7 @@ namespace Z_Ui.Base
         DialogText,
         Notice
     }
-    [DefaultExecutionOrder(-10)]
+    [DefaultExecutionOrder(-100)]
     public partial class UiHolder : MonoBehaviour
     {
 

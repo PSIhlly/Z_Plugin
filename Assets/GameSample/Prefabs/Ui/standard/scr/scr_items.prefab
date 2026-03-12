@@ -1,18 +1,19 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1 &44647669220062782
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 44647669220062785}
   - component: {fileID: 44647669220062786}
   - component: {fileID: 44647669220062789}
   - component: {fileID: 6238135931006243432}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: scr_items
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,13 +123,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 44647669927673701}
   - component: {fileID: 44647669927673702}
   - component: {fileID: 44647669927673703}
   - component: {fileID: 44647669927673700}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,10 +214,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 44647670852615145}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -282,6 +285,18 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 72
       objectReference: {fileID: 0}
+    - target: {fileID: 5226644236414305979, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 0ef681cc3f5eae047a7b155d170887b4, type: 2}
+    - target: {fileID: 5226644236414305979, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8623805276869744401, guid: 0ef681cc3f5eae047a7b155d170887b4, type: 2}
+    - target: {fileID: 5226644236414305979, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5265619651492037006, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: elementTrsLst.Array.size
       value: 8
@@ -310,6 +325,18 @@ PrefabInstance:
       propertyPath: elementTrsLst.Array.data[7]
       value: 
       objectReference: {fileID: 6373986811067304438}
+    - target: {fileID: 6147628635658392846, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147628635658392846, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147628635658392846, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.5

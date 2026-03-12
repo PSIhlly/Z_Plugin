@@ -1,6 +1,7 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Ui.ModAssetSelectWindow;
 using UnityEngine;
 using Z_DataSystem;
@@ -36,12 +37,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-              onComplete = (data) =>
-              {
-                  GameManager.instance.curStory.icon = data.name;
-                  GameManager.instance.saveCtrl.AddTex(data);
-              },
-              sizeLimit = new Vector2Int(400, 400)
+            onComplete = (data) =>
+            {
+                GameManager.instance.curStory.icon = data.name;
+                GameManager.instance.saveCtrl.AddTex(data);
+            },
+            sizeLimit = new Vector2Int(400, 400)
         });
     }
 
@@ -101,6 +102,43 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
     }
 
+    public void CreateSceneObjectArg(string name)
+    {
+        if (SceneParamForm.DataByName.Keys.Count > GlobalSettings.SCENE_PARAM_MAX)
+            return;
+
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(SceneParamForm.DataByName.Keys);
+        }
+
+        SceneParamForm.AddData(new SceneParamForm.Data(-1, name, 0, 0f, 0f, 1f));
+        foreach (var obj in MapObjectForm.DataById.Values)
+        {
+            obj.paramDic[name] = new MapObjectParamForm.Data(-1, name, 0, 0f, 0f, 1f);
+            obj.paramDic = obj.paramDic;//refresh
+        }
+    }
+    public void DeleteSceneObjectArg(string name)
+    {
+        SceneParamForm.RemoveData(SceneParamForm.DataByName[name].uid);
+        foreach (var obj in MapObjectForm.DataById.Values)
+        {
+            obj.paramDic.Remove(name);
+            obj.paramDic = obj.paramDic;//refresh
+        }
+    }
+
+    public void RenameSceneObjectParam(string oldName, string newName)
+    {
+        SceneParamForm.DataByName[oldName].name = newName;
+        foreach (var obj in MapObjectForm.DataById.Values)
+        {
+            obj.paramDic[newName] = obj.paramDic[oldName];
+            obj.paramDic.Remove(oldName);
+            obj.paramDic = obj.paramDic;//refresh
+        }
+    }
 
 
     #endregion
@@ -212,8 +250,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(MapObjectForm.DataByName.Keys);
         }
-
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab, false, new Dictionary<string, EventTriggerForm.Data>()));
+        var paramDic = new Dictionary<string, MapObjectParamForm.Data>();
+        foreach (var prm in MapObjectParamForm.DataByName.Values)
+        {
+            paramDic[prm.name] = prm.Copy();
+        }
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -253,10 +295,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region character
-    public void ChooseCharacterParam(string title, Action<EntryItem> act,EntryItem addItem=null)
+    public void ChooseCharacterParam(string title, Action<EntryItem> act, EntryItem addItem = null)
     {
         var items = new EntryItem();
-        if(addItem!=null)
+        if (addItem != null)
         {
             items.Add(addItem);
         }

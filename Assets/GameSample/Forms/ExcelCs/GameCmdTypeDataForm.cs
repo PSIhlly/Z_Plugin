@@ -142,6 +142,8 @@ namespace Form
 
                 {10008,new Data(10008,"uiImg")},
 
+                {10009,new Data(10009,"pos")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -160,6 +162,8 @@ namespace Form
                         {"effect",_DataByUid[10007]},
     
                         {"uiImg",_DataByUid[10008]},
+    
+                        {"pos",_DataByUid[10009]},
     
                     };
     

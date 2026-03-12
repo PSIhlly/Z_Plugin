@@ -108,6 +108,10 @@ namespace Ui.DialogMain
                     DialogManager.instance.ShowHistory();
 
                 });
+                view.btn_menu.onClick.AddListener(() =>
+                {
+                    DialogManager.instance.settings.menuAct?.Invoke();
+                });
             }
             public override void OnHide()
             {

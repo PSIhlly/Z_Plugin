@@ -9,13 +9,13 @@ namespace Z_ByteSerialize
 {
     public static class Z_Json
     {
-        public static Dictionary<Type,(Func<object,JObject>, Func<JObject, object>)> extra=new Dictionary<Type, (Func<object, JObject>, Func<JObject, object>)>();
+        public static Dictionary<Type, (Func<object, JObject>, Func<JObject, object>)> extra = new Dictionary<Type, (Func<object, JObject>, Func<JObject, object>)>();
         public static void Set<T>(this JObject jo, string key, T value)
         {
             var tp = typeof(T);
             jo.Set(tp, key, value);
         }
-        public static void Set(this JObject jo, Type tp,string key, object value)
+        public static void Set(this JObject jo, Type tp, string key, object value)
         {
             if (extra.ContainsKey(tp))
             {
@@ -40,7 +40,7 @@ namespace Z_ByteSerialize
                 {
                     JObject subJo = new JObject();
 
-                    subJo.Set(tp.GetGenericArguments()[0],"v", v);
+                    subJo.Set(tp.GetGenericArguments()[0], "v", v);
                     ja.Add(subJo);
                 }
                 jo[key] = ja;
@@ -59,7 +59,7 @@ namespace Z_ByteSerialize
             }
             else if (value is Enum)
             {
-                
+
                 jo[key] = (int)value;
             }
             else
@@ -74,18 +74,18 @@ namespace Z_ByteSerialize
             var tp = typeof(T);
             return (T)jo.Get(tp, key);
         }
-        public static object Get(this JObject jo,Type tp, string key)
+        public static object Get(this JObject jo, Type tp, string key)
         {
 
             try
             {
-                if (extra.ContainsKey(tp))
-                {
-                    return extra[tp].Item2((JObject)jo[key]);
-                }
-                else if (jo[key] == null||jo[key]==null)
+                if (key == null || jo[key].Type == JTokenType.Null)
                 {
                     return null;
+                }
+                else if (extra.ContainsKey(tp))
+                {
+                    return extra[tp].Item2((JObject)jo[key]);
                 }
                 else if (tp == typeof(Vector3))
                 {
@@ -99,7 +99,7 @@ namespace Z_ByteSerialize
                 }
                 else if (IsIList(tp))
                 {
-                    if(!(jo[key] is JArray))
+                    if (!(jo[key] is JArray))
                     {
                         return null;
                     }
@@ -143,7 +143,7 @@ namespace Z_ByteSerialize
             }
             catch (Exception e)
             {
-                Debug.LogError(jo+" "+tp+" "+key+" "+e);
+                Debug.LogError(jo + " " + tp + " " + key + " " + e);
                 return null;
             }
         }

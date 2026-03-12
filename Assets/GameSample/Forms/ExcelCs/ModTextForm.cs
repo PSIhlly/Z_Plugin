@@ -628,6 +628,12 @@ namespace Form
 
                 {1000246,new Data(1000246,"internal","Internal","内部的")},
 
+                {1000247,new Data(1000247,"test","Test","测试")},
+
+                {1000248,new Data(1000248,"cantSaveWhenTest","can't save when test","测试时不能保存")},
+
+                {1000249,new Data(1000249,"sceneObjectParameter","Scene object parameter","景物参数")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -1122,6 +1128,12 @@ namespace Form
                         {"extern",_DataById[1000245]},
     
                         {"internal",_DataById[1000246]},
+    
+                        {"test",_DataById[1000247]},
+    
+                        {"cantSaveWhenTest",_DataById[1000248]},
+    
+                        {"sceneObjectParameter",_DataById[1000249]},
     
                     };
     

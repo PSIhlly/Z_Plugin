@@ -38,11 +38,12 @@ namespace Ui.PlayAsset
         }
         public override void OnShow()
         {
+            Refresh();
         }
         public override void OnUpdate()
         {
 
-                Refresh(); 
+            Refresh();
         }
         public void Refresh()
         {
@@ -71,15 +72,12 @@ namespace Ui.PlayAsset
 
         public override void OnCreate()
         {
-            model.prm = param;
-            rect.sizeDelta=new Vector2( model.prm.data.size.x, model.prm.data.size.y);
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultEventTexName()).GetSprite();
-
-
         }
         public override void OnShow()
         {
-
+            model.prm = param;
+            rect.sizeDelta = new Vector2(model.prm.data.size.x, model.prm.data.size.y);
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultEventTexName()).GetSprite();
             Refresh();
         }
         public void Refresh()

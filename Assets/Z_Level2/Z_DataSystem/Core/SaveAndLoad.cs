@@ -93,6 +93,8 @@ namespace Z_UnitSystem
         }
         public static bool Exist(string key)
         {
+            if (string.IsNullOrEmpty(key))
+                return false;
             var path = GetRealPath(key);
             if (Directory.Exists(path))
                 return true;

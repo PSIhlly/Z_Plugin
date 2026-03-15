@@ -27,7 +27,8 @@ namespace Ui.ZCodeEntry
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();
             model.curEntry = new List<SyntaxNode>();
-            var pg = new ProgramDataForm.Data(-1, "", view.ipt_code.text, model.cpr.Compile(view.ipt_code.text, out var syntaxs));
+            var lst=model.cpr.Compile(view.ipt_code.text, out var syntaxs,out var count,out var ret);
+            var pg = new ProgramDataForm.Data(-1, "", view.ipt_code.text,lst, count,ret);
             model.interpreter = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), pg, 0, -1,0, null);
 
             view.btn_run.onClick.AddListener(() =>
@@ -36,14 +37,12 @@ namespace Ui.ZCodeEntry
             });
             view.btn_toCode.onClick.AddListener(() =>
             {
-                model.interpreter.program.code = model.dcpr.Decompile(model.curEntry);
-                model.interpreter.program.zCode = model.cpr.Compile(model.interpreter.program.code, out var nodes);
+                model.interpreter.program.ApplyCode(model.dcpr.Decompile(model.curEntry), model.cpr);
                 view.ipt_code.Set(model.interpreter.program.code);
             });
             view.btn_toEntry.onClick.AddListener(() =>
             {
-                model.interpreter.program.code = view.ipt_code.text;
-                model.interpreter.program.zCode = model.cpr.Compile(model.interpreter.program.code, out model.curEntry);
+                model.curEntry=model.interpreter.program.ApplyCode(view.ipt_code.text, model.cpr);
                 itemCon.Clear();
                 foreach (var node in model.curEntry)
                 {

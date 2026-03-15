@@ -73,6 +73,7 @@ namespace Ui.ModAssetSelectWindow
     public partial class UiModAssetSelectWindowView:UiView
     {
 
+            public MediaPlayer mp_;
             public Btn btn_bg;
             public ScrView scr_items;
             public Btn btn_import;
@@ -85,15 +86,16 @@ namespace Ui.ModAssetSelectWindow
         public UiModAssetSelectWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_bg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            scr_items = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            btn_import = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_import = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_close = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            go_item = uiHolder.elementTrsLst[7].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            mp_ = uiHolder.elementTrsLst[0].GetComponent<MediaPlayer>();
+            btn_bg = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            btn_import = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_import = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            btn_ = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[6].GetComponent<Sta>();
+            btn_close = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            go_item = uiHolder.elementTrsLst[8].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
         }
 
     }

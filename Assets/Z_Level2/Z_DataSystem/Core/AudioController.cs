@@ -20,9 +20,10 @@ namespace Z_DataSystem.Form
     {
         public partial class Data
         {
-            public void Play(MediaPlayer player)
+            public void Play(MediaPlayer player, bool loop = false)
             {
                 player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);
+                player.Loop = loop;
             }
         }
     }
@@ -64,7 +65,7 @@ namespace Z_DataSystem
                 if (data != null)
                 {
                     var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
-                    File.WriteAllBytes(AssetManager.cachePath+ nm, data);
+                    File.WriteAllBytes(AssetManager.cachePath + nm, data);
                     var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, nm);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()

@@ -1,7 +1,28 @@
+using System;
 using System.Collections.Generic;
+using Z_Code;
 using Z_Code.Form;
-
-namespace Z_Code { 
+namespace Z_Code.Form
+{ 
+public static partial class ProgramDataForm
+{
+    public partial class Data
+    {
+        public List<SyntaxNode> ApplyCode(string code, Compiler compiler = null)
+        {
+            if (compiler == null)
+                compiler = new Compiler();
+            this.code = code;
+            zCode = compiler.Compile(code, out var res, out int count, out string ret);
+            paramCount = count;
+            returnValue = ret;
+            return res;
+        }
+    }
+}
+}
+namespace Z_Code
+{
 
     public static class CodeHelper
     {
@@ -22,6 +43,8 @@ namespace Z_Code {
         {
             return new BoxDataForm.Data(-1, null, null, num, new Dictionary<string, BoxDataForm.Data>());
         }
+
+
     }
 
 }

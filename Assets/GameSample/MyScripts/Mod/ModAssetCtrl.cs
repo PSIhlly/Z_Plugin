@@ -652,9 +652,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return true;
         }, items);
     }
-    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act, bool createOnly = false)
+    public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act)
     {
-        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType, createOnly, out var defaultItem);
+        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType, out var defaultItem);
+        items.Merge("#", GameManager.instance.evtCtrl.GetEventEntry(type, retType));
         NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>
         {
             act?.Invoke(res);
@@ -673,7 +674,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         if (type == null)
             type = "";
 
-        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "", new List<string>(), category, type));
+        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "", new List<string>(), 0, "void", category, type));
     }
     public void DeleteEvent(string name)
     {

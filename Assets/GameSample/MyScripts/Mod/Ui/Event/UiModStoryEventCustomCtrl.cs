@@ -57,12 +57,17 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             model.cat = null;
             model.type = null;
             model.data = null;
-            if(EventProgramDataForm.DataByUid.Count>0)
+            if (EventProgramDataForm.DatasByCategory.Count > 0)
             {
-                var defaultData = EventProgramDataForm.DataByUid.First().Value;
-                model.cat = defaultData.category;
-                model.type = defaultData.type;
-                model.data = defaultData;
+                var firstCat = EventProgramDataForm.DatasByCategory.Keys.First();
+                var catList = EventProgramDataForm.DatasByCategory[firstCat];
+                if (catList.Count > 0)
+                {
+                    var firstData = catList[0];
+                    model.cat = firstCat;
+                    model.type = firstData.type;
+                    model.data = firstData;
+                }
             }
             Refresh();
         }
@@ -157,6 +162,26 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             model.cat = cat;
             model.type = type;
             model.data = data;
+            if (model.cat != null && model.type == null)
+            {
+                var catList = EventProgramDataForm.DatasByCategory[model.cat];
+                if (catList.Count > 0)
+                {
+                    model.type = catList[0].type;
+                }
+            }
+            if (model.cat != null && model.type != null && model.data == null)
+            {
+                var key = (model.cat, model.type);
+                if (EventProgramDataForm.DatasByCategoryType.ContainsKey(key))
+                {
+                    var items = EventProgramDataForm.DatasByCategoryType[key];
+                    if (items.Count > 0)
+                    {
+                        model.data = items[0];
+                    }
+                }
+            }
             Refresh();
         }
     }

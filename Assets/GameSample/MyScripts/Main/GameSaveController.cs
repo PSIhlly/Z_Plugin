@@ -40,14 +40,14 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void Package(int storyId)
     {
-        File.WriteAllText(AssetManager.externPatn + storyId + ".png",SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)));
+        File.WriteAllText(AssetManager.externPatn + storyId + ".png", SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)));
     }
 
     #endregion
 
     #region unpackage
 
-    public void Unpackage(string content,int storyId)
+    public void Unpackage(string content, int storyId)
     {
         SaveAndLoad.Unpackage(content, Main2StoryManager.GetStoryCoreFolder(storyId));
     }
@@ -382,6 +382,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void LoadSaveStory(int id)
     {
+        ResetStory();
         var folder = Main2StoryManager.GetStorySaveFolder(id);
 
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
@@ -396,10 +397,14 @@ public class GameSaveController : Z_Controller<GameManager>
 
         LoadEvent(folder, assetFolder);
         LoadProgress(folder, assetFolder);
-
+        //manage Scene
         DeleteCache(id);
+        if (LackMapScene(folder))
+        {
+            CopyMapScene(Main2StoryManager.GetStoryCoreFolder(id), folder);
+        }
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
-
+        //
         LoadUiItem(folder);
 
     }
@@ -814,6 +819,20 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
+    #endregion
+
+    #region check
+    public bool LackMapScene(string folder)
+    {
+        foreach (var data in SceneForm.DataByUid.Values)
+        {
+            if (!SaveAndLoad.Exist(folder + Main2StoryManager.GetSceneFileNameById(data.uid)))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     #endregion
 
     #region del

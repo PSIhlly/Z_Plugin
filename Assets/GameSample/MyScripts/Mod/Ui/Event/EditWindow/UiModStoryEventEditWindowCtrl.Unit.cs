@@ -1,3 +1,5 @@
+using Form;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Z_Code;
 using Z_Code.Form;
@@ -94,6 +96,16 @@ namespace Ui.ModStoryEventEditWindow
                             {
                                 CreateTxt(cur);
                             }
+                        }
+                        else if (EventProgramDataForm.DataByName.ContainsKey(model.node.desc.code))
+                        {
+                            CreateTxt(model.node.desc.code + "(");
+                            for (int i = 0; i < model.node.subNodes.Count; i++)
+                            {
+                                CreateTxt($"{(i > 0 ? "," : "")}param{i + 1}=");
+                                CreateNode(model.node.subNodes[i]);
+                            }
+                            CreateTxt(")");
                         }
                         else
                         {

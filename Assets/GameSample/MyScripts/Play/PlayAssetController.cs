@@ -39,12 +39,16 @@ public interface InternalPlayAssetController
 }
 public interface ExternalPlayAssetController
 {
-    public int Add(string texName, Vector2 size);
+    public int Add(string texName, float scale);
     public void Remove(int id);
     public void SetPos(int id, Vector2 tar, float time);
     public void SetEuler(int id, float tar, float time);
     public void SetOpacity(int id, float tar, float time);
     public void SetRemoveTime(int id, float time);
+}
+public class PlayAssetEvent : Z_Event
+{
+
 }
 public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetController, ExternalPlayAssetController
 {
@@ -70,14 +74,22 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
         UiManager.instance.CloseUi<UiPlayAssetCtrl>();
     }
 
-    public int Add(string texName,Vector2 size)
+    public int Add(string texName, float scale)
     {
-        var data = new ImageUiItemForm.Data(-1, texName,size, Vector2.one * 0.5f, 0, 0, Vector2.one * 0.5f, 0, 0, 0, 0, 0, 0, 0, 0,999999);
+        var texData = TexAssetForm.DataByName.GetDv(texName, null);
+        Vector2 size = Vector2.zero;
+        if (texData != null)
+        {
+            var tex = texData.GetTex();
+            size = new Vector2(tex.width * scale, tex.height * scale);
+        }
+        var data = new ImageUiItemForm.Data(-1, texName, size, Vector2.one * 0.5f, 0, 0, Vector2.one * 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 999999);
         return ImageUiItemForm.AddData(data);
     }
     public void Remove(int id)
     {
         ImageUiItemForm.RemoveData(id);
+        Z_EventHelper.Invoke(new PlayAssetEvent());
     }
     public void SetPos(int id, Vector2 tar, float time)
     {
@@ -87,8 +99,9 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
             data.tarPos = tar;
             data.posTime = time;
             data.posProgress = 0;
-            data.oldPos = data.ctrl == null ?Vector2.one*0.5f: data.ctrl.rect.position;
+            data.oldPos = data.ctrl == null ? Vector2.one * 0.5f : data.ctrl.rect.position;
         }
+        Z_EventHelper.Invoke(new PlayAssetEvent());
     }
     public void SetEuler(int id, float tar, float time)
     {
@@ -98,8 +111,9 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
             data.tarEuler = tar;
             data.eulerTime = time;
             data.eulerProgress = 0;
-            data.oldEuler = data.ctrl == null ? 0: data.ctrl.rect.eulerAngles.z;
+            data.oldEuler = data.ctrl == null ? 0 : data.ctrl.rect.eulerAngles.z;
         }
+        Z_EventHelper.Invoke(new PlayAssetEvent());
     }
     public void SetOpacity(int id, float tar, float time)
     {
@@ -111,6 +125,7 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
             data.opacityProgress = 0;
             data.oldOpacity = data.ctrl == null ? 1 : data.ctrl.view.img_.color.a;
         }
+        Z_EventHelper.Invoke(new PlayAssetEvent());
     }
     public void SetRemoveTime(int id, float time)
     {
@@ -119,6 +134,7 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
         {
             data.removeTime = time;
         }
+        Z_EventHelper.Invoke(new PlayAssetEvent());
     }
-    
+
 }

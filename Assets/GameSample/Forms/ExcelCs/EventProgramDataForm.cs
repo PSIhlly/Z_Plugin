@@ -42,6 +42,10 @@ namespace Form
 
             ProgramDataForm.changeZcodeAction+=ChangeZcode;
 
+            ProgramDataForm.changeParamcountAction+=ChangeParamcount;
+
+            ProgramDataForm.changeReturnvalueAction+=ChangeReturnvalue;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -68,6 +72,10 @@ namespace Form
         public static Action<Data,string,string> changeCodeAction;
                 
         public static Action<Data,List<string>,List<string>> changeZcodeAction;
+                
+        public static Action<Data,int,int> changeParamcountAction;
+                
+        public static Action<Data,string,string> changeReturnvalueAction;
                 
         public static Action<Data,string,string> changeCategoryAction;
                 
@@ -114,17 +122,19 @@ namespace Form
                  
                      }
                     
-            public Data(ProgramDataForm.Data data):base(data.uid,data.name,data.code,data.zCode)
+            public Data(ProgramDataForm.Data data):base(data.uid,data.name,data.code,data.zCode,data.paramCount,data.returnValue)
             {
             }
             
-            public Data(int uid,string name,string code,List<string> zCode,string category,string type):base(uid,name,code,zCode)
+            public Data(int uid,string name,string code,List<string> zCode,int paramCount,string returnValue,string category,string type):base(uid,name,code,zCode,paramCount,returnValue)
             {
 
              this.uid = uid;
              this.name = name;
              this.code = code;
              this.zCode = zCode;
+             this.paramCount = paramCount;
+             this.returnValue = returnValue;
              this.category = category;
              this.type = type;
 
@@ -136,18 +146,20 @@ namespace Form
              this.name = data.name;
              this.code = data.code;
              this.zCode = data.zCode;
+             this.paramCount = data.paramCount;
+             this.returnValue = data.returnValue;
              this.category = data.category;
              this.type = data.type;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,code,new List<string>(zCode),category,type);
+        return new Data(sameId? uid:uidChain.GetId(),name,code,new List<string>(zCode),paramCount,returnValue,category,type);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",null,"","");
+                   private static Data _defaultData=new Data(0,"","",null,0,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -276,6 +288,10 @@ namespace Form
 
                 jo.Get<List<string>>("zCode"),
 
+                jo.Get<int>("paramCount"),
+
+                jo.Get<string>("returnValue"),
+
                 jo.Get<string>("category"),
 
                 jo.Get<string>("type")
@@ -297,6 +313,10 @@ namespace Form
             jo.Set<string>("code",data.code);
 
             jo.Set<List<string>>("zCode",data.zCode);
+
+            jo.Set<int>("paramCount",data.paramCount);
+
+            jo.Set<string>("returnValue",data.returnValue);
 
             jo.Set<string>("category",data.category);
 
@@ -440,6 +460,26 @@ ProgramDataForm.RemoveData(uid);
                 {
 
                 changeZcodeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeParamcount(ProgramDataForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeParamcountAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeReturnvalue(ProgramDataForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeReturnvalueAction?.Invoke(data,oldV,newV);
                 }
                     
             }

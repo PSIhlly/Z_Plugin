@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
 using Ui.ModStoryEventTrigger;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_Code;
@@ -25,6 +26,7 @@ namespace Form
     {
 
     }
+
     public static partial class EventInterpretDataForm
     {
         public partial class Data
@@ -49,28 +51,28 @@ public enum TriggerType
 
 public static partial class GlobalEventHelper
 {
-    public static string CHARACTER="$ch$";
-    public static string ITEM="$it$";
-    public static string SCENEOBJECT="$so$";
-    public static string EFFECT="$ef$";
+    public static string CHARACTER = "$ch$";
+    public static string ITEM = "$it$";
+    public static string SCENEOBJECT = "$so$";
+    public static string EFFECT = "$ef$";
     public static string UIIMAGE = "$ui$";
 
     public static string GetName(string mark, string name = "")
     {
         return $"{mark}{name}{mark}";
     }
-    public static int GetId(string name,string mark)
+    public static int GetId(string name, string mark)
     {
-        if(IsAsset(name,mark))
+        if (IsAsset(name, mark))
         {
             return int.Parse(name.Split(mark)[1]);
         }
         return 0;
     }
-    public static bool IsAsset(string name,string mark)
+    public static bool IsAsset(string name, string mark)
     {
         var parts = name.Split(mark);
-        if ( parts.Length == 3 && string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[2]))
+        if (parts.Length == 3 && string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[2]))
         {
             return true;
         }
@@ -125,7 +127,7 @@ public static partial class GlobalSettings
 }
 public class GameEventController : Z_Controller<GameManager>
 {
-    
+
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
     List<Func<bool>> tasks;
@@ -258,7 +260,7 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap,trigger.name);
+                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, trigger.name);
                 }
                 break;
             default:
@@ -270,17 +272,19 @@ public class GameEventController : Z_Controller<GameManager>
         }
     }
 
-    public void Execute(EventProgramDataForm.Data evt, int user,Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "")
+    public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap==null?new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(): defaultHeap, evt.Copy(), 0, -1, user, null, releaseTrigger, 0));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, releaseTrigger, 0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {
         var res = new EntryItem();
         foreach (var data in EventProgramDataForm.DataByName.Values)
         {
+            if (!IsCorrect(retType, data.returnValue))
+                continue;
             var cat = data.category == "" ? TextManager.instance.GetTxt("unclassified") : data.category;
             var type = data.type == "" ? TextManager.instance.GetTxt("unclassified") : data.type;
             if (!res.subs.ContainsKey(cat))
@@ -305,7 +309,7 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
-    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, bool createOnly, out EntryItem defaultItem)
+    public EntryItem GetCmdEntry(SceneEventType objectType, string retType, out EntryItem defaultItem)
     {
         defaultItem = null;
         var res = new EntryItem();
@@ -315,21 +319,16 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 continue;
             }
-            if (createOnly && !data.canCreate)
+
+            if (!IsCorrect(retType, data.retTypes == null ? "void" : data.retTypes[0]))
             {
-                continue;
-            }
-            if (!string.IsNullOrEmpty(retType))
-            {
-                if (data.retTypes == null)
+                if (retType == "void" && !string.IsNullOrEmpty(data.allowAsVoid))
                 {
-                    if (retType != CmdTypeDataForm.defaultData.name)
-                        continue;
+
                 }
                 else
                 {
-                    if (data.retTypes[0] != retType && data.retTypes[0] != "var")
-                        continue;
+                    continue;
                 }
             }
             string category = TextManager.instance.GetTxt(data.category);
@@ -353,5 +352,28 @@ public class GameEventController : Z_Controller<GameManager>
     {
         return new EventTriggerForm.Data(-1, key, new List<string>(), default);
     }
+    public bool IsCorrect(string allowRetType, string retType)
+    {
+        if (string.IsNullOrEmpty(allowRetType))
+            allowRetType = "void";
+        if (string.IsNullOrEmpty(allowRetType))
+            retType = "void";
 
+        if (allowRetType == "void")//确定有类型
+        {
+            return retType == "void";
+        }
+        else if (allowRetType == "var")
+        {
+            return retType != "void";
+        }
+        else
+        {
+            if (retType == "var")
+            {
+                return true;
+            }
+            return allowRetType == retType;
+        }
+    }
 }

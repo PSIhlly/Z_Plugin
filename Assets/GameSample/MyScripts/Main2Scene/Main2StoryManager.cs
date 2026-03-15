@@ -1,5 +1,6 @@
 using Form;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -32,7 +33,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameIsproto[("Player", true)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), 1, new List<int>() { }, new List<int>() { 1 }, new List<int>() { 1 }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle);
+            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid}, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle);
             ProgressForm.AddData(progress);
             var data = new GameMapData();
             data.Init();
@@ -46,9 +47,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
                     ModManager.instance.assetCtrl.CreateEvent("mainDialog", "enterGame", "dialog");
                     var dialogEvt = EventProgramDataForm.DataByName["mainDialog"];
-                    dialogEvt.code =
-                        @"ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");GameOver();";
-                    dialogEvt.zCode = cpr.Compile(dialogEvt.code,out _);
+                    dialogEvt.ApplyCode(@"ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");GameOver();");
+                        
                     progress.events["onBeginEvent"] = new EventTriggerForm.Data(-1, "onBeginEvent", new List<string>() { "mainDialog" }, default);
                     break;
                 case EditorStyle.Rpg:
@@ -117,11 +117,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         PlayManager.instance.BeginScene(sceneId);
     }
 
-    private async Task<bool> StartLoadScene(string storyCoreFolder, int id)
+    private async Task<bool> StartLoadScene(string storyFolder, int id)
     {
-        if (!SaveAndLoad.Exist(storyCoreFolder + "/" + GetSceneFileNameById(id)))
+        if (!SaveAndLoad.Exist(storyFolder + "/" + GetSceneFileNameById(id)))
         {
-            Debug.LogError(storyCoreFolder + "/" + GetSceneFileNameById(id) + " scene file not exist");
+            Debug.LogError(storyFolder + "/" + GetSceneFileNameById(id) + " scene file not exist");
         }
         GameManager.instance.curScene = SceneForm.DataByUid[id];
 
@@ -132,7 +132,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         data = await Task.Run(() =>
         {
-            return GameManager.instance.saveCtrl.LoadSceneMap(storyCoreFolder + "/" + GetSceneFileNameById(id));
+            return GameManager.instance.saveCtrl.LoadSceneMap(storyFolder + "/" + GetSceneFileNameById(id));
         });
 
         LoadingManager.instance.RemoveLoadItem("scene");

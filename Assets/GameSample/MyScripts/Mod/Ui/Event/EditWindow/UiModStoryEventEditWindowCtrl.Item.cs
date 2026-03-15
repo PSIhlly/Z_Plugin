@@ -30,14 +30,34 @@ namespace Ui.ModStoryEventEditWindow
             {
                 if (model.prm.node == null)
                 {
-                    ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "", (item) =>
+                    ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "void", (item) =>
                     {
-                        var data = GameCmdDataForm.DataByUid[item.id];
-                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
-                        parent.model.cpr.Compile(sel.defaultCode, out var res);
-                        model.prm.targetNewList.AddRange(res);
-                        parent.ApplyEntry();
-                    }, true);
+                        if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
+                        {
+                            var data = GameCmdDataForm.DataByUid[item.id];
+                            GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
+                            string defaultCode = sel.defaultCode;
+                            if (!string.IsNullOrEmpty(sel.allowAsVoid))
+                                defaultCode = $"{sel.allowAsVoid}{defaultCode};";
+                            parent.model.cpr.Compile(defaultCode, out var res,out _,out _);
+                            model.prm.targetNewList.AddRange(res);
+                            parent.ApplyEntry();
+                        }else if(ProgramDataForm.DataByName.ContainsKey(item.content))
+                        {
+                            var data = ProgramDataForm.DataByName[item.content];
+                            var paramCount = data.paramCount;
+                            var rawCode = item.content + "(";
+                            for (int i = 0; i < paramCount; i++)
+                            {
+                                rawCode += $"{(i==0?"":",")}param{i+1}";
+                            }
+                            rawCode += ");";
+                            parent.model.cpr.Compile(rawCode, out var res,out _,out _);
+                            model.prm.targetNewList.AddRange(res);
+                            parent.ApplyEntry();
+                        }
+                        
+                    });
                 }
                 else
                 {
@@ -76,7 +96,7 @@ namespace Ui.ModStoryEventEditWindow
                             targetNewList = model.prm.targetNewList,
                         }, ++curRender);
                     }
-                    
+
                 }
 
                 if (model.prm.node.desc.type == CodeType.Action)
@@ -135,10 +155,18 @@ namespace Ui.ModStoryEventEditWindow
                         }
 
                     }
-                    else
+                    else if (EventProgramDataForm.DataByName.ContainsKey(node.desc.code))
                     {
-                        res = node.desc.code;
+                        res = node.desc.code + "(";
+
+                        for (int i = 0; i < node.subNodes.Count; i++)
+                        {
+                            res += $"{(i > 0 ? "," : "")}param{i + 1}={GetNodeDesc(node.subNodes[i])}";
+                        }
+                        res += ")";
                     }
+                    else
+                        res = node.desc.code;
                     break;
                 default:
                     res = node.desc.code;

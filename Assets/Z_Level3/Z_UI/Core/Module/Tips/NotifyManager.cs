@@ -31,6 +31,14 @@ namespace Z_Ui.Notify
         {
             subs[item.content] = item;
         }
+        public void Merge(string addMark,EntryItem item)
+        {
+            foreach(var sub in item.subs)
+            {
+                sub.Value.parent = this;
+                subs[addMark+sub.Key]=sub.Value;
+            }
+        }
         public bool IsChildOf(EntryItem item)
         {
             var tmp = this;

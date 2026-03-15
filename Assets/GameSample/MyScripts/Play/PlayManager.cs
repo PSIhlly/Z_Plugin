@@ -83,6 +83,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
             {
                 GameManager.instance.saveCtrl.LoadCoreStory(id);
                 FirstPlayInit();
+                GameManager.instance.saveCtrl.SaveSaveStory(id);
             }
             GameManager.instance.saveCtrl.LoadSaveStory(id);
         }

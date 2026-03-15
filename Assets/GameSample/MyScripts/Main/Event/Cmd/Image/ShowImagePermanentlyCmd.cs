@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowImagePermanentlyCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var handle = PlayManager.instance.assetCtrl.Add(prm[0].str, new Vector2(prm[1].num, prm[2].num));
+            var handle = PlayManager.instance.assetCtrl.Add(prm[0].str, prm[1].num);
             PlayManager.instance.assetCtrl.SetRemoveTime(handle, int.MaxValue);
             asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.UIIMAGE, handle.ToString())) };
             return true;

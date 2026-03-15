@@ -25,7 +25,7 @@ namespace Ui.PlayAsset
     public partial class UiPlayAssetModel
     {
     }
-    public partial class UiPlayAssetCtrl
+    public partial class UiPlayAssetCtrl:IZ_Listener<PlayAssetEvent>
     {
 
         UiContainer<UiImageCtrl> imageCon;
@@ -34,8 +34,10 @@ namespace Ui.PlayAsset
         {
 
             imageCon = new UiContainer<UiImageCtrl>(view.go_image);
-
+            Z_EventHelper.Register(this);
         }
+
+      
         public override void OnShow()
         {
             Refresh();
@@ -57,6 +59,11 @@ namespace Ui.PlayAsset
             }
             imageCon.Refresh();
         }
+        public void OnEvent(PlayAssetEvent evt)
+        {
+            Refresh();
+        }
+
     }
 
     public partial class UiImageParam

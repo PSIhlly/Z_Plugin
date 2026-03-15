@@ -91,6 +91,10 @@ namespace Z_Code
 
                             cmds[forFalseJumpCmdId] = cmds.Count.ToString();
                             break;
+                        case "Return":
+                            BuildZl(cmds, node.subNodes[0]);
+                            cmds.Add(GetOpName(Op.Ret));
+                            break;
                     }
                     break;
                 case CodeType.FuncName:

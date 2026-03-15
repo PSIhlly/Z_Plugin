@@ -98,7 +98,7 @@ namespace Z_Debug
             }
             for (int p=0;p<str.Length;)
             {
-                Debug.Log(str.Substring(p,Mathf.Min(str.Length-p,maxLength)));
+                Debug.Log(Time.frameCount+":"+str.Substring(p,Mathf.Min(str.Length-p,maxLength)));
                 p += maxLength;
             }
         }

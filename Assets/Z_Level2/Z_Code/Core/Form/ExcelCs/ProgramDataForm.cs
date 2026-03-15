@@ -48,6 +48,10 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,List<string>,List<string>> changeZcodeAction;
                 
+        public static Action<Data,int,int> changeParamcountAction;
+                
+        public static Action<Data,string,string> changeReturnvalueAction;
+                
 
 
         public partial class Data
@@ -125,13 +129,51 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string code,List<string> zCode)
+                    private int  _paramCount;
+                    /// <summary>
+                    ///参数数量
+                    ///</summary>
+                    public int  paramCount{
+                                get{return _paramCount;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeParamcount(this,_paramCount,value); 
+                    }
+        
+                _paramCount = value;
+                }
+                 
+                     }
+                    
+                    private string  _returnValue;
+                    /// <summary>
+                    ///返回值
+                    ///</summary>
+                    public string  returnValue{
+                                get{return _returnValue;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeReturnvalue(this,_returnValue,value); 
+                    }
+        
+                _returnValue = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string code,List<string> zCode,int paramCount,string returnValue)
             {
 
              this.uid = uid;
              this.name = name;
              this.code = code;
              this.zCode = zCode;
+             this.paramCount = paramCount;
+             this.returnValue = returnValue;
 
             }
             public void Reset(Data data)
@@ -141,16 +183,18 @@ public static readonly int autoUidCnt=1000000;
              this.name = data.name;
              this.code = data.code;
              this.zCode = data.zCode;
+             this.paramCount = data.paramCount;
+             this.returnValue = data.returnValue;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,code,new List<string>(zCode));
+        return new Data(sameId? uid:uidChain.GetId(),name,code,new List<string>(zCode),paramCount,returnValue);
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","",null);
+                   private static Data _defaultData=new Data(0,"","",null,0,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -189,7 +233,7 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"","",null)},
+                {1,new Data(1,"","",null,0,"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -245,7 +289,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.Get<string>("code"),
 
-                jo.Get<List<string>>("zCode")
+                jo.Get<List<string>>("zCode"),
+
+                jo.Get<int>("paramCount"),
+
+                jo.Get<string>("returnValue")
                     );
 
             return data;
@@ -264,6 +312,10 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("code",data.code);
 
             jo.Set<List<string>>("zCode",data.zCode);
+
+            jo.Set<int>("paramCount",data.paramCount);
+
+            jo.Set<string>("returnValue",data.returnValue);
 
             return jo;
         }
@@ -387,6 +439,26 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeZcodeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeParamcount(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeParamcountAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeReturnvalue(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeReturnvalueAction?.Invoke(data,oldV,newV);
                 }
                     
             }

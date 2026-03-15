@@ -29,7 +29,8 @@ namespace Z_Code
         Greater,
         Less,
         NotGreater,
-        NotLess
+        NotLess,
+        Ret
     }
     namespace Form
     {
@@ -39,7 +40,7 @@ namespace Z_Code
             public class RetInfo
             {
                 public bool complete;
-                public BoxDataForm.Data ret= CodeHelper.CreateBox();
+                public BoxDataForm.Data ret = CodeHelper.CreateBox();
             }
             public partial class Data
             {
@@ -188,7 +189,7 @@ namespace Z_Code
                                 var newHeap = new Dictionary<string, BoxDataForm.Data>();
                                 for (int i = 0; i < prm.Length; i++)
                                 {
-                                    newHeap[$"param{data.top - i}"] = GetBox(data.stack[data.top - i - 1]).Copy();
+                                    newHeap[$"param{i + 1}"] = GetBox(data.stack[data.top - i - 1]).Copy();
                                 }
                                 if (data.subInterpret == null)
                                 {
@@ -202,7 +203,7 @@ namespace Z_Code
                                     data.p++;
                                     for (int i = 0; i < prm.Length; i++)
                                     {
-                                        GetBox(data.stack[data.top - i - 1]).Reset(data.subInterpret.heap[$"param{data.top - i}"]);
+                                        GetBox(data.stack[data.top - i - 1]).Reset(data.subInterpret.heap[$"param{i + 1}"]);
                                     }
                                     for (int i = 0; i <= prm.Length; i++)
                                     {
@@ -267,7 +268,26 @@ namespace Z_Code
                         }
                         break;
                     case Op.Plus:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) + GetNum(Pop())));
+                        var box1 = Pop();
+                        var box2 = Pop();
+                        if (box1.str == null && box2.str == null)
+                        {
+
+                            Push(CodeHelper.CreateBoxByNum(GetNum(box1) + GetNum(box2)));
+                        }
+                        else if (box1.str != null && box2.str == null)
+                        {
+                            Push(CodeHelper.CreateBoxByStr(GetStr(box1) + GetNum(box2)));
+                        }
+                        else if (box1.str == null && box2.str != null)
+                        {
+                            Push(CodeHelper.CreateBoxByStr(GetNum(box1) + GetStr(box2)));
+                        }
+                        else
+                        {
+                            Push(CodeHelper.CreateBoxByStr(GetStr(box1) + GetStr(box2)));
+                        }
+
                         break;
                     case Op.Positive:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop())));
@@ -315,6 +335,13 @@ namespace Z_Code
                             return new RetInfo();
                         }
                         break;
+                    case Op.Ret:
+                        box = Pop();
+                        realBox = GetBox(box);
+                        return new RetInfo()
+                        {
+                            ret = realBox
+                        };
                     default:
                         Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not found£¡£¡");
                         break;

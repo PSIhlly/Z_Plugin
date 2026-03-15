@@ -41,6 +41,9 @@ namespace Z_Code
                     case "Wait":
                         code = $"Wait({ResetStatement(node.subNodes[0])})";
                         break;
+                    case "Return":
+                        code = $"Return {ResetStatement(node.subNodes[0])}";
+                        break;
                     case "if":
                         code = $"if({ResetStatement(node.subNodes[0])})\n{{\n{ResetStatement(node.subNodes[1])}}} \n" +
                             $"{(node.subNodes.Count > 2 ? $"else \n{{\n{ResetStatement(node.subNodes[2])}}}\n" : "")}";

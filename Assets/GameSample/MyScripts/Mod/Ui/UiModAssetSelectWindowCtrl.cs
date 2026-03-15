@@ -152,6 +152,18 @@ namespace Ui.ModAssetSelectWindow
             view.btn_.onClick.AddListener(() =>
             {
                 parent.model.sel = model.prm.data;
+                if (parent.model.prm is UiModAssetSelectTexWindowParam texPrm)
+                {
+                }
+                else if (parent.model.prm is UiModAssetSelectAudioWindowParam audioPrm)
+                {
+                    ((AudioAssetForm.Data)model.prm.data).Play(parent.view.mp_);
+                    
+                }
+                else if (parent.model.prm is UiModAssetSelectVideoWindowParam videoPrm)
+                {
+                    view.img_.sprite = TextureHelper.transparentSprite;
+                }
                 parent.Refresh();
             });
         }
@@ -165,10 +177,12 @@ namespace Ui.ModAssetSelectWindow
             if (parent.model.prm is UiModAssetSelectTexWindowParam texPrm)
             {
                 view.img_.sprite = ((TexAssetForm.Data)model.prm.data).GetSprite();
+                view.txt_.text = ((TexAssetForm.Data)model.prm.data).name;
             }
             else if (parent.model.prm is UiModAssetSelectAudioWindowParam audioPrm)
             {
                 view.img_.sprite = TextureHelper.transparentSprite;
+                view.txt_.text = ((AudioAssetForm.Data)model.prm.data).name;
             }
             else if (parent.model.prm is UiModAssetSelectVideoWindowParam videoPrm)
             {

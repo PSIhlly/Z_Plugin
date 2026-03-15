@@ -91,21 +91,48 @@ namespace Ui.ModStoryEventEditWindow
             view.btn_edit.onClick.AddListener(() =>
             {
                 var tp = GlobalEventHelper.GetGameRetType(model.selUnit.desc);
-                if (model.selUnit.parentNode != null && model.selUnit.parentNode.desc.type == CodeType.FuncName && CmdDataForm.DataByName.ContainsKey(model.selUnit.parentNode.desc.code))
+                if (model.selUnit.parentNode != null && model.selUnit.parentNode.desc.type == CodeType.FuncName)
                 {
-                    var data = CmdDataForm.DataByName[model.selUnit.parentNode.desc.code];
-                    var prmId = model.selUnit.parentNode.subNodes.IndexOf(model.selUnit);
-                    tp = data.prmTypes[prmId];
+                    if (CmdDataForm.DataByName.ContainsKey(model.selUnit.parentNode.desc.code))
+                    {
+                        var data = CmdDataForm.DataByName[model.selUnit.parentNode.desc.code];
+                        var prmId = model.selUnit.parentNode.subNodes.IndexOf(model.selUnit);
+                        tp = data.prmTypes[prmId];
+                    }
+                    else
+                    {
+                        tp = "var";
+                    }
+
                 }
                 ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, tp, (item) =>
                 {
-                    var data = GameCmdDataForm.DataByUid[item.id];
-                    BaseData.cmdDic[data.name].GetUnitChooseCode((code) =>
+                    if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
                     {
-                        model.cpr.Compile(code, out var res);
+                        var data = GameCmdDataForm.DataByUid[item.id];
+                        BaseData.cmdDic[data.name].GetUnitChooseCode((code) =>
+                        {
+                            if (tp == "void" && !string.IsNullOrEmpty(data.allowAsVoid))
+                                code = $"{data.allowAsVoid}{code};";
+                            model.cpr.Compile(code, out var res, out _, out _);
+                            ReplaceNode(model.selUnit, res[0]);
+                            ApplyEntry();
+                        }, model.selUnit);
+                    }
+                    else if (ProgramDataForm.DataByName.ContainsKey(item.content))
+                    {
+                        var data = ProgramDataForm.DataByName[item.content];
+                        var paramCount = data.paramCount;
+                        var rawCode = item.content + "(";
+                        for (int i = 0; i < paramCount; i++)
+                        {
+                            rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
+                        }
+                        rawCode += ");";
+                        model.cpr.Compile(rawCode, out var res, out _, out _);
                         ReplaceNode(model.selUnit, res[0]);
-                        ApplyEntry();
-                    }, model.selUnit);
+                    }
+                    
                 });
 
             });
@@ -117,13 +144,34 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_insert.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "", (item) =>
+                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "void", (item) =>
                 {
                     if (item != null)
                     {
-                        var data = GameCmdDataForm.DataByUid[item.id];
-                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
-                        model.cpr.Compile(sel.defaultCode, out var res);
+                        string defaultCode = "";
+                        if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
+                        {
+                            var data = GameCmdDataForm.DataByUid[item.id];
+                            GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
+                            defaultCode = sel.defaultCode;
+                            if (!string.IsNullOrEmpty(sel.allowAsVoid))
+                                defaultCode = $"{sel.allowAsVoid}{defaultCode};";
+                        }
+                        else if (ProgramDataForm.DataByName.ContainsKey(item.content))
+                        {
+                            var data = ProgramDataForm.DataByName[item.content];
+                            var paramCount = data.paramCount;
+                            var rawCode = item.content + "(";
+                            for (int i = 0; i < paramCount; i++)
+                            {
+                                rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
+                            }
+                            rawCode += ");";
+                            defaultCode = rawCode;
+                        }
+
+
+                        model.cpr.Compile(defaultCode, out var res, out _, out _);
                         int id = model.curEntry.IndexOf(model.selItem);
                         foreach (var r in res)
                         {
@@ -134,20 +182,19 @@ namespace Ui.ModStoryEventEditWindow
                         ApplyEntry();
                     }
 
-                }, true);
+                });
             });
         }
         public void ApplyEntry()
         {
-            model.data.code = model.dcpr.Decompile(model.curEntry);
-            model.data.zCode = model.cpr.Compile(model.data.code, out _);
+            model.data.ApplyCode(model.dcpr.Decompile(model.curEntry), model.cpr);
             view.ipt_code.Set(model.data.code);
             Refresh();
         }
         public void ApplyCode()
         {
-            model.data.code = view.ipt_code.text;
-            model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+            model.curEntry = model.data.ApplyCode(view.ipt_code.text, model.cpr);
+
             Refresh();
         }
         public override void OnShow()
@@ -155,7 +202,8 @@ namespace Ui.ModStoryEventEditWindow
             model.codeEditMode = false;
             model.data = param.data;
             model.onClose = param.onClose;
-            model.data.zCode = model.cpr.Compile(model.data.code, out model.curEntry);
+
+            model.curEntry = model.data.ApplyCode(model.data.code, model.cpr);
             view.ipt_code.Set(model.data.code);
 
             model.selItem = null;

@@ -21,8 +21,8 @@ public class Z_Code_Sample : MonoBehaviour
 */
 
         var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
-        var res = cpr.Compile(code, out var syntaxs);
-        var program = new ProgramDataForm.Data(-1, "", code, res);
+        var res = cpr.Compile(code, out var syntaxs,out var count,out var ret);
+        var program = new ProgramDataForm.Data(-1, "", code, res,count,ret);
 
 
         var itp = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1, 0, null);
@@ -31,14 +31,13 @@ public class Z_Code_Sample : MonoBehaviour
         runBtn.onClick.AddListener(() =>
         {
             itp.Reset();
-            itp.program.code = gameObject.GetComponentInChildren<TMP_InputField>().text;
-            itp.program.zCode = cpr.Compile(itp.program.code, out var syntaxs);
+            itp.program.ApplyCode(gameObject.GetComponentInChildren<TMP_InputField>().text, cpr);
             StartCoroutine(Interpret(itp));
         });
         rebuildBtn.onClick.AddListener(() =>
         {
             var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
-            var res = cpr.Compile(code, out var syntaxs);
+            var res = cpr.Compile(code, out var syntaxs,out _,out _);
             gameObject.GetComponentInChildren<TMP_InputField>().text = dcpr.Decompile(syntaxs);
         });
     }

@@ -40,16 +40,21 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void Package(int storyId)
     {
-        File.WriteAllText(AssetManager.externPatn + storyId + ".png", SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)));
+        var icon = Texture2D.whiteTexture;
+        if (TexAssetForm.DataByName.ContainsKey(GameManager.instance.curStory.icon))
+        {
+            icon = (Texture2D)TexAssetForm.DataByName[GameManager.instance.curStory.icon].GetTex();
+        }
+        File.WriteAllBytes(AssetManager.externPatn + storyId + ".png", TextureHelper.GetPNGWithExtraInfo(icon, System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)))));
     }
 
     #endregion
 
     #region unpackage
 
-    public void Unpackage(string content, int storyId)
+    public void Unpackage(byte[] content, int storyId)
     {
-        SaveAndLoad.Unpackage(content, Main2StoryManager.GetStoryCoreFolder(storyId));
+        SaveAndLoad.Unpackage(System.Text.Encoding.UTF8.GetString(TextureHelper.GetExtraInfoByPNG(content)), Main2StoryManager.GetStoryCoreFolder(storyId));
     }
 
     #endregion

@@ -1484,6 +1484,18 @@ namespace ModStoryCharacterUnitConfig
             public Txt txt_hpArgument;
             public Txt txt_moveSpeedParameter;
             public Txt txt_faceType;
+            public Btn btn_lightAttack;
+            public Btn btn_heavyAttack;
+            public Btn btn_e;
+            public Btn btn_q;
+            public Btn btn_passive1;
+            public Btn btn_passive2;
+            public Txt txt_lightAttack;
+            public Txt txt_heavyAttack;
+            public Txt txt_e;
+            public Txt txt_q;
+            public Txt txt_passive1;
+            public Txt txt_passive2;
         public UiModStoryCharacterUnitConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -1509,6 +1521,18 @@ namespace ModStoryCharacterUnitConfig
             txt_hpArgument = uiHolder.elementTrsLst[19].GetComponent<Txt>();
             txt_moveSpeedParameter = uiHolder.elementTrsLst[20].GetComponent<Txt>();
             txt_faceType = uiHolder.elementTrsLst[21].GetComponent<Txt>();
+            btn_lightAttack = uiHolder.elementTrsLst[22].GetComponent<Btn>();
+            btn_heavyAttack = uiHolder.elementTrsLst[23].GetComponent<Btn>();
+            btn_e = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            btn_q = uiHolder.elementTrsLst[25].GetComponent<Btn>();
+            btn_passive1 = uiHolder.elementTrsLst[26].GetComponent<Btn>();
+            btn_passive2 = uiHolder.elementTrsLst[27].GetComponent<Btn>();
+            txt_lightAttack = uiHolder.elementTrsLst[28].GetComponent<Txt>();
+            txt_heavyAttack = uiHolder.elementTrsLst[29].GetComponent<Txt>();
+            txt_e = uiHolder.elementTrsLst[30].GetComponent<Txt>();
+            txt_q = uiHolder.elementTrsLst[31].GetComponent<Txt>();
+            txt_passive1 = uiHolder.elementTrsLst[32].GetComponent<Txt>();
+            txt_passive2 = uiHolder.elementTrsLst[33].GetComponent<Txt>();
         }
 
     }

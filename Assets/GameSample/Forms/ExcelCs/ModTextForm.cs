@@ -642,6 +642,8 @@ namespace Form
 
                 {1000249,new Data(1000249,"sceneObjectParameter","Scene object parameter","景物参数")},
 
+                {1000250,new Data(1000250,"Choose Skill","Choose Skill","选择技能")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -1142,6 +1144,8 @@ namespace Form
                         {"cantSaveWhenTest",_DataById[1000248]},
     
                         {"sceneObjectParameter",_DataById[1000249]},
+    
+                        {"Choose Skill",_DataById[1000250]},
     
                     };
     

@@ -583,6 +583,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             sizeLimit = new Vector2Int(100, 100)
         });
     }
+    public void ChooseSkill(string title, Action<SkillForm.Data> act)
+    {
+        var items = new EntryItem();
+
+        foreach (var data in SkillForm.DataByUid.Values)
+        {
+            items.Add(data.name, TexAssetForm.DataByName[data.icon].GetSprite());
+        }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+            true, (item) =>
+            {
+                act?.Invoke(SkillForm.DataByName[item.content]);
+                return true;
+            }, items);
+    }
     #endregion
 
 

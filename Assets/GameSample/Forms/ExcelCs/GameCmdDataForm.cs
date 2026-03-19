@@ -356,7 +356,7 @@ namespace Form
 
                 {100040,new Data(100040,"LostItem",new List<string>(){"item","amount",},new List<string>(){"item","num",},null,new List<string>(){"void",},"Lost {0} x {1}","LostItem(\"empty\",1);","item","backpack",EditorStyle.Rpg,"")},
 
-                {100041,new Data(100041,"SetCharacterParameter",new List<string>(){"character","paramName","value",},new List<string>(){"character","string","num",},null,new List<string>(){"void",},"Set Character ID {0} 's {1} = {2}","SetCharacterParameter(self,\"empty\",1);","character","parameter",EditorStyle.Rpg,"")},
+                {100041,new Data(100041,"SetCharacterParameter",new List<string>(){"character","paramName","value",},new List<string>(){"character","string","num",},null,new List<string>(){"void",},"Set Character {0} 's {1} = {2}","SetCharacterParameter(self,\"empty\",1);","character","parameter",EditorStyle.Rpg,"")},
 
                 {100042,new Data(100042,"GetCurrentCharacter",null,null,new List<string>(){"character",},new List<string>(){"character",},"Get currently used character ID","GetCurrentCharacter()","character","system",EditorStyle.Rpg,"")},
 
@@ -389,6 +389,10 @@ namespace Form
                 {100057,new Data(100057,"TriggerCharacter",null,null,null,new List<string>(){"character",},"","trigger","scene","character",EditorStyle.Rpg,"")},
 
                 {100058,new Data(100058,"Return",new List<string>(){"result",},new List<string>(){"var",},null,new List<string>(){"void",},"return {0}","Return result;","basic","process",EditorStyle.Avg,"")},
+
+                {100059,new Data(100059,"GetObjectParameter",new List<string>(){"sceneObject","paramName",},new List<string>(){"sceneObject","string",},new List<string>(){"value",},new List<string>(){"num",},"Get Object {0} 's {1}","GetSceneObjectParameter(self,\"empty\")","scene","parameter",EditorStyle.Rpg,"")},
+
+                {100060,new Data(100060,"SetObjectParameter",new List<string>(){"sceneObject","paramName","value",},new List<string>(){"sceneObject","string","num",},null,new List<string>(){"void",},"Set Object {0} 's {1} = {2}","SetSceneObjectParameter(self,\"empty\",1);","scene","parameter",EditorStyle.Rpg,"")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -507,6 +511,10 @@ namespace Form
     
                         {"Return",_DataByUid[100058]},
     
+                        {"GetObjectParameter",_DataByUid[100059]},
+    
+                        {"SetObjectParameter",_DataByUid[100060]},
+    
                     };
     
                     _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
@@ -536,6 +544,8 @@ namespace Form
                             {("character","system"),new List<Data>()},
         
                             {("scene","character"),new List<Data>()},
+        
+                            {("scene","parameter"),new List<Data>()},
         
                 };
 
@@ -652,6 +662,10 @@ namespace Form
                     _DatasByCategoryType[("scene","character")].Add(_DataByUid[100057]);
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100058]);
+
+                    _DatasByCategoryType[("scene","parameter")].Add(_DataByUid[100059]);
+
+                    _DatasByCategoryType[("scene","parameter")].Add(_DataByUid[100060]);
 
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
@@ -780,6 +794,10 @@ namespace Form
                     _DatasByCategory["scene"].Add(_DataByUid[100057]);
 
                     _DatasByCategory["basic"].Add(_DataByUid[100058]);
+
+                    _DatasByCategory["scene"].Add(_DataByUid[100059]);
+
+                    _DatasByCategory["scene"].Add(_DataByUid[100060]);
 
 
             childInitAction?.Invoke();

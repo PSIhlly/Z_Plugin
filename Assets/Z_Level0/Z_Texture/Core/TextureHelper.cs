@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -159,6 +160,175 @@ namespace Z_Texture
             }
         }
 
+        public static byte[] GetPNGWithExtraInfo(Texture2D tex,byte[] info)
+{
+    byte[] pngData = GetTextureByte(tex);
+    return InsertTextChunk(pngData, "ZEXTRA", Convert.ToBase64String(info));
+}
+        public static byte[] GetExtraInfoByPNG(byte[] texByte)
+{
+    string infoBase64 = ExtractTextChunk(texByte, "ZEXTRA");
+    if (string.IsNullOrEmpty(infoBase64))
+        return null;
+    return Convert.FromBase64String(infoBase64);
+}
+
+        private static byte[] InsertTextChunk(byte[] pngData, string keyword, string text)
+{
+    using (MemoryStream ms = new MemoryStream())
+    using (BinaryWriter writer = new BinaryWriter(ms))
+    {
+        int pngSignatureLength = 8;
+        writer.Write(pngData, 0, pngSignatureLength);
+        
+        byte[] textChunk = CreateTextChunk(keyword, text);
+        writer.Write(textChunk);
+        
+        int idatStart = FindChunk(pngData, "IDAT");
+        if (idatStart == -1)
+        {
+            writer.Write(pngData, pngSignatureLength, pngData.Length - pngSignatureLength);
+        }
+        else
+        {
+            writer.Write(pngData, pngSignatureLength, idatStart - pngSignatureLength);
+            writer.Write(pngData, idatStart, pngData.Length - idatStart);
+        }
+        
+        return ms.ToArray();
+    }
+        }
+
+        private static string ExtractTextChunk(byte[] pngData, string keyword)
+{
+    int offset = 8;
+    while (offset < pngData.Length)
+    {
+        int chunkLength = BitConverter.ToInt32(pngData, offset);
+        if (BitConverter.IsLittleEndian)
+            chunkLength = ReverseBytes(chunkLength);
+        
+        offset += 4;
+        string chunkType = Encoding.ASCII.GetString(pngData, offset, 4);
+        offset += 4;
+        
+        if (chunkType == "tEXt")
+        {
+            byte[] chunkData = new byte[chunkLength];
+            Array.Copy(pngData, offset, chunkData, 0, chunkLength);
+            
+            int nullIndex = Array.IndexOf(chunkData, (byte)0);
+            if (nullIndex != -1)
+            {
+                string chunkKeyword = Encoding.ASCII.GetString(chunkData, 0, nullIndex);
+                if (chunkKeyword == keyword)
+                {
+                    return Encoding.ASCII.GetString(chunkData, nullIndex + 1, chunkLength - nullIndex - 1);
+                }
+            }
+        }
+        
+        offset += chunkLength + 4;
+    }
+    return null;
+        }
+
+        private static byte[] CreateTextChunk(string keyword, string text)
+{
+    byte[] keywordBytes = Encoding.ASCII.GetBytes(keyword);
+    byte[] textBytes = Encoding.ASCII.GetBytes(text);
+    byte[] data = new byte[keywordBytes.Length + 1 + textBytes.Length];
+    
+    Array.Copy(keywordBytes, 0, data, 0, keywordBytes.Length);
+    data[keywordBytes.Length] = 0;
+    Array.Copy(textBytes, 0, data, keywordBytes.Length + 1, textBytes.Length);
+    
+    using (MemoryStream ms = new MemoryStream())
+    using (BinaryWriter writer = new BinaryWriter(ms))
+    {
+        int length = data.Length;
+        if (BitConverter.IsLittleEndian)
+            length = ReverseBytes(length);
+        writer.Write(length);
+        writer.Write(Encoding.ASCII.GetBytes("tEXt"));
+        writer.Write(data);
+        
+        using (CRC32 crc = new CRC32())
+        {
+            byte[] chunkHeader = Encoding.ASCII.GetBytes("tEXt");
+            writer.Write(ReverseBytes(BitConverter.ToInt32(crc.ComputeHash(chunkHeader.Concat(data).ToArray()))));
+        }
+        
+        return ms.ToArray();
+    }
+        }
+
+        private static int FindChunk(byte[] pngData, string chunkType)
+{
+    int offset = 8;
+    while (offset < pngData.Length)
+    {
+        int chunkLength = BitConverter.ToInt32(pngData, offset);
+        if (BitConverter.IsLittleEndian)
+            chunkLength = ReverseBytes(chunkLength);
+        
+        offset += 4;
+        string currentChunkType = Encoding.ASCII.GetString(pngData, offset, 4);
+        if (currentChunkType == chunkType)
+            return offset - 4;
+        offset += 4 + chunkLength + 4;
+    }
+    return -1;
+        }
+
+        private static int ReverseBytes(int value)
+{
+    byte[] bytes = BitConverter.GetBytes(value);
+    Array.Reverse(bytes);
+    return BitConverter.ToInt32(bytes, 0);
+        }
+
+        private class CRC32 : HashAlgorithm
+{
+    private const uint Polynomial = 0xEDB88320;
+    private uint[] table;
+    private uint hash;
+
+    public CRC32()
+    {
+        table = new uint[256];
+        for (uint i = 0; i < 256; i++)
+        {
+            uint crc = i;
+            for (int j = 0; j < 8; j++)
+            {
+                crc = (crc >> 1) ^ ((crc & 1) == 1 ? Polynomial : 0);
+            }
+            table[i] = crc;
+        }
+        Initialize();
+    }
+
+    public override void Initialize()
+    {
+        hash = 0xFFFFFFFF;
+    }
+
+    protected override byte[] HashFinal()
+    {
+        byte[] bytes = BitConverter.GetBytes(~hash);
+        Array.Reverse(bytes);
+        return bytes;
+    }
+
+    protected override void HashCore(byte[] array, int ibStart, int cbSize)
+    {
+        for (int i = ibStart; i < ibStart + cbSize; i++)
+        {
+            hash = (hash >> 8) ^ table[(hash ^ array[i]) & 0xFF];
+        }
+    }
+        }
 
         #endregion
 
@@ -221,6 +391,9 @@ namespace Z_Texture
             }
             return sb.ToString();
         }
+
+
+        
 
         #endregion
     }

@@ -20,6 +20,7 @@ namespace Z_Map
             set { base.ins = value; }
             get { return (CharacterInstance)base.ins; }
         }
+        public Vector3? forceEuler;
 
         public float pathDis;
 
@@ -61,6 +62,12 @@ namespace Z_Map
                 Move(Vector3.down * Time.deltaTime * 2f);
                 //fix
                 ins?.UpdatePos();
+            }
+            if(forceEuler!=null)
+            {
+                data.euler = (Vector3)forceEuler;
+                ins.transform.eulerAngles = (Vector3)forceEuler;
+                forceEuler = null;
             }
 
             Z_EventHelper.Invoke(new CharacterEvent()
@@ -132,7 +139,7 @@ namespace Z_Map
 
                     var faceDir = dir;
                     faceDir.y = 0;
-                    if (faceDir != Vector3.zero)
+                    if (faceDir != Vector3.zero&&!data.isMine)
                         euler = Quaternion.LookRotation(faceDir).eulerAngles;
 
                 }

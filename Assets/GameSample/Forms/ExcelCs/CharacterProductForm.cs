@@ -93,6 +93,8 @@ namespace Form
                 
         public static Action<Data,bool,bool> changeUniqueAction;
                 
+        public static Action<Data,Dictionary<SkillType,int>,Dictionary<SkillType,int>> changeSkillAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -314,11 +316,29 @@ namespace Form
                  
                      }
                     
+                    private Dictionary<SkillType,int>  _skill;
+                    /// <summary>
+                    ///¼¼ÄÜ
+                    ///</summary>
+                    public Dictionary<SkillType,int>  skill{
+                                get{return _skill;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeSkill(this,_skill,value); 
+                    }
+        
+                _skill = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.isProto)
             {
             }
             
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique):base(uid,name,label,isProto)
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique,Dictionary<SkillType,int> skill):base(uid,name,label,isProto)
             {
 
              this.uid = uid;
@@ -337,6 +357,7 @@ namespace Form
              this.desc = desc;
              this.tachie = tachie;
              this.unique = unique;
+             this.skill = skill;
 
             }
             public void Reset(Data data)
@@ -358,16 +379,17 @@ namespace Form
              this.desc = data.desc;
              this.tachie = data.tachie;
              this.unique = data.unique;
+             this.skill = data.skill;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique,new Dictionary<SkillType,int>(skill));
                 }
             
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false);
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -532,7 +554,9 @@ namespace Form
 
                 jo.Get<string>("tachie"),
 
-                jo.Get<bool>("unique")
+                jo.Get<bool>("unique"),
+
+                jo.Get<Dictionary<SkillType,int>>("skill")
                     );
 
             return data;
@@ -575,6 +599,8 @@ namespace Form
             jo.Set<string>("tachie",data.tachie);
 
             jo.Set<bool>("unique",data.unique);
+
+            jo.Set<Dictionary<SkillType,int>>("skill",data.skill);
 
             return jo;
         }
@@ -873,6 +899,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeUniqueAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSkill(Data superData,Dictionary<SkillType,int> oldV,Dictionary<SkillType,int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSkillAction?.Invoke(data,oldV,newV);
                 }
                     
             }

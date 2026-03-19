@@ -1,6 +1,7 @@
 using Form;
 using System;
 using Ui.AnimChoose;
+using Z_DesignStyle;
 using Z_Text;
 using Z_Ui.Notify;
 
@@ -63,6 +64,60 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 Refresh();
             });
 
+            view.btn_lightAttack.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
+                {
+                    model.data.skill[SkillType.LightAttack] = item.uid;
+                    Refresh();
+                });
+            });
+
+            view.btn_heavyAttack.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
+                {
+                    model.data.skill[SkillType.HeavyAttack] = item.uid;
+                    Refresh();
+                });
+            });
+
+            view.btn_e.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
+                {
+                    model.data.skill[SkillType.E] = item.uid;
+                    Refresh();
+                });
+            });
+
+            view.btn_q.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
+                {
+                    model.data.skill[SkillType.Q] = item.uid;
+                    Refresh();
+                });
+            });
+
+            view.btn_passive1.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
+                {
+                    model.data.skill[SkillType.Passive] = item.uid;
+                    Refresh();
+                });
+            });
+
+            view.btn_passive2.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
+                {
+                    model.data.skill[SkillType.Passive] = item.uid;
+                    Refresh();
+                });
+            });
+
 
         }
         public override void OnShow()
@@ -95,6 +150,21 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.model_EventChooseObjectLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectLeaveEvent" });
             view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
+
+            view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack])? SkillForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
+
+            view.txt_heavyAttack.text = model.data.skill.ContainsKey(SkillType.HeavyAttack) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.HeavyAttack])? SkillForm.DataByUid[model.data.skill[SkillType.HeavyAttack]].name : "";
+
+            view.txt_e.text = model.data.skill.ContainsKey(SkillType.E) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.E])? SkillForm.DataByUid[model.data.skill[SkillType.E]].name : "";
+
+            view.txt_q.text = model.data.skill.ContainsKey(SkillType.Q) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.Q])? SkillForm.DataByUid[model.data.skill[SkillType.Q]].name : "";
+
+            view.txt_passive1.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
+
+            view.txt_passive2.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
+
+
+
 
         }
     }

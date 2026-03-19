@@ -123,6 +123,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
             }
+            else
+            {
+                data.name = ch.name;
+                data.unit.productInfo = (ch.uid, -1);
+                _characterDic[ch] = data;
+            }
+
         }
         _playerM = GetOrNewCharacter(_playerG);
     }
@@ -164,7 +171,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
         var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
+        if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
+        {
+            var data = SkillForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
 
+            data.events
+        }
     }
     public void OnMouseMove(Vector3 pos)
     {
@@ -211,7 +223,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         if (setPlayerRot != null)
         {
-            _playerM.unit.ins.transform.rotation = (Quaternion)setPlayerRot;
+            _playerM.unit.forceEuler = ((Quaternion)setPlayerRot).eulerAngles;
 
 #if PLATFORM_ANDROID
             rotHoldingSeconds -= Time.deltaTime;

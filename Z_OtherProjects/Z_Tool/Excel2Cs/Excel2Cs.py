@@ -448,7 +448,7 @@ def serialize_handle():
 
             if name == formInfo.id_str or 'write' in formInfo.var_config_dic[name] and 'unsave' not in formInfo.var_config_dic[name] :
                 formInfo.deserialize_str+=f'''
-                jo.Get<{formInfo.var_type_dic[name]}>("{name}"),
+                jo.SelectToken("{name}")==null?defaultData.{name}:jo.Get<{formInfo.var_type_dic[name]}>("{name}"),
 '''             
             else:#不可用的取default
                 formInfo.deserialize_str+=f'''

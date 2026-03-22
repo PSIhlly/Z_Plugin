@@ -94,7 +94,7 @@ namespace Z_Map.Analysis
 
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
-                        Vector3[] points = Mesh.GetMesh(bc, obs.pos+Vector3.up * obs.scale.y / 2, obs.euler, obs.scale).positions;
+                        Vector3[] points = Mesh.GetMesh(bc, obs.pos+Vector3.up * obs.scale.y / 2, obs.euler, Graph.ElementwiseMultiply(bc.transform.lossyScale, obs.scale)).positions;
                         var overlapPoses = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),
@@ -103,7 +103,7 @@ namespace Z_Map.Analysis
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].z) };
                         foreach (var pos in overlapPoses)
                         {
-                            var mapPos = RealPos2MapPos(pos);
+                            var mapPos = RealPos2MapPosInt(pos);
                             for (int i = 0, icnt = offset.Length; i < icnt; i++)
                             {
                                 if (InArea(mapPos) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(pos.x, pos.z) + offset[i]))
@@ -127,9 +127,9 @@ namespace Z_Map.Analysis
             res.y = 0;
             return res;
         }
-        public Vector3Int RealPos2MapPos(Vector3 pos)
+        public Vector3Int RealPos2MapPosInt(Vector3 pos)
         {
-            return _super.utilCtrl.RealPos2MapPos(pos);
+            return _super.utilCtrl.RealPos2MapPosInt(pos);
         }
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {

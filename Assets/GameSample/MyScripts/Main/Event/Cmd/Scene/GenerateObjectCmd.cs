@@ -28,9 +28,8 @@ namespace Z_Code
         {
             var data = MapObjectForm.DataByName[prm[0].str];
             var key = data.id.ToString();
-                var newObjectData = MapManager.instance.AddObject(key, Vector3.one*int.MaxValue, data.name, null);
-            newObjectData.unit.productInfo = (data.id, -1);
-                newObjectData.unit.evtDic = data.events;
+            var newObjectData = MapManager.instance.AddObject(key, MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)), data.name, null);
+            GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);
             asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName( GlobalEventHelper.SCENEOBJECT,newObjectData.uid.ToString())) };
 
             return true;

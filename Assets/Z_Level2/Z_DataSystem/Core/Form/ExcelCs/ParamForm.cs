@@ -39,6 +39,8 @@ public static readonly int autoUidCnt=1000000;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -46,11 +48,11 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,ValType,ValType> changeValuetypeAction;
                 
-        public static Action<Data,float,float> changeMinAction;
+        public static Action<Data,string,string> changeMinAction;
                 
-        public static Action<Data,float,float> changeVAction;
+        public static Action<Data,string,string> changeVAction;
                 
-        public static Action<Data,float,float> changeMaxAction;
+        public static Action<Data,string,string> changeMaxAction;
                 
 
 
@@ -111,11 +113,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private float  _min;
+                    private string  _min;
                     /// <summary>
                     ///最小值
                     ///</summary>
-                    public float  min{
+                    public string  min{
                                 get{return _min;}
  set{
 
@@ -129,11 +131,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private float  _v;
+                    private string  _v;
                     /// <summary>
                     ///当前值
                     ///</summary>
-                    public float  v{
+                    public string  v{
                                 get{return _v;}
  set{
 
@@ -147,11 +149,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private float  _max;
+                    private string  _max;
                     /// <summary>
                     ///最大值
                     ///</summary>
-                    public float  max{
+                    public string  max{
                                 get{return _max;}
  set{
 
@@ -165,7 +167,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,ValType valueType,float min,float v,float max)
+            public Data(int uid,string name,ValType valueType,string min,string v,string max)
             {
 
              this.uid = uid;
@@ -192,9 +194,14 @@ public static readonly int autoUidCnt=1000000;
         return new Data(sameId? uid:uidChain.GetId(),name,valueType,min,v,max);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                ParamForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f);
+                   private static Data _defaultData=new Data(0,"",default,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -265,17 +272,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<ValType>("valueType"),
+                jo.SelectToken("valueType")==null?defaultData.valueType:jo.Get<ValType>("valueType"),
 
-                jo.Get<float>("min"),
+                jo.SelectToken("min")==null?defaultData.min:jo.Get<string>("min"),
 
-                jo.Get<float>("v"),
+                jo.SelectToken("v")==null?defaultData.v:jo.Get<string>("v"),
 
-                jo.Get<float>("max")
+                jo.SelectToken("max")==null?defaultData.max:jo.Get<string>("max")
                     );
 
             return data;
@@ -284,6 +291,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -293,11 +301,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<ValType>("valueType",data.valueType);
 
-            jo.Set<float>("min",data.min);
+            jo.Set<string>("min",data.min);
 
-            jo.Set<float>("v",data.v);
+            jo.Set<string>("v",data.v);
 
-            jo.Set<float>("max",data.max);
+            jo.Set<string>("max",data.max);
 
             return jo;
         }
@@ -408,7 +416,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeMin(Data superData,float oldV,float newV)
+            public static void ChangeMin(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -418,7 +426,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeV(Data superData,float oldV,float newV)
+            public static void ChangeV(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -428,7 +436,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeMax(Data superData,float oldV,float newV)
+            public static void ChangeMax(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {

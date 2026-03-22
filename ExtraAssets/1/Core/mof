@@ -1,0 +1,140 @@
+[
+  {
+    "id": 400001,
+    "name": "wall",
+    "icon": "z_map_b$floor$0",
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": "Cube"
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": "z_map_b$floor$0"
+        }
+      ],
+      "isObstacle": false
+    },
+    "label": "",
+    "collision": false,
+    "events": [],
+    "paramDic": []
+  },
+  {
+    "id": 1,
+    "name": "子弹",
+    "icon": "reservedI$",
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": "Cube"
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|1|0.9"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": "$i$5418776c97885aa1761d1860306b10bddd71753a$i$"
+        }
+      ],
+      "isObstacle": false
+    },
+    "label": "",
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": "子弹"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": "子弹销毁"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": "子弹移动"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "所属人物",
+        "v": {
+          "uid": -1,
+          "name": "所属人物",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}"
+        }
+      },
+      {
+        "k": "移动方向",
+        "v": {
+          "uid": -1,
+          "name": "移动方向",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "id": 200001,
+    "name": "floor",
+    "icon": "z_map_b$floor$0",
+    "animTimeInterval": 0.0,
+    "texsName": [
+      {
+        "v": "z_map_b$floor$0"
+      }
+    ],
+    "label": "",
+    "events": []
+  },
+  {
+    "id": 200002,
+    "name": "grass",
+    "icon": "z_map_b$grass$0",
+    "animTimeInterval": 0.0,
+    "texsName": [
+      {
+        "v": "z_map_b$grass$0"
+      }
+    ],
+    "label": "",
+    "events": []
+  },
+  {
+    "id": 200003,
+    "name": "road",
+    "icon": "z_map_b$road$0",
+    "animTimeInterval": 0.0,
+    "texsName": [
+      {
+        "v": "z_map_b$road$0"
+      }
+    ],
+    "label": "",
+    "events": []
+  }
+]

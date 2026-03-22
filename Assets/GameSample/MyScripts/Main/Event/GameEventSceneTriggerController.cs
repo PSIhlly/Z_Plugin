@@ -31,6 +31,7 @@ public enum SceneEventType
     Item = 4,
     Character = 5
 }
+
 namespace Z_Map
 {
 
@@ -110,6 +111,7 @@ namespace Z_Map
 
     }
 }
+
 public class GameEventSceneTriggerController : Z_Controller<GameEventController>, IZ_Listener<CollideEvent>, IZ_Listener<TileEvent>, IZ_Listener<ItemEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<CharacterEvent>, IZ_Listener<StoryLifeEvent>
 {
     public Action evts;

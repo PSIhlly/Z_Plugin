@@ -60,6 +60,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -101,6 +103,11 @@ namespace Form
         return new Data(sameId? id:idChain.GetId(),key,contentEn,contentCn);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                CommonTextForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","","");
@@ -400,13 +407,13 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<string>("key"),
+                jo.SelectToken("key")==null?defaultData.key:jo.Get<string>("key"),
 
-                jo.Get<string>("contentEn"),
+                jo.SelectToken("contentEn")==null?defaultData.contentEn:jo.Get<string>("contentEn"),
 
-                jo.Get<string>("contentCn")
+                jo.SelectToken("contentCn")==null?defaultData.contentCn:jo.Get<string>("contentCn")
                     );
 
             return data;
@@ -415,6 +422,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

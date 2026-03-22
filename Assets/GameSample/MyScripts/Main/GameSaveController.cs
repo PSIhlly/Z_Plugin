@@ -20,6 +20,8 @@ public class GameSaveController : Z_Controller<GameManager>
     public string mapObjectFormFileName => "mof";
     public string storyFormFileName => "sf";
     public string characterParamFormFileName => "cpaf";
+
+    public string mapObjectParamFormFileName => "opaf";
     public string sceneFormFileName => "saf";
     public string characterProductFormFileName => "cprf";
     public string eventFormFileName => "ef";
@@ -150,6 +152,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveObject(string storyCoreFolder, bool noImage = false)
     {
+        SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectParamFormFileName, MapObjectParamForm.GetJaByDatas().ToString());
 
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectFormFileName, MapObjectForm.GetJaByDatas().ToString());
         if (!noImage)
@@ -323,26 +326,26 @@ public class GameSaveController : Z_Controller<GameManager>
     private void SaveStoryVideo(string videoName, string path)
     {
         var data = VideoAssetForm.DataByName.GetDv(videoName, null);
-        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(videoName))
+        if (data != null &&  !GlobalNameHelper.IsInnerAssetName(videoName))
         {
             var tex = VideoAssetForm.DataByName[videoName];
             path = path + assetFolder + videoName;
             if (!SaveAndLoad.Exist(path))
             {
-                SaveAndLoad.Save(path, data.bytes);
+                SaveAndLoad.Copy(data.path, path);
             }
         }
     }
     private void SaveStoryAudio(string audioName, string path)
     {
         var data = AudioAssetForm.DataByName.GetDv(audioName, null);
-        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(audioName))
+        if (data != null &&  !GlobalNameHelper.IsInnerAssetName(audioName))
         {
             var tex = AudioAssetForm.DataByName[audioName];
             path = path + assetFolder + audioName;
             if (!SaveAndLoad.Exist(path))
             {
-                SaveAndLoad.Save(path, data.bytes);
+                SaveAndLoad.Copy(data.path, path);
             }
         }
     }
@@ -712,6 +715,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+
     public void AddStoryTex(TexAssetForm.Data rawData)
     {
         StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData);
@@ -876,9 +880,9 @@ public class GameSaveController : Z_Controller<GameManager>
 
         //item生成mapItem
         MapItemForm.Clear();
-        if (ItemProductForm.DatasByIsproto.ContainsKey(true))
+        if (ItemProductForm.DatasByProtouid.ContainsKey(0))
         {
-            foreach (var itemData in ItemProductForm.DatasByIsproto[true])
+            foreach (var itemData in ItemProductForm.DatasByProtouid[0])
             {
                 MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.uid));
             }
@@ -886,9 +890,9 @@ public class GameSaveController : Z_Controller<GameManager>
 
         //character生成mapCharacter
         MapCharacterForm.Clear();
-        if (CharacterProductForm.DatasByIsproto.ContainsKey(true))
+        if (CharacterProductForm.DatasByProtouid.ContainsKey(0))
         {
-            foreach (var characterData in CharacterProductForm.DatasByIsproto[true])
+            foreach (var characterData in CharacterProductForm.DatasByProtouid[0])
             {
                 MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.label, characterData.avatarTexName, characterData.uid));
             }

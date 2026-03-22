@@ -68,6 +68,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -169,6 +171,11 @@ namespace Form
         return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,releaseTrigger,blockProgramUid);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                EventInterpretDataForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,"",0);
@@ -250,25 +257,25 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<List<BoxDataForm.Data>>("stack"),
+                jo.SelectToken("stack")==null?defaultData.stack:jo.Get<List<BoxDataForm.Data>>("stack"),
 
-                jo.Get<Dictionary<string,BoxDataForm.Data>>("heap"),
+                jo.SelectToken("heap")==null?defaultData.heap:jo.Get<Dictionary<string,BoxDataForm.Data>>("heap"),
 
-                jo.Get<ProgramDataForm.Data>("program"),
+                jo.SelectToken("program")==null?defaultData.program:jo.Get<ProgramDataForm.Data>("program"),
 
-                jo.Get<int>("p"),
+                jo.SelectToken("p")==null?defaultData.p:jo.Get<int>("p"),
 
-                jo.Get<int>("top"),
+                jo.SelectToken("top")==null?defaultData.top:jo.Get<int>("top"),
 
-                jo.Get<int>("user"),
+                jo.SelectToken("user")==null?defaultData.user:jo.Get<int>("user"),
 
-                jo.Get<InterpretDataForm.Data>("subInterpret"),
+                jo.SelectToken("subInterpret")==null?defaultData.subInterpret:jo.Get<InterpretDataForm.Data>("subInterpret"),
 
-                jo.Get<string>("releaseTrigger"),
+                jo.SelectToken("releaseTrigger")==null?defaultData.releaseTrigger:jo.Get<string>("releaseTrigger"),
 
-                jo.Get<int>("blockProgramUid")
+                jo.SelectToken("blockProgramUid")==null?defaultData.blockProgramUid:jo.Get<int>("blockProgramUid")
                     );
 
             return data;
@@ -277,6 +284,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

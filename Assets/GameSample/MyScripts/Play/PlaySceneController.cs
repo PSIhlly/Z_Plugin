@@ -20,6 +20,7 @@ using Z_Map.Form;
 using Z_Time;
 using Z_Ui;
 using Z_UnitSystem;
+using static UnityEditor.PlayerSettings;
 
 public interface InternalPlaySceneController
 {
@@ -115,10 +116,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         foreach (var data in CharacterUnitForm.DataByUid.Values)
         {
             var ch = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
-            if (ch.isProto && !ch.unique)
+            if (ch.protoUid==0 && !ch.unique)
             {
                 var newCharacter = ch.Copy(false);
-                newCharacter.ToProduct();
+                newCharacter.ToProduct(ch.uid);
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
@@ -156,7 +157,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         return default(T);
     }
-    public void OnMouse(bool click, Vector3 pos, Vector3 dir)
+    public void OnMouse(bool drag, bool release, Vector3 pos, Vector3 dir)
     {
         if (GameManager.instance.curProgress.blockProgramUid > 0)
         {
@@ -165,18 +166,30 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         if (waitForActive || !enable)
             return;
         // set z
-        pos.z = CameraInstance.instance.cam.nearClipPlane;
-        // to world
-        Vector3 worldPosition = CameraInstance.instance.cam.ScreenToWorldPoint(pos);
-        worldPosition.y = CameraInstance.instance.tarTrs.position.y;
-        var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
-        var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
-        if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
+        //if(release)
         {
-            var data = SkillForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
-
-            data.events
+            pos.z = CameraInstance.instance.cam.nearClipPlane;
+            // to world
+            Vector3 worldPosition = CameraInstance.instance.cam.ScreenToWorldPoint(pos);
+            worldPosition.y = CameraInstance.instance.tarTrs.position.y;
+            var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
+            var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
+            if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
+            {
+                var data = SkillForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
+                if(data.lastUseTime==0||data.lastUseTime+data.cd<GameManager.instance.curProgress.seconds)
+                {
+                    data.lastUseTime = GameManager.instance.curProgress.seconds;
+                    Z_EventHelper.Invoke(new CharacterSkillEvent()
+                    {
+                        data = _playerG,
+                        skillId = data.uid
+                    });
+                }
+                
+            }
         }
+       
     }
     public void OnMouseMove(Vector3 pos)
     {
@@ -299,7 +312,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return;
         if (CharacterParamForm.DataByName.ContainsKey(_playerG.speedParamName))
         {
-            setPlayerMove += dir * (float)_playerG.paramDic[_playerG.speedParamName].v;
+            setPlayerMove += dir * (float)_playerG.paramDic[_playerG.speedParamName].GetValue().num;
         }
         else
         {
@@ -359,9 +372,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
-        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)
         {
-            OnMouse(false, evt.pos, evt.delta);
+            OnMouse((downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude >= GlobalSettings.DRAG_DIS2, false, evt.pos, evt.delta);
         }
     }
 
@@ -383,9 +396,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
-        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
+
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero )
         {
-            OnMouse(true, evt.pos, Vector3.zero);
+            OnMouse((downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2,true, evt.pos, Vector3.zero);
         }
         downPos = Vector2.zero;
     }

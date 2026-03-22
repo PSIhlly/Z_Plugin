@@ -46,6 +46,8 @@ public static readonly int autoIdCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -199,6 +201,11 @@ public static readonly int autoIdCnt=100;
         return new Data(sameId? id:idChain.GetId(),new List<string>(subPrefabUnitName),new List<Vector3>(subPrefabUnitPos),new List<Vector3>(subPrefabUnitScale),new List<string>(subUnitTexsName),isObstacle);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                MapModelForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,new List<string>(){"Cube",},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},new List<string>(){"z_map_b$floor$0",},false);
@@ -272,17 +279,17 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<List<string>>("subPrefabUnitName"),
+                jo.SelectToken("subPrefabUnitName")==null?defaultData.subPrefabUnitName:jo.Get<List<string>>("subPrefabUnitName"),
 
-                jo.Get<List<Vector3>>("subPrefabUnitPos"),
+                jo.SelectToken("subPrefabUnitPos")==null?defaultData.subPrefabUnitPos:jo.Get<List<Vector3>>("subPrefabUnitPos"),
 
-                jo.Get<List<Vector3>>("subPrefabUnitScale"),
+                jo.SelectToken("subPrefabUnitScale")==null?defaultData.subPrefabUnitScale:jo.Get<List<Vector3>>("subPrefabUnitScale"),
 
-                jo.Get<List<string>>("subUnitTexsName"),
+                jo.SelectToken("subUnitTexsName")==null?defaultData.subUnitTexsName:jo.Get<List<string>>("subUnitTexsName"),
 
-                jo.Get<bool>("isObstacle")
+                jo.SelectToken("isObstacle")==null?defaultData.isObstacle:jo.Get<bool>("isObstacle")
                     );
 
             return data;
@@ -291,6 +298,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

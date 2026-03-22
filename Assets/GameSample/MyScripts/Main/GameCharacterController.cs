@@ -83,7 +83,7 @@ namespace Form
                     case ParamShowType.AlwaysWithPanel:
                         return true;
                     case ParamShowType.OnlyNotZero:
-                        return paramDic[prmName].v != 0;
+                        return paramDic[prmName].GetValue().num != 0;
                     case ParamShowType.Hide:
                         return false;
                 }

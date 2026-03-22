@@ -64,6 +64,8 @@ namespace Z_Map.Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -182,6 +184,11 @@ namespace Z_Map.Form
         return new Data(sameId? uid:uidChain.GetId(),isObstacle,name,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra,enteredScene);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                ObjectUnitForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false);
@@ -263,27 +270,27 @@ namespace Z_Map.Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<bool>("isObstacle"),
+                jo.SelectToken("isObstacle")==null?defaultData.isObstacle:jo.Get<bool>("isObstacle"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("prefabName"),
+                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.Get<Vector3>("pos"),
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector3>("pos"),
 
-                jo.Get<Vector3>("euler"),
+                jo.SelectToken("euler")==null?defaultData.euler:jo.Get<Vector3>("euler"),
 
-                jo.Get<Vector3>("scale"),
+                jo.SelectToken("scale")==null?defaultData.scale:jo.Get<Vector3>("scale"),
 
-                jo.Get<UpdateType>("updateType"),
+                jo.SelectToken("updateType")==null?defaultData.updateType:jo.Get<UpdateType>("updateType"),
 
-                jo.Get<List<int>>("collidingUnitUid"),
+                jo.SelectToken("collidingUnitUid")==null?defaultData.collidingUnitUid:jo.Get<List<int>>("collidingUnitUid"),
 
-                jo.Get<string>("extra"),
+                jo.SelectToken("extra")==null?defaultData.extra:jo.Get<string>("extra"),
 
-                jo.Get<bool>("enteredScene")
+                jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene")
                     );
 
             return data;
@@ -292,6 +299,7 @@ namespace Z_Map.Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

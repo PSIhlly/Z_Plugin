@@ -72,7 +72,7 @@ namespace Ui.PlaySceneMain
             {
                 if (prm.showType == ParamShowType.AlwaysWithPanel)
                 {
-                    prmCon.Add(new UiParamShowParam() { max = prm.max - prm.min, value = prm.v - prm.min, color = colors[id] });
+                    prmCon.Add(new UiParamShowParam() { max = prm.GetMax().num - prm.GetMin().num, value = prm.GetValue().num - prm.GetMin().num, color = colors[id] });
                     if (id < colors.Length - 1)
                     {
                         id++;
@@ -116,7 +116,7 @@ namespace Ui.PlaySceneMain
             {
                 if (prm.showType == ParamShowType.AlwaysWithPanel)
                 {
-                    con.Add(new UiParamShowParam() { max = prm.max - prm.min, value = prm.v - prm.min, color = colors[id] });
+                    con.Add(new UiParamShowParam() { max = prm.GetMax().num - prm.GetMin().num, value = prm.GetValue().num - prm.GetMin().num, color = colors[id] });
                     if (id < colors.Length - 1)
                     {
                         id++;

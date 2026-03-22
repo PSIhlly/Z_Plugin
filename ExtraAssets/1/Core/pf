@@ -1,0 +1,78 @@
+[
+  {
+    "uid": 1,
+    "seconds": 0.0,
+    "sceneId": 1,
+    "pos": "500|1000|500",
+    "characterUid": 2,
+    "bag": [],
+    "team": [
+      {
+        "v": 1
+      },
+      {
+        "v": 2
+      }
+    ],
+    "teamActive": [
+      {
+        "v": 1
+      },
+      {
+        "v": 2
+      }
+    ],
+    "uiStyleImageName": [],
+    "events": [
+      {
+        "k": "onBeginEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBeginEvent",
+          "evt": [
+            {
+              "v": "主对话"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterParamChangeEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterParamChangeEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterParamChangeEvent$1$HP",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterParamChangeEvent$1$HP",
+          "evt": [
+            {
+              "v": "胜利"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "cameraMode": 0,
+    "dialogCache": {
+      "uid": 0,
+      "title": "",
+      "mainText": "",
+      "mainPictureName": "",
+      "mainVideoName": "",
+      "profilePictureName": "",
+      "mainAudioName": ""
+    },
+    "triggeredOnceEvts": [],
+    "notFirstTime": false,
+    "blockProgramUid": 0,
+    "editorStyle": 3
+  }
+]

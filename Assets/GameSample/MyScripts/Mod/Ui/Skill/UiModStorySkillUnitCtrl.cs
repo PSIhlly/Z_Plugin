@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using Ui.EventChoose;
 using Z_Code.Form;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -117,7 +118,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
             view.sta_lightAttack.ChangeState(model.data.skillTypes.Contains(SkillType.LightAttack)?1:0);
             view.sta_heavyAttack.ChangeState(model.data.skillTypes.Contains(SkillType.HeavyAttack)?1:0);
 
-            //view.txt_onTriggerEvent.text = model.data.events.GetDv("onTriggerEvent", EventTriggerForm.defaultData).evt;
+            view.model_EventChoose.Set(new UiEventChooseParam() { dic = model.data.events, key = "invoke" });
 
         }
         private void SetKillType(SkillType tp)

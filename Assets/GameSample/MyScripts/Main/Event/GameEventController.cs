@@ -19,6 +19,7 @@ using Z_Map;
 using Z_Text;
 using Z_Ui.Notify;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 using static Z_Code.Form.InterpretDataForm;
 namespace Form
 {
@@ -183,7 +184,16 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 continue;
             }
-            if (data.Interpret().complete)
+            bool complete = false;
+            if (GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user) && !UnitForm.DataByUid.ContainsKey(data.user))
+            {
+                complete = true;
+            }
+            else
+            {
+                complete = data.Interpret().complete;
+            }
+            if (complete)
             {
                 if (!string.IsNullOrEmpty(data.releaseTrigger))
                 {
@@ -348,6 +358,7 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return res;
     }
+
     public static EventTriggerForm.Data CreateTrigger(string key)
     {
         return new EventTriggerForm.Data(-1, key, new List<string>(), default);

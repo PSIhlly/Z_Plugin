@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Z_Debug;
 using Z_DesignStyle;
@@ -200,7 +201,47 @@ namespace Z_Map
 
 
         }
+        public void UpdateSingleOne(MapUnit unit)
+        {
 
+            if (unit is CharacterUnit ch)
+            {
+                foreach (var tile in characterTileDic.Get(ch))
+                {
+                    if (tile.isShowing)
+                    {
+                        ch.Show();
+                        if (!curCharacterLst.Contains(ch.data))
+                            curCharacterLst.Add(ch.data);
+                    }
+                }
+            }
+            else if (unit is ItemUnit it)
+            {
+                foreach (var tile in itemTileDic.Get(it))
+                {
+                    if (tile.isShowing)
+                    {
+                        it.Show();
+                        if (!curItemLst.Contains(it.data))
+                            curItemLst.Add(it.data);
+                    }
+                }
+            }
+            else if (unit is ObjectUnit ob)
+            {
+                foreach (var tile in objectTileDic.Get(ob))
+                {
+                    if (tile.isShowing)
+                    {
+                        ob.Show();
+                        if (!curObjectLst.Contains(ob.data))
+                            curObjectLst.Add(ob.data);
+                    }
+                }
+            }
+
+        }
 
         private void UpdateMapInfo()
         {
@@ -365,7 +406,7 @@ namespace Z_Map
             UpdateMapInfo();
             if (forceFresh || (curCenterPos - lastCenterPos).sqrMagnitude >= 1f)
             {
-                viewCenter = _super.utilCtrl.RealPos2MapPos(curCenterPos);
+                viewCenter = _super.utilCtrl.RealPos2MapPosInt(curCenterPos);
 
                 if (GlobalSettings.MAP_SHOW_DEBUG)
                 {
@@ -385,8 +426,8 @@ namespace Z_Map
                 unit.VisOff();
                 foreach (var curObj in objectTileDic.Get(unit))
                 {
-                    if(curObj.belongTile == unit)
-                    curObj.VisOff();
+                    if (curObj.belongTile == unit)
+                        curObj.VisOff();
                 }
                 foreach (var curItem in itemTileDic.Get(unit))
                 {
@@ -458,13 +499,13 @@ namespace Z_Map
             }
 
         }
-        public void ApplyMove(Unit unit, Vector3 newPos, Vector3 euler,bool teleport=false)
+        public void ApplyMove(Unit unit, Vector3 newPos, Vector3 euler, bool teleport = false)
         {
-            var newMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
+            var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
             {
                 newPos = _super.utilCtrl.GetClosestInArea(newPos);
-                newMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
+                newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             }
             if (_super.data.maps.ContainsKey((newMapPos.x, newMapPos.y, newMapPos.z)))
             {
@@ -497,7 +538,7 @@ namespace Z_Map
             unit.data.euler = euler;
             if (oldPos != newPos)
             {
-                MapManager.instance.updateCtrl.ChechCollideEvent(unit, teleport?newPos-oldPos:Vector3.zero);
+                MapManager.instance.updateCtrl.ChechCollideEvent(unit, teleport ? newPos - oldPos : Vector3.zero);
             }
 
 
@@ -519,7 +560,7 @@ namespace Z_Map
             }
             HashSet<int> exist = new HashSet<int>() { unit.data.uid };
 
-            foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z),dir.magnitude))
+            foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z), dir.magnitude))
             {
                 var lst = new List<Unit>(objectTileDic.Get(tile));
                 lst.AddRange(itemTileDic.Get(tile));
@@ -602,7 +643,7 @@ namespace Z_Map
             {
                 if (_super.data.CheckItemUnit(itemData))
                 {
-                    var mapPos = _super.utilCtrl.RealPos2MapPos(itemData.pos);
+                    var mapPos = _super.utilCtrl.RealPos2MapPosInt(itemData.pos);
                     if (_super.utilCtrl.InArea(mapPos))
                     {
                         itemTileDic.Add(itemData.unit, _super.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
@@ -634,7 +675,7 @@ namespace Z_Map
             {
                 if (_super.data.CheckCharacterUnit(characterData))
                 {
-                    var mapPos = _super.utilCtrl.RealPos2MapPos(characterData.pos);
+                    var mapPos = _super.utilCtrl.RealPos2MapPosInt(characterData.pos);
                     if (_super.utilCtrl.InArea(mapPos))
                     {
                         characterTileDic.Add(characterData.unit, _super.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);

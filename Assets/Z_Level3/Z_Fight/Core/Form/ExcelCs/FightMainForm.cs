@@ -40,6 +40,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -193,6 +195,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),uidCnt,fightJa,weaponJa,bulletJa,weaponBulletJa);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                FightMainForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,0,"","","","");
@@ -266,17 +273,17 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<int>("uidCnt"),
+                jo.SelectToken("uidCnt")==null?defaultData.uidCnt:jo.Get<int>("uidCnt"),
 
-                jo.Get<string>("fightJa"),
+                jo.SelectToken("fightJa")==null?defaultData.fightJa:jo.Get<string>("fightJa"),
 
-                jo.Get<string>("weaponJa"),
+                jo.SelectToken("weaponJa")==null?defaultData.weaponJa:jo.Get<string>("weaponJa"),
 
-                jo.Get<string>("bulletJa"),
+                jo.SelectToken("bulletJa")==null?defaultData.bulletJa:jo.Get<string>("bulletJa"),
 
-                jo.Get<string>("weaponBulletJa")
+                jo.SelectToken("weaponBulletJa")==null?defaultData.weaponBulletJa:jo.Get<string>("weaponBulletJa")
                     );
 
             return data;
@@ -285,6 +292,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

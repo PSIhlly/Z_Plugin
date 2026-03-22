@@ -39,6 +39,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -46,7 +48,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
-        public static Action<Data,bool,bool> changeIsprotoAction;
+        public static Action<Data,int,int> changeProtouidAction;
                 
 
 
@@ -107,31 +109,31 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private bool  _isProto;
+                    private int  _protoUid;
                     /// <summary>
-                    ///是原型
+                    ///原型Uid
                     ///</summary>
-                    public bool  isProto{
-                                get{return _isProto;}
+                    public int  protoUid{
+                                get{return _protoUid;}
  set{
 
                     if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
-                       ChangeIsproto(this,_isProto,value); 
+                       ChangeProtouid(this,_protoUid,value); 
                     }
         
-                _isProto = value;
+                _protoUid = value;
                 }
                  
                      }
                     
-            public Data(int uid,string name,string label,bool isProto)
+            public Data(int uid,string name,string label,int protoUid)
             {
 
              this.uid = uid;
              this.name = name;
              this.label = label;
-             this.isProto = isProto;
+             this.protoUid = protoUid;
 
             }
             public void Reset(Data data)
@@ -140,17 +142,22 @@ public static readonly int autoUidCnt=100;
              this.uid = data.uid;
              this.name = data.name;
              this.label = data.label;
-             this.isProto = data.isProto;
+             this.protoUid = data.protoUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,isProto);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,protoUid);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                ProductForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   private static Data _defaultData=new Data(0,"","",false);
+                   private static Data _defaultData=new Data(0,"","",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -221,13 +228,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("label"),
+                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.Get<bool>("isProto")
+                jo.SelectToken("protoUid")==null?defaultData.protoUid:jo.Get<int>("protoUid")
                     );
 
             return data;
@@ -236,6 +243,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -245,7 +253,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("label",data.label);
 
-            jo.Set<bool>("isProto",data.isProto);
+            jo.Set<int>("protoUid",data.protoUid);
 
             return jo;
         }
@@ -356,12 +364,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeIsproto(Data superData,bool oldV,bool newV)
+            public static void ChangeProtouid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIsprotoAction?.Invoke(data,oldV,newV);
+                changeProtouidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

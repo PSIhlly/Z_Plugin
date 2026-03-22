@@ -39,7 +39,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStorySceneObjectParameter
         {
 
             argCon.Clear();
-            foreach (var data in SceneParamForm.DataByName.Values)
+            foreach (var data in MapObjectParamForm.DataByName.Values)
             {
                 argCon.Add(new UiArgParam()
                 {
@@ -57,11 +57,11 @@ namespace Ui.ModStory.ModStoryParameter.ModStorySceneObjectParameter
 
     public partial class UiArgParam
     {
-        public SceneParamForm.Data data;
+        public MapObjectParamForm.Data data;
     }
     public partial class UiArgModel
     {
-        public SceneParamForm.Data data;
+        public MapObjectParamForm.Data data;
     }
     public partial class UiArgCtrl
     {
@@ -81,12 +81,12 @@ namespace Ui.ModStory.ModStoryParameter.ModStorySceneObjectParameter
             });
             view.ipt_value.onFinishInput+=(s)=>
             {
-                model.data.v = StringHelper.ToFloat(s, 0f);
+                model.data.SetValue(StringHelper.ToFloat(s, 0f));
                 Refresh();
             };
             view.ipt_name.onFinishInput+=(s)=>
             {
-                if (StringHelper.IsUniqueName(SceneParamForm.DataByName.Keys, s))
+                if (StringHelper.IsUniqueName(MapObjectParamForm.DataByName.Keys, s))
                 {
                     ModManager.instance.assetCtrl.RenameSceneObjectParam(model.data.name,s);
                 }
@@ -106,7 +106,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStorySceneObjectParameter
             if (model.data != null)
             {
                 view.ipt_name.Set(model.data.name);
-                view.ipt_value.Set(model.data.v.ToString("0.##"));
+                view.ipt_value.Set(model.data.GetValue().num.ToString("0.##"));
             }
 
         }

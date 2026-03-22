@@ -1,0 +1,27 @@
+[
+  {
+    "uid": 1,
+    "name": "十六夜攻击",
+    "label": "",
+    "icon": "reservedI$",
+    "skillTypes": [],
+    "cd": 0.2,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": "十六夜攻击"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  }
+]

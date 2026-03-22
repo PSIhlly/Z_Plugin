@@ -64,6 +64,10 @@ namespace Z_DataSystem
                 if (data != null)
                 {
                     var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
+                    if(!Directory.Exists(AssetManager.cachePath))
+                    {
+                        Directory.CreateDirectory(AssetManager.cachePath);
+                    }
                     File.WriteAllBytes(AssetManager.cachePath + nm, data);
                     var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, nm);
                     callback?.Invoke(form);

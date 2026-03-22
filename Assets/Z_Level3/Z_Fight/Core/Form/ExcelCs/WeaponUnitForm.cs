@@ -64,6 +64,8 @@ namespace Z_Fight.Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -248,6 +250,11 @@ namespace Z_Fight.Form
         return new Data(sameId? uid:uidChain.GetId(),name,fightUid,new List<int>(weaponBulletsId),curWeaponBulletAid,cdRemain,magazineRemain,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                WeaponUnitForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"",0,null,0,0f,0,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"");
@@ -329,33 +336,33 @@ namespace Z_Fight.Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<int>("fightUid"),
+                jo.SelectToken("fightUid")==null?defaultData.fightUid:jo.Get<int>("fightUid"),
 
-                jo.Get<List<int>>("weaponBulletsId"),
+                jo.SelectToken("weaponBulletsId")==null?defaultData.weaponBulletsId:jo.Get<List<int>>("weaponBulletsId"),
 
-                jo.Get<int>("curWeaponBulletAid"),
+                jo.SelectToken("curWeaponBulletAid")==null?defaultData.curWeaponBulletAid:jo.Get<int>("curWeaponBulletAid"),
 
-                jo.Get<float>("cdRemain"),
+                jo.SelectToken("cdRemain")==null?defaultData.cdRemain:jo.Get<float>("cdRemain"),
 
-                jo.Get<int>("magazineRemain"),
+                jo.SelectToken("magazineRemain")==null?defaultData.magazineRemain:jo.Get<int>("magazineRemain"),
 
-                jo.Get<string>("prefabName"),
+                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.Get<Vector3>("pos"),
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector3>("pos"),
 
-                jo.Get<Vector3>("euler"),
+                jo.SelectToken("euler")==null?defaultData.euler:jo.Get<Vector3>("euler"),
 
-                jo.Get<Vector3>("scale"),
+                jo.SelectToken("scale")==null?defaultData.scale:jo.Get<Vector3>("scale"),
 
-                jo.Get<UpdateType>("updateType"),
+                jo.SelectToken("updateType")==null?defaultData.updateType:jo.Get<UpdateType>("updateType"),
 
-                jo.Get<List<int>>("collidingUnitUid"),
+                jo.SelectToken("collidingUnitUid")==null?defaultData.collidingUnitUid:jo.Get<List<int>>("collidingUnitUid"),
 
-                jo.Get<string>("extra")
+                jo.SelectToken("extra")==null?defaultData.extra:jo.Get<string>("extra")
                     );
 
             return data;
@@ -364,6 +371,7 @@ namespace Z_Fight.Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

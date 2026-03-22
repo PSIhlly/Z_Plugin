@@ -80,7 +80,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryItemParameter
             });
             view.ipt_value.onFinishInput += (s) =>
             {
-                model.data.v = StringHelper.ToFloat(s, 0f);
+                model.data.SetValue(StringHelper.ToFloat(s, 0f));
                 Refresh();
             };
             view.ipt_name.onFinishInput += (s) =>
@@ -116,7 +116,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryItemParameter
             if (model.data != null)
             {
                 view.ipt_name.Set(model.data.name);
-                view.ipt_value.Set(model.data.v.ToString("0.##"));
+                view.ipt_value.Set(model.data.GetValue().num.ToString("0.##"));
                 view.dp_.Set((int)model.data.showType);
             }
 

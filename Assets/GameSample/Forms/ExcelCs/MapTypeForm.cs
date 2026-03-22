@@ -46,6 +46,8 @@ public static readonly int autoIdCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
 
 
@@ -127,6 +129,11 @@ private set{
         return new Data(sameId? id:idChain.GetId(),NameKey,icon,needLayer);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                MapTypeForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","",false);
@@ -214,7 +221,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
                     _defaultData.NameKey,
 
@@ -229,6 +236,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

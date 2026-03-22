@@ -12,9 +12,13 @@ using Ui;
 using Ui.EnterMain;
 using Ui.ModStory.ModStoryEffect.ModStoryEffectUnit;
 using Ui.PlaySceneMenu;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Z_Audio;
 using Z_ByteSerialize;
+using Z_Code;
+using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -25,7 +29,97 @@ using Z_Texture;
 using Z_Ui;
 using Z_Ui.Dialog;
 using Z_UnitSystem;
+namespace Form
+{
 
+    public static partial class GameParamForm
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        public static void RegisterGet()
+        {
+            beforeGetAction = (data) =>
+            {
+                data.min = BoxDataForm.GetJoByData(data.GetMin()).ToString();
+                data.v = BoxDataForm.GetJoByData(data.GetValue()).ToString();
+                data.max = BoxDataForm.GetJoByData(data.GetMax()).ToString();
+            };
+        }
+
+        public partial class Data
+        {
+            BoxDataForm.Data _boxValue;
+            BoxDataForm.Data _boxMin;
+            BoxDataForm.Data _boxMax;
+            public BoxDataForm.Data GetValue()
+            {
+                return Get(ref _boxValue,v);
+            }
+            public BoxDataForm.Data GetMin()
+            {
+                return Get(ref _boxMin,min);
+            }
+            public BoxDataForm.Data GetMax()
+            {
+                return Get(ref _boxMax,max);
+            }
+            public void SetValue(object v)
+            {
+                Set(GetValue(), v);
+            }
+            public void SetMin(object v)
+            {
+                Set(GetMin(), v);
+            }
+            public void SetMax(object v)
+            {
+                Set(GetMax(), v);
+            }
+            
+            private BoxDataForm.Data Get(ref BoxDataForm.Data box,string str)
+            {
+                if (box == null)
+                {
+                    try
+                    {
+                        if(!string.IsNullOrEmpty(str))
+                            box = BoxDataForm.GetDataByJo(JObject.Parse(str));
+                        else
+                            box = CodeHelper.CreateBox();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e);
+                        box = CodeHelper.CreateBox();
+                    }
+                }
+
+                return box;
+            }
+            private void Set(BoxDataForm.Data box, object o)
+            {
+                if (o is string str)
+                {
+                    box.str = str;
+                }
+                else if (o is float num)
+                {
+                    box.num = num;
+                    box.str = null;
+                }
+                else if (o is int i)
+                {
+                    box.num = i;
+                    box.str = null;
+                }
+                else if (o is BoxDataForm.Data b)
+                {
+                    box.Reset(b.Copy());
+                }
+            }
+
+        }
+    }
+}
 
 
 public class CameraMoveEvent : Z_Event
@@ -36,6 +130,7 @@ public class CameraMoveEvent : Z_Event
 
 public static partial class GlobalSettings
 {
+    public static string BGM_FILE_NAME = "Bgm.mp3";
     public static float DRAG_DIS2 => InputManager.instance.screenSize.x / 25;
     public static int TERRAIN_LAYER_MAX => 3;
     public static int TEXTURE_MAX = 100000;
@@ -63,6 +158,8 @@ public static class GlobalNameHelper
 }
 
 
+
+
 public class GameManager : Z_MonoManager<GameManager>
 {
     public GameUtilController utilCtrl;
@@ -81,6 +178,7 @@ public class GameManager : Z_MonoManager<GameManager>
     public override void Init()
     {
         base.Init();
+        AudioManager.instance.BgmStreaming(GlobalSettings.BGM_FILE_NAME);
         LanguageManager.instance.SetLanguage(Language.Cn);
 
         utilCtrl = new GameUtilController(this);
@@ -100,7 +198,7 @@ public class GameManager : Z_MonoManager<GameManager>
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName("")));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultStoryTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(Texture2D.whiteTexture, GlobalNameHelper.GetDefaultEventTexName()));
-        
+
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultCharacterTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(new Texture2D(1, 1), GlobalNameHelper.GetDefaultModelTexName()));

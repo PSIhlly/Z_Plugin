@@ -56,6 +56,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -89,6 +91,11 @@ namespace Form
         return new Data(sameId? uid:uidChain.GetId(),name);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                GameCmdTypeDataForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"void");
@@ -220,9 +227,9 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name")
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name")
                     );
 
             return data;
@@ -231,6 +238,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

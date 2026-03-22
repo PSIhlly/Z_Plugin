@@ -31,17 +31,12 @@ namespace Z_Code
             GameManager.instance.evtCtrl.StartTask(() =>
             {
                 var relaPos = new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
-                var time = prm[4].num;
+                var time = Mathf.Max(0.0001f, prm[2].num);
                 var step = Mathf.Min(1,Time.deltaTime / time) * relaPos;
 
 
                 var oldPos = data.pos;
-                if (time <= 0)
-                {
-                    asyncTask.Complete();
-                    return true;
-                }
-                else
+  
                 {
                     if (data.unit is ObjectUnit o)
                     {
@@ -53,6 +48,11 @@ namespace Z_Code
                 prm[1].dic["y"].num -= realStep.z;
                 prm[1].dic["height"].num -= realStep.y;
                 prm[2].num -= Time.deltaTime;
+                if (prm[2].num <= 0)
+                {
+                    asyncTask.Complete();
+                    return true;
+                }
                 return false;
             });
 

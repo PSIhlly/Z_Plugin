@@ -843,17 +843,23 @@ namespace ModStoryCharacterUnitParameter
 
             public GameObject go_argIpt;
             public Txt txt_;
-            public Ipt ipt_min;
-            public Ipt ipt_value;
-            public Ipt ipt_max;
+            public Btn btn_min;
+            public Btn btn_value;
+            public Btn btn_max;
+            public Txt txt_min;
+            public Txt txt_value;
+            public Txt txt_max;
         public UiArgIptView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_argIpt = uiHolder.elementTrsLst[0].gameObject;
             txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            ipt_min = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_max = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_min = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_value = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_max = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            txt_min = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_value = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_max = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -1927,13 +1933,13 @@ namespace ModStorySkillUnit
 
             public Btn btn_back;
             public Btn btn_delete;
+            public UiEventChooseCtrl model_EventChoose;
             public Ipt ipt_name;
             public Ipt ipt_label;
             public Ipt ipt_cd;
             public Btn btn_icon;
             public Img img_icon;
             public Btn btn_triggerCondition;
-            public Btn btn_onTriggerEvent;
             public Btn btn_lightAttack;
             public Sta sta_lightAttack;
             public Btn btn_heavyAttack;
@@ -1943,19 +1949,18 @@ namespace ModStorySkillUnit
             public Btn btn_q;
             public Sta sta_q;
             public Txt txt_triggerCondition;
-            public Txt txt_onTriggerEvent;
         public UiModStorySkillUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_cd = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            btn_icon = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            img_icon = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            btn_triggerCondition = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            btn_onTriggerEvent = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            model_EventChoose = (UiEventChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            ipt_label = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            ipt_cd = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            btn_icon = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            img_icon = uiHolder.elementTrsLst[7].GetComponent<Img>();
+            btn_triggerCondition = uiHolder.elementTrsLst[8].GetComponent<Btn>();
             btn_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Btn>();
             sta_lightAttack = uiHolder.elementTrsLst[10].GetComponent<Sta>();
             btn_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Btn>();
@@ -1965,7 +1970,6 @@ namespace ModStorySkillUnit
             btn_q = uiHolder.elementTrsLst[15].GetComponent<Btn>();
             sta_q = uiHolder.elementTrsLst[16].GetComponent<Sta>();
             txt_triggerCondition = uiHolder.elementTrsLst[17].GetComponent<Txt>();
-            txt_onTriggerEvent = uiHolder.elementTrsLst[18].GetComponent<Txt>();
         }
 
     }
@@ -1990,6 +1994,8 @@ namespace ModStorySkillUnit
             model=new UiModStorySkillUnitModel();
 
 
+            view.model_EventChoose = new UiEventChooseCtrl();
+            view.model_EventChoose.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -2327,17 +2333,23 @@ namespace ModStoryItemUnitParameter
 
             public GameObject go_argIpt;
             public Txt txt_;
-            public Ipt ipt_min;
-            public Ipt ipt_value;
-            public Ipt ipt_max;
+            public Btn btn_min;
+            public Btn btn_value;
+            public Btn btn_max;
+            public Txt txt_min;
+            public Txt txt_value;
+            public Txt txt_max;
         public UiArgIptView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_argIpt = uiHolder.elementTrsLst[0].gameObject;
             txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            ipt_min = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_max = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_min = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_value = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_max = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            txt_min = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_value = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_max = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -3695,17 +3707,23 @@ namespace ModStoryMapObjectObjectParameter
 
             public GameObject go_argIpt;
             public Txt txt_;
-            public Ipt ipt_min;
-            public Ipt ipt_value;
-            public Ipt ipt_max;
+            public Btn btn_min;
+            public Btn btn_value;
+            public Btn btn_max;
+            public Txt txt_min;
+            public Txt txt_value;
+            public Txt txt_max;
         public UiArgIptView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_argIpt = uiHolder.elementTrsLst[0].gameObject;
             txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            ipt_min = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_max = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_min = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_value = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_max = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            txt_min = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_value = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_max = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -3802,8 +3820,8 @@ namespace ModStoryMapObjectObjectConfig
     public partial class UiModStoryMapObjectObjectConfigView:UiView
     {
 
-            public Btn btn_fixed;
-            public Sta sta_fixed;
+            public Btn btn_collision;
+            public Sta sta_collision;
             public UiEventChooseCtrl model_EventChooseCharacterTouch;
             public UiEventChooseCtrl model_EventChooseCharacterLeave;
             public UiEventChooseCtrl model_EventChooseObjectTouch;
@@ -3813,8 +3831,8 @@ namespace ModStoryMapObjectObjectConfig
         public UiModStoryMapObjectObjectConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_fixed = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            sta_fixed = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_collision = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            sta_collision = uiHolder.elementTrsLst[1].GetComponent<Sta>();
             model_EventChooseCharacterTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             model_EventChooseCharacterLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;

@@ -46,6 +46,8 @@ public static readonly int autoUidCnt=1000000;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -155,6 +157,11 @@ public static readonly int autoUidCnt=1000000;
         return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(evt),type);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                EventTriggerForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"",new List<string>(),default);
@@ -242,13 +249,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<List<string>>("evt"),
+                jo.SelectToken("evt")==null?defaultData.evt:jo.Get<List<string>>("evt"),
 
-                jo.Get<TriggerType>("type")
+                jo.SelectToken("type")==null?defaultData.type:jo.Get<TriggerType>("type")
                     );
 
             return data;
@@ -257,6 +264,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

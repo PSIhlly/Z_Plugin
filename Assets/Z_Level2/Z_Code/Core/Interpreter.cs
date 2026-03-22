@@ -1,5 +1,7 @@
+//#define INTERPRETER_DEBUG 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Debug;
@@ -104,7 +106,7 @@ namespace Z_Code
     public class Interpreter
     {
         public InterpretDataForm.Data data;
-        public const bool DEBUG = false;
+
         InterpretAsyncTask asyncTask;
 
         public Interpreter(InterpretDataForm.Data interpret)
@@ -118,14 +120,25 @@ namespace Z_Code
 
             int cnt = data.program.zCode.Count;
             BoxDataForm.Data box = null;
+            BoxDataForm.Data box2 = null;
             BoxDataForm.Data realBox = null;
-
+#if INTERPRETER_DEBUG
+            {
+                Z_Log.Log("[Start]");
+            }
+#endif
             for (; data.p < cnt; data.p++)
             {
-                if (DEBUG)
+#if INTERPRETER_DEBUG
+                Z_Log.Log(data.p + ":" + (Op)int.Parse(data.program.zCode[data.p]));
+
+                Z_Log.Log("{Current Stacks:}");
+                for (int i=0;i<data.stack.Count;i++)
                 {
-                    Z_Log.Log(data.p + ":" + (data.program.zCode[data.p]));
+                    Z_Log.Log("{"+i+" val:"+ data.stack[i].valName+" num:"+ data.stack[i].num+" str:"+ data.stack[i].str+" dic:"+ data.stack[i].dic.Count+ "}");
                 }
+#endif
+
                 switch ((Op)(int.Parse(data.program.zCode[data.p])))
                 {
                     case Op.PushNum:
@@ -143,6 +156,9 @@ namespace Z_Code
                         break;
                     case Op.Call:
                         string funcName = data.program.zCode[data.p + 1];
+#if INTERPRETER_DEBUG
+                        Z_Log.Log(" invoke" + funcName);
+#endif
                         try
                         {
                             if (BaseData.cmdDic.ContainsKey(funcName))
@@ -231,7 +247,16 @@ namespace Z_Code
 
                         break;
                     case Op.Equal:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) == GetNum(Pop()) ? 1 : 0));
+                        box = GetBox(Pop());
+                        box2 = GetBox(Pop());
+                        if(box.str==null&& box2.str == null)
+                        {
+                            Push(CodeHelper.CreateBoxByNum(GetNum(box) == GetNum(box2) ? 1 : 0));
+                        }else 
+                        {
+                            Push(CodeHelper.CreateBoxByNum(GetStr(box) == GetStr(box2) ? 1 : 0));
+                        }
+                        
                         break;
                     case Op.Greater:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) > GetNum(Pop()) ? 1 : 0));
@@ -246,7 +271,16 @@ namespace Z_Code
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) >= GetNum(Pop()) ? 1 : 0));
                         break;
                     case Op.NotEqual:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) != GetNum(Pop()) ? 1 : 0));
+                        box = GetBox(Pop());
+                        box2 = GetBox(Pop());
+                        if (box.str == null && box2.str == null)
+                        {
+                            Push(CodeHelper.CreateBoxByNum(GetNum(box) != GetNum(box2) ? 1 : 0));
+                        }
+                        else
+                        {
+                            Push(CodeHelper.CreateBoxByNum(GetStr(box) != GetStr(box2) ? 1 : 0));
+                        }
                         break;
                     case Op.Take:
                         box = Pop();
@@ -268,24 +302,23 @@ namespace Z_Code
                         }
                         break;
                     case Op.Plus:
-                        var box1 = Pop();
-                        var box2 = Pop();
-                        if (box1.str == null && box2.str == null)
+                         box = GetBox(Pop());
+                         box2 = GetBox(Pop());
+                        if (box.str == null && box2.str == null)
                         {
-
-                            Push(CodeHelper.CreateBoxByNum(GetNum(box1) + GetNum(box2)));
+                            Push(CodeHelper.CreateBoxByNum(GetNum(box) + GetNum(box2)));
                         }
-                        else if (box1.str != null && box2.str == null)
+                        else if (box.str != null && box2.str == null)
                         {
-                            Push(CodeHelper.CreateBoxByStr(GetStr(box1) + GetNum(box2)));
+                            Push(CodeHelper.CreateBoxByStr(GetStr(box) + GetNum(box2)));
                         }
-                        else if (box1.str == null && box2.str != null)
+                        else if (box.str == null && box2.str != null)
                         {
-                            Push(CodeHelper.CreateBoxByStr(GetNum(box1) + GetStr(box2)));
+                            Push(CodeHelper.CreateBoxByStr(GetNum(box) + GetStr(box2)));
                         }
                         else
                         {
-                            Push(CodeHelper.CreateBoxByStr(GetStr(box1) + GetStr(box2)));
+                            Push(CodeHelper.CreateBoxByStr(GetStr(box) + GetStr(box2)));
                         }
 
                         break;
@@ -379,12 +412,17 @@ namespace Z_Code
                 {
                     if (!data.heap[box.valName].dic.ContainsKey(box.str))
                     {
+
                         data.heap[box.valName].dic[box.str] = CodeHelper.CreateBox();
                     }
                     return data.heap[box.valName].dic[box.str];
                 }
                 else
                 {
+#if INTERPRETER_DEBUG
+                    Debug.Log(box.valName + " means " + CodeHelper.GetBoxContent(data.heap[box.valName]));
+#endif
+
                     return data.heap[box.valName];
                 }
             }

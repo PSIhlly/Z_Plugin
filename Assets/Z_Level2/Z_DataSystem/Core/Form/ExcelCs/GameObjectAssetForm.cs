@@ -57,6 +57,8 @@ namespace Z_DataSystem.Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -106,6 +108,11 @@ namespace Z_DataSystem.Form
         return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                GameObjectAssetForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","",null,"",null);
@@ -215,15 +222,15 @@ namespace Z_DataSystem.Form
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
                     _defaultData.path,
 
-                jo.Get<byte[]>("bytes"),
+                jo.SelectToken("bytes")==null?defaultData.bytes:jo.Get<byte[]>("bytes"),
 
-                jo.Get<string>("hash"),
+                jo.SelectToken("hash")==null?defaultData.hash:jo.Get<string>("hash"),
 
                     _defaultData.asset
                     );
@@ -234,6 +241,7 @@ namespace Z_DataSystem.Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

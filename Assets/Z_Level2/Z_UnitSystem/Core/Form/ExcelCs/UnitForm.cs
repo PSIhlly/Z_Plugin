@@ -39,6 +39,8 @@ public static readonly int autoUidCnt=1000000;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -273,6 +275,11 @@ public static readonly int autoUidCnt=1000000;
         return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                UnitForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"");
@@ -346,23 +353,23 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("prefabName"),
+                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.Get<Vector3>("pos"),
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector3>("pos"),
 
-                jo.Get<Vector3>("euler"),
+                jo.SelectToken("euler")==null?defaultData.euler:jo.Get<Vector3>("euler"),
 
-                jo.Get<Vector3>("scale"),
+                jo.SelectToken("scale")==null?defaultData.scale:jo.Get<Vector3>("scale"),
 
-                jo.Get<UpdateType>("updateType"),
+                jo.SelectToken("updateType")==null?defaultData.updateType:jo.Get<UpdateType>("updateType"),
 
-                jo.Get<List<int>>("collidingUnitUid"),
+                jo.SelectToken("collidingUnitUid")==null?defaultData.collidingUnitUid:jo.Get<List<int>>("collidingUnitUid"),
 
-                jo.Get<string>("extra")
+                jo.SelectToken("extra")==null?defaultData.extra:jo.Get<string>("extra")
                     );
 
             return data;
@@ -371,6 +378,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

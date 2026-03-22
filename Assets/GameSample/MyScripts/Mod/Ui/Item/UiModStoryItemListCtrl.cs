@@ -55,9 +55,9 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemList
             }
             labCon.Refresh();
             itemCon.Clear();
-            var datas = model.lab == null || !ItemProductForm.DatasByLabelIsproto.ContainsKey((model.lab, true)) ?
-                (ItemProductForm.DatasByIsproto.ContainsKey(true)?(ItemProductForm.DatasByIsproto[true]):new List<ItemProductForm.Data>())
-                : ItemProductForm.DatasByLabelIsproto[(model.lab, true)];
+            var datas = model.lab == null || !ItemProductForm.DatasByLabelProtouid.ContainsKey((model.lab, 0)) ?
+                (ItemProductForm.DatasByProtouid.ContainsKey(0)?(ItemProductForm.DatasByProtouid[0]):new List<ItemProductForm.Data>())
+                : ItemProductForm.DatasByLabelProtouid[(model.lab, 0)];
 
             foreach (var data in datas)
             {

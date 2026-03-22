@@ -39,6 +39,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -170,6 +172,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),str,valName,num,new Dictionary<string,BoxDataForm.Data>(dic));
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                BoxDataForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,null,null,0f,new Dictionary<string,BoxDataForm.Data>(){});
@@ -243,15 +250,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("str"),
+                jo.SelectToken("str")==null?defaultData.str:jo.Get<string>("str"),
 
-                jo.Get<string>("valName"),
+                jo.SelectToken("valName")==null?defaultData.valName:jo.Get<string>("valName"),
 
-                jo.Get<float>("num"),
+                jo.SelectToken("num")==null?defaultData.num:jo.Get<float>("num"),
 
-                jo.Get<Dictionary<string,BoxDataForm.Data>>("dic")
+                jo.SelectToken("dic")==null?defaultData.dic:jo.Get<Dictionary<string,BoxDataForm.Data>>("dic")
                     );
 
             return data;
@@ -260,6 +267,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

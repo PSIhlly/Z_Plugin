@@ -1,0 +1,11 @@
+[
+  {
+    "uid": 1,
+    "name": "scene",
+    "miniMap": "reservedI$",
+    "pos": {
+      "Item1": 0.5,
+      "Item2": 0.5
+    }
+  }
+]

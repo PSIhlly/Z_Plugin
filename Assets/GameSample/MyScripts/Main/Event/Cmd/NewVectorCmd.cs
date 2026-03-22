@@ -13,10 +13,10 @@ namespace Z_Code
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new NumCmd());
+            Register(new NewVectorCmd());
         }
         public override string GetName() => "NewVector";
-        public override CmdBase GetNew() => new NumCmd();
+        public override CmdBase GetNew() => new NewVectorCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             var box = CodeHelper.CreateBox();

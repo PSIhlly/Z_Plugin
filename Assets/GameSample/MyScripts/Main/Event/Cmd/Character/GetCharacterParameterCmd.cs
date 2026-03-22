@@ -29,7 +29,12 @@ namespace Z_Code
             var data = CharacterProductForm.DataByUid.GetDv( GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), null);
             if (data != null && data.paramDic.ContainsKey(prm[1].str))
             {
-                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(data.paramDic[prm[1].str].v) };
+                asyncTask.res = new BoxDataForm.Data[] {data.paramDic[prm[1].str].GetValue().Copy() };
+            }
+            else
+            {
+                Debug.LogError("未找到" + prm[0].str);
+                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBox() };
             }
             return true;
         }

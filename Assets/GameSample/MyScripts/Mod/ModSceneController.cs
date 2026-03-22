@@ -70,7 +70,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     #region extern Var
     private DesignType _designType;
-    private int _offset = 500;
+    public int _offset = 500;
 
     private int _layer = 0;
     private int _cntX = 1;
@@ -171,7 +171,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         {
             worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         }
-        var hitPos = mapMgr.utilCtrl.RealPos2MapPos(worldPosition);
+        var hitPos = mapMgr.utilCtrl.RealPos2MapPosInt(worldPosition);
         //manage
         switch (designType)
         {
@@ -296,9 +296,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             {
                                 object[] prms = null;
                                 var newObjectData = mapMgr.AddObject(objectData.name, finalPos, objectData.name, prms);
-                                newObjectData.unit.productInfo = (objectData.id, -1);
-                                newObjectData.unit.paramInfo = new Dictionary<string, MapObjectParamForm.Data>(objectData.paramDic);
-                                newObjectData.isObstacle = true;
+                                GameManager.instance.mapCtrl.RegisterObject(newObjectData, objectData);
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
 
@@ -463,7 +461,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 var finalZ = posZ + z;
                 var finalY = posY + realPos.y;
                 var finalPos = new Vector3(finalX, finalY, finalZ);
-                var mapPos = mapMgr.utilCtrl.RealPos2MapPos(finalPos);
+                var mapPos = mapMgr.utilCtrl.RealPos2MapPosInt(finalPos);
                 if (mapMgr.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
                 {
                     onFind?.Invoke(mapMgr.data.maps[(mapPos.x, mapPos.y, mapPos.z)], finalPos);

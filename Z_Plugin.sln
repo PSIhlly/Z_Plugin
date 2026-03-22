@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVProVideo.Editor", "AVProVideo.Editor.csproj", "{4E661FCC-9208-5F58-D11D-8274C23E27CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerryYellow.CodeAssist.Editor", "MerryYellow.CodeAssist.Editor.csproj", "{0EE0C851-42CD-13D6-D17D-E1925BF83056}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVProVideo.Runtime", "AVProVideo.Runtime.csproj", "{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z_DataSystem", "Z_DataSystem.csproj", "{3428B746-B4AE-5435-B504-CE58C46FCD23}"
@@ -55,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z_String", "Z_String.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVProVideo.Extensions.VisualEffectGraph", "AVProVideo.Extensions.VisualEffectGraph.csproj", "{9DF0EC1E-4065-71AD-F4DB-9827195B11D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z_Audio", "Z_Audio.csproj", "{68B9A014-53CC-FBC1-D66F-7A1C4111124D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,10 +69,6 @@ Global
 		{4E661FCC-9208-5F58-D11D-8274C23E27CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E661FCC-9208-5F58-D11D-8274C23E27CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E661FCC-9208-5F58-D11D-8274C23E27CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -169,6 +165,10 @@ Global
 		{9DF0EC1E-4065-71AD-F4DB-9827195B11D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DF0EC1E-4065-71AD-F4DB-9827195B11D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DF0EC1E-4065-71AD-F4DB-9827195B11D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68B9A014-53CC-FBC1-D66F-7A1C4111124D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68B9A014-53CC-FBC1-D66F-7A1C4111124D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68B9A014-53CC-FBC1-D66F-7A1C4111124D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68B9A014-53CC-FBC1-D66F-7A1C4111124D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

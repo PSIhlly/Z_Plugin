@@ -148,7 +148,7 @@ public class MapManager : Z_MonoManager<MapManager>
     }
     public ObjectUnitForm.Data AddObject(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
-        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
             return null;
@@ -159,13 +159,15 @@ public class MapManager : Z_MonoManager<MapManager>
         foreach (var m in utilCtrl.GetOverlap(oData))
         {
             updateCtrl.objectTileDic.Add(oData.unit, m);
+
         }
         oData.unit.Create();
+        updateCtrl.UpdateSingleOne(oData.unit);
         return oData;
     }
     public ItemUnitForm.Data AddItem(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
-        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
             return null;
@@ -175,11 +177,12 @@ public class MapManager : Z_MonoManager<MapManager>
         iData.pos = realPos;
         updateCtrl.itemTileDic.Add(iData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
         iData.unit.Create();
+        updateCtrl.UpdateSingleOne(iData.unit);
         return iData;
     }
     public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, object[] prms = null)
     {
-        var mapPos = utilCtrl.RealPos2MapPos(realPos);
+        var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
             return null;
@@ -189,6 +192,7 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
         cData.name = name;
         cData.unit.Create();
+        updateCtrl.UpdateSingleOne(cData.unit);
         return cData;
     }
     public void RemoveTile(TileUnitForm.Data form)

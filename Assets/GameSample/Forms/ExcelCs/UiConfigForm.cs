@@ -46,6 +46,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -419,6 +421,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),texName,size,oldPos,posProgress,posTime,tarPos,oldOpacity,opacityProgress,opacityTime,tarOpacity,oldEuler,eulerProgress,eulerTime,tarEuler,removeTime);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                UiConfigForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"",default,default,0f,0f,default,0f,0f,0f,0f,0f,0f,0f,0f,999999f);
@@ -492,37 +499,37 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("texName"),
+                jo.SelectToken("texName")==null?defaultData.texName:jo.Get<string>("texName"),
 
-                jo.Get<Vector2>("size"),
+                jo.SelectToken("size")==null?defaultData.size:jo.Get<Vector2>("size"),
 
-                jo.Get<Vector2>("oldPos"),
+                jo.SelectToken("oldPos")==null?defaultData.oldPos:jo.Get<Vector2>("oldPos"),
 
-                jo.Get<float>("posProgress"),
+                jo.SelectToken("posProgress")==null?defaultData.posProgress:jo.Get<float>("posProgress"),
 
-                jo.Get<float>("posTime"),
+                jo.SelectToken("posTime")==null?defaultData.posTime:jo.Get<float>("posTime"),
 
-                jo.Get<Vector2>("tarPos"),
+                jo.SelectToken("tarPos")==null?defaultData.tarPos:jo.Get<Vector2>("tarPos"),
 
-                jo.Get<float>("oldOpacity"),
+                jo.SelectToken("oldOpacity")==null?defaultData.oldOpacity:jo.Get<float>("oldOpacity"),
 
-                jo.Get<float>("opacityProgress"),
+                jo.SelectToken("opacityProgress")==null?defaultData.opacityProgress:jo.Get<float>("opacityProgress"),
 
-                jo.Get<float>("opacityTime"),
+                jo.SelectToken("opacityTime")==null?defaultData.opacityTime:jo.Get<float>("opacityTime"),
 
-                jo.Get<float>("tarOpacity"),
+                jo.SelectToken("tarOpacity")==null?defaultData.tarOpacity:jo.Get<float>("tarOpacity"),
 
-                jo.Get<float>("oldEuler"),
+                jo.SelectToken("oldEuler")==null?defaultData.oldEuler:jo.Get<float>("oldEuler"),
 
-                jo.Get<float>("eulerProgress"),
+                jo.SelectToken("eulerProgress")==null?defaultData.eulerProgress:jo.Get<float>("eulerProgress"),
 
-                jo.Get<float>("eulerTime"),
+                jo.SelectToken("eulerTime")==null?defaultData.eulerTime:jo.Get<float>("eulerTime"),
 
-                jo.Get<float>("tarEuler"),
+                jo.SelectToken("tarEuler")==null?defaultData.tarEuler:jo.Get<float>("tarEuler"),
 
-                jo.Get<float>("removeTime")
+                jo.SelectToken("removeTime")==null?defaultData.removeTime:jo.Get<float>("removeTime")
                     );
 
             return data;
@@ -531,6 +538,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

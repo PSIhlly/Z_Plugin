@@ -40,6 +40,8 @@ public static readonly int autoUidCnt=1000000;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -237,6 +239,11 @@ public static readonly int autoUidCnt=1000000;
         return new Data(sameId? uid:uidChain.GetId(),mapUnitSize,logicSize,viewSize,mapJa,objectJa,characterJa,itemJa);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                MapMainForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,Vector3.zero,Vector3Int.zero,Vector3Int.zero,"","","","");
@@ -310,21 +317,21 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<Vector3>("mapUnitSize"),
+                jo.SelectToken("mapUnitSize")==null?defaultData.mapUnitSize:jo.Get<Vector3>("mapUnitSize"),
 
-                jo.Get<Vector3Int>("logicSize"),
+                jo.SelectToken("logicSize")==null?defaultData.logicSize:jo.Get<Vector3Int>("logicSize"),
 
-                jo.Get<Vector3Int>("viewSize"),
+                jo.SelectToken("viewSize")==null?defaultData.viewSize:jo.Get<Vector3Int>("viewSize"),
 
-                jo.Get<string>("mapJa"),
+                jo.SelectToken("mapJa")==null?defaultData.mapJa:jo.Get<string>("mapJa"),
 
-                jo.Get<string>("objectJa"),
+                jo.SelectToken("objectJa")==null?defaultData.objectJa:jo.Get<string>("objectJa"),
 
-                jo.Get<string>("characterJa"),
+                jo.SelectToken("characterJa")==null?defaultData.characterJa:jo.Get<string>("characterJa"),
 
-                jo.Get<string>("itemJa")
+                jo.SelectToken("itemJa")==null?defaultData.itemJa:jo.Get<string>("itemJa")
                     );
 
             return data;
@@ -333,6 +340,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

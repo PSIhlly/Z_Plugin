@@ -46,6 +46,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -58,6 +60,8 @@ public static readonly int autoUidCnt=100;
         public static Action<Data,List<SkillType>,List<SkillType>> changeSkilltypesAction;
                 
         public static Action<Data,float,float> changeCdAction;
+                
+        public static Action<Data,float,float> changeLastusetimeAction;
                 
         public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
@@ -176,6 +180,24 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
+                    private float  _lastUseTime;
+                    /// <summary>
+                    ///上次使用时间戳(s)
+                    ///</summary>
+                    public float  lastUseTime{
+                                get{return _lastUseTime;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeLastusetime(this,_lastUseTime,value); 
+                    }
+        
+                _lastUseTime = value;
+                }
+                 
+                     }
+                    
                     private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
                     ///事件
@@ -212,7 +234,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string label,string icon,List<SkillType> skillTypes,float cd,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid)
+            public Data(int uid,string name,string label,string icon,List<SkillType> skillTypes,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid)
             {
 
              this.uid = uid;
@@ -221,6 +243,7 @@ public static readonly int autoUidCnt=100;
              this.icon = icon;
              this.skillTypes = skillTypes;
              this.cd = cd;
+             this.lastUseTime = lastUseTime;
              this.events = events;
              this.triggerConditionUid = triggerConditionUid;
 
@@ -234,18 +257,24 @@ public static readonly int autoUidCnt=100;
              this.icon = data.icon;
              this.skillTypes = data.skillTypes;
              this.cd = data.cd;
+             this.lastUseTime = data.lastUseTime;
              this.events = data.events;
              this.triggerConditionUid = data.triggerConditionUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,icon,new List<SkillType>(skillTypes),cd,new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,icon,new List<SkillType>(skillTypes),cd,lastUseTime,new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                SkillForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",null,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
+                   private static Data _defaultData=new Data(0,"","","",new List<SkillType>(),0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -344,21 +373,23 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("label"),
+                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
 
-                jo.Get<List<SkillType>>("skillTypes"),
+                jo.SelectToken("skillTypes")==null?defaultData.skillTypes:jo.Get<List<SkillType>>("skillTypes"),
 
-                jo.Get<float>("cd"),
+                jo.SelectToken("cd")==null?defaultData.cd:jo.Get<float>("cd"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+                jo.SelectToken("lastUseTime")==null?defaultData.lastUseTime:jo.Get<float>("lastUseTime"),
 
-                jo.Get<int>("triggerConditionUid")
+                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+
+                jo.SelectToken("triggerConditionUid")==null?defaultData.triggerConditionUid:jo.Get<int>("triggerConditionUid")
                     );
 
             return data;
@@ -367,6 +398,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -381,6 +413,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<List<SkillType>>("skillTypes",data.skillTypes);
 
             jo.Set<float>("cd",data.cd);
+
+            jo.Set<float>("lastUseTime",data.lastUseTime);
 
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
@@ -543,6 +577,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeCdAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLastusetime(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLastusetimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

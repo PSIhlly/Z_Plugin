@@ -34,9 +34,9 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
 
 
-            view.btn_fixed.onClick.AddListener(() =>
+            view.btn_collision.onClick.AddListener(() =>
             {
-                model.data.isFixed = !model.data.isFixed;
+                model.data.collision = !model.data.collision;
                 Refresh();
             });
            
@@ -48,7 +48,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         }
         public void Refresh()
         {
-            view.sta_fixed.ChangeState(model.data.isFixed?1:0);
+            view.sta_collision.ChangeState(model.data.collision?1:0);
 
             view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
             view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });

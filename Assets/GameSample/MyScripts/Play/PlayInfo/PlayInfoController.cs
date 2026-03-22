@@ -1,5 +1,6 @@
 using Form;
 using Microsoft.Win32;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Ui;
@@ -8,6 +9,8 @@ using Ui.PlaySceneMain;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using Z_Code;
+using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Debug;
@@ -55,7 +58,7 @@ public interface ExternalPlayInfoController
 {
     public void GainItem(int uid, int amount, bool toast = true, bool message = true);
     public void LostItem(int uid, int amount, bool toast = true, bool message = true);
-    public void ChangeCharacterParam(int characterUid, string name, float value);
+    public void ChangeCharacterParam(int characterUid, string name, object value);
 }
 public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>
 {
@@ -102,7 +105,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         }
     }
 
-    public void ChangeCharacterParam(int characterUid, string name, float value)
+    public void ChangeCharacterParam(int characterUid, string name, object value)
     {
         var data = CharacterProductForm.DataByUid.GetDv(characterUid, null);
         if (data != null)
@@ -110,10 +113,29 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             var prm = data.paramDic.GetDv(name, null);
             if (prm != null)
             {
-                prm.v = Mathf.Min(Mathf.Max(value, prm.min), prm.max);
+                if (value is float num)
+                {
+                    var min = prm.GetMin().num;
+                    var max = prm.GetMax().num;
+                    prm.SetValue(Mathf.Min(Mathf.Max(num, min), max));
+                }
+                else 
+                {
+                    prm.SetValue(value);
+                }
                 Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.ParamChange, data = data, name = name });
             }
+            else
+            {
+
+                Debug.LogError("未找到" + name);
+                data.paramDic[name] = new CharacterParamForm.Data(-1, name, 0, "", "", "",ParamShowType.Hide);
+                data.paramDic[name].SetValue(value);
+
+            }
         }
+        
+
     }
     public void LostItem(int uid, int amount, bool toast = true, bool message = true)
     {
@@ -153,7 +175,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     }
     public void LostItem(string name,int amount ,bool toast = true, bool message = true)
     {
-        var item = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        var item = ItemProductForm.DataByNameProtouid.GetDv((name, 0), null);
         if(item==null)
         {
             return;
@@ -167,13 +189,13 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         if (newItem == null)
             return;
         newItem = newItem.Copy(false);
-        newItem.ToProduct();
+        newItem.ToProduct(uid);
         newItem.amount = amount;
         GainItem(newItem, toast, message);
     }
     public void GainItem(string name,int amount, bool toast = true, bool message = true)
     {
-        var newItem = ItemProductForm.DataByNameIsproto.GetDv((name, true), null);
+        var newItem = ItemProductForm.DataByNameProtouid.GetDv((name, 0), null);
         if (newItem == null)
         {
             return;
@@ -183,10 +205,10 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void GainItem(int uid,bool toast = true, bool message = true)
     {
         var newItem = ItemProductForm.DataByUid[uid];
-        if(newItem.isProto)
+        if(newItem.protoUid==0)
         {
             newItem= newItem.Copy(false);
-            newItem.ToProduct();
+            newItem.ToProduct(newItem.uid);
         }
         GainItem(newItem, toast, message);
     }

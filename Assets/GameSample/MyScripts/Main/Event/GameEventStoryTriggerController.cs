@@ -31,13 +31,20 @@ public class StoryLifeEvent : Z_Event
 {
     public StoryLifeEventType type;
 }
-
-public class GameEventStoryTriggerController : Z_Controller<GameEventController>, IZ_Listener<StoryLifeEvent>, IZ_Listener<StoryItemEvent>, IZ_Listener<StoryCharacterEvent>
+public class CharacterSkillEvent : Z_Event
+{
+    public CharacterProductForm.Data data;
+    public int skillId;
+}
+public class GameEventStoryTriggerController : Z_Controller<GameEventController>, IZ_Listener<StoryLifeEvent>, IZ_Listener<StoryItemEvent>, IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>
 {
 
     public GameEventStoryTriggerController(GameEventController super) : base(super)
     {
         Z_EventHelper.Register<StoryLifeEvent>(this);
+        Z_EventHelper.Register<StoryItemEvent>(this);
+        Z_EventHelper.Register<StoryCharacterEvent>(this);
+        Z_EventHelper.Register<CharacterSkillEvent>(this);
     }
     public void OnEvent(StoryLifeEvent evt)
     {
@@ -79,10 +86,17 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
             case StoryCharacterEventType.ParamChange:
                 _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onCharacterParamChangeEvent", null), 0, heap);
                 _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}$", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.uid}${evt.name}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}$", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}${evt.name}", null), 0, heap);
                 break;
 
         }
+    }
+    public void OnEvent(CharacterSkillEvent evt)
+    {
+        var heap = new Dictionary<string, BoxDataForm.Data>() { { "self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) }};
+        _super.TriggerEventExecute(SkillForm.DataByUid[evt.skillId].events.GetDv("invoke", null), 0, heap);
+
+        
     }
 }

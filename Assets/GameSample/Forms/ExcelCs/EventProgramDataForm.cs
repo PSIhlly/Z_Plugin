@@ -64,6 +64,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -157,6 +159,11 @@ namespace Form
         return new Data(sameId? uid:uidChain.GetId(),name,code,new List<string>(zCode),paramCount,returnValue,category,type);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                EventProgramDataForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","",null,0,"","","");
@@ -280,21 +287,21 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("code"),
+                jo.SelectToken("code")==null?defaultData.code:jo.Get<string>("code"),
 
-                jo.Get<List<string>>("zCode"),
+                jo.SelectToken("zCode")==null?defaultData.zCode:jo.Get<List<string>>("zCode"),
 
-                jo.Get<int>("paramCount"),
+                jo.SelectToken("paramCount")==null?defaultData.paramCount:jo.Get<int>("paramCount"),
 
-                jo.Get<string>("returnValue"),
+                jo.SelectToken("returnValue")==null?defaultData.returnValue:jo.Get<string>("returnValue"),
 
-                jo.Get<string>("category"),
+                jo.SelectToken("category")==null?defaultData.category:jo.Get<string>("category"),
 
-                jo.Get<string>("type")
+                jo.SelectToken("type")==null?defaultData.type:jo.Get<string>("type")
                     );
 
             return data;
@@ -303,6 +310,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

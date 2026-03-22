@@ -46,6 +46,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -419,6 +421,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                ProgressForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg);
@@ -492,37 +499,37 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<float>("seconds"),
+                jo.SelectToken("seconds")==null?defaultData.seconds:jo.Get<float>("seconds"),
 
-                jo.Get<int>("sceneId"),
+                jo.SelectToken("sceneId")==null?defaultData.sceneId:jo.Get<int>("sceneId"),
 
-                jo.Get<Vector3>("pos"),
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector3>("pos"),
 
-                jo.Get<int>("characterUid"),
+                jo.SelectToken("characterUid")==null?defaultData.characterUid:jo.Get<int>("characterUid"),
 
-                jo.Get<List<int>>("bag"),
+                jo.SelectToken("bag")==null?defaultData.bag:jo.Get<List<int>>("bag"),
 
-                jo.Get<List<int>>("team"),
+                jo.SelectToken("team")==null?defaultData.team:jo.Get<List<int>>("team"),
 
-                jo.Get<List<int>>("teamActive"),
+                jo.SelectToken("teamActive")==null?defaultData.teamActive:jo.Get<List<int>>("teamActive"),
 
-                jo.Get<Dictionary<string,string>>("uiStyleImageName"),
+                jo.SelectToken("uiStyleImageName")==null?defaultData.uiStyleImageName:jo.Get<Dictionary<string,string>>("uiStyleImageName"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
-                jo.Get<CameraMode>("cameraMode"),
+                jo.SelectToken("cameraMode")==null?defaultData.cameraMode:jo.Get<CameraMode>("cameraMode"),
 
-                jo.Get<ClipForm.Data>("dialogCache"),
+                jo.SelectToken("dialogCache")==null?defaultData.dialogCache:jo.Get<ClipForm.Data>("dialogCache"),
 
-                jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
+                jo.SelectToken("triggeredOnceEvts")==null?defaultData.triggeredOnceEvts:jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
 
-                jo.Get<bool>("notFirstTime"),
+                jo.SelectToken("notFirstTime")==null?defaultData.notFirstTime:jo.Get<bool>("notFirstTime"),
 
-                jo.Get<int>("blockProgramUid"),
+                jo.SelectToken("blockProgramUid")==null?defaultData.blockProgramUid:jo.Get<int>("blockProgramUid"),
 
-                jo.Get<EditorStyle>("editorStyle")
+                jo.SelectToken("editorStyle")==null?defaultData.editorStyle:jo.Get<EditorStyle>("editorStyle")
                     );
 
             return data;
@@ -531,6 +538,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

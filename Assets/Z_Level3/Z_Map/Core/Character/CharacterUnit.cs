@@ -119,6 +119,10 @@ namespace Z_Map
 
                         foreach (var obj in casts)
                         {
+                            if(obj is ObjectUnit objU&&!objU.data.isObstacle)//ignore no object
+                            {
+                                continue;
+                            }
                             if (existUnit.Contains(obj) || obj == this)
                                 continue;
                             existUnit.Add(obj);

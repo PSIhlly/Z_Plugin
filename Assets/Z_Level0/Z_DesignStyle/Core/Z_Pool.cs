@@ -10,7 +10,10 @@ namespace Z_DesignStyle
         protected HashSet<Obj> activeObjs=new HashSet<Obj>();
 
         public abstract void Clear(Obj obj);
-        public abstract void Destroy();
+        public virtual void Destroy()
+        {
+
+        }
         public abstract Obj New();
         public abstract void Fresh(Obj obj);
         public virtual Obj Get()
@@ -29,5 +32,14 @@ namespace Z_DesignStyle
             Clear(obj);
         }
 
+        public virtual void Clear()
+        {
+            var lst = new List<Obj>(activeObjs);
+            for(int i=0; i< lst.Count; i++)
+            {
+                if (activeObjs.Contains(lst[i]))
+                    Push(lst[i]);
+            }
+        }
     }
 }

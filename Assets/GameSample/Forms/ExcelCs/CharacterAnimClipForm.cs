@@ -46,6 +46,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -155,6 +157,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),new Dictionary<EquipPartType,ItemStyle>(equipStyle),new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),new Dictionary<BodyPartType,string>(partTex));
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                CharacterAnimClipForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,new Dictionary<EquipPartType,ItemStyle>(){},new Dictionary<EquipPartType,(float,float,int,float)>(){},new Dictionary<BodyPartType,string>(){});
@@ -228,13 +235,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<Dictionary<EquipPartType,ItemStyle>>("equipStyle"),
+                jo.SelectToken("equipStyle")==null?defaultData.equipStyle:jo.Get<Dictionary<EquipPartType,ItemStyle>>("equipStyle"),
 
-                jo.Get<Dictionary<EquipPartType,(float,float,int,float)>>("equipTrs"),
+                jo.SelectToken("equipTrs")==null?defaultData.equipTrs:jo.Get<Dictionary<EquipPartType,(float,float,int,float)>>("equipTrs"),
 
-                jo.Get<Dictionary<BodyPartType,string>>("partTex")
+                jo.SelectToken("partTex")==null?defaultData.partTex:jo.Get<Dictionary<BodyPartType,string>>("partTex")
                     );
 
             return data;
@@ -243,6 +250,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

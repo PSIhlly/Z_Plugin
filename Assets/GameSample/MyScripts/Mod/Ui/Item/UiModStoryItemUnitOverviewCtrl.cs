@@ -37,7 +37,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             view.ipt_name.onFinishInput+=(s)=>
             {
                 var lst = new List<string>();
-                foreach(var data in ItemProductForm.DataByNameIsproto.Values)
+                foreach(var data in ItemProductForm.DataByNameProtouid.Values)
                     lst.Add(data.name);
 
                 if(StringHelper.IsUniqueName(lst, s))

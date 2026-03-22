@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_String;
+using Z_Code;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitParameter
 {
@@ -60,21 +61,27 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public override void OnCreate()
         {
 
-            view.ipt_min.onFinishInput += (s) =>
+            view.btn_min.onClick.AddListener(() =>
             {
-                model.data.min = StringHelper.ToFloat(s, 0);
-                Refresh();
-            };
-            view.ipt_value.onFinishInput += (s) =>
+                ModManager.instance.assetCtrl.ChooseBasicCmd(model.data.GetMin(), () =>
+                {
+                    Refresh();
+                });
+            });
+            view.btn_value.onClick.AddListener(() =>
             {
-                model.data.v = StringHelper.ToFloat(s, 0);
-                Refresh();
-            };
-            view.ipt_max.onFinishInput += (s) =>
+                ModManager.instance.assetCtrl.ChooseBasicCmd(model.data.GetValue(), () =>
+                {
+                    Refresh();
+                });
+            });
+            view.btn_max.onClick.AddListener(() =>
             {
-                model.data.max = StringHelper.ToFloat(s, 0);
-                Refresh();
-            };
+                ModManager.instance.assetCtrl.ChooseBasicCmd(model.data.GetMax(), () =>
+                {
+                    Refresh();
+                });
+            });
 
         }
         public override void OnShow()
@@ -86,9 +93,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
 
             view.txt_.text = model.data.name;
-            view.ipt_min.Set(model.data.min.ToString());
-            view.ipt_value.Set(model.data.v.ToString());
-            view.ipt_max.Set(model.data.max.ToString());
+            view.txt_min.text = (model.data.GetMin().GetBoxContent());
+            view.txt_value.text = (model.data.GetValue().GetBoxContent());
+            view.txt_max.text = (model.data.GetMax().GetBoxContent());
         }
     }
 

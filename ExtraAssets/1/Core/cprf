@@ -1,0 +1,2759 @@
+[
+  {
+    "uid": 1,
+    "name": "爱丽丝",
+    "label": "",
+    "avatarTexName": "$i$a4383dd53fe99319f6b689f989a3a03316160e08$i$",
+    "paramDic": [
+      {
+        "k": "速度",
+        "v": {
+          "uid": -1,
+          "name": "速度",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      },
+      {
+        "k": "HP",
+        "v": {
+          "uid": -1,
+          "name": "HP",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 10.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 10.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      }
+    ],
+    "protoUid": 0,
+    "animDic": [
+      {
+        "k": "上闲置",
+        "v": {
+          "uid": 0,
+          "name": "上闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$c2e216dc10efe6bf40b31dd0297f6f4f62acb5b6$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "下闲置",
+        "v": {
+          "uid": 0,
+          "name": "下闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$1853422b7da9a290baa504cd12279888578e6d56$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "左闲置",
+        "v": {
+          "uid": 0,
+          "name": "左闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$341dba3d802ce48e14df94501c94d6877a016cda$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "右闲置",
+        "v": {
+          "uid": 0,
+          "name": "右闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$2b85df35c0862d4e7d0f9c8c37a0b227066e4fd7$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "上奔跑",
+        "v": {
+          "uid": 0,
+          "name": "上奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$7ab0388ef81c6102f0ae955f9be8514f3a228ed1$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$c2e216dc10efe6bf40b31dd0297f6f4f62acb5b6$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$7ab0388ef81c6102f0ae955f9be8514f3a228ed1$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "下奔跑",
+        "v": {
+          "uid": 0,
+          "name": "下奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$1853422b7da9a290baa504cd12279888578e6d56$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$1e5203acfbc90b1b92da6d0927e4ba4a7f2c7456$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$9d7bce98794c371f89f0fd89e7a5c8b101eddfd3$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "左奔跑",
+        "v": {
+          "uid": 0,
+          "name": "左奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$341dba3d802ce48e14df94501c94d6877a016cda$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$624ce05061bdf08e6c9aa966f6993795ba198758$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$5a669cf58e4c49975cd0db308797daa340874b68$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "右奔跑",
+        "v": {
+          "uid": 0,
+          "name": "右奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$c3ea47e1ce51762ea200781b76dc74c54e82ef55$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$2b85df35c0862d4e7d0f9c8c37a0b227066e4fd7$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$205a1c205a742809405bbba203e7ed076ce11737$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      }
+    ],
+    "defaultAnimName": [
+      {
+        "k": "idle",
+        "v": "anim"
+      },
+      {
+        "k": "move",
+        "v": "anim"
+      },
+      {
+        "k": "idle0",
+        "v": "上闲置"
+      },
+      {
+        "k": "move0",
+        "v": "上奔跑"
+      },
+      {
+        "k": "idle1",
+        "v": "下闲置"
+      },
+      {
+        "k": "move1",
+        "v": "下奔跑"
+      },
+      {
+        "k": "idle2",
+        "v": "左闲置"
+      },
+      {
+        "k": "move2",
+        "v": "左奔跑"
+      },
+      {
+        "k": "idle3",
+        "v": "右闲置"
+      },
+      {
+        "k": "move3",
+        "v": "右奔跑"
+      }
+    ],
+    "faceType": 1,
+    "speedParamName": "速度",
+    "hpParamName": "",
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": "碰爱丽丝"
+            }
+          ],
+          "type": 1
+        }
+      },
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [
+            {
+              "v": "爱丽丝行为"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [],
+          "type": 0
+        }
+      }
+    ],
+    "equips": [],
+    "desc": "",
+    "tachie": "$i$9e26bf9362e93bc03a267667765298ae28b46b7a$i$",
+    "unique": false,
+    "skill": []
+  },
+  {
+    "uid": 2,
+    "name": "十六夜咲夜",
+    "label": "",
+    "avatarTexName": "$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$",
+    "paramDic": [
+      {
+        "k": "速度",
+        "v": {
+          "uid": 1,
+          "name": "速度",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      },
+      {
+        "k": "HP",
+        "v": {
+          "uid": -1,
+          "name": "HP",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 2.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 2.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      }
+    ],
+    "protoUid": 0,
+    "animDic": [
+      {
+        "k": "上闲置",
+        "v": {
+          "uid": 0,
+          "name": "上闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$3b158ef98107e90996a0c16c3ffddae48584aab2$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "下闲置",
+        "v": {
+          "uid": 0,
+          "name": "下闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$ae673ff502aa0bfd97bcf9744b3e950332665a09$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "左闲置",
+        "v": {
+          "uid": 0,
+          "name": "左闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$4e8e7ca16513b359f5ec6bd4cf6da5c4a2461b18$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "右闲置",
+        "v": {
+          "uid": 0,
+          "name": "右闲置",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$938e194690605b9cc93e049274cb2617c3adecab$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "上奔跑",
+        "v": {
+          "uid": 0,
+          "name": "上奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$5a9d4972ab54aca4fc200e98113d9d1c63f78a8c$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$3b158ef98107e90996a0c16c3ffddae48584aab2$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$ef0d48bdb2f0a1a55c5236475741d036413e2668$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "下奔跑",
+        "v": {
+          "uid": 0,
+          "name": "下奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$ae673ff502aa0bfd97bcf9744b3e950332665a09$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$529c6092b3020b4427675d5cf7805f764fabb58f$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$76bbaccf9d7c8d7ec5754895398531908f290a92$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "左奔跑",
+        "v": {
+          "uid": 0,
+          "name": "左奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$5c5b886e5d229cf64f332ddd4e3d2cfa8c2a2d97$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$4e8e7ca16513b359f5ec6bd4cf6da5c4a2461b18$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$08a520acf1616759c952324971e3936351b6b5af$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      },
+      {
+        "k": "右奔跑",
+        "v": {
+          "uid": 0,
+          "name": "右奔跑",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$c199cd6cc9f6956bef3c759619211be116abb6b4$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$938e194690605b9cc93e049274cb2617c3adecab$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$09fc7ef4fea293ae52e301010c693378af44645b$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      }
+    ],
+    "defaultAnimName": [
+      {
+        "k": "idle",
+        "v": "anim"
+      },
+      {
+        "k": "move",
+        "v": "anim"
+      },
+      {
+        "k": "idle0",
+        "v": "上闲置"
+      },
+      {
+        "k": "move0",
+        "v": "上奔跑"
+      },
+      {
+        "k": "idle1",
+        "v": "下闲置"
+      },
+      {
+        "k": "move1",
+        "v": "下奔跑"
+      },
+      {
+        "k": "idle2",
+        "v": "左闲置"
+      },
+      {
+        "k": "move2",
+        "v": "左奔跑"
+      },
+      {
+        "k": "idle3",
+        "v": "右闲置"
+      },
+      {
+        "k": "move3",
+        "v": "右奔跑"
+      }
+    ],
+    "faceType": 1,
+    "speedParamName": "速度",
+    "hpParamName": "",
+    "events": [],
+    "equips": [],
+    "desc": "",
+    "tachie": "$i$2b0e6709db9983318d6585aa7fa80fc743dce608$i$",
+    "unique": true,
+    "skill": [
+      {
+        "k": 0,
+        "v": 1
+      }
+    ]
+  }
+]

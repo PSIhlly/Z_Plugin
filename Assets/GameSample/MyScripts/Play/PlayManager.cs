@@ -130,7 +130,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         foreach (var uid in progress.bag)
         {
             var newItem = ItemProductForm.DataByUid[uid].Copy(false);
-            newItem.ToProduct();
+            newItem.ToProduct(uid);
             items.Add(newItem.uid);
         }
         var characters = new List<int>();
@@ -143,7 +143,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
             if (!ch.unique)
             {
                 var newCharacter = ch.Copy(false);
-                newCharacter.ToProduct();
+                newCharacter.ToProduct(uid);
 
                 characters.Add(newCharacter.uid);
                 foreach (var uidActive in progress.teamActive)

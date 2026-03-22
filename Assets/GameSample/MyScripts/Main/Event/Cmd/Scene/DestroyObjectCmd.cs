@@ -26,7 +26,12 @@ namespace Z_Code
         public override CmdBase GetNew() => new DestroyObjectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var unit = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)].unit;
+            var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT), null);
+            if (data == null)
+            {
+                return true;
+            }
+            var unit = data.unit;
             if (unit is ObjectUnit o)
             {
                 MapManager.instance.RemoveObject(o.data);
@@ -37,8 +42,8 @@ namespace Z_Code
             }
             else if (unit is CharacterUnit c)
             {
-                var form=CharacterProductForm.DataByUid.GetDv(c.productInfo.Item1,null);
-                if(form!=null&&!form.unique)
+                var form = CharacterProductForm.DataByUid.GetDv(c.productInfo.Item1, null);
+                if (form != null && !form.unique)
                 {
                     CharacterProductForm.RemoveData(form.uid);
                     MapManager.instance.RemoveCharacter(c.data);

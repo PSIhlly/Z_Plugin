@@ -40,6 +40,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -215,6 +217,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPictureName,mainVideoName,profilePictureName,mainAudioName);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                ClipForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","","","","","");
@@ -288,19 +295,19 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("title"),
+                jo.SelectToken("title")==null?defaultData.title:jo.Get<string>("title"),
 
-                jo.Get<string>("mainText"),
+                jo.SelectToken("mainText")==null?defaultData.mainText:jo.Get<string>("mainText"),
 
-                jo.Get<string>("mainPictureName"),
+                jo.SelectToken("mainPictureName")==null?defaultData.mainPictureName:jo.Get<string>("mainPictureName"),
 
-                jo.Get<string>("mainVideoName"),
+                jo.SelectToken("mainVideoName")==null?defaultData.mainVideoName:jo.Get<string>("mainVideoName"),
 
-                jo.Get<string>("profilePictureName"),
+                jo.SelectToken("profilePictureName")==null?defaultData.profilePictureName:jo.Get<string>("profilePictureName"),
 
-                jo.Get<string>("mainAudioName")
+                jo.SelectToken("mainAudioName")==null?defaultData.mainAudioName:jo.Get<string>("mainAudioName")
                     );
 
             return data;
@@ -309,6 +316,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

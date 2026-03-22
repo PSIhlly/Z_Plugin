@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using Z_Audio;
 using Z_Code;
+using Z_Code.Form;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Input;
@@ -30,10 +32,10 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             CharacterParamForm.Clear();
             CharacterProductForm.Clear();
             ModManager.instance.assetCtrl.CreateCharacter("Player");
-            var player = CharacterProductForm.DataByNameIsproto[("Player", true)];
+            var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid}, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle);
+            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle);
             ProgressForm.AddData(progress);
             var data = new GameMapData();
             data.Init();
@@ -48,13 +50,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                     ModManager.instance.assetCtrl.CreateEvent("mainDialog", "enterGame", "dialog");
                     var dialogEvt = EventProgramDataForm.DataByName["mainDialog"];
                     dialogEvt.ApplyCode(@"ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");GameOver();");
-                        
+
                     progress.events["onBeginEvent"] = new EventTriggerForm.Data(-1, "onBeginEvent", new List<string>() { "mainDialog" }, default);
                     break;
                 case EditorStyle.Rpg:
                 case EditorStyle.RpgAdvanced:
-                    var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, 0f, 100f, 100f, 0, ParamShowType.AlwaysWithPanel);
-                    var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, 0f, 5f, 5f, 0, default);
+                    var prmBox = CodeHelper.CreateBoxByNum(100);
+                    var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), BoxDataForm.GetJoByData(prmBox).ToString(), ParamShowType.AlwaysWithPanel);
+                    prmBox.num = 5;
+                    var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), BoxDataForm.GetJoByData(prmBox).ToString(), default);
                     CharacterParamForm.AddData(hpParamData);
                     CharacterParamForm.AddData(speedParamData);
                     player.hpParamName = "Hp";
@@ -102,6 +106,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         }
         ProgressForm.Clear();
         GameManager.instance.curStory = null;
+
+        AudioManager.instance.BgmStreaming(GlobalSettings.BGM_FILE_NAME);
     }
     #endregion
 

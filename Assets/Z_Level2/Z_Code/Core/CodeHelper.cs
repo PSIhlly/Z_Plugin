@@ -43,7 +43,14 @@ namespace Z_Code
         {
             return new BoxDataForm.Data(-1, null, null, num, new Dictionary<string, BoxDataForm.Data>());
         }
-
+        public static string GetBoxContent(this BoxDataForm.Data data)
+        {
+            if(data.str==null)
+            {
+                return data.num.ToString();
+            }
+            return data.str;
+        }
 
     }
 

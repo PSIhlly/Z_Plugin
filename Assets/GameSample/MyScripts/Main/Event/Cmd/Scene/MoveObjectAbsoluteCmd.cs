@@ -31,17 +31,12 @@ namespace Z_Code
             GameManager.instance.evtCtrl.StartTask(() =>
             {
                 var pos = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
-                var time = prm[2].num;
+                var time = Mathf.Max(0.0001f, prm[2].num);
                 var oldPos = data.pos;
                 var step = Mathf.Min(1,Time.deltaTime / time) * (pos - oldPos)+ oldPos;
 
 
-                if (time <= 0)
-                {
-                    asyncTask.Complete();
-                    return true;
-                }
-                else
+
                 {
                     if (data.unit is ObjectUnit o)
                     {
@@ -49,6 +44,11 @@ namespace Z_Code
                     }
                 }
                 prm[2].num -= Time.deltaTime;
+                if (prm[2].num <= 0)
+                {
+                    asyncTask.Complete();
+                    return true;
+                }
                 return false;
             });
 

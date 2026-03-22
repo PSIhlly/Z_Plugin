@@ -60,7 +60,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             labCon.Refresh();
 
             itemCon.Clear();
-            var datas = model.lab == null || !CharacterProductForm.DatasByLabelIsproto.ContainsKey((model.lab, true)) ?( CharacterProductForm.DatasByIsproto.ContainsKey(true)?CharacterProductForm.DatasByIsproto[true]:new List<CharacterProductForm.Data>() ): CharacterProductForm.DatasByLabelIsproto[(model.lab, true)];
+            var datas = model.lab == null || !CharacterProductForm.DatasByLabelProtouid.ContainsKey((model.lab, 0)) ?( CharacterProductForm.DatasByProtouid.ContainsKey(0)?CharacterProductForm.DatasByProtouid[0]:new List<CharacterProductForm.Data>() ): CharacterProductForm.DatasByLabelProtouid[(model.lab, 0)];
             foreach (var data in datas)
             {
                 itemCon.Add(new UiBigItemParam()

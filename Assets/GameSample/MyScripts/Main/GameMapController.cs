@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Z_ByteSerialize;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -832,7 +833,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             ins.renderers[i].SetPropertyBlock(propBlock);
         }
     }
-
+    public void RegisterObject(ObjectUnitForm.Data newObjectData,MapObjectForm.Data objectData)
+    {
+        newObjectData.unit.productInfo = (objectData.id, -1);
+        newObjectData.unit.paramInfo = new Dictionary<string, MapObjectParamForm.Data>(objectData.paramDic);
+        newObjectData.isObstacle = objectData.collision;
+    }
     public void OnEvent(TileEvent evt)
     {
         switch (evt.type)

@@ -303,11 +303,18 @@ namespace {self.file_namespace}
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 {self.declare_change_action}
 
 {self.data_declare}
         {{
 {self.declare_str}
+            public {"virtual" if self.extend_data_str == '' else "override"}  void BeforeGet()
+            {{
+                {"" if self.extend_data_str == '' else "base.BeforeGet();"}
+                {self.name}Form.beforeGetAction?.Invoke(this);
+            }}
         }}
 {self.default_content_str}
 {self.dic_str}
@@ -368,6 +375,7 @@ namespace {self.file_namespace}
         public static JObject GetJoByData(Data data)
         {{
             Init();
+            data.BeforeGet();
 {self.serialize_str}
             return jo;
         }}

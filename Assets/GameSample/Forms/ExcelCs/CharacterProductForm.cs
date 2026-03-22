@@ -40,7 +40,7 @@ namespace Form
 
             ProductForm.changeLabelAction+=ChangeLabel;
 
-            ProductForm.changeIsprotoAction+=ChangeIsproto;
+            ProductForm.changeProtouidAction+=ChangeProtouid;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -60,6 +60,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -71,7 +73,7 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,CharacterParamForm.Data>,Dictionary<string,CharacterParamForm.Data>> changeParamdicAction;
                 
-        public static Action<Data,bool,bool> changeIsprotoAction;
+        public static Action<Data,int,int> changeProtouidAction;
                 
         public static Action<Data,Dictionary<string,CharacterAnimForm.Data>,Dictionary<string,CharacterAnimForm.Data>> changeAnimdicAction;
                 
@@ -334,11 +336,11 @@ namespace Form
                  
                      }
                     
-            public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.isProto)
+            public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,bool isProto,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique,Dictionary<SkillType,int> skill):base(uid,name,label,isProto)
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique,Dictionary<SkillType,int> skill):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -346,7 +348,7 @@ namespace Form
              this.label = label;
              this.avatarTexName = avatarTexName;
              this.paramDic = paramDic;
-             this.isProto = isProto;
+             this.protoUid = protoUid;
              this.animDic = animDic;
              this.defaultAnimName = defaultAnimName;
              this.faceType = faceType;
@@ -368,7 +370,7 @@ namespace Form
              this.label = data.label;
              this.avatarTexName = data.avatarTexName;
              this.paramDic = data.paramDic;
-             this.isProto = data.isProto;
+             this.protoUid = data.protoUid;
              this.animDic = data.animDic;
              this.defaultAnimName = data.defaultAnimName;
              this.faceType = data.faceType;
@@ -384,12 +386,17 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),isProto,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique,new Dictionary<SkillType,int>(skill));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique,new Dictionary<SkillType,int>(skill));
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                CharacterProductForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},false,null,new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false,null);
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false,new Dictionary<SkillType,int>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -403,13 +410,13 @@ namespace Form
                 }
             }
     
-            static Dictionary<(string,bool), List<Data>> _DatasByLabelIsproto;
-            public static Dictionary<(string,bool), List<Data>> DatasByLabelIsproto
+            static Dictionary<(string,int), List<Data>> _DatasByLabelProtouid;
+            public static Dictionary<(string,int), List<Data>> DatasByLabelProtouid
             {
                 get
                 {
                     Init();
-                    return _DatasByLabelIsproto;
+                    return _DatasByLabelProtouid;
                 }
             }
     
@@ -423,23 +430,23 @@ namespace Form
                 }
             }
     
-            static Dictionary<bool, List<Data>> _DatasByIsproto;
-            public static Dictionary<bool, List<Data>> DatasByIsproto
+            static Dictionary<int, List<Data>> _DatasByProtouid;
+            public static Dictionary<int, List<Data>> DatasByProtouid
             {
                 get
                 {
                     Init();
-                    return _DatasByIsproto;
+                    return _DatasByProtouid;
                 }
             }
     
-            static Dictionary<(string,bool), Data> _DataByNameIsproto;
-            public static Dictionary<(string,bool), Data> DataByNameIsproto
+            static Dictionary<(string,int), Data> _DataByNameProtouid;
+            public static Dictionary<(string,int), Data> DataByNameProtouid
             {
                 get
                 {
                     Init();
-                    return _DataByNameIsproto;
+                    return _DataByNameProtouid;
                 }
             }
     
@@ -461,11 +468,11 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByNameIsproto = new Dictionary<(string,bool), Data>() {
+                    _DataByNameProtouid = new Dictionary<(string,int), Data>() {
     
                     };
     
-                    _DatasByLabelIsproto = new Dictionary<(string,bool), List<Data>>() {
+                    _DatasByLabelProtouid = new Dictionary<(string,int), List<Data>>() {
     
                 };
 
@@ -473,7 +480,7 @@ namespace Form
     
                 };
 
-                    _DatasByIsproto = new Dictionary<bool, List<Data>>() {
+                    _DatasByProtouid = new Dictionary<int, List<Data>>() {
     
                 };
 
@@ -524,39 +531,39 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("label"),
+                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.Get<string>("avatarTexName"),
+                jo.SelectToken("avatarTexName")==null?defaultData.avatarTexName:jo.Get<string>("avatarTexName"),
 
-                jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDic"),
+                jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDic"),
 
-                jo.Get<bool>("isProto"),
+                jo.SelectToken("protoUid")==null?defaultData.protoUid:jo.Get<int>("protoUid"),
 
-                jo.Get<Dictionary<string,CharacterAnimForm.Data>>("animDic"),
+                jo.SelectToken("animDic")==null?defaultData.animDic:jo.Get<Dictionary<string,CharacterAnimForm.Data>>("animDic"),
 
-                jo.Get<Dictionary<string,string>>("defaultAnimName"),
+                jo.SelectToken("defaultAnimName")==null?defaultData.defaultAnimName:jo.Get<Dictionary<string,string>>("defaultAnimName"),
 
-                jo.Get<FaceType>("faceType"),
+                jo.SelectToken("faceType")==null?defaultData.faceType:jo.Get<FaceType>("faceType"),
 
-                jo.Get<string>("speedParamName"),
+                jo.SelectToken("speedParamName")==null?defaultData.speedParamName:jo.Get<string>("speedParamName"),
 
-                jo.Get<string>("hpParamName"),
+                jo.SelectToken("hpParamName")==null?defaultData.hpParamName:jo.Get<string>("hpParamName"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
-                jo.Get<Dictionary<EquipPartType,int>>("equips"),
+                jo.SelectToken("equips")==null?defaultData.equips:jo.Get<Dictionary<EquipPartType,int>>("equips"),
 
-                jo.Get<string>("desc"),
+                jo.SelectToken("desc")==null?defaultData.desc:jo.Get<string>("desc"),
 
-                jo.Get<string>("tachie"),
+                jo.SelectToken("tachie")==null?defaultData.tachie:jo.Get<string>("tachie"),
 
-                jo.Get<bool>("unique"),
+                jo.SelectToken("unique")==null?defaultData.unique:jo.Get<bool>("unique"),
 
-                jo.Get<Dictionary<SkillType,int>>("skill")
+                jo.SelectToken("skill")==null?defaultData.skill:jo.Get<Dictionary<SkillType,int>>("skill")
                     );
 
             return data;
@@ -565,6 +572,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -578,7 +586,7 @@ namespace Form
 
             jo.Set<Dictionary<string,CharacterParamForm.Data>>("paramDic",data.paramDic);
 
-            jo.Set<bool>("isProto",data.isProto);
+            jo.Set<int>("protoUid",data.protoUid);
 
             jo.Set<Dictionary<string,CharacterAnimForm.Data>>("animDic",data.animDic);
 
@@ -622,19 +630,19 @@ namespace Form
 
         DataByUid[data.uid]=data;
     
-                    DataByNameIsproto[(data.name,data.isProto)]=data;
+                    DataByNameProtouid[(data.name,data.protoUid)]=data;
     
-                    if(!DatasByLabelIsproto.ContainsKey((data.label,data.isProto)))
-                        DatasByLabelIsproto[(data.label,data.isProto)]=new List<Data>();
-                    DatasByLabelIsproto[(data.label,data.isProto)].Add(data);
+                    if(!DatasByLabelProtouid.ContainsKey((data.label,data.protoUid)))
+                        DatasByLabelProtouid[(data.label,data.protoUid)]=new List<Data>();
+                    DatasByLabelProtouid[(data.label,data.protoUid)].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
                     DatasByLabel[data.label].Add(data);
     
-                    if(!DatasByIsproto.ContainsKey(data.isProto))
-                        DatasByIsproto[data.isProto]=new List<Data>();
-                    DatasByIsproto[data.isProto].Add(data);
+                    if(!DatasByProtouid.ContainsKey(data.protoUid))
+                        DatasByProtouid[data.protoUid]=new List<Data>();
+                    DatasByProtouid[data.protoUid].Add(data);
     
 ProductForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -651,19 +659,19 @@ ProductForm.AddData(data);
 
                     DataByUid.Remove(data.uid);
     
-                    DataByNameIsproto.Remove((data.name,data.isProto));
+                    DataByNameProtouid.Remove((data.name,data.protoUid));
     
-                    DatasByLabelIsproto[(data.label,data.isProto)].Remove(data);
-                    if(DatasByLabelIsproto[(data.label,data.isProto)].Count==0)
-                        DatasByLabelIsproto.Remove((data.label,data.isProto));
+                    DatasByLabelProtouid[(data.label,data.protoUid)].Remove(data);
+                    if(DatasByLabelProtouid[(data.label,data.protoUid)].Count==0)
+                        DatasByLabelProtouid.Remove((data.label,data.protoUid));
     
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
                         DatasByLabel.Remove(data.label);
     
-                    DatasByIsproto[data.isProto].Remove(data);
-                    if(DatasByIsproto[data.isProto].Count==0)
-                        DatasByIsproto.Remove(data.isProto);
+                    DatasByProtouid[data.protoUid].Remove(data);
+                    if(DatasByProtouid[data.protoUid].Count==0)
+                        DatasByProtouid.Remove(data.protoUid);
     
 ProductForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -724,8 +732,8 @@ ProductForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
-                    DataByNameIsproto.Remove((oldV,data.isProto));
-                    DataByNameIsproto[(newV,data.isProto)]=data;
+                    DataByNameProtouid.Remove((oldV,data.protoUid));
+                    DataByNameProtouid[(newV,data.protoUid)]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
@@ -744,12 +752,12 @@ ProductForm.RemoveData(uid);
                         DatasByLabel[newV]=new List<Data>();
                     DatasByLabel[newV].Add(data);
  
-                    DatasByLabelIsproto[(oldV,data.isProto)].Remove(data);
-                    if(DatasByLabelIsproto[(oldV,data.isProto)].Count==0)
-                        DatasByLabelIsproto.Remove((oldV,data.isProto));
-                    if(!DatasByLabelIsproto.ContainsKey((newV,data.isProto)))
-                        DatasByLabelIsproto[(newV,data.isProto)]=new List<Data>();
-                    DatasByLabelIsproto[(newV,data.isProto)].Add(data);
+                    DatasByLabelProtouid[(oldV,data.protoUid)].Remove(data);
+                    if(DatasByLabelProtouid[(oldV,data.protoUid)].Count==0)
+                        DatasByLabelProtouid.Remove((oldV,data.protoUid));
+                    if(!DatasByLabelProtouid.ContainsKey((newV,data.protoUid)))
+                        DatasByLabelProtouid[(newV,data.protoUid)]=new List<Data>();
+                    DatasByLabelProtouid[(newV,data.protoUid)].Add(data);
  
                 changeLabelAction?.Invoke(data,oldV,newV);
                 }
@@ -776,29 +784,29 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeIsproto(ProductForm.Data superData,bool oldV,bool newV)
+            public static void ChangeProtouid(ProductForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                    DatasByIsproto[oldV].Remove(data);
-                    if(DatasByIsproto[oldV].Count==0)
-                        DatasByIsproto.Remove(oldV);
-                    if(!DatasByIsproto.ContainsKey(newV))
-                        DatasByIsproto[newV]=new List<Data>();
-                    DatasByIsproto[newV].Add(data);
+                    DatasByProtouid[oldV].Remove(data);
+                    if(DatasByProtouid[oldV].Count==0)
+                        DatasByProtouid.Remove(oldV);
+                    if(!DatasByProtouid.ContainsKey(newV))
+                        DatasByProtouid[newV]=new List<Data>();
+                    DatasByProtouid[newV].Add(data);
  
-                    DataByNameIsproto.Remove((data.name,oldV));
-                    DataByNameIsproto[(data.name,newV)]=data;
+                    DataByNameProtouid.Remove((data.name,oldV));
+                    DataByNameProtouid[(data.name,newV)]=data;
  
-                    DatasByLabelIsproto[(data.label,oldV)].Remove(data);
-                    if(DatasByLabelIsproto[(data.label,oldV)].Count==0)
-                        DatasByLabelIsproto.Remove((data.label,oldV));
-                    if(!DatasByLabelIsproto.ContainsKey((data.label,newV)))
-                        DatasByLabelIsproto[(data.label,newV)]=new List<Data>();
-                    DatasByLabelIsproto[(data.label,newV)].Add(data);
+                    DatasByLabelProtouid[(data.label,oldV)].Remove(data);
+                    if(DatasByLabelProtouid[(data.label,oldV)].Count==0)
+                        DatasByLabelProtouid.Remove((data.label,oldV));
+                    if(!DatasByLabelProtouid.ContainsKey((data.label,newV)))
+                        DatasByLabelProtouid[(data.label,newV)]=new List<Data>();
+                    DatasByLabelProtouid[(data.label,newV)].Add(data);
  
-                changeIsprotoAction?.Invoke(data,oldV,newV);
+                changeProtouidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

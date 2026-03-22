@@ -40,6 +40,8 @@ public static readonly int autoIdCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -369,6 +371,11 @@ public static readonly int autoIdCnt=100;
         return new Data(sameId? id:idChain.GetId(),itemId,damage,prefabName,magazineCapacity,cdTime,reloadTime,speed,range,attackPos,attackDir,selfHurt,accuracy,bulletsPer);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                WeaponBulletForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,0,0,"",0,0f,0f,0f,0f,Vector3.zero,Vector3.zero,false,0f,0);
@@ -442,33 +449,33 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<int>("itemId"),
+                jo.SelectToken("itemId")==null?defaultData.itemId:jo.Get<int>("itemId"),
 
-                jo.Get<int>("damage"),
+                jo.SelectToken("damage")==null?defaultData.damage:jo.Get<int>("damage"),
 
-                jo.Get<string>("prefabName"),
+                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.Get<int>("magazineCapacity"),
+                jo.SelectToken("magazineCapacity")==null?defaultData.magazineCapacity:jo.Get<int>("magazineCapacity"),
 
-                jo.Get<float>("cdTime"),
+                jo.SelectToken("cdTime")==null?defaultData.cdTime:jo.Get<float>("cdTime"),
 
-                jo.Get<float>("reloadTime"),
+                jo.SelectToken("reloadTime")==null?defaultData.reloadTime:jo.Get<float>("reloadTime"),
 
-                jo.Get<float>("speed"),
+                jo.SelectToken("speed")==null?defaultData.speed:jo.Get<float>("speed"),
 
-                jo.Get<float>("range"),
+                jo.SelectToken("range")==null?defaultData.range:jo.Get<float>("range"),
 
-                jo.Get<Vector3>("attackPos"),
+                jo.SelectToken("attackPos")==null?defaultData.attackPos:jo.Get<Vector3>("attackPos"),
 
-                jo.Get<Vector3>("attackDir"),
+                jo.SelectToken("attackDir")==null?defaultData.attackDir:jo.Get<Vector3>("attackDir"),
 
-                jo.Get<bool>("selfHurt"),
+                jo.SelectToken("selfHurt")==null?defaultData.selfHurt:jo.Get<bool>("selfHurt"),
 
-                jo.Get<float>("accuracy"),
+                jo.SelectToken("accuracy")==null?defaultData.accuracy:jo.Get<float>("accuracy"),
 
-                jo.Get<int>("bulletsPer")
+                jo.SelectToken("bulletsPer")==null?defaultData.bulletsPer:jo.Get<int>("bulletsPer")
                     );
 
             return data;
@@ -477,6 +484,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

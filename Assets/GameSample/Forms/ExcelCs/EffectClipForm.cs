@@ -46,6 +46,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -243,6 +245,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),tex,time,pos,rot,scale,opacity,transition);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                EffectClipForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"",0f,Vector3.zero,0f,Vector3.one,1f,false);
@@ -316,21 +323,21 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("tex"),
+                jo.SelectToken("tex")==null?defaultData.tex:jo.Get<string>("tex"),
 
-                jo.Get<float>("time"),
+                jo.SelectToken("time")==null?defaultData.time:jo.Get<float>("time"),
 
-                jo.Get<Vector3>("pos"),
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector3>("pos"),
 
-                jo.Get<float>("rot"),
+                jo.SelectToken("rot")==null?defaultData.rot:jo.Get<float>("rot"),
 
-                jo.Get<Vector3>("scale"),
+                jo.SelectToken("scale")==null?defaultData.scale:jo.Get<Vector3>("scale"),
 
-                jo.Get<float>("opacity"),
+                jo.SelectToken("opacity")==null?defaultData.opacity:jo.Get<float>("opacity"),
 
-                jo.Get<bool>("transition")
+                jo.SelectToken("transition")==null?defaultData.transition:jo.Get<bool>("transition")
                     );
 
             return data;
@@ -339,6 +346,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

@@ -60,6 +60,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -71,7 +73,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeLabelAction;
                 
-        public static Action<Data,bool,bool> changeIsfixedAction;
+        public static Action<Data,bool,bool> changeCollisionAction;
                 
         public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
@@ -100,20 +102,20 @@ namespace Form
                  
                      }
                     
-                    private bool  _isFixed;
+                    private bool  _collision;
                     /// <summary>
-                    ///¹Ì¶¨
+                    ///Åö×²
                     ///</summary>
-                    public bool  isFixed{
-                                get{return _isFixed;}
+                    public bool  collision{
+                                get{return _collision;}
  set{
 
                     if(_DataById!=null&&_DataById.ContainsValue(this))
                     {
-                       ChangeIsfixed(this,_isFixed,value); 
+                       ChangeCollision(this,_collision,value); 
                     }
         
-                _isFixed = value;
+                _collision = value;
                 }
                  
                      }
@@ -158,7 +160,7 @@ namespace Form
             {
             }
             
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool isFixed,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic):base(id,name,icon,label)
+            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -166,7 +168,7 @@ namespace Form
              this.icon = icon;
              this.model = model;
              this.label = label;
-             this.isFixed = isFixed;
+             this.collision = collision;
              this.events = events;
              this.paramDic = paramDic;
 
@@ -179,19 +181,24 @@ namespace Form
              this.icon = data.icon;
              this.model = data.model;
              this.label = data.label;
-             this.isFixed = data.isFixed;
+             this.collision = data.collision;
              this.events = data.events;
              this.paramDic = data.paramDic;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,isFixed,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<string,MapObjectParamForm.Data>(paramDic));
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,collision,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<string,MapObjectParamForm.Data>(paramDic));
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                MapObjectForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -306,21 +313,21 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
 
-                jo.Get<MapModelForm.Data>("model"),
+                jo.SelectToken("model")==null?defaultData.model:jo.Get<MapModelForm.Data>("model"),
 
-                jo.Get<string>("label"),
+                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.Get<bool>("isFixed"),
+                jo.SelectToken("collision")==null?defaultData.collision:jo.Get<bool>("collision"),
 
-                jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
-                jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic")
+                jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic")
                     );
 
             return data;
@@ -329,6 +336,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -342,7 +350,7 @@ namespace Form
 
             jo.Set<string>("label",data.label);
 
-            jo.Set<bool>("isFixed",data.isFixed);
+            jo.Set<bool>("collision",data.collision);
 
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
@@ -499,12 +507,12 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeIsfixed(Data superData,bool oldV,bool newV)
+            public static void ChangeCollision(Data superData,bool oldV,bool newV)
             {
                 if(superData is Data data)
                 {
 
-                changeIsfixedAction?.Invoke(data,oldV,newV);
+                changeCollisionAction?.Invoke(data,oldV,newV);
                 }
                     
             }

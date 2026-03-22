@@ -49,10 +49,15 @@ namespace Z_Map
 
             return _super.data.maps.ContainsKey((x, y, z));
         }
-        public Vector3Int RealPos2MapPos(Vector3 pos)
+        public Vector3Int RealPos2MapPosInt(Vector3 pos)
         {
             pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
             return new Vector3Int((int)Math.Round(pos.x), (int)(pos.y), (int)Math.Round(pos.z));
+        }
+        public Vector3 RealPos2MapPos(Vector3 pos)
+        {
+            pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
+            return pos;
         }
         public Vector3 MapPos2RealPos(Vector3 pos)
         {
@@ -66,7 +71,7 @@ namespace Z_Map
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {
             var newPos = SearchClosedValid(MapPos2RealPos(pos));
-            return RealPos2MapPos(newPos);
+            return RealPos2MapPosInt(newPos);
         }
         public Vector3 GetClosestInArea(Vector3 pos)
         {
@@ -76,7 +81,7 @@ namespace Z_Map
         private Vector3 SearchClosedValid(Vector3 pos)
         {
 
-            Vector3Int mapPos = RealPos2MapPos(pos);
+            Vector3Int mapPos = RealPos2MapPosInt(pos);
             //groundFirst
             int floor = -1;
             if (_super.data.mapXZ2Y.ContainsKey((mapPos.x, mapPos.z)))
@@ -197,11 +202,11 @@ namespace Z_Map
                 var pos = c.transform.position;
                 if (c is BoxCollider box)
                 {
-                    res.Add(Mesh.GetMesh(box, pos - root.transform.position + rootPos, rootEuler, rootScale));
+                    res.Add(Mesh.GetMesh(box, pos - root.transform.position + rootPos, rootEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
                 }
                 else if (c is SphereCollider sp)
                 {
-                    res.Add(Mesh.GetMesh(sp, pos - root.transform.position + rootPos, rootEuler, rootScale));
+                    res.Add(Mesh.GetMesh(sp, pos - root.transform.position + rootPos, rootEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
                 }
             }
             return res;
@@ -218,7 +223,7 @@ namespace Z_Map
             var ans = new List<TileUnit>();
             foreach (var p in res)
             {
-                var mp = RealPos2MapPos(p);
+                var mp = RealPos2MapPosInt(p);
                 if (InArea(mp))
                 {
                     ans.Add(_super.data.maps[(mp.x, mp.y, mp.z)].unit);

@@ -27,24 +27,24 @@ namespace Form
         static void Register()
         {
 
-                ParamForm.childInitAction+=InitInternal;
+                GameParamForm.childInitAction+=InitInternal;
 
 
-                ParamForm.childRemoveAction+=RemoveChildren;
-                ParamForm.childAddAction+=AddChildren;
+                GameParamForm.childRemoveAction+=RemoveChildren;
+                GameParamForm.childAddAction+=AddChildren;
             
 
-            ParamForm.changeUidAction+=ChangeUid;
+            GameParamForm.changeUidAction+=ChangeUid;
 
-            ParamForm.changeNameAction+=ChangeName;
+            GameParamForm.changeNameAction+=ChangeName;
 
-            ParamForm.changeValuetypeAction+=ChangeValuetype;
+            GameParamForm.changeValuetypeAction+=ChangeValuetype;
 
-            ParamForm.changeMinAction+=ChangeMin;
+            GameParamForm.changeMinAction+=ChangeMin;
 
-            ParamForm.changeVAction+=ChangeV;
+            GameParamForm.changeVAction+=ChangeV;
 
-            ParamForm.changeMaxAction+=ChangeMax;
+            GameParamForm.changeMaxAction+=ChangeMax;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -57,13 +57,15 @@ namespace Form
         
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain =>ParamForm.uidChain;
+        public static Z_Chain.Chain uidChain =>GameParamForm.uidChain;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -71,22 +73,22 @@ namespace Form
                 
         public static Action<Data,ValType,ValType> changeValuetypeAction;
                 
-        public static Action<Data,float,float> changeMinAction;
+        public static Action<Data,string,string> changeMinAction;
                 
-        public static Action<Data,float,float> changeVAction;
+        public static Action<Data,string,string> changeVAction;
                 
-        public static Action<Data,float,float> changeMaxAction;
+        public static Action<Data,string,string> changeMaxAction;
                 
 
 
-        public partial class Data : ParamForm.Data
+        public partial class Data : GameParamForm.Data
         {
 
-            public Data(ParamForm.Data data):base(data.uid,data.name,data.valueType,data.min,data.v,data.max)
+            public Data(GameParamForm.Data data):base(data.uid,data.name,data.valueType,data.min,data.v,data.max)
             {
             }
             
-            public Data(int uid,string name,ValType valueType,float min,float v,float max):base(uid,name,valueType,min,v,max)
+            public Data(int uid,string name,ValType valueType,string min,string v,string max):base(uid,name,valueType,min,v,max)
             {
 
              this.uid = uid;
@@ -113,9 +115,14 @@ namespace Form
         return new Data(sameId? uid:uidChain.GetId(),name,valueType,min,v,max);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                MapObjectParamForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   private static Data _defaultData=new Data(0,"",default,0f,0f,0f);
+                   private static Data _defaultData=new Data(0,"",default,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -143,7 +150,7 @@ namespace Form
         static public void Init()
         {
 
-            ParamForm.Init();
+            GameParamForm.Init();
 
         }
         public static void InitInternal()
@@ -167,7 +174,7 @@ namespace Form
 
             foreach(var data in DataByUid.Values)
             {
-                ParamForm.AddData(data);
+                GameParamForm.AddData(data);
             }
 
 
@@ -208,17 +215,17 @@ namespace Form
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<ValType>("valueType"),
+                jo.SelectToken("valueType")==null?defaultData.valueType:jo.Get<ValType>("valueType"),
 
-                jo.Get<float>("min"),
+                jo.SelectToken("min")==null?defaultData.min:jo.Get<string>("min"),
 
-                jo.Get<float>("v"),
+                jo.SelectToken("v")==null?defaultData.v:jo.Get<string>("v"),
 
-                jo.Get<float>("max")
+                jo.SelectToken("max")==null?defaultData.max:jo.Get<string>("max")
                     );
 
             return data;
@@ -227,6 +234,7 @@ namespace Form
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -236,11 +244,11 @@ namespace Form
 
             jo.Set<ValType>("valueType",data.valueType);
 
-            jo.Set<float>("min",data.min);
+            jo.Set<string>("min",data.min);
 
-            jo.Set<float>("v",data.v);
+            jo.Set<string>("v",data.v);
 
-            jo.Set<float>("max",data.max);
+            jo.Set<string>("max",data.max);
 
             return jo;
         }
@@ -264,7 +272,7 @@ namespace Form
     
                     DataByName[data.name]=data;
     
-ParamForm.AddData(data);
+GameParamForm.AddData(data);
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.uid;
@@ -281,7 +289,7 @@ ParamForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
-ParamForm.RemoveData(uid);
+GameParamForm.RemoveData(uid);
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
             removeAction?.Invoke(data);
@@ -308,13 +316,13 @@ ParamForm.RemoveData(uid);
             }
         }
 
-         private static void RemoveChildren(ParamForm.Data data)
+         private static void RemoveChildren(GameParamForm.Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.uid);      
         }
-         private static void AddChildren(ParamForm.Data superData)
+         private static void AddChildren(GameParamForm.Data superData)
         {
             Init();
             if(superData is Data data)
@@ -325,7 +333,7 @@ ParamForm.RemoveData(uid);
 
 
 
-            public static void ChangeUid(ParamForm.Data superData,int oldV,int newV)
+            public static void ChangeUid(GameParamForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -335,7 +343,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeName(ParamForm.Data superData,string oldV,string newV)
+            public static void ChangeName(GameParamForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -348,7 +356,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeValuetype(ParamForm.Data superData,ValType oldV,ValType newV)
+            public static void ChangeValuetype(GameParamForm.Data superData,ValType oldV,ValType newV)
             {
                 if(superData is Data data)
                 {
@@ -358,7 +366,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeMin(ParamForm.Data superData,float oldV,float newV)
+            public static void ChangeMin(GameParamForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -368,7 +376,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeV(ParamForm.Data superData,float oldV,float newV)
+            public static void ChangeV(GameParamForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -378,7 +386,7 @@ ParamForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeMax(ParamForm.Data superData,float oldV,float newV)
+            public static void ChangeMax(GameParamForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {

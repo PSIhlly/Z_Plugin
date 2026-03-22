@@ -60,6 +60,8 @@ namespace Form
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -138,6 +140,11 @@ private set{
         return new Data(sameId? id:idChain.GetId(),name,prefabName,icon,step,label);
                 }
             
+            public override  void BeforeGet()
+            {
+                base.BeforeGet();
+                MapTerrainForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","","",0f,"");
@@ -273,17 +280,17 @@ private set{
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("prefabName"),
+                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
 
                     _defaultData.step,
 
-                jo.Get<string>("label")
+                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label")
                     );
 
             return data;
@@ -292,6 +299,7 @@ private set{
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

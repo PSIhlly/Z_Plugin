@@ -39,6 +39,8 @@ public static readonly int autoIdCnt=10000;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeIdAction;
                 
@@ -192,6 +194,11 @@ public static readonly int autoIdCnt=10000;
         return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                AssetForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"","",null,"",null);
@@ -279,15 +286,15 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<string>("path"),
+                jo.SelectToken("path")==null?defaultData.path:jo.Get<string>("path"),
 
-                jo.Get<byte[]>("bytes"),
+                jo.SelectToken("bytes")==null?defaultData.bytes:jo.Get<byte[]>("bytes"),
 
-                jo.Get<string>("hash"),
+                jo.SelectToken("hash")==null?defaultData.hash:jo.Get<string>("hash"),
 
                     _defaultData.asset
                     );
@@ -298,6 +305,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

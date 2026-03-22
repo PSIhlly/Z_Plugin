@@ -25,7 +25,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetCharacterParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.infoCtrl.ChangeCharacterParam(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), prm[1].str, (int)prm[2].num);
+            object v;
+            PlayManager.instance.infoCtrl.ChangeCharacterParam(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), prm[1].str, prm[2]);
 
             return true;
         }

@@ -39,6 +39,8 @@ public static readonly int autoUidCnt=100;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeUidAction;
                 
@@ -236,6 +238,11 @@ public static readonly int autoUidCnt=100;
         return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode);
                 }
             
+            public virtual  void BeforeGet()
+            {
+                
+                CmdDataForm.beforeGetAction?.Invoke(this);
+            }
         }
 
                    private static Data _defaultData=new Data(0,"",null,null,null,null,"","");
@@ -395,21 +402,21 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.Get<List<string>>("prmNames"),
+                jo.SelectToken("prmNames")==null?defaultData.prmNames:jo.Get<List<string>>("prmNames"),
 
-                jo.Get<List<string>>("prmTypes"),
+                jo.SelectToken("prmTypes")==null?defaultData.prmTypes:jo.Get<List<string>>("prmTypes"),
 
-                jo.Get<List<string>>("retNames"),
+                jo.SelectToken("retNames")==null?defaultData.retNames:jo.Get<List<string>>("retNames"),
 
-                jo.Get<List<string>>("retTypes"),
+                jo.SelectToken("retTypes")==null?defaultData.retTypes:jo.Get<List<string>>("retTypes"),
 
-                jo.Get<string>("desc"),
+                jo.SelectToken("desc")==null?defaultData.desc:jo.Get<string>("desc"),
 
-                jo.Get<string>("defaultCode")
+                jo.SelectToken("defaultCode")==null?defaultData.defaultCode:jo.Get<string>("defaultCode")
                     );
 
             return data;
@@ -418,6 +425,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

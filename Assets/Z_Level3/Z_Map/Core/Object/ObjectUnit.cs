@@ -41,7 +41,7 @@ namespace Z_Map
 
         public override void UpdateInfo()
         {
-            
+
             if (isShowing)
             {
                 if (_data.pos != ins.transform.position || _data.euler != ins.transform.eulerAngles)
@@ -61,8 +61,8 @@ namespace Z_Map
             var avoidDir = new List<Vector3>();
             HashSet<int> exist = new HashSet<int>() { data.uid };
             float res = mag;
-            Dictionary<CharacterUnit, Vector3> push=new Dictionary<CharacterUnit, Vector3>();
-            if (dir != Vector3.zero)
+            Dictionary<CharacterUnit, Vector3> push = new Dictionary<CharacterUnit, Vector3>();
+            if (dir != Vector3.zero && data.isObstacle)
             {
                 foreach (var tile in manager.utilCtrl.GetOverlap(data))
                 {
@@ -71,13 +71,13 @@ namespace Z_Map
                         if (exist.Contains(ch.data.uid))
                             continue;
                         exist.Add(ch.data.uid);
-   
-                            var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly,out _);
-                            if (dis < mag)
-                            {
-                                push[ch] = -dir * 1.1f / mag * (dis - mag);
-                            }
-                           
+
+                        var dis = manager.updateCtrl.CheckCollide(this, ch, dir, CollideType.CollideOnly, out _);
+                        if (dis < mag)
+                        {
+                            push[ch] = -dir * 1.1f / mag * (dis - mag);
+                        }
+
                     }
                 }
             }

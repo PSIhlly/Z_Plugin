@@ -39,6 +39,7 @@ namespace Z_Map
     public static class DynamicGlobalSettings
     {
         public static CameraMode cameraMode;
+        public static bool pauseNav;
     }
 
     public static class GlobalHelper

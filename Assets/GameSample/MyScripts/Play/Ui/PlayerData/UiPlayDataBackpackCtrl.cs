@@ -8,6 +8,7 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem.Form;
 using Z_Text;
+using Z_Ui.Notify;
 
 namespace Ui.PlayData.PlayDataBackpack
 {
@@ -36,6 +37,21 @@ namespace Ui.PlayData.PlayDataBackpack
             });
             view.btn_drop.onClick.AddListener(() =>
             {
+                if (model.sel.amount > 1)
+                {
+                    NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input drop amount"), true, (res) =>
+                    {
+                        if (int.TryParse(res, out var amount))
+                        {
+                            PlayManager.instance.infoCtrl.LostItem(model.sel.uid, amount);
+                        }
+                        return true;
+                    }, "1");
+                }
+                else
+                {
+                    PlayManager.instance.infoCtrl.LostItem(model.sel.uid, 1);
+                }
 
             });
             view.btn_use.onClick.AddListener(() =>
@@ -45,6 +61,7 @@ namespace Ui.PlayData.PlayDataBackpack
             view.btn_equip.onClick.AddListener(() =>
             {
 
+                var equipCharacter = PlayManager.instance.infoCtrl.GetTeamEquipedCharacter(model.sel.uid, out var part);
             });
             itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameItems);
             labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
@@ -96,17 +113,17 @@ namespace Ui.PlayData.PlayDataBackpack
                 view.img_.sprite = TexAssetForm.DataByName[model.sel.iconTexName].GetSprite();
                 view.txt_desc.text = model.sel.desc;
                 view.txt_name.text = model.sel.name;
-                view.txt_amount.text = TextManager.instance.GetTxt("count")+":"+ model.sel.amount.ToString();
-                foreach(var arg in model.sel.paramDic)
+                view.txt_amount.text = TextManager.instance.GetTxt("count") + ":" + model.sel.amount.ToString();
+                foreach (var arg in model.sel.paramDic)
                 {
-                    if(model.sel.CanShow(arg.Key))
-                    gameArgCon.Add(new UiGameArgsParam()
-                    {
-                        content = arg.Key + ":" + arg.Value.v
-                    });
+                    if (model.sel.CanShow(arg.Key))
+                        gameArgCon.Add(new UiGameArgsParam()
+                        {
+                            content = arg.Key + ":" + arg.Value.v
+                        });
                 }
-
-                
+                var equipCharacter = PlayManager.instance.infoCtrl.GetTeamEquipedCharacter(model.sel.uid, out var part);
+                view.sta_showArea.ChangeState(model.sel.canEquipe ? 0 : (equipCharacter != null ? 2 : 1));
             }
             gameArgCon.Refresh();
         }
@@ -187,10 +204,11 @@ namespace Ui.PlayData.PlayDataBackpack
         public void Refresh()
         {
             view.sta_exist.ChangeState(1);
+
             view.txt_.text = model.data.name;
             view.txt_count.text = model.data.amount.ToString();
             view.img_.sprite = TexAssetForm.DataByName[model.data.iconTexName].GetSprite();
-            view.sta_.ChangeState(parent.model.sel == model.data ? 1 : 0);
+
         }
     }
     public partial class UiGameArgsParam

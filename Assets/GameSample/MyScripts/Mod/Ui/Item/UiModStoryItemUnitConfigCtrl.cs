@@ -49,11 +49,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 var items = new EntryItem();
                 foreach (EquipPartType part in Enum.GetValues(typeof(EquipPartType)))
                 {
-                    items.Add(TextManager.instance.GetTxt(part.ToString()));
+                    items.Add(TextManager.instance.GetTxt(part.ToString()), null, (int)part);
                 }
                 NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("chooseEquipPart"), false, (res) =>
                 {
-                    model.data.equip = (EquipPartType)Enum.Parse(typeof(EquipPartType), res.content);
+                    model.data.equip = (EquipPartType)res.id;
                     Refresh();
                     return true;
                 }, items);

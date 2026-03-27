@@ -96,7 +96,7 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _itemId;
                     /// <summary>
-                    ///ÎäÆ÷µÀ¾ßid
+                    ///æ­¦å™¨é“å…·id
                     ///</summary>
                     public int  itemId{
                                 get{return _itemId;}
@@ -114,7 +114,7 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _damage;
                     /// <summary>
-                    ///ÉËº¦
+                    ///ä¼¤å®³
                     ///</summary>
                     public int  damage{
                                 get{return _damage;}
@@ -132,7 +132,7 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _prefabName;
                     /// <summary>
-                    ///Ô¤ÖÆÃû×Ö£¨Ë÷Òı£©
+                    ///é¢„åˆ¶åå­—ï¼ˆç´¢å¼•ï¼‰
                     ///</summary>
                     public string  prefabName{
                                 get{return _prefabName;}
@@ -150,7 +150,7 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _magazineCapacity;
                     /// <summary>
-                    ///µ¯¼Ğ×ÜÁ¿
+                    ///å¼¹å¤¹æ€»é‡
                     ///</summary>
                     public int  magazineCapacity{
                                 get{return _magazineCapacity;}
@@ -168,7 +168,7 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _cdTime;
                     /// <summary>
-                    ///ÉäËÙÀäÈ´Ê±³¤
+                    ///å°„é€Ÿå†·å´æ—¶é•¿
                     ///</summary>
                     public float  cdTime{
                                 get{return _cdTime;}
@@ -186,7 +186,7 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _reloadTime;
                     /// <summary>
-                    ///×°ÌîÊ±³¤
+                    ///è£…å¡«æ—¶é•¿
                     ///</summary>
                     public float  reloadTime{
                                 get{return _reloadTime;}
@@ -204,7 +204,7 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _speed;
                     /// <summary>
-                    ///µ¯ËÙ
+                    ///å¼¹é€Ÿ
                     ///</summary>
                     public float  speed{
                                 get{return _speed;}
@@ -222,7 +222,7 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _range;
                     /// <summary>
-                    ///Éä³Ì
+                    ///å°„ç¨‹
                     ///</summary>
                     public float  range{
                                 get{return _range;}
@@ -240,7 +240,7 @@ public static readonly int autoIdCnt=100;
                     
                     private Vector3  _attackPos;
                     /// <summary>
-                    ///Ç¹¿Ú
+                    ///æªå£
                     ///</summary>
                     public Vector3  attackPos{
                                 get{return _attackPos;}
@@ -258,7 +258,7 @@ public static readonly int autoIdCnt=100;
                     
                     private Vector3  _attackDir;
                     /// <summary>
-                    ///·½Ïò
+                    ///æ–¹å‘
                     ///</summary>
                     public Vector3  attackDir{
                                 get{return _attackDir;}
@@ -276,7 +276,7 @@ public static readonly int autoIdCnt=100;
                     
                     private bool  _selfHurt;
                     /// <summary>
-                    ///×Ô¼ºÉËº¦
+                    ///è‡ªå·±ä¼¤å®³
                     ///</summary>
                     public bool  selfHurt{
                                 get{return _selfHurt;}
@@ -294,7 +294,7 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _accuracy;
                     /// <summary>
-                    ///¾«¶È
+                    ///ç²¾åº¦
                     ///</summary>
                     public float  accuracy{
                                 get{return _accuracy;}
@@ -312,7 +312,7 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _bulletsPer;
                     /// <summary>
-                    ///µ¥´Î¿ª»ğµ¯Êı
+                    ///å•æ¬¡å¼€ç«å¼¹æ•°
                     ///</summary>
                     public int  bulletsPer{
                                 get{return _bulletsPer;}

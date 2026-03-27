@@ -227,6 +227,7 @@ public class GameEventController : Z_Controller<GameManager>
             if (GameManager.instance.curProgress.triggeredOnceEvts.ContainsKey(trigger.Item1))
                 GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
         }
+        Z_Map.DynamicGlobalSettings.pauseNav = GameManager.instance.curProgress.blockProgramUid == 0 ? false : true;
     }
 
 

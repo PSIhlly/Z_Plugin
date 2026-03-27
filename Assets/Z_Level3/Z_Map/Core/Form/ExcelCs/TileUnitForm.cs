@@ -97,7 +97,7 @@ namespace Z_Map.Form
         {
 
                 /// <summary>
-                ///单位逻辑
+                ///鍗曚綅閫昏緫
                 ///</summary>
                 public TileUnit unit
                 {
@@ -109,7 +109,7 @@ namespace Z_Map.Form
 
                     private Dictionary<int,string>  _texNameDic;
                     /// <summary>
-                    ///纹理名字（索引）
+                    ///绾圭悊鍚嶅瓧锛堢储寮曪級
                     ///</summary>
                     public Dictionary<int,string>  texNameDic{
                                 get{return _texNameDic;}
@@ -127,7 +127,7 @@ namespace Z_Map.Form
                     
                     private Vector3Int  _mapPos;
                     /// <summary>
-                    ///离散位置
+                    ///绂绘暎浣嶇疆
                     ///</summary>
                     public Vector3Int  mapPos{
                                 get{return _mapPos;}
@@ -145,7 +145,7 @@ namespace Z_Map.Form
                     
                     private bool  _enteredScene;
                     /// <summary>
-                    ///进入过所属scene
+                    ///杩涘叆杩囨墍灞瀞cene
                     ///</summary>
                     public bool  enteredScene{
                                 get{return _enteredScene;}

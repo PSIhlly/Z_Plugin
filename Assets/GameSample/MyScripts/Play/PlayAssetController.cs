@@ -2,6 +2,7 @@ using Form;
 using Microsoft.Win32;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlayAsset;
@@ -99,9 +100,24 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
             data.tarPos = tar;
             data.posTime = time;
             data.posProgress = 0;
-            data.oldPos = data.ctrl == null ? Vector2.one * 0.5f : data.ctrl.rect.position;
+            if (data.ctrl == null)
+            {
+                if (time == 0)
+                {
+                    data.oldPos = tar;
+                }
+            }
+            else
+            {
+                if (time == 0)
+                {
+                    data.ctrl.rect.position = tar;
+                }
+                data.oldPos = data.ctrl.rect.position;
+            }
+
+            Z_EventHelper.Invoke(new PlayAssetEvent());
         }
-        Z_EventHelper.Invoke(new PlayAssetEvent());
     }
     public void SetEuler(int id, float tar, float time)
     {
@@ -136,5 +152,9 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
         }
         Z_EventHelper.Invoke(new PlayAssetEvent());
     }
+    
+  
+
+
 
 }

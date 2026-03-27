@@ -84,7 +84,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _mapUnitSize;
                     /// <summary>
-                    ///单位图块大小
+                    ///鍗曚綅鍥惧潡澶у皬
                     ///</summary>
                     public Vector3  mapUnitSize{
                                 get{return _mapUnitSize;}
@@ -102,7 +102,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3Int  _logicSize;
                     /// <summary>
-                    ///逻辑大小
+                    ///閫昏緫澶у皬
                     ///</summary>
                     public Vector3Int  logicSize{
                                 get{return _logicSize;}
@@ -120,7 +120,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3Int  _viewSize;
                     /// <summary>
-                    ///视口大小
+                    ///瑙嗗彛澶у皬
                     ///</summary>
                     public Vector3Int  viewSize{
                                 get{return _viewSize;}
@@ -138,7 +138,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _mapJa;
                     /// <summary>
-                    ///地图数据
+                    ///鍦板浘鏁版嵁
                     ///</summary>
                     public string  mapJa{
                                 get{return _mapJa;}
@@ -156,7 +156,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _objectJa;
                     /// <summary>
-                    ///景物数据
+                    ///鏅墿鏁版嵁
                     ///</summary>
                     public string  objectJa{
                                 get{return _objectJa;}
@@ -174,7 +174,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _characterJa;
                     /// <summary>
-                    ///单位数据
+                    ///鍗曚綅鏁版嵁
                     ///</summary>
                     public string  characterJa{
                                 get{return _characterJa;}
@@ -192,7 +192,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _itemJa;
                     /// <summary>
-                    ///道具数据
+                    ///閬撳叿鏁版嵁
                     ///</summary>
                     public string  itemJa{
                                 get{return _itemJa;}

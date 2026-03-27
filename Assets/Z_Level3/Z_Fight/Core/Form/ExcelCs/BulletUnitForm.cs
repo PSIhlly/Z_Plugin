@@ -97,7 +97,7 @@ namespace Z_Fight.Form
         {
 
                 /// <summary>
-                ///µ¥Î»Âß¼­
+                ///å•ä½é€»è¾‘
                 ///</summary>
                 public BulletUnit unit
                 {
@@ -109,7 +109,7 @@ namespace Z_Fight.Form
 
                     private int  _weaponBulletId;
                     /// <summary>
-                    ///ÎäÆ÷×Óµ¯Êı¾İid
+                    ///æ­¦å™¨å­å¼¹æ•°æ®id
                     ///</summary>
                     public int  weaponBulletId{
                                 get{return _weaponBulletId;}
@@ -127,7 +127,7 @@ namespace Z_Fight.Form
                     
                     private float  _rangeLast;
                     /// <summary>
-                    ///ÓàÊ£Éä³Ì
+                    ///ä½™å‰©å°„ç¨‹
                     ///</summary>
                     public float  rangeLast{
                                 get{return _rangeLast;}
@@ -145,7 +145,7 @@ namespace Z_Fight.Form
                     
                     private int  _attackerUid;
                     /// <summary>
-                    ///¹¥»÷Õß
+                    ///æ”»å‡»è€…
                     ///</summary>
                     public int  attackerUid{
                                 get{return _attackerUid;}

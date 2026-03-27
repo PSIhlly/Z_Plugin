@@ -68,7 +68,7 @@ public static readonly int autoUidCnt=1000000;
                 protected Unit _unit;
 
                 /// <summary>
-                ///µ¥Î»Âß¼­
+                ///å•ä½é€»è¾‘
                 ///</summary>
                 public Unit unit
                 {
@@ -98,7 +98,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû³Æ
+                    ///åç§°
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -116,7 +116,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _prefabName;
                     /// <summary>
-                    ///Ô¤ÖÆÃû×Ö£¨Ë÷Òı£©
+                    ///é¢„åˆ¶åå­—ï¼ˆç´¢å¼•ï¼‰
                     ///</summary>
                     public string  prefabName{
                                 get{return _prefabName;}
@@ -134,7 +134,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _pos;
                     /// <summary>
-                    ///Î»ÖÃ
+                    ///ä½ç½®
                     ///</summary>
                     public Vector3  pos{
                                 get{return _pos;}
@@ -152,7 +152,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _euler;
                     /// <summary>
-                    ///Å·À­Ğı×ª
+                    ///æ¬§æ‹‰æ—‹è½¬
                     ///</summary>
                     public Vector3  euler{
                                 get{return _euler;}
@@ -170,7 +170,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _scale;
                     /// <summary>
-                    ///Ëõ·Å
+                    ///ç¼©æ”¾
                     ///</summary>
                     public Vector3  scale{
                                 get{return _scale;}
@@ -188,7 +188,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private UpdateType  _updateType;
                     /// <summary>
-                    ///¸üĞÂ·½Ê½
+                    ///æ›´æ–°æ–¹å¼
                     ///</summary>
                     public UpdateType  updateType{
                                 get{return _updateType;}
@@ -206,7 +206,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<int>  _collidingUnitUid;
                     /// <summary>
-                    ///Åö×²ÖĞ
+                    ///ç¢°æ’ä¸­
                     ///</summary>
                     public List<int>  collidingUnitUid{
                                 get{return _collidingUnitUid;}
@@ -224,7 +224,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _extra;
                     /// <summary>
-                    ///À©Õ¹Î»
+                    ///æ‰©å±•ä½
                     ///</summary>
                     public string  extra{
                                 get{return _extra;}

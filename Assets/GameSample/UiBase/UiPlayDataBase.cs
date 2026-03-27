@@ -193,6 +193,7 @@ namespace PlayDataBackpack
             public ScrView scr_labs;
             public ScrView scr_gameItems;
             public Sta sta_show;
+            public Sta sta_showArea;
             public Img img_;
             public Btn btn_;
             public Txt txt_desc;
@@ -203,9 +204,10 @@ namespace PlayDataBackpack
             public UiLabCtrl sub_lab;
             public GameObject go_gameItem;
             public UiGameItemCtrl sub_gameItem;
+            public Btn btn_use;
             public Btn btn_drop;
             public Btn btn_equip;
-            public Btn btn_use;
+            public Btn btn_unequip;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
             public UiGameArgsCtrl sub_gameArgs;
@@ -215,22 +217,24 @@ namespace PlayDataBackpack
             scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             scr_gameItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
             sta_show = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
-            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            txt_desc = uiHolder.elementTrsLst[5].GetComponent<Txt>();
-            scr_gameArgs = uiHolder.elementTrsLst[6].GetComponent<ScrView>();
-            txt_name = uiHolder.elementTrsLst[7].GetComponent<Txt>();
-            txt_amount = uiHolder.elementTrsLst[8].GetComponent<Txt>();
-            go_lab = uiHolder.elementTrsLst[9].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            go_gameItem = uiHolder.elementTrsLst[11].gameObject;
-            sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
-            btn_drop = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            btn_equip = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            btn_use = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            go_gameArgs = uiHolder.elementTrsLst[16].gameObject;
-            sta_gameArgs = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            sta_showArea = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            btn_ = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            txt_desc = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            scr_gameArgs = uiHolder.elementTrsLst[7].GetComponent<ScrView>();
+            txt_name = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_amount = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            go_lab = uiHolder.elementTrsLst[10].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            go_gameItem = uiHolder.elementTrsLst[12].gameObject;
+            sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            btn_use = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_drop = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            btn_equip = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            btn_unequip = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            go_gameArgs = uiHolder.elementTrsLst[18].gameObject;
+            sta_gameArgs = uiHolder.elementTrsLst[19].GetComponent<Sta>();
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[20].GetComponent<UiHolder>().ctrl;
         }
 
     }

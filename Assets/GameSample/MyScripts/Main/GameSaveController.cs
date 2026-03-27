@@ -97,6 +97,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveCoreStory(int id)
     {
         SaveOverview(id);
+
         string path = Main2StoryManager.GetStoryCoreFolder(id);
 
         SaveMaterial(path);
@@ -236,6 +237,8 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null, bool noImage = false)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
+
+        SaveStoryTex("$i$$i$", storyCoreFolder);
         if (!noImage)
         {
             Action<EventProgramDataForm.Data> act = (data) =>
@@ -616,6 +619,8 @@ public class GameSaveController : Z_Controller<GameManager>
     public void LoadEvent(string folder, string assetFolder)
     {
         var pathForm = folder + "/" + eventFormFileName;
+
+        LoadStoryTex("$i$$i$", assetFolder);
         EventProgramDataForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {

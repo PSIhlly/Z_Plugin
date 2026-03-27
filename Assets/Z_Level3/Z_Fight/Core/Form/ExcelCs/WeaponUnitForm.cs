@@ -101,7 +101,7 @@ namespace Z_Fight.Form
         {
 
                 /// <summary>
-                ///µ¥Î»Âß¼­
+                ///å•ä½é€»è¾‘
                 ///</summary>
                 public WeaponUnit unit
                 {
@@ -113,7 +113,7 @@ namespace Z_Fight.Form
 
                     private int  _fightUid;
                     /// <summary>
-                    ///³ÖÓĞÕß
+                    ///æŒæœ‰è€…
                     ///</summary>
                     public int  fightUid{
                                 get{return _fightUid;}
@@ -131,7 +131,7 @@ namespace Z_Fight.Form
                     
                     private List<int>  _weaponBulletsId;
                     /// <summary>
-                    ///×Óµ¯ÀàĞÍÁĞ±í
+                    ///å­å¼¹ç±»å‹åˆ—è¡¨
                     ///</summary>
                     public List<int>  weaponBulletsId{
                                 get{return _weaponBulletsId;}
@@ -149,7 +149,7 @@ namespace Z_Fight.Form
                     
                     private int  _curWeaponBulletAid;
                     /// <summary>
-                    ///µ±Ç°Ê¹ÓÃ×Óµ¯id
+                    ///å½“å‰ä½¿ç”¨å­å¼¹id
                     ///</summary>
                     public int  curWeaponBulletAid{
                                 get{return _curWeaponBulletAid;}
@@ -167,7 +167,7 @@ namespace Z_Fight.Form
                     
                     private float  _cdRemain;
                     /// <summary>
-                    ///ÉäËÙÀäÈ´Ê±³¤ÓàÊ£
+                    ///å°„é€Ÿå†·å´æ—¶é•¿ä½™å‰©
                     ///</summary>
                     public float  cdRemain{
                                 get{return _cdRemain;}
@@ -185,7 +185,7 @@ namespace Z_Fight.Form
                     
                     private int  _magazineRemain;
                     /// <summary>
-                    ///µ¯¼ĞÓàÊ£
+                    ///å¼¹å¤¹ä½™å‰©
                     ///</summary>
                     public int  magazineRemain{
                                 get{return _magazineRemain;}

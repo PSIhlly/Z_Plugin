@@ -102,7 +102,7 @@ namespace Ui.PlayAsset
             }
 
             data.eulerProgress += Time.deltaTime;
-            if (data.posTime == 0)
+            if (data.eulerTime == 0)
             {
                 rect.eulerAngles = rect.eulerAngles.NewSetZ(data.tarEuler);
             }

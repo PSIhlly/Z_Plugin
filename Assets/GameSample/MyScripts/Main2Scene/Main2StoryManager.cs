@@ -7,10 +7,12 @@ using UnityEngine;
 using Z_Audio;
 using Z_Code;
 using Z_Code.Form;
+using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
+using Z_Texture;
 using Z_Ui.Form;
 using Z_Ui.Loading;
 using Z_UnitSystem;
@@ -40,7 +42,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var data = new GameMapData();
             data.Init();
             EventProgramDataForm.Clear();
-
+            StoryTexAssetForm.AddData(new StoryTexAssetForm.Data(AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture),"$i$$i$")));
             var cpr = new Compiler();
             switch (defaultStyle)
             {

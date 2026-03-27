@@ -48,7 +48,7 @@ namespace Z_Map
             if (data.updateType == UpdateType.Always || isShowing)
             {
                 //nav
-                if (data.navEnabled)
+                if (data.navEnabled && !DynamicGlobalSettings.pauseNav)
                 {
                     if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
                     {
@@ -63,7 +63,7 @@ namespace Z_Map
                 //fix
                 ins?.UpdatePos();
             }
-            if(forceEuler!=null)
+            if (forceEuler != null)
             {
                 data.euler = (Vector3)forceEuler;
                 ins.transform.eulerAngles = (Vector3)forceEuler;
@@ -105,7 +105,7 @@ namespace Z_Map
                 if (dir != Vector3.zero)
                 {
                     existUnit.Clear();
-                    foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z),mag))
+                    foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z), mag))
                     {
                         if ((tile.data.pos - data.pos).sqrMagnitude > 1.69f)
                             continue;
@@ -119,7 +119,7 @@ namespace Z_Map
 
                         foreach (var obj in casts)
                         {
-                            if(obj is ObjectUnit objU&&!objU.data.isObstacle)//ignore no object
+                            if (obj is ObjectUnit objU && !objU.data.isObstacle)//ignore no object
                             {
                                 continue;
                             }
@@ -143,7 +143,7 @@ namespace Z_Map
 
                     var faceDir = dir;
                     faceDir.y = 0;
-                    if (faceDir != Vector3.zero&&!data.isMine)
+                    if (faceDir != Vector3.zero && !data.isMine)
                         euler = Quaternion.LookRotation(faceDir).eulerAngles;
 
                 }

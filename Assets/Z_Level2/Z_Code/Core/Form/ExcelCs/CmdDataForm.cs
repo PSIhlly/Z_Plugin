@@ -83,7 +83,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû³Æ
+                    ///åç§°
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -101,7 +101,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _prmNames;
                     /// <summary>
-                    ///²ÎÊıÃû³Æ
+                    ///å‚æ•°åç§°
                     ///</summary>
                     public List<string>  prmNames{
                                 get{return _prmNames;}
@@ -119,7 +119,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _prmTypes;
                     /// <summary>
-                    ///²ÎÊıÀàĞÍ
+                    ///å‚æ•°ç±»å‹
                     ///</summary>
                     public List<string>  prmTypes{
                                 get{return _prmTypes;}
@@ -137,7 +137,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _retNames;
                     /// <summary>
-                    ///·µ»ØÖµÃû³Æ
+                    ///è¿”å›å€¼åç§°
                     ///</summary>
                     public List<string>  retNames{
                                 get{return _retNames;}
@@ -155,7 +155,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _retTypes;
                     /// <summary>
-                    ///·µ»ØÖµÀàĞÍ
+                    ///è¿”å›å€¼ç±»å‹
                     ///</summary>
                     public List<string>  retTypes{
                                 get{return _retTypes;}
@@ -173,7 +173,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _desc;
                     /// <summary>
-                    ///ÃèÊö
+                    ///æè¿°
                     ///</summary>
                     public string  desc{
                                 get{return _desc;}
@@ -191,7 +191,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _defaultCode;
                     /// <summary>
-                    ///Ä¬ÈÏ´úÂë
+                    ///é»˜è®¤ä»£ç 
                     ///</summary>
                     public string  defaultCode{
                                 get{return _defaultCode;}
@@ -290,9 +290,9 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} - {0}","1-1")},
 
-                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£¨{1}£©*£¨{0}£©","1*1")},
+                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"ï¼ˆ{1}ï¼‰*ï¼ˆ{0}ï¼‰","1*1")},
 
-                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£¨{1}£©/£¨{0}£©","1/1")},
+                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"ï¼ˆ{1}ï¼‰/ï¼ˆ{0}ï¼‰","1/1")},
 
                 {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} = {0}","var=1;")},
 
@@ -319,6 +319,10 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 {17,new Data(17,"Wait",new List<string>(){"time",},new List<string>(){"num",},null,new List<string>(){"void",},"wait for {0} seconds","Wait(1);")},
 
                 {18,new Data(18,"Return",new List<string>(){"result",},new List<string>(){"var",},null,new List<string>(){"void",},"return {0}","Return result;")},
+
+                {19,new Data(19,".",new List<string>(){"a","b",},new List<string>(){"var","var",},new List<string>(){"result",},new List<string>(){"var",},"{1}.{0}","a.b")},
+
+                {20,new Data(20,"[",new List<string>(){"a","b",},new List<string>(){"var","string",},new List<string>(){"result",},new List<string>(){"var",},"{1}[{0}]","a[b]")},
 
                 };
                     _DataByName = new Dictionary<string, Data>() {
@@ -358,6 +362,10 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                         {"Wait",_DataByUid[17]},
     
                         {"Return",_DataByUid[18]},
+    
+                        {".",_DataByUid[19]},
+    
+                        {"[",_DataByUid[20]},
     
                     };
     

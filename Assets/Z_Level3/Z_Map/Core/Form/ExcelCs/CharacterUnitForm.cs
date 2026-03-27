@@ -105,7 +105,7 @@ namespace Z_Map.Form
         {
 
                 /// <summary>
-                ///µ¥Î»Âß¼­
+                ///å•ä½é€»è¾‘
                 ///</summary>
                 public CharacterUnit unit
                 {
@@ -117,7 +117,7 @@ namespace Z_Map.Form
 
                     private bool  _navEnabled;
                     /// <summary>
-                    ///ÆôÓÃ
+                    ///å¯ç”¨
                     ///</summary>
                     public bool  navEnabled{
                                 get{return _navEnabled;}
@@ -135,7 +135,7 @@ namespace Z_Map.Form
                     
                     private Vector3  _destination;
                     /// <summary>
-                    ///Ä¿µÄµØ
+                    ///ç›®çš„åœ°
                     ///</summary>
                     public Vector3  destination{
                                 get{return _destination;}
@@ -153,7 +153,7 @@ namespace Z_Map.Form
                     
                     private float  _speed;
                     /// <summary>
-                    ///ËÙ¶È
+                    ///é€Ÿåº¦
                     ///</summary>
                     public float  speed{
                                 get{return _speed;}
@@ -171,7 +171,7 @@ namespace Z_Map.Form
                     
                     private float  _alertDis;
                     /// <summary>
-                    ///Æô¶¯¾àÀë
+                    ///å¯åŠ¨è·ç¦»
                     ///</summary>
                     public float  alertDis{
                                 get{return _alertDis;}
@@ -189,7 +189,7 @@ namespace Z_Map.Form
                     
                     private float  _pathDis;
                     /// <summary>
-                    ///Ñ°Â·¾àÀëÉÏÏŞ
+                    ///å¯»è·¯è·ç¦»ä¸Šé™
                     ///</summary>
                     public float  pathDis{
                                 get{return _pathDis;}
@@ -207,7 +207,7 @@ namespace Z_Map.Form
                     
                     private bool  _isMine;
                     /// <summary>
-                    ///ÊÇÎÒ×Ô¼º
+                    ///æ˜¯æˆ‘è‡ªå·±
                     ///</summary>
                     public bool  isMine{
                                 get{return _isMine;}
@@ -225,7 +225,7 @@ namespace Z_Map.Form
                     
                     private bool  _enteredScene;
                     /// <summary>
-                    ///½øÈë¹ıËùÊôscene
+                    ///è¿›å…¥è¿‡æ‰€å±scene
                     ///</summary>
                     public bool  enteredScene{
                                 get{return _enteredScene;}

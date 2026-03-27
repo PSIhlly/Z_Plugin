@@ -71,7 +71,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû³Æ
+                    ///åç§°
                     ///</summary>
                     public string  name{
                                 get{return _name;}

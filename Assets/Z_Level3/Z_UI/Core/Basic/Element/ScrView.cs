@@ -91,7 +91,7 @@ namespace Z_Ui.Base
                 }
                 int totRow = (cnt / columnCnt) + (cnt % columnCnt != 0 ? 1 : 0);
                 if (DEBUG)
-                    Debug.Log("[sv]ÐÐÊý£º" + totRow);
+                    Debug.Log("[sv]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" + totRow);
 
                     content.sizeDelta += new Vector2(width - content.rect.width, Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
        
@@ -124,7 +124,7 @@ namespace Z_Ui.Base
 
             if(DEBUG)
             {
-                Debug.Log("[sv]Ô­Ê¼Ïî³ß´ç£º" + cell.rect.width + "*" + cell.rect.height + "  ¿ÉÈÝÄÉ" + columnCnt + "ÁÐ" + $",({height} - {top}) / ({cell.rect.height} + {ySpacing})"+"="+ rowCnt + "ÐÐ£¬²¼³ß´ç£º" + content.rect.width + "*" + content.rect.height);
+                Debug.Log("[sv]Ô­Ê¼ï¿½ï¿½ß´ç£º" + cell.rect.width + "*" + cell.rect.height + "  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" + columnCnt + "ï¿½ï¿½" + $",({height} - {top}) / ({cell.rect.height} + {ySpacing})"+"="+ rowCnt + "ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ß´ç£º" + content.rect.width + "*" + content.rect.height);
             }
             UpdateInfo(normalizedPosition);
         }

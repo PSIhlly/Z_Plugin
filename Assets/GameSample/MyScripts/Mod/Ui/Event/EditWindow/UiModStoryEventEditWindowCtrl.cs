@@ -7,10 +7,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using Z_Code;
 using Z_Code.Form;
+using Z_CodeVisual;
 using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using static UnityEditor.Progress;
+using static UnityEngine.InputManagerEntry;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiModStoryEventEditWindowParam
@@ -132,13 +134,19 @@ namespace Ui.ModStoryEventEditWindow
                         model.cpr.Compile(rawCode, out var res, out _, out _);
                         ReplaceNode(model.selUnit, res[0]);
                     }
-                    
+
                 });
 
             });
             view.btn_del.onClick.AddListener(() =>
             {
-                model.curEntry.Remove(model.selItem);
+
+                var parentList = FindParentList(model.curEntry, model.selItem);
+                if (parentList != null)
+                {
+                    parentList.Remove(model.selItem);
+                }
+
                 model.selItem = null;
                 ApplyEntry();
             });
@@ -172,10 +180,11 @@ namespace Ui.ModStoryEventEditWindow
 
 
                         model.cpr.Compile(defaultCode, out var res, out _, out _);
-                        int id = model.curEntry.IndexOf(model.selItem);
+                        var parentLst=FindParentList(model.curEntry, model.selItem);
+                        int id = parentLst.IndexOf(model.selItem);
                         foreach (var r in res)
                         {
-                            model.curEntry.Insert(id, r);
+                            parentLst.Insert(id, r);
                             model.selItem = r;
                             id++;
                         }
@@ -361,6 +370,25 @@ namespace Ui.ModStoryEventEditWindow
             {
                 Debug.Log(o.Contains(nodeNew) + "!!!");
             }
+        }
+        private List<SyntaxNode> FindParentList(List<SyntaxNode> o, SyntaxNode target)
+        {
+            foreach (var sub in o)
+            {
+                if (sub == target)
+                {
+                    return o;
+                }
+                else
+                {
+                    var res = FindParentList(sub.subNodes, target);
+                    if (res != null)
+                    {
+                        return res;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

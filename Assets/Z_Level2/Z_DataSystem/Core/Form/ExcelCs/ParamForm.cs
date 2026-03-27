@@ -79,7 +79,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû³Æ
+                    ///åç§°
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -97,7 +97,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private ValType  _valueType;
                     /// <summary>
-                    ///Êı¾İÀàĞÍ
+                    ///æ•°æ®ç±»å‹
                     ///</summary>
                     public ValType  valueType{
                                 get{return _valueType;}
@@ -115,7 +115,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _min;
                     /// <summary>
-                    ///×îĞ¡Öµ
+                    ///æœ€å°å€¼
                     ///</summary>
                     public string  min{
                                 get{return _min;}
@@ -133,7 +133,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _v;
                     /// <summary>
-                    ///µ±Ç°Öµ
+                    ///å½“å‰å€¼
                     ///</summary>
                     public string  v{
                                 get{return _v;}
@@ -151,7 +151,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _max;
                     /// <summary>
-                    ///×î´óÖµ
+                    ///æœ€å¤§å€¼
                     ///</summary>
                     public string  max{
                                 get{return _max;}

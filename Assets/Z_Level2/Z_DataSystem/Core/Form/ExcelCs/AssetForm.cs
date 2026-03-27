@@ -79,7 +79,7 @@ public static readonly int autoIdCnt=10000;
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû³Æ£¨Ë÷Òı£©
+                    ///åç§°ï¼ˆç´¢å¼•ï¼‰
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -97,7 +97,7 @@ public static readonly int autoIdCnt=10000;
                     
                     private string  _path;
                     /// <summary>
-                    ///Â·¾¶
+                    ///è·¯å¾„
                     ///</summary>
                     public string  path{
                                 get{return _path;}
@@ -115,7 +115,7 @@ public static readonly int autoIdCnt=10000;
                     
                     private byte[]  _bytes;
                     /// <summary>
-                    ///¶ş½øÖÆÎÄ¼ş
+                    ///äºŒè¿›åˆ¶æ–‡ä»¶
                     ///</summary>
                     public byte[]  bytes{
                                 get{return _bytes;}
@@ -133,7 +133,7 @@ public static readonly int autoIdCnt=10000;
                     
                     private string  _hash;
                     /// <summary>
-                    ///¹şÏ£
+                    ///å“ˆå¸Œ
                     ///</summary>
                     public string  hash{
                                 get{return _hash;}
@@ -151,7 +151,7 @@ public static readonly int autoIdCnt=10000;
                     
                     private object  _asset;
                     /// <summary>
-                    ///ÔËĞĞÊ±×ÊÔ´
+                    ///è¿è¡Œæ—¶èµ„æº
                     ///</summary>
                     public object  asset{
                                 get{return _asset;}

@@ -79,7 +79,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû³Æ
+                    ///åç§°
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -97,7 +97,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _code;
                     /// <summary>
-                    ///Ô´´úÂë
+                    ///æºä»£ç 
                     ///</summary>
                     public string  code{
                                 get{return _code;}
@@ -115,7 +115,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<string>  _zCode;
                     /// <summary>
-                    ///z´úÂë
+                    ///zä»£ç 
                     ///</summary>
                     public List<string>  zCode{
                                 get{return _zCode;}
@@ -133,7 +133,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _paramCount;
                     /// <summary>
-                    ///²ÎÊıÊıÁ¿
+                    ///å‚æ•°æ•°é‡
                     ///</summary>
                     public int  paramCount{
                                 get{return _paramCount;}
@@ -151,7 +151,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _returnValue;
                     /// <summary>
-                    ///·µ»ØÖµ
+                    ///è¿”å›å€¼
                     ///</summary>
                     public string  returnValue{
                                 get{return _returnValue;}

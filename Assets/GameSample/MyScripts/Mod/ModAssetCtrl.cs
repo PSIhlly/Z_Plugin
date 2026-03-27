@@ -402,7 +402,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public CharacterAnimForm.Data CreateCharacterAnim(string name)
     {
-        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } });
+        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } },1);
     }
     public CharacterAnimClipForm.Data CreateCharacterAnimClip()
     {
@@ -815,7 +815,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             styleTex[style] = GlobalNameHelper.GetDefaultTexName();
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>()));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(),true));
     }
     public void DeleteItem(int itemUid)
     {

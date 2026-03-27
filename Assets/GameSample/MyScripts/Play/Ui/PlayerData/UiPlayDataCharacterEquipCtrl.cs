@@ -30,7 +30,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
             gameEquipCon = new UiScrViewContainer<UiGameEquipCtrl>(view.go_gameEquip, view.scr_gameEquip);
             view.btn_disequip.onClick.AddListener(() =>
             {
-
+                PlayManager.instance.infoCtrl.Unequip(model.data.uid,model.selPart);
             });
             gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(view.go_gameArgs, view.scr_gameArgs);
 

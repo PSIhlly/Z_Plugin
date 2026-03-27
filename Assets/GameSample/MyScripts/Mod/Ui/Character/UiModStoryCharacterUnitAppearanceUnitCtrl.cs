@@ -31,13 +31,13 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public EquipPartType equipPart;
         public int id;
     }
-    public partial class UiModStoryCharacterUnitAppearanceUnitCtrl:IZ_Listener<AssetEvent>
+    public partial class UiModStoryCharacterUnitAppearanceUnitCtrl : IZ_Listener<AssetEvent>
     {
 
         UiScrViewContainer<UiItemCtrl> itemCon;
         UiScrViewContainer<UiPartCtrl> partCon;
-        UiScrViewContainer<UiEquipPartCtrl> equipPartCon; 
-        UiScrViewContainer<UiToggleCtrl> enablePartCon; 
+        UiScrViewContainer<UiEquipPartCtrl> equipPartCon;
+        UiScrViewContainer<UiToggleCtrl> enablePartCon;
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
@@ -62,7 +62,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 model.data.animTimeInterval = StringHelper.ToFloat(s, 0.2f, true);
                 Refresh();
             };
-
+            view.ipt_priority.onFinishInput += (s) =>
+            {
+                model.data.priority = StringHelper.ToInt(s, 1, true);
+                Refresh();
+            };
 
             view.btn_deleteTex.onClick.AddListener(() =>
             {
@@ -104,11 +108,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             {
                 ModManager.instance.assetCtrl.ChooseItemStyle(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    model.data.animClip[model.id].equipStyle[model.equipPart] =(ItemStyle)Enum.Parse(typeof(ItemStyle), item.content);
+                    model.data.animClip[model.id].equipStyle[model.equipPart] = (ItemStyle)Enum.Parse(typeof(ItemStyle), item.content);
                     Refresh();
                 });
             });
-            
+
         }
         public override void OnShow()
         {
@@ -128,6 +132,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.ipt_name.Set(model.data.name);
             view.ipt_scale.Set(model.data.scale.ToString());
             view.ipt_interval.Set(model.data.animTimeInterval.ToString());
+            view.ipt_priority.Set(model.data.priority.ToString());
 
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
             view.sta_equip.ChangeState(model.equipPart == EquipPartType.None ? 0 : 1);
@@ -148,11 +153,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             DisplayCameraAreaManager.instance.Clear();
 
-            view.sta_equip.ChangeState(model.id > -1 && model.equipPart != EquipPartType.None?1:0);
+            view.sta_equip.ChangeState(model.id > -1 && model.equipPart != EquipPartType.None ? 1 : 0);
             view.model_axis.SetShow(false);
             if (model.id > -1)
             {
-               
+
                 view.sta_equip.ChangeState(0);
 
                 foreach (EquipPartType equipPart in Enum.GetValues(typeof(EquipPartType)))
@@ -166,7 +171,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
                 foreach (BodyPartType part in model.data.partEnable.Keys)
                 {
-                    if (part != BodyPartType.None&& model.data.partEnable[part])
+                    if (part != BodyPartType.None && model.data.partEnable[part])
                         partCon.Add(new UiPartParam()
                         {
                             tp = part
@@ -176,17 +181,17 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 if (model.equipPart != EquipPartType.None)
                 {
                     view.txt_layer.text = model.data.animClip[model.id].equipTrs[model.equipPart].Item3.ToString();
-                    
-  /*                  view.model_Axis.SetActive(true, new UiAxisParam()
-                    {
-                        pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[model.id].z + rate / 2) / rate),
-                        limitRtf = view.rtf_image,
-                        onTrsChange = (tp) => {
-                            model.data.model.subPrefabUnitPos[model.id] = new Vector3((tp.Item1.x * 2 - 1) * rate / 2, 0, (tp.Item1.y * 2 - 1) * rate / 2);
 
-                            RefreshView();
-                        }
-                    });*/
+                    /*                  view.model_Axis.SetActive(true, new UiAxisParam()
+                                      {
+                                          pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[model.id].z + rate / 2) / rate),
+                                          limitRtf = view.rtf_image,
+                                          onTrsChange = (tp) => {
+                                              model.data.model.subPrefabUnitPos[model.id] = new Vector3((tp.Item1.x * 2 - 1) * rate / 2, 0, (tp.Item1.y * 2 - 1) * rate / 2);
+
+                                              RefreshView();
+                                          }
+                                      });*/
                 }
 
 
@@ -248,7 +253,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.btn_enablePart.onClick.AddListener(() =>
             {
-                if(!parent.model.data.partEnable.ContainsKey(model.tp))
+                if (!parent.model.data.partEnable.ContainsKey(model.tp))
                 {
                     parent.model.data.partEnable[model.tp] = false;
                 }
@@ -265,13 +270,13 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public void Refresh()
         {
             view.txt_.text = TextManager.instance.GetTxt(model.tp.ToString());
-            view.sta_enablePart.ChangeState(parent.model.data.partEnable.ContainsKey(model.tp)&&parent.model.data.partEnable[model.tp] ? 1 : 0);
+            view.sta_enablePart.ChangeState(parent.model.data.partEnable.ContainsKey(model.tp) && parent.model.data.partEnable[model.tp] ? 1 : 0);
 
         }
     }
 
 
-public partial class UiItemParam
+    public partial class UiItemParam
     {
         public int id;
     }

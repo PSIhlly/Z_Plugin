@@ -61,6 +61,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Dictionary<BodyPartType,bool>,Dictionary<BodyPartType,bool>> changePartenableAction;
                 
+        public static Action<Data,int,int> changePriorityAction;
+                
 
 
         public partial class Data
@@ -174,7 +176,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,List<CharacterAnimClipForm.Data> animClip,float animTimeInterval,float scale,Dictionary<BodyPartType,bool> partEnable)
+                    private int  _priority;
+                    /// <summary>
+                    ///”≈œ»º∂
+                    ///</summary>
+                    public int  priority{
+                                get{return _priority;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangePriority(this,_priority,value); 
+                    }
+        
+                _priority = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,List<CharacterAnimClipForm.Data> animClip,float animTimeInterval,float scale,Dictionary<BodyPartType,bool> partEnable,int priority)
             {
 
              this.uid = uid;
@@ -183,6 +203,7 @@ public static readonly int autoUidCnt=100;
              this.animTimeInterval = animTimeInterval;
              this.scale = scale;
              this.partEnable = partEnable;
+             this.priority = priority;
 
             }
             public void Reset(Data data)
@@ -194,11 +215,12 @@ public static readonly int autoUidCnt=100;
              this.animTimeInterval = data.animTimeInterval;
              this.scale = data.scale;
              this.partEnable = data.partEnable;
+             this.priority = data.priority;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<CharacterAnimClipForm.Data>(animClip),animTimeInterval,scale,new Dictionary<BodyPartType,bool>(partEnable));
+        return new Data(sameId? uid:uidChain.GetId(),name,new List<CharacterAnimClipForm.Data>(animClip),animTimeInterval,scale,new Dictionary<BodyPartType,bool>(partEnable),priority);
                 }
             
             public virtual  void BeforeGet()
@@ -208,7 +230,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",null,0f,0f,new Dictionary<BodyPartType,bool>(){});
+                   private static Data _defaultData=new Data(0,"",null,0f,0f,new Dictionary<BodyPartType,bool>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -289,7 +311,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("scale")==null?defaultData.scale:jo.Get<float>("scale"),
 
-                jo.SelectToken("partEnable")==null?defaultData.partEnable:jo.Get<Dictionary<BodyPartType,bool>>("partEnable")
+                jo.SelectToken("partEnable")==null?defaultData.partEnable:jo.Get<Dictionary<BodyPartType,bool>>("partEnable"),
+
+                jo.SelectToken("priority")==null?defaultData.priority:jo.Get<int>("priority")
                     );
 
             return data;
@@ -313,6 +337,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<float>("scale",data.scale);
 
             jo.Set<Dictionary<BodyPartType,bool>>("partEnable",data.partEnable);
+
+            jo.Set<int>("priority",data.priority);
 
             return jo;
         }
@@ -449,6 +475,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changePartenableAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePriority(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePriorityAction?.Invoke(data,oldV,newV);
                 }
                     
             }

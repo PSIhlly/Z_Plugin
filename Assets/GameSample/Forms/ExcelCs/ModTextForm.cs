@@ -653,6 +653,10 @@ namespace Form
 
                 {1000251,new Data(1000251,"collision","Collision","碰撞")},
 
+                {1000252,new Data(1000252,"isConsume","Consume","是消耗品")},
+
+                {1000253,new Data(1000253,"priority","Priority","优先级")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -1157,6 +1161,10 @@ namespace Form
                         {"Choose Skill",_DataById[1000250]},
     
                         {"collision",_DataById[1000251]},
+    
+                        {"isConsume",_DataById[1000252]},
+    
+                        {"priority",_DataById[1000253]},
     
                     };
     

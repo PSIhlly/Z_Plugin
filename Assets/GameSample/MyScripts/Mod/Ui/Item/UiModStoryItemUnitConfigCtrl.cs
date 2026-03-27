@@ -38,11 +38,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                 model.data.canEquipe = !model.data.canEquipe;
                 Refresh();
             });
-            view.ipt_price.onFinishInput += (s) =>
+            view.btn_isConsume.onClick.AddListener(() =>
             {
-                model.data.price = StringHelper.ToInt(s, 0);
+                model.data.isConsume = !model.data.isConsume;
                 Refresh();
-            };
+            });
 
             view.btn_part.onClick.AddListener(() =>
             {
@@ -68,7 +68,6 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         public void Refresh()
         {
             view.sta_canEquipped.ChangeState(model.data.canEquipe ? 1 : 0);
-            view.ipt_price.Set(model.data.price.ToString());
 
             view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onUseEvent" });
             view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onEquipEvent" });

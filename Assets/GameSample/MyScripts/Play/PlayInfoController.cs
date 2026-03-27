@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
@@ -59,9 +60,11 @@ public interface ExternalPlayInfoController
 {
     public void GainItem(int uid, int amount, bool toast = true, bool message = true);
     public void LostItem(int uid, int amount, bool toast = true, bool message = true);
+    public void UseItem(int uid, int amount, bool toast = true, bool message = true);
     public void ChangeCharacterParam(int characterUid, string name, object value);
     public void Equip(int characterUid, int itemUid, EquipPartType part);
     public void Unequip(int characterUid, EquipPartType part);
+    public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act);
 
     public CharacterProductForm.Data GetTeamEquipedCharacter(int ItemProductUid, out EquipPartType partType);
 }
@@ -147,17 +150,31 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     #region item
     public void UseItem(int uid, int amount, bool toast = true, bool message = true)
     {
-        var item = RemoveItemInternal(uid, amount);
-        var content = TextManager.instance.GetTxt("use") + " " + item.name + " x" + item.amount;
-        if (toast)
+        var item = ItemProductForm.DataByUid.GetDv(uid, null);
+        if (bagName2UidDic.ContainsKey(item.name))
         {
-            NotifyManager.instance.AddTip(content);
+            ItemProductForm.Data res = null;
+            if (item.isConsume)
+            {
+                res = RemoveItemInternal(uid, amount);
+            }
+            else
+            {
+                res = item;
+            }
+            var content = TextManager.instance.GetTxt("use") + " " + res.name + " x" + res.amount;
+            if (toast)
+            {
+                NotifyManager.instance.AddTip(content);
+            }
+            if (message)
+            {
+                _super.sceneCtrl.AddMessage(content);
+            }
+            Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Use, data = res });
         }
-        if (message)
-        {
-            _super.sceneCtrl.AddMessage(content);
-        }
-        Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Use, data = item });
+
+
     }
     private ItemProductForm.Data RemoveItemInternal(int uid, int amount)
     {
@@ -332,6 +349,26 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         return null;
     }
 
+    #endregion
+
+    #region team
+
+    public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act)
+    {
+        var items = new EntryItem();
+        foreach (var uid in GameManager.instance.curProgress.team)
+        {
+            var ch = CharacterProductForm.DataByUid[uid];
+            items.Add(ch.name, StoryTexAssetForm.DataByName.GetDv(ch.avatarTexName, StoryTexAssetForm.defaultData).GetSprite(), uid);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                var ch = CharacterProductForm.DataByUid[item.id];
+                act?.Invoke(ch);
+                return true;
+            }, items);
+    }
     #endregion
 
     public void OnEvent(CollideEvent evt)

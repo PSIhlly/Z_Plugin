@@ -204,8 +204,8 @@ namespace PlayDataBackpack
             public UiLabCtrl sub_lab;
             public GameObject go_gameItem;
             public UiGameItemCtrl sub_gameItem;
-            public Btn btn_use;
             public Btn btn_drop;
+            public Btn btn_use;
             public Btn btn_equip;
             public Btn btn_unequip;
             public GameObject go_gameArgs;
@@ -228,8 +228,8 @@ namespace PlayDataBackpack
             sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
             go_gameItem = uiHolder.elementTrsLst[12].gameObject;
             sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
-            btn_use = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            btn_drop = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            btn_drop = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_use = uiHolder.elementTrsLst[15].GetComponent<Btn>();
             btn_equip = uiHolder.elementTrsLst[16].GetComponent<Btn>();
             btn_unequip = uiHolder.elementTrsLst[17].GetComponent<Btn>();
             go_gameArgs = uiHolder.elementTrsLst[18].gameObject;

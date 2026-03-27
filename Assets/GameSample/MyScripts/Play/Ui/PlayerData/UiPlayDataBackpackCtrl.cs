@@ -56,12 +56,33 @@ namespace Ui.PlayData.PlayDataBackpack
             });
             view.btn_use.onClick.AddListener(() =>
             {
-
+                PlayManager.instance.infoCtrl.UseItem(model.sel.uid,1);
             });
             view.btn_equip.onClick.AddListener(() =>
             {
-
                 var equipCharacter = PlayManager.instance.infoCtrl.GetTeamEquipedCharacter(model.sel.uid, out var part);
+                if(GameManager.instance.curProgress.team.Count<=1)
+                {
+                    PlayManager.instance.infoCtrl.Equip(GameManager.instance.curProgress.team[0], model.sel.uid, ItemProductForm.DataByUid[model.sel.uid].equip);
+                    Refresh();
+                }
+                else
+                {
+                    PlayManager.instance.infoCtrl.ChooseTeamCharacter(TextManager.instance.GetTxt("Equip character"), (ch) =>
+                    {
+                        PlayManager.instance.infoCtrl.Equip(ch.uid, model.sel.uid, ItemProductForm.DataByUid[model.sel.uid].equip);
+                    });
+                    Refresh();
+                }
+            });
+            view.btn_unequip.onClick.AddListener(() =>
+            {
+                var equipCharacter = PlayManager.instance.infoCtrl.GetTeamEquipedCharacter(model.sel.uid, out var part);
+                if(equipCharacter!=null)
+                {
+                    PlayManager.instance.infoCtrl.Unequip(equipCharacter.uid, ItemProductForm.DataByUid[model.sel.uid].equip);
+                }
+                Refresh();
             });
             itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameItems);
             labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
@@ -123,7 +144,7 @@ namespace Ui.PlayData.PlayDataBackpack
                         });
                 }
                 var equipCharacter = PlayManager.instance.infoCtrl.GetTeamEquipedCharacter(model.sel.uid, out var part);
-                view.sta_showArea.ChangeState(model.sel.canEquipe ? 0 : (equipCharacter != null ? 2 : 1));
+                view.sta_showArea.ChangeState(model.sel.canEquipe ? (equipCharacter != null ? 2 : 1) : 0);
             }
             gameArgCon.Refresh();
         }

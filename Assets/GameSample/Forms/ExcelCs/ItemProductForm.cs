@@ -93,6 +93,8 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
+        public static Action<Data,bool,bool> changeIsconsumeAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -296,11 +298,29 @@ namespace Form
                  
                      }
                     
+                    private bool  _isConsume;
+                    /// <summary>
+                    ///是消费品
+                    ///</summary>
+                    public bool  isConsume{
+                                get{return _isConsume;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeIsconsume(this,_isConsume,value); 
+                    }
+        
+                _isConsume = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,int protoUid,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,int protoUid,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events,bool isConsume):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -318,6 +338,7 @@ namespace Form
              this.price = price;
              this.canEquipe = canEquipe;
              this.events = events;
+             this.isConsume = isConsume;
 
             }
             public void Reset(Data data)
@@ -338,11 +359,12 @@ namespace Form
              this.price = data.price;
              this.canEquipe = data.canEquipe;
              this.events = data.events;
+             this.isConsume = data.isConsume;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),protoUid,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,new Dictionary<string,ItemParamForm.Data>(paramDic),protoUid,model,desc,amount,maxAmountPer,equip,new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,new Dictionary<string,EventTriggerForm.Data>(events),isConsume);
                 }
             
             public override  void BeforeGet()
@@ -352,7 +374,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},0,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},0,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){},false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -515,7 +537,9 @@ namespace Form
 
                 jo.SelectToken("canEquipe")==null?defaultData.canEquipe:jo.Get<bool>("canEquipe"),
 
-                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events")
+                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+
+                jo.SelectToken("isConsume")==null?defaultData.isConsume:jo.Get<bool>("isConsume")
                     );
 
             return data;
@@ -557,6 +581,8 @@ namespace Form
             jo.Set<bool>("canEquipe",data.canEquipe);
 
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+
+            jo.Set<bool>("isConsume",data.isConsume);
 
             return jo;
         }
@@ -845,6 +871,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeEventsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIsconsume(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIsconsumeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

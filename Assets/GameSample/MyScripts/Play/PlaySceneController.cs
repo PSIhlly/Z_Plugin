@@ -116,10 +116,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         foreach (var data in CharacterUnitForm.DataByUid.Values)
         {
             var ch = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
+
             if (ch.protoUid==0 && !ch.unique)
             {
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct(ch.uid);
+                
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
@@ -130,7 +132,6 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.unit.productInfo = (ch.uid, -1);
                 _characterDic[ch] = data;
             }
-
         }
         _playerM = GetOrNewCharacter(_playerG);
     }
@@ -174,18 +175,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             worldPosition.y = CameraInstance.instance.tarTrs.position.y;
             var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
             var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
-            if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
+            if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
             {
-                var data = SkillForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
-                if(data.lastUseTime==0||data.lastUseTime+data.cd<GameManager.instance.curProgress.seconds)
-                {
-                    data.lastUseTime = GameManager.instance.curProgress.seconds;
-                    Z_EventHelper.Invoke(new CharacterSkillEvent()
-                    {
-                        data = _playerG,
-                        skillId = data.uid
-                    });
-                }
+                var data = SkillProductForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
+                _super.infoCtrl.UseSkill(_playerG.uid,data.uid);
                 
             }
         }

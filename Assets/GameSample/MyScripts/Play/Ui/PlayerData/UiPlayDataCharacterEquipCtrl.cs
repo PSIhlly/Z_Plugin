@@ -1,5 +1,6 @@
 using Form;
 using System;
+using Z_Code;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Text;
@@ -28,9 +29,16 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
         {
 
             gameEquipCon = new UiScrViewContainer<UiGameEquipCtrl>(view.go_gameEquip, view.scr_gameEquip);
-            view.btn_disequip.onClick.AddListener(() =>
+            view.btn_unequip.onClick.AddListener(() =>
             {
-                PlayManager.instance.infoCtrl.Unequip(model.data.uid,model.selPart);
+                PlayManager.instance.infoCtrl.Unequip(model.data.uid, model.selPart);
+            });
+            view.btn_equip.onClick.AddListener(() =>
+            {
+                PlayManager.instance.infoCtrl.ChooseEquipItems(TextManager.instance.GetTxt("Equipment"), (it) =>
+                {
+                    PlayManager.instance.infoCtrl.Equip(model.data.uid, it.uid, model.selPart);
+                }, model.selPart);
             });
             gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(view.go_gameArgs, view.scr_gameArgs);
 
@@ -42,22 +50,27 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
         }
         public void Refresh()
         {
-            view.sta_show.ChangeState(model.sel == null ? 0 : 1);
+            view.sta_show.ChangeState(model.selPart == EquipPartType.None ? 0 : 1);
 
             gameArgsCon.Clear();
-            if (model.sel != null)
+            if (model.selPart != EquipPartType.None)
             {
-                view.sta_show.ChangeState(0);
                 view.txt_part.text = TextManager.instance.GetTxt(model.selPart.ToString());
-                view.txt_name.text = model.sel.name;
-                foreach (var pair in model.data.paramDic)
+                view.txt_name.text = model.sel?.name;
+                view.btn_equip.gameObject.SetActive(model.sel == null);
+                view.btn_unequip.gameObject.SetActive(model.sel != null);
+                if (model.sel != null)
                 {
-                    if (model.data.CanShow(pair.Key))
-                        gameArgsCon.Add(new UiGameArgsParam()
-                        {
-                            content = pair.Key + ":" + pair.Value.v,
-                        });
+                    foreach (var pair in model.sel.paramDic)
+                    {
+                        if (model.data.CanShow(pair.Key))
+                            gameArgsCon.Add(new UiGameArgsParam()
+                            {
+                                content = pair.Key + ":" + CodeHelper.GetBoxContent(pair.Value.GetValue()),
+                            });
+                    }
                 }
+
 
             }
             gameArgsCon.Refresh();

@@ -255,6 +255,10 @@ namespace Form
 
                 {20043,new Data(20043,"unequip","Unequip","卸下")},
 
+                {20044,new Data(20044,"Equip character","Equip character","装备角色")},
+
+                {20045,new Data(20045,"Equipment","Equipment","装备")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -361,6 +365,10 @@ namespace Form
                         {"Passive",_DataById[20042]},
     
                         {"unequip",_DataById[20043]},
+    
+                        {"Equip character",_DataById[20044]},
+    
+                        {"Equipment",_DataById[20045]},
     
                     };
     

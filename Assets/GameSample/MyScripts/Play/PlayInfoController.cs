@@ -39,6 +39,7 @@ public class StoryItemEvent : Z_Event
 public enum StoryCharacterEventType
 {
     ParamChange,
+    SkillParamChange
 }
 public class StoryCharacterEvent : Z_Event
 {
@@ -46,6 +47,7 @@ public class StoryCharacterEvent : Z_Event
     public string name;
     public CharacterProductForm.Data data;
 }
+
 
 public interface InternalPlayInfoController
 {
@@ -62,11 +64,14 @@ public interface ExternalPlayInfoController
     public void LostItem(int uid, int amount, bool toast = true, bool message = true);
     public void UseItem(int uid, int amount, bool toast = true, bool message = true);
     public void ChangeCharacterParam(int characterUid, string name, object value);
+    public void ChangeSkillParam(int skillUid, string name, object value);
     public void Equip(int characterUid, int itemUid, EquipPartType part);
     public void Unequip(int characterUid, EquipPartType part);
     public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act);
+    public void ChooseEquipItems(string title, Action<ItemProductForm.Data> act, EquipPartType part);
 
     public CharacterProductForm.Data GetTeamEquipedCharacter(int ItemProductUid, out EquipPartType partType);
+    public void UseSkill(int characterUid, int skillUid);
 }
 public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>
 {
@@ -91,6 +96,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void Begin()
     {
         enable = true;
+        bagName2UidDic.Clear();
         foreach (var uid in GameManager.instance.curProgress.bag)
         {
             GainItem(uid, false, false);
@@ -105,6 +111,12 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     {
         if (!enable)
             return;
+
+        Z_Map.DynamicGlobalSettings.pauseNav = GameManager.instance.curProgress.blockProgramUid == 0 ? false : true;
+        if (GameManager.instance.curProgress.blockProgramUid != 0)
+        {
+            return;
+        }
         int oldSecond = (int)GameManager.instance.curProgress.seconds;
         GameManager.instance.curProgress.seconds += Time.deltaTime;
         if (oldSecond < (int)GameManager.instance.curProgress.seconds)
@@ -146,6 +158,57 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
     }
     #endregion
+
+    #region skill
+
+    public void UseSkill(int characterUid,int skillUid)
+    {
+        var character = CharacterProductForm.DataByUid[characterUid];
+        var skill = SkillProductForm.DataByUid[skillUid];
+        if (skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds)
+        {
+            skill.lastUseTime = GameManager.instance.curProgress.seconds;
+            Z_EventHelper.Invoke(new CharacterSkillEvent()
+            {
+                data = character,
+                skillUid = skill.uid
+            });
+        }
+    }
+
+    public void ChangeSkillParam(int skillUid, string name, object value)
+    {
+        var data = SkillProductForm.DataByUid.GetDv(skillUid, null);
+        if (data != null)
+        {
+            var prm = data.paramDic.GetDv(name, null);
+            if (prm != null)
+            {
+                if (value is float num)
+                {
+                    var min = prm.GetMin().num;
+                    var max = prm.GetMax().num;
+                    prm.SetValue(Mathf.Min(Mathf.Max(num, min), max));
+                }
+                else
+                {
+                    prm.SetValue(value);
+                }
+                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.SkillParamChange, data = CharacterProductForm.DataByUid[data.characterUid], name = skillUid.ToString() });
+            }
+            else
+            {
+                Debug.LogError("未找到" + name);
+                data.paramDic[name] = new SkillParamForm.Data(-1, name, 0, "", "", "", ParamShowType.Hide);
+                data.paramDic[name].SetValue(value);
+            }
+        }
+    }
+
+
+    #endregion
+
+
 
     #region item
     public void UseItem(int uid, int amount, bool toast = true, bool message = true)
@@ -303,7 +366,8 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void Equip(int characterUid, int itemUid, EquipPartType part)
     {
         var ch = CharacterProductForm.DataByUid.GetDv(characterUid, null);
-        if (ch != null && ItemProductForm.DataByUid.ContainsKey(itemUid) && part != EquipPartType.None)
+        var item = ItemProductForm.DataByUid.GetDv(itemUid, null);
+        if (ch != null && ItemProductForm.DataByUid.ContainsKey(itemUid) && part != EquipPartType.None && item.equip == part)
         {
             var oldCh = GetTeamEquipedCharacter(itemUid, out var oldPart);
             if (oldCh != null)
@@ -322,7 +386,25 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             ch.equips[part] = 0;
         }
     }
-
+    public void ChooseEquipItems(string title, Action<ItemProductForm.Data> act, EquipPartType part)
+    {
+        var items = new EntryItem();
+        foreach (var uid in GameManager.instance.curProgress.bag)
+        {
+            var it = ItemProductForm.DataByUid[uid];
+            if (it.canEquipe && it.equip == part)
+            {
+                items.Add(it.name, StoryTexAssetForm.DataByName.GetDv(it.iconTexName, StoryTexAssetForm.defaultData).GetSprite(), uid);
+            }
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                var it = ItemProductForm.DataByUid[item.id];
+                act?.Invoke(it);
+                return true;
+            }, items);
+    }
     public CharacterProductForm.Data GetTeamEquipedCharacter(int ItemProductUid, out EquipPartType partType)
     {
         partType = default;

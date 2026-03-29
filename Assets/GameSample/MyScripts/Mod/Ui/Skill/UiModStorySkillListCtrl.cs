@@ -18,7 +18,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
     public partial class UiModStorySkillListModel
     {
         public string lab;
-        public SkillForm.Data data;
+        public SkillProductForm.Data data;
     }
     public partial class UiModStorySkillListCtrl
     {
@@ -45,7 +45,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
             {
                 lab = null
             });
-            foreach (var lab in SkillForm.DatasByLabel.Keys)
+            foreach (var lab in SkillProductForm.DatasByLabel.Keys)
             {
                 if(lab!="")
                 labCon.Add(new UiLabParam()
@@ -55,8 +55,8 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
             }
             labCon.Refresh();
             itemCon.Clear();
-            var datas = string.IsNullOrEmpty(model.lab) ? new List<SkillForm.Data>(SkillForm.DataByUid.Values) : 
-                (SkillForm.DatasByLabel.ContainsKey(model.lab) ? SkillForm.DatasByLabel[model.lab] : new List<SkillForm.Data>());
+            var datas = string.IsNullOrEmpty(model.lab) ? new List<SkillProductForm.Data>(SkillProductForm.DataByUid.Values) : 
+                (SkillProductForm.DatasByLabel.ContainsKey(model.lab) ? SkillProductForm.DatasByLabel[model.lab] : new List<SkillProductForm.Data>());
 
             foreach (var data in datas)
             {
@@ -117,11 +117,11 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
 
     public partial class UiBigItemParam
     {
-        public SkillForm.Data data;
+        public SkillProductForm.Data data;
     }
     public partial class UiBigItemModel
     {
-        public SkillForm.Data data;
+        public SkillProductForm.Data data;
     }
     public partial class UiBigItemCtrl
     {

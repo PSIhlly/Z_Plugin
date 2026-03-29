@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
@@ -21,6 +22,7 @@ public static partial class GlobalSettings
     public const int GLOBAL_PARAM_MAX = 100000;
     public const int ITEM_PARAM_MAX = 100000;
     public const int SCENE_PARAM_MAX = 100000;
+    public const int SKILL_PARAM_MAX = 100000;
 
 }
 public static partial class GlobalDataHelper
@@ -70,6 +72,35 @@ namespace Form
     {
         public partial class Data
         {
+            public override void ToProduct(int protoUid)
+            {
+                base.ToProduct(protoUid);
+                CheckSkillProduct();
+            }
+            public void CheckSkillProduct()
+            {
+                if (skill != null)
+                {
+                    var newSkillDic = new Dictionary<SkillType, int>();
+                    foreach (var skillKvp in skill)
+                    {
+                        var skillData = SkillProductForm.DataByUid.GetDv(skillKvp.Value, null);
+                        if (skillData != null && skillData.protoUid == 0)
+                        {
+                            var newSkill = skillData.Copy(false);
+                            newSkill.ToProduct(skillData.uid);
+                            newSkillDic[skillKvp.Key] = newSkill.uid;
+                            newSkill.characterUid = uid;
+                        }
+                        else
+                        {
+                            newSkillDic[skillKvp.Key] = skillKvp.Value;
+                        }
+
+                    }
+                    skill = newSkillDic;
+                }
+            }
             public bool CanShow(string prmName)
             {
                 if (!paramDic.ContainsKey(prmName) || !CharacterParamForm.DataByName.ContainsKey(prmName))
@@ -106,7 +137,9 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         {
             None,
             Idle,
-            Move
+            Move,
+            Special,
+            Die
         }
         public AnimController()
         {
@@ -117,14 +150,19 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         public CharacterAnimForm.Data[] idleAnim;
         public CharacterAnimForm.Data[] moveAnim;
 
-        public Dictionary<BodyPartType, string> stateCur = new Dictionary<BodyPartType, string>();
-        public Dictionary<BodyPartType, string> stateTar = new Dictionary<BodyPartType, string>();
+        public Dictionary<BodyPartType, State> stateCur = new Dictionary<BodyPartType, State>();
+        public Dictionary<BodyPartType, string> animCur = new Dictionary<BodyPartType, string>();
+        public Dictionary<BodyPartType, string> animTar = new Dictionary<BodyPartType, string>();
         public Dictionary<BodyPartType, int> stateCd = new Dictionary<BodyPartType, int>();
         public Dictionary<BodyPartType, string> animCurCache = new Dictionary<BodyPartType, string>();
         public Dictionary<BodyPartType, Timer> animTimer = new Dictionary<BodyPartType, Timer>();
 
-        public CharacterAnimForm.Data GetAnim(State state)
+        public CharacterAnimForm.Data GetAnim(State state, string extraAnimName)
         {
+            if (!string.IsNullOrEmpty(extraAnimName))
+            {
+                return productData.animDic.GetDv(extraAnimName, idleAnim[(int)GetDir()]);
+            }
             switch (state)
             {
                 case State.Move:
@@ -133,20 +171,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                     return idleAnim[(int)GetDir()];
             }
         }
-        public CharacterAnimForm.Data GetAnimByName(string animName)
-        {
-            for (int i = 0; i < idleAnim.Length; i++)
-            {
-                if (idleAnim[i] != null && idleAnim[i].name == animName)
-                    return idleAnim[i];
-            }
-            for (int i = 0; i < moveAnim.Length; i++)
-            {
-                if (moveAnim[i] != null && moveAnim[i].name == animName)
-                    return moveAnim[i];
-            }
-            return null;
-        }
+
         private FourDirecton GetDir()
         {
             switch (productData.faceType)
@@ -179,8 +204,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         {
             foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
             {
-                stateCur[part] = "";
-                stateTar[part] = "";
+                animCur[part] = "";
+                animTar[part] = "";
                 stateCd[part] = 0;
                 animCurCache[part] = "";
                 animTimer[part] = null;
@@ -192,7 +217,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             {
                 if (part == BodyPartType.None)
                     continue;
-                var anim = GetAnimByName(stateCur[part]);
+                var anim = productData.animDic.GetDv(animCur[part], null);
                 if (anim != null && anim.partEnable.ContainsKey(part) && anim.partEnable[part])
                 {
                     data.unit.ins.renderers[(int)part - 1].enabled = true;
@@ -203,11 +228,19 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 }
             }
         }
-        public void TryChangeState(State tar, BodyPartType part, bool forceReplay = false)
+        public void ChangeState(State tar, BodyPartType part, bool forceReplay = false, string extraAnimName = "")
+        {
+            CharacterAnimForm.Data anim = GetAnim(tar, extraAnimName);
+            animCur[part] = anim.name;
+            stateCur[part] = tar;
+            stateCd[part] = 0;
+            UpdateAnim(part, data.unit.ins.renderers[(int)part - 1], data, anim, forceReplay);
+        }
+        public void TryChangeState(State tar, BodyPartType part, bool forceReplay = false, string extraAnimName = "")
         {
             if (part == BodyPartType.None)
                 return;
-            CharacterAnimForm.Data anim = GetAnim(tar);
+            CharacterAnimForm.Data anim = GetAnim(tar, extraAnimName);
             if (anim == null)
                 return;
 
@@ -216,24 +249,44 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 return;
             }
 
+            if (stateCur.ContainsKey(part))
+            {
+                if (stateCur[part] == State.Die)//die cant interrupt
+                {
+                    return;
+                }
+                if ((tar == State.Idle || tar == State.Move) && stateCur[part] == State.Special)
+                {
+                    return;
+                }
+            }
+
+
             string tarAnimName = anim.name;
 
-            if ((stateTar[part] != tarAnimName) && !string.IsNullOrEmpty(stateCur[part]))
+            if ((animTar[part] != tarAnimName) && !string.IsNullOrEmpty(animCur[part]))
             {
                 stateCd[part] = 10;
             }
 
-            stateTar[part] = tarAnimName;
-            if (stateCur[part] != tarAnimName)
+            animTar[part] = tarAnimName;
+            if (tar != State.Special && tar != State.Die)
             {
-                stateCd[part]--;
+                if (animCur[part] != tarAnimName)
+                {
+                    stateCd[part]--;
+                }
+                if (stateCd[part] > 0)
+                {
+                    return;
+                }
             }
-            if (stateCd[part] > 0)
+            else
             {
-                return;
+                stateCd[part] = 0;
             }
-            stateCur[part] = tarAnimName;
-            UpdateAnim(part, data.unit.ins.renderers[(int)part - 1], data, anim, forceReplay);
+            ChangeState(tar, part, forceReplay, extraAnimName);
+
         }
 
 
@@ -263,7 +316,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                     int cur = 0;//(int)((Time.time % all) / anim.animTimeInterval-0.0001f);
 
                     float timeProgress = 0;// (Time.time % anim.animTimeInterval);
-                    render.GetPropertyBlock(propBlock);
+
                     animCurCache[part] = anim.name;
 
                     propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[part]].GetTex());
@@ -272,10 +325,27 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         render.GetPropertyBlock(propBlock);
+
+                        if (cur + 1 >= anim.animClip.Count)
+                        {
+
+                            if (stateCur[part] == State.Special)
+                            {
+                                ChangeState(State.Idle, part);
+                                return true;
+                            }
+                            if (stateCur[part] == State.Die)
+                            {
+                                return true;
+                            }
+
+                        }
                         cur = (cur + 1) % anim.animClip.Count;
                         propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[renderPart]].GetTex());
                         render.SetPropertyBlock(propBlock);
                         return false;
+
+
                     }, data.unit.ins);
                 }
                 else
@@ -349,7 +419,15 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         }
     }
 
+    public void PlaySpecialAnim(CharacterUnitForm.Data ch, string animName)
+    {
+        var status = animControllerDic[ch];
 
+        foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+        {
+            status.TryChangeState(AnimController.State.Special, part, true, animName);
+        }
+    }
 
     public void CheckAnim(CharacterInstance ins)
     {
@@ -393,6 +471,12 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 LoadModel(evt.unit.ins);
                 break;
             case MapEventType.AfterUpdate:
+                //manage nav
+                var productData = CharacterProductForm.DataByUid.GetDv(evt.unit.productInfo.Item1, null);
+                if(productData!=null)
+                {
+                    evt.unit.data.navEnabled = productData.enableNav && _super.curProgress.seconds > productData.recoveryTime;
+                }
                 CheckAnim(evt.unit.ins);
                 break;
         }

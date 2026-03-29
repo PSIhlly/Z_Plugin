@@ -20,6 +20,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string mapObjectFormFileName => "mof";
     public string storyFormFileName => "sf";
     public string characterParamFormFileName => "cpaf";
+    public string skillParamFormFileName => "spaf";
 
     public string mapObjectParamFormFileName => "opaf";
     public string sceneFormFileName => "saf";
@@ -27,7 +28,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string eventFormFileName => "ef";
     public string itemParamFormFileName => "ipaf";
     public string effectFormFileName => "etf";
-    public string skillFormFileName => "slf";
+    public string skillProductFormFileName => "splf";
     public string itemProductFormFileName => "iprf";
     public string imageUiItemFormFileName => "iuif";
 
@@ -197,12 +198,15 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveSkill(string storyCoreFolder, bool noImage = false)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + skillFormFileName, SkillForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + skillParamFormFileName, SkillParamForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + skillProductFormFileName, SkillProductForm.GetJaByDatas().ToString());
         if (!noImage)
-            foreach (var data in SkillForm.DataByUid.Values)
+            foreach (var data in SkillProductForm.DataByUid.Values)
             {
                 SaveStoryTex(data.icon, storyCoreFolder);
             }
+
+
     }
     public void SaveItem(string storyCoreFolder, bool noImage = false)
     {
@@ -546,19 +550,30 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void LoadSkill(string folder, string assetFolder)
     {
-        var pathForm = folder + "/" + skillFormFileName;
-        SkillForm.ClearAuto();
+        var pathForm = folder + "/" + skillParamFormFileName;
+        SkillParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in SkillForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            foreach (var form in SkillParamForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
-                SkillForm.AddData(form);
+                SkillParamForm.AddData(form);
             }
         }
 
-        foreach (var data in SkillForm.DataByUid.Values)
+        pathForm = folder + "/" + skillProductFormFileName;
+        SkillProductForm.ClearAuto();
+        if (SaveAndLoad.Exist(pathForm))
         {
-            LoadStoryTex(data.icon, assetFolder);
+            foreach (var form in SkillProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                SkillProductForm.AddData(form);
+            }
+        }
+
+        foreach (var data in SkillProductForm.DataByUid.Values)
+        {
+            var icon = data.icon;
+            LoadStoryTex(icon, assetFolder);
         }
     }
     public void LoadItem(string folder, string assetFolder)

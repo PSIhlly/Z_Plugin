@@ -62,11 +62,6 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 model.data.animTimeInterval = StringHelper.ToFloat(s, 0.2f, true);
                 Refresh();
             };
-            view.ipt_priority.onFinishInput += (s) =>
-            {
-                model.data.priority = StringHelper.ToInt(s, 1, true);
-                Refresh();
-            };
 
             view.btn_deleteTex.onClick.AddListener(() =>
             {
@@ -132,7 +127,6 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.ipt_name.Set(model.data.name);
             view.ipt_scale.Set(model.data.scale.ToString());
             view.ipt_interval.Set(model.data.animTimeInterval.ToString());
-            view.ipt_priority.Set(model.data.priority.ToString());
 
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
             view.sta_equip.ChangeState(model.equipPart == EquipPartType.None ? 0 : 1);

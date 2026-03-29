@@ -73,7 +73,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///åç§°
+                    ///Ãû³Æ
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -91,7 +91,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private BoxDataForm.Data  _data;
                     /// <summary>
-                    ///æ•°æ®
+                    ///Êı¾İ
                     ///</summary>
                     public BoxDataForm.Data  data{
                                 get{return _data;}

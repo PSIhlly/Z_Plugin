@@ -642,8 +642,17 @@
   {
     "uid": 5,
     "name": "碰爱丽丝",
-    "code": "爱丽丝说话(\"我来草拟了\");\n爱丽丝说话(\"乖乖进小黑屋\");\nShowDialog(\"$i$e9114f916f2f59943fdf8851f9e3fe705ca24352$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"十六夜咲夜\",\"呜呜呜\");\nGameOver();\n",
+    "code": "Return 0;\n爱丽丝说话(\"我来草拟了\");\n爱丽丝说话(\"乖乖进小黑屋\");\nShowDialog(\"$i$e9114f916f2f59943fdf8851f9e3fe705ca24352$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"十六夜咲夜\",\"呜呜呜\");\nGameOver();\n",
     "zCode": [
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "22"
+      },
       {
         "v": "1"
       },
@@ -730,7 +739,7 @@
       }
     ],
     "paramCount": 0,
-    "returnValue": "void",
+    "returnValue": "0",
     "category": "主流程",
     "type": "抓"
   },
@@ -1148,8 +1157,32 @@
   {
     "uid": 7,
     "name": "十六夜攻击",
-    "code": "posRaw=GetCharacterPos(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"子弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
+    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPos(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"子弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
     "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "攻击"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "CharacterPlayAnim"
+      },
       {
         "v": "14"
       },
@@ -1211,7 +1244,7 @@
         "v": "15"
       },
       {
-        "v": "85"
+        "v": "93"
       },
       {
         "v": "14"
@@ -1403,7 +1436,7 @@
         "v": "16"
       },
       {
-        "v": "14"
+        "v": "22"
       }
     ],
     "paramCount": 0,

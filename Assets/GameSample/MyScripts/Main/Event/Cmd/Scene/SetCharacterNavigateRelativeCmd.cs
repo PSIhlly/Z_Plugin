@@ -35,7 +35,8 @@ namespace Z_Code
                 data.pathDis = 999;
                 data.alertDis = 999;
                 data.destination = data.pos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
-                data.navEnabled = true;
+
+                productData.enableNav = true;
             }
 
             return true;

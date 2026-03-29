@@ -2697,6 +2697,165 @@
             }
           ]
         }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 0,
+          "name": "攻击",
+          "animClip": [
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$2b0e6709db9983318d6585aa7fa80fc743dce608$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "uid": 0,
+                "equipStyle": [],
+                "equipTrs": [
+                  {
+                    "k": 0,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 1,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 2,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 3,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  },
+                  {
+                    "k": 4,
+                    "v": {
+                      "Item1": 0.5,
+                      "Item2": 0.5,
+                      "Item3": 1,
+                      "Item4": 0.5
+                    }
+                  }
+                ],
+                "partTex": [
+                  {
+                    "k": 0,
+                    "v": "reservedI$"
+                  },
+                  {
+                    "k": 1,
+                    "v": "$i$31ecf5fedb44d2e7e59806675ab3e9f58cda6e1a$i$"
+                  },
+                  {
+                    "k": 2,
+                    "v": "reservedI$"
+                  }
+                ]
+              }
+            }
+          ],
+          "animTimeInterval": 2.0,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
       }
     ],
     "defaultAnimName": [

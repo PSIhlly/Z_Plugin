@@ -18,15 +18,29 @@ using Z_Code.Form;
 namespace Form
 {
 
-    public static partial class SkillForm
+    public static partial class SkillProductForm
     {
-public static readonly int autoUidCnt=100;
+
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
+                ProductForm.childInitAction+=InitInternal;
 
+
+                ProductForm.childRemoveAction+=RemoveChildren;
+                ProductForm.childAddAction+=AddChildren;
+            
+
+            ProductForm.changeUidAction+=ChangeUid;
+
+            ProductForm.changeNameAction+=ChangeName;
+
+            ProductForm.changeLabelAction+=ChangeLabel;
+
+            ProductForm.changeProtouidAction+=ChangeProtouid;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -39,7 +53,7 @@ public static readonly int autoUidCnt=100;
         
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain ;
+        public static Z_Chain.Chain uidChain =>ProductForm.uidChain;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
@@ -55,9 +69,15 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
+        public static Action<Data,int,int> changeProtouidAction;
+                
         public static Action<Data,string,string> changeIconAction;
                 
+        public static Action<Data,Dictionary<string,SkillParamForm.Data>,Dictionary<string,SkillParamForm.Data>> changeParamdicAction;
+                
         public static Action<Data,List<SkillType>,List<SkillType>> changeSkilltypesAction;
+                
+        public static Action<Data,int,int> changeCharacteruidAction;
                 
         public static Action<Data,float,float> changeCdAction;
                 
@@ -69,63 +89,9 @@ public static readonly int autoUidCnt=100;
                 
 
 
-        public partial class Data
+        public partial class Data : ProductForm.Data
         {
 
-                    private int  _uid;
-                    /// <summary>
-                    ///
-                    ///</summary>
-                    public int  uid{
-                                get{return _uid;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeUid(this,_uid,value); 
-                    }
-        
-                _uid = value;
-                }
-                 
-                     }
-                    
-                    private string  _name;
-                    /// <summary>
-                    ///名称
-                    ///</summary>
-                    public string  name{
-                                get{return _name;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeName(this,_name,value); 
-                    }
-        
-                _name = value;
-                }
-                 
-                     }
-                    
-                    private string  _label;
-                    /// <summary>
-                    ///标签
-                    ///</summary>
-                    public string  label{
-                                get{return _label;}
- set{
-
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
-                    {
-                       ChangeLabel(this,_label,value); 
-                    }
-        
-                _label = value;
-                }
-                 
-                     }
-                    
                     private string  _icon;
                     /// <summary>
                     ///图标
@@ -144,6 +110,24 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
+                    private Dictionary<string,SkillParamForm.Data>  _paramDic;
+                    /// <summary>
+                    ///数据
+                    ///</summary>
+                    public Dictionary<string,SkillParamForm.Data>  paramDic{
+                                get{return _paramDic;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeParamdic(this,_paramDic,value); 
+                    }
+        
+                _paramDic = value;
+                }
+                 
+                     }
+                    
                     private List<SkillType>  _skillTypes;
                     /// <summary>
                     ///可装备类型
@@ -158,6 +142,24 @@ public static readonly int autoUidCnt=100;
                     }
         
                 _skillTypes = value;
+                }
+                 
+                     }
+                    
+                    private int  _characterUid;
+                    /// <summary>
+                    ///所属角色Uid
+                    ///</summary>
+                    public int  characterUid{
+                                get{return _characterUid;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeCharacteruid(this,_characterUid,value); 
+                    }
+        
+                _characterUid = value;
                 }
                  
                      }
@@ -234,14 +236,21 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string label,string icon,List<SkillType> skillTypes,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid)
+            public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.protoUid)
+            {
+            }
+            
+            public Data(int uid,string name,string label,int protoUid,string icon,Dictionary<string,SkillParamForm.Data> paramDic,List<SkillType> skillTypes,int characterUid,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
              this.name = name;
              this.label = label;
+             this.protoUid = protoUid;
              this.icon = icon;
+             this.paramDic = paramDic;
              this.skillTypes = skillTypes;
+             this.characterUid = characterUid;
              this.cd = cd;
              this.lastUseTime = lastUseTime;
              this.events = events;
@@ -254,8 +263,11 @@ public static readonly int autoUidCnt=100;
              this.uid = data.uid;
              this.name = data.name;
              this.label = data.label;
+             this.protoUid = data.protoUid;
              this.icon = data.icon;
+             this.paramDic = data.paramDic;
              this.skillTypes = data.skillTypes;
+             this.characterUid = data.characterUid;
              this.cd = data.cd;
              this.lastUseTime = data.lastUseTime;
              this.events = data.events;
@@ -264,17 +276,17 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,icon,new List<SkillType>(skillTypes),cd,lastUseTime,new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,protoUid,icon,new Dictionary<string,SkillParamForm.Data>(paramDic),new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
                 }
             
-            public virtual  void BeforeGet()
+            public override  void BeforeGet()
             {
-                
-                SkillForm.beforeGetAction?.Invoke(this);
+                base.BeforeGet();
+                SkillProductForm.beforeGetAction?.Invoke(this);
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new List<SkillType>(),0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
+                   private static Data _defaultData=new Data(0,"","",0,"",new Dictionary<string,SkillParamForm.Data>(){},new List<SkillType>(),0,0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -288,6 +300,16 @@ public static readonly int autoUidCnt=100;
                 }
             }
     
+            static Dictionary<(string,int), List<Data>> _DatasByLabelProtouid;
+            public static Dictionary<(string,int), List<Data>> DatasByLabelProtouid
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLabelProtouid;
+                }
+            }
+    
             static Dictionary<string, List<Data>> _DatasByLabel;
             public static Dictionary<string, List<Data>> DatasByLabel
             {
@@ -298,13 +320,23 @@ public static readonly int autoUidCnt=100;
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
+            static Dictionary<int, List<Data>> _DatasByProtouid;
+            public static Dictionary<int, List<Data>> DatasByProtouid
             {
                 get
                 {
                     Init();
-                    return _DataByName;
+                    return _DatasByProtouid;
+                }
+            }
+    
+            static Dictionary<(string,int), Data> _DataByNameProtouid;
+            public static Dictionary<(string,int), Data> DataByNameProtouid
+            {
+                get
+                {
+                    Init();
+                    return _DataByNameProtouid;
                 }
             }
     
@@ -312,23 +344,33 @@ public static readonly int autoUidCnt=100;
         static public void Init()
         {
 
-            InitInternal();
+            ProductForm.Init();
+
         }
         public static void InitInternal()
         {
             if(inited)
                 return;
             inited=true;  
-uidChain=new Z_Chain.Chain (autoUidCnt);
+
+        
 
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DataByNameProtouid = new Dictionary<(string,int), Data>() {
     
                     };
     
+                    _DatasByLabelProtouid = new Dictionary<(string,int), List<Data>>() {
+    
+                };
+
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                };
+
+                    _DatasByProtouid = new Dictionary<int, List<Data>>() {
     
                 };
 
@@ -336,7 +378,13 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
             childInitAction?.Invoke();
             
 
-foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
+            foreach(var data in DataByUid.Values)
+            {
+                ProductForm.AddData(data);
+            }
+
+
+        
              
         }
 
@@ -379,9 +427,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
+                jo.SelectToken("protoUid")==null?defaultData.protoUid:jo.Get<int>("protoUid"),
+
                 jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
 
+                jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,SkillParamForm.Data>>("paramDic"),
+
                 jo.SelectToken("skillTypes")==null?defaultData.skillTypes:jo.Get<List<SkillType>>("skillTypes"),
+
+                jo.SelectToken("characterUid")==null?defaultData.characterUid:jo.Get<int>("characterUid"),
 
                 jo.SelectToken("cd")==null?defaultData.cd:jo.Get<float>("cd"),
 
@@ -408,9 +462,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("label",data.label);
 
+            jo.Set<int>("protoUid",data.protoUid);
+
             jo.Set<string>("icon",data.icon);
 
+            jo.Set<Dictionary<string,SkillParamForm.Data>>("paramDic",data.paramDic);
+
             jo.Set<List<SkillType>>("skillTypes",data.skillTypes);
+
+            jo.Set<int>("characterUid",data.characterUid);
 
             jo.Set<float>("cd",data.cd);
 
@@ -440,13 +500,21 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
         DataByUid[data.uid]=data;
     
-                    DataByName[data.name]=data;
+                    DataByNameProtouid[(data.name,data.protoUid)]=data;
+    
+                    if(!DatasByLabelProtouid.ContainsKey((data.label,data.protoUid)))
+                        DatasByLabelProtouid[(data.label,data.protoUid)]=new List<Data>();
+                    DatasByLabelProtouid[(data.label,data.protoUid)].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
                     DatasByLabel[data.label].Add(data);
     
-
+                    if(!DatasByProtouid.ContainsKey(data.protoUid))
+                        DatasByProtouid[data.protoUid]=new List<Data>();
+                    DatasByProtouid[data.protoUid].Add(data);
+    
+ProductForm.AddData(data);
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.uid;
@@ -461,13 +529,21 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                     DataByUid.Remove(data.uid);
     
-                    DataByName.Remove(data.name);
+                    DataByNameProtouid.Remove((data.name,data.protoUid));
+    
+                    DatasByLabelProtouid[(data.label,data.protoUid)].Remove(data);
+                    if(DatasByLabelProtouid[(data.label,data.protoUid)].Count==0)
+                        DatasByLabelProtouid.Remove((data.label,data.protoUid));
     
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
                         DatasByLabel.Remove(data.label);
     
-
+                    DatasByProtouid[data.protoUid].Remove(data);
+                    if(DatasByProtouid[data.protoUid].Count==0)
+                        DatasByProtouid.Remove(data.protoUid);
+    
+ProductForm.RemoveData(uid);
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
             removeAction?.Invoke(data);
@@ -494,13 +570,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             }
         }
 
-         private static void RemoveChildren(Data data)
+         private static void RemoveChildren(ProductForm.Data data)
         {
             Init();
             if(data is Data)
                RemoveData(data.uid);      
         }
-         private static void AddChildren(Data superData)
+         private static void AddChildren(ProductForm.Data superData)
         {
             Init();
             if(superData is Data data)
@@ -511,7 +587,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
 
 
-            public static void ChangeUid(Data superData,int oldV,int newV)
+            public static void ChangeUid(ProductForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -521,20 +597,20 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeName(Data superData,string oldV,string newV)
+            public static void ChangeName(ProductForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DataByNameProtouid.Remove((oldV,data.protoUid));
+                    DataByNameProtouid[(newV,data.protoUid)]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeLabel(Data superData,string oldV,string newV)
+            public static void ChangeLabel(ProductForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
@@ -546,7 +622,41 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                         DatasByLabel[newV]=new List<Data>();
                     DatasByLabel[newV].Add(data);
  
+                    DatasByLabelProtouid[(oldV,data.protoUid)].Remove(data);
+                    if(DatasByLabelProtouid[(oldV,data.protoUid)].Count==0)
+                        DatasByLabelProtouid.Remove((oldV,data.protoUid));
+                    if(!DatasByLabelProtouid.ContainsKey((newV,data.protoUid)))
+                        DatasByLabelProtouid[(newV,data.protoUid)]=new List<Data>();
+                    DatasByLabelProtouid[(newV,data.protoUid)].Add(data);
+ 
                 changeLabelAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeProtouid(ProductForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByProtouid[oldV].Remove(data);
+                    if(DatasByProtouid[oldV].Count==0)
+                        DatasByProtouid.Remove(oldV);
+                    if(!DatasByProtouid.ContainsKey(newV))
+                        DatasByProtouid[newV]=new List<Data>();
+                    DatasByProtouid[newV].Add(data);
+ 
+                    DataByNameProtouid.Remove((data.name,oldV));
+                    DataByNameProtouid[(data.name,newV)]=data;
+ 
+                    DatasByLabelProtouid[(data.label,oldV)].Remove(data);
+                    if(DatasByLabelProtouid[(data.label,oldV)].Count==0)
+                        DatasByLabelProtouid.Remove((data.label,oldV));
+                    if(!DatasByLabelProtouid.ContainsKey((data.label,newV)))
+                        DatasByLabelProtouid[(data.label,newV)]=new List<Data>();
+                    DatasByLabelProtouid[(data.label,newV)].Add(data);
+ 
+                changeProtouidAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -561,12 +671,32 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
+            public static void ChangeParamdic(Data superData,Dictionary<string,SkillParamForm.Data> oldV,Dictionary<string,SkillParamForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeParamdicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
             public static void ChangeSkilltypes(Data superData,List<SkillType> oldV,List<SkillType> newV)
             {
                 if(superData is Data data)
                 {
 
                 changeSkilltypesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCharacteruid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCharacteruidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -68,8 +68,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         public void Refresh()
         {
             view.sta_canEquipped.ChangeState(model.data.canEquipe ? 1 : 0);
+            view.sta_equip.ChangeState(model.data.canEquipe ? 1 : 0);
+            view.sta_isConsume.ChangeState(model.data.isConsume ? 1 : 0);
 
-            view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onUseEvent" });
+
+            view.model_EventChooseUse.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onUseEvent" });
             view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onEquipEvent" });
             view.model_EventChooseDisequip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onDisequipEvent" });
 

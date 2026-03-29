@@ -151,17 +151,17 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
 
-            view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack])? SkillForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
+            view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack])? SkillProductForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
 
-            view.txt_heavyAttack.text = model.data.skill.ContainsKey(SkillType.HeavyAttack) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.HeavyAttack])? SkillForm.DataByUid[model.data.skill[SkillType.HeavyAttack]].name : "";
+            view.txt_heavyAttack.text = model.data.skill.ContainsKey(SkillType.HeavyAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.HeavyAttack])? SkillProductForm.DataByUid[model.data.skill[SkillType.HeavyAttack]].name : "";
 
-            view.txt_e.text = model.data.skill.ContainsKey(SkillType.E) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.E])? SkillForm.DataByUid[model.data.skill[SkillType.E]].name : "";
+            view.txt_e.text = model.data.skill.ContainsKey(SkillType.E) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.E])? SkillProductForm.DataByUid[model.data.skill[SkillType.E]].name : "";
 
-            view.txt_q.text = model.data.skill.ContainsKey(SkillType.Q) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.Q])? SkillForm.DataByUid[model.data.skill[SkillType.Q]].name : "";
+            view.txt_q.text = model.data.skill.ContainsKey(SkillType.Q) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Q])? SkillProductForm.DataByUid[model.data.skill[SkillType.Q]].name : "";
 
-            view.txt_passive1.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
+            view.txt_passive1.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
 
-            view.txt_passive2.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
+            view.txt_passive2.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
 
 
 

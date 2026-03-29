@@ -57,6 +57,8 @@ public static partial class GlobalEventHelper
     public static string SCENEOBJECT = "$so$";
     public static string EFFECT = "$ef$";
     public static string UIIMAGE = "$ui$";
+    public static string VECTOR = "$vt$";
+    public static string SKILL = "$sk$";
 
     public static string GetName(string mark, string name = "")
     {
@@ -100,6 +102,10 @@ public static partial class GlobalEventHelper
             res = "effect";
         else if (IsAsset(desc.code, UIIMAGE))
             res = "uiImg";
+        else if (IsAsset(desc.code, VECTOR))
+            res = "vector";
+        else if (IsAsset(desc.code, SKILL))
+            res = "skill";
         return res;
     }
     public static bool IsSceneTrigger(string triggerName, int user)
@@ -227,7 +233,7 @@ public class GameEventController : Z_Controller<GameManager>
             if (GameManager.instance.curProgress.triggeredOnceEvts.ContainsKey(trigger.Item1))
                 GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
         }
-        Z_Map.DynamicGlobalSettings.pauseNav = GameManager.instance.curProgress.blockProgramUid == 0 ? false : true;
+        
     }
 
 

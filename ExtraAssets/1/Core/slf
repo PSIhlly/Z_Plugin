@@ -4,7 +4,11 @@
     "name": "十六夜攻击",
     "label": "",
     "icon": "reservedI$",
-    "skillTypes": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
     "cd": 0.2,
     "lastUseTime": 0.0,
     "events": [

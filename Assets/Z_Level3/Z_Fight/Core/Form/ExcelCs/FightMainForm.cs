@@ -80,7 +80,7 @@ public static readonly int autoUidCnt=100;
                     
                     private int  _uidCnt;
                     /// <summary>
-                    ///uid鎬绘暟
+                    ///uid总数
                     ///</summary>
                     public int  uidCnt{
                                 get{return _uidCnt;}
@@ -98,7 +98,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _fightJa;
                     /// <summary>
-                    ///鎴樻枟鏁版嵁
+                    ///战斗数据
                     ///</summary>
                     public string  fightJa{
                                 get{return _fightJa;}
@@ -116,7 +116,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _weaponJa;
                     /// <summary>
-                    ///姝﹀櫒鏁版嵁
+                    ///武器数据
                     ///</summary>
                     public string  weaponJa{
                                 get{return _weaponJa;}
@@ -134,7 +134,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _bulletJa;
                     /// <summary>
-                    ///瀛愬脊鏁版嵁
+                    ///子弹数据
                     ///</summary>
                     public string  bulletJa{
                                 get{return _bulletJa;}
@@ -152,7 +152,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _weaponBulletJa;
                     /// <summary>
-                    ///姝﹀櫒瀛愬脊鏁版嵁
+                    ///武器子弹数据
                     ///</summary>
                     public string  weaponBulletJa{
                                 get{return _weaponBulletJa;}

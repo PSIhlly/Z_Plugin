@@ -83,7 +83,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _name;
                     /// <summary>
-                    ///åç§°
+                    ///Ãû³Æ
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -101,7 +101,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _prmNames;
                     /// <summary>
-                    ///å‚æ•°åç§°
+                    ///²ÎÊıÃû³Æ
                     ///</summary>
                     public List<string>  prmNames{
                                 get{return _prmNames;}
@@ -119,7 +119,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _prmTypes;
                     /// <summary>
-                    ///å‚æ•°ç±»å‹
+                    ///²ÎÊıÀàĞÍ
                     ///</summary>
                     public List<string>  prmTypes{
                                 get{return _prmTypes;}
@@ -137,7 +137,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _retNames;
                     /// <summary>
-                    ///è¿”å›å€¼åç§°
+                    ///·µ»ØÖµÃû³Æ
                     ///</summary>
                     public List<string>  retNames{
                                 get{return _retNames;}
@@ -155,7 +155,7 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _retTypes;
                     /// <summary>
-                    ///è¿”å›å€¼ç±»å‹
+                    ///·µ»ØÖµÀàĞÍ
                     ///</summary>
                     public List<string>  retTypes{
                                 get{return _retTypes;}
@@ -173,7 +173,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _desc;
                     /// <summary>
-                    ///æè¿°
+                    ///ÃèÊö
                     ///</summary>
                     public string  desc{
                                 get{return _desc;}
@@ -191,7 +191,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _defaultCode;
                     /// <summary>
-                    ///é»˜è®¤ä»£ç 
+                    ///Ä¬ÈÏ´úÂë
                     ///</summary>
                     public string  defaultCode{
                                 get{return _defaultCode;}
@@ -290,9 +290,9 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} - {0}","1-1")},
 
-                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"ï¼ˆ{1}ï¼‰*ï¼ˆ{0}ï¼‰","1*1")},
+                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£¨{1}£©*£¨{0}£©","1*1")},
 
-                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"ï¼ˆ{1}ï¼‰/ï¼ˆ{0}ï¼‰","1/1")},
+                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£¨{1}£©/£¨{0}£©","1/1")},
 
                 {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} = {0}","var=1;")},
 

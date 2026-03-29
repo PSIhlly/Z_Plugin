@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "uid": 5,
+    "name": "杖",
+    "label": "武器",
+    "iconTexName": "$i$d5c609e1c6a70f25983dcd257d40f4c7d7b99e8c$i$",
+    "paramDic": [],
+    "protoUid": 0,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": "Cube"
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": "$i$d5c609e1c6a70f25983dcd257d40f4c7d7b99e8c$i$"
+        }
+      ],
+      "isObstacle": false
+    },
+    "desc": "武器",
+    "amount": 1,
+    "maxAmountPer": 99,
+    "equip": 2,
+    "styleTex": [
+      {
+        "k": 0,
+        "v": "$i$d5c609e1c6a70f25983dcd257d40f4c7d7b99e8c$i$"
+      },
+      {
+        "k": 1,
+        "v": "$i$d5c609e1c6a70f25983dcd257d40f4c7d7b99e8c$i$"
+      },
+      {
+        "k": 2,
+        "v": "$i$d5c609e1c6a70f25983dcd257d40f4c7d7b99e8c$i$"
+      }
+    ],
+    "price": 0,
+    "canEquipe": true,
+    "events": [],
+    "isConsume": true
+  }
+]

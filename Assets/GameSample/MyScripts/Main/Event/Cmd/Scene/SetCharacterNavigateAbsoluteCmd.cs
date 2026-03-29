@@ -30,13 +30,14 @@ namespace Z_Code
         {
             var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER)];
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
-            if(data!=null)
+            if (data != null)
             {
                 data.speed = productData.paramDic[productData.speedParamName].GetValue().num;
                 data.pathDis = 999;
                 data.alertDis = 999;
                 data.destination = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
-                data.navEnabled = true;
+
+                productData.enableNav = true;
             }
             return true;
         }

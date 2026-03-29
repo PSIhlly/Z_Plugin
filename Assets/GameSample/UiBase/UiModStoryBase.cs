@@ -429,6 +429,122 @@ namespace ModStorySceneObjectParameter
     }
 }
 
+namespace ModStorySkillParameter
+
+{
+
+
+
+
+
+
+
+    public partial class UiArgParam:UiParam
+    {
+    }
+
+    public partial class UiArgView:UiView
+    {
+
+            public GameObject go_arg;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_delete;
+            public Ipt ipt_name;
+            public Ipt ipt_value;
+            public Dp dp_;
+        public UiArgView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_arg = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
+        }
+
+    }
+    public partial class UiArgCtrl:UiCtrl
+    {
+        public UiArgView view;
+        public UiArgModel model;
+        public UiArgParam param;
+        public UiModStorySkillParameterCtrl parent=>(UiModStorySkillParameterCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiArgParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiArgView(uiHolder);
+            model=new UiArgModel();
+
+
+        }
+
+    }
+    public partial class UiArgModel:UiModel
+    {
+        
+    }
+    public partial class UiModStorySkillParameterParam:UiParam
+    {
+    }
+
+    public partial class UiModStorySkillParameterView:UiView
+    {
+
+            public ScrView scr_args;
+            public GameObject go_arg;
+            public UiArgCtrl sub_arg;
+        public UiModStorySkillParameterView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            scr_args = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            go_arg = uiHolder.elementTrsLst[1].gameObject;
+            sub_arg = (UiArgCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStorySkillParameterCtrl:UiCtrl
+    {
+        public UiModStorySkillParameterView view;
+        public UiModStorySkillParameterModel model;
+        public UiModStorySkillParameterParam param;
+        public UiModStoryParameterCtrl parent=>(UiModStoryParameterCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStorySkillParameterParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStorySkillParameterView(uiHolder);
+            model=new UiModStorySkillParameterModel();
+
+
+            view.sub_arg = new UiArgCtrl();
+            view.sub_arg.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiModStorySkillParameterModel:UiModel
+    {
+        
+    }
+}
+
 namespace ModStoryConfig
 
 {
@@ -497,6 +613,7 @@ namespace ModStoryConfig
             public ModStoryCharacterParameter.UiModStoryCharacterParameterCtrl page_ModStoryCharacterParameter;
             public ModStoryItemParameter.UiModStoryItemParameterCtrl page_ModStoryItemParameter;
             public ModStorySceneObjectParameter.UiModStorySceneObjectParameterCtrl page_ModStorySceneObjectParameter;
+            public ModStorySkillParameter.UiModStorySkillParameterCtrl page_ModStorySkillParameter;
             public ModStoryConfig.UiModStoryConfigCtrl page_ModStoryConfig;
             public Btn btn_characterParameter;
             public Sta sta_characterParameter;
@@ -504,6 +621,8 @@ namespace ModStoryConfig
             public Sta sta_itemParameter;
             public Btn btn_sceneObjectParameter;
             public Sta sta_sceneObjectParameter;
+            public Btn btn_skillParameter;
+            public Sta sta_skillParameter;
             public Btn btn_config;
             public Sta sta_config;
         public UiModStoryParameterView(UiHolder uiHolder):base(uiHolder)
@@ -512,15 +631,18 @@ namespace ModStoryConfig
             page_ModStoryCharacterParameter = (ModStoryCharacterParameter.UiModStoryCharacterParameterCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
             page_ModStoryItemParameter = (ModStoryItemParameter.UiModStoryItemParameterCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
             page_ModStorySceneObjectParameter = (ModStorySceneObjectParameter.UiModStorySceneObjectParameterCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            page_ModStoryConfig = (ModStoryConfig.UiModStoryConfigCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            btn_characterParameter = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_characterParameter = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            btn_itemParameter = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_itemParameter = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_sceneObjectParameter = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_sceneObjectParameter = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            btn_config = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            sta_config = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            page_ModStorySkillParameter = (ModStorySkillParameter.UiModStorySkillParameterCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            page_ModStoryConfig = (ModStoryConfig.UiModStoryConfigCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            btn_characterParameter = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_characterParameter = uiHolder.elementTrsLst[6].GetComponent<Sta>();
+            btn_itemParameter = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_itemParameter = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            btn_sceneObjectParameter = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            sta_sceneObjectParameter = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            btn_skillParameter = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_skillParameter = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_config = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_config = uiHolder.elementTrsLst[14].GetComponent<Sta>();
         }
 
     }
@@ -551,8 +673,10 @@ namespace ModStoryConfig
             view.page_ModStoryItemParameter.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.page_ModStorySceneObjectParameter = new ModStorySceneObjectParameter.UiModStorySceneObjectParameterCtrl();
             view.page_ModStorySceneObjectParameter.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.page_ModStorySkillParameter = new ModStorySkillParameter.UiModStorySkillParameterCtrl();
+            view.page_ModStorySkillParameter.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.page_ModStoryConfig = new ModStoryConfig.UiModStoryConfigCtrl();
-            view.page_ModStoryConfig.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.page_ModStoryConfig.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
         }
 
     }
@@ -1304,7 +1428,6 @@ namespace ModStoryCharacterUnitAppearanceUnit
             public Ipt ipt_name;
             public Ipt ipt_scale;
             public Ipt ipt_interval;
-            public Ipt ipt_priority;
             public Btn btn_deleteTex;
             public Btn btn_resetTex;
             public ScrView scr_equipParts;
@@ -1338,30 +1461,29 @@ namespace ModStoryCharacterUnitAppearanceUnit
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             ipt_scale = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             ipt_interval = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
-            ipt_priority = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
-            btn_deleteTex = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_resetTex = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            scr_equipParts = uiHolder.elementTrsLst[10].GetComponent<ScrView>();
-            sta_equip = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            scr_parts = uiHolder.elementTrsLst[12].GetComponent<ScrView>();
-            go_toggle = uiHolder.elementTrsLst[13].gameObject;
-            sub_toggle = (UiToggleCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[15].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
-            btn_image = uiHolder.elementTrsLst[17].GetComponent<Btn>();
-            rimg_image = uiHolder.elementTrsLst[18].GetComponent<RImg>();
-            rtf_image = uiHolder.elementTrsLst[19].GetComponent<RectTransform>();
-            rtf_axis = uiHolder.elementTrsLst[20].GetComponent<RectTransform>();
-            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
-            go_equipPart = uiHolder.elementTrsLst[22].gameObject;
-            sub_equipPart = (UiEquipPartCtrl) uiHolder.elementTrsLst[23].GetComponent<UiHolder>().ctrl;
-            btn_itemStyle = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            btn_plus = uiHolder.elementTrsLst[25].GetComponent<Btn>();
-            btn_minus = uiHolder.elementTrsLst[26].GetComponent<Btn>();
-            go_part = uiHolder.elementTrsLst[27].gameObject;
-            sub_part = (UiPartCtrl) uiHolder.elementTrsLst[28].GetComponent<UiHolder>().ctrl;
-            txt_ = uiHolder.elementTrsLst[29].GetComponent<Txt>();
-            txt_layer = uiHolder.elementTrsLst[30].GetComponent<Txt>();
+            btn_deleteTex = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_resetTex = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            scr_equipParts = uiHolder.elementTrsLst[9].GetComponent<ScrView>();
+            sta_equip = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            scr_parts = uiHolder.elementTrsLst[11].GetComponent<ScrView>();
+            go_toggle = uiHolder.elementTrsLst[12].gameObject;
+            sub_toggle = (UiToggleCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[14].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            btn_image = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            rimg_image = uiHolder.elementTrsLst[17].GetComponent<RImg>();
+            rtf_image = uiHolder.elementTrsLst[18].GetComponent<RectTransform>();
+            rtf_axis = uiHolder.elementTrsLst[19].GetComponent<RectTransform>();
+            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[20].GetComponent<UiHolder>().ctrl;
+            go_equipPart = uiHolder.elementTrsLst[21].gameObject;
+            sub_equipPart = (UiEquipPartCtrl) uiHolder.elementTrsLst[22].GetComponent<UiHolder>().ctrl;
+            btn_itemStyle = uiHolder.elementTrsLst[23].GetComponent<Btn>();
+            btn_plus = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            btn_minus = uiHolder.elementTrsLst[25].GetComponent<Btn>();
+            go_part = uiHolder.elementTrsLst[26].gameObject;
+            sub_part = (UiPartCtrl) uiHolder.elementTrsLst[27].GetComponent<UiHolder>().ctrl;
+            txt_ = uiHolder.elementTrsLst[28].GetComponent<Txt>();
+            txt_layer = uiHolder.elementTrsLst[29].GetComponent<Txt>();
         }
 
     }
@@ -1926,14 +2048,20 @@ namespace ModStorySkillUnit
 
 
 
-    public partial class UiModStorySkillUnitParam:UiParam
+namespace ModStorySkillUnitOverview
+
+{
+
+
+
+
+    public partial class UiModStorySkillUnitOverviewParam:UiParam
     {
     }
 
-    public partial class UiModStorySkillUnitView:UiView
+    public partial class UiModStorySkillUnitOverviewView:UiView
     {
 
-            public Btn btn_back;
             public Btn btn_delete;
             public UiEventChooseCtrl model_EventChoose;
             public Ipt ipt_name;
@@ -1951,27 +2079,203 @@ namespace ModStorySkillUnit
             public Btn btn_q;
             public Sta sta_q;
             public Txt txt_triggerCondition;
+        public UiModStorySkillUnitOverviewView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            model_EventChoose = (UiEventChooseCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            ipt_label = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            ipt_cd = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_icon = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            img_icon = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            btn_triggerCondition = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_lightAttack = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_heavyAttack = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            btn_e = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_e = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            btn_q = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            sta_q = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            txt_triggerCondition = uiHolder.elementTrsLst[16].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiModStorySkillUnitOverviewCtrl:UiCtrl
+    {
+        public UiModStorySkillUnitOverviewView view;
+        public UiModStorySkillUnitOverviewModel model;
+        public UiModStorySkillUnitOverviewParam param;
+        public UiModStorySkillUnitCtrl parent=>(UiModStorySkillUnitCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStorySkillUnitOverviewParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStorySkillUnitOverviewView(uiHolder);
+            model=new UiModStorySkillUnitOverviewModel();
+
+
+            view.model_EventChoose = new UiEventChooseCtrl();
+            view.model_EventChoose.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiModStorySkillUnitOverviewModel:UiModel
+    {
+        
+    }
+}
+
+namespace ModStorySkillUnitParameter
+
+{
+
+
+
+
+
+
+
+    public partial class UiArgIptParam:UiParam
+    {
+    }
+
+    public partial class UiArgIptView:UiView
+    {
+
+            public GameObject go_argIpt;
+            public Txt txt_;
+            public Btn btn_min;
+            public Btn btn_value;
+            public Btn btn_max;
+            public Txt txt_min;
+            public Txt txt_value;
+            public Txt txt_max;
+        public UiArgIptView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_argIpt = uiHolder.elementTrsLst[0].gameObject;
+            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            btn_min = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_value = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_max = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            txt_min = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_value = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            txt_max = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiArgIptCtrl:UiCtrl
+    {
+        public UiArgIptView view;
+        public UiArgIptModel model;
+        public UiArgIptParam param;
+        public UiModStorySkillUnitParameterCtrl parent=>(UiModStorySkillUnitParameterCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiArgIptParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiArgIptView(uiHolder);
+            model=new UiArgIptModel();
+
+
+        }
+
+    }
+    public partial class UiArgIptModel:UiModel
+    {
+        
+    }
+    public partial class UiModStorySkillUnitParameterParam:UiParam
+    {
+    }
+
+    public partial class UiModStorySkillUnitParameterView:UiView
+    {
+
+            public ScrView scr_argIpts;
+            public GameObject go_argIpt;
+            public UiArgIptCtrl sub_argIpt;
+        public UiModStorySkillUnitParameterView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            scr_argIpts = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            go_argIpt = uiHolder.elementTrsLst[1].gameObject;
+            sub_argIpt = (UiArgIptCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStorySkillUnitParameterCtrl:UiCtrl
+    {
+        public UiModStorySkillUnitParameterView view;
+        public UiModStorySkillUnitParameterModel model;
+        public UiModStorySkillUnitParameterParam param;
+        public UiModStorySkillUnitCtrl parent=>(UiModStorySkillUnitCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStorySkillUnitParameterParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStorySkillUnitParameterView(uiHolder);
+            model=new UiModStorySkillUnitParameterModel();
+
+
+            view.sub_argIpt = new UiArgIptCtrl();
+            view.sub_argIpt.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiModStorySkillUnitParameterModel:UiModel
+    {
+        
+    }
+}
+
+    public partial class UiModStorySkillUnitParam:UiParam
+    {
+    }
+
+    public partial class UiModStorySkillUnitView:UiView
+    {
+
+            public Btn btn_back;
+            public ModStorySkillUnitOverview.UiModStorySkillUnitOverviewCtrl page_ModStorySkillUnitOverview;
+            public ModStorySkillUnitParameter.UiModStorySkillUnitParameterCtrl page_ModStorySkillUnitParameter;
+            public Btn btn_overview;
+            public Sta sta_overview;
+            public Btn btn_parameter;
+            public Sta sta_parameter;
         public UiModStorySkillUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            model_EventChoose = (UiEventChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_cd = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            btn_icon = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            img_icon = uiHolder.elementTrsLst[7].GetComponent<Img>();
-            btn_triggerCondition = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            sta_lightAttack = uiHolder.elementTrsLst[10].GetComponent<Sta>();
-            btn_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            sta_heavyAttack = uiHolder.elementTrsLst[12].GetComponent<Sta>();
-            btn_e = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            sta_e = uiHolder.elementTrsLst[14].GetComponent<Sta>();
-            btn_q = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            sta_q = uiHolder.elementTrsLst[16].GetComponent<Sta>();
-            txt_triggerCondition = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            page_ModStorySkillUnitOverview = (ModStorySkillUnitOverview.UiModStorySkillUnitOverviewCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            page_ModStorySkillUnitParameter = (ModStorySkillUnitParameter.UiModStorySkillUnitParameterCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            btn_overview = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_overview = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            btn_parameter = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_parameter = uiHolder.elementTrsLst[6].GetComponent<Sta>();
         }
 
     }
@@ -1996,8 +2300,10 @@ namespace ModStorySkillUnit
             model=new UiModStorySkillUnitModel();
 
 
-            view.model_EventChoose = new UiEventChooseCtrl();
-            view.model_EventChoose.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_ModStorySkillUnitOverview = new ModStorySkillUnitOverview.UiModStorySkillUnitOverviewCtrl();
+            view.page_ModStorySkillUnitOverview.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_ModStorySkillUnitParameter = new ModStorySkillUnitParameter.UiModStorySkillUnitParameterCtrl();
+            view.page_ModStorySkillUnitParameter.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

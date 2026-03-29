@@ -83,7 +83,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<BoxDataForm.Data>  _stack;
                     /// <summary>
-                    ///æ ˆ
+                    ///Õ»
                     ///</summary>
                     public List<BoxDataForm.Data>  stack{
                                 get{return _stack;}
@@ -101,7 +101,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Dictionary<string,BoxDataForm.Data>  _heap;
                     /// <summary>
-                    ///å †
+                    ///¶Ñ
                     ///</summary>
                     public Dictionary<string,BoxDataForm.Data>  heap{
                                 get{return _heap;}
@@ -119,7 +119,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private ProgramDataForm.Data  _program;
                     /// <summary>
-                    ///ç¨‹åº
+                    ///³ÌĞò
                     ///</summary>
                     public ProgramDataForm.Data  program{
                                 get{return _program;}
@@ -137,7 +137,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _p;
                     /// <summary>
-                    ///ç¨‹åºè®¡æ•°å™¨
+                    ///³ÌĞò¼ÆÊıÆ÷
                     ///</summary>
                     public int  p{
                                 get{return _p;}
@@ -155,7 +155,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _top;
                     /// <summary>
-                    ///æ ˆé¡¶
+                    ///Õ»¶¥
                     ///</summary>
                     public int  top{
                                 get{return _top;}
@@ -173,7 +173,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _user;
                     /// <summary>
-                    ///è°ƒç”¨è€…id
+                    ///µ÷ÓÃÕßid
                     ///</summary>
                     public int  user{
                                 get{return _user;}
@@ -191,7 +191,7 @@ public static readonly int autoUidCnt=1000000;
                     
                     private InterpretDataForm.Data  _subInterpret;
                     /// <summary>
-                    ///å­è§£é‡Šå™¨
+                    ///×Ó½âÊÍÆ÷
                     ///</summary>
                     public InterpretDataForm.Data  subInterpret{
                                 get{return _subInterpret;}

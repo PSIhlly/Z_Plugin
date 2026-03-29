@@ -142,11 +142,11 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
                 if (evt.b is CharacterUnit ch2)
                 {
-                    heap["trigger"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch2.productInfo.Item1.ToString()));
+                    heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch2.productInfo.Item1.ToString()));
                 }
                 else if (evt.b is ObjectUnit o2)
                 {
-                    heap["trigger"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, o2.data.uid.ToString()));
+                    heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, o2.data.uid.ToString()));
                 }
 
                 switch (evt.type)

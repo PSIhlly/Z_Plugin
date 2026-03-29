@@ -32,7 +32,7 @@ namespace Z_Code
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
             if (data != null)
             {
-                data.navEnabled = false;
+                productData.enableNav = false;
             }
             return true;
         }

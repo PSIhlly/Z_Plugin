@@ -82,7 +82,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _title;
                     /// <summary>
-                    ///æ ‡é¢˜
+                    ///±êÌâ
                     ///</summary>
                     public string  title{
                                 get{return _title;}
@@ -100,7 +100,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainText;
                     /// <summary>
-                    ///å†…å®¹
+                    ///ÄÚÈİ
                     ///</summary>
                     public string  mainText{
                                 get{return _mainText;}
@@ -118,7 +118,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainPictureName;
                     /// <summary>
-                    ///èƒŒæ™¯å›¾ç‰‡
+                    ///±³¾°Í¼Æ¬
                     ///</summary>
                     public string  mainPictureName{
                                 get{return _mainPictureName;}
@@ -136,7 +136,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainVideoName;
                     /// <summary>
-                    ///èƒŒæ™¯è§†é¢‘
+                    ///±³¾°ÊÓÆµ
                     ///</summary>
                     public string  mainVideoName{
                                 get{return _mainVideoName;}
@@ -154,7 +154,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _profilePictureName;
                     /// <summary>
-                    ///å¤´åƒå›¾ç‰‡
+                    ///Í·ÏñÍ¼Æ¬
                     ///</summary>
                     public string  profilePictureName{
                                 get{return _profilePictureName;}
@@ -172,7 +172,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainAudioName;
                     /// <summary>
-                    ///éŸ³å£°
+                    ///ÒôÉù
                     ///</summary>
                     public string  mainAudioName{
                                 get{return _mainAudioName;}

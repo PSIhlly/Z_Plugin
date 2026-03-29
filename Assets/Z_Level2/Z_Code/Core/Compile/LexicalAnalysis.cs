@@ -92,7 +92,7 @@ namespace Z_Code
                 }
                 else if (IsEmpty(code[i]))
                 {
-
+                    End(lst, sb);
                 }
                 else if (IsSplit(code[i]))
                 {

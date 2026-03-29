@@ -25,7 +25,7 @@ namespace Z_DataSystem.Form
     {
         public partial class Data
         {
-            public void ToProduct(int protoUid)
+            public virtual void ToProduct(int protoUid)
             {
                 this.protoUid = protoUid;
                 AddData(this);

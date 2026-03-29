@@ -33,6 +33,13 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             SceneForm.AddData(sceneData);
             CharacterParamForm.Clear();
             CharacterProductForm.Clear();
+
+            ItemParamForm.Clear();
+            ItemProductForm.Clear();
+
+            SkillParamForm.Clear();
+            SkillProductForm.Clear();
+
             ModManager.instance.assetCtrl.CreateCharacter("Player");
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;

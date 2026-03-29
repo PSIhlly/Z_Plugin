@@ -136,6 +136,11 @@ public class PlayManager : Z_MonoManager<PlayManager>
         var characters = new List<int>();
         var charactersActive = new List<int>();
 
+        foreach(var ch in CharacterProductForm.DataByUid.Values)
+        {
+            ch.CheckSkillProduct();
+        }
+
 
         foreach (var uid in progress.team)
         {

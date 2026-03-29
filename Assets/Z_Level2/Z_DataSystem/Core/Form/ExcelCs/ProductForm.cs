@@ -75,7 +75,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _name;
                     /// <summary>
-                    ///鍚嶇О
+                    ///名称
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -93,7 +93,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _label;
                     /// <summary>
-                    ///鏍囩
+                    ///标签
                     ///</summary>
                     public string  label{
                                 get{return _label;}
@@ -111,7 +111,7 @@ public static readonly int autoUidCnt=100;
                     
                     private int  _protoUid;
                     /// <summary>
-                    ///鍘熷瀷Uid
+                    ///原型Uid
                     ///</summary>
                     public int  protoUid{
                                 get{return _protoUid;}

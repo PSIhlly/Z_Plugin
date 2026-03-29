@@ -65,10 +65,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
         }
 
-        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, "", "", "",default));
+        CharacterParamForm.AddData(new CharacterParamForm.Data(-1, name, 0, "", "", "", default));
         foreach (var character in CharacterProductForm.DataByUid.Values)
         {
-            character.paramDic[name] = new CharacterParamForm.Data(-1, name, 0, "", "", "",default);
+            character.paramDic[name] = new CharacterParamForm.Data(-1, name, 0, "", "", "", default);
         }
     }
     public void DeleteCharacterArg(string name)
@@ -79,7 +79,20 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             character.paramDic.Remove(name);
         }
     }
-
+    public void RenameCharacterParam(string oldName, string newName)
+    {
+        CharacterParamForm.DataByName[oldName].name = newName;
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            var prm = character.paramDic.GetDv(oldName, null);
+            if (prm != null)
+            {
+                character.paramDic[newName] = prm;
+                prm.name = newName;
+                character.paramDic.Remove(oldName);
+            }
+        }
+    }
 
     public void CreateItemArg(string name)
     {
@@ -94,7 +107,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         ItemParamForm.AddData(new ItemParamForm.Data(-1, name, 0, "", "", "", default));
         foreach (var item in ItemProductForm.DataByUid.Values)
         {
-            item.paramDic[name] = new ItemParamForm.Data(-1, name, 0, "", "", "",default);
+            item.paramDic[name] = new ItemParamForm.Data(-1, name, 0, "", "", "", default);
         }
     }
     public void DeleteItemArg(string name)
@@ -103,6 +116,20 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         foreach (var item in ItemProductForm.DataByUid.Values)
         {
             item.paramDic.Remove(name);
+        }
+    }
+    public void RenameItemParam(string oldName, string newName)
+    {
+        ItemParamForm.DataByName[oldName].name = newName;
+        foreach (var item in ItemProductForm.DataByUid.Values)
+        {
+            var prm = item.paramDic.GetDv(oldName, null);
+            if (prm != null)
+            {
+                item.paramDic[newName] = prm;
+                prm.name = newName;
+                item.paramDic.Remove(oldName);
+            }
         }
     }
 
@@ -116,10 +143,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             name = StringHelper.GetUniqueName(MapObjectParamForm.DataByName.Keys);
         }
 
-        MapObjectParamForm.AddData(new MapObjectParamForm.Data(-1, name, 0, "","",""));
+        MapObjectParamForm.AddData(new MapObjectParamForm.Data(-1, name, 0, "", "", ""));
         foreach (var obj in MapObjectForm.DataById.Values)
         {
-            obj.paramDic[name] = new MapObjectParamForm.Data(-1, name, 0, "","","");
+            obj.paramDic[name] = new MapObjectParamForm.Data(-1, name, 0, "", "", "");
             obj.paramDic = obj.paramDic;//refresh
         }
     }
@@ -143,7 +170,40 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             obj.paramDic = obj.paramDic;//refresh
         }
     }
+    public void CreateSkillArg(string name)
+    {
+        if (SkillParamForm.DataByName.Keys.Count > GlobalSettings.SKILL_PARAM_MAX)
+            return;
 
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(SkillParamForm.DataByName.Keys);
+        }
+
+        SkillParamForm.AddData(new SkillParamForm.Data(-1, name, 0, "", "", "", default));
+        foreach (var skill in SkillProductForm.DataByUid.Values)
+        {
+            skill.paramDic[name] = new SkillParamForm.Data(-1, name, 0, "", "", "", default);
+        }
+    }
+    public void DeleteSkillArg(string name)
+    {
+        SkillParamForm.RemoveData(SkillParamForm.DataByName[name].uid);
+        foreach (var skill in SkillProductForm.DataByUid.Values)
+        {
+            skill.paramDic.Remove(name);
+        }
+    }
+    public void RenameSkillParam(string oldName, string newName)
+    {
+        SkillParamForm.DataByName[oldName].name = newName;
+        foreach (var obj in SkillProductForm.DataByUid.Values)
+        {
+            obj.paramDic[newName] = obj.paramDic[oldName];
+            obj.paramDic.Remove(oldName);
+            obj.paramDic = obj.paramDic;//refresh
+        }
+    }
 
     #endregion
 
@@ -359,20 +419,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
-    public void RenameCharacterParam(string oldName, string newName)
-    {
-        CharacterParamForm.DataByName[oldName].name = newName;
-        foreach (var character in CharacterProductForm.DataByUid.Values)
-        {
-            var prm = character.paramDic.GetDv(oldName, null);
-            if (prm != null)
-            {
-                character.paramDic[newName] = prm;
-                prm.name = newName;
-                character.paramDic.Remove(oldName);
-            }
-        }
-    }
+
 
 
     public void ImportCharacterAvatar(int uid)
@@ -402,7 +449,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public CharacterAnimForm.Data CreateCharacterAnim(string name)
     {
-        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } },1);
+        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } });
     }
     public CharacterAnimClipForm.Data CreateCharacterAnimClip()
     {
@@ -422,7 +469,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            name = StringHelper.GetUniqueName(CharacterParamForm.DataByName.Keys);
+            name = StringHelper.GetUniqueName(CharacterProductForm.DataByUid.Keys);
         }
         var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "anim", CreateCharacterAnim("anim") } };
 
@@ -441,7 +488,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false,new Dictionary<SkillType,int>()));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false, new Dictionary<SkillType, int>(), 0, false));
     }
     public void DeleteCharacter(int uid)
     {
@@ -566,13 +613,18 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            name = StringHelper.GetUniqueName(SkillForm.DataByName.Keys);
+            name = StringHelper.GetUniqueName(SkillProductForm.DataByUid.Keys);
         }
-        SkillForm.AddData(new SkillForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), new List<SkillType>(), 1,0, new Dictionary<string, EventTriggerForm.Data>(), 0));
+        var paramDic = new Dictionary<string, SkillParamForm.Data>();
+        foreach (var prm in SkillParamForm.DataByName.Values)
+        {
+            paramDic[prm.name] = prm.Copy();
+        }
+        SkillProductForm.AddData(new SkillProductForm.Data(-1, name, "", 0, GlobalNameHelper.GetDefaultTexName(), paramDic, new List<SkillType>(), 0, 1, 0, new Dictionary<string, EventTriggerForm.Data>(), 0));
     }
     public void DeleteSkill(int uid)
     {
-        SkillForm.RemoveData(uid);
+        SkillProductForm.RemoveData(uid);
     }
     public void ImportSkillIcon(int skillUid)
     {
@@ -580,25 +632,25 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                var skillData = SkillForm.DataByUid[skillUid];
+                var skillData = SkillProductForm.DataByUid[skillUid];
                 skillData.icon = data.name;
                 GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
     }
-    public void ChooseSkill(string title, Action<SkillForm.Data> act)
+    public void ChooseSkill(string title, Action<SkillProductForm.Data> act)
     {
         var items = new EntryItem();
 
-        foreach (var data in SkillForm.DataByUid.Values)
+        foreach (var data in SkillProductForm.DataByUid.Values)
         {
-            items.Add(data.name, TexAssetForm.DataByName[data.icon].GetSprite());
+            items.Add(data.name, TexAssetForm.DataByName[data.icon].GetSprite(), data.uid);
         }
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>
             {
-                act?.Invoke(SkillForm.DataByName[item.content]);
+                act?.Invoke(SkillProductForm.DataByUid[item.id]);
                 return true;
             }, items);
     }
@@ -671,14 +723,14 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return true;
         }, items);
     }
-    public void ChooseBasicCmd(BoxDataForm.Data box,Action onComplete)
+    public void ChooseBasicCmd(BoxDataForm.Data box, Action onComplete)
     {
         var items = new EntryItem();
-        items.Add(TextManager.instance.GetTxt("Num"),null,1);
+        items.Add(TextManager.instance.GetTxt("Num"), null, 1);
         items.Add(TextManager.instance.GetTxt("Text"), null, 2);
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>
         {
-            switch(res.id)
+            switch (res.id)
             {
                 case 1:
                     NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), true, (res) =>
@@ -691,7 +743,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                         onComplete?.Invoke();
                         return true;
                     }, box.num.ToString());
-                    
+
                     break;
                 case 2:
                     NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), true, (res) =>
@@ -764,20 +816,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
 
 
-    public void RenameItemParam(string oldName, string newName)
-    {
-        ItemParamForm.DataByName[oldName].name = newName;
-        foreach (var item in ItemProductForm.DataByUid.Values)
-        {
-            var prm = item.paramDic.GetDv(oldName, null);
-            if (prm != null)
-            {
-                item.paramDic[newName] = prm;
-                prm.name = newName;
-                item.paramDic.Remove(oldName);
-            }
-        }
-    }
+
 
 
 
@@ -801,7 +840,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         if (string.IsNullOrEmpty(name))
         {
-            name = StringHelper.GetUniqueName(ItemParamForm.DataByName.Keys);
+            name = StringHelper.GetUniqueName(ItemProductForm.DataByUid.Keys);
         }
         var dic = new Dictionary<string, ItemParamForm.Data>();
         foreach (var prm in ItemParamForm.DataByName.Values)
@@ -815,7 +854,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             styleTex[style] = GlobalNameHelper.GetDefaultTexName();
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(),true));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true));
     }
     public void DeleteItem(int itemUid)
     {

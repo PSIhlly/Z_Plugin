@@ -111,7 +111,7 @@ namespace Z_Fight.Form
         {
 
                 /// <summary>
-                ///å•ä½é€»è¾‘
+                ///µ¥Î»Âß¼­
                 ///</summary>
                 public FightUnit unit
                 {
@@ -123,7 +123,7 @@ namespace Z_Fight.Form
 
                     private Dictionary<int,int>  _itemIdCountDic;
                     /// <summary>
-                    ///é“å…·æŒæœ‰æ•°å­—å…¸
+                    ///µÀ¾ß³ÖÓĞÊı×Öµä
                     ///</summary>
                     public Dictionary<int,int>  itemIdCountDic{
                                 get{return _itemIdCountDic;}
@@ -141,7 +141,7 @@ namespace Z_Fight.Form
                     
                     private List<int>  _curUsingWeaponsSid;
                     /// <summary>
-                    ///ä½¿ç”¨ä¸­subId
+                    ///Ê¹ÓÃÖĞsubId
                     ///</summary>
                     public List<int>  curUsingWeaponsSid{
                                 get{return _curUsingWeaponsSid;}
@@ -159,7 +159,7 @@ namespace Z_Fight.Form
                     
                     private List<int>  _curReloadWeaponsSid;
                     /// <summary>
-                    ///è£…å¡«ä¸­subId
+                    ///×°ÌîÖĞsubId
                     ///</summary>
                     public List<int>  curReloadWeaponsSid{
                                 get{return _curReloadWeaponsSid;}
@@ -177,7 +177,7 @@ namespace Z_Fight.Form
                     
                     private float  _alertDistance;
                     /// <summary>
-                    ///æˆ˜æ–—è§¦å‘è·ç¦»
+                    ///Õ½¶·´¥·¢¾àÀë
                     ///</summary>
                     public float  alertDistance{
                                 get{return _alertDistance;}
@@ -195,7 +195,7 @@ namespace Z_Fight.Form
                     
                     private float  _hp;
                     /// <summary>
-                    ///è¡€é‡
+                    ///ÑªÁ¿
                     ///</summary>
                     public float  hp{
                                 get{return _hp;}
@@ -213,7 +213,7 @@ namespace Z_Fight.Form
                     
                     private float  _hpMax;
                     /// <summary>
-                    ///è¡€é‡ä¸Šé™
+                    ///ÑªÁ¿ÉÏÏŞ
                     ///</summary>
                     public float  hpMax{
                                 get{return _hpMax;}
@@ -231,7 +231,7 @@ namespace Z_Fight.Form
                     
                     private float  _defence;
                     /// <summary>
-                    ///æŠ¤ç”²
+                    ///»¤¼×
                     ///</summary>
                     public float  defence{
                                 get{return _defence;}
@@ -249,7 +249,7 @@ namespace Z_Fight.Form
                     
                     private int  _targetFightUid;
                     /// <summary>
-                    ///ç›®æ ‡uid
+                    ///Ä¿±êuid
                     ///</summary>
                     public int  targetFightUid{
                                 get{return _targetFightUid;}
@@ -267,7 +267,7 @@ namespace Z_Fight.Form
                     
                     private float  _reloadTime;
                     /// <summary>
-                    ///è£…å¡«æŒç»­æ—¶é—´
+                    ///×°Ìî³ÖĞøÊ±¼ä
                     ///</summary>
                     public float  reloadTime{
                                 get{return _reloadTime;}
@@ -285,7 +285,7 @@ namespace Z_Fight.Form
                     
                     private bool  _isMine;
                     /// <summary>
-                    ///æ˜¯æˆ‘è‡ªå·±
+                    ///ÊÇÎÒ×Ô¼º
                     ///</summary>
                     public bool  isMine{
                                 get{return _isMine;}

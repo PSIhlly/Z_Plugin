@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using Z_Text;
 using Unity.Burst.Intrinsics;
+using Z_Code;
 using Z_DataSystem.Form;
+using Z_Text;
+using Z_Texture;
+using Z_Ui.Base;
 
 namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterData
 {
@@ -46,7 +47,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterData
                 if (model.data.CanShow(pair.Key))
                     gameArgsCon.Add(new UiGameArgsParam()
                     {
-                        content = pair.Key + ":" + pair.Value.v
+                        content = pair.Key + ":" + CodeHelper.GetBoxContent(pair.Value.GetValue())
                     });
             }
             gameArgsCon.Refresh();

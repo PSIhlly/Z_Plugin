@@ -75,7 +75,7 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _key;
                     /// <summary>
-                    ///绱㈠紩
+                    ///索引
                     ///</summary>
                     public string  key{
                                 get{return _key;}
@@ -93,7 +93,7 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _contentEn;
                     /// <summary>
-                    ///鑻辨枃
+                    ///英文
                     ///</summary>
                     public string  contentEn{
                                 get{return _contentEn;}
@@ -111,7 +111,7 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _contentCn;
                     /// <summary>
-                    ///涓枃
+                    ///中文
                     ///</summary>
                     public string  contentCn{
                                 get{return _contentCn;}

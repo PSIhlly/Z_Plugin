@@ -97,6 +97,10 @@ namespace Form
                 
         public static Action<Data,Dictionary<SkillType,int>,Dictionary<SkillType,int>> changeSkillAction;
                 
+        public static Action<Data,float,float> changeRecoverytimeAction;
+                
+        public static Action<Data,bool,bool> changeEnablenavAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -336,11 +340,47 @@ namespace Form
                  
                      }
                     
+                    private float  _recoveryTime;
+                    /// <summary>
+                    ///取消僵直时间戳(s)
+                    ///</summary>
+                    public float  recoveryTime{
+                                get{return _recoveryTime;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeRecoverytime(this,_recoveryTime,value); 
+                    }
+        
+                _recoveryTime = value;
+                }
+                 
+                     }
+                    
+                    private bool  _enableNav;
+                    /// <summary>
+                    ///开启寻路
+                    ///</summary>
+                    public bool  enableNav{
+                                get{return _enableNav;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeEnablenav(this,_enableNav,value); 
+                    }
+        
+                _enableNav = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique,Dictionary<SkillType,int> skill):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -360,6 +400,8 @@ namespace Form
              this.tachie = tachie;
              this.unique = unique;
              this.skill = skill;
+             this.recoveryTime = recoveryTime;
+             this.enableNav = enableNav;
 
             }
             public void Reset(Data data)
@@ -382,11 +424,13 @@ namespace Form
              this.tachie = data.tachie;
              this.unique = data.unique;
              this.skill = data.skill;
+             this.recoveryTime = data.recoveryTime;
+             this.enableNav = data.enableNav;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique,new Dictionary<SkillType,int>(skill));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique,new Dictionary<SkillType,int>(skill),recoveryTime,enableNav);
                 }
             
             public override  void BeforeGet()
@@ -396,7 +440,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false,new Dictionary<SkillType,int>(){});
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false,new Dictionary<SkillType,int>(){},0f,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -563,7 +607,11 @@ namespace Form
 
                 jo.SelectToken("unique")==null?defaultData.unique:jo.Get<bool>("unique"),
 
-                jo.SelectToken("skill")==null?defaultData.skill:jo.Get<Dictionary<SkillType,int>>("skill")
+                jo.SelectToken("skill")==null?defaultData.skill:jo.Get<Dictionary<SkillType,int>>("skill"),
+
+                jo.SelectToken("recoveryTime")==null?defaultData.recoveryTime:jo.Get<float>("recoveryTime"),
+
+                jo.SelectToken("enableNav")==null?defaultData.enableNav:jo.Get<bool>("enableNav")
                     );
 
             return data;
@@ -609,6 +657,10 @@ namespace Form
             jo.Set<bool>("unique",data.unique);
 
             jo.Set<Dictionary<SkillType,int>>("skill",data.skill);
+
+            jo.Set<float>("recoveryTime",data.recoveryTime);
+
+            jo.Set<bool>("enableNav",data.enableNav);
 
             return jo;
         }
@@ -917,6 +969,26 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeSkillAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRecoverytime(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRecoverytimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnablenav(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnablenavAction?.Invoke(data,oldV,newV);
                 }
                     
             }

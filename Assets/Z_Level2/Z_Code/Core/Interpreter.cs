@@ -371,9 +371,11 @@ namespace Z_Code
                     case Op.Ret:
                         box = Pop();
                         realBox = GetBox(box);
+                        
                         return new RetInfo()
                         {
-                            ret = realBox
+                            ret = realBox,
+                            complete = true
                         };
                     default:
                         Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not found£¡£¡");

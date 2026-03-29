@@ -77,7 +77,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _str;
                     /// <summary>
-                    ///å­—ç¬¦ä¸²
+                    ///×Ö·û´®
                     ///</summary>
                     public string  str{
                                 get{return _str;}
@@ -95,7 +95,7 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _valName;
                     /// <summary>
-                    ///æŒ‡å‘åç§°
+                    ///Ö¸ÏòÃû³Æ
                     ///</summary>
                     public string  valName{
                                 get{return _valName;}
@@ -113,7 +113,7 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _num;
                     /// <summary>
-                    ///æ•°å€¼
+                    ///ÊıÖµ
                     ///</summary>
                     public float  num{
                                 get{return _num;}
@@ -131,7 +131,7 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<string,BoxDataForm.Data>  _dic;
                     /// <summary>
-                    ///å­—å…¸
+                    ///×Öµä
                     ///</summary>
                     public Dictionary<string,BoxDataForm.Data>  dic{
                                 get{return _dic;}

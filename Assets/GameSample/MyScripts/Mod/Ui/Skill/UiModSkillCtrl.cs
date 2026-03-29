@@ -20,7 +20,7 @@ namespace Ui.ModStory.ModStorySkill
     {
 
         public int selPage;
-        public SkillForm.Data data;
+        public SkillProductForm.Data data;
     }
     public partial class UiModStorySkillCtrl
     {
@@ -38,7 +38,7 @@ namespace Ui.ModStory.ModStorySkill
             Refresh();
         }
 
-        public void SelPage(int id, SkillForm.Data data = null)
+        public void SelPage(int id, SkillProductForm.Data data = null)
         {
             model.selPage = id;
             model.data = data;

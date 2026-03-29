@@ -525,7 +525,8 @@ namespace PlayDataCharacterEquip
             public ScrView scr_gameArgs;
             public GameObject go_gameEquip;
             public UiGameEquipCtrl sub_gameEquip;
-            public Btn btn_disequip;
+            public Btn btn_unequip;
+            public Btn btn_equip;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
             public UiGameArgsCtrl sub_gameArgs;
@@ -540,10 +541,11 @@ namespace PlayDataCharacterEquip
             scr_gameArgs = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
             go_gameEquip = uiHolder.elementTrsLst[6].gameObject;
             sub_gameEquip = (UiGameEquipCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            btn_disequip = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            go_gameArgs = uiHolder.elementTrsLst[9].gameObject;
-            sta_gameArgs = uiHolder.elementTrsLst[10].GetComponent<Sta>();
-            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            btn_unequip = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_equip = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            go_gameArgs = uiHolder.elementTrsLst[10].gameObject;
+            sta_gameArgs = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
         }
 
     }

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using TuanjieMuse.Chat.ViewModel;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
@@ -72,6 +73,8 @@ public interface ExternalPlayInfoController
 
     public CharacterProductForm.Data GetTeamEquipedCharacter(int ItemProductUid, out EquipPartType partType);
     public void UseSkill(int characterUid, int skillUid);
+
+    public void ChooseCurrentCharacter(int characterUid);
 }
 public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>
 {
@@ -333,31 +336,38 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
         if (!bagName2UidDic.ContainsKey(data.name))
             bagName2UidDic[data.name] = new List<int>();
-
-        foreach (var uid in bagName2UidDic[data.name])
+        if(GameManager.instance.curProgress.bag.Contains(data.uid))
         {
-            var old = ItemProductForm.DataByUid[uid];
-            if (old.amount < old.maxAmountPer)
+            bagName2UidDic[data.name].Add(data.uid);
+        }
+        else
+        {
+            foreach (var uid in bagName2UidDic[data.name])
             {
-                int addition = Mathf.Min(old.maxAmountPer - old.amount, data.amount);
-                data.amount -= addition;
-                old.amount += addition;
+                var old = ItemProductForm.DataByUid[uid];
+                if (old.amount < old.maxAmountPer)
+                {
+                    int addition = Mathf.Min(old.maxAmountPer - old.amount, data.amount);
+                    data.amount -= addition;
+                    old.amount += addition;
+                }
             }
+            while (data.amount > 0)
+            {
+                var newData = data.Copy(false);
+                newData.ToProduct(data.protoUid);
+                newData.amount = Mathf.Min(newData.maxAmountPer, data.amount);
+                data.amount -= newData.amount;
+
+                bagName2UidDic[newData.name].Add(newData.uid);
+                GameManager.instance.curProgress.bag.Add(newData.uid);
+            }
+
+            data.DestroyProduct();
+
+            Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Add, data = data });
         }
-        while (data.amount > 0)
-        {
-            var newData = data.Copy(false);
-            newData.ToProduct(data.protoUid);
-            newData.amount = Mathf.Min(newData.maxAmountPer, data.amount);
-            data.amount -= newData.amount;
-
-            bagName2UidDic[newData.name].Add(newData.uid);
-            GameManager.instance.curProgress.bag.Add(newData.uid);
-        }
-
-        data.DestroyProduct();
-
-        Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Add, data = data });
+        
 
     }
     #endregion
@@ -434,6 +444,16 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     #endregion
 
     #region team
+
+    public void ChooseCurrentCharacter(int characterUid)
+    {
+        var ch = CharacterProductForm.DataByUid.GetDv(characterUid, null);
+        if (ch != null && GameManager.instance.curProgress.team.Contains(ch.uid))
+        {
+            GameManager.instance.curProgress.characterUid = ch.uid;
+            _super.sceneCtrl.RefreshCurrentCharacter();
+        }
+    }
 
     public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act)
     {

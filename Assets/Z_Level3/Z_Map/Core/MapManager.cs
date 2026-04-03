@@ -54,6 +54,7 @@ namespace Z_Map
         Create,
         Show,
         AfterUpdate,
+        Hide,
     }
     public class ItemEvent : Z_Event
     {
@@ -181,14 +182,14 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.UpdateSingleOne(iData.unit);
         return iData;
     }
-    public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, object[] prms = null)
+    public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, string extra = "")
     {
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
             return null;
         }
-        var cData = this.data.AddCharacter(prefabName, isMine, prms);
+        var cData = this.data.AddCharacter(prefabName, isMine, extra);
         cData.pos = realPos;
         updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
         cData.name = name;

@@ -100,6 +100,10 @@ namespace Ui.PlaySceneMain
         public override void OnCreate()
         {
             con = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
+            view.btn_.onClick.AddListener(() =>
+            {
+                PlayManager.instance.infoCtrl.ChooseCurrentCharacter(model.data.uid);
+            });
         }
         public override void OnShow()
         {

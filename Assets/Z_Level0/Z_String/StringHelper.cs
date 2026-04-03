@@ -11,11 +11,11 @@ namespace Z_String
         {
             return char.ToLower(s[0]) + s.Substring(1);
         }
-        public static float ToFloat(string str,float defaultV,bool onlyPositive=false)
+        public static float ToFloat(string str, float defaultV, bool onlyPositive = false)
         {
             if (float.TryParse(str, out var f))
             {
-                if (onlyPositive&&f < 0)
+                if (onlyPositive && f < 0)
                     f = 0;
                 return f;
             }
@@ -44,16 +44,26 @@ namespace Z_String
         }
         public static string GetUniqueName(ICollection col)
         {
-            int cur=0;
+            int cur = 0;
             foreach (var c in col)
             {
-                var nms = ((string)c).Split("New");
-                if (nms.Length > 1)
+                int now = 0;
+                if (c is string)
                 {
-                    cur = ToInt(nms[1], 0) + 1;
+                    var nms = ((string)c).Split("New");
+                    if (nms.Length > 1)
+                    {
+                        now = ToInt(nms[1], 0) + 1;
+
+                    }
                 }
+                else if (c is int)
+                {
+                    now = (int)c + 1;
+                }
+                cur = Math.Max(cur, now);
             }
-            return "New"+cur;
+            return "New" + cur;
         }
         public static string RemoveMultiLine(string str)
         {
@@ -70,7 +80,7 @@ namespace Z_String
                         unique = false; break;
                     }
                 }
-                if(unique)
+                if (unique)
                 {
                     res += strs[i] + "\n";
                 }
@@ -78,15 +88,15 @@ namespace Z_String
             return res;
         }
 
-        public static string Repeat(this string str,int times)
+        public static string Repeat(this string str, int times)
         {
             StringBuilder sb = new StringBuilder();
-            for(int i= 0; i < times; i++)
+            for (int i = 0; i < times; i++)
             {
                 sb.Append(str);
             }
             return sb.ToString();
         }
 
-            }
+    }
 }

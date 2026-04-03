@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using Z_DataSystem;
@@ -30,8 +31,9 @@ public static partial class GlobalDataHelper
 
 
 }
-public enum FourDirecton
+public enum AnimDirecton
 {
+    Fixed,
     Up,
     Down,
     Left,
@@ -147,8 +149,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         }
         public CharacterUnitForm.Data data;
         public CharacterProductForm.Data productData => CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
-        public CharacterAnimForm.Data[] idleAnim;
-        public CharacterAnimForm.Data[] moveAnim;
+        public CharacterAnimForm.Data idleAnim;
+        public CharacterAnimForm.Data moveAnim;
 
         public Dictionary<BodyPartType, State> stateCur = new Dictionary<BodyPartType, State>();
         public Dictionary<BodyPartType, string> animCur = new Dictionary<BodyPartType, string>();
@@ -157,22 +159,23 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         public Dictionary<BodyPartType, string> animCurCache = new Dictionary<BodyPartType, string>();
         public Dictionary<BodyPartType, Timer> animTimer = new Dictionary<BodyPartType, Timer>();
 
+        public AnimDirecton dirCur = AnimDirecton.Fixed;
         public CharacterAnimForm.Data GetAnim(State state, string extraAnimName)
         {
             if (!string.IsNullOrEmpty(extraAnimName))
             {
-                return productData.animDic.GetDv(extraAnimName, idleAnim[(int)GetDir()]);
+                return productData.animDic.GetDv(extraAnimName, idleAnim);
             }
             switch (state)
             {
                 case State.Move:
-                    return moveAnim[(int)GetDir()];
+                    return moveAnim;
                 default:
-                    return idleAnim[(int)GetDir()];
+                    return idleAnim;
             }
         }
 
-        private FourDirecton GetDir()
+        private AnimDirecton GetDir()
         {
             switch (productData.faceType)
             {
@@ -180,22 +183,22 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                     var angle = (data.unit.ins.transform.eulerAngles.y % 360 + 360) % 360;
                     if (angle >= 45 && angle < 135)
                     {
-                        return FourDirecton.Right;
+                        return AnimDirecton.Right;
                     }
                     else if (angle >= 135 && angle < 225)
                     {
-                        return FourDirecton.Down;
+                        return AnimDirecton.Down;
                     }
                     else if (angle >= 225 && angle < 315)
                     {
-                        return FourDirecton.Left;
+                        return AnimDirecton.Left;
                     }
                     else
                     {
-                        return FourDirecton.Up;
+                        return AnimDirecton.Up;
                     }
                 default:
-                    return FourDirecton.Up;
+                    return AnimDirecton.Up;
             }
 
         }
@@ -296,13 +299,17 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             {
                 animCurCache[part] = "";
             }
-            if (anim == null || (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name))
+            if (anim == null)
             {
                 return;
             }
-
+            if (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name && GetDir() == dirCur)
+            {
+                return;
+            }
+            dirCur = GetDir();
             MaterialPropertyBlock propBlock;
-            if (anim != null && anim.animClip.Count > 0)
+            if (anim != null && anim.animClip.Count > 0 && anim.animClip[dirCur].Count > 0)
             {
 
                 propBlock = new MaterialPropertyBlock();
@@ -312,21 +319,21 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
                 if (anim.animTimeInterval > 0)
                 {
-                    float all = anim.animTimeInterval * anim.animClip.Count;
+                    float all = anim.animTimeInterval * anim.animClip[dirCur].Count;
                     int cur = 0;//(int)((Time.time % all) / anim.animTimeInterval-0.0001f);
 
                     float timeProgress = 0;// (Time.time % anim.animTimeInterval);
 
                     animCurCache[part] = anim.name;
 
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[part]].GetTex());
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[dirCur][cur].partTex[part]].GetTex());
                     var renderPart = part;
                     animTimer[part] = TimeManager.instance.StartTimer(timeProgress, anim.animTimeInterval, () =>
                     {
                         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                         render.GetPropertyBlock(propBlock);
 
-                        if (cur + 1 >= anim.animClip.Count)
+                        if (cur + 1 >= anim.animClip[dirCur].Count)
                         {
 
                             if (stateCur[part] == State.Special)
@@ -340,17 +347,15 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                             }
 
                         }
-                        cur = (cur + 1) % anim.animClip.Count;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[cur].partTex[renderPart]].GetTex());
+                        cur = (cur + 1) % anim.animClip[dirCur].Count;
+                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[dirCur][cur].partTex[renderPart]].GetTex());
                         render.SetPropertyBlock(propBlock);
                         return false;
-
-
                     }, data.unit.ins);
                 }
                 else
                 {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[0].partTex[part]].GetTex());
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[dirCur][0].partTex[part]].GetTex());
                 }
                 render.SetPropertyBlock(propBlock);
             }
@@ -365,32 +370,27 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             return;
         }
         var productData = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
-        CharacterAnimForm.Data[] idleAnim = new CharacterAnimForm.Data[4];
-        CharacterAnimForm.Data[] moveAnim = new CharacterAnimForm.Data[4];
-
-        switch (productData.faceType)
-        {
-            case FaceType.Fixed:
-            case FaceType.Flexible:
-                idleAnim[0] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("idle", null), null);
-                moveAnim[0] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("move", null), null);
-                break;
-            case FaceType.FourDirection:
-                for (int i = 0; i < 4; i++)
-                {
-                    idleAnim[i] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("idle" + i, null), null);
-                    moveAnim[i] = productData.animDic.GetDv(productData.defaultAnimName.GetDv("move" + i, null), null);
-                }
-                break;
-        }
+        CharacterAnimForm.Data idleAnim = productData.animDic.GetDv(productData.defaultAnimName.GetDv("idle", null), null);
+        CharacterAnimForm.Data moveAnim = productData.animDic.GetDv(productData.defaultAnimName.GetDv("move", null), null);
 
         GameManager.instance.characterCtrl.CreateAnim(data, idleAnim, moveAnim);
+    }
+    public void UnregisterAnim(CharacterUnitForm.Data data)
+    {
+        var ctrl = animControllerDic.GetDv(data, null);
+        if (ctrl != null)
+        {
+            foreach (var timer in ctrl.animTimer)
+            {
+                TimeManager.instance.CancelTimer(timer.Value);
+            }
+        }
     }
     public void Reset()
     {
         animControllerDic.Clear();
     }
-    public void CreateAnim(CharacterUnitForm.Data key, CharacterAnimForm.Data[] idleAnim, CharacterAnimForm.Data[] moveAnim)
+    public void CreateAnim(CharacterUnitForm.Data key, CharacterAnimForm.Data idleAnim, CharacterAnimForm.Data moveAnim)
     {
         animControllerDic[key] = new AnimController()
         {
@@ -436,6 +436,10 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             return;
         }
         var data = ins.unit.data;
+        if (!animControllerDic.ContainsKey(ins.unit.data))
+        {
+            return;
+        }
         var form = CharacterProductForm.DataByUid[ins.unit.productInfo.Item1];
         if (form == null)
         {
@@ -468,16 +472,21 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         switch (evt.type)
         {
             case MapEventType.Show:
+                RegisterAnim(evt.unit.data);
                 LoadModel(evt.unit.ins);
                 break;
             case MapEventType.AfterUpdate:
                 //manage nav
                 var productData = CharacterProductForm.DataByUid.GetDv(evt.unit.productInfo.Item1, null);
-                if(productData!=null)
+                if (productData != null)
                 {
                     evt.unit.data.navEnabled = productData.enableNav && _super.curProgress.seconds > productData.recoveryTime;
                 }
                 CheckAnim(evt.unit.ins);
+                break;
+            case MapEventType.Hide:
+                //manage nav
+                UnregisterAnim(evt.unit.data);
                 break;
         }
     }

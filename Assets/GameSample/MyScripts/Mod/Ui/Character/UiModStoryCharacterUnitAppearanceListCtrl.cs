@@ -8,6 +8,8 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem.Form;
 using UnityEngine;
+using Z_DesignStyle;
+using Z_Map.Analysis;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitAppearance.ModStoryCharacterUnitAppearanceList
 {
@@ -43,7 +45,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             {
                 itemCon.Add(new UiBigItemParam()
                 {
-                    data= data
+                    data = data
                 });
             }
             itemCon.Add(new UiBigItemParam()
@@ -70,7 +72,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateCharacterAnim(parent.model.data.uid,parent.model.data.name);
+                ModManager.instance.assetCtrl.CreateCharacterAnim(parent.model.data.uid, parent.model.data.name);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
@@ -81,22 +83,34 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public override void OnShow()
         {
-            model.data=param.data;
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()
         {
             view.sta_exist.ChangeState(model.data == null ? 0 : 1);
-            if (model.data != null) {
+            if (model.data != null)
+            {
                 view.txt_.text = model.data.name;
-                if(model.data.animClip.Count > 0&& model.data.animClip[0].partTex.ContainsKey(BodyPartType.UpperPart))
+                string icon = GlobalNameHelper.GetDefaultTexName();
+                switch (parent.model.data.faceType)
                 {
-                    view.img_.sprite = TexAssetForm.DataByName[model.data.animClip[0].partTex[BodyPartType.UpperPart]].GetSprite();
+                    case FaceType.Fixed:
+                    case FaceType.Flexible:
+                        if (model.data.animClip[AnimDirecton.Fixed].Count > 0)
+                        {
+                            icon = model.data.animClip[AnimDirecton.Fixed][0].partTex.GetDv(BodyPartType.UpperPart, icon);
+                        }
+                        break;
+                    case FaceType.FourDirection:
+                        if (model.data.animClip[AnimDirecton.Up].Count > 0)
+                        {
+                            icon = model.data.animClip[AnimDirecton.Up][0].partTex.GetDv(BodyPartType.UpperPart, icon);
+                        }
+                        break;
                 }
-                else
-                {
-                    view.img_.sprite = TexAssetForm.DataByName[GlobalNameHelper.GetDefaultTexName()].GetSprite();
-                }
+
+                view.img_.sprite = TexAssetForm.DataByName[icon].GetSprite();
             }
         }
     }

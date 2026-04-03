@@ -59,7 +59,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             view.page_ModStoryCharacterUnitAppearanceUnit.SetShow(model.selPage == 1, new UiModStoryCharacterUnitAppearanceUnitParam()
             {
-                data = model.animData
+                data = model.animData,
+                ch = model.data
             });
         }
     }

@@ -9,9 +9,9 @@ using Z_Map.Form;
 public class GameMapData : MapInfo
 {
 
-    public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
+    public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
     {
-        var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "",false);
+        var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), extra, false);
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;

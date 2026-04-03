@@ -14,6 +14,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Texture;
 using Z_Time;
+using static UnityEngine.Rendering.DebugUI;
 
 
 
@@ -44,34 +45,64 @@ namespace Z_Map
             }
             set
             {
-
                 var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
-                var ja = new JArray();
-                ja.Add(value.Item1);
-                ja.Add(value.Item2);
-                jo[productKey] = ja;
-
-                data.extra = jo.ToString();
+                data.extra = GetProductInfoString(jo,value);
                 _productInfo = value;
             }
 
         }
+        public static string GetProductInfoString(JObject ori, (int, int) info)
+        {
+            var ja = new JArray();
+            ja.Add(info.Item1);
+            ja.Add(info.Item2);
+            ori[productKey] = ja;
+            return ori.ToString();
+        }
 
         public static string paramKey = "prm";
-        private Dictionary<string, MapObjectParamForm.Data> _paramInfo;
-        public Dictionary<string, MapObjectParamForm.Data> paramInfo
+        private Dictionary<string, GameParamForm.Data> _paramInfo;
+        public Dictionary<string, GameParamForm.Data> paramInfo
         {
             get
             {
                 if (_paramInfo == default)
                 {
-                    _paramInfo = new Dictionary<string, MapObjectParamForm.Data>();
+                    _paramInfo = new Dictionary<string, GameParamForm.Data>();
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
                         if (jo != null && jo[paramKey] != null)
                         {
-                            _paramInfo = jo.Get<Dictionary<string, MapObjectParamForm.Data>>(paramKey);
+                            _paramInfo = jo.Get<Dictionary<string, GameParamForm.Data>>(paramKey);
+                        }
+                    }
+                    if(this is CharacterUnit ch)
+                    {
+                        var chp=CharacterProductForm.DataByUid.GetDv(ch.productInfo.Item1, null);
+                        if(chp!=null)
+                        {
+                            foreach(var pair in chp.paramDic)
+                            {
+                                if(!_paramInfo.ContainsKey(pair.Key))
+                                {
+                                    _paramInfo[pair.Key] = pair.Value;
+                                }
+                            }
+                        }
+                    }
+                    else if(this is ObjectUnit obj)
+                    {
+                        var objp = CharacterProductForm.DataByUid.GetDv(obj.productInfo.Item1, null);
+                        if (objp != null)
+                        {
+                            foreach (var pair in objp.paramDic)
+                            {
+                                if (!_paramInfo.ContainsKey(pair.Key))
+                                {
+                                    _paramInfo[pair.Key] = pair.Value;
+                                }
+                            }
                         }
                     }
                 }
@@ -81,17 +112,16 @@ namespace Z_Map
             {
 
                 var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
-
-                jo.Set<Dictionary<string, MapObjectParamForm.Data>>(paramKey, value);
-
-                data.extra = jo.ToString();
+               
+                data.extra = GetParamInfoString(jo, value);
                 _paramInfo = value;
             }
-
-
-
         }
-
+        public static string GetParamInfoString(JObject ori, Dictionary<string, GameParamForm.Data> info)
+        {
+            ori.Set(paramKey, info);
+            return ori.ToString();
+        }
     }
 }
 
@@ -836,7 +866,10 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public void RegisterObject(ObjectUnitForm.Data newObjectData,MapObjectForm.Data objectData)
     {
         newObjectData.unit.productInfo = (objectData.id, -1);
-        newObjectData.unit.paramInfo = new Dictionary<string, MapObjectParamForm.Data>(objectData.paramDic);
+        newObjectData.unit.paramInfo = new Dictionary<string, GameParamForm.Data>();
+        foreach (var pair in objectData.paramDic)
+            newObjectData.unit.paramInfo[pair.Key] = pair.Value;
+
         newObjectData.isObstacle = objectData.collision;
     }
     public void OnEvent(TileEvent evt)

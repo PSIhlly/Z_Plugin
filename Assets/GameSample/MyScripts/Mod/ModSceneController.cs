@@ -350,8 +350,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false);
-                                newCharacerData.unit.productInfo = (data.uid, -1);
+                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false,MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(),(data.uid, -1)));
                                 newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
                             }
                         });

@@ -1,0 +1,92 @@
+[
+  {
+    "uid": 14,
+    "name": "灵梦攻击",
+    "label": "攻击",
+    "protoUid": 0,
+    "icon": "reservedI$",
+    "paramDic": [
+      {
+        "k": "伤害",
+        "v": {
+          "uid": 3,
+          "name": "伤害",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      }
+    ],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.2,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": "灵梦攻击"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 3,
+    "name": "攻击",
+    "label": "攻击",
+    "protoUid": 0,
+    "icon": "$i$5418776c97885aa1761d1860306b10bddd71753a$i$",
+    "paramDic": [
+      {
+        "k": "伤害",
+        "v": {
+          "uid": -1,
+          "name": "New0",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      }
+    ],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.2,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": "十六夜攻击"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  }
+]

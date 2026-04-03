@@ -1,0 +1,187 @@
+using Form;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using Z_ByteSerialize;
+using Z_Code;
+using Z_Code.Form;
+using Z_DataSystem;
+using Z_DataSystem.Form;
+using Z_Debug;
+using Z_DesignStyle;
+using Z_Map;
+using Z_Map.Form;
+using Z_Math;
+using Z_Text;
+using Z_Time;
+using Z_Ui.Base;
+using Z_Ui.Notify;
+using Z_UnitSystem;
+
+
+public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<CharacterEvent>
+{
+    private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.imgName);
+    private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.canvasName);
+    private Dictionary<int, CanvasHolder> canvasDic = new Dictionary<int, CanvasHolder>();
+    private int updateFrame;
+    private List<string> needShowParamName = new List<string>();
+    private List<string> needShowParamNameWithoutPlayer = new List<string>();
+    public PlaySceneEffectController(PlayManager super) : base(super)
+    {
+        this.Register();
+    }
+
+    public void Begin()
+    {
+        needShowParamName.Clear();
+        needShowParamNameWithoutPlayer.Clear();
+        foreach (var prm in CharacterParamForm.DataByName.Values)
+        {
+
+            var type = prm.showType;
+            if (type == ParamShowType.AlwaysWithPanelAndScene)
+            {
+                needShowParamName.Add(prm.name);
+                needShowParamNameWithoutPlayer.Add(prm.name);
+            }
+            else if (type == ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer)
+            {
+                needShowParamNameWithoutPlayer.Add(prm.name);
+            }
+        }
+        canvasDic.Clear(); updateFrame = 0;
+    }
+    public void CreatEffect(int uid, Vector3 pos, float rot)
+    {
+        var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
+
+        TimeManager.instance.CancelTimer(img.animTimer);
+        int cur = -1;
+        float startTime = Time.time;
+
+        img.oriPos = pos;
+        img.oriRot = rot;
+        img.oriScale = Vector3.one;
+
+        img.trs.position = pos;
+        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
+        img.trs.localScale = Vector3.one;
+        var clips = EffectForm.DataByUid[uid].clips;
+        img.animTimer = TimeManager.instance.StartTimer(0, 0.02f, () =>
+        {
+            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+            float progress = Time.time - startTime;
+
+            var clip = cur == -1 ? null : clips[cur];
+            if (cur == -1 || progress > clips[cur].time)
+            {
+                startTime = Time.time;
+                cur++;
+                if (clips.Count <= cur)
+                {
+                    InstancePoolManager.instance.DeleteInstance(img.gameObject, effectPrefab);
+                    return true;
+                }
+
+                clip = clips[cur];
+                img.render.GetPropertyBlock(propBlock);
+                propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
+
+                img.trs.position = img.oriPos + clip.pos;
+                img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+                img.trs.localScale = img.oriScale + clip.scale;
+                propBlock.SetFloat("_Alpha", clip.opacity);
+                img.render.SetPropertyBlock(propBlock);
+            }
+            else if (clip.transition && clips.Count > cur + 1)
+            {
+                img.render.GetPropertyBlock(propBlock);
+                var clipNxt = clips[cur + 1];
+                float rate = Mathf.Min(1, progress / clips[cur].time);
+                img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
+                img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
+                img.trs.localScale = img.oriScale + Vector3.Lerp(clip.scale, clipNxt.scale, rate);
+                propBlock.SetFloat("_Alpha", clip.opacity + (clipNxt.opacity - clip.opacity) * rate);
+                img.render.SetPropertyBlock(propBlock);
+            }
+
+            return false;
+        }, img);
+
+    }
+    public void Update()
+    {
+        if (updateFrame < Time.frameCount)
+        {
+            updateFrame = Time.frameCount + 10;
+            var temps = new List<int>();
+            foreach (var pair in canvasDic)
+            {
+                if (!CharacterUnitForm.DataByUid.ContainsKey(pair.Key))
+                {
+                    temps.Add(pair.Key);
+
+                    InstancePoolManager.instance.DeleteInstance(pair.Value.gameObject, canvasPrefab);
+
+                }
+            }
+            foreach (var temp in temps)
+            {
+                canvasDic.Remove(temp);
+            }
+        }
+    }
+
+    public void BindCanvas(CharacterUnitForm.Data unitData)
+    {
+        var productData = CharacterProductForm.DataByUid.GetDv(unitData.unit.productInfo.Item1, null);
+        if (productData == null)
+        {
+            canvasDic.Remove(unitData.uid);
+            return;
+        }
+        var canvas = GetCanvas(unitData);
+        canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
+        var paramInfo = unitData.unit.paramInfo;
+        var lst = unitData.isMine ? needShowParamName : needShowParamNameWithoutPlayer;
+
+        for (int i = 0, icnt = lst.Count; i < icnt; i++)
+        {
+            if (paramInfo.ContainsKey(lst[i]))
+            {
+                canvas.ShowSlider(paramInfo[lst[i]].GetValue().num, paramInfo[lst[i]].GetMax().num, i);
+            }
+
+        }
+    }
+    public CanvasHolder GetCanvas(CharacterUnitForm.Data unitData)
+    {
+        if (!canvasDic.ContainsKey(unitData.uid))
+        {
+            canvasDic[unitData.uid] = InstancePoolManager.instance.CreateInstance(canvasPrefab).GetComponent<CanvasHolder>();
+            canvasDic[unitData.uid].gameObject.SetActive(true);
+        }
+        return canvasDic[unitData.uid];
+    }
+    public void OnEvent(CharacterEvent evt)
+    {
+        if(!_super.enable)
+        {
+            return;
+        }
+        switch (evt.type)
+        {
+            case MapEventType.Show:
+                break;
+            case MapEventType.AfterUpdate:
+                //manage nav
+                if (evt.unit.ins != null)
+                    BindCanvas(evt.unit.data);
+                break;
+        }
+    }
+}

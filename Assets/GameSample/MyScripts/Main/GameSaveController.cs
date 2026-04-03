@@ -181,14 +181,18 @@ public class GameSaveController : Z_Controller<GameManager>
                 SaveStoryTex(data.tachie, storyCoreFolder);
                 foreach (var anim in data.animDic.Values)
                 {
-                    for (int i = 0; i < anim.animClip.Count; i++)
+
+                    foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
                     {
-                        foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+                        foreach (AnimDirecton dir in Enum.GetValues(typeof(AnimDirecton)))
                         {
-                            if (anim.animClip[i].partTex.ContainsKey(part))
+                            for (int i = 0; i < anim.animClip[dir].Count; i++)
                             {
-                                var nm = anim.animClip[i].partTex[part];
-                                SaveStoryTex(nm, storyCoreFolder);
+                                if (anim.animClip[dir][i].partTex.ContainsKey(part))
+                                {
+                                    var nm = anim.animClip[dir][i].partTex[part];
+                                    SaveStoryTex(nm, storyCoreFolder);
+                                }
                             }
                         }
                     }
@@ -333,7 +337,7 @@ public class GameSaveController : Z_Controller<GameManager>
     private void SaveStoryVideo(string videoName, string path)
     {
         var data = VideoAssetForm.DataByName.GetDv(videoName, null);
-        if (data != null &&  !GlobalNameHelper.IsInnerAssetName(videoName))
+        if (data != null && !GlobalNameHelper.IsInnerAssetName(videoName))
         {
             var tex = VideoAssetForm.DataByName[videoName];
             path = path + assetFolder + videoName;
@@ -346,7 +350,7 @@ public class GameSaveController : Z_Controller<GameManager>
     private void SaveStoryAudio(string audioName, string path)
     {
         var data = AudioAssetForm.DataByName.GetDv(audioName, null);
-        if (data != null &&  !GlobalNameHelper.IsInnerAssetName(audioName))
+        if (data != null && !GlobalNameHelper.IsInnerAssetName(audioName))
         {
             var tex = AudioAssetForm.DataByName[audioName];
             path = path + assetFolder + audioName;
@@ -532,15 +536,21 @@ public class GameSaveController : Z_Controller<GameManager>
 
             foreach (var anim in data.animDic.Values)
             {
-
-                for (int i = 0; i < anim.animClip.Count; i++)
+                foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
                 {
-                    foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+                    foreach (AnimDirecton dir in Enum.GetValues(typeof(AnimDirecton)))
                     {
-                        if (anim.animClip[i].partTex.ContainsKey(part))
+                        if (!anim.animClip.ContainsKey(dir))
                         {
-                            var nm = anim.animClip[i].partTex[part];
-                            LoadStoryTex(nm, assetFolder);
+                            anim.animClip[dir] = new List<CharacterAnimClipForm.Data>();
+                        }
+                        for (int i = 0; i < anim.animClip[dir].Count; i++)
+                        {
+                            if (anim.animClip[dir][i].partTex.ContainsKey(part))
+                            {
+                                var nm = anim.animClip[dir][i].partTex[part];
+                                LoadStoryTex(nm, assetFolder);
+                            }
                         }
 
                     }

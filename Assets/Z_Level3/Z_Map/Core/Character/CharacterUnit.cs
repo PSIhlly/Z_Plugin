@@ -30,7 +30,6 @@ namespace Z_Map
         }
         public override void Show()
         {
-            GameManager.instance.characterCtrl.RegisterAnim(data);
             base.Show();
             Z_EventHelper.Invoke(new CharacterEvent()
             {
@@ -180,6 +179,11 @@ namespace Z_Map
 
         public override void Remove()
         {
+            Z_EventHelper.Invoke(new CharacterEvent()
+            {
+                type = MapEventType.Hide,
+                unit = this
+            });
             CharacterUnitForm.RemoveData(data.uid);
             base.Remove();
         }

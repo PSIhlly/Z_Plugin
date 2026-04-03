@@ -435,6 +435,8 @@ namespace Form
 
                 {100077,new Data(100077,"TargetSkill",null,null,null,new List<string>(){"skill",},"","target","skill","system",EditorStyle.Rpg,"")},
 
+                {100078,new Data(100078,"Effect",null,null,null,new List<string>(){"effect",},"","\"$ef$$ef$\"","basic","const",EditorStyle.Rpg,"")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -589,6 +591,8 @@ namespace Form
                         {"SetSkillParameter",_DataByUid[100076]},
     
                         {"TargetSkill",_DataByUid[100077]},
+    
+                        {"Effect",_DataByUid[100078]},
     
                     };
     
@@ -786,6 +790,8 @@ namespace Form
 
                     _DatasByCategoryType[("skill","system")].Add(_DataByUid[100077]);
 
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100078]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -957,6 +963,8 @@ namespace Form
                     _DatasByCategory["skill"].Add(_DataByUid[100076]);
 
                     _DatasByCategory["skill"].Add(_DataByUid[100077]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100078]);
 
 
             childInitAction?.Invoke();

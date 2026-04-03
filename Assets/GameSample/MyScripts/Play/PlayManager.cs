@@ -1,5 +1,6 @@
 using Form;
 using System.Collections.Generic;
+using Ui.ModStory.ModStoryEffect.ModStoryEffectUnit;
 using Ui.Start;
 using Z_DesignStyle;
 using Z_Ui;
@@ -9,6 +10,8 @@ public enum ParamShowType
 {
     Always,
     AlwaysWithPanel,
+    AlwaysWithPanelAndScene,
+    AlwaysWithPanelAndSceneWithoutPlayer,
     OnlyNotZero,
     Hide
 }
@@ -31,6 +34,8 @@ public class PlayManager : Z_MonoManager<PlayManager>
     private InternalPlayAssetController _assetCtrl;
     public ExternalPlayAssetController assetCtrl;
 
+
+    public PlaySceneEffectController effectCtrl;
     // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
@@ -47,6 +52,9 @@ public class PlayManager : Z_MonoManager<PlayManager>
         var __assetCtrl = new PlayAssetController(this);
         _assetCtrl = __assetCtrl;
         assetCtrl = __assetCtrl;
+
+
+        effectCtrl = new PlaySceneEffectController(this);
         //  assetCtrl = new ModAssetCtrl(this);
     }
 
@@ -62,6 +70,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
         _sceneCtrl.Update();
         _infoCtrl.Update();
+        effectCtrl.Update();
     }
     public void LateUpdate()
     {
@@ -98,6 +107,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.sceneId);
         _assetCtrl.Begin();
 
+        effectCtrl.Begin();
         enable = true;
     }
 

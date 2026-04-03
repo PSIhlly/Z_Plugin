@@ -53,7 +53,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,List<CharacterAnimClipForm.Data>,List<CharacterAnimClipForm.Data>> changeAnimclipAction;
+        public static Action<Data,Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>,Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>> changeAnimclipAction;
                 
         public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
@@ -102,11 +102,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private List<CharacterAnimClipForm.Data>  _animClip;
+                    private Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>  _animClip;
                     /// <summary>
-                    ///×°±¸
+                    ///Æ¬¶Î
                     ///</summary>
-                    public List<CharacterAnimClipForm.Data>  animClip{
+                    public Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>  animClip{
                                 get{return _animClip;}
  set{
 
@@ -174,7 +174,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,List<CharacterAnimClipForm.Data> animClip,float animTimeInterval,float scale,Dictionary<BodyPartType,bool> partEnable)
+            public Data(int uid,string name,Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>> animClip,float animTimeInterval,float scale,Dictionary<BodyPartType,bool> partEnable)
             {
 
              this.uid = uid;
@@ -198,7 +198,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<CharacterAnimClipForm.Data>(animClip),animTimeInterval,scale,new Dictionary<BodyPartType,bool>(partEnable));
+        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>(animClip),animTimeInterval,scale,new Dictionary<BodyPartType,bool>(partEnable));
                 }
             
             public virtual  void BeforeGet()
@@ -208,7 +208,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",new List<CharacterAnimClipForm.Data>(),0f,0f,new Dictionary<BodyPartType,bool>(){});
+                   private static Data _defaultData=new Data(0,"",new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>(){},0f,0f,new Dictionary<BodyPartType,bool>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -283,7 +283,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("animClip")==null?defaultData.animClip:jo.Get<List<CharacterAnimClipForm.Data>>("animClip"),
+                jo.SelectToken("animClip")==null?defaultData.animClip:jo.Get<Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>>("animClip"),
 
                 jo.SelectToken("animTimeInterval")==null?defaultData.animTimeInterval:jo.Get<float>("animTimeInterval"),
 
@@ -306,7 +306,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<List<CharacterAnimClipForm.Data>>("animClip",data.animClip);
+            jo.Set<Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>>("animClip",data.animClip);
 
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
@@ -413,7 +413,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeAnimclip(Data superData,List<CharacterAnimClipForm.Data> oldV,List<CharacterAnimClipForm.Data> newV)
+            public static void ChangeAnimclip(Data superData,Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>> oldV,Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>> newV)
             {
                 if(superData is Data data)
                 {

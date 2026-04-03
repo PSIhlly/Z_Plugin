@@ -168,7 +168,6 @@ public class GameManager : Z_MonoManager<GameManager>
     public GameMapController mapCtrl;
     public GameCharacterController characterCtrl;
     public GameItemController itemCtrl;
-    public GameEffectController effectCtrl;
 
 
     public StoryForm.Data curStory;
@@ -188,7 +187,8 @@ public class GameManager : Z_MonoManager<GameManager>
         mapCtrl = new GameMapController(this);
         characterCtrl = new GameCharacterController(this);
         itemCtrl = new GameItemController(this);
-        effectCtrl = new GameEffectController(this);
+
+
 
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets
@@ -239,9 +239,7 @@ public class GameManager : Z_MonoManager<GameManager>
     {
         UiManager.instance.ShowUi<UiEnterMainCtrl>();
     }
-    public void Update()
-    {
-    }
+
     public void RegisterInputDefault()
     {
         var ins = InputManager.instance;

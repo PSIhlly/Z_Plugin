@@ -449,7 +449,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public CharacterAnimForm.Data CreateCharacterAnim(string name)
     {
-        return new CharacterAnimForm.Data(0, name, new List<CharacterAnimClipForm.Data>(), 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } });
+        var dic = new Dictionary<AnimDirecton, List<CharacterAnimClipForm.Data>>();
+        foreach (AnimDirecton dir in Enum.GetValues(typeof(AnimDirecton)))
+        {
+            dic[dir] = new List<CharacterAnimClipForm.Data>();
+            dic[dir].Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
+        }
+        return new CharacterAnimForm.Data(0, name, dic, 0.2f, 1f, new Dictionary<BodyPartType, bool>() { { BodyPartType.None, false }, { BodyPartType.UpperPart, true }, { BodyPartType.LowerPart, false } });
     }
     public CharacterAnimClipForm.Data CreateCharacterAnimClip()
     {
@@ -473,7 +479,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var animDic = new Dictionary<string, CharacterAnimForm.Data>() { { "anim", CreateCharacterAnim("anim") } };
 
-        animDic["anim"].animClip.Add(ModManager.instance.assetCtrl.CreateCharacterAnimClip());
         var defaultAnimName = new Dictionary<string, string>();
         defaultAnimName["idle"] = "anim";
         defaultAnimName["move"] = "anim";
@@ -496,12 +501,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
 
 
-    public bool DeleteCharacterAnimId(int characterUid, string animNm, int id)
+    public bool DeleteCharacterAnimId(int characterUid, string animNm,AnimDirecton dir, int id)
     {
         var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[animNm];
 
-        anim.animClip.RemoveAt(id);
+        anim.animClip[dir].RemoveAt(id);
 
         return false;
     }
@@ -518,7 +523,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         anim.name = newName;
         data.animDic[newName] = anim;
     }
-    public void ImportCharacterAnim(int characterUid, string animNm, BodyPartType part, int id)
+    public void ImportCharacterAnim(int characterUid, string animNm,AnimDirecton dir, BodyPartType part, int id)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
@@ -526,9 +531,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 var chracterData = CharacterProductForm.DataByUid[characterUid];
                 var anim = chracterData.animDic[animNm];
-                if (anim.animClip.Count > id)
+                if (anim.animClip[dir].Count > id)
                 {
-                    anim.animClip[id].partTex[part] = data.name;
+                    anim.animClip[dir][id].partTex[part] = data.name;
                 }
                 GameManager.instance.saveCtrl.AddStoryTex(data);
             },
@@ -547,11 +552,15 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         data.animDic[animName] = CreateCharacterAnim(animName);
 
     }
-    public void CreateCharacterAnimId(int characterUid, string animNm)
+    public void CreateCharacterAnimId(int characterUid, string animNm,AnimDirecton dir)
     {
         var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[animNm];
-        anim.animClip.Add(CreateCharacterAnimClip());
+        if(!anim.animClip.ContainsKey(dir))
+        {
+            anim.animClip[dir] = new List<CharacterAnimClipForm.Data>();
+        }
+        anim.animClip[dir].Add(CreateCharacterAnimClip());
     }
     #endregion
 
@@ -598,12 +607,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         foreach (var data in EffectForm.DataByUid.Values)
         {
-            items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].GetSprite());
+            items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].GetSprite(),data.uid);
         }
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>
             {
-                act?.Invoke(EffectForm.DataByName[item.content]);
+                act?.Invoke(EffectForm.DataByUid[item.id]);
                 return true;
             }, items);
     }

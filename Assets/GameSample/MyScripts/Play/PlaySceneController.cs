@@ -42,6 +42,7 @@ public interface ExternalPlaySceneController
     public void SetPlayerRotation(Vector3 dir, float speed);
     public void AddMessage(string content);
     public void ForceUpdate();
+    public void RefreshCurrentCharacter();
 
     public CharacterUnitForm.Data GetCharacterUnit(int productUid);
 }
@@ -107,21 +108,20 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         waitForActive = false;
         _characterDic = new Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data>();
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
-        _playerM = null;
+
 
         //character Reflect
 
-        _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
 
         foreach (var data in CharacterUnitForm.DataByUid.Values)
         {
             var ch = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
 
-            if (ch.protoUid==0 && !ch.unique)
+            if (ch.protoUid == 0 && !ch.unique)
             {
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct(ch.uid);
-                
+
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
@@ -133,6 +133,17 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 _characterDic[ch] = data;
             }
         }
+        _playerM = null;
+        _playerG = null;
+        RefreshCurrentCharacter();
+    }
+    public void RefreshCurrentCharacter()
+    {
+        if (_playerM != null)
+        {
+            MapManager.instance.RemoveCharacter(_playerM);
+        }
+        _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
         _playerM = GetOrNewCharacter(_playerG);
     }
     public void End()
@@ -178,11 +189,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
             {
                 var data = SkillProductForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
-                _super.infoCtrl.UseSkill(_playerG.uid,data.uid);
-                
+                _super.infoCtrl.UseSkill(_playerG.uid, data.uid);
+
             }
         }
-       
+
     }
     public void OnMouseMove(Vector3 pos)
     {
@@ -240,11 +251,13 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             }
 #endif
         }
+        if (_playerM != null)
+        {
 
-        lastPlayerPos = _playerM.pos;
-        SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
-
-        GameManager.instance.curProgress.pos = _playerM.pos;
+            lastPlayerPos = _playerM.pos;
+            SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
+            GameManager.instance.curProgress.pos = _playerM.pos;
+        }
 
         GameManager.instance.evtCtrl.sceneTriggerCtrl.evts?.Invoke();
         GameManager.instance.evtCtrl.sceneTriggerCtrl.evts -= GameManager.instance.evtCtrl.sceneTriggerCtrl.evts;
@@ -273,7 +286,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         CharacterUnitForm.Data unitData = null;
         foreach (var curData in CharacterUnitForm.DataByUid.Values)
         {
-            if (curData.unit.productInfo.Item1 == data.uid && unitData.name == data.name)
+            if (curData.unit.productInfo.Item1 == data.uid)
             {
                 unitData = curData;
                 break;
@@ -281,8 +294,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         if (unitData == null)
         {
-            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true); ;
-            unitData.unit.productInfo = (data.uid, -1);
+            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
         }
         _characterDic[data] = unitData;
         return unitData;
@@ -390,9 +402,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
             return;
 
-        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero )
+        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)
         {
-            OnMouse((downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2,true, evt.pos, Vector3.zero);
+            OnMouse((downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2, true, evt.pos, Vector3.zero);
         }
         downPos = Vector2.zero;
     }

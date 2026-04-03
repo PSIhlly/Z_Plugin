@@ -22,6 +22,7 @@ namespace Z_Map
 
         protected string mapName => GlobalHelper.GetInternalPrefabName("map");
         public static string imgName => GlobalHelper.GetInternalPrefabName("img");
+        public static string canvasName => GlobalHelper.GetInternalPrefabName("canvas");
         protected string defaultTextureName => "grass";
 
 
@@ -136,9 +137,9 @@ namespace Z_Map
             RegisterNewObject(data);
             return data;
         }
-        public CharacterUnitForm.Data AddCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
+        public CharacterUnitForm.Data AddCharacter(string prefabName = "", bool isMine = false, string extra = "")
         {
-            var data = GetNewCharacter(prefabName, isMine, prms);
+            var data = GetNewCharacter(prefabName, isMine, extra);
             RegisterNewCharacter(data);
             return data;
         }
@@ -170,9 +171,9 @@ namespace Z_Map
         }
 
 
-        public virtual CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, object[] prms = null)
+        public virtual CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
         {
-            return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), "", false);
+            return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false);
         }
         public virtual void RegisterNewCharacter(CharacterUnitForm.Data data)
         {

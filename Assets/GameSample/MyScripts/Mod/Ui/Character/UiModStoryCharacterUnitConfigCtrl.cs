@@ -19,12 +19,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
     public partial class UiModStoryCharacterUnitConfigCtrl
     {
-        UiAnimChooseCtrl[] idles;
-        UiAnimChooseCtrl[] moves;
         public override void OnCreate()
         {
-            idles = new UiAnimChooseCtrl[] { view.model_idle0AnimChoose, view.model_idle1AnimChoose, view.model_idle2AnimChoose, view.model_idle3AnimChoose };
-            moves = new UiAnimChooseCtrl[] { view.model_move0AnimChoose, view.model_move1AnimChoose, view.model_move2AnimChoose, view.model_move3AnimChoose };
+
             view.btn_faceType.onClick.AddListener(() =>
             {
                 var items = new EntryItem();
@@ -132,15 +129,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.txt_faceType.oriText = model.data.faceType.ToString();
 
-            idles[0].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = (model.data.faceType == FaceType.FourDirection ? "idle0" : "idle") });
-            moves[0].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = (model.data.faceType == FaceType.FourDirection ? "move0" : "move") });
-            for (int i = 1; i < 4; i++)
-            {
-                idles[i].gameObject.SetActive(model.data.faceType == FaceType.FourDirection);
-                idles[i].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = "idle" + i });
-                moves[i].gameObject.SetActive(model.data.faceType == FaceType.FourDirection);
-                moves[i].Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = "move" + i });
-            }
+            view.model_IdleAnimChoose.Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = "idle" });
+            view.model_MoveAnimChoose.Set(new UiAnimChooseParam() { dic = model.data.defaultAnimName, options = model.data.animDic, key = "move" });
+
 
             view.sta_unique.ChangeState(model.data.unique ? 1 : 0);
 
@@ -151,17 +142,17 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
 
-            view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack])? SkillProductForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
+            view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
 
-            view.txt_heavyAttack.text = model.data.skill.ContainsKey(SkillType.HeavyAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.HeavyAttack])? SkillProductForm.DataByUid[model.data.skill[SkillType.HeavyAttack]].name : "";
+            view.txt_heavyAttack.text = model.data.skill.ContainsKey(SkillType.HeavyAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.HeavyAttack]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.HeavyAttack]].name : "";
 
-            view.txt_e.text = model.data.skill.ContainsKey(SkillType.E) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.E])? SkillProductForm.DataByUid[model.data.skill[SkillType.E]].name : "";
+            view.txt_e.text = model.data.skill.ContainsKey(SkillType.E) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.E]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.E]].name : "";
 
-            view.txt_q.text = model.data.skill.ContainsKey(SkillType.Q) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Q])? SkillProductForm.DataByUid[model.data.skill[SkillType.Q]].name : "";
+            view.txt_q.text = model.data.skill.ContainsKey(SkillType.Q) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Q]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.Q]].name : "";
 
-            view.txt_passive1.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
+            view.txt_passive1.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
 
-            view.txt_passive2.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive])? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
+            view.txt_passive2.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
 
 
 

@@ -6,7 +6,7 @@
     "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
     "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
     "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
-    "showType": 1
+    "showType": 3
   },
   {
     "uid": 1,

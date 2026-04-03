@@ -657,6 +657,14 @@ namespace Form
 
                 {1000253,new Data(1000253,"priority","Priority","优先级")},
 
+                {1000254,new Data(1000254,"Up","Up","上")},
+
+                {1000255,new Data(1000255,"Down","Down","下")},
+
+                {1000256,new Data(1000256,"Left","Left","左")},
+
+                {1000257,new Data(1000257,"Right","Right","右")},
+
                 };
                     _DataByKey = new Dictionary<string, Data>() {
     
@@ -1165,6 +1173,14 @@ namespace Form
                         {"isConsume",_DataById[1000252]},
     
                         {"priority",_DataById[1000253]},
+    
+                        {"Up",_DataById[1000254]},
+    
+                        {"Down",_DataById[1000255]},
+    
+                        {"Left",_DataById[1000256]},
+    
+                        {"Right",_DataById[1000257]},
     
                     };
     

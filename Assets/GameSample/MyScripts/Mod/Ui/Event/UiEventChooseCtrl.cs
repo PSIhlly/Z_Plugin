@@ -62,6 +62,10 @@ namespace Ui.EventChoose
         }
         public void Refresh()
         {
+            if(model.prm==null)
+            {
+                return;
+            }
             view.txt_name.oriText = model.prm.key;
             var evt = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).evt;
             view.txt_onEvent.text = $"{evt.GetDv(0, "")}({evt.Count})";

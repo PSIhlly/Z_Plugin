@@ -14,6 +14,8 @@ using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DataSystem;
 using Ui.Axis;
+using TuanjieMuse.Chat.Model;
+using Z_Ui;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitAppearance.ModStoryCharacterUnitAppearanceUnit
 {
@@ -22,19 +24,26 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     {
 
         public CharacterAnimForm.Data data;
+        public CharacterProductForm.Data ch;
     }
     public partial class UiModStoryCharacterUnitAppearanceUnitModel
     {
 
         public CharacterAnimForm.Data data;
+        public CharacterProductForm.Data ch;
+        public AnimDirecton dir;
+        public int id;
         public BodyPartType part;
         public EquipPartType equipPart;
-        public int id;
+        public FaceType faceType;
     }
     public partial class UiModStoryCharacterUnitAppearanceUnitCtrl : IZ_Listener<AssetEvent>
     {
 
         UiScrViewContainer<UiItemCtrl> itemCon;
+
+        
+        UiContainer<UiDirCtrl> dirCon;
         UiScrViewContainer<UiPartCtrl> partCon;
         UiScrViewContainer<UiEquipPartCtrl> equipPartCon;
         UiScrViewContainer<UiToggleCtrl> enablePartCon;
@@ -65,45 +74,45 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.btn_deleteTex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.uid, model.data.name, model.id);
+                ModManager.instance.assetCtrl.DeleteCharacterAnimId(parent.model.data.uid, model.data.name, model.dir,model.id);
                 model.id = -1;
                 model.part = BodyPartType.None;
                 Refresh();
             });
             view.btn_resetTex.onClick.AddListener(() =>
             {
-                model.data.animClip[model.id].partTex[model.part] = GlobalNameHelper.GetDefaultTexName();
+                model.data.animClip[model.dir][model.id].partTex[model.part] = GlobalNameHelper.GetDefaultTexName();
                 Refresh();
             });
             view.btn_image.onClick.AddListener(() =>
             {
                 if (model.equipPart == EquipPartType.None)
                 {
-                    ModManager.instance.assetCtrl.ImportCharacterAnim(parent.model.data.uid, model.data.name, model.part, model.id);
+                    ModManager.instance.assetCtrl.ImportCharacterAnim(parent.model.data.uid, model.data.name, model.dir,model.part, model.id);
                 }
             });
             itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
-
+            dirCon = new UiContainer<UiDirCtrl>(view.go_dir);
             enablePartCon = new UiScrViewContainer<UiToggleCtrl>(view.go_toggle, view.scr_enableParts);
             partCon = new UiScrViewContainer<UiPartCtrl>(view.go_part, view.scr_parts);
             equipPartCon = new UiScrViewContainer<UiEquipPartCtrl>(view.go_equipPart, view.scr_equipParts);
             view.btn_plus.onClick.AddListener(() =>
             {
-                var o = model.data.animClip[model.id].equipTrs[model.equipPart];
-                model.data.animClip[model.id].equipTrs[model.equipPart] = (o.Item1 + 1, o.Item2, o.Item3, o.Item4);
+                var o = model.data.animClip[model.dir][model.id].equipTrs[model.equipPart];
+                model.data.animClip[model.dir][model.id].equipTrs[model.equipPart] = (o.Item1 + 1, o.Item2, o.Item3, o.Item4);
                 Refresh();
             });
             view.btn_minus.onClick.AddListener(() =>
             {
-                var o = model.data.animClip[model.id].equipTrs[model.equipPart];
-                model.data.animClip[model.id].equipTrs[model.equipPart] = (o.Item1 - 1, o.Item2, o.Item3, o.Item4);
+                var o = model.data.animClip[model.dir][model.id].equipTrs[model.equipPart];
+                model.data.animClip[model.dir][model.id].equipTrs[model.equipPart] = (o.Item1 - 1, o.Item2, o.Item3, o.Item4);
                 Refresh();
             });
             view.btn_itemStyle.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseItemStyle(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    model.data.animClip[model.id].equipStyle[model.equipPart] = (ItemStyle)Enum.Parse(typeof(ItemStyle), item.content);
+                    model.data.animClip[model.dir][model.id].equipStyle[model.equipPart] = (ItemStyle)Enum.Parse(typeof(ItemStyle), item.content);
                     Refresh();
                 });
             });
@@ -112,10 +121,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public override void OnShow()
         {
             model.data = param.data;
+            model.ch = param.ch;
             DisplayCameraAreaManager.instance.Show();
             model.id = -1;
             model.part = BodyPartType.UpperPart;
             model.equipPart = EquipPartType.None;
+            model.dir = model.ch.faceType == FaceType.FourDirection ? AnimDirecton.Up : AnimDirecton.Fixed;
             Refresh();
         }
         public override void OnHide()
@@ -174,7 +185,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
                 if (model.equipPart != EquipPartType.None)
                 {
-                    view.txt_layer.text = model.data.animClip[model.id].equipTrs[model.equipPart].Item3.ToString();
+                    view.txt_layer.text = model.data.animClip[model.dir][model.id].equipTrs[model.equipPart].Item3.ToString();
 
                     /*                  view.model_Axis.SetActive(true, new UiAxisParam()
                                       {
@@ -196,26 +207,58 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             partCon.Refresh();
 
 
+            dirCon.Clear();
+            switch (model.ch.faceType)
+            {
+                case FaceType.Fixed:
+                case FaceType.Flexible:
+                    dirCon.Add(new UiDirParam()
+                    {
+                        dir = AnimDirecton.Fixed
+                    });
+                    break;
+                case FaceType.FourDirection:
+                    dirCon.Add(new UiDirParam()
+                    {
+                        dir = AnimDirecton.Up
+                    });
+                    dirCon.Add(new UiDirParam()
+                    {
+                        dir = AnimDirecton.Down
+                    });
+                    dirCon.Add(new UiDirParam()
+                    {
+                        dir = AnimDirecton.Left
+                    });
+                    dirCon.Add(new UiDirParam()
+                    {
+                        dir = AnimDirecton.Right
+                    });
+                    break;
+
+            }
+            dirCon.Refresh();
+
             itemCon.Clear();
-            for (int i = 0, icnt = model.data.animClip.Count; i < icnt; i++)
+            for (int i = 0; i < model.data.animClip[model.dir].Count; i++)
             {
                 itemCon.Add(new UiItemParam()
                 {
-                    id = i
+                    id = i,
                 });
             }
             itemCon.Add(new UiItemParam()
             {
-                id = -1
+                id = -1,
             });
             itemCon.Refresh();
 
-
+            UiManager.Rebuild(gameObject, true);
         }
         private void RefreshView()
         {
             List<string> texNameLst = new List<string>() {
-                model.data.animClip[model.id].partTex[BodyPartType.UpperPart],
+                model.data.animClip[model.dir][model.id].partTex[BodyPartType.UpperPart],
                 null,
                 GlobalNameHelper.GetDefaultTexName()
                 };
@@ -268,7 +311,36 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
         }
     }
-
+    public partial class UiDirParam
+    {
+        public AnimDirecton dir;
+    }
+    public partial class UiDirModel
+    {
+        public AnimDirecton dir;
+    }
+    public partial class UiDirCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.model.dir = model.dir;
+                parent.model.id = -1;
+                parent.Refresh();
+            });
+        }
+        public override void OnShow()
+        {
+            model.dir = param.dir;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            view.txt_.oriText = model.dir.ToString();
+            view.sta_.ChangeState(model.dir != parent.model.dir ? 0 : 1);
+        }
+    }
 
     public partial class UiItemParam
     {
@@ -276,7 +348,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
     public partial class UiItemModel
     {
-        public int id;
+        public UiItemParam prm;
     }
     public partial class UiItemCtrl
     {
@@ -286,28 +358,28 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateCharacterAnimId(parent.parent.model.data.uid, parent.model.data.name);
+                ModManager.instance.assetCtrl.CreateCharacterAnimId(parent.model.ch.uid, parent.model.data.name,parent.model.dir);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
             {
-                parent.model.id = model.id;
+                parent.model.id = model.prm.id;
                 parent.Refresh();
             });
 
         }
         public override void OnShow()
         {
-            model.id = param.id;
+            model.prm = param;
             Refresh();
         }
         public void Refresh()
         {
-            view.sta_exist.ChangeState(model.id == -1 ? 0 : 1);
-            if (model.id != -1)
+            view.sta_exist.ChangeState(model.prm.id == -1 ? 0 : 1);
+            if (model.prm.id != -1)
             {
                 view.txt_.text = "";
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.animClip[model.id].partTex[BodyPartType.UpperPart]].GetSprite();
+                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.animClip[parent.model.dir][model.prm.id].partTex[BodyPartType.UpperPart]].GetSprite();
             }
 
         }

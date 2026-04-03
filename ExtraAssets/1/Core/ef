@@ -2,7 +2,7 @@
   {
     "uid": 11,
     "name": "胜利",
-    "code": "if(GetCharacterParameter(self,\"HP\")<=0)\n{\nPause();\n十六夜说话(\"哈哈哈，我赢了\");\nShowAdvancedDialog(\"$i$99b3020eae25f733e23e497391f407083a11636f$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"\",\"\",\"$a$$a$\",\"$v$1853b510390967b73b6a4941ae13cf62678d4a47$v$\",0);\nWait(1);\nGameOver();\n} \n;\n",
+    "code": "if(GetCharacterParameter(self,\"HP\")<=0)\n{\nPause();\n十六夜说话(\"哈哈哈，我赢了\");\nWait(1);\nGameOver();\n} \n;\n",
     "zCode": [
       {
         "v": "0"
@@ -41,7 +41,7 @@
         "v": "15"
       },
       {
-        "v": "50"
+        "v": "32"
       },
       {
         "v": "0"
@@ -74,60 +74,6 @@
         "v": "十六夜说话"
       },
       {
-        "v": "1"
-      },
-      {
-        "v": "$i$99b3020eae25f733e23e497391f407083a11636f$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": ""
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": ""
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$a$$a$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$v$1853b510390967b73b6a4941ae13cf62678d4a47$v$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "7"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowAdvancedDialog"
-      },
-      {
         "v": "0"
       },
       {
@@ -152,7 +98,7 @@
         "v": "16"
       },
       {
-        "v": "50"
+        "v": "32"
       }
     ],
     "paramCount": 0,
@@ -163,13 +109,13 @@
   {
     "uid": 10,
     "name": "子弹销毁",
-    "code": "if(IsObjectEnableCollision(trigger))\n{\nDestroyObject(self);\n}\n",
+    "code": "if(IsObjectEnableCollision(target))\n{\nDestroyObject(self);\n} \n;\n",
     "zCode": [
       {
         "v": "14"
       },
       {
-        "v": "trigger"
+        "v": "target"
       },
       {
         "v": "0"
@@ -440,13 +386,13 @@
   {
     "uid": 8,
     "name": "子弹",
-    "code": "if(GetSceneObjectParameter(self,\"所属人物\")!=trigger)\n{\nSetCharacterParameter(trigger,\"HP\",GetCharacterParameter(trigger,\"HP\")-1);\nShowTip(\"击中目标！！！\");\nDestroyObject(self);\n} \n;\n",
+    "code": "if(GetSceneObjectParameter(self,\"所属人物\")!=target)\n{\nCharacterStun(target,1);\nSetCharacterParameter(target,\"HP\",GetCharacterParameter(target,\"HP\")-1);\nShowEffect(\"$ef$1$ef$\",GetCharacterPos(target),0);\nShowTip(\"击中目标！！！\");\nDestroyObject(self);\n} \n;\n",
     "zCode": [
       {
         "v": "14"
       },
       {
-        "v": "trigger"
+        "v": "target"
       },
       {
         "v": "14"
@@ -479,13 +425,37 @@
         "v": "15"
       },
       {
-        "v": "46"
+        "v": "68"
       },
       {
         "v": "14"
       },
       {
-        "v": "trigger"
+        "v": "target"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "CharacterStun"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
       },
       {
         "v": "1"
@@ -503,7 +473,7 @@
         "v": "14"
       },
       {
-        "v": "trigger"
+        "v": "target"
       },
       {
         "v": "1"
@@ -537,6 +507,48 @@
       },
       {
         "v": "SetCharacterParameter"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$ef$1$ef$"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPos"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowEffect"
       },
       {
         "v": "1"
@@ -578,7 +590,7 @@
         "v": "16"
       },
       {
-        "v": "46"
+        "v": "68"
       }
     ],
     "paramCount": 0,
@@ -1266,6 +1278,496 @@
       },
       {
         "v": "子弹"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "pos"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GenerateObject"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "newObject"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "newObject"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "所属人物"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetSceneObjectParameter"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "newObject"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "移动方向"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterForwardVector"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetSceneObjectParameter"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "newObject"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterRotation"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetObjectRotation"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "22"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 12,
+    "name": "子弹追踪",
+    "code": "dir=GetSceneObjectParameter(self,\"移动方向\");\ndir.x=(dir.x)*(80);\ndir.height=(dir.height)*(80);\ndir.y=(dir.y)*(80);\nMoveObjectRelative(self,dir,10);\nDestroyObject(self)",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "移动方向"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetSceneObjectParameter"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "80"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "x"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "x"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "80"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "height"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "height"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "80"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "y"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "y"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "10"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "MoveObjectRelative"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 13,
+    "name": "灵梦攻击",
+    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPos(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "攻击"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "CharacterPlayAnim"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPos"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "posRaw"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "-0.5"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "20"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "93"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "posRaw"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "pos"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "札弹"
       },
       {
         "v": "14"

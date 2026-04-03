@@ -23,7 +23,7 @@ namespace Z_Code
             });
         }
         public override string GetName() => "Image";
-        public override CmdBase GetNew() => new NumCmd();
+        public override CmdBase GetNew() => new ImageCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             return true;

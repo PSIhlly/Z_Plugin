@@ -27,16 +27,21 @@ namespace Z_Code
         public override CmdBase GetNew() => new MoveObjectRelativeCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
+            asyncTask.interpreter.data.heapTemp.Clear();
+            foreach (var p in prm)
+                asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
+            var heapTemp = asyncTask.interpreter.data.heapTemp;
+            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(heapTemp[0].str, GlobalEventHelper.SCENEOBJECT)];
+
             GameManager.instance.evtCtrl.StartTask(() =>
             {
-                var relaPos = new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
-                var time = Mathf.Max(0.0001f, prm[2].num);
-                var step = Mathf.Min(1,Time.deltaTime / time) * relaPos;
+                var relaPos = new Vector3(heapTemp[1].dic["x"].num, heapTemp[1].dic["height"].num, heapTemp[1].dic["y"].num);
+                var time = Mathf.Max(0.0001f, heapTemp[2].num);
+                var step = Mathf.Min(1, Time.deltaTime / time) * relaPos;
 
 
                 var oldPos = data.pos;
-  
+
                 {
                     if (data.unit is ObjectUnit o)
                     {
@@ -44,11 +49,11 @@ namespace Z_Code
                     }
                 }
                 var realStep = (data.pos - oldPos);
-                prm[1].dic["x"].num -= realStep.x;
-                prm[1].dic["y"].num -= realStep.z;
-                prm[1].dic["height"].num -= realStep.y;
-                prm[2].num -= Time.deltaTime;
-                if (prm[2].num <= 0)
+                heapTemp[1].dic["x"].num -= realStep.x;
+                heapTemp[1].dic["y"].num -= realStep.z;
+                heapTemp[1].dic["height"].num -= realStep.y;
+                heapTemp[2].num -= Time.deltaTime;
+                if (heapTemp[2].num <= 0)
                 {
                     asyncTask.Complete();
                     return true;

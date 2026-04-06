@@ -2,31 +2,135 @@
   {
     "uid": 1,
     "name": "受击",
-    "label": "受击",
+    "label": "",
     "clips": [
       {
-        "v": {
-          "uid": -1,
-          "tex": "$i$024b801341199b8e1697080232e6e09339614336$i$",
-          "time": 1.0,
-          "pos": "0|0|0",
-          "rot": 0.0,
-          "scale": "1|1|1",
-          "opacity": 1.0,
-          "transition": true
-        }
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$54f3250f3f11117ceb83c80084650e1935c96d8e$i$",
+              "time": 0.1,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
       },
       {
-        "v": {
-          "uid": -1,
-          "tex": "$i$024b801341199b8e1697080232e6e09339614336$i$",
-          "time": 1.0,
-          "pos": "0|0|0",
-          "rot": 0.0,
-          "scale": "2|2|2",
-          "opacity": 0.0,
-          "transition": false
-        }
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$09714d17b684bd5fe3a0f7b6b65e630e8843477d$i$",
+              "time": 0.1,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$09714d17b684bd5fe3a0f7b6b65e630e8843477d$i$",
+              "time": 0.1,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$c4e9d084e6d5adb45ea06461716f52d5349cbf62$i$",
+              "time": 0.2,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$c4e9d084e6d5adb45ea06461716f52d5349cbf62$i$",
+              "time": 0.1,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$e7a6adc868e1148a33d0ec8d60fb21b03a55e40f$i$",
+              "time": 0.3,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$e7a6adc868e1148a33d0ec8d60fb21b03a55e40f$i$",
+              "time": 0.1,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$e26e26e08f4980dd95557011feab0155db8bd472$i$",
+              "time": 1.4,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$e26e26e08f4980dd95557011feab0155db8bd472$i$",
+              "time": 0.1,
+              "pos": "0|1.2|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
       }
     ]
   }

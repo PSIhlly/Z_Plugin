@@ -28,22 +28,41 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetCharacterRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER)];
+            asyncTask.interpreter.data.heapTemp.Clear();
+            foreach (var p in prm)
+                asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
+            var heapTemp = asyncTask.interpreter.data.heapTemp;
+            var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(heapTemp[0].str, GlobalEventHelper.CHARACTER)];
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
-            
+
+            void Set(float y)
+            {
+                data.unit.forceEuler = data.euler.NewSetY(y);
+                data.euler = data.euler.NewSetY(y);
+                if (data.unit.ins != null)
+                {
+                    data.unit.ins.transform.eulerAngles = data.unit.ins.transform.eulerAngles.NewSetY(y);
+                }
+            }
+
+            if (heapTemp[2].num <= 0)
+            {
+                Set(heapTemp[1].num);
+                return true;
+            }
             GameManager.instance.evtCtrl.StartTask(() =>
             {
-                var euler = prm[1].num;
-                var time = Mathf.Max(prm[2].num,0.0001f);
+                var euler = heapTemp[1].num;
+                var time = Mathf.Max(heapTemp[2].num,0.0001f);
                 
                 
                 if(data!=null)
                 {
                     var step = Mathf.Min(1, Time.deltaTime / time) * (euler - data.euler.y);
-                    data.unit.forceEuler = data.euler.NewSetY(data.euler.y + step) ;
+                    Set(step);
                 }
-                prm[2].num -= Time.deltaTime;
-                if (prm[2].num <= 0)
+                heapTemp[2].num -= Time.deltaTime;
+                if (heapTemp[2].num <= 0)
                 {
                     asyncTask.Complete();
                     return true;

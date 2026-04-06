@@ -501,7 +501,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
 
 
-    public bool DeleteCharacterAnimId(int characterUid, string animNm,AnimDirecton dir, int id)
+    public bool DeleteCharacterAnimId(int characterUid, string animNm, AnimDirecton dir, int id)
     {
         var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[animNm];
@@ -523,7 +523,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         anim.name = newName;
         data.animDic[newName] = anim;
     }
-    public void ImportCharacterAnim(int characterUid, string animNm,AnimDirecton dir, BodyPartType part, int id)
+    public void ImportCharacterAnim(int characterUid, string animNm, AnimDirecton dir, BodyPartType part, int id)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
@@ -552,11 +552,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         data.animDic[animName] = CreateCharacterAnim(animName);
 
     }
-    public void CreateCharacterAnimId(int characterUid, string animNm,AnimDirecton dir)
+    public void CreateCharacterAnimId(int characterUid, string animNm, AnimDirecton dir)
     {
         var data = CharacterProductForm.DataByUid[characterUid];
         var anim = data.animDic[animNm];
-        if(!anim.animClip.ContainsKey(dir))
+        if (!anim.animClip.ContainsKey(dir))
         {
             anim.animClip[dir] = new List<CharacterAnimClipForm.Data>();
         }
@@ -565,13 +565,21 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
     #region effect
-    public EffectClipForm.Data CreateEffectClip(string texName)
+    public List<EffectClipForm.Data> CreateEffectClips(string texName = null)
     {
-        return new EffectClipForm.Data(-1, texName, 1, Vector3.zero, 0, Vector3.one, 1, true);
+        return new List<EffectClipForm.Data>() { CreateEffectClip(texName) };
     }
-    public void DeleteEffectClip(int effectUid, int id)
+    public EffectClipForm.Data CreateEffectClip(string texName = null)
+    {
+        return new EffectClipForm.Data(-1, string.IsNullOrEmpty(texName) ? GlobalNameHelper.GetDefaultTexName() : texName, 1, Vector3.zero, 0, Vector3.one, 1, true);
+    }
+    public void DeleteEffectClips(int effectUid, int id)
     {
         EffectForm.DataByUid[effectUid].clips.RemoveAt(id);
+    }
+    public void DeleteEffectClip(int effectUid,int id1, int id2)
+    {
+        EffectForm.DataByUid[effectUid].clips[id1].RemoveAt(id2);
     }
     public void CreateEffect(string lab = "", string name = null)
     {
@@ -579,20 +587,20 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(EffectForm.DataByName.Keys);
         }
-        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) }));
+        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) } }));
     }
     public void DeleteEffect(int effectUid)
     {
         EffectForm.RemoveData(effectUid);
     }
-    public void ImportEffectImage(int effectUid)
+    public void ImportEffectImage(int effectUid, int clipId)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
             onComplete = (data) =>
             {
                 var effectData = EffectForm.DataByUid[effectUid];
-                foreach (var clip in effectData.clips)
+                foreach (var clip in effectData.clips[clipId])
                 {
                     clip.tex = data.name;
                 }
@@ -607,7 +615,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         foreach (var data in EffectForm.DataByUid.Values)
         {
-            items.Add(data.name, TexAssetForm.DataByName[data.clips[0].tex].GetSprite(),data.uid);
+            items.Add(data.name, TexAssetForm.DataByName[data.clips[0][0].tex].GetSprite(), data.uid);
         }
         NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
             true, (item) =>

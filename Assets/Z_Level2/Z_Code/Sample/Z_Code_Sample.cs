@@ -25,7 +25,7 @@ public class Z_Code_Sample : MonoBehaviour
         var program = new ProgramDataForm.Data(-1, "", code, res,count,ret);
 
 
-        var itp = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1, 0, null);
+        var itp = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1, 0, null, new List<BoxDataForm.Data>());
         StartCoroutine(Interpret(itp));
 
         runBtn.onClick.AddListener(() =>

@@ -22,10 +22,17 @@ public static class Z_EventHelper
         }
         if(type2Listener[type].Contains(listener))
         {
-            Debug.LogError("double rigister");
             return;
         }
         type2Listener[type].Add(listener);
+    }
+    public static void Unregister<T>(this IZ_Listener<T> listener)
+    {
+        var type = typeof(T);
+        if (type2Listener.ContainsKey(type)&& type2Listener[type].Contains(listener))
+        {
+            type2Listener[type].Remove(listener);
+        }
     }
 
     public static void Invoke<T>(T evt)

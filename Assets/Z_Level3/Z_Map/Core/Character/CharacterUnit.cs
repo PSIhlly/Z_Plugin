@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.TextCore.Text;
 using Z_Map.Form;
 using Z_UnitSystem.Form;
@@ -42,9 +43,12 @@ namespace Z_Map
             if (lastUpdateFrame == Time.frameCount)
                 return;
             lastUpdateFrame = Time.frameCount;
+            if (!isVising)
+            {
+                MapManager.instance.updateCtrl.UpdateSingleOne(this);
+            }
 
-
-            if (data.updateType == UpdateType.Always || isShowing)
+            if (data.updateType == UpdateType.Always || isShowing || GlobalSettings.UPDATE_ALL_CHARACTER)
             {
                 //nav
                 if (data.navEnabled && !DynamicGlobalSettings.pauseNav)
@@ -65,7 +69,8 @@ namespace Z_Map
             if (forceEuler != null)
             {
                 data.euler = (Vector3)forceEuler;
-                ins.transform.eulerAngles = (Vector3)forceEuler;
+                if (ins != null)
+                    ins.transform.eulerAngles = (Vector3)forceEuler;
                 forceEuler = null;
             }
 
@@ -92,7 +97,6 @@ namespace Z_Map
             HashSet<Vector3> existAvoid = new HashSet<Vector3>();
 
             HashSet<MapUnit> existUnit = new HashSet<MapUnit>();
-
             while (dirQue.Count > 0)
             {
                 dir = dirQue.Dequeue();
@@ -148,10 +152,23 @@ namespace Z_Map
                 }
                 if ((firstTry || res > 0.001f) && avoidDir.Count > 0)
                 {
-                    var curDir = dir * (mag - res) / mag;
-                    dirQue.Clear();
-                    existAvoid.Clear();
-                    foreach (var o in avoidDir)
+                    if (Z_Math.Graph.IsVectorsInHemisphere(avoidDir, out var hemisphereNormal))
+                    {
+                        Vector3 newDir = Vector3.zero;
+                        foreach (var o in avoidDir)//start
+                        {
+                            newDir += o;
+                        }
+                        if (Mathf.Abs((newDir.normalized + dir.normalized).sqrMagnitude) > 0.00001f)
+                        {
+                            dir = dir * (mag - res) / mag;
+                            float loss = dir.magnitude - Vector3.Dot(newDir.normalized, dir);
+                            dirQue.Enqueue((dir- (( + Vector3.Dot(newDir.normalized, dir) - 0.1f * loss  ) * newDir.normalized)));
+                            
+                        }
+                    }
+
+                    /*foreach (var o in avoidDir)
                     {
                         if (existAvoid.Contains(o))
                             continue;
@@ -162,11 +179,11 @@ namespace Z_Map
                         var realO = o * dot;
                         if ((curDir - realO).sqrMagnitude < 0.0001f)
                             continue;
-                        /*               if (dir.x != 0 && dir.z != 0)
+                        *//*               if (dir.x != 0 && dir.z != 0)
                                            Debug.Log(Time.frameCount + " " + realO.magnitude + " " + curDir.magnitude + " " + (curDir - realO).magnitude + " " + dir.magnitude);
-                     */
+                     *//*
                         dirQue.Enqueue(curDir - realO);
-                    }
+                    }*/
                 }
                 firstTry = false;
                 dir *= (res) / mag;

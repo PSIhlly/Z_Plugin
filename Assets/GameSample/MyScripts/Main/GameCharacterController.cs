@@ -109,11 +109,13 @@ namespace Form
                 {
                     return false;
                 }
-                var prmData = CharacterParamForm.DataByName[prmName];
-                switch (prmData.showType)
+                var protoPrm = CharacterParamForm.DataByName[prmName];
+                switch (protoPrm.showType)
                 {
                     case ParamShowType.Always:
                     case ParamShowType.AlwaysWithPanel:
+                    case ParamShowType.AlwaysWithPanelAndScene:
+                    case ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer:
                         return true;
                     case ParamShowType.OnlyNotZero:
                         return paramDic[prmName].GetValue().num != 0;
@@ -237,11 +239,12 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             animCur[part] = anim.name;
             stateCur[part] = tar;
             stateCd[part] = 0;
+
             UpdateAnim(part, data.unit.ins.renderers[(int)part - 1], data, anim, forceReplay);
         }
         public void TryChangeState(State tar, BodyPartType part, bool forceReplay = false, string extraAnimName = "")
         {
-            if (part == BodyPartType.None)
+            if (part == BodyPartType.None || data.unit.ins == null)
                 return;
             CharacterAnimForm.Data anim = GetAnim(tar, extraAnimName);
             if (anim == null)

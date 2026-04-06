@@ -33,6 +33,7 @@ namespace Z_Map
             if (!textDic.ContainsKey(key))
             {
                 textDic[key] = Instantiate(textProto.gameObject, textProto.transform.parent).GetComponent<TextMeshProUGUI>();
+                textDic[key].gameObject.SetActive(true);
             }
             textDic[key].text = text;
         }
@@ -49,16 +50,18 @@ namespace Z_Map
         }
         public void ToastText(string text, float lastTime)
         {
-            var tmp = Instantiate(toastTextProto, toastTextProto.transform.parent).GetComponent<TextMeshProUGUI>();
-            tmp.text = text;
-            var oriPos = trs.position + Vector3.down / 2 + Vector3.back / 2;
-            var tarPos = trs.position + Vector3.up / 2 + Vector3.forward / 2;
+            GameObject tmp = Instantiate(toastTextProto.gameObject, toastTextProto.transform.parent);
+            tmp.SetActive(true);
+            var textTmp = tmp.GetComponent<TextMeshProUGUI>();
+            textTmp.text = text;
+            var oriPos = trs.position;
+            var tarPos = trs.position + Vector3.up  + Vector3.forward ;
             tmp.transform.position = oriPos;
             float timeCur = 0;
             TimeManager.instance.StartTimer(0, 0.0001f, () =>
             {
                 timeCur += Time.deltaTime;
-                tmp.transform.position = Vector3.Lerp(oriPos, tarPos, timeCur / lastTime);
+                tmp.transform.position = Vector3.Lerp(oriPos, tarPos, timeCur * 2 / lastTime);
                 if (timeCur > lastTime)
                 {
                     Destroy(tmp.gameObject);

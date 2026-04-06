@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using UnityEngine;
 using Z_Debug;
 using Z_DesignStyle;
 using Z_Map.Form;
 using Z_Math;
+using Z_Mesh;
 using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
@@ -64,7 +66,11 @@ namespace Z_Map
             private set;
         }
        = new List<ItemUnitForm.Data>();
-        (int, int, int, int, int, int) lastView;
+        public (int, int, int, int, int, int) lastView
+        {
+            get;
+            private set;
+        }
 
         private void FreshMap()
         {
@@ -607,24 +613,19 @@ namespace Z_Map
             avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
             var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
-            foreach (var tar in unit.GetMeshes(type))
-            {
-                foreach (var cur in trigger.GetMeshes(type))
-                {
-                    float dis = 0;
-                    var curType = Mesh.MeshIntersectMesh(cur, tar, dir, out dis, out var avoid);
 
-                    assist.Add(curType);
-                    if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
-                    {
-                        avoidDir.Add(avoid);
-                    }
-                    else if (dis < disRes)
-                    {
-                        disRes = dis;
-                        avoidDir.Clear();
-                        avoidDir.Add(avoid);
-                    }
+            foreach (var cur in trigger.GetMeshes(type))
+            {
+                float dis = CheckCollide(cur, unit,dir, type,out var avoidDirTmp,out var assistTmp);
+                assist.Merge(assistTmp);
+                if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
+                {
+                }
+                else if (dis < disRes)
+                {
+                    disRes = dis;
+                    avoidDir.Clear();
+                    avoidDir.AddRange(avoidDirTmp);
                 }
             }
             var res = assist.GetRes();
@@ -634,6 +635,31 @@ namespace Z_Map
             }
             return disRes;
         }
+        public float CheckCollide(MeshInfo trigger, MapUnit unit, Vector3 dir, CollideType type, out List<Vector3> avoidDir, out IntersectAssisant assist, Action<Unit, Graph.IntersectType, float> onCast = null)
+        {
+            float disRes= (dir).magnitude;
+            avoidDir = new List<Vector3>();
+            assist = new Graph.IntersectAssisant(false);
+            foreach (var tar in unit.GetMeshes(type))
+            {
+                float dis = 0;
+                var curType = Mesh.MeshIntersectMesh(trigger, tar, dir, out dis, out var avoid);
+
+                assist.Add(curType);
+                if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
+                {
+                    avoidDir.Add(avoid);
+                }
+                else if (dis < disRes)
+                {
+                    disRes = dis;
+                    avoidDir.Clear();
+                    avoidDir.Add(avoid);
+                }
+            }
+            return disRes;
+        }
+
         public void Begin()
         {
 

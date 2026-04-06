@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.GPUDriven;
 using Z_DesignStyle;
+using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_Math;
 using Z_Mesh;
+using Z_Ui;
+using static UnityEditor.PlayerSettings;
 using Mesh = Z_Mesh.Mesh;
 namespace Z_Map
 {
@@ -19,10 +23,10 @@ namespace Z_Map
         public MapUtilController(MapManager super) : base(super)
         {
         }
-        public List<TileUnit> GetNineTile((int, int, int) mapPos,float length)
+        public List<TileUnit> GetNineTile((int, int, int) mapPos, float length)
         {
             List<TileUnit> res = new List<TileUnit>();
-            int area=(int)Math.Max(1, length);
+            int area = (int)Math.Max(1, length);
             for (int i = mapPos.Item1 - area; i <= mapPos.Item1 + area; i++)
                 for (int j = mapPos.Item3 - area; j <= mapPos.Item3 + area; j++)
                 {
@@ -109,6 +113,7 @@ namespace Z_Map
                     for (int z = -2; z <= 2; z++)
                     {
                         var cur = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapPos.x + x, mapPos.y + y, mapPos.z + z), _super.data.mainData.mapUnitSize);
+
                         if (InArea(cur) && disMin > (cur - pos).sqrMagnitude)
                         {
                             disMin = (cur - pos).sqrMagnitude;
@@ -123,14 +128,14 @@ namespace Z_Map
                 var vis = new HashSet<(int, int, int)>();
                 queue.Enqueue((mapPos.x, mapPos.y, mapPos.z));
                 vis.Add((mapPos.x, mapPos.y, mapPos.z));
-                while (queue.Count < 0)
+                while (queue.Count > 0)
                 {
                     var cur = queue.Dequeue();
                     var dirs = new (int, int, int)[]{
                             (cur.Item1+1,cur.Item2,cur.Item3), (cur.Item1 - 1, cur.Item2, cur.Item3),
-                            (cur.Item1,cur.Item2+1,cur.Item3),(cur.Item1,cur.Item2-1,cur.Item3),
                             (cur.Item1,cur.Item2,cur.Item3+1),(cur.Item1,cur.Item2,cur.Item3-1)
                         };
+                    bool finded = false;
                     foreach (var d in dirs)
                     {
                         if (!vis.Contains(d) && InLimit(d))
@@ -138,6 +143,7 @@ namespace Z_Map
                             if (_super.data.maps.ContainsKey(d))
                             {
                                 tar = new Vector3(d.Item1, d.Item2, d.Item3);
+                                finded = true;
                                 break;
                             }
                             else
@@ -147,6 +153,8 @@ namespace Z_Map
                             }
                         }
                     }
+                    if (finded)
+                        break;
                 }
             }
             {
@@ -208,6 +216,46 @@ namespace Z_Map
                 {
                     res.Add(Mesh.GetMesh(sp, pos - root.transform.position + rootPos, rootEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
                 }
+            }
+            return res;
+        }
+        public List<MapUnit> CaptureCast(Vector3 from, Vector3 to, float radius)
+        {
+            var res = new List<MapUnit>();
+
+            HashSet<int> exist = new HashSet<int>();
+
+            var fromMesh = Mesh.GetMesh(from, radius, Vector3.zero, Vector3.one);
+            var toMesh = Mesh.GetMesh(to, radius, Vector3.zero, Vector3.one);
+            var lst = Graph.GetRoughOverlapIntPos(fromMesh.positions);
+            lst.AddRange(Graph.GetRoughOverlapIntPos(toMesh.positions));
+
+
+            foreach (var pos in lst)
+            {
+                var mapPos = _super.utilCtrl.RealPos2MapPosInt(pos);
+                if (_super.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                {
+                    var tile = _super.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit;
+                    var unitLst = new List<MapUnit>() { tile };
+                    unitLst.AddRange(_super.updateCtrl.objectTileDic.Get(tile));
+                    unitLst.AddRange(_super.updateCtrl.characterTileDic.Get(tile));
+                    foreach (var u in unitLst)
+                    {
+                        if (exist.Contains(u.data.uid))
+                            continue;
+                        exist.Add(u.data.uid);
+
+                        _super.updateCtrl.CheckCollide(fromMesh, u, to - from, CollideType.CollideOnly, out _, out var assist);
+                        if (assist.GetRes() != Graph.IntersectType.None)
+                        {
+                            res.Add(u);
+                        }
+
+                    }
+
+                }
+                Debug.DrawLine(from, to, Color.green);
             }
             return res;
         }

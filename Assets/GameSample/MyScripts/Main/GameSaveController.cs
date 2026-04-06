@@ -237,7 +237,7 @@ public class GameSaveController : Z_Controller<GameManager>
             {
                 foreach (var clip in data.clips)
                 {
-                    SaveStoryTex(clip.tex, storyCoreFolder);
+                    SaveStoryTex(clip[0].tex, storyCoreFolder);
                 }
             }
     }
@@ -636,7 +636,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var clip in data.clips)
             {
-                LoadStoryTex(clip.tex, assetFolder);
+                LoadStoryTex(clip[0].tex, assetFolder);
             }
         }
     }

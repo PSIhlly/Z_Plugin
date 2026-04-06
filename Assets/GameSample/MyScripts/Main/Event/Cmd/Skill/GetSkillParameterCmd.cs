@@ -26,10 +26,10 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetSkillParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = SkillProductForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SKILL), null);
+            var data = SkillProductForm.GetByEvtName(prm[0].str);
             if (data != null && data.paramDic.ContainsKey(prm[1].str))
             {
-                asyncTask.res = new BoxDataForm.Data[] {data.paramDic[prm[1].str].GetValue().Copy() };
+                asyncTask.res = new BoxDataForm.Data[] {data.paramDic[prm[1].str].GetValue().DeepCopy() };
             }
             else
             {

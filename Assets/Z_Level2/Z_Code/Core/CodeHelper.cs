@@ -1,25 +1,41 @@
+using Codice.CM.Common;
 using System;
 using System.Collections.Generic;
 using Z_Code;
 using Z_Code.Form;
 namespace Z_Code.Form
-{ 
-public static partial class ProgramDataForm
 {
-    public partial class Data
+    public static partial class BoxDataForm
     {
-        public List<SyntaxNode> ApplyCode(string code, Compiler compiler = null)
+        public partial class Data
         {
-            if (compiler == null)
-                compiler = new Compiler();
-            this.code = code;
-            zCode = compiler.Compile(code, out var res, out int count, out string ret);
-            paramCount = count;
-            returnValue = ret;
-            return res;
+            public Data DeepCopy(bool sameId = true)
+            {
+                var tmpDic = new Dictionary<string, BoxDataForm.Data>();
+                foreach (var pair in dic)
+                {
+                    tmpDic[pair.Key] = pair.Value.DeepCopy();
+                }
+                return new Data(sameId ? uid : uidChain.GetId(), str, valName, num, tmpDic);
+            }
         }
     }
-}
+    public static partial class ProgramDataForm
+    {
+        public partial class Data
+        {
+            public List<SyntaxNode> ApplyCode(string code, Compiler compiler = null)
+            {
+                if (compiler == null)
+                    compiler = new Compiler();
+                this.code = code;
+                zCode = compiler.Compile(code, out var res, out int count, out string ret);
+                paramCount = count;
+                returnValue = ret;
+                return res;
+            }
+        }
+    }
 }
 namespace Z_Code
 {
@@ -45,7 +61,7 @@ namespace Z_Code
         }
         public static string GetBoxContent(this BoxDataForm.Data data)
         {
-            if(data.str==null)
+            if (data.str == null)
             {
                 return data.num.ToString();
             }

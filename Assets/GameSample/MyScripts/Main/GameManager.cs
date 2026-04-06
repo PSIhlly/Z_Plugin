@@ -113,7 +113,7 @@ namespace Form
                 }
                 else if (o is BoxDataForm.Data b)
                 {
-                    box.Reset(b.Copy());
+                    box.Reset(b.DeepCopy());
                 }
             }
 

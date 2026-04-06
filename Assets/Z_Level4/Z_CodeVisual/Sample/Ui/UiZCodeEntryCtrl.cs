@@ -29,7 +29,7 @@ namespace Ui.ZCodeEntry
             model.curEntry = new List<SyntaxNode>();
             var lst=model.cpr.Compile(view.ipt_code.text, out var syntaxs,out var count,out var ret);
             var pg = new ProgramDataForm.Data(-1, "", view.ipt_code.text,lst, count,ret);
-            model.interpreter = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), pg, 0, -1,0, null);
+            model.interpreter = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), pg, 0, -1,0, null, new List<BoxDataForm.Data>());
 
             view.btn_run.onClick.AddListener(() =>
             {

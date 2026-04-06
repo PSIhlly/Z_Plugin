@@ -324,6 +324,12 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {20,new Data(20,"[",new List<string>(){"a","b",},new List<string>(){"var","string",},new List<string>(){"result",},new List<string>(){"var",},"{1}[{0}]","a[b]")},
 
+                {21,new Data(21,"Len",new List<string>(){"var",},new List<string>(){"var",},new List<string>(){"count",},new List<string>(){"num",},"{0} 's length","Len(a)")},
+
+                {22,new Data(22,"GetKeys",new List<string>(){"var",},new List<string>(){"var",},new List<string>(){"list",},new List<string>(){"var",},"{0} 's keys list","GetKeys(a)")},
+
+                {23,new Data(23,"GetValues",new List<string>(){"var",},new List<string>(){"var",},new List<string>(){"list",},new List<string>(){"var",},"{0} 's values list","GetValues(a)")},
+
                 };
                     _DataByName = new Dictionary<string, Data>() {
     
@@ -366,6 +372,12 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                         {".",_DataByUid[19]},
     
                         {"[",_DataByUid[20]},
+    
+                        {"Len",_DataByUid[21]},
+    
+                        {"GetKeys",_DataByUid[22]},
+    
+                        {"GetValues",_DataByUid[23]},
     
                     };
     

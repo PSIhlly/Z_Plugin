@@ -1,17 +1,18 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1 &2497650239419119728
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 5218568027821633788}
   - component: {fileID: 4015258869905101652}
   - component: {fileID: 3870053065856857496}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: img_
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.16503906, y: -0.1665039}
-  m_SizeDelta: {x: -0.32928467, y: 0.008178711}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4015258869905101652
 CanvasRenderer:
@@ -83,13 +84,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 5514599902119004261}
   - component: {fileID: 821554500513361695}
   - component: {fileID: 7506659056317325585}
   - component: {fileID: 4856481702044009788}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: mp_
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,8 +114,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.16503906, y: -0.1665039}
-  m_SizeDelta: {x: -0.32928467, y: 0.008178711}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &821554500513361695
 CanvasRenderer:
@@ -361,11 +363,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 1894792210158967654}
   - component: {fileID: 7962213546310134797}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: DialogBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}

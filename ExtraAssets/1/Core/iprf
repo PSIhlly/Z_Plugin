@@ -4,7 +4,20 @@
     "name": "杖",
     "label": "武器",
     "iconTexName": "$i$d5c609e1c6a70f25983dcd257d40f4c7d7b99e8c$i$",
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "攻击力",
+        "v": {
+          "uid": -1,
+          "name": "攻击力",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      }
+    ],
     "protoUid": 0,
     "model": {
       "id": 0,

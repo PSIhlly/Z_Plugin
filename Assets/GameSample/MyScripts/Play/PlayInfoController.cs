@@ -40,13 +40,15 @@ public class StoryItemEvent : Z_Event
 public enum StoryCharacterEventType
 {
     ParamChange,
-    SkillParamChange
+    SkillParamChange,
+    ChangeCharacter
 }
 public class StoryCharacterEvent : Z_Event
 {
     public StoryCharacterEventType type;
     public string name;
     public CharacterProductForm.Data data;
+    public object obj;
 }
 
 
@@ -72,7 +74,7 @@ public interface ExternalPlayInfoController
     public void ChooseEquipItems(string title, Action<ItemProductForm.Data> act, EquipPartType part);
 
     public CharacterProductForm.Data GetTeamEquipedCharacter(int ItemProductUid, out EquipPartType partType);
-    public void UseSkill(int characterUid, int skillUid);
+    public void UseSkill(int characterUid, int skillUid,bool ignoreCd);
 
     public void ChooseCurrentCharacter(int characterUid);
 }
@@ -134,6 +136,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         if (data != null)
         {
             var prm = data.paramDic.GetDv(name, null);
+            float oldValue = prm.GetValue().num;
             if (prm != null)
             {
                 if (value is float num)
@@ -146,7 +149,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
                 {
                     prm.SetValue(value);
                 }
-                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.ParamChange, data = data, name = name });
+                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.ParamChange, data = data, name = name, obj = (prm.GetValue().num - oldValue) });
             }
             else
             {
@@ -164,11 +167,11 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
     #region skill
 
-    public void UseSkill(int characterUid,int skillUid)
+    public void UseSkill(int characterUid, int skillUid,bool ignoreCd)
     {
         var character = CharacterProductForm.DataByUid[characterUid];
         var skill = SkillProductForm.DataByUid[skillUid];
-        if (skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds)
+        if (ignoreCd||(skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds))
         {
             skill.lastUseTime = GameManager.instance.curProgress.seconds;
             Z_EventHelper.Invoke(new CharacterSkillEvent()
@@ -185,6 +188,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         if (data != null)
         {
             var prm = data.paramDic.GetDv(name, null);
+            float oldValue = prm.GetValue().num;
             if (prm != null)
             {
                 if (value is float num)
@@ -197,7 +201,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
                 {
                     prm.SetValue(value);
                 }
-                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.SkillParamChange, data = CharacterProductForm.DataByUid[data.characterUid], name = skillUid.ToString() });
+                Z_EventHelper.Invoke(new StoryCharacterEvent() { type = StoryCharacterEventType.SkillParamChange, data = CharacterProductForm.DataByUid[data.characterUid], name = skillUid.ToString(), obj = (prm.GetValue().num - oldValue) });
             }
             else
             {
@@ -336,7 +340,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
         if (!bagName2UidDic.ContainsKey(data.name))
             bagName2UidDic[data.name] = new List<int>();
-        if(GameManager.instance.curProgress.bag.Contains(data.uid))
+        if (GameManager.instance.curProgress.bag.Contains(data.uid))
         {
             bagName2UidDic[data.name].Add(data.uid);
         }
@@ -367,7 +371,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
             Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Add, data = data });
         }
-        
+
 
     }
     #endregion
@@ -452,6 +456,11 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         {
             GameManager.instance.curProgress.characterUid = ch.uid;
             _super.sceneCtrl.RefreshCurrentCharacter();
+            Z_EventHelper.Invoke(new StoryCharacterEvent()
+            {
+                type = StoryCharacterEventType.ChangeCharacter,
+                data = ch
+            });
         }
     }
 

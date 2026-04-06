@@ -21,13 +21,51 @@ using Z_Ui.Notify;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 using static Z_Code.Form.InterpretDataForm;
+public class EventModifyEvent : Z_Event
+{
+
+}
 namespace Form
 {
-    public class EventModifyEvent : Z_Event
+
+
+    public static partial class SkillProductForm
     {
-
+        public static Data GetByEvtName(string evtName, int characterUid = 0)
+        {
+            var id = GlobalEventHelper.GetId(evtName, GlobalEventHelper.SKILL);
+            var ch = CharacterProductForm.DataByUid.GetDv(characterUid, null);
+            if (id < 0)
+            {
+               
+                if (ch != null)
+                {
+                    id = ch.skill.GetDv((SkillType)(-id), 0);
+                    return DataByUid.GetDv(id, null);
+                }
+            }
+            else
+            {
+                if (ch != null)
+                {
+                    foreach(var sk in ch.skill.Values)
+                    {
+                        var cur = DataByUid.GetDv(sk, null);
+                        if(cur!=null)
+                        {
+                            if(cur.protoUid == id)
+                            {
+                                return cur;
+                            }
+                        }
+                    }
+                    return DataByUid.GetDv(id, null);
+                }
+                DataByUid.GetDv(id, null);
+            }
+            return null;
+        }
     }
-
     public static partial class EventInterpretDataForm
     {
         public partial class Data
@@ -233,7 +271,7 @@ public class GameEventController : Z_Controller<GameManager>
             if (GameManager.instance.curProgress.triggeredOnceEvts.ContainsKey(trigger.Item1))
                 GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
         }
-        
+
     }
 
 
@@ -293,7 +331,7 @@ public class GameEventController : Z_Controller<GameManager>
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, releaseTrigger, 0));
+        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), releaseTrigger, 0));
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {

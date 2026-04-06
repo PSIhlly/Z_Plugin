@@ -33,6 +33,79 @@
     "paramDic": []
   },
   {
+    "id": 9,
+    "name": "札弹",
+    "icon": "reservedI$",
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": "Cube"
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.5|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": "$i$0659ebd8a4ec5e78b8f328f64f76b8a7d7588783$i$"
+        }
+      ],
+      "isObstacle": false
+    },
+    "label": "",
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": "子弹"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": "子弹追踪"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": "子弹销毁"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": []
+  },
+  {
     "id": 1,
     "name": "子弹",
     "icon": "reservedI$",
@@ -136,78 +209,5 @@
         }
       }
     ]
-  },
-  {
-    "id": 9,
-    "name": "札弹",
-    "icon": "reservedI$",
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": "Cube"
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.5|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": "$i$0659ebd8a4ec5e78b8f328f64f76b8a7d7588783$i$"
-        }
-      ],
-      "isObstacle": false
-    },
-    "label": "",
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": "子弹"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": "子弹移动"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": "子弹销毁"
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": []
   }
 ]

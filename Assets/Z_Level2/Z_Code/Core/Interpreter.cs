@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Z_Code.Form;
 using Z_Debug;
 using static Z_Code.Form.InterpretDataForm;
@@ -205,16 +206,17 @@ namespace Z_Code
                                 var newHeap = new Dictionary<string, BoxDataForm.Data>();
                                 for (int i = 0; i < prm.Length; i++)
                                 {
-                                    newHeap[$"param{i + 1}"] = GetBox(data.stack[data.top - i - 1]).Copy();
+                                    newHeap[$"param{i + 1}"] = GetBox(data.stack[data.top - i - 1]).DeepCopy();
                                 }
                                 if (data.subInterpret == null)
                                 {
-                                    data.subInterpret = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), newHeap, func, 0, -1, 0, null);
+                                    data.subInterpret = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), newHeap, func, 0, -1, 0, null, new List<BoxDataForm.Data>());
                                 }
                                 var ret = data.subInterpret.Interpret();
 
                                 if (ret.complete)
                                 {
+                                    data.heapTemp.Clear();
                                     //Delay
                                     data.p++;
                                     for (int i = 0; i < prm.Length; i++)
@@ -294,39 +296,55 @@ namespace Z_Code
                         realBox = GetBox(box);
                         if (box.str != null)
                         {
-                            data.heap[box.valName].dic[box.str] = GetBox(Pop()).Copy();
+                            data.heap[box.valName].dic[box.str] = GetBox(Pop()).DeepCopy();
                         }
                         else
                         {
-                            data.heap[box.valName] = GetBox(Pop()).Copy();
+                            data.heap[box.valName] = GetBox(Pop()).DeepCopy();
                         }
                         break;
                     case Op.Plus:
                          box = GetBox(Pop());
                          box2 = GetBox(Pop());
-                        if (box.str == null && box2.str == null)
+                        if(box.dic.Count>0&&box2.dic.Count>0)
                         {
-                            Push(CodeHelper.CreateBoxByNum(GetNum(box) + GetNum(box2)));
-                        }
-                        else if (box.str != null && box2.str == null)
-                        {
-                            Push(CodeHelper.CreateBoxByStr(GetStr(box) + GetNum(box2)));
-                        }
-                        else if (box.str == null && box2.str != null)
-                        {
-                            Push(CodeHelper.CreateBoxByStr(GetNum(box) + GetStr(box2)));
+                            var ret = CodeHelper.CreateBox();
+                            foreach(var pair in box.dic)
+                            {
+                                if (box2.dic.ContainsKey(pair.Key))
+                                {
+                                    ret.dic[pair.Key]=ValuePlus(pair.Value, box2.dic[pair.Key]);
+                                }
+                            }
+                            Push(ret);
                         }
                         else
                         {
-                            Push(CodeHelper.CreateBoxByStr(GetStr(box) + GetStr(box2)));
+                            Push(ValuePlus(box, box2));
                         }
-
                         break;
                     case Op.Positive:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop())));
                         break;
                     case Op.Minus:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) - GetNum(Pop())));
+                        box = GetBox(Pop());
+                        box2 = GetBox(Pop());
+                        if (box.dic.Count > 0 && box2.dic.Count > 0)
+                        {
+                            var ret = CodeHelper.CreateBox();
+                            foreach (var pair in box.dic)
+                            {
+                                if (box2.dic.ContainsKey(pair.Key))
+                                {
+                                    ret.dic[pair.Key] = ValueMinus(pair.Value, box2.dic[pair.Key]);
+                                }
+                            }
+                            Push(ret);
+                        }
+                        else
+                        {
+                            Push(ValueMinus(box, box2));
+                        }
                         break;
                     case Op.Negative:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * -1f));
@@ -378,7 +396,7 @@ namespace Z_Code
                             complete = true
                         };
                     default:
-                        Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not found£¡£¡");
+                        Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not foundï¿½ï¿½ï¿½ï¿½");
                         break;
 
                 }
@@ -447,6 +465,36 @@ namespace Z_Code
         public void Reset()
         {
             asyncTask.Reset();
+        }
+        private BoxDataForm.Data ValuePlus(BoxDataForm.Data box1, BoxDataForm.Data box2)
+        {
+            if (box1.str == null && box2.str == null)
+            {
+                return (CodeHelper.CreateBoxByNum(GetNum(box1) + GetNum(box2)));
+            }
+            else if (box1.str != null && box2.str == null)
+            {
+                return  (CodeHelper.CreateBoxByStr(GetStr(box1) + GetNum(box2)));
+            }
+            else if (box1.str == null && box2.str != null)
+            {
+                return  (CodeHelper.CreateBoxByStr(GetNum(box1) + GetStr(box2)));
+            }
+            else
+            {
+                return  (CodeHelper.CreateBoxByStr(GetStr(box1) + GetStr(box2)));
+            }
+        }
+        private BoxDataForm.Data ValueMinus(BoxDataForm.Data box1, BoxDataForm.Data box2)
+        {
+            if (box1.str == null && box2.str == null)
+            {
+                return (CodeHelper.CreateBoxByNum(GetNum(box1) - GetNum(box2)));
+            }
+            else
+            {
+                return (CodeHelper.CreateBoxByStr("error"));
+            }
         }
 
     }

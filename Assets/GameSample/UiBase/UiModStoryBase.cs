@@ -4559,6 +4559,9 @@ namespace ModStoryEffectUnit
 
 
 
+
+
+
     public partial class UiEffectParam:UiParam
     {
     }
@@ -4607,7 +4610,7 @@ namespace ModStoryEffectUnit
         public UiEffectView view;
         public UiEffectModel model;
         public UiEffectParam param;
-        public UiModStoryEffectUnitCtrl parent=>(UiModStoryEffectUnitCtrl)uiHolder.parent.ctrl;
+        public UiClipsCtrl parent=>(UiClipsCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -4630,6 +4633,67 @@ namespace ModStoryEffectUnit
     {
         
     }
+    public partial class UiClipsParam:UiParam
+    {
+    }
+
+    public partial class UiClipsView:UiView
+    {
+
+            public GameObject go_clips;
+            public Sta sta_;
+            public Btn btn_new;
+            public Btn btn_delete;
+            public ScrView scr_effects;
+            public Btn btn_image;
+            public Img img_image;
+            public GameObject go_effect;
+            public UiEffectCtrl sub_effect;
+        public UiClipsView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_clips = uiHolder.elementTrsLst[0].gameObject;
+            sta_ = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            scr_effects = uiHolder.elementTrsLst[4].GetComponent<ScrView>();
+            btn_image = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            go_effect = uiHolder.elementTrsLst[7].gameObject;
+            sub_effect = (UiEffectCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiClipsCtrl:UiCtrl
+    {
+        public UiClipsView view;
+        public UiClipsModel model;
+        public UiClipsParam param;
+        public UiModStoryEffectUnitCtrl parent=>(UiModStoryEffectUnitCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiClipsParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiClipsView(uiHolder);
+            model=new UiClipsModel();
+
+
+            view.sub_effect = new UiEffectCtrl();
+            view.sub_effect.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiClipsModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryEffectUnitParam:UiParam
     {
     }
@@ -4639,25 +4703,19 @@ namespace ModStoryEffectUnit
 
             public Btn btn_back;
             public Btn btn_delete;
-            public ScrView scr_effects;
+            public GameObject go_clips;
+            public UiClipsCtrl sub_clips;
             public Ipt ipt_name;
             public Ipt ipt_label;
-            public Btn btn_image;
-            public Img img_image;
-            public GameObject go_effect;
-            public UiEffectCtrl sub_effect;
         public UiModStoryEffectUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            scr_effects = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            btn_image = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            img_image = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            go_effect = uiHolder.elementTrsLst[7].gameObject;
-            sub_effect = (UiEffectCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            go_clips = uiHolder.elementTrsLst[2].gameObject;
+            sub_clips = (UiClipsCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            ipt_label = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
         }
 
     }
@@ -4682,8 +4740,8 @@ namespace ModStoryEffectUnit
             model=new UiModStoryEffectUnitModel();
 
 
-            view.sub_effect = new UiEffectCtrl();
-            view.sub_effect.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_clips = new UiClipsCtrl();
+            view.sub_clips.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }

@@ -22,18 +22,22 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowAdvancedDialogCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            if (VideoAssetForm.DataByName.ContainsKey(prm[5].str))
+            asyncTask.interpreter.data.heapTemp.Clear();
+            foreach (var p in prm)
+                asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
+            var heapTemp = asyncTask.interpreter.data.heapTemp;
+            if (VideoAssetForm.DataByName.ContainsKey(heapTemp[5].str))
                 AudioManager.instance.BgmPause();
-            if (prm[1].str =="$i$$i$")
-                prm[1].str = null;
-            if (prm[0].str == "$i$$i$")
-                prm[0].str = null;
+            if (heapTemp[1].str =="$i$$i$")
+                heapTemp[1].str = null;
+            if (heapTemp[0].str == "$i$$i$")
+                heapTemp[0].str = null;
 
-            DialogManager.instance.Begin(prm[2].str, prm[3].str, prm[0].str, prm[5].str, prm[1].str, prm[4].str, () =>
+            DialogManager.instance.Begin(heapTemp[2].str, heapTemp[3].str, heapTemp[0].str, heapTemp[5].str, heapTemp[1].str, heapTemp[4].str, () =>
             {
                 AudioManager.instance.BgmContinue();
                 asyncTask.Complete();
-            }, prm[6].num == 1);
+            }, heapTemp[6].num == 1);
             return false;
         }
     }

@@ -445,8 +445,8 @@ UnitForm.RemoveData(uid);
             }
             
             public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
-            {
-                if(superData is Data data)
+        {
+            if (superData is Data data)
                 {
 
                 changePosAction?.Invoke(data,oldV,newV);

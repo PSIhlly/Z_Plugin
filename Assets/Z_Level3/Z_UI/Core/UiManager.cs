@@ -132,13 +132,11 @@ namespace Z_Ui
             }
 
 
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
+          
                 foreach (var rt in rts)
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
                 }
-            }, go);
 
         }
         public void InvokeEvents()

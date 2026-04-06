@@ -43,18 +43,16 @@ public interface ExternalPlaySceneController
     public void AddMessage(string content);
     public void ForceUpdate();
     public void RefreshCurrentCharacter();
+    public SkillType? GetCurOptSkill();
+    public void SetCurOptSkill(SkillType? type);
 
     public CharacterUnitForm.Data GetCharacterUnit(int productUid);
 }
-public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
+public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputKeyUpEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
 {
     public PlaySceneController(PlayManager super) : base(super)
     {
-        this.Register<InputKeyEvent>();
-        this.Register<InputMouseEvent>();
-        this.Register<InputMouseDownEvent>();
-        this.Register<InputMouseUpEvent>();
-        this.Register<InputMouseMoveEvent>();
+
     }
 
     bool enable = false;
@@ -64,6 +62,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     Vector3 setPlayerMove;
     Quaternion? setPlayerRot;
     float rotHoldingSeconds;
+
+    SkillType? curOptSkill;
 
     Vector2 downPos;
     private CharacterUnitForm.Data _playerM;
@@ -84,7 +84,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
-
+        curOptSkill = null; 
         setPlayerRot = null;
         downPos = Vector2.zero;
 
@@ -105,6 +105,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         setPlayerMove = Vector3.zero;
         enable = true;
+        this.Register<InputKeyEvent>();
+        this.Register<InputKeyUpEvent>();
+        this.Register<InputMouseEvent>();
+        this.Register<InputMouseDownEvent>();
+        this.Register<InputMouseUpEvent>();
+        this.Register<InputMouseMoveEvent>();
         waitForActive = false;
         _characterDic = new Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data>();
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
@@ -148,9 +154,18 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void End()
     {
+        
         GameManager.instance.evtCtrl.ClearSceneEvent();
         GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         enable = false;
+
+        this.Unregister<InputKeyEvent>();
+        this.Unregister<InputKeyUpEvent>();
+        this.Unregister<InputMouseEvent>();
+        this.Unregister<InputMouseDownEvent>();
+        this.Unregister<InputMouseUpEvent>();
+        this.Unregister<InputMouseMoveEvent>();
+
         MapManager.instance.End();
         UiManager.instance.CloseAll();
         GameManager.instance.RegisterInputDefault();
@@ -189,7 +204,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
             {
                 var data = SkillProductForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
-                _super.infoCtrl.UseSkill(_playerG.uid, data.uid);
+                _super.infoCtrl.UseSkill(_playerG.uid, data.uid, false);
 
             }
         }
@@ -344,6 +359,15 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
 
 
+    public SkillType? GetCurOptSkill()
+    {
+        return curOptSkill;
+    }
+    public void SetCurOptSkill(SkillType? type)
+    {
+        curOptSkill = type;
+    }
+
     #region op
     public void OnEvent(InputKeyEvent evt)
     {
@@ -371,6 +395,30 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             }
         }
         SetPlayerMove(step.normalized * 0.02f);
+    }
+    public void OnEvent(InputKeyUpEvent evt)
+    {
+        int tar = -1;
+        if (evt.key.Contains(KeyCode.Alpha1))
+        {
+            tar = 0;
+        }
+        else if (evt.key.Contains(KeyCode.Alpha2))
+        {
+            tar = 1;
+        }
+        else if (evt.key.Contains(KeyCode.Alpha3))
+        {
+            tar = 2;
+        }
+        else if (evt.key.Contains(KeyCode.Alpha4))
+        {
+            tar = 3;
+        }
+        if (tar != -1 && GameManager.instance.curProgress.teamActive.Count > tar)
+        {
+            PlayManager.instance.infoCtrl.ChooseCurrentCharacter(GameManager.instance.curProgress.teamActive[tar]);
+        }
     }
 
     public void OnEvent(InputMouseEvent evt)

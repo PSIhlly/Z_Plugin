@@ -387,6 +387,22 @@ namespace Z_Input
             }
 
             keyLst.Clear();
+            if (Input.GetKeyUp(KeyCode.Alpha1))
+            {
+                keyLst.Add(KeyCode.Alpha1);
+            }
+            if (Input.GetKeyUp(KeyCode.Alpha2))
+            {
+                keyLst.Add(KeyCode.Alpha2);
+            }
+            if (Input.GetKeyUp(KeyCode.Alpha3))
+            {
+                keyLst.Add(KeyCode.Alpha3);
+            }
+            if (Input.GetKeyUp(KeyCode.Alpha4))
+            {
+                keyLst.Add(KeyCode.Alpha4);
+            }
             if (Input.GetKeyUp(KeyCode.W))
             {
                 keyLst.Add(KeyCode.W);

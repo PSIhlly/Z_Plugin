@@ -18,7 +18,6 @@ namespace Ui.PlaySceneMain
         UiContainer<UiParamShowCtrl> prmCon;
         public override void OnCreate()
         {
-            this.Register();
 #if UNITY_STANDALONE_WIN
             view.page_PlayerTouchOpt.SetShow(false);
 #else
@@ -50,7 +49,12 @@ namespace Ui.PlaySceneMain
 
         public override void OnShow()
         {
+            this.Register();
             Refresh();
+        }
+        public override void OnHide()
+        {
+            this.Unregister();
         }
 
         public void Refresh()
@@ -70,14 +74,23 @@ namespace Ui.PlaySceneMain
             prmCon.Clear();
             foreach (var prm in cur.paramDic.Values)
             {
-                if (prm.showType == ParamShowType.AlwaysWithPanel)
+                var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name,null);
+                if (protoPrm!=null)
                 {
-                    prmCon.Add(new UiParamShowParam() { max = prm.GetMax().num - prm.GetMin().num, value = prm.GetValue().num - prm.GetMin().num, color = colors[id] });
-                    if (id < colors.Length - 1)
+                    switch (protoPrm.showType)
                     {
-                        id++;
+                        case ParamShowType.AlwaysWithPanel:
+                        case ParamShowType.AlwaysWithPanelAndScene:
+                        case ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer:
+                            prmCon.Add(new UiParamShowParam() { max = prm.GetMax().num - prm.GetMin().num, value = prm.GetValue().num - prm.GetMin().num, color = colors[id] });
+                            if (id < colors.Length - 1)
+                            {
+                                id++;
+                            }
+                            break;
                     }
                 }
+                
             }
             prmCon.Refresh();
 
@@ -118,12 +131,20 @@ namespace Ui.PlaySceneMain
             int id = 0;
             foreach (var prm in model.data.paramDic.Values)
             {
-                if (prm.showType == ParamShowType.AlwaysWithPanel)
+                var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name, null);
+                if (protoPrm != null)
                 {
-                    con.Add(new UiParamShowParam() { max = prm.GetMax().num - prm.GetMin().num, value = prm.GetValue().num - prm.GetMin().num, color = colors[id] });
-                    if (id < colors.Length - 1)
+                    switch (protoPrm.showType)
                     {
-                        id++;
+                        case ParamShowType.AlwaysWithPanel:
+                        case ParamShowType.AlwaysWithPanelAndScene:
+                        case ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer:
+                            con.Add(new UiParamShowParam() { max = prm.GetMax().num - prm.GetMin().num, value = prm.GetValue().num - prm.GetMin().num, color = colors[id] });
+                            if (id < colors.Length - 1)
+                            {
+                                id++;
+                            }
+                            break;
                     }
                 }
             }

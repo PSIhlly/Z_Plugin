@@ -140,7 +140,7 @@ public static readonly int autoUidCnt=1000000;
                                 get{return _pos;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if (_DataByUid!=null&&_DataByUid.ContainsValue(this))
                     {
                        ChangePos(this,_pos,value); 
                     }

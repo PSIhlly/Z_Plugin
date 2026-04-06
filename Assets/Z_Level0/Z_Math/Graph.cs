@@ -50,6 +50,23 @@ namespace Z_Math
                         break;
                 }
             }
+            public void Merge(IntersectAssisant assist)
+            {
+                if (assist.isIn == -1)
+                    isIn = -1;
+                if (isIn == 0 && assist.isIn == 1)
+                    isIn = 1;
+
+                if (assist.isOut == -1)
+                    isOut = -1;
+                if (isOut == 0 && assist.isOut == 1)
+                    isOut = 1;
+
+                if (assist.isCross == -1)
+                    isCross = -1;
+                if (isOut == 0 && assist.isCross == 1)
+                    isCross = 1;
+            }
             public IntersectType GetRes()
             {
                 if (isCross == 1)
@@ -358,35 +375,60 @@ namespace Z_Math
 
             var newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
 
-
-
             float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
             var cubeCenter = (cubeEightPoints[(int)CubeEightPoint.LeftDownBack] + cubeEightPoints[(int)CubeEightPoint.RightUpForward]) / 2;
 
             float touchTime = 0;
             float avoidTime = 1;
 
-            var axis = disDir.normalized;
+            HashSet<Vector3> exist = new HashSet<Vector3>();
+            List<Vector3> axesToCheck = new List<Vector3>();
 
-            // 1. 初始投影区间
-            float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
-            float sphereMin = sphereCenterProj - sphereRadius;
-            float sphereMax = sphereCenterProj + sphereRadius;
+            axesToCheck.AddRange(GetFaceNormals(cubeEightPoints));
 
-            (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
-
-            float dirProj = Vector3.Dot(dir, axis);
-
-            var res = CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
-
-            avoidDir += (avoid * axis).normalized;
-            if (dir.y == 0)
+            if (dir.sqrMagnitude > 0)
             {
-                int temp = 0;
-                //Debug.Log(Time.frameCount);
+                var edgeDirs = GetCubeEdgeDirections(cubeEightPoints);
+                foreach (var edgeDir in edgeDirs)
+                {
+                    Vector3 crossAxis = Vector3.Cross(dir, edgeDir);
+                    if (crossAxis.sqrMagnitude > 0)
+                    {
+                        axesToCheck.Add(crossAxis.normalized);
+                    }
+                }
             }
-            //Debug.Log(Time.frameCount + " : " + axis + " " + sphereMin + " " + sphereMax + " " + cubeMin + " " + cubeMax + "  " + dir + "  " + dirProj + " " + " --- " + touchTime + " " + avoidTime);
 
+            foreach (Vector3 axis in axesToCheck)
+            {
+                if (exist.Contains(axis) || exist.Contains(-axis))
+                {
+                    continue;
+                }
+                exist.Add(axis);
+
+                if (axis.sqrMagnitude <= 0)
+                {
+                    continue;
+                }
+
+                float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
+                float sphereMin = sphereCenterProj - sphereRadius;
+                float sphereMax = sphereCenterProj + sphereRadius;
+
+                (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
+
+                float dirProj = Vector3.Dot(dir, axis);
+
+                if (CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out var avoid))
+                {
+                    break;
+                }
+            }
+            if (IsSphereAndCubeOverlap(ElementwisePlus(sphereSixPoints, dir), cubeEightPoints))
+            {
+                toIn = true;
+            }
             if ((fromIn && !newInner) ||
     (fromIn && newInner && newDisDir.sqrMagnitude < disDir.sqrMagnitude)
     || (!fromIn && !newInner && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
@@ -400,15 +442,13 @@ namespace Z_Math
                     touchTime = 1;
                 }
             }
-            if (IsSphereAndCubeOverlap(ElementwisePlus(sphereSixPoints, dir), cubeEightPoints))
-            {
-                toIn = true;
-            }
 
 
             dis = touchTime * mag;
-
-            avoidDir = avoidDir.normalized;
+            if(touchTime<1)
+            {
+                avoidDir = GetPointToCube(sphereCenter+dir* touchTime, cubeEightPoints, out _);
+            }
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
 
@@ -505,6 +545,60 @@ namespace Z_Math
             normals.Add(normal3);
 
             return normals;
+        }
+
+        private static List<Vector3> GetCubeEdgeDirections(Vector3[] cubeEightPoints)
+        {
+            List<Vector3> edges = new List<Vector3>();
+            Vector3 p0 = cubeEightPoints[(int)CubeEightPoint.LeftDownBack];
+            Vector3 p1 = cubeEightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 p2 = cubeEightPoints[(int)CubeEightPoint.LeftUpBack];
+            Vector3 p3 = cubeEightPoints[(int)CubeEightPoint.LeftDownForward];
+
+            Vector3 right = (p1 - p0).normalized;
+            Vector3 up = (p2 - p0).normalized;
+            Vector3 forward = (p3 - p0).normalized;
+
+            if (right.sqrMagnitude > 0) edges.Add(right);
+            if (up.sqrMagnitude > 0) edges.Add(up);
+            if (forward.sqrMagnitude > 0) edges.Add(forward);
+
+            return edges;
+        }
+
+        public static bool IsVectorsInHemisphere(List<Vector3> vectors, out Vector3 hemisphereNormal)
+        {
+            hemisphereNormal = Vector3.zero;
+            if (vectors == null || vectors.Count == 0)
+                return true;
+
+            for (int i = 0; i < vectors.Count; i++)
+            {
+                var candidate = vectors[i];
+                if (candidate.sqrMagnitude <= 0)
+                    continue;
+                candidate.Normalize();
+                bool allInHemisphere = true;
+                for (int j = 0; j < vectors.Count; j++)
+                {
+                    if (i == j)
+                        continue;
+                    var v = vectors[j];
+                    if (v.sqrMagnitude <= 0)
+                        continue;
+                    if (Vector3.Dot(candidate, v.normalized) < 0)
+                    {
+                        allInHemisphere = false;
+                        break;
+                    }
+                }
+                if (allInHemisphere)
+                {
+                    hemisphereNormal = candidate;
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static (float min, float max) ProjectCubeOntoAxis(Vector3[] cubeEightPoints, Vector3 axis)

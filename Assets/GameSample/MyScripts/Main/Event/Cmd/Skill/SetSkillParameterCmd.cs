@@ -25,7 +25,12 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetSkillParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.infoCtrl.ChangeSkillParam(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SKILL), prm[1].str, prm[2]);
+            var data = SkillProductForm.GetByEvtName(prm[0].str);
+            if(data!=null)
+            {
+                PlayManager.instance.infoCtrl.ChangeSkillParam(data.uid, prm[1].str, prm[2]);
+
+            }
 
             return true;
         }

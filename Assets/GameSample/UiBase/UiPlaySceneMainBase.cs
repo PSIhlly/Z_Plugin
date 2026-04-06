@@ -9,6 +9,7 @@ namespace Ui.PlaySceneMain
 
 {
 
+using Ui.Stick;
 using Ui.ParamShow;
 
 
@@ -131,21 +132,17 @@ namespace PlayerTouchOpt
     public partial class UiPlayerTouchOptView:UiView
     {
 
-            public GameObject go_move;
-            public RectTransform rtf_move;
-            public GameObject go_attack;
-            public RectTransform rtf_attack;
-            public RectTransform rtf_moveStick;
-            public RectTransform rtf_attackStick;
+            public GameObject go_moveStick;
+            public UiStickCtrl model_moveStick;
+            public GameObject go_attackStick;
+            public UiStickCtrl model_attackStick;
         public UiPlayerTouchOptView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_move = uiHolder.elementTrsLst[0].gameObject;
-            rtf_move = uiHolder.elementTrsLst[1].GetComponent<RectTransform>();
-            go_attack = uiHolder.elementTrsLst[2].gameObject;
-            rtf_attack = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
-            rtf_moveStick = uiHolder.elementTrsLst[4].GetComponent<RectTransform>();
-            rtf_attackStick = uiHolder.elementTrsLst[5].GetComponent<RectTransform>();
+            go_moveStick = uiHolder.elementTrsLst[0].gameObject;
+            model_moveStick = (UiStickCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            go_attackStick = uiHolder.elementTrsLst[2].gameObject;
+            model_attackStick = (UiStickCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -170,6 +167,10 @@ namespace PlayerTouchOpt
             model=new UiPlayerTouchOptModel();
 
 
+            view.model_moveStick = new UiStickCtrl();
+            view.model_moveStick.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_attackStick = new UiStickCtrl();
+            view.model_attackStick.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

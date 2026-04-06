@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using Z_String;
-using Z_Math;
+using Z_Code;
+using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_Math;
+using Z_String;
+using Z_Texture;
+using Z_Ui;
+using Z_Ui.Base;
+using static UnityEngine.GUI;
 
 namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
 {
@@ -24,10 +28,10 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
     public partial class UiModStoryEffectUnitCtrl
     {
 
-        UiScrViewContainer<UiEffectCtrl> effectCon;
+        UiContainer<UiClipsCtrl> clipsCon;
         public override void OnCreate()
         {
-            effectCon = new UiScrViewContainer<UiEffectCtrl>(view.go_effect,view.scr_effects);
+            clipsCon = new UiContainer<UiClipsCtrl>(view.go_clips);
             view.btn_back.onClick.AddListener(() =>
             {
                 parent.SelPage(0);
@@ -47,12 +51,6 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                 model.data.label = s;
                 Refresh();
             };
-
-            view.btn_image.onClick.AddListener(() =>
-            {
-                ModManager.instance.assetCtrl.ImportEffectImage(parent.model.data.uid);
-                Refresh();
-            });
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteEffect(parent.model.data.uid);
@@ -73,24 +71,94 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
 
-            effectCon.Clear();
-            for(int i=0; i<model.data.clips.Count;i++)
+            clipsCon.Clear();
+            for (int i = 0; i < parent.model.data.clips.Count; i++)
             {
-                effectCon.Add(new UiEffectParam()
+                clipsCon.Add(new UiClipsParam()
                 {
-                    id=i
+                    id = i
                 });
             }
-            effectCon.Add(new UiEffectParam()
+            clipsCon.Add(new UiClipsParam()
             {
                 id = -1
             });
-            effectCon.Refresh();
-
-            view.img_image.sprite = TexAssetForm.DataByName[model.data.clips[0].tex].GetSprite();
+            clipsCon.Refresh();
+            UiManager.Rebuild(view.go_clips.transform.parent.gameObject);
         }
     }
+    public partial class UiClipsParam
+    {
+        public int id;
+    }
+    public partial class UiClipsModel
+    {
+        public int id;
+    }
+    public partial class UiClipsCtrl:IZ_Listener<AssetEvent>
+    {
+        UiScrViewContainer<UiEffectCtrl> effectCon;
+        public override void OnCreate()
+        {
+            effectCon = new UiScrViewContainer<UiEffectCtrl>(view.go_effect, view.scr_effects);
 
+            view.btn_new.onClick.AddListener(() =>
+            {
+                parent.model.data.clips.Add(ModManager.instance.assetCtrl.CreateEffectClips());
+                parent.Refresh();
+            });
+            view.btn_delete.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.DeleteEffectClips(parent.model.data.uid,model.id);
+                parent.Refresh();
+            });
+
+            view.btn_image.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportEffectImage(parent.model.data.uid,model.id);
+                Refresh();
+            });
+        }
+        public override void OnShow()
+        {
+            this.Register();
+            if (param != null)
+            {
+                model.id = param.id;
+            }
+            Refresh();
+        }
+        public override void OnDisable()
+        {
+            this.Unregister();
+        }
+        public void Refresh()
+        {
+            view.sta_.ChangeState(model.id == -1 ? 0 : 1);
+            if (model.id != -1)
+            {
+                effectCon.Clear();
+                for (int i = 0; i < parent.model.data.clips[model.id].Count; i++)
+                {
+                    effectCon.Add(new UiEffectParam()
+                    {
+                        id = i
+                    });
+                }
+                effectCon.Add(new UiEffectParam()
+                {
+                    id = -1
+                });
+                effectCon.Refresh();
+                view.img_image.sprite = TexAssetForm.DataByName[parent.model.data.clips[model.id][0].tex].GetSprite();
+            }
+        }
+
+        void IZ_Listener<AssetEvent>.OnEvent(AssetEvent evt)
+        {
+            Refresh();
+        }
+    }
     public partial class UiEffectParam
     {
         public int id;
@@ -101,70 +169,72 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
     }
     public partial class UiEffectCtrl
     {
+        EffectClipForm.Data data => parent.parent.model.data.clips[parent.model.id][model.id];
         public override void OnCreate()
         {
 
             view.btn_new.onClick.AddListener(() =>
             {
-                parent.model.data.clips.Add(ModManager.instance.assetCtrl.CreateEffectClip(parent.model.data.clips[0].tex));
+                parent.parent.model.data.clips[parent.model.id].Add(ModManager.instance.assetCtrl.CreateEffectClip(parent.parent.model.data.clips[parent.model.id][0].tex));
                 parent.Refresh();
             });
             view.ipt_posSetX.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].pos=parent.model.data.clips[model.id].pos.NewSetX(StringHelper.ToFloat(s,0));
+                data.pos= data.pos.NewSetX(StringHelper.ToFloat(s,0));
                 Refresh();
             };
             view.ipt_posSetY.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].pos = parent.model.data.clips[model.id].pos.NewSetY(StringHelper.ToFloat(s, 0));
+                data.pos = data.pos.NewSetY(StringHelper.ToFloat(s, 0));
                 Refresh();
             };
             view.ipt_posSetZ.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].pos = parent.model.data.clips[model.id].pos.NewSetZ(StringHelper.ToFloat(s, 0));
+                data.pos = data.pos.NewSetZ(StringHelper.ToFloat(s, 0));
                 Refresh();
             };
 
             view.ipt_scaleSetX.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].scale = parent.model.data.clips[model.id].scale.NewSetX(StringHelper.ToFloat(s, 1));
+                data.scale = data.scale.NewSetX(StringHelper.ToFloat(s, 1));
                 Refresh();
             };
             view.ipt_scaleSetY.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].scale = parent.model.data.clips[model.id].scale.NewSetY(StringHelper.ToFloat(s, 1));
+                data.scale = data.scale.NewSetY(StringHelper.ToFloat(s, 1));
+                Refresh();
             };
             view.ipt_scaleSetZ.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].scale = parent.model.data.clips[model.id].scale.NewSetZ(StringHelper.ToFloat(s, 1));
+                data.scale = data.scale.NewSetZ(StringHelper.ToFloat(s, 1));
                 Refresh();
             };
 
             view.ipt_rotate.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].rot = StringHelper.ToInt(s, 0);
+                data.rot = StringHelper.ToInt(s, 0);
                 Refresh();
             };
 
             view.ipt_sustain.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].time = StringHelper.ToInt(s, 0);
+                data.time = StringHelper.ToFloat(s, 0);
                 Refresh();
             };
 
             view.ipt_opacity.onFinishInput = (s) =>
             {
-                parent.model.data.clips[model.id].opacity = StringHelper.ToFloat(s, 1);
+                data.opacity = StringHelper.ToFloat(s, 1);
                 Refresh();
             };
             view.btn_transparence.onClick.AddListener(() =>
             {
-                parent.model.data.clips[model.id].transition = !parent.model.data.clips[model.id].transition;
+                data.transition = !data.transition;
                 Refresh();
             });
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteEffectClip(parent.model.data.uid,model.id);
+                ModManager.instance.assetCtrl.DeleteEffectClip(parent.parent.model.data.uid,parent.model.id,model.id);
                 parent.Refresh();
             });
         }
@@ -182,7 +252,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
             view.sta_exist.ChangeState(model.id == -1 ? 0 : 1);
             if(model.id != -1)
             {
-                var clip =parent.model.data.clips[model.id];
+                var clip =data;
                 view.ipt_posSetX.Set(clip.pos.x.ToString("0.##"));
                 view.ipt_posSetY.Set(clip.pos.y.ToString("0.##"));
                 view.ipt_posSetZ.Set(clip.pos.z.ToString("0.##"));

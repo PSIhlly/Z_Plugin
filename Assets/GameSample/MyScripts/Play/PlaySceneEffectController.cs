@@ -57,6 +57,9 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     }
     public void CreatEffect(int uid, Vector3 pos, float rot)
     {
+        var clips = EffectForm.DataByUid[uid].clips;
+        foreach(var eft in clips)
+        {
         var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
 
         TimeManager.instance.CancelTimer(img.animTimer);
@@ -70,38 +73,37 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         img.trs.position = pos;
         img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
         img.trs.localScale = Vector3.one;
-        var clips = EffectForm.DataByUid[uid].clips;
         img.animTimer = TimeManager.instance.StartTimer(0, 0.02f, () =>
         {
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             float progress = Time.time - startTime;
 
-            var clip = cur == -1 ? null : clips[cur];
-            if (cur == -1 || progress > clips[cur].time)
+            var clip = cur == -1 ? null : eft[cur];
+            if (cur == -1 || progress > eft[cur].time)
             {
                 startTime = Time.time;
                 cur++;
-                if (clips.Count <= cur)
+                if (eft.Count <= cur)
                 {
                     InstancePoolManager.instance.DeleteInstance(img.gameObject, effectPrefab);
                     return true;
                 }
 
-                clip = clips[cur];
+                clip = eft[cur];
                 img.render.GetPropertyBlock(propBlock);
                 propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
 
-                img.trs.position = img.oriPos + clip.pos;
+                img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
                 img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
                 img.trs.localScale = img.oriScale + clip.scale;
                 propBlock.SetFloat("_Alpha", clip.opacity);
                 img.render.SetPropertyBlock(propBlock);
             }
-            else if (clip.transition && clips.Count > cur + 1)
+            else if (clip.transition && eft.Count > cur + 1)
             {
                 img.render.GetPropertyBlock(propBlock);
-                var clipNxt = clips[cur + 1];
-                float rate = Mathf.Min(1, progress / clips[cur].time);
+                var clipNxt = eft[cur + 1];
+                float rate = Mathf.Min(1, progress / eft[cur].time);
                 img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
                 img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
                 img.trs.localScale = img.oriScale + Vector3.Lerp(clip.scale, clipNxt.scale, rate);
@@ -111,6 +113,8 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
             return false;
         }, img);
+
+        }
 
     }
     public void Update()
@@ -158,6 +162,18 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
         }
     }
+    public void FloatingText(string txt, Vector3 pos)
+    {
+        var o = InstancePoolManager.instance.CreateInstance(canvasPrefab);
+        o.transform.position = pos+Vector3.up * 1.4f;
+        o.SetActive(true);
+        o.GetComponent<CanvasHolder>().ToastText(txt, 2);
+        TimeManager.instance.StartTimer(3, 0, () =>
+        {
+            InstancePoolManager.instance.DeleteInstance(o, canvasPrefab);
+            return true;
+        }, o.GetComponent<CanvasHolder>());
+    }
     public CanvasHolder GetCanvas(CharacterUnitForm.Data unitData)
     {
         if (!canvasDic.ContainsKey(unitData.uid))
@@ -169,7 +185,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     }
     public void OnEvent(CharacterEvent evt)
     {
-        if(!_super.enable)
+        if (!_super.enable)
         {
             return;
         }

@@ -58,6 +58,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,InterpretDataForm.Data,InterpretDataForm.Data> changeSubinterpretAction;
                 
+        public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeHeaptempAction;
+                
 
 
         public partial class Data
@@ -207,7 +209,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret)
+                    private List<BoxDataForm.Data>  _heapTemp;
+                    /// <summary>
+                    ///¡Ÿ ±∂—
+                    ///</summary>
+                    public List<BoxDataForm.Data>  heapTemp{
+                                get{return _heapTemp;}
+ set{
+
+                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    {
+                       ChangeHeaptemp(this,_heapTemp,value); 
+                    }
+        
+                _heapTemp = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,List<BoxDataForm.Data> heapTemp)
             {
 
              this.uid = uid;
@@ -218,6 +238,7 @@ public static readonly int autoUidCnt=1000000;
              this.top = top;
              this.user = user;
              this.subInterpret = subInterpret;
+             this.heapTemp = heapTemp;
 
             }
             public void Reset(Data data)
@@ -231,11 +252,12 @@ public static readonly int autoUidCnt=1000000;
              this.top = data.top;
              this.user = data.user;
              this.subInterpret = data.subInterpret;
+             this.heapTemp = data.heapTemp;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp));
                 }
             
             public virtual  void BeforeGet()
@@ -245,7 +267,7 @@ public static readonly int autoUidCnt=1000000;
             }
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -330,7 +352,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("user")==null?defaultData.user:jo.Get<int>("user"),
 
-                jo.SelectToken("subInterpret")==null?defaultData.subInterpret:jo.Get<InterpretDataForm.Data>("subInterpret")
+                jo.SelectToken("subInterpret")==null?defaultData.subInterpret:jo.Get<InterpretDataForm.Data>("subInterpret"),
+
+                jo.SelectToken("heapTemp")==null?defaultData.heapTemp:jo.Get<List<BoxDataForm.Data>>("heapTemp")
                     );
 
             return data;
@@ -358,6 +382,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("user",data.user);
 
             jo.Set<InterpretDataForm.Data>("subInterpret",data.subInterpret);
+
+            jo.Set<List<BoxDataForm.Data>>("heapTemp",data.heapTemp);
 
             return jo;
         }
@@ -514,6 +540,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeSubinterpretAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHeaptemp(Data superData,List<BoxDataForm.Data> oldV,List<BoxDataForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHeaptempAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -79,12 +79,13 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
 
     public void OnEvent(StoryCharacterEvent evt)
     {
-        var heap = new Dictionary<string, BoxDataForm.Data>() { { "self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) } };
+        var heap = new Dictionary<string, BoxDataForm.Data>() { { "self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) }, };
    
         switch (evt.type)
         {
             case StoryCharacterEventType.ParamChange:
                 heap["target"] = CodeHelper.CreateBoxByStr(evt.name);
+                heap["delta"] = CodeHelper.CreateBoxByNum((float)evt.obj);
                 _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onCharacterParamChangeEvent", null), 0, heap);
                 _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, heap);
                 _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}$", null), 0, heap);

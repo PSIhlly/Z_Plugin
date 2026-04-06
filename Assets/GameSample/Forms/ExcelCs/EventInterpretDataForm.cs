@@ -50,6 +50,8 @@ namespace Form
 
             InterpretDataForm.changeSubinterpretAction+=ChangeSubinterpret;
 
+            InterpretDataForm.changeHeaptempAction+=ChangeHeaptemp;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -86,6 +88,8 @@ namespace Form
         public static Action<Data,int,int> changeUserAction;
                 
         public static Action<Data,InterpretDataForm.Data,InterpretDataForm.Data> changeSubinterpretAction;
+                
+        public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeHeaptempAction;
                 
         public static Action<Data,string,string> changeReleasetriggerAction;
                 
@@ -132,11 +136,11 @@ namespace Form
                  
                      }
                     
-            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top,data.user,data.subInterpret)
+            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top,data.user,data.subInterpret,data.heapTemp)
             {
             }
             
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top,user,subInterpret)
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,List<BoxDataForm.Data> heapTemp,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top,user,subInterpret,heapTemp)
             {
 
              this.uid = uid;
@@ -147,6 +151,7 @@ namespace Form
              this.top = top;
              this.user = user;
              this.subInterpret = subInterpret;
+             this.heapTemp = heapTemp;
              this.releaseTrigger = releaseTrigger;
              this.blockProgramUid = blockProgramUid;
 
@@ -162,13 +167,14 @@ namespace Form
              this.top = data.top;
              this.user = data.user;
              this.subInterpret = data.subInterpret;
+             this.heapTemp = data.heapTemp;
              this.releaseTrigger = data.releaseTrigger;
              this.blockProgramUid = data.blockProgramUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,releaseTrigger,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp),releaseTrigger,blockProgramUid);
                 }
             
             public override  void BeforeGet()
@@ -178,7 +184,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,"",0);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,null,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -273,6 +279,8 @@ namespace Form
 
                 jo.SelectToken("subInterpret")==null?defaultData.subInterpret:jo.Get<InterpretDataForm.Data>("subInterpret"),
 
+                jo.SelectToken("heapTemp")==null?defaultData.heapTemp:jo.Get<List<BoxDataForm.Data>>("heapTemp"),
+
                 jo.SelectToken("releaseTrigger")==null?defaultData.releaseTrigger:jo.Get<string>("releaseTrigger"),
 
                 jo.SelectToken("blockProgramUid")==null?defaultData.blockProgramUid:jo.Get<int>("blockProgramUid")
@@ -303,6 +311,8 @@ namespace Form
             jo.Set<int>("user",data.user);
 
             jo.Set<InterpretDataForm.Data>("subInterpret",data.subInterpret);
+
+            jo.Set<List<BoxDataForm.Data>>("heapTemp",data.heapTemp);
 
             jo.Set<string>("releaseTrigger",data.releaseTrigger);
 
@@ -463,6 +473,16 @@ InterpretDataForm.RemoveData(uid);
                 {
 
                 changeSubinterpretAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHeaptemp(InterpretDataForm.Data superData,List<BoxDataForm.Data> oldV,List<BoxDataForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHeaptempAction?.Invoke(data,oldV,newV);
                 }
                     
             }

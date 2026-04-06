@@ -30,7 +30,7 @@ namespace Z_Code
             var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
             if (data != null && ((MapUnit)(data.unit)).paramInfo.ContainsKey(prm[1].str))
             {
-                asyncTask.res = new BoxDataForm.Data[] { ((MapUnit)(data.unit)).paramInfo[prm[1].str].GetValue().Copy() };
+                asyncTask.res = new BoxDataForm.Data[] { ((MapUnit)(data.unit)).paramInfo[prm[1].str].GetValue().DeepCopy() };
             }
             else
             {

@@ -19,9 +19,13 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowDialogCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.interpreter.data.heapTemp.Clear();
+            foreach (var p in prm)
+                asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
+            var heapTemp = asyncTask.interpreter.data.heapTemp;
 
             var cache = GameManager.instance.curProgress.dialogCache;
-            DialogManager.instance.Begin(prm[2].str,  prm[3].str , prm[0].str ,"", prm[1].str,"", () =>
+            DialogManager.instance.Begin(heapTemp[2].str,  heapTemp[3].str , heapTemp[0].str ,"", heapTemp[1].str,"", () =>
             {
                 asyncTask.Complete();
             });

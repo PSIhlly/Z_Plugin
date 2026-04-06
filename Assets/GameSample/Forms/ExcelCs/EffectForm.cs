@@ -55,7 +55,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
-        public static Action<Data,List<EffectClipForm.Data>,List<EffectClipForm.Data>> changeClipsAction;
+        public static Action<Data,List<List<EffectClipForm.Data>>,List<List<EffectClipForm.Data>>> changeClipsAction;
                 
 
 
@@ -116,11 +116,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private List<EffectClipForm.Data>  _clips;
+                    private List<List<EffectClipForm.Data>>  _clips;
                     /// <summary>
                     ///
                     ///</summary>
-                    public List<EffectClipForm.Data>  clips{
+                    public List<List<EffectClipForm.Data>>  clips{
                                 get{return _clips;}
  set{
 
@@ -134,7 +134,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string label,List<EffectClipForm.Data> clips)
+            public Data(int uid,string name,string label,List<List<EffectClipForm.Data>> clips)
             {
 
              this.uid = uid;
@@ -154,7 +154,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,new List<EffectClipForm.Data>(clips));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,new List<List<EffectClipForm.Data>>(clips));
                 }
             
             public virtual  void BeforeGet()
@@ -269,7 +269,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.SelectToken("clips")==null?defaultData.clips:jo.Get<List<EffectClipForm.Data>>("clips")
+                jo.SelectToken("clips")==null?defaultData.clips:jo.Get<List<List<EffectClipForm.Data>>>("clips")
                     );
 
             return data;
@@ -288,7 +288,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("label",data.label);
 
-            jo.Set<List<EffectClipForm.Data>>("clips",data.clips);
+            jo.Set<List<List<EffectClipForm.Data>>>("clips",data.clips);
 
             return jo;
         }
@@ -421,7 +421,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeClips(Data superData,List<EffectClipForm.Data> oldV,List<EffectClipForm.Data> newV)
+            public static void ChangeClips(Data superData,List<List<EffectClipForm.Data>> oldV,List<List<EffectClipForm.Data>> newV)
             {
                 if(superData is Data data)
                 {

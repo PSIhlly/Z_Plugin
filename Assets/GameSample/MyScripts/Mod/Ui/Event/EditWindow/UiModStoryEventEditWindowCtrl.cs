@@ -260,8 +260,10 @@ namespace Ui.ModStoryEventEditWindow
 
             RefreshUnitDetail();
             RefreshUnit();
-
-            UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
+            },gameObject);
         }
         public void RefreshUnit()
         {
@@ -280,8 +282,10 @@ namespace Ui.ModStoryEventEditWindow
             unitCon.Refresh();
 
 
-
-            UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
+            }, gameObject);
 
         }
         public void RefreshUnitDetail()
@@ -304,8 +308,11 @@ namespace Ui.ModStoryEventEditWindow
         public void SelUnit(SyntaxNode node)
         {
             model.selUnit = node;
-            Refresh();
-            UiManager.Rebuild(view.scr_units.gameObject, true);
+            Refresh(); 
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(view.scr_units.gameObject, true);
+            }, gameObject);
             if (node != null)
             {
                 TimeManager.instance.AddCurLateUpdateAction(() =>

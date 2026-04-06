@@ -31,11 +31,13 @@ namespace Form
                 {
                     return false;
                 }
-                var prmData = ItemParamForm.DataByName[prmName];
-                switch (prmData.showType)
+                var protoPrm = ItemParamForm.DataByName[prmName];
+                switch (protoPrm.showType)
                 {
                     case ParamShowType.Always:
                     case ParamShowType.AlwaysWithPanel:
+                    case ParamShowType.AlwaysWithPanelAndScene:
+                    case ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer:
                         return true;
                     case ParamShowType.OnlyNotZero:
                         return paramDic[prmName].GetValue().num != 0;

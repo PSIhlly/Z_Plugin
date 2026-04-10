@@ -126,7 +126,7 @@ namespace Z_DataSystem
             else
             {
                 string[] allFiles = Directory.GetFiles(path);
-                // ¹ýÂË³öÍ¼Æ¬ÎÄ¼þ
+                // ï¿½ï¿½ï¿½Ë³ï¿½Í¼Æ¬ï¿½Ä¼ï¿½
                 foreach (string file in allFiles)
                 {
                     string extension = Path.GetExtension(file).ToLower();
@@ -152,16 +152,16 @@ namespace Z_DataSystem
         }
         public TexAssetForm.Data CreateDataByTex(Texture2D tex, string name)
         {
-            return new TexAssetForm.Data(-1, name, "", null, "", tex);
+            return new TexAssetForm.Data(-1, name, "", null, "", tex, "");
         }
         public TexAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new TexAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null);
+            return new TexAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null, "");
         }
         public TexAssetForm.Data CreateDataByPath(string path, string name)
         {
             path = SaveAndLoad.GetRealPath(path);
-            return new TexAssetForm.Data(-1, name, path, null, "", null);
+            return new TexAssetForm.Data(-1, name, path, null, "", null, "");
         }
         public TexAssetForm.Data CreateDataByTex(Texture tex, string name)
         {

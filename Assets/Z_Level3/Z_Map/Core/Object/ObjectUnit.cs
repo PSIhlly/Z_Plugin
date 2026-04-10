@@ -8,6 +8,7 @@ using Z_ByteSerialize;
 using Z_Map.Form;
 using Z_Math;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 namespace Z_Map
 {
@@ -41,13 +42,15 @@ namespace Z_Map
 
         public override void UpdateInfo()
         {
-
-            if (isShowing)
+            if (lastUpdateFrame == Time.frameCount)
+                return;
+            lastUpdateFrame = Time.frameCount;
+/*            if (isShowing)
             {
                 if (_data.pos != ins.transform.position || _data.euler != ins.transform.eulerAngles)
                     MapManager.instance.updateCtrl.ApplyMove(this, ins.transform.position, ins.transform.eulerAngles);
 
-            }
+            }*/
 
             Z_EventHelper.Invoke(new ObjectEvent()
             {
@@ -85,6 +88,14 @@ namespace Z_Map
             foreach (var pair in push)
             {
                 pair.Key.Move(pair.Value);
+            }
+            if (manager.utilCtrl.IsOnBoundary(data.pos))
+            {
+                Z_EventHelper.Invoke(new ObjectEvent()
+                {
+                    type = MapEventType.BoundaryTouch,
+                    unit = this
+                });
             }
         }
         public override void Remove()

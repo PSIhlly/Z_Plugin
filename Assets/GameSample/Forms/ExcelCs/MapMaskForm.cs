@@ -80,13 +80,13 @@ namespace Form
 
                     private List<string>  _texsName;
                     /// <summary>
-                    ///Ã˘Õº√˚≥∆
+                    ///Ë¥¥ÂõæÂêçÁß∞
                     ///</summary>
                     public List<string>  texsName{
                                 get{return _texsName;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTexsname(this,_texsName,value); 
                     }
@@ -136,6 +136,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -186,11 +187,18 @@ namespace Form
                 {300001,new Data(300001,"alpha","z_map_a$alpha$0",new List<string>(){"z_map_a$alpha$0","z_map_a$alpha$1","z_map_a$alpha$2","z_map_a$alpha$3","z_map_a$alpha$4","z_map_a$alpha$5",},"")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"alpha",_DataById[300001]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -297,6 +305,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -317,7 +326,9 @@ MapBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -348,7 +359,9 @@ MapBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

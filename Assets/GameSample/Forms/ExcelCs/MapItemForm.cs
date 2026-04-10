@@ -82,13 +82,13 @@ namespace Form
 
                     private MapModelForm.Data  _model;
                     /// <summary>
-                    ///模型
+                    ///妯″瀷
                     ///</summary>
                     public MapModelForm.Data  model{
                                 get{return _model;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeModel(this,_model,value); 
                     }
@@ -100,13 +100,13 @@ namespace Form
                     
                     private int  _itemUid;
                     /// <summary>
-                    ///道具id
+                    ///閬撳叿id
                     ///</summary>
                     public int  itemUid{
                                 get{return _itemUid;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeItemuid(this,_itemUid,value); 
                     }
@@ -158,6 +158,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -208,11 +209,18 @@ namespace Form
                 {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",0)},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"wall",_DataById[400001]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -323,6 +331,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -343,7 +352,9 @@ MapBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -374,7 +385,9 @@ MapBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

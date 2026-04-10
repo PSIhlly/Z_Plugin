@@ -78,7 +78,7 @@ namespace Form
 
                     private bool  _terrain;
                     /// <summary>
-                    ///清理地板
+                    ///娓呯悊鍦版澘
                     ///</summary>
                     public bool  terrain{
                                 get{return _terrain;}
@@ -91,7 +91,7 @@ private set{
                     
                     private bool  _mObject;
                     /// <summary>
-                    ///清理景物
+                    ///娓呯悊鏅墿
                     ///</summary>
                     public bool  mObject{
                                 get{return _mObject;}
@@ -104,7 +104,7 @@ private set{
                     
                     private bool  _item;
                     /// <summary>
-                    ///清理物品
+                    ///娓呯悊鐗╁搧
                     ///</summary>
                     public bool  item{
                                 get{return _item;}
@@ -117,7 +117,7 @@ private set{
                     
                     private bool  _character;
                     /// <summary>
-                    ///清理角色
+                    ///娓呯悊瑙掕壊
                     ///</summary>
                     public bool  character{
                                 get{return _character;}
@@ -130,7 +130,7 @@ private set{
                     
                     private bool  _texture;
                     /// <summary>
-                    ///清理贴图
+                    ///娓呯悊璐村浘
                     ///</summary>
                     public bool  texture{
                                 get{return _texture;}
@@ -189,6 +189,7 @@ private set{
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -243,6 +244,8 @@ private set{
                 {10000003,new Data(10000003,"remain terrain","","",false,true,true,true,false)},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"all erase",_DataById[10000001]},
@@ -251,7 +254,12 @@ private set{
     
                         {"remain terrain",_DataById[10000003]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -368,6 +376,7 @@ private set{
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -388,7 +397,9 @@ MapBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -419,7 +430,9 @@ MapBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

@@ -80,13 +80,13 @@ namespace Form
 
                     private int  _characterUid;
                     /// <summary>
-                    ///ÈËÎïid
+                    ///äººç‰©id
                     ///</summary>
                     public int  characterUid{
                                 get{return _characterUid;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCharacteruid(this,_characterUid,value); 
                     }
@@ -136,6 +136,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -184,9 +185,16 @@ namespace Form
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -289,6 +297,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -309,7 +318,9 @@ MapBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -340,7 +351,9 @@ MapBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

@@ -68,7 +68,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -80,13 +80,13 @@ public static readonly int autoUidCnt=100;
                     
                     private int  _uidCnt;
                     /// <summary>
-                    ///uid总数
+                    ///uid鎬绘暟
                     ///</summary>
                     public int  uidCnt{
                                 get{return _uidCnt;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUidcnt(this,_uidCnt,value); 
                     }
@@ -98,13 +98,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _fightJa;
                     /// <summary>
-                    ///战斗数据
+                    ///鎴樻枟鏁版嵁
                     ///</summary>
                     public string  fightJa{
                                 get{return _fightJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeFightja(this,_fightJa,value); 
                     }
@@ -116,13 +116,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _weaponJa;
                     /// <summary>
-                    ///武器数据
+                    ///姝﹀櫒鏁版嵁
                     ///</summary>
                     public string  weaponJa{
                                 get{return _weaponJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeWeaponja(this,_weaponJa,value); 
                     }
@@ -134,13 +134,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _bulletJa;
                     /// <summary>
-                    ///子弹数据
+                    ///瀛愬脊鏁版嵁
                     ///</summary>
                     public string  bulletJa{
                                 get{return _bulletJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeBulletja(this,_bulletJa,value); 
                     }
@@ -152,13 +152,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _weaponBulletJa;
                     /// <summary>
-                    ///武器子弹数据
+                    ///姝﹀櫒瀛愬脊鏁版嵁
                     ///</summary>
                     public string  weaponBulletJa{
                                 get{return _weaponBulletJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeWeaponbulletja(this,_weaponBulletJa,value); 
                     }
@@ -206,6 +206,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -232,6 +233,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -327,6 +330,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -341,7 +345,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -366,7 +372,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

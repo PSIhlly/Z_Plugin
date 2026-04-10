@@ -102,13 +102,13 @@ namespace Form
 
                     private string  _category;
                     /// <summary>
-                    ///“ªº∂±Í«©
+                    ///‰∏ÄÁ∫ßÊ†áÁ≠æ
                     ///</summary>
                     public string  category{
                                 get{return _category;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCategory(this,_category,value); 
                     }
@@ -120,13 +120,13 @@ namespace Form
                     
                     private string  _type;
                     /// <summary>
-                    ///∂˛º∂±Í«©
+                    ///‰∫åÁ∫ßÊ†áÁ≠æ
                     ///</summary>
                     public string  type{
                                 get{return _type;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeType(this,_type,value); 
                     }
@@ -138,13 +138,13 @@ namespace Form
                     
                     private EditorStyle  _lowestEditorStyle;
                     /// <summary>
-                    ///◊ÓµÕ–Ìø…±‡º≠ƒ£ Ω
+                    ///ÊúÄ‰ΩéËÆ∏ÂèØÁºñËæëÊ®°Âºè
                     ///</summary>
                     public EditorStyle  lowestEditorStyle{
                                 get{return _lowestEditorStyle;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeLowesteditorstyle(this,_lowestEditorStyle,value); 
                     }
@@ -156,13 +156,13 @@ namespace Form
                     
                     private string  _allowAsVoid;
                     /// <summary>
-                    ///‘ –Ì∂¿¡¢…˘√˜£¨ π”√µƒ”Ôæ‰«∞◊∫
+                    ///ÂÖÅËÆ∏Áã¨Á´ãÂ£∞ÊòéÔºå‰ΩøÁî®ÁöÑËØ≠Âè•ÂâçÁºÄ
                     ///</summary>
                     public string  allowAsVoid{
                                 get{return _allowAsVoid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAllowasvoid(this,_allowAsVoid,value); 
                     }
@@ -226,6 +226,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -465,7 +466,11 @@ namespace Form
 
                 {100092,new Data(100092,"IsUnobstructed",new List<string>(){"from","to","radius",},new List<string>(){"vector","vector","num",},new List<string>(){"unobstructed",},new List<string>(){"num",},"sphere with {2} radius from {0} to {1} is unobstructed(collidable object)","IsUnobstructed(NewVector(1,1,0),NewVector(1,1,0),0.2)","sceneObject","detect",EditorStyle.Rpg,"")},
 
+                {100093,new Data(100093,"ShowEffectByCharacter",new List<string>(){"effect","character","ignoreRotation",},new List<string>(){"effect","character","num",},null,new List<string>(){"void",},"Show character:{1} Effect{0} ignore rotation?{2} ","ShowEffectByCharacter(\"$ef$$ef$\",self,1);","effect","system",EditorStyle.RpgAdvanced,"")},
+
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"ShowTip",_DataByUid[100001]},
@@ -650,7 +655,14 @@ namespace Form
     
                         {"IsUnobstructed",_DataByUid[100092]},
     
+                        {"ShowEffectByCharacter",_DataByUid[100093]},
+    
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
     
@@ -884,6 +896,8 @@ namespace Form
 
                     _DatasByCategoryType[("sceneObject","detect")].Add(_DataByUid[100092]);
 
+                    _DatasByCategoryType[("effect","system")].Add(_DataByUid[100093]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -1084,6 +1098,8 @@ namespace Form
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100092]);
 
+                    _DatasByCategory["effect"].Add(_DataByUid[100093]);
+
 
             childInitAction?.Invoke();
             
@@ -1209,6 +1225,7 @@ namespace Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -1233,7 +1250,9 @@ CmdDataForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -1268,7 +1287,9 @@ CmdDataForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

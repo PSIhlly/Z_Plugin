@@ -419,6 +419,14 @@ namespace Z_Input
             {
                 keyLst.Add(KeyCode.D);
             }
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                keyLst.Add(KeyCode.E);
+            }
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                keyLst.Add(KeyCode.Q);
+            }
             if (keyLst.Count > 0)
             {
                 Z_EventHelper.Invoke(new InputKeyUpEvent()

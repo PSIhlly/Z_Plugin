@@ -25,6 +25,7 @@ using Z_DesignStyle;
 using Z_Input;
 using Z_Language;
 using Z_Map;
+using Z_Map.Form;
 using Z_Texture;
 using Z_Ui;
 using Z_Ui.Dialog;
@@ -228,6 +229,8 @@ public class GameManager : Z_MonoManager<GameManager>
 
 
         RegisterInputDefault();
+
+
 
         DialogManager.instance.SetMenuAct(() =>
         {

@@ -96,6 +96,19 @@
           "name": "onObjectTouchEvent",
           "evt": [
             {
+              "v": "子弹碰撞销毁"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
               "v": "子弹销毁"
             }
           ],
@@ -165,7 +178,7 @@
           "name": "onObjectTouchEvent",
           "evt": [
             {
-              "v": "子弹销毁"
+              "v": "子弹碰撞销毁"
             }
           ],
           "type": 0
@@ -179,6 +192,19 @@
           "evt": [
             {
               "v": "子弹移动"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": "子弹销毁"
             }
           ],
           "type": 0

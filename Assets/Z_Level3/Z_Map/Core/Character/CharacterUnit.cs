@@ -62,7 +62,10 @@ namespace Z_Map
                 }
 
                 //gravity)
-                Move(Vector3.down * Time.deltaTime * 2f);
+                if(GlobalSettings.ENABLE_GRAVITY)
+                {
+                    Move(Vector3.down * Time.deltaTime * 2f);
+                }
                 //fix
                 ins?.UpdatePos();
             }
@@ -97,6 +100,7 @@ namespace Z_Map
             HashSet<Vector3> existAvoid = new HashSet<Vector3>();
 
             HashSet<MapUnit> existUnit = new HashSet<MapUnit>();
+            bool moved = false;
             while (dirQue.Count > 0)
             {
                 dir = dirQue.Dequeue();
@@ -188,9 +192,22 @@ namespace Z_Map
                 firstTry = false;
                 dir *= (res) / mag;
                 if (res > 0.01f)
+                {
+                    moved = true;
                     manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
+                }
             }
-
+            if(moved)
+            {
+                if (manager.utilCtrl.IsOnBoundary(data.pos))
+                {
+                    Z_EventHelper.Invoke(new CharacterEvent()
+                    {
+                        type = MapEventType.BoundaryTouch,
+                        unit = this
+                    });
+                }
+            }
 
         }
 

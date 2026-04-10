@@ -17,6 +17,7 @@ using Z_DesignStyle;
 using Z_Input;
 using Z_Map;
 using Z_Map.Form;
+using Z_Math;
 using Z_Time;
 using Z_Ui;
 using Z_UnitSystem;
@@ -85,33 +86,42 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
             size = new Vector2(tex.width * scale, tex.height * scale);
         }
         var data = new ImageUiItemForm.Data(-1, texName, size, Vector2.one * 0.5f, 0, 0, Vector2.one * 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 999999);
-        return ImageUiItemForm.AddData(data);
+        var id = ImageUiItemForm.AddData(data);
+        Z_EventHelper.Invoke(new PlayAssetEvent());
+        return id;
     }
     public void Remove(int id)
-    {
-        ImageUiItemForm.RemoveData(id);
-        Z_EventHelper.Invoke(new PlayAssetEvent());
-    }
-    public void SetPos(int id, Vector2 tar, float time)
     {
         var data = ImageUiItemForm.DataByUid.GetDv(id, null);
         if (data != null)
         {
-            data.tarPos = tar;
+            data.ctrl = null;
+            ImageUiItemForm.RemoveData(id);
+        }
+        Z_EventHelper.Invoke(new PlayAssetEvent());
+    }
+    public void SetPos(int id, Vector2 normalizedTar, float time)
+    {
+        var data = ImageUiItemForm.DataByUid.GetDv(id, null);
+        var rect = UiManager.instance.GetUi<UiPlayAssetCtrl>().rect;
+        if (data != null && rect != null)
+        {
+
+            data.tarPos = Graph.GetRealPos(normalizedTar, rect);
             data.posTime = time;
             data.posProgress = 0;
             if (data.ctrl == null)
             {
                 if (time == 0)
                 {
-                    data.oldPos = tar;
+                    data.oldPos = data.tarPos;
                 }
             }
             else
             {
                 if (time == 0)
                 {
-                    data.ctrl.rect.position = tar;
+                    data.ctrl.rect.position = data.tarPos;
                 }
                 data.oldPos = data.ctrl.rect.position;
             }
@@ -152,8 +162,8 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
         }
         Z_EventHelper.Invoke(new PlayAssetEvent());
     }
-    
-  
+
+
 
 
 

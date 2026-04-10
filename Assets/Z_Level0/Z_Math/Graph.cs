@@ -1,18 +1,36 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Schema;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Animations;
-using UnityEngine.UIElements;
+
 namespace Z_Math
 {
     public static class Graph
     {
         public static float DELTA = 0.05f;
         public static bool dDebug;
+
+        private static readonly Vector3[] s_CubeCornerOffsets = new Vector3[]
+        {
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, -0.5f, -0.5f),
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(-0.5f, 0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, 0.5f)
+        };
+
+        private static readonly Vector3[] s_SphereDirections = new Vector3[]
+        {
+            Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back
+        };
+
+        private static readonly int[] s_CubeClosePointOffsets = new int[]
+        {
+            4, -4, 1, -1, 2, -2
+        };
+
         public class IntersectAssisant
         {
             int isOut = 0;
@@ -162,17 +180,17 @@ namespace Z_Math
         public static List<Vector3Int> DeduplicateIntPos(List<List<Vector3Int>> lst)
         {
             HashSet<Vector3Int> exist = new HashSet<Vector3Int>();
-            foreach (var o in lst)
+            int count = lst.Count;
+            for (int i = 0; i < count; i++)
             {
-                foreach (var p in o)
+                var subList = lst[i];
+                int subCount = subList.Count;
+                for (int j = 0; j < subCount; j++)
                 {
-                    if (!exist.Contains(p))
-                    {
-                        exist.Add(p);
-                    }
+                    exist.Add(subList[j]);
                 }
             }
-            return exist.ToList();
+            return new List<Vector3Int>(exist);
         }
         public static Vector3 ElementwiseMultiply(Vector3 a, Vector3 b)
         {
@@ -184,10 +202,11 @@ namespace Z_Math
         }
         public static Vector3[] ElementwisePlus(Vector3[] a, Vector3 b)
         {
-            Vector3[] res = new Vector3[a.Length];
-            for (int i = 0; i < a.Length; i++)
+            int len = a.Length;
+            Vector3[] res = new Vector3[len];
+            for (int i = 0; i < len; i++)
             {
-                res[i] = ElementwisePlus(a[i], b);
+                res[i] = new Vector3(a[i].x + b.x, a[i].y + b.y, a[i].z + b.z);
             }
             return res;
         }
@@ -211,28 +230,21 @@ namespace Z_Math
 
         public static Vector3[] GetCubeEightPoint(Vector3 center, Vector3 size, Vector3 euler)
         {
-
             Vector3[] ans = new Vector3[8];
             Quaternion rotation = Quaternion.Euler(euler);
-            //ref CubeEightPoint
-            Vector3[] choose = new[] { new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f),
-                                        new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f)};
             for (int i = 0; i < 8; i++)
             {
-                ans[i] = center + rotation * ElementwiseMultiply(choose[i], size);
+                ans[i] = center + rotation * ElementwiseMultiply(s_CubeCornerOffsets[i], size);
             }
             return ans;
         }
         public static Vector3[] GetSphereSixPoint(Vector3 center, float radius, Vector3 euler, Vector3 scale)
         {
-
             Vector3[] ans = new Vector3[6];
             Quaternion rotation = Quaternion.Euler(euler);
-            //ref CubeEightPoint
-            Vector3[] choose = new[] { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
-            for (int i = 0; i < choose.Length; i++)
+            for (int i = 0; i < 6; i++)
             {
-                ans[i] = center + rotation * ElementwiseMultiply(choose[i] * radius, scale);
+                ans[i] = center + rotation * ElementwiseMultiply(s_SphereDirections[i] * radius, scale);
             }
             return ans;
         }
@@ -240,22 +252,33 @@ namespace Z_Math
 
         public static List<Vector3Int> GetRoughOverlapIntPos(Vector3[] points)
         {
+            int len = points.Length;
             int minX = int.MaxValue;
             int minY = int.MaxValue;
             int minZ = int.MaxValue;
             int maxX = int.MinValue;
             int maxY = int.MinValue;
             int maxZ = int.MinValue;
-            for (int i = 0; i < points.Length; i++)
+            for (int i = 0; i < len; i++)
             {
-                minX = Mathf.Min((int)points[i].x, minX);
-                minY = Mathf.Min((int)points[i].y, minY);
-                minZ = Mathf.Min((int)points[i].z, minZ);
-                maxX = Mathf.Max((int)(points[i].x + 1), maxX);
-                maxY = Mathf.Max((int)(points[i].y + 1), maxY);
-                maxZ = Mathf.Max((int)(points[i].z + 1), maxZ);
+                Vector3 p = points[i];
+                int px = (int)p.x;
+                int py = (int)p.y;
+                int pz = (int)p.z;
+                if (px < minX) minX = px;
+                if (py < minY) minY = py;
+                if (pz < minZ) minZ = pz;
+                int px1 = px + 1;
+                int py1 = py + 1;
+                int pz1 = pz + 1;
+                if (px1 > maxX) maxX = px1;
+                if (py1 > maxY) maxY = py1;
+                if (pz1 > maxZ) maxZ = pz1;
             }
-            List<Vector3Int> res = new List<Vector3Int>((maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1));
+            int sizeX = maxX - minX + 1;
+            int sizeY = maxY - minY + 1;
+            int sizeZ = maxZ - minZ + 1;
+            List<Vector3Int> res = new List<Vector3Int>(sizeX * sizeY * sizeZ);
             for (int i = minX; i <= maxX; i++)
                 for (int j = minY; j <= maxY; j++)
                     for (int k = minZ; k <= maxZ; k++)
@@ -267,15 +290,7 @@ namespace Z_Math
 
         public static bool GetPointInSphere(Vector3 point, float a2, float b2, float c2)
         {
-            try
-            {
-
-                return point.x * point.x / a2 + point.y * point.y / b2 + point.z * point.z / c2 <= 1e-9;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+            return point.x * point.x / a2 + point.y * point.y / b2 + point.z * point.z / c2 <= 1e-9;
         }
 
 
@@ -288,12 +303,11 @@ namespace Z_Math
             avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
-            var mag = dir.magnitude;
+            float mag = dir.magnitude;
             dis = mag;
             HashSet<Vector3> exist = new HashSet<Vector3>();
-            List<Vector3> axesToCheck = new List<Vector3>();
-            var aCenter = (aCubeEightPoints[(int)CubeEightPoint.LeftDownBack] + aCubeEightPoints[(int)CubeEightPoint.RightUpForward]) / 2;
-            var bCenter = (bCubeEightPoints[(int)CubeEightPoint.LeftDownBack] + bCubeEightPoints[(int)CubeEightPoint.RightUpForward]) / 2;
+            Vector3 aCenter = (aCubeEightPoints[0] + aCubeEightPoints[7]) * 0.5f;
+            Vector3 bCenter = (bCubeEightPoints[0] + bCubeEightPoints[7]) * 0.5f;
 
             if (IsCubesOverlap(aCubeEightPoints, bCubeEightPoints))
             {
@@ -307,38 +321,23 @@ namespace Z_Math
             float touchTime = 0;
             float avoidTime = 1;
 
-            {
-                axesToCheck.AddRange(GetFaceNormals(aCubeEightPoints));
-                axesToCheck.AddRange(GetFaceNormals(bCubeEightPoints));
+            Vector3 normal1, normal2, normal3;
+            GetFaceNormals(aCubeEightPoints, out normal1, out normal2, out normal3);
 
-                foreach (Vector3 axis in axesToCheck)
-                {
-                    if (exist.Contains(axis))
-                    {
-                        continue;
-                    }
-                    exist.Add(axis);
+            if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
+            if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
+            if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
 
-                    if (axis.sqrMagnitude <= 0)
-                    {
-                        continue;
-                    }
+            GetFaceNormals(bCubeEightPoints, out normal1, out normal2, out normal3);
+            if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
+            if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
+            if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
 
-                    (float aMin, float aMax) = ProjectCubeOntoAxis(aCubeEightPoints, axis);
-                    (float bMin, float bMax) = ProjectCubeOntoAxis(bCubeEightPoints, axis);
-
-                    float dirProj = Vector3.Dot(dir, axis);
-
-                    if (CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid))
-                        break;
-                    avoidDir += (avoid * axis).normalized;
-                }
-            }
             if (fromIn)
             {
                 avoidTime = 1;
                 touchTime = 0;
-                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)//todo
+                if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
                     touchTime = 1;
             }
             if (touchTime > avoidTime)
@@ -354,16 +353,38 @@ namespace Z_Math
             avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
+
+        private static bool AddAxisCheck(Vector3 axis, HashSet<Vector3> exist)
+        {
+            if (axis.sqrMagnitude <= 0) return false;
+            if (exist.Contains(axis)) return false;
+            exist.Add(axis);
+            return true;
+        }
+
+        private static void CheckAxis(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, Vector3 axis,
+            ref float touchTime, ref float avoidTime, ref Vector3 avoidDir)
+        {
+            (float aMin, float aMax) = ProjectCubeOntoAxis(aCubeEightPoints, axis);
+            (float bMin, float bMax) = ProjectCubeOntoAxis(bCubeEightPoints, axis);
+
+            float dirProj = Vector3.Dot(dir, axis);
+
+            if (CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid))
+                return;
+            avoidDir += (avoid * axis).normalized;
+        }
+
         public static IntersectType SphereIntersectCube(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
             avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
-            var mag = dir.magnitude;
+            float mag = dir.magnitude;
             dis = mag;
 
-            var sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
-            var disDir = GetPointToCube(sphereCenter, cubeEightPoints, out fromIn);
+            Vector3 sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) * 0.5f;
+            Vector3 disDir = GetPointToCube(sphereCenter, cubeEightPoints, out fromIn);
 
             if (fromIn)
             {
@@ -373,65 +394,69 @@ namespace Z_Math
                 }
             }
 
-            var newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
+            Vector3 newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
 
-            float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
-            var cubeCenter = (cubeEightPoints[(int)CubeEightPoint.LeftDownBack] + cubeEightPoints[(int)CubeEightPoint.RightUpForward]) / 2;
+            float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude * 0.5f;
 
             float touchTime = 0;
             float avoidTime = 1;
 
             HashSet<Vector3> exist = new HashSet<Vector3>();
-            List<Vector3> axesToCheck = new List<Vector3>();
 
-            axesToCheck.AddRange(GetFaceNormals(cubeEightPoints));
+            Vector3 normal1, normal2, normal3;
+            GetFaceNormals(cubeEightPoints, out normal1, out normal2, out normal3);
+
+            if (AddAxisCheckSphere(normal1, exist))
+            {
+                CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, normal1, ref touchTime, ref avoidTime);
+            }
+            if (AddAxisCheckSphere(normal2, exist))
+            {
+                CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, normal2, ref touchTime, ref avoidTime);
+            }
+            if (AddAxisCheckSphere(normal3, exist))
+            {
+                CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, normal3, ref touchTime, ref avoidTime);
+            }
 
             if (dir.sqrMagnitude > 0)
             {
-                var edgeDirs = GetCubeEdgeDirections(cubeEightPoints);
-                foreach (var edgeDir in edgeDirs)
+                Vector3 right, up, forward;
+                GetCubeEdgeDirections(cubeEightPoints, out right, out up, out forward);
+
+                if (right.sqrMagnitude > 0)
                 {
-                    Vector3 crossAxis = Vector3.Cross(dir, edgeDir);
-                    if (crossAxis.sqrMagnitude > 0)
+                    Vector3 crossAxis = Vector3.Cross(dir, right);
+                    if (crossAxis.sqrMagnitude > 0 && AddAxisCheckSphere(crossAxis.normalized, exist))
                     {
-                        axesToCheck.Add(crossAxis.normalized);
+                        CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, crossAxis.normalized, ref touchTime, ref avoidTime);
+                    }
+                }
+                if (up.sqrMagnitude > 0)
+                {
+                    Vector3 crossAxis = Vector3.Cross(dir, up);
+                    if (crossAxis.sqrMagnitude > 0 && AddAxisCheckSphere(crossAxis.normalized, exist))
+                    {
+                        CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, crossAxis.normalized, ref touchTime, ref avoidTime);
+                    }
+                }
+                if (forward.sqrMagnitude > 0)
+                {
+                    Vector3 crossAxis = Vector3.Cross(dir, forward);
+                    if (crossAxis.sqrMagnitude > 0 && AddAxisCheckSphere(crossAxis.normalized, exist))
+                    {
+                        CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, crossAxis.normalized, ref touchTime, ref avoidTime);
                     }
                 }
             }
 
-            foreach (Vector3 axis in axesToCheck)
-            {
-                if (exist.Contains(axis) || exist.Contains(-axis))
-                {
-                    continue;
-                }
-                exist.Add(axis);
-
-                if (axis.sqrMagnitude <= 0)
-                {
-                    continue;
-                }
-
-                float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
-                float sphereMin = sphereCenterProj - sphereRadius;
-                float sphereMax = sphereCenterProj + sphereRadius;
-
-                (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
-
-                float dirProj = Vector3.Dot(dir, axis);
-
-                if (CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out var avoid))
-                {
-                    break;
-                }
-            }
             if (IsSphereAndCubeOverlap(ElementwisePlus(sphereSixPoints, dir), cubeEightPoints))
             {
                 toIn = true;
             }
             if ((fromIn && !newInner) ||
-    (fromIn && newInner && newDisDir.sqrMagnitude < disDir.sqrMagnitude)
-    || (!fromIn && !newInner && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
+                (fromIn && newInner && newDisDir.sqrMagnitude < disDir.sqrMagnitude)
+                || (!fromIn && !newInner && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
             {
                 touchTime = 1;
             }
@@ -445,11 +470,33 @@ namespace Z_Math
 
 
             dis = touchTime * mag;
-            if(touchTime<1)
+            if (touchTime < 1)
             {
-                avoidDir = GetPointToCube(sphereCenter+dir* touchTime, cubeEightPoints, out _);
+                avoidDir = GetPointToCube(sphereCenter + dir * touchTime, cubeEightPoints, out _);
             }
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
+        }
+
+        private static bool AddAxisCheckSphere(Vector3 axis, HashSet<Vector3> exist)
+        {
+            if (axis.sqrMagnitude <= 0) return false;
+            if (exist.Contains(axis) || exist.Contains(-axis)) return false;
+            exist.Add(axis);
+            return true;
+        }
+
+        private static void CheckSphereAxis(Vector3 sphereCenter, float sphereRadius, Vector3[] cubeEightPoints,
+            Vector3 dir, Vector3 axis, ref float touchTime, ref float avoidTime)
+        {
+            float sphereCenterProj = Vector3.Dot(sphereCenter, axis);
+            float sphereMin = sphereCenterProj - sphereRadius;
+            float sphereMax = sphereCenterProj + sphereRadius;
+
+            (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
+
+            float dirProj = Vector3.Dot(dir, axis);
+
+            CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out _);
         }
 
         public static IntersectType SphereIntersectSphere(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
@@ -457,9 +504,8 @@ namespace Z_Math
             avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
-            var mag = dir.magnitude;
+            float mag = dir.magnitude;
             dis = mag;
-            // 先检查初始是否已重叠
             if (IsSpheresOverlap(aSphereSixPoints, bSphereSixPoints))
             {
                 fromIn = true;
@@ -468,21 +514,21 @@ namespace Z_Math
                     return IntersectType.Inner;
                 }
             }
-            var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-            var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-            var aRadius = (aSphereSixPoints[(int)SphereSixPoint.Left] - aSphereSixPoints[(int)SphereSixPoint.Right]).magnitude / 2;
-            var bRadius = (bSphereSixPoints[(int)SphereSixPoint.Left] - bSphereSixPoints[(int)SphereSixPoint.Right]).magnitude / 2;
+            Vector3 aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) * 0.5f;
+            Vector3 bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) * 0.5f;
+            float aRadius = (aSphereSixPoints[(int)SphereSixPoint.Left] - aSphereSixPoints[(int)SphereSixPoint.Right]).magnitude * 0.5f;
+            float bRadius = (bSphereSixPoints[(int)SphereSixPoint.Left] - bSphereSixPoints[(int)SphereSixPoint.Right]).magnitude * 0.5f;
             float touchTime = 0;
             float avoidTime = 1;
 
 
             {
-
-                var axis = (aCenter - bCenter).normalized;
+                Vector3 diff = aCenter - bCenter;
+                float sqrMag = diff.sqrMagnitude;
+                Vector3 axis = sqrMag > 0 ? diff.normalized : Vector3.up;
 
                 if (axis.sqrMagnitude > 0)
                 {
-                    // 1. 初始投影区间（t=0时）
                     float aCenterProj = Vector3.Dot(aCenter, axis);
                     float aMin = aCenterProj - aRadius;
                     float aMax = aCenterProj + aRadius;
@@ -491,17 +537,10 @@ namespace Z_Math
                     float bMin = bCenterProj - bRadius;
                     float bMax = bCenterProj + bRadius;
 
-                    // 2. 移动速度在轴上的投影
                     float dirProj = Vector3.Dot(dir, axis);
-                    var res = CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
+                    CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
 
-                    /* if(!res)
-                         Debug.Log(res + " " + aMin + " " + aMax + " " + bMin + " " + bMax + "  " + axis + "  " + dirProj + " " + dir + " --- " + touchTime + " " + avoidTime);
- */
                     avoidDir += (avoid * axis).normalized;
-
-
-
                 }
 
             }
@@ -528,42 +567,28 @@ namespace Z_Math
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
 
-        private static List<Vector3> GetFaceNormals(Vector3[] cubeEightPoints)
+        private static void GetFaceNormals(Vector3[] cubeEightPoints, out Vector3 normal1, out Vector3 normal2, out Vector3 normal3)
         {
-            List<Vector3> normals = new List<Vector3>();
             Vector3 p0 = cubeEightPoints[(int)CubeEightPoint.LeftDownBack];
             Vector3 p1 = cubeEightPoints[(int)CubeEightPoint.LeftUpBack];
             Vector3 p2 = cubeEightPoints[(int)CubeEightPoint.LeftDownForward];
             Vector3 p3 = cubeEightPoints[(int)CubeEightPoint.RightDownBack];
 
-            Vector3 normal1 = Vector3.Cross(p1 - p0, p2 - p0).normalized;
-            Vector3 normal2 = Vector3.Cross(p2 - p0, p3 - p0).normalized;
-            Vector3 normal3 = Vector3.Cross(p3 - p0, p1 - p0).normalized;
-
-            normals.Add(normal1);
-            normals.Add(normal2);
-            normals.Add(normal3);
-
-            return normals;
+            normal1 = Vector3.Cross(p1 - p0, p2 - p0).normalized;
+            normal2 = Vector3.Cross(p2 - p0, p3 - p0).normalized;
+            normal3 = Vector3.Cross(p3 - p0, p1 - p0).normalized;
         }
 
-        private static List<Vector3> GetCubeEdgeDirections(Vector3[] cubeEightPoints)
+        private static void GetCubeEdgeDirections(Vector3[] cubeEightPoints, out Vector3 right, out Vector3 up, out Vector3 forward)
         {
-            List<Vector3> edges = new List<Vector3>();
             Vector3 p0 = cubeEightPoints[(int)CubeEightPoint.LeftDownBack];
             Vector3 p1 = cubeEightPoints[(int)CubeEightPoint.RightDownBack];
             Vector3 p2 = cubeEightPoints[(int)CubeEightPoint.LeftUpBack];
             Vector3 p3 = cubeEightPoints[(int)CubeEightPoint.LeftDownForward];
 
-            Vector3 right = (p1 - p0).normalized;
-            Vector3 up = (p2 - p0).normalized;
-            Vector3 forward = (p3 - p0).normalized;
-
-            if (right.sqrMagnitude > 0) edges.Add(right);
-            if (up.sqrMagnitude > 0) edges.Add(up);
-            if (forward.sqrMagnitude > 0) edges.Add(forward);
-
-            return edges;
+            right = (p1 - p0).normalized;
+            up = (p2 - p0).normalized;
+            forward = (p3 - p0).normalized;
         }
 
         public static bool IsVectorsInHemisphere(List<Vector3> vectors, out Vector3 hemisphereNormal)
@@ -572,14 +597,15 @@ namespace Z_Math
             if (vectors == null || vectors.Count == 0)
                 return true;
 
-            for (int i = 0; i < vectors.Count; i++)
+            int count = vectors.Count;
+            for (int i = 0; i < count; i++)
             {
                 var candidate = vectors[i];
                 if (candidate.sqrMagnitude <= 0)
                     continue;
                 candidate.Normalize();
                 bool allInHemisphere = true;
-                for (int j = 0; j < vectors.Count; j++)
+                for (int j = 0; j < count; j++)
                 {
                     if (i == j)
                         continue;
@@ -605,9 +631,9 @@ namespace Z_Math
         {
             float min = float.MaxValue;
             float max = float.MinValue;
-            foreach (var v in cubeEightPoints)
+            for (int i = 0; i < 8; i++)
             {
-                float proj = Vector3.Dot(v, axis);
+                float proj = Vector3.Dot(cubeEightPoints[i], axis);
                 if (proj < min) min = proj;
                 if (proj > max) max = proj;
             }
@@ -618,17 +644,17 @@ namespace Z_Math
 
         public static IntersectType LineIntersectCube(Vector3[] eightPoints, Vector3 from, Vector3 to, out float dis)
         {
-            var mag = (to - from).magnitude;
+            float mag = (to - from).magnitude;
             dis = mag;
-            var forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
-            var up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
-            var right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            Vector3 forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
             to = GetNewCoordinateVector(to, right, up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
             from = GetNewCoordinateVector(from, right, up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
 
-            var x = right.magnitude;
-            var y = up.magnitude;
-            var z = forward.magnitude;
+            float x = right.magnitude;
+            float y = up.magnitude;
+            float z = forward.magnitude;
             if (to.x < 0 && from.x < 0)
                 return IntersectType.None;
             if (to.x > x && from.x > x)
@@ -642,17 +668,9 @@ namespace Z_Math
             if (to.z > z && from.z > z)
                 return IntersectType.None;
 
-            var fromIn = false;
-            var toIn = false;
-            if (from.x < x && from.x > 0 && from.y > 0 && from.y < y && from.z > 0 && from.z < z)
-            {
-                fromIn = true;
-            }
+            bool fromIn = from.x < x && from.x > 0 && from.y > 0 && from.y < y && from.z > 0 && from.z < z;
 
-            if (to.x < x && to.x > 0 && to.y > 0 && to.y < y && to.z > 0 && to.z < z)
-            {
-                toIn = true;
-            }
+            bool toIn = to.x < x && to.x > 0 && to.y > 0 && to.y < y && to.z > 0 && to.z < z;
 
             if (fromIn && toIn)
             {
@@ -710,14 +728,14 @@ namespace Z_Math
         public static IntersectType PointIntersectCube(Vector3[] eightPoints, Vector3 point, out float dis)
         {
             dis = 0;
-            var forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
-            var up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
-            var right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
+            Vector3 forward = eightPoints[(int)CubeEightPoint.RightDownForward] - eightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 up = eightPoints[(int)CubeEightPoint.RightUpBack] - eightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 right = eightPoints[(int)CubeEightPoint.RightDownBack] - eightPoints[(int)CubeEightPoint.LeftDownBack];
             point = GetNewCoordinateVector(point, right, up, forward) - eightPoints[(int)CubeEightPoint.LeftDownBack];
 
-            var x = right.magnitude;
-            var y = up.magnitude;
-            var z = forward.magnitude;
+            float x = right.magnitude;
+            float y = up.magnitude;
+            float z = forward.magnitude;
 
             if (point.x >= 0 && point.x <= x && point.y >= 0 && point.y <= y && point.z >= 0 && point.z <= z)
                 return IntersectType.In;
@@ -727,18 +745,18 @@ namespace Z_Math
         public static IntersectType LineIntersectSphere(Vector3[] sixPoint, Vector3 from, Vector3 to, out float dis)
         {
             Vector3 dir = to - from;
-            var mag = dir.magnitude;
+            float mag = dir.magnitude;
             dis = mag;
-            var center = (sixPoint[(int)SphereSixPoint.Forward] + sixPoint[(int)SphereSixPoint.Back]) / 2;
-            var forward = sixPoint[(int)SphereSixPoint.Forward] - center;
-            var up = sixPoint[(int)SphereSixPoint.Up] - center;
-            var right = sixPoint[(int)SphereSixPoint.Right] - center;
+            Vector3 center = (sixPoint[(int)SphereSixPoint.Forward] + sixPoint[(int)SphereSixPoint.Back]) * 0.5f;
+            Vector3 forward = sixPoint[(int)SphereSixPoint.Forward] - center;
+            Vector3 up = sixPoint[(int)SphereSixPoint.Up] - center;
+            Vector3 right = sixPoint[(int)SphereSixPoint.Right] - center;
             to = GetNewCoordinateVector(to, right, up, forward) - center;
             from = GetNewCoordinateVector(from, right, up, forward) - center;
 
-            var x = right.magnitude;
-            var y = up.magnitude;
-            var z = forward.magnitude;
+            float x = right.magnitude;
+            float y = up.magnitude;
+            float z = forward.magnitude;
             float a2 = x * x;
             float b2 = y * y;
             float c2 = z * z;
@@ -774,14 +792,14 @@ namespace Z_Math
             bool t2Valid = false;
             if (t1 >= 0 && t1 <= 1)
             {
-                dis = Math.Min(t1 * dir.magnitude, dis);
+                dis = Math.Min(t1 * mag, dis);
                 t1Valid = true;
             }
 
             bool fromIn = GetPointInSphere(from, a2, b2, c2);
             if (t2 >= 0 && t2 <= 1)
             {
-                dis = Math.Min(t2 * dir.magnitude, dis);
+                dis = Math.Min(t2 * mag, dis);
                 t2Valid = true;
             }
 
@@ -807,56 +825,43 @@ namespace Z_Math
         public static bool GetPointOnLineByX(Vector3 from, Vector3 to, float x, out Vector3 res)
         {
             res = Vector3.zero;
-            try
-            {
-                var dir = to - from;
-                var basic = (x - from.x) / dir.x;
-                res = new Vector3(x, basic * dir.y + from.y, basic * dir.z + from.z);
-                return IsClamp(res, from, to);
-            }
-            catch (Exception e)
-            {
+            Vector3 dir = to - from;
+            float dirX = dir.x;
+            if (Mathf.Abs(dirX) < 1e-9f)
                 return false;
-            }
+            float basic = (x - from.x) / dirX;
+            res = new Vector3(x, basic * dir.y + from.y, basic * dir.z + from.z);
+            return IsClamp(res, from, to);
         }
         public static bool GetPointOnLineByY(Vector3 from, Vector3 to, float y, out Vector3 res)
         {
             res = Vector3.zero;
-            try
-            {
-                var dir = to - from;
-                var basic = (y - from.y) / dir.y;
-                res = new Vector3(basic * dir.x + from.x, y, basic * dir.z + from.z);
-                return IsClamp(res, from, to);
-            }
-            catch (Exception e)
-            {
+            Vector3 dir = to - from;
+            float dirY = dir.y;
+            if (Mathf.Abs(dirY) < 1e-9f)
                 return false;
-            }
+            float basic = (y - from.y) / dirY;
+            res = new Vector3(basic * dir.x + from.x, y, basic * dir.z + from.z);
+            return IsClamp(res, from, to);
         }
         public static bool GetPointOnLineByZ(Vector3 from, Vector3 to, float z, out Vector3 res)
         {
             res = Vector3.zero;
-            try
-            {
-                var dir = to - from;
-                var basic = (z - from.z) / dir.z;
-                res = new Vector3(basic * dir.x + from.x, basic * dir.y + from.y, z);
-                return IsClamp(res, from, to);
-            }
-            catch (Exception e)
-            {
+            Vector3 dir = to - from;
+            float dirZ = dir.z;
+            if (Mathf.Abs(dirZ) < 1e-9f)
                 return false;
-            }
+            float basic = (z - from.z) / dirZ;
+            res = new Vector3(basic * dir.x + from.x, basic * dir.y + from.y, z);
+            return IsClamp(res, from, to);
         }
         public static Vector3[] RotatePointAroundOrigin(Vector3[] points, Vector3 euler)
         {
-            Vector3[] newPos = new Vector3[points.Length];
+            int len = points.Length;
+            Vector3[] newPos = new Vector3[len];
             Quaternion rotation = Quaternion.Euler(euler);
-            for (int i = 0, icnt = points.Length; i < icnt; i++)
+            for (int i = 0; i < len; i++)
             {
-                // 将欧拉角转换为四元数
-                // 使用四元数旋转点
                 newPos[i] = rotation * points[i];
             }
             return newPos;
@@ -872,28 +877,19 @@ namespace Z_Math
             return v;
         }
 
-        /// <summary>
-        /// 获取向量法平面上随机向量
-        /// </summary>
-        /// <param name="v"></param>
-        /// <param name="length"></param>
-        /// <returns></returns>
         public static Vector3 GetRandomVectorOnPlane(Vector3 v, float length)
         {
-            // 计算两个与v垂直的基向量
-            Vector3 right = Vector3.Cross(v, Vector3.up);  // 与v垂直的向量
-            if (right.magnitude < 0.001f)  // 如果v与Vector3.up平行，尝试与其他向量交叉
+            Vector3 right = Vector3.Cross(v, Vector3.up);
+            if (right.sqrMagnitude < 0.001f)
             {
                 right = Vector3.Cross(v, Vector3.forward);
             }
 
-            Vector3 forward = Vector3.Cross(v, right);  // 获取另一个与v垂直的向量
+            Vector3 forward = Vector3.Cross(v, right);
 
-            // 随机生成平面内的两个方向
             float randomX = UnityEngine.Random.Range(-1f, 1f);
             float randomY = UnityEngine.Random.Range(-1f, 1f);
 
-            // 通过线性组合获得随机的向量
             Vector3 randomVector = (right * randomX + forward * randomY).normalized * length;
 
             return randomVector;
@@ -902,7 +898,7 @@ namespace Z_Math
         {
             Vector3 w = targetPoint - linePoint;
             float dotVV = Vector3.Dot(lineDir, lineDir);
-            if (dotVV < 1e-6f) // 直线方向向量不能为零
+            if (dotVV < 1e-6f)
                 return Vector3.zero;
 
             float t = Vector3.Dot(w, lineDir) / dotVV;
@@ -911,45 +907,45 @@ namespace Z_Math
         }
         private static bool IsCubesOverlap(Vector3[] cubeA, Vector3[] cubeB)
         {
-            List<Vector3> axes = new List<Vector3>();
-            axes.AddRange(GetFaceNormals(cubeA));
-            axes.AddRange(GetFaceNormals(cubeB));
+            Vector3 normal1, normal2, normal3;
 
-            foreach (var axis in axes)
-            {
-                if (axis.sqrMagnitude < 0) continue;
+            GetFaceNormals(cubeA, out normal1, out normal2, out normal3);
+            if (!CheckAxisOverlap(cubeA, cubeB, normal1)) return false;
+            if (!CheckAxisOverlap(cubeA, cubeB, normal2)) return false;
+            if (!CheckAxisOverlap(cubeA, cubeB, normal3)) return false;
 
-                (float minA, float maxA) = ProjectCubeOntoAxis(cubeA, axis);
-                (float minB, float maxB) = ProjectCubeOntoAxis(cubeB, axis);
+            GetFaceNormals(cubeB, out normal1, out normal2, out normal3);
+            if (!CheckAxisOverlap(cubeA, cubeB, normal1)) return false;
+            if (!CheckAxisOverlap(cubeA, cubeB, normal2)) return false;
+            if (!CheckAxisOverlap(cubeA, cubeB, normal3)) return false;
 
-                if (!IsOverlap(minA, maxA, minB, maxB))
-                {
-                    return false;
-                }
-            }
             return true;
+        }
+
+        private static bool CheckAxisOverlap(Vector3[] cubeA, Vector3[] cubeB, Vector3 axis)
+        {
+            if (axis.sqrMagnitude <= 0) return true;
+
+            (float minA, float maxA) = ProjectCubeOntoAxis(cubeA, axis);
+            (float minB, float maxB) = ProjectCubeOntoAxis(cubeB, axis);
+
+            return IsOverlap(minA, maxA, minB, maxB);
         }
 
         public static bool IsSphereAndCubeOverlap(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints)
         {
-
-
-            var aCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) / 2;
-            var aRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude / 2;
-            var axis = GetPointToCube(aCenter, cubeEightPoints, out var inner).normalized;
+            Vector3 aCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) * 0.5f;
+            float aRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude * 0.5f;
+            Vector3 axis = GetPointToCube(aCenter, cubeEightPoints, out var inner).normalized;
             if (inner)
                 return true;
-            // 对每个轴检查投影重叠
             {
-                // 计算椭球在轴上的投影区间 [ellipsoidMin, ellipsoidMax]
                 float ellipsoidCenterProj = Vector3.Dot(aCenter, axis);
                 float ellipsoidMin = ellipsoidCenterProj - aRadius;
                 float ellipsoidMax = ellipsoidCenterProj + aRadius;
 
-                // 计算立方体在轴上的投影区间 [cubeMin, cubeMax]
                 (float cubeMin, float cubeMax) = ProjectCubeOntoAxis(cubeEightPoints, axis);
 
-                // 检查是否分离
                 if (ellipsoidMax <= cubeMin || cubeMax <= ellipsoidMin)
                     return false;
             }
@@ -958,34 +954,35 @@ namespace Z_Math
         }
         public static bool IsSpheresOverlap(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints)
         {
+            Vector3 aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) * 0.5f;
+            Vector3 bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) * 0.5f;
+            float aRadius = (aSphereSixPoints[(int)SphereSixPoint.Left] - aCenter).magnitude;
+            float bRadius = (bSphereSixPoints[(int)SphereSixPoint.Left] - bCenter).magnitude;
 
-            var aCenter = (aSphereSixPoints[(int)SphereSixPoint.Left] + aSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-            var bCenter = (bSphereSixPoints[(int)SphereSixPoint.Left] + bSphereSixPoints[(int)SphereSixPoint.Right]) / 2;
-
-            return (bCenter - aCenter).magnitude <= (aSphereSixPoints[(int)SphereSixPoint.Left] - aCenter).magnitude + (bSphereSixPoints[(int)SphereSixPoint.Left] - bCenter).magnitude; // 所有轴都重叠，判定碰撞
+            return (bCenter - aCenter).sqrMagnitude <= (aRadius + bRadius) * (aRadius + bRadius);
         }
 
         public static Vector3 GetPointToCube(Vector3 point, Vector3[] cubeEightPoints, out bool inner)
         {
             inner = false;
-            var boxCenter = (cubeEightPoints[(int)CubeEightPoint.LeftUpBack] + cubeEightPoints[(int)CubeEightPoint.RightDownForward]) / 2;
-            var min2 = float.MaxValue;
-            var id = 0;
-            for (int i = 0; i < cubeEightPoints.Length; i++)
+            int id = 0;
+            float min2 = float.MaxValue;
+            for (int i = 0; i < 8; i++)
             {
-                var dis = (cubeEightPoints[i] - point).sqrMagnitude;
+                Vector3 diff = cubeEightPoints[i] - point;
+                float dis = diff.sqrMagnitude;
                 if (dis < min2)
                 {
                     min2 = dis;
                     id = i;
                 }
             }
-            var dir = cubeEightPoints[id] - point;
-            var axis = GetCubeClosePoint(cubeEightPoints, (CubeEightPoint)id);
+            Vector3 dir = cubeEightPoints[id] - point;
+            Vector3[] axis = GetCubeClosePoint(cubeEightPoints, (CubeEightPoint)id);
             axis[0] = (cubeEightPoints[id] - axis[0]).normalized;
             axis[1] = (cubeEightPoints[id] - axis[1]).normalized;
             axis[2] = (cubeEightPoints[id] - axis[2]).normalized;
-            var res = GetNewCoordinateVector(point - cubeEightPoints[id], axis[0], axis[1], axis[2]);
+            Vector3 res = GetNewCoordinateVector(point - cubeEightPoints[id], axis[0], axis[1], axis[2]);
             if (res.x <= 0 && res.y <= 0 && res.z <= 0)
             {
                 inner = true;
@@ -1025,7 +1022,7 @@ namespace Z_Math
         public static Vector3[] GetCubeClosePoint(Vector3[] cubeEightPoints, CubeEightPoint cur)
         {
             int id = (int)cur;
-            var res = new Vector3[3];
+            Vector3[] res = new Vector3[3];
             res[0] = (cubeEightPoints[id / 4 == 0 ? id + 4 : id - 4]);
             res[1] = (cubeEightPoints[id % 2 == 0 ? id + 1 : id - 1]);
             res[2] = (cubeEightPoints[id / 2 % 2 == 0 ? id + 2 : id - 2]);
@@ -1041,10 +1038,11 @@ namespace Z_Math
             bool isPositive = false;
             bool isNegative = false;
 
-            for (int i = 0; i < quadFourPoint.Length; i++)
+            int len = quadFourPoint.Length;
+            for (int i = 0; i < len; i++)
             {
                 Vector2 p1 = quadFourPoint[i];
-                Vector2 p2 = quadFourPoint[(i + 1) % quadFourPoint.Length];
+                Vector2 p2 = quadFourPoint[(i + 1) % len];
 
                 float crossProduct = Cross(p1, p2, point);
 
@@ -1153,30 +1151,22 @@ namespace Z_Math
 
 
 
-
-
         #region UI
-        /// <summary>
-        /// 左下后角 0 0 0
-        /// </summary>
-        /// <param name="relativePos"></param>
-        /// <param name="area"></param>
         public static Vector2 GetNormalizedRelativePos(Vector2 realPos, RectTransform area)
         {
             Vector3[] cor = new Vector3[4];
             area.GetWorldCorners(cor);
-            return new Vector2((realPos.x - cor[0].x) / (cor[3].x - cor[0].x), (realPos.y - cor[0].y) / (cor[1].y - cor[0].y));
+            float width = cor[3].x - cor[0].x;
+            float height = cor[1].y - cor[0].y;
+            return new Vector2((realPos.x - cor[0].x) / width, (realPos.y - cor[0].y) / height);
         }
-        /// <summary>
-        /// 左下后角 0 0 0
-        /// </summary>
-        /// <param name="relativeNormalizedPos"></param>
-        /// <param name="area"></param>
         public static Vector2 GetRealPos(Vector2 relativeNormalizedPos, RectTransform area)
         {
             Vector3[] cor = new Vector3[4];
             area.GetWorldCorners(cor);
-            return new Vector2(cor[0].x + (cor[3].x - cor[0].x) * relativeNormalizedPos.x, cor[0].y + (cor[1].y - cor[0].y) * relativeNormalizedPos.y);
+            float width = cor[3].x - cor[0].x;
+            float height = cor[1].y - cor[0].y;
+            return new Vector2(cor[0].x + width * relativeNormalizedPos.x, cor[0].y + height * relativeNormalizedPos.y);
         }
         public static Vector2 GetSize(this RectTransform area)
         {
@@ -1188,7 +1178,7 @@ namespace Z_Math
         {
             Vector3[] cor = new Vector3[4];
             area.GetWorldCorners(cor);
-            return new Vector2((cor[3].x + cor[0].x) / 2, (cor[1].y + cor[0].y) / 2);
+            return new Vector2((cor[3].x + cor[0].x) * 0.5f, (cor[1].y + cor[0].y) * 0.5f);
         }
         #endregion
         #region Misc
@@ -1237,33 +1227,19 @@ namespace Z_Math
         }
 
 
-        /// <summary>
-        /// 计算直角三角形的斜边长度和指定夹角
-        /// </summary>
-        /// <param name="a">第一条直角边长度</param>
-        /// <param name="b">第二条直角边长度</param>
-        /// <param name="hypotenuse">输出：斜边长度</param>
-        /// <param name="angleDegrees">输出：斜边与第一条直角边的夹角（度）</param>
         public static void CalculateTriangle(float a, float b, out float hypotenuse, out float angleDegrees)
         {
-            // 验证输入（边长必须为正数）
             if (a <= 0 || b <= 0)
             {
                 throw new ArgumentException("直角边长度必须为正数");
             }
 
-            // 1. 计算斜边长度（勾股定理：c = √(a² + b²)）
             hypotenuse = Mathf.Sqrt(a * a + b * b);
 
-            // 2. 计算夹角（与第一条直角边a的夹角θ）
-            // 原理：tanθ = 对边/邻边 = b/a → θ = arctan(b/a)
-            float angleRadians = Mathf.Atan(b / a); // 结果为弧度
-            angleDegrees = Mathf.Round(RadiansToDegrees(angleRadians)); // 转换为度并保留2位小数
+            float angleRadians = Mathf.Atan(b / a);
+            angleDegrees = Mathf.Round(RadiansToDegrees(angleRadians));
         }
 
-        /// <summary>
-        /// 弧度转角度
-        /// </summary>
         public static float RadiansToDegrees(float radians)
         {
             return radians * (180 / Mathf.PI);

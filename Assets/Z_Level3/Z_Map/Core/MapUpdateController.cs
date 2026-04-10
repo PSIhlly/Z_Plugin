@@ -260,10 +260,19 @@ namespace Z_Map
                     map.unit.UpdateInfo();
                 }
             }
-
-            foreach (var map in curObjectLst)
+            if (GlobalSettings.UPDATE_ALL_OBJECT)
             {
-                map.unit.UpdateInfo();
+                foreach (var oData in ObjectUnitForm.DataByUid.Values)
+                {
+                    oData.unit.UpdateInfo();
+                }
+            }
+            else
+            {
+                foreach (var map in curObjectLst)
+                {
+                    map.unit.UpdateInfo();
+                }
             }
             foreach (var map in curItemLst)
             {
@@ -453,9 +462,9 @@ namespace Z_Map
                 unit.VisDegree(1f);
                 foreach (var curObj in objectTileDic.Get(unit))
                 {
+                    
                     if (curObj.belongTile == unit)
                     {
-
                         curObj.VisOn();
                         curObj.VisDegree(1f);
                     }
@@ -544,12 +553,12 @@ namespace Z_Map
             unit.data.euler = euler;
             if (oldPos != newPos)
             {
-                MapManager.instance.updateCtrl.ChechCollideEvent(unit, teleport ? newPos - oldPos : Vector3.zero);
+                MapManager.instance.updateCtrl.CheckCollideEvent(unit, teleport ? newPos - oldPos : Vector3.zero);
             }
 
 
         }
-        public void ChechCollideEvent(Unit unit, Vector3 dir)
+        public void CheckCollideEvent(Unit unit, Vector3 dir)
         {
             TileUnit cur = null;
             if (unit is CharacterUnit ch)

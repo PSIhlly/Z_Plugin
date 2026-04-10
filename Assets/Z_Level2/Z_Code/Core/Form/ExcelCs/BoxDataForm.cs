@@ -65,7 +65,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -77,13 +77,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _str;
                     /// <summary>
-                    ///◊÷∑˚¥Æ
+                    ///Â≠óÁ¨¶‰∏≤
                     ///</summary>
                     public string  str{
                                 get{return _str;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeStr(this,_str,value); 
                     }
@@ -95,13 +95,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _valName;
                     /// <summary>
-                    ///÷∏œÚ√˚≥∆
+                    ///ÊåáÂêëÂêçÁß∞
                     ///</summary>
                     public string  valName{
                                 get{return _valName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeValname(this,_valName,value); 
                     }
@@ -113,13 +113,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _num;
                     /// <summary>
-                    /// ˝÷µ
+                    ///Êï∞ÂÄº
                     ///</summary>
                     public float  num{
                                 get{return _num;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeNum(this,_num,value); 
                     }
@@ -131,13 +131,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<string,BoxDataForm.Data>  _dic;
                     /// <summary>
-                    ///◊÷µ‰
+                    ///Â≠óÂÖ∏
                     ///</summary>
                     public Dictionary<string,BoxDataForm.Data>  dic{
                                 get{return _dic;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDic(this,_dic,value); 
                     }
@@ -183,6 +183,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -209,6 +210,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -300,6 +303,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -314,7 +318,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -339,7 +345,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

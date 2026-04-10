@@ -224,7 +224,7 @@ public class GameEventController : Z_Controller<GameManager>
         releaseTriggerTuple.Clear();
         foreach (var data in lst)
         {
-            if (GameManager.instance.curProgress.blockProgramUid > 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
+            if (GameManager.instance.curProgress.blockProgramUid != 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
             {
                 continue;
             }
@@ -326,12 +326,15 @@ public class GameEventController : Z_Controller<GameManager>
                 break;
         }
     }
-
+    int debugId = 0;
     public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "")
     {
         if (evt == null)
             return;
-        EventInterpretDataForm.AddData(new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), releaseTrigger, 0));
+        var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(),0, releaseTrigger, 0);
+        data.debugId = debugId++;
+        EventInterpretDataForm.AddData(data);
+
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {

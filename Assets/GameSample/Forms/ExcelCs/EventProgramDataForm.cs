@@ -90,13 +90,13 @@ namespace Form
 
                     private string  _category;
                     /// <summary>
-                    ///Ò»¼¶±êÇ©
+                    ///ä¸€çº§æ ‡ç­¾
                     ///</summary>
                     public string  category{
                                 get{return _category;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCategory(this,_category,value); 
                     }
@@ -108,13 +108,13 @@ namespace Form
                     
                     private string  _type;
                     /// <summary>
-                    ///¶þ¼¶±êÇ©
+                    ///äºŒçº§æ ‡ç­¾
                     ///</summary>
                     public string  type{
                                 get{return _type;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeType(this,_type,value); 
                     }
@@ -170,6 +170,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -228,9 +229,16 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
     
@@ -349,6 +357,7 @@ namespace Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -373,7 +382,9 @@ ProgramDataForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -408,7 +419,9 @@ ProgramDataForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

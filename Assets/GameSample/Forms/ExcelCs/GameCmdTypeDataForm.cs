@@ -102,6 +102,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -160,6 +161,8 @@ namespace Form
                 {10010,new Data(10010,"skill")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"img",_DataByUid[10001]},
@@ -182,7 +185,12 @@ namespace Form
     
                         {"skill",_DataByUid[10010]},
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();
@@ -269,6 +277,7 @@ namespace Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -285,7 +294,9 @@ CmdTypeDataForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -312,7 +323,9 @@ CmdTypeDataForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

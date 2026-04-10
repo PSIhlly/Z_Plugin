@@ -84,13 +84,13 @@ namespace Form
 
                     private float  _animTimeInterval;
                     /// <summary>
-                    ///播放间隔时间
+                    ///鎾斁闂撮殧鏃堕棿
                     ///</summary>
                     public float  animTimeInterval{
                                 get{return _animTimeInterval;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAnimtimeinterval(this,_animTimeInterval,value); 
                     }
@@ -102,13 +102,13 @@ namespace Form
                     
                     private List<string>  _texsName;
                     /// <summary>
-                    ///贴图名称
+                    ///璐村浘鍚嶇О
                     ///</summary>
                     public List<string>  texsName{
                                 get{return _texsName;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTexsname(this,_texsName,value); 
                     }
@@ -120,13 +120,13 @@ namespace Form
                     
                     private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    ///事件
+                    ///浜嬩欢
                     ///</summary>
                     public Dictionary<string,EventTriggerForm.Data>  events{
                                 get{return _events;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEvents(this,_events,value); 
                     }
@@ -180,6 +180,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -234,6 +235,8 @@ namespace Form
                 {200003,new Data(200003,"road","z_map_b$road$0",0f,new List<string>(){"z_map_b$road$0",},"",new Dictionary<string,EventTriggerForm.Data>(){})},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"floor",_DataById[200001]},
@@ -242,7 +245,12 @@ namespace Form
     
                         {"road",_DataById[200003]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -361,6 +369,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -381,7 +390,9 @@ MapBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -412,7 +423,9 @@ MapBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

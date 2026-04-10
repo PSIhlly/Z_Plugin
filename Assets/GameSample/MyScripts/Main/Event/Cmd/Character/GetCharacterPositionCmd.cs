@@ -35,6 +35,9 @@ namespace Z_Code
                 box.dic["height"] = CodeHelper.CreateBoxByNum(vec.y);
                 box.dic["y"] = CodeHelper.CreateBoxByNum(vec.z);
                 asyncTask.res = new BoxDataForm.Data[] { box };
+            }else
+            {
+                Debug.LogError($"GetCharacterPositionCmd error: GetCharacterUnit can't find character with id {prm[0].str}");
             }
             return true;
         }

@@ -141,7 +141,9 @@ namespace {self.file_namespace}
             foreach(var key in keys)
             {{
                 if(key < {self.id_str}Chain.cnt)
-                    RemoveData(key);
+                    {{
+                        RemoveData(key);
+                    }}
             }}
         }}
 

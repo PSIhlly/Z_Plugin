@@ -94,7 +94,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -106,13 +106,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _texName;
                     /// <summary>
-                    ///Í¼Æ¬Ãû³Æ
+                    ///å›¾ç‰‡åç§°
                     ///</summary>
                     public string  texName{
                                 get{return _texName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTexname(this,_texName,value); 
                     }
@@ -124,13 +124,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Vector2  _size;
                     /// <summary>
-                    ///³ß´ç
+                    ///å°ºå¯¸
                     ///</summary>
                     public Vector2  size{
                                 get{return _size;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSize(this,_size,value); 
                     }
@@ -142,13 +142,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Vector2  _oldPos;
                     /// <summary>
-                    ///Ô­Î»ÖÃ
+                    ///åŸä½ç½®
                     ///</summary>
                     public Vector2  oldPos{
                                 get{return _oldPos;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeOldpos(this,_oldPos,value); 
                     }
@@ -160,13 +160,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _posProgress;
                     /// <summary>
-                    ///Î»ÖÃ½ø¶È
+                    ///ä½ç½®è¿›åº¦
                     ///</summary>
                     public float  posProgress{
                                 get{return _posProgress;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePosprogress(this,_posProgress,value); 
                     }
@@ -178,13 +178,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _posTime;
                     /// <summary>
-                    ///Î»ÖÃ×ÜºÄÊ±
+                    ///ä½ç½®æ€»è€—æ—¶
                     ///</summary>
                     public float  posTime{
                                 get{return _posTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePostime(this,_posTime,value); 
                     }
@@ -196,13 +196,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Vector2  _tarPos;
                     /// <summary>
-                    ///Ä¿±êÎ»ÖÃ
+                    ///ç›®æ ‡ä½ç½®
                     ///</summary>
                     public Vector2  tarPos{
                                 get{return _tarPos;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTarpos(this,_tarPos,value); 
                     }
@@ -214,13 +214,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _oldOpacity;
                     /// <summary>
-                    ///Ô­²»Í¸Ã÷¶È
+                    ///åŸä¸é€æ˜åº¦
                     ///</summary>
                     public float  oldOpacity{
                                 get{return _oldOpacity;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeOldopacity(this,_oldOpacity,value); 
                     }
@@ -232,13 +232,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _opacityProgress;
                     /// <summary>
-                    ///²»Í¸Ã÷¶È½ø¶È
+                    ///ä¸é€æ˜åº¦è¿›åº¦
                     ///</summary>
                     public float  opacityProgress{
                                 get{return _opacityProgress;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeOpacityprogress(this,_opacityProgress,value); 
                     }
@@ -250,13 +250,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _opacityTime;
                     /// <summary>
-                    ///²»Í¸Ã÷¶È×ÜºÄÊ±
+                    ///ä¸é€æ˜åº¦æ€»è€—æ—¶
                     ///</summary>
                     public float  opacityTime{
                                 get{return _opacityTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeOpacitytime(this,_opacityTime,value); 
                     }
@@ -268,13 +268,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _tarOpacity;
                     /// <summary>
-                    ///Ä¿±ê²»Í¸Ã÷¶È
+                    ///ç›®æ ‡ä¸é€æ˜åº¦
                     ///</summary>
                     public float  tarOpacity{
                                 get{return _tarOpacity;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTaropacity(this,_tarOpacity,value); 
                     }
@@ -286,13 +286,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _oldEuler;
                     /// <summary>
-                    ///Ô­Ğı×ª
+                    ///åŸæ—‹è½¬
                     ///</summary>
                     public float  oldEuler{
                                 get{return _oldEuler;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeOldeuler(this,_oldEuler,value); 
                     }
@@ -304,13 +304,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _eulerProgress;
                     /// <summary>
-                    ///Ğı×ª½ø¶È
+                    ///æ—‹è½¬è¿›åº¦
                     ///</summary>
                     public float  eulerProgress{
                                 get{return _eulerProgress;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEulerprogress(this,_eulerProgress,value); 
                     }
@@ -322,13 +322,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _eulerTime;
                     /// <summary>
-                    ///Ğı×ª×ÜºÄÊ±
+                    ///æ—‹è½¬æ€»è€—æ—¶
                     ///</summary>
                     public float  eulerTime{
                                 get{return _eulerTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEulertime(this,_eulerTime,value); 
                     }
@@ -340,13 +340,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _tarEuler;
                     /// <summary>
-                    ///Ä¿±êĞı×ª
+                    ///ç›®æ ‡æ—‹è½¬
                     ///</summary>
                     public float  tarEuler{
                                 get{return _tarEuler;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTareuler(this,_tarEuler,value); 
                     }
@@ -358,13 +358,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _removeTime;
                     /// <summary>
-                    ///ÒÆ³ıÊ±¼ä
+                    ///ç§»é™¤æ—¶é—´
                     ///</summary>
                     public float  removeTime{
                                 get{return _removeTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeRemovetime(this,_removeTime,value); 
                     }
@@ -432,6 +432,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -458,6 +459,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -593,6 +596,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -607,7 +611,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -632,7 +638,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

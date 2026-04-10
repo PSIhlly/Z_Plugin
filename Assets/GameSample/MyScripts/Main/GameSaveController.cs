@@ -1,9 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Form;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RenderHeads.Media.AVProVideo;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.WSA;
 using Z_DataSystem;
@@ -33,6 +34,9 @@ public class GameSaveController : Z_Controller<GameManager>
     public string imageUiItemFormFileName => "iuif";
 
     public string progressFormFileName => "pf";
+    public string imageAssetFormFileName => "iaff";
+    public string audioAssetFormFileName => "aaff";
+    public string videoAssetFormFileName => "vaff";
 
     public string assetFolder => "ast/";
     public GameSaveController(GameManager super) : base(super)
@@ -78,15 +82,15 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         string path = Main2StoryManager.GetStorySaveFolder(id);
 
-        SaveMaterial(path, true);
-        SaveObject(path, true);
-        SaveCharacter(path, true);
-        SaveSkill(path, true);
-        SaveItem(path, true);
-        SaveEffect(path, true);
-        SaveEvent(path, null, true);
-        SaveConfig(path, true);
-        SaveScene(path, true);
+        SaveMaterial(path);
+        SaveObject(path);
+        SaveCharacter(path);
+        SaveSkill(path);
+        SaveItem(path);
+        SaveEffect(path);
+        SaveEvent(path, null);
+        SaveConfig(path);
+        SaveScene(path);
 
         SaveUiItem(path);
         SaveProgress(path);
@@ -111,6 +115,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveConfig(path);
         SaveScene(path);
         SaveAndLoad.Delete(Main2StoryManager.GetStorySaveFolder(id));
+        SaveAssets(path);
     }
     public void SaveOverview(int id)
     {
@@ -124,166 +129,56 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
-    public void SaveMaterial(string storyCoreFolder, bool noImage = false)
+    public void SaveMaterial(string storyCoreFolder)
     {
 
         SaveAndLoad.Save(storyCoreFolder + "/" + mapTextureFormFileName, MapTextureForm.GetJaByDatas().ToString());
 
         SaveAndLoad.Save(storyCoreFolder + "/" + mapMaskFormFileName, MapMaskForm.GetJaByDatas().ToString());
-        if (!noImage)
-        {
-            foreach (var data in MapTextureForm.DataById.Values)
-            {
-                for (int i = 0; i < data.texsName.Count; i++)
-                {
-                    var nm = data.texsName[i];
-                    SaveStoryTex(nm, storyCoreFolder);
-                }
-            }
 
-            foreach (var data in MapMaskForm.DataById.Values)
-            {
-                for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic6)).Length; i++)
-                {
-                    var nm = data.texsName[i];
-                    SaveStoryTex(nm, storyCoreFolder);
-                }
-            }
-        }
 
     }
-    public void SaveObject(string storyCoreFolder, bool noImage = false)
+    public void SaveObject(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectParamFormFileName, MapObjectParamForm.GetJaByDatas().ToString());
 
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectFormFileName, MapObjectForm.GetJaByDatas().ToString());
-        if (!noImage)
-            foreach (var data in MapObjectForm.DataById.Values)
-            {
-                for (int i = 0; i < data.model.subUnitTexsName.Count; i++)
-                {
-                    var nm = data.model.subUnitTexsName[i];
-                    SaveStoryTex(nm, storyCoreFolder);
-                }
-            }
+
     }
 
-    public void SaveCharacter(string storyCoreFolder, bool noImage = false)
+    public void SaveCharacter(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + characterParamFormFileName, CharacterParamForm.GetJaByDatas().ToString());
 
         SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas().ToString());
-        if (!noImage)
-            foreach (var data in CharacterProductForm.DataByUid.Values)
-            {
-                var icon = data.avatarTexName;
-                SaveStoryTex(icon, storyCoreFolder);
-                SaveStoryTex(data.tachie, storyCoreFolder);
-                foreach (var anim in data.animDic.Values)
-                {
 
-                    foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
-                    {
-                        foreach (AnimDirecton dir in Enum.GetValues(typeof(AnimDirecton)))
-                        {
-                            for (int i = 0; i < anim.animClip[dir].Count; i++)
-                            {
-                                if (anim.animClip[dir][i].partTex.ContainsKey(part))
-                                {
-                                    var nm = anim.animClip[dir][i].partTex[part];
-                                    SaveStoryTex(nm, storyCoreFolder);
-                                }
-                            }
-                        }
-                    }
-
-                }
-            }
     }
-    public void SaveSkill(string storyCoreFolder, bool noImage = false)
+    public void SaveSkill(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + skillParamFormFileName, SkillParamForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + skillProductFormFileName, SkillProductForm.GetJaByDatas().ToString());
-        if (!noImage)
-            foreach (var data in SkillProductForm.DataByUid.Values)
-            {
-                SaveStoryTex(data.icon, storyCoreFolder);
-            }
-
 
     }
-    public void SaveItem(string storyCoreFolder, bool noImage = false)
+    public void SaveItem(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + itemParamFormFileName, ItemParamForm.GetJaByDatas().ToString());
-
         SaveAndLoad.Save(storyCoreFolder + "/" + itemProductFormFileName, ItemProductForm.GetJaByDatas().ToString());
-        if (!noImage)
-            foreach (var data in ItemProductForm.DataByUid.Values)
-            {
-                var icon = data.iconTexName;
-
-                SaveStoryTex(icon, storyCoreFolder);
-                foreach (var nm in data.model.subUnitTexsName)
-                {
-                    SaveStoryTex(nm, storyCoreFolder);
-                }
-            }
     }
-    public void SaveEffect(string storyCoreFolder, bool noImage = false)
+    public void SaveEffect(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + effectFormFileName, EffectForm.GetJaByDatas().ToString());
-        if (!noImage)
-            foreach (var data in EffectForm.DataByUid.Values)
-            {
-                foreach (var clip in data.clips)
-                {
-                    SaveStoryTex(clip[0].tex, storyCoreFolder);
-                }
-            }
+
     }
 
-    public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null, bool noImage = false)
+    public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
 
-        SaveStoryTex("$i$$i$", storyCoreFolder);
-        if (!noImage)
-        {
-            Action<EventProgramDataForm.Data> act = (data) =>
-            {
-                var imgs = data.code.Split(AssetDefines.IMAGE_MARK);//获取常量图片
-                for (int i = 1; i < imgs.Length; i += 2)
-                {
-                    SaveStoryTex(AssetManager.instance.texCtrl.GetName(imgs[i]), storyCoreFolder);
-                }
-                var videos = data.code.Split(AssetDefines.VIDEO_MARK);//获取常量图片
-                for (int i = 1; i < videos.Length; i += 2)
-                {
-                    SaveStoryVideo(AssetManager.instance.videoCtrl.GetName(videos[i]), storyCoreFolder);
-                }
-                var audios = data.code.Split(AssetDefines.AUDIO_MARK);//获取常量图片
-                for (int i = 1; i < audios.Length; i += 2)
-                {
-                    SaveStoryAudio(AssetManager.instance.audioCtrl.GetName(audios[i]), storyCoreFolder);
-                }
-            };
-            if (data != null)
-            {
-                act.Invoke(data);
-            }
-            else
-            {
-                foreach (var curData in EventProgramDataForm.DataByUid.Values)
-                {
-                    act.Invoke(curData);
-                }
-            }
-        }
 
 
     }
 
-    public void SaveConfig(string storyFolder, bool noImage = false)
+    public void SaveConfig(string storyFolder)
     {
         SaveAndLoad.Save(storyFolder + "/" + progressFormFileName, ProgressForm.GetJaByDatas().ToString());
     }
@@ -296,15 +191,37 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(storySaveFolder + "/" + imageUiItemFormFileName, ImageUiItemForm.GetJaByDatas().ToString());
     }
-    public void SaveScene(string storyCoreFolder, bool noImage = false)
+    public void SaveScene(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + sceneFormFileName, SceneForm.GetJaByDatas().ToString());
-        if (!noImage)
-            foreach (var data in SceneForm.DataByUid.Values)
+
+    }
+    public void SaveAssets(string storyCoreFolder)
+    {
+        SaveStoryTex("$i$$i$", storyCoreFolder);
+        SaveAndLoad.Save(storyCoreFolder + "/" + imageAssetFormFileName, StoryTexAssetForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + audioAssetFormFileName, StoryAudioAssetForm.GetJaByDatas().ToString());
+        SaveAndLoad.Save(storyCoreFolder + "/" + videoAssetFormFileName, StoryVideoAssetForm.GetJaByDatas().ToString());
+
+        foreach (var data in StoryTexAssetForm.DataById.Values)
+        {
+            SaveStoryTex(data.name, storyCoreFolder);
+        }
+        foreach (var data in StoryAudioAssetForm.DataById.Values)
+        {
+            SaveStoryAudio(data.name, storyCoreFolder);
+        }
+        foreach (var data in StoryVideoAssetForm.DataById.Values)
+        {
+            SaveStoryVideo(data.name, storyCoreFolder);
+        }
+        SaveAndLoad.EachFile(storyCoreFolder + assetFolder, (name) =>
+        {
+            if (!StoryTexAssetForm.DataByName.ContainsKey(name) && !StoryAudioAssetForm.DataByName.ContainsKey(name) && !StoryVideoAssetForm.DataByName.ContainsKey(name))
             {
-                var icon = data.miniMap;
-                SaveStoryTex(icon, storyCoreFolder);
+                SaveAndLoad.Delete(storyCoreFolder + assetFolder + name);
             }
+        });
     }
     #region util
     private void SaveTex(string texName, string path)
@@ -369,35 +286,37 @@ public class GameSaveController : Z_Controller<GameManager>
         ResetStory();
         var folder = Main2StoryManager.GetStoryCoreFolder(id);
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
-        LoadScene(folder, assetFolder);
-        LoadMaterial(folder, assetFolder);
-        LoadObject(folder, assetFolder);
-        LoadCharacter(folder, assetFolder);
-        LoadSkill(folder, assetFolder);
+        LoadScene(folder);
+        LoadMaterial(folder);
+        LoadObject(folder);
+        LoadCharacter(folder);
+        LoadSkill(folder);
 
-        LoadItem(folder, assetFolder);
-        LoadEffect(folder, assetFolder);
+        LoadItem(folder);
+        LoadEffect(folder);
 
-        LoadEvent(folder, assetFolder);
-        LoadProgress(folder, assetFolder);
+        LoadEvent(folder);
+        LoadProgress(folder);
 
         DeleteCache(id);
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
+        LoadAsset(assetFolder);
     }
     public void ResetStory()
     {
-        LoadScene(null, null);
-        LoadMaterial(null, null);
-        LoadObject(null, null);
-        LoadCharacter(null, null);
-        LoadSkill(null, null);
+        LoadScene(null);
+        LoadMaterial(null);
+        LoadObject(null);
+        LoadCharacter(null);
+        LoadSkill(null);
 
-        LoadItem(null, null);
-        LoadEffect(null, null);
+        LoadItem(null);
+        LoadEffect(null);
 
-        LoadEvent(null, null);
-        LoadProgress(null, null);
+        LoadEvent(null);
+        LoadProgress(null);
         LoadUiItem(null);
+        LoadAsset(null);
     }
     public void LoadSaveStory(int id)
     {
@@ -405,17 +324,17 @@ public class GameSaveController : Z_Controller<GameManager>
         var folder = Main2StoryManager.GetStorySaveFolder(id);
 
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
-        LoadScene(folder, assetFolder);
-        LoadMaterial(folder, assetFolder);
-        LoadObject(folder, assetFolder);
-        LoadCharacter(folder, assetFolder);
-        LoadSkill(folder, assetFolder);
+        LoadScene(folder);
+        LoadMaterial(folder);
+        LoadObject(folder);
+        LoadCharacter(folder);
+        LoadSkill(folder);
 
-        LoadItem(folder, assetFolder);
-        LoadEffect(folder, assetFolder);
+        LoadItem(folder);
+        LoadEffect(folder);
 
-        LoadEvent(folder, assetFolder);
-        LoadProgress(folder, assetFolder);
+        LoadEvent(folder);
+        LoadProgress(folder);
         //manage Scene
         DeleteCache(id);
         if (LackMapScene(folder))
@@ -425,6 +344,7 @@ public class GameSaveController : Z_Controller<GameManager>
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
         //
         LoadUiItem(folder);
+        LoadAsset(assetFolder);
 
     }
 
@@ -445,9 +365,9 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
-    public void LoadMaterial(string folder, string assetFolder)
+    public void LoadMaterial(string folder)
     {
-        var pathForm = folder + "/" + mapTextureFormFileName;
+        var pathForm = folder + mapTextureFormFileName;
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -456,17 +376,9 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
 
-        foreach (var data in MapTextureForm.DataById.Values)
-        {
-            for (int i = 0; i < data.texsName.Count; i++)
-            {
-                var nm = data.texsName[i];
-                LoadStoryTex(nm, assetFolder);
 
-            }
-        }
 
-        pathForm = folder + "/" + mapMaskFormFileName;
+        pathForm = folder + mapMaskFormFileName;
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in MapMaskForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
@@ -474,18 +386,11 @@ public class GameSaveController : Z_Controller<GameManager>
                 MapMaskForm.AddData(form);
             }
         }
-        foreach (var data in MapMaskForm.DataById.Values)
-        {
-            for (int i = 0; i < Enum.GetValues(typeof(AlphaTexBasic6)).Length; i++)
-            {
-                var nm = data.texsName[i];
-                LoadStoryTex(nm, assetFolder);
-            }
-        }
+
     }
-    public void LoadObject(string folder, string assetFolder)
+    public void LoadObject(string folder)
     {
-        var pathForm = folder + "/" + mapObjectFormFileName;
+        var pathForm = folder + mapObjectFormFileName;
         MapObjectForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -495,20 +400,12 @@ public class GameSaveController : Z_Controller<GameManager>
                 MapObjectForm.AddData(form);
             }
         }
-        foreach (var data in MapObjectForm.DataById.Values)
-        {
-            for (int i = 0; i < data.model.subUnitTexsName.Count; i++)
-            {
-                var nm = data.model.subUnitTexsName[i];
-                LoadStoryTex(nm, assetFolder);
 
-            }
-        }
     }
 
-    public void LoadCharacter(string folder, string assetFolder)
+    public void LoadCharacter(string folder)
     {
-        var pathForm = folder + "/" + characterParamFormFileName;
+        var pathForm = folder + characterParamFormFileName;
         CharacterParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -518,7 +415,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
 
-        pathForm = folder + "/" + characterProductFormFileName;
+        pathForm = folder + characterProductFormFileName;
         CharacterProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -531,8 +428,6 @@ public class GameSaveController : Z_Controller<GameManager>
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
             var icon = data.avatarTexName;
-            LoadStoryTex(icon, assetFolder);
-            LoadStoryTex(data.tachie, assetFolder);
 
             foreach (var anim in data.animDic.Values)
             {
@@ -544,23 +439,16 @@ public class GameSaveController : Z_Controller<GameManager>
                         {
                             anim.animClip[dir] = new List<CharacterAnimClipForm.Data>();
                         }
-                        for (int i = 0; i < anim.animClip[dir].Count; i++)
-                        {
-                            if (anim.animClip[dir][i].partTex.ContainsKey(part))
-                            {
-                                var nm = anim.animClip[dir][i].partTex[part];
-                                LoadStoryTex(nm, assetFolder);
-                            }
-                        }
+
 
                     }
                 }
             }
         }
     }
-    public void LoadSkill(string folder, string assetFolder)
+    public void LoadSkill(string folder)
     {
-        var pathForm = folder + "/" + skillParamFormFileName;
+        var pathForm = folder + skillParamFormFileName;
         SkillParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -570,7 +458,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
 
-        pathForm = folder + "/" + skillProductFormFileName;
+        pathForm = folder + skillProductFormFileName;
         SkillProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -580,15 +468,11 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
 
-        foreach (var data in SkillProductForm.DataByUid.Values)
-        {
-            var icon = data.icon;
-            LoadStoryTex(icon, assetFolder);
-        }
+
     }
-    public void LoadItem(string folder, string assetFolder)
+    public void LoadItem(string folder)
     {
-        var pathForm = folder + "/" + itemParamFormFileName;
+        var pathForm = folder + itemParamFormFileName;
         ItemParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -598,7 +482,7 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
 
-        pathForm = folder + "/" + itemProductFormFileName;
+        pathForm = folder + itemProductFormFileName;
         ItemProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -608,21 +492,12 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
 
-        foreach (var data in ItemProductForm.DataByUid.Values)
-        {
-            var icon = data.iconTexName;
-            LoadStoryTex(icon, assetFolder);
 
-            foreach (var nm in data.model.subUnitTexsName)
-            {
-                LoadStoryTex(nm, assetFolder);
-            }
-        }
     }
 
-    public void LoadEffect(string folder, string assetFolder)
+    public void LoadEffect(string folder)
     {
-        var pathForm = folder + "/" + effectFormFileName;
+        var pathForm = folder + effectFormFileName;
         EffectForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -631,42 +506,51 @@ public class GameSaveController : Z_Controller<GameManager>
                 EffectForm.AddData(form);
             }
         }
+    }
 
-        foreach (var data in EffectForm.DataByUid.Values)
+    public void LoadAsset(string folder)
+    {
+        var path = "";
+        path = folder + imageAssetFormFileName;
+        StoryTexAssetForm.ClearAuto();
+        if (SaveAndLoad.Exist(path))
         {
-            foreach (var clip in data.clips)
+            foreach (var form in StoryTexAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
             {
-                LoadStoryTex(clip[0].tex, assetFolder);
+                StoryTexAssetForm.AddData(form);
+                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+            }
+        }
+        path = folder + audioAssetFormFileName;
+        if (SaveAndLoad.Exist(path))
+        {
+            foreach (var form in StoryAudioAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+            {
+                StoryAudioAssetForm.AddData(form);
+                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+            }
+        }
+        path = folder + videoAssetFormFileName;
+        if (SaveAndLoad.Exist(path))
+        {
+            foreach (var form in StoryVideoAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+            {
+                StoryVideoAssetForm.AddData(form);
+                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
             }
         }
     }
 
-    public void LoadEvent(string folder, string assetFolder)
+    public void LoadEvent(string folder)
     {
-        var pathForm = folder + "/" + eventFormFileName;
+        var pathForm = folder + eventFormFileName;
 
-        LoadStoryTex("$i$$i$", assetFolder);
         EventProgramDataForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
             foreach (var form in EventProgramDataForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
                 EventProgramDataForm.AddData(form);
-                var imgs = form.code.Split(AssetDefines.IMAGE_MARK);//获取常量图片
-                for (int i = 1; i < imgs.Length; i += 2)
-                {
-                    LoadStoryTex(AssetManager.instance.texCtrl.GetName(imgs[i]), assetFolder);
-                }
-                var audios = form.code.Split(AssetDefines.AUDIO_MARK);//获取常量图片
-                for (int i = 1; i < audios.Length; i += 2)
-                {
-                    LoadStoryAudio(AssetManager.instance.audioCtrl.GetName(audios[i]), assetFolder);
-                }
-                var videos = form.code.Split(AssetDefines.VIDEO_MARK);//获取常量图片
-                for (int i = 1; i < videos.Length; i += 2)
-                {
-                    LoadStoryVideo(AssetManager.instance.videoCtrl.GetName(videos[i]), assetFolder);
-                }
             }
         }
 
@@ -678,9 +562,9 @@ public class GameSaveController : Z_Controller<GameManager>
         mapData.Init(SaveAndLoad.Load<string>(scenePath));
         return mapData;
     }
-    public void LoadProgress(string folder, string assetFolder)
+    public void LoadProgress(string folder)
     {
-        var pathForm = folder + "/" + progressFormFileName;
+        var pathForm = folder + progressFormFileName;
 
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -694,7 +578,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void LoadUiItem(string folder)
     {
-        var pathForm = folder + "/" + imageUiItemFormFileName;
+        var pathForm = folder + imageUiItemFormFileName;
         ImageUiItemForm.Clear();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -705,9 +589,9 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
-    public void LoadScene(string folder, string assetFolder)
+    public void LoadScene(string folder)
     {
-        var pathForm = folder + "/" + sceneFormFileName;
+        var pathForm = folder + sceneFormFileName;
         SceneForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
@@ -716,12 +600,6 @@ public class GameSaveController : Z_Controller<GameManager>
                 SceneForm.AddData(form);
             }
         }
-
-        foreach (var data in SceneForm.DataByUid.Values)
-        {
-            var nm = data.miniMap;
-            LoadStoryTex(nm, assetFolder);
-        }
     }
 
     public void LoadLocalModStory()
@@ -729,22 +607,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     }
     #region util
-    public void LoadStoryTex(string texName, string path)
-    {
-        if (!string.IsNullOrEmpty(texName) && SaveAndLoad.Exist(path) && !StoryTexAssetForm.DataByName.ContainsKey(texName) && !GlobalNameHelper.IsInnerAssetName(texName))
-        {
-            path = path + assetFolder + texName;
-            if (SaveAndLoad.Exist(path))
-            {
-                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByPath(path, texName));
-            }
-            else if (!GameTexAssetForm.DataByName.ContainsKey(texName))
-            {
-                Debug.LogError(texName + "贴图丢失！");
-                AddStoryTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, texName));
-            }
-        }
-    }
+
 
     public void AddStoryTex(TexAssetForm.Data rawData)
     {
@@ -800,14 +663,6 @@ public class GameSaveController : Z_Controller<GameManager>
         });
     }
 
-    public void LoadStoryAudio(string audioName, string path)
-    {
-        path = path + assetFolder + audioName;
-        if (!string.IsNullOrEmpty(audioName) && SaveAndLoad.Exist(path) && !StoryAudioAssetForm.DataByName.ContainsKey(audioName) && !GlobalNameHelper.IsInnerAssetName(audioName))
-        {
-            AddStoryAudio(AssetManager.instance.audioCtrl.CreateDataByPath(path, audioName));
-        }
-    }
     public void AddStoryAudio(AudioAssetForm.Data rawData)
     {
         StoryAudioAssetForm.Data data = new StoryAudioAssetForm.Data(rawData);
@@ -823,14 +678,7 @@ public class GameSaveController : Z_Controller<GameManager>
             importAssetName = data.name
         });
     }
-    public void LoadStoryVideo(string videoName, string path)
-    {
-        path = path + assetFolder + videoName;
-        if (!string.IsNullOrEmpty(videoName) && SaveAndLoad.Exist(path) && !StoryVideoAssetForm.DataByName.ContainsKey(videoName) && !GlobalNameHelper.IsInnerAssetName(videoName))
-        {
-            AddStoryVideo(AssetManager.instance.videoCtrl.CreateDataByPath(path, videoName));
-        }
-    }
+
     public void AddStoryVideo(VideoAssetForm.Data rawData)
     {
         StoryVideoAssetForm.Data data = new StoryVideoAssetForm.Data(rawData);

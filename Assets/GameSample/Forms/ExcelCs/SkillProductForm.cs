@@ -94,13 +94,13 @@ namespace Form
 
                     private string  _icon;
                     /// <summary>
-                    ///Õº±Í
+                    ///ÂõæÊ†á
                     ///</summary>
                     public string  icon{
                                 get{return _icon;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeIcon(this,_icon,value); 
                     }
@@ -112,13 +112,13 @@ namespace Form
                     
                     private Dictionary<string,SkillParamForm.Data>  _paramDic;
                     /// <summary>
-                    /// ˝æ›
+                    ///Êï∞ÊçÆ
                     ///</summary>
                     public Dictionary<string,SkillParamForm.Data>  paramDic{
                                 get{return _paramDic;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeParamdic(this,_paramDic,value); 
                     }
@@ -130,13 +130,13 @@ namespace Form
                     
                     private List<SkillType>  _skillTypes;
                     /// <summary>
-                    ///ø…◊∞±∏¿‡–Õ
+                    ///ÂèØË£ÖÂ§áÁ±ªÂûã
                     ///</summary>
                     public List<SkillType>  skillTypes{
                                 get{return _skillTypes;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSkilltypes(this,_skillTypes,value); 
                     }
@@ -148,13 +148,13 @@ namespace Form
                     
                     private int  _characterUid;
                     /// <summary>
-                    ///À˘ ÙΩ«…´Uid
+                    ///ÊâÄÂ±ûËßíËâ≤Uid
                     ///</summary>
                     public int  characterUid{
                                 get{return _characterUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCharacteruid(this,_characterUid,value); 
                     }
@@ -166,13 +166,13 @@ namespace Form
                     
                     private float  _cd;
                     /// <summary>
-                    ///¿‰»¥(s)
+                    ///ÂÜ∑Âç¥(s)
                     ///</summary>
                     public float  cd{
                                 get{return _cd;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCd(this,_cd,value); 
                     }
@@ -184,13 +184,13 @@ namespace Form
                     
                     private float  _lastUseTime;
                     /// <summary>
-                    ///…œ¥Œ π”√ ±º‰¥¡(s)
+                    ///‰∏äÊ¨°‰ΩøÁî®Êó∂Èó¥Êà≥(s)
                     ///</summary>
                     public float  lastUseTime{
                                 get{return _lastUseTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeLastusetime(this,_lastUseTime,value); 
                     }
@@ -202,13 +202,13 @@ namespace Form
                     
                     private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    /// ¬º˛
+                    ///‰∫ã‰ª∂
                     ///</summary>
                     public Dictionary<string,EventTriggerForm.Data>  events{
                                 get{return _events;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEvents(this,_events,value); 
                     }
@@ -220,13 +220,13 @@ namespace Form
                     
                     private int  _triggerConditionUid;
                     /// <summary>
-                    ///Ãıº˛uid
+                    ///Êù°‰ª∂uid
                     ///</summary>
                     public int  triggerConditionUid{
                                 get{return _triggerConditionUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTriggerconditionuid(this,_triggerConditionUid,value); 
                     }
@@ -290,6 +290,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -358,9 +359,16 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByNameProtouid = new Dictionary<(string,int), Data>() {
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabelProtouid = new Dictionary<(string,int), List<Data>>() {
     
@@ -499,6 +507,7 @@ namespace Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByNameProtouid[(data.name,data.protoUid)]=data;
     
@@ -527,7 +536,9 @@ ProductForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByNameProtouid.Remove((data.name,data.protoUid));
     
@@ -566,7 +577,9 @@ ProductForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

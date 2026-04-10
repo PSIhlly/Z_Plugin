@@ -114,6 +114,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -151,115 +152,117 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"yes","Yes","ÊÇ")},
+                {1,new Data(1,"yes","Yes","æ˜¯")},
 
-                {2,new Data(2,"no","No","·ñ")},
+                {2,new Data(2,"no","No","å¦")},
 
-                {3,new Data(3,"new","New","ĞÂ")},
+                {3,new Data(3,"new","New","æ–°")},
 
-                {4,new Data(4,"play_1","Play","²¥·Å")},
+                {4,new Data(4,"play_1","Play","æ’­æ”¾")},
 
-                {5,new Data(5,"stop","Stop","Í£Ö¹")},
+                {5,new Data(5,"stop","Stop","åœæ­¢")},
 
-                {6,new Data(6,"custom","Costom","×Ô¶¨Òå")},
+                {6,new Data(6,"custom","Costom","è‡ªå®šä¹‰")},
 
-                {7,new Data(7,"gain","Gain","»ñµÃ")},
+                {7,new Data(7,"gain","Gain","è·å¾—")},
 
-                {8,new Data(8,"lost","Lost","Ê§È¥")},
+                {8,new Data(8,"lost","Lost","å¤±å»")},
 
-                {10001,new Data(10001,"savePopupTitle","Do you need Save?","ĞèÒª±£´æÂğ?")},
+                {10001,new Data(10001,"savePopupTitle","Do you need Save?","éœ€è¦ä¿å­˜å—?")},
 
-                {20001,new Data(20001,"play_2","Start","¿ªÊ¼ÓÎÏ·")},
+                {20001,new Data(20001,"play_2","Start","å¼€å§‹æ¸¸æˆ")},
 
-                {20002,new Data(20002,"workshop","Workshop","´´Òâ¹¤·»")},
+                {20002,new Data(20002,"workshop","Workshop","åˆ›æ„å·¥åŠ")},
 
-                {20003,new Data(20003,"lounge","Lounge","ĞİÏ¢ÊÒ")},
+                {20003,new Data(20003,"lounge","Lounge","ä¼‘æ¯å®¤")},
 
-                {20004,new Data(20004,"setting","Settings","ÉèÖÃ")},
+                {20004,new Data(20004,"setting","Settings","è®¾ç½®")},
 
-                {20005,new Data(20005,"exit","Exit","ÍË³ö")},
+                {20005,new Data(20005,"exit","Exit","é€€å‡º")},
 
-                {20006,new Data(20006,"news","News","×ÊÑ¶")},
+                {20006,new Data(20006,"news","News","èµ„è®¯")},
 
-                {20007,new Data(20007,"back","Back","·µ»Ø")},
+                {20007,new Data(20007,"back","Back","è¿”å›")},
 
-                {20008,new Data(20008,"backpack","Backpack","±³°ü")},
+                {20008,new Data(20008,"backpack","Backpack","èƒŒåŒ…")},
 
-                {20009,new Data(20009,"use","Use","Ê¹ÓÃ")},
+                {20009,new Data(20009,"use","Use","ä½¿ç”¨")},
 
-                {20010,new Data(20010,"drop","Drop","¶ªÆú")},
+                {20010,new Data(20010,"drop","Drop","ä¸¢å¼ƒ")},
 
-                {20011,new Data(20011,"equip","Equip","×°±¸")},
+                {20011,new Data(20011,"equip","Equip","è£…å¤‡")},
 
-                {20012,new Data(20012,"character","Character","½ÇÉ«")},
+                {20012,new Data(20012,"character","Character","è§’è‰²")},
 
-                {20013,new Data(20013,"basicInformation","Basic Information","»ù´¡ĞÅÏ¢")},
+                {20013,new Data(20013,"basicInformation","Basic Information","åŸºç¡€ä¿¡æ¯")},
 
-                {20014,new Data(20014,"all","All","È«²¿")},
+                {20014,new Data(20014,"all","All","å…¨éƒ¨")},
 
-                {20015,new Data(20015,"label","Label","±êÇ©")},
+                {20015,new Data(20015,"label","Label","æ ‡ç­¾")},
 
-                {20016,new Data(20016,"leftHand","Left hand","×óÊÖ")},
+                {20016,new Data(20016,"leftHand","Left hand","å·¦æ‰‹")},
 
-                {20017,new Data(20017,"rightHand","Right hand","ÓÒÊÖ")},
+                {20017,new Data(20017,"rightHand","Right hand","å³æ‰‹")},
 
-                {20018,new Data(20018,"head","Head","Í·")},
+                {20018,new Data(20018,"head","Head","å¤´")},
 
-                {20019,new Data(20019,"body","Body","ÉíÌå")},
+                {20019,new Data(20019,"body","Body","èº«ä½“")},
 
-                {20020,new Data(20020,"reset","Reset","ÖØÖÃ")},
+                {20020,new Data(20020,"reset","Reset","é‡ç½®")},
 
-                {20021,new Data(20021,"apply","Apply","Ó¦ÓÃ")},
+                {20021,new Data(20021,"apply","Apply","åº”ç”¨")},
 
-                {20022,new Data(20022,"delete","Delete","É¾³ı")},
+                {20022,new Data(20022,"delete","Delete","åˆ é™¤")},
 
-                {20023,new Data(20023,"map","Map","µØÍ¼")},
+                {20023,new Data(20023,"map","Map","åœ°å›¾")},
 
-                {20024,new Data(20024,"menu","Menu","²Ëµ¥")},
+                {20024,new Data(20024,"menu","Menu","èœå•")},
 
-                {20025,new Data(20025,"count","Count","ÊıÁ¿")},
+                {20025,new Data(20025,"count","Count","æ•°é‡")},
 
-                {20026,new Data(20026,"save","Save","±£´æ")},
+                {20026,new Data(20026,"save","Save","ä¿å­˜")},
 
-                {20027,new Data(20027,"save success","Save success!","±£´æ³É¹¦")},
+                {20027,new Data(20027,"save success","Save success!","ä¿å­˜æˆåŠŸ")},
 
-                {20028,new Data(20028,"input value","Input value","ÊäÈëÖµ")},
+                {20028,new Data(20028,"input value","Input value","è¾“å…¥å€¼")},
 
-                {20029,new Data(20029,"auto play","Auto play","×Ô¶¯²¥·Å")},
+                {20029,new Data(20029,"auto play","Auto play","è‡ªåŠ¨æ’­æ”¾")},
 
-                {20030,new Data(20030,"skip","Skip","Ìø¹ı")},
+                {20030,new Data(20030,"skip","Skip","è·³è¿‡")},
 
-                {20031,new Data(20031,"hide","Hide","Òş²Ø")},
+                {20031,new Data(20031,"hide","Hide","éšè—")},
 
-                {20032,new Data(20032,"history","History","ÀúÊ·¼ÇÂ¼")},
+                {20032,new Data(20032,"history","History","å†å²è®°å½•")},
 
-                {20033,new Data(20033,"data","Data","Êı¾İ")},
+                {20033,new Data(20033,"data","Data","æ•°æ®")},
 
-                {20034,new Data(20034,"skill","Skill","¼¼ÄÜ")},
+                {20034,new Data(20034,"skill","Skill","æŠ€èƒ½")},
 
-                {20035,new Data(20035,"Please select one from the following","Please select one from the following","Çë´ÓÏÂ·½Ñ¡ÔñÒ»Ïî")},
+                {20035,new Data(20035,"Please select one from the following","Please select one from the following","è¯·ä»ä¸‹æ–¹é€‰æ‹©ä¸€é¡¹")},
 
-                {20036,new Data(20036,"name","Name","Ãû³Æ")},
+                {20036,new Data(20036,"name","Name","åç§°")},
 
-                {20037,new Data(20037,"cd(s)","CD(s)","ÀäÈ´(Ãë)")},
+                {20037,new Data(20037,"cd(s)","CD(s)","å†·å´(ç§’)")},
 
-                {20038,new Data(20038,"LightAttack","Light attack","Çá»÷")},
+                {20038,new Data(20038,"LightAttack","Light attack","è½»å‡»")},
 
-                {20039,new Data(20039,"HeavyAttack","Heavy attack","ÖØ»÷")},
+                {20039,new Data(20039,"HeavyAttack","Heavy attack","é‡å‡»")},
 
-                {20040,new Data(20040,"E","E button","E¼¼ÄÜ")},
+                {20040,new Data(20040,"E","E button","EæŠ€èƒ½")},
 
-                {20041,new Data(20041,"Q","Q button","Q¼¼ÄÜ")},
+                {20041,new Data(20041,"Q","Q button","QæŠ€èƒ½")},
 
-                {20042,new Data(20042,"Passive","Passive","±»¶¯¼¼ÄÜ")},
+                {20042,new Data(20042,"Passive","Passive","è¢«åŠ¨æŠ€èƒ½")},
 
-                {20043,new Data(20043,"unequip","Unequip","Ğ¶ÏÂ")},
+                {20043,new Data(20043,"unequip","Unequip","å¸ä¸‹")},
 
-                {20044,new Data(20044,"Equip character","Equip character","×°±¸½ÇÉ«")},
+                {20044,new Data(20044,"Equip character","Equip character","è£…å¤‡è§’è‰²")},
 
-                {20045,new Data(20045,"Equipment","Equipment","×°±¸")},
+                {20045,new Data(20045,"Equipment","Equipment","è£…å¤‡")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByKey = new Dictionary<string, Data>() {
     
                         {"yes",_DataById[1]},
@@ -370,7 +373,12 @@ namespace Form
     
                         {"Equipment",_DataById[20045]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();
@@ -465,6 +473,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByKey[data.key]=data;
     
@@ -481,7 +490,9 @@ TextBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByKey.Remove(data.key);
     
@@ -508,7 +519,9 @@ TextBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

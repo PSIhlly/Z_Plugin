@@ -74,7 +74,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -86,13 +86,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _name;
                     /// <summary>
-                    ///名称
+                    ///鍚嶇О
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -104,13 +104,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>  _animClip;
                     /// <summary>
-                    ///片段
+                    ///鐗囨
                     ///</summary>
                     public Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>  animClip{
                                 get{return _animClip;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAnimclip(this,_animClip,value); 
                     }
@@ -122,13 +122,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _animTimeInterval;
                     /// <summary>
-                    ///动画间隔
+                    ///鍔ㄧ敾闂撮殧
                     ///</summary>
                     public float  animTimeInterval{
                                 get{return _animTimeInterval;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAnimtimeinterval(this,_animTimeInterval,value); 
                     }
@@ -140,13 +140,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _scale;
                     /// <summary>
-                    ///缩放
+                    ///缂╂斁
                     ///</summary>
                     public float  scale{
                                 get{return _scale;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeScale(this,_scale,value); 
                     }
@@ -158,13 +158,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<BodyPartType,bool>  _partEnable;
                     /// <summary>
-                    ///部位启用
+                    ///閮ㄤ綅鍚敤
                     ///</summary>
                     public Dictionary<BodyPartType,bool>  partEnable{
                                 get{return _partEnable;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePartenable(this,_partEnable,value); 
                     }
@@ -212,6 +212,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -238,6 +239,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -333,6 +336,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -347,7 +351,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -372,7 +378,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

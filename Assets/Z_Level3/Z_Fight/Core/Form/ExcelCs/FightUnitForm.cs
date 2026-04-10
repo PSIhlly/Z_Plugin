@@ -111,7 +111,7 @@ namespace Z_Fight.Form
         {
 
                 /// <summary>
-                ///µ•Œª¬ﬂº≠
+                ///Âçï‰ΩçÈÄªËæë
                 ///</summary>
                 public FightUnit unit
                 {
@@ -123,13 +123,13 @@ namespace Z_Fight.Form
 
                     private Dictionary<int,int>  _itemIdCountDic;
                     /// <summary>
-                    ///µ¿æﬂ≥÷”– ˝◊÷µ‰
+                    ///ÈÅìÂÖ∑ÊåÅÊúâÊï∞Â≠óÂÖ∏
                     ///</summary>
                     public Dictionary<int,int>  itemIdCountDic{
                                 get{return _itemIdCountDic;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeItemidcountdic(this,_itemIdCountDic,value); 
                     }
@@ -141,13 +141,13 @@ namespace Z_Fight.Form
                     
                     private List<int>  _curUsingWeaponsSid;
                     /// <summary>
-                    /// π”√÷–subId
+                    ///‰ΩøÁî®‰∏≠subId
                     ///</summary>
                     public List<int>  curUsingWeaponsSid{
                                 get{return _curUsingWeaponsSid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCurusingweaponssid(this,_curUsingWeaponsSid,value); 
                     }
@@ -159,13 +159,13 @@ namespace Z_Fight.Form
                     
                     private List<int>  _curReloadWeaponsSid;
                     /// <summary>
-                    ///◊∞ÃÓ÷–subId
+                    ///Ë£ÖÂ°´‰∏≠subId
                     ///</summary>
                     public List<int>  curReloadWeaponsSid{
                                 get{return _curReloadWeaponsSid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCurreloadweaponssid(this,_curReloadWeaponsSid,value); 
                     }
@@ -177,13 +177,13 @@ namespace Z_Fight.Form
                     
                     private float  _alertDistance;
                     /// <summary>
-                    ///’Ω∂∑¥•∑¢æ‡¿Î
+                    ///ÊàòÊñóËß¶ÂèëË∑ùÁ¶ª
                     ///</summary>
                     public float  alertDistance{
                                 get{return _alertDistance;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAlertdistance(this,_alertDistance,value); 
                     }
@@ -195,13 +195,13 @@ namespace Z_Fight.Form
                     
                     private float  _hp;
                     /// <summary>
-                    ///—™¡ø
+                    ///Ë°ÄÈáè
                     ///</summary>
                     public float  hp{
                                 get{return _hp;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeHp(this,_hp,value); 
                     }
@@ -213,13 +213,13 @@ namespace Z_Fight.Form
                     
                     private float  _hpMax;
                     /// <summary>
-                    ///—™¡ø…œœﬁ
+                    ///Ë°ÄÈáè‰∏äÈôê
                     ///</summary>
                     public float  hpMax{
                                 get{return _hpMax;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeHpmax(this,_hpMax,value); 
                     }
@@ -231,13 +231,13 @@ namespace Z_Fight.Form
                     
                     private float  _defence;
                     /// <summary>
-                    ///ª§º◊
+                    ///Êä§Áî≤
                     ///</summary>
                     public float  defence{
                                 get{return _defence;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDefence(this,_defence,value); 
                     }
@@ -249,13 +249,13 @@ namespace Z_Fight.Form
                     
                     private int  _targetFightUid;
                     /// <summary>
-                    ///ƒø±Íuid
+                    ///ÁõÆÊ†áuid
                     ///</summary>
                     public int  targetFightUid{
                                 get{return _targetFightUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTargetfightuid(this,_targetFightUid,value); 
                     }
@@ -267,13 +267,13 @@ namespace Z_Fight.Form
                     
                     private float  _reloadTime;
                     /// <summary>
-                    ///◊∞ÃÓ≥÷–¯ ±º‰
+                    ///Ë£ÖÂ°´ÊåÅÁª≠Êó∂Èó¥
                     ///</summary>
                     public float  reloadTime{
                                 get{return _reloadTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeReloadtime(this,_reloadTime,value); 
                     }
@@ -285,13 +285,13 @@ namespace Z_Fight.Form
                     
                     private bool  _isMine;
                     /// <summary>
-                    /// «Œ“◊‘º∫
+                    ///ÊòØÊàëËá™Â∑±
                     ///</summary>
                     public bool  isMine{
                                 get{return _isMine;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeIsmine(this,_isMine,value); 
                     }
@@ -371,6 +371,7 @@ namespace Z_Fight.Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -399,6 +400,8 @@ namespace Z_Fight.Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -552,6 +555,7 @@ namespace Z_Fight.Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -566,7 +570,9 @@ UnitForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 UnitForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -591,7 +597,9 @@ UnitForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

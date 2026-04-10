@@ -25,27 +25,25 @@ namespace Ui.PlayAsset
     public partial class UiPlayAssetModel
     {
     }
-    public partial class UiPlayAssetCtrl:IZ_Listener<PlayAssetEvent>
+    public partial class UiPlayAssetCtrl : IZ_Listener<PlayAssetEvent>
     {
 
         UiContainer<UiImageCtrl> imageCon;
         float time;
         public override void OnCreate()
         {
-
             imageCon = new UiContainer<UiImageCtrl>(view.go_image);
-            Z_EventHelper.Register(this);
         }
 
-      
+
         public override void OnShow()
         {
+            Z_EventHelper.Register(this);
             Refresh();
         }
-        public override void OnUpdate()
+        public override void OnHide()
         {
-
-            Refresh();
+            Z_EventHelper.Unregister(this);
         }
         public void Refresh()
         {
@@ -58,6 +56,7 @@ namespace Ui.PlayAsset
                 });
             }
             imageCon.Refresh();
+
         }
         public void OnEvent(PlayAssetEvent evt)
         {
@@ -83,24 +82,28 @@ namespace Ui.PlayAsset
         public override void OnShow()
         {
             model.prm = param;
+            model.prm.data.ctrl = this;
             rect.sizeDelta = new Vector2(model.prm.data.size.x, model.prm.data.size.y);
             view.img_.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultEventTexName()).GetSprite();
+            Refresh();
+        }
+        public override void OnUpdate()
+        {
+            model.prm.data.posProgress += Time.deltaTime;
             Refresh();
         }
         public void Refresh()
         {
             var data = model.prm.data;
 
-            data.posProgress += Time.deltaTime;
             if (data.posTime == 0)
             {
-                rect.position = Graph.GetRealPos(data.tarPos, parent.rect);
+                rect.position = data.tarPos;
             }
             else
             {
-                rect.position = Graph.GetRealPos(data.oldPos + (data.tarPos - data.oldPos) * (data.posProgress / data.posTime), parent.rect);
+                rect.position = Vector3.Lerp(data.oldPos, data.tarPos, data.posProgress / data.posTime);
             }
-
             data.eulerProgress += Time.deltaTime;
             if (data.eulerTime == 0)
             {
@@ -108,17 +111,17 @@ namespace Ui.PlayAsset
             }
             else
             {
-                rect.eulerAngles = rect.eulerAngles.NewSetZ(data.oldEuler + (data.tarEuler - data.oldEuler) * (data.eulerProgress / data.eulerTime));
+                rect.eulerAngles = rect.eulerAngles.NewSetZ(data.oldEuler + (data.tarEuler - data.oldEuler) * Math.Min(1f, data.eulerProgress / data.eulerTime));
             }
 
             data.opacityProgress += Time.deltaTime;
-            if (data.posTime == 0)
+            if (data.opacityTime == 0)
             {
                 view.img_.color.NewSetA(data.tarOpacity);
             }
             else
             {
-                view.img_.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * (data.opacityProgress / data.opacityTime));
+                view.img_.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * Math.Min(1f, data.opacityProgress / data.opacityTime));
             }
             if (data.removeTime < int.MaxValue)
             {

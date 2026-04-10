@@ -68,7 +68,7 @@ public static readonly int autoUidCnt=1000000;
                 protected Unit _unit;
 
                 /// <summary>
-                ///µ•Œª¬ﬂº≠
+                ///Âçï‰ΩçÈÄªËæë
                 ///</summary>
                 public Unit unit
                 {
@@ -86,7 +86,7 @@ public static readonly int autoUidCnt=1000000;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -98,13 +98,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚≥∆
+                    ///ÂêçÁß∞
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -116,13 +116,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _prefabName;
                     /// <summary>
-                    ///‘§÷∆√˚◊÷£®À˜“˝£©
+                    ///È¢ÑÂà∂ÂêçÂ≠óÔºàÁ¥¢ÂºïÔºâ
                     ///</summary>
                     public string  prefabName{
                                 get{return _prefabName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePrefabname(this,_prefabName,value); 
                     }
@@ -134,13 +134,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _pos;
                     /// <summary>
-                    ///Œª÷√
+                    ///‰ΩçÁΩÆ
                     ///</summary>
                     public Vector3  pos{
                                 get{return _pos;}
  set{
 
-                    if (_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePos(this,_pos,value); 
                     }
@@ -152,13 +152,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _euler;
                     /// <summary>
-                    ///≈∑¿≠–˝◊™
+                    ///Ê¨ßÊãâÊóãËΩ¨
                     ///</summary>
                     public Vector3  euler{
                                 get{return _euler;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEuler(this,_euler,value); 
                     }
@@ -170,13 +170,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _scale;
                     /// <summary>
-                    ///Àı∑≈
+                    ///Áº©Êîæ
                     ///</summary>
                     public Vector3  scale{
                                 get{return _scale;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeScale(this,_scale,value); 
                     }
@@ -188,13 +188,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private UpdateType  _updateType;
                     /// <summary>
-                    ///∏¸–¬∑Ω Ω
+                    ///Êõ¥Êñ∞ÊñπÂºè
                     ///</summary>
                     public UpdateType  updateType{
                                 get{return _updateType;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUpdatetype(this,_updateType,value); 
                     }
@@ -206,13 +206,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<int>  _collidingUnitUid;
                     /// <summary>
-                    ///≈ˆ◊≤÷–
+                    ///Á¢∞Êíû‰∏≠
                     ///</summary>
                     public List<int>  collidingUnitUid{
                                 get{return _collidingUnitUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCollidingunituid(this,_collidingUnitUid,value); 
                     }
@@ -224,13 +224,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _extra;
                     /// <summary>
-                    ///¿©’πŒª
+                    ///Êâ©Â±ï‰Ωç
                     ///</summary>
                     public string  extra{
                                 get{return _extra;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeExtra(this,_extra,value); 
                     }
@@ -286,6 +286,7 @@ public static readonly int autoUidCnt=1000000;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -312,6 +313,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -419,6 +422,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -433,7 +437,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -458,7 +464,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

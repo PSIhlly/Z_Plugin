@@ -93,7 +93,7 @@ namespace Z_DataSystem
             else
             {
                 string[] allFiles = Directory.GetFiles(path);
-                // ¹ýÂË³öÍ¼Æ¬ÎÄ¼þ
+                // ï¿½ï¿½ï¿½Ë³ï¿½Í¼Æ¬ï¿½Ä¼ï¿½
                 foreach (string file in allFiles)
                 {
                     string extension = Path.GetExtension(file).ToLower();
@@ -114,16 +114,16 @@ namespace Z_DataSystem
         }
         public VideoAssetForm.Data CreateDataByClip(VideoClip clip, string name)
         {
-            return new VideoAssetForm.Data(-1, name, "", null, "", clip);
+            return new VideoAssetForm.Data(-1, name, "", null, "", clip,"");
         }
         public VideoAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new VideoAssetForm.Data(-1, name, "", data, "", null);
+            return new VideoAssetForm.Data(-1, name, "", data, "", null, "");
         }
         public VideoAssetForm.Data CreateDataByPath(string path, string name)
         {
             path = SaveAndLoad.GetRealPath(path);
-            return new VideoAssetForm.Data(-1, name, path, null, "", null);
+            return new VideoAssetForm.Data(-1, name, path, null, "", null, "");
         }
 
     }

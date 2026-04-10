@@ -84,7 +84,7 @@ public static readonly int autoIdCnt=100;
                                 get{return _id;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeId(this,_id,value); 
                     }
@@ -96,13 +96,13 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _itemId;
                     /// <summary>
-                    ///Œ‰∆˜µ¿æﬂid
+                    ///Ê≠¶Âô®ÈÅìÂÖ∑id
                     ///</summary>
                     public int  itemId{
                                 get{return _itemId;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeItemid(this,_itemId,value); 
                     }
@@ -114,13 +114,13 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _damage;
                     /// <summary>
-                    ///…À∫¶
+                    ///‰º§ÂÆ≥
                     ///</summary>
                     public int  damage{
                                 get{return _damage;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDamage(this,_damage,value); 
                     }
@@ -132,13 +132,13 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _prefabName;
                     /// <summary>
-                    ///‘§÷∆√˚◊÷£®À˜“˝£©
+                    ///È¢ÑÂà∂ÂêçÂ≠óÔºàÁ¥¢ÂºïÔºâ
                     ///</summary>
                     public string  prefabName{
                                 get{return _prefabName;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePrefabname(this,_prefabName,value); 
                     }
@@ -150,13 +150,13 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _magazineCapacity;
                     /// <summary>
-                    ///µØº–◊‹¡ø
+                    ///ÂºπÂ§πÊÄªÈáè
                     ///</summary>
                     public int  magazineCapacity{
                                 get{return _magazineCapacity;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMagazinecapacity(this,_magazineCapacity,value); 
                     }
@@ -168,13 +168,13 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _cdTime;
                     /// <summary>
-                    ///…‰ÀŸ¿‰»¥ ±≥§
+                    ///Â∞ÑÈÄüÂÜ∑Âç¥Êó∂Èïø
                     ///</summary>
                     public float  cdTime{
                                 get{return _cdTime;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCdtime(this,_cdTime,value); 
                     }
@@ -186,13 +186,13 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _reloadTime;
                     /// <summary>
-                    ///◊∞ÃÓ ±≥§
+                    ///Ë£ÖÂ°´Êó∂Èïø
                     ///</summary>
                     public float  reloadTime{
                                 get{return _reloadTime;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeReloadtime(this,_reloadTime,value); 
                     }
@@ -204,13 +204,13 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _speed;
                     /// <summary>
-                    ///µØÀŸ
+                    ///ÂºπÈÄü
                     ///</summary>
                     public float  speed{
                                 get{return _speed;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSpeed(this,_speed,value); 
                     }
@@ -222,13 +222,13 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _range;
                     /// <summary>
-                    ///…‰≥Ã
+                    ///Â∞ÑÁ®ã
                     ///</summary>
                     public float  range{
                                 get{return _range;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeRange(this,_range,value); 
                     }
@@ -240,13 +240,13 @@ public static readonly int autoIdCnt=100;
                     
                     private Vector3  _attackPos;
                     /// <summary>
-                    ///«πø⁄
+                    ///Êû™Âè£
                     ///</summary>
                     public Vector3  attackPos{
                                 get{return _attackPos;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAttackpos(this,_attackPos,value); 
                     }
@@ -258,13 +258,13 @@ public static readonly int autoIdCnt=100;
                     
                     private Vector3  _attackDir;
                     /// <summary>
-                    ///∑ΩœÚ
+                    ///ÊñπÂêë
                     ///</summary>
                     public Vector3  attackDir{
                                 get{return _attackDir;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAttackdir(this,_attackDir,value); 
                     }
@@ -276,13 +276,13 @@ public static readonly int autoIdCnt=100;
                     
                     private bool  _selfHurt;
                     /// <summary>
-                    ///◊‘º∫…À∫¶
+                    ///Ëá™Â∑±‰º§ÂÆ≥
                     ///</summary>
                     public bool  selfHurt{
                                 get{return _selfHurt;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSelfhurt(this,_selfHurt,value); 
                     }
@@ -294,13 +294,13 @@ public static readonly int autoIdCnt=100;
                     
                     private float  _accuracy;
                     /// <summary>
-                    ///æ´∂»
+                    ///Á≤æÂ∫¶
                     ///</summary>
                     public float  accuracy{
                                 get{return _accuracy;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAccuracy(this,_accuracy,value); 
                     }
@@ -312,13 +312,13 @@ public static readonly int autoIdCnt=100;
                     
                     private int  _bulletsPer;
                     /// <summary>
-                    ///µ•¥Œø™ªµØ ˝
+                    ///ÂçïÊ¨°ÂºÄÁÅ´ÂºπÊï∞
                     ///</summary>
                     public int  bulletsPer{
                                 get{return _bulletsPer;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeBulletsper(this,_bulletsPer,value); 
                     }
@@ -382,6 +382,7 @@ public static readonly int autoIdCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -408,6 +409,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -535,6 +538,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -549,7 +553,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
 
             idChain.PushId(data.id);
@@ -574,7 +580,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

@@ -4,13 +4,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using TuanjieMuse.Chat.ViewModel;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using Z_Code;
 using Z_Code.Form;
 using Z_DataSystem;
@@ -74,7 +77,9 @@ public interface ExternalPlayInfoController
     public void ChooseEquipItems(string title, Action<ItemProductForm.Data> act, EquipPartType part);
 
     public CharacterProductForm.Data GetTeamEquipedCharacter(int ItemProductUid, out EquipPartType partType);
-    public void UseSkill(int characterUid, int skillUid,bool ignoreCd);
+
+    public bool CanUseSkill(int characterUid, SkillType type);
+    public void UseSkill(int characterUid, int skillUid, bool ignoreCd);
 
     public void ChooseCurrentCharacter(int characterUid);
 }
@@ -128,7 +133,9 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         {
             Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.EverySecond });
         }
+        CalcTeamSkill();
     }
+
     #region param
     public void ChangeCharacterParam(int characterUid, string name, object value)
     {
@@ -167,15 +174,52 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
     #region skill
 
-    public void UseSkill(int characterUid, int skillUid,bool ignoreCd)
+    private void CalcTeamSkill()
+    {
+        foreach (var uid in GameManager.instance.curProgress.team)
+        {
+            var ch = CharacterProductForm.DataByUid.GetDv(uid, null);
+            if (ch != null)
+            {
+                foreach (var kvp in ch.skill)
+                {
+                    var skill = SkillProductForm.DataByUid.GetDv(kvp.Value, null);
+                    if (skill != null && skill.cd + skill.lastUseTime > GameManager.instance.curProgress.seconds - Time.deltaTime && skill.cd + skill.lastUseTime < GameManager.instance.curProgress.seconds)
+                    {
+                        Z_EventHelper.Invoke(new CharacterSkillEvent()
+                        {
+                            type = CharacterSkillEventType.Ready,
+                            data = ch,
+                            skillUid = skill.uid
+                        });
+                    }
+                }
+            }
+        }
+    }
+    public bool CanUseSkill(int characterUid, SkillType type)
+    {
+        var character = CharacterProductForm.DataByUid.GetDv(characterUid, null);
+        if (character != null && character.skill.ContainsKey(type))
+        {
+            var skill = SkillProductForm.DataByUid.GetDv(character.skill[type], null);
+            if (skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds)
+            {
+                return GameManager.instance.curProgress.blockProgramUid <= 0 && PlayManager.instance.sceneCtrl.GetCurOptSkill() == null;
+            }
+        }
+        return false;
+    }
+    public void UseSkill(int characterUid, int skillUid, bool ignoreCd)
     {
         var character = CharacterProductForm.DataByUid[characterUid];
         var skill = SkillProductForm.DataByUid[skillUid];
-        if (ignoreCd||(skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds))
+        if (ignoreCd || (skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds))
         {
             skill.lastUseTime = GameManager.instance.curProgress.seconds;
             Z_EventHelper.Invoke(new CharacterSkillEvent()
             {
+                type = CharacterSkillEventType.Use,
                 data = character,
                 skillUid = skill.uid
             });

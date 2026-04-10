@@ -606,7 +606,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 }
                 GameManager.instance.saveCtrl.AddStoryTex(data);
             },
-            sizeLimit = new Vector2Int(100, 100)
+            sizeLimit = new Vector2Int(1000, 1000)
         });
     }
     public void ChooseEffect(string title, Action<EffectForm.Data> act)

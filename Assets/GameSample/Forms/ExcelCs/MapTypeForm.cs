@@ -69,7 +69,7 @@ private set{
                     
                     private string  _NameKey;
                     /// <summary>
-                    ///Ãû³ÆË÷Òı
+                    ///åç§°ç´¢å¼•
                     ///</summary>
                     public string  NameKey{
                                 get{return _NameKey;}
@@ -82,7 +82,7 @@ private set{
                     
                     private string  _icon;
                     /// <summary>
-                    ///Í¼±ê
+                    ///å›¾æ ‡
                     ///</summary>
                     public string  icon{
                                 get{return _icon;}
@@ -95,7 +95,7 @@ private set{
                     
                     private bool  _needLayer;
                     /// <summary>
-                    ///ÊÇ·ñĞèÒª²ã¼¶ÉèÖÃ
+                    ///æ˜¯å¦éœ€è¦å±‚çº§è®¾ç½®
                     ///</summary>
                     public bool  needLayer{
                                 get{return _needLayer;}
@@ -140,6 +140,7 @@ private set{
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -180,6 +181,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 {100,new Data(100,"erase","z_map_b$floor$0",false)},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             

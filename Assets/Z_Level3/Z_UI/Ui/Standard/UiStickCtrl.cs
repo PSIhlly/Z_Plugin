@@ -22,7 +22,9 @@ namespace Ui.Stick
         public Action<Vector3> dragAct;
         public Action<Vector3> upAct;
         public Func<bool> canStartFunc;
+        public Action hideAct;
         public bool startFromStick;
+        public Sprite icon;
     }
     public partial class UiStickModel
     {
@@ -43,12 +45,15 @@ namespace Ui.Stick
             this.Register<InputMouseEvent>();
             model.curId = -1;
             model.prm = param;
+            if(model.prm.icon!=null)
+                view.img_stick.sprite = model.prm.icon;
         }
         public override void OnHide()
         {
             this.Unregister<InputMouseDownEvent>();
             this.Unregister<InputMouseUpEvent>();
             this.Unregister<InputMouseEvent>();
+            model.prm?.hideAct?.Invoke();
         }
         public void SetDragingAct(Action act)
         {

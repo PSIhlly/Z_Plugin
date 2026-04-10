@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -89,6 +90,19 @@ namespace Z_UnitSystem
             {
                 var f = File.Create(path);
                 f.Close();
+            }
+        }
+        public static void EachFile(string folder,Action<string> act)
+        {
+            folder = GetRealPath(folder);
+            if (Exist(folder))
+            {
+                var lst = new List<string>(Directory.EnumerateFiles(folder));
+                foreach(var file in lst)
+                {
+                    act(Path.GetFileName(file));
+                }
+
             }
         }
         public static bool Exist(string key)

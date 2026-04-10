@@ -442,6 +442,7 @@ using Z_Texture;
             var fullPath = Application.dataPath + uiHolder.path + "/Ui" + uiHolder.uiName + "Base.cs";
             if (File.Exists(fullPath))
                 File.Delete(fullPath);
+            uiHolder.parent = null;
             File.WriteAllText(fullPath, GetCode());
             Debug.Log(fullPath + " Generate Success!");
         }

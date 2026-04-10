@@ -161,7 +161,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                  return data;
              });
          }*/
-        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, data.mainData.viewSize.y, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
+        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 1, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
 
         DynamicGlobalSettings.cameraMode = ProgressForm.DataByUid[1].cameraMode;
         MapManager.instance.Begin(data);

@@ -105,7 +105,7 @@ namespace Z_Map.Form
         {
 
                 /// <summary>
-                ///µ¥Î»Âß¼­
+                ///å•ä½é€»è¾‘
                 ///</summary>
                 public CharacterUnit unit
                 {
@@ -117,13 +117,13 @@ namespace Z_Map.Form
 
                     private bool  _navEnabled;
                     /// <summary>
-                    ///ÆôÓÃ
+                    ///å¯ç”¨
                     ///</summary>
                     public bool  navEnabled{
                                 get{return _navEnabled;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeNavenabled(this,_navEnabled,value); 
                     }
@@ -135,13 +135,13 @@ namespace Z_Map.Form
                     
                     private Vector3  _destination;
                     /// <summary>
-                    ///Ä¿µÄµØ
+                    ///ç›®çš„åœ°
                     ///</summary>
                     public Vector3  destination{
                                 get{return _destination;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDestination(this,_destination,value); 
                     }
@@ -153,13 +153,13 @@ namespace Z_Map.Form
                     
                     private float  _speed;
                     /// <summary>
-                    ///ËÙ¶È
+                    ///é€Ÿåº¦
                     ///</summary>
                     public float  speed{
                                 get{return _speed;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSpeed(this,_speed,value); 
                     }
@@ -171,13 +171,13 @@ namespace Z_Map.Form
                     
                     private float  _alertDis;
                     /// <summary>
-                    ///Æô¶¯¾àÀë
+                    ///å¯åŠ¨è·ç¦»
                     ///</summary>
                     public float  alertDis{
                                 get{return _alertDis;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAlertdis(this,_alertDis,value); 
                     }
@@ -189,13 +189,13 @@ namespace Z_Map.Form
                     
                     private float  _pathDis;
                     /// <summary>
-                    ///Ñ°Â·¾àÀëÉÏÏŞ
+                    ///å¯»è·¯è·ç¦»ä¸Šé™
                     ///</summary>
                     public float  pathDis{
                                 get{return _pathDis;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePathdis(this,_pathDis,value); 
                     }
@@ -207,13 +207,13 @@ namespace Z_Map.Form
                     
                     private bool  _isMine;
                     /// <summary>
-                    ///ÊÇÎÒ×Ô¼º
+                    ///æ˜¯æˆ‘è‡ªå·±
                     ///</summary>
                     public bool  isMine{
                                 get{return _isMine;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeIsmine(this,_isMine,value); 
                     }
@@ -225,13 +225,13 @@ namespace Z_Map.Form
                     
                     private bool  _enteredScene;
                     /// <summary>
-                    ///½øÈë¹ıËùÊôscene
+                    ///è¿›å…¥è¿‡æ‰€å±scene
                     ///</summary>
                     public bool  enteredScene{
                                 get{return _enteredScene;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEnteredscene(this,_enteredScene,value); 
                     }
@@ -305,6 +305,7 @@ namespace Z_Map.Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -333,6 +334,8 @@ namespace Z_Map.Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -474,6 +477,7 @@ namespace Z_Map.Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -488,7 +492,9 @@ UnitForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 UnitForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -513,7 +519,9 @@ UnitForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

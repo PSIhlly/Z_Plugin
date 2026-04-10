@@ -12,15 +12,15 @@ public interface IZ_Listener<T>
 }
 public static class Z_EventHelper
 {
-    private static Dictionary<Type, List<object>> type2Listener=new Dictionary<Type, List<object>>();
+    private static Dictionary<Type, List<object>> type2Listener = new Dictionary<Type, List<object>>();
     public static void Register<T>(this IZ_Listener<T> listener)
     {
         var type = typeof(T);
-        if(!type2Listener.ContainsKey(type))
+        if (!type2Listener.ContainsKey(type))
         {
-            type2Listener[type] = new List<object>(); 
+            type2Listener[type] = new List<object>();
         }
-        if(type2Listener[type].Contains(listener))
+        if (type2Listener[type].Contains(listener))
         {
             return;
         }
@@ -29,7 +29,7 @@ public static class Z_EventHelper
     public static void Unregister<T>(this IZ_Listener<T> listener)
     {
         var type = typeof(T);
-        if (type2Listener.ContainsKey(type)&& type2Listener[type].Contains(listener))
+        if (type2Listener.ContainsKey(type) && type2Listener[type].Contains(listener))
         {
             type2Listener[type].Remove(listener);
         }
@@ -38,14 +38,15 @@ public static class Z_EventHelper
     public static void Invoke<T>(T evt)
     {
         var type = evt.GetType();
-        if(!type2Listener.ContainsKey(type))
+        if (!type2Listener.ContainsKey(type))
         {
             return;
         }
-        foreach (var listener in type2Listener[type])
+        var lst = new List<object>(type2Listener[type]);
+        foreach (var listener in lst)
         {
-            if(listener!=null)
-            ((IZ_Listener<T>)listener).OnEvent(evt);
+            if (listener != null)
+                ((IZ_Listener<T>)listener).OnEvent(evt);
         }
     }
 }

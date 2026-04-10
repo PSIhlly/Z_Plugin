@@ -70,7 +70,7 @@ public static readonly int autoUidCnt=1000000;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -82,13 +82,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _name;
                     /// <summary>
-                    ///名称
+                    ///鍚嶇О
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -100,13 +100,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<string>  _evt;
                     /// <summary>
-                    ///事件名称
+                    ///浜嬩欢鍚嶇О
                     ///</summary>
                     public List<string>  evt{
                                 get{return _evt;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEvt(this,_evt,value); 
                     }
@@ -118,13 +118,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private TriggerType  _type;
                     /// <summary>
-                    ///触发类型
+                    ///瑙﹀彂绫诲瀷
                     ///</summary>
                     public TriggerType  type{
                                 get{return _type;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeType(this,_type,value); 
                     }
@@ -168,6 +168,7 @@ public static readonly int autoUidCnt=1000000;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -204,9 +205,16 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();
@@ -295,6 +303,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -311,7 +320,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -338,7 +349,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

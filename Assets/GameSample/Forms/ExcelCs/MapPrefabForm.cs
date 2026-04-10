@@ -69,7 +69,7 @@ private set{
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚◊÷
+                    ///ÂêçÂ≠ó
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -82,7 +82,7 @@ private set{
                     
                     private string  _icon;
                     /// <summary>
-                    ///Õº±Í
+                    ///ÂõæÊ†á
                     ///</summary>
                     public string  icon{
                                 get{return _icon;}
@@ -125,6 +125,7 @@ private set{
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -165,13 +166,20 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 {2,new Data(2,"Sphere","")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"Cube",_DataById[1]},
     
                         {"Sphere",_DataById[2]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();

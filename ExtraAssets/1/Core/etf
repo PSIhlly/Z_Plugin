@@ -1,5 +1,64 @@
 [
   {
+    "uid": 3,
+    "name": "灵梦E",
+    "label": "",
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 180.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 359.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "uid": 1,
     "name": "受击",
     "label": "",
@@ -127,6 +186,65 @@
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "uid": 2,
+    "name": "灵梦Q",
+    "label": "",
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 180.0,
+              "scale": "5|5|5",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 359.0,
+              "scale": "5|5|5",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "time": 2.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
               "transition": false
             }
           }

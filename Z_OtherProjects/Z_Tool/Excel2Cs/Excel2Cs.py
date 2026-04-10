@@ -129,7 +129,7 @@ def var_normal_handle():
 
                 if 'write' in formInfo.var_config_dic[name]:
                     set_event=f'''
-                    if(_DataBy{formInfo.id_str.capitalize()}!=null&&_DataBy{formInfo.id_str.capitalize()}.ContainsValue(this))
+                    if(_DataBy{formInfo.id_str.capitalize()}!=null&&_DatasHashSet.Contains(this))
                     {{
                        Change{name.capitalize()}(this,_{name},value); 
                     }}
@@ -159,6 +159,7 @@ def dic_handle():
     for formInfo in form_info_list:
     #添加索引
         formInfo.dic_str+=f"""
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataBy{formInfo.id_str.capitalize()};
             public static Dictionary<int, Data> DataBy{formInfo.id_str.capitalize()}
             {{
@@ -314,16 +315,21 @@ def assign_data_handle():
         formInfo.content_str+=f'''
                 _DataBy{formInfo.id_str.capitalize()} = new Dictionary<int, Data>() {{
 {var_assign}
-                }};'''
+                }};
+                _DatasHashSet=new HashSet<Data>();
+                '''
 
 def add_remove_handle():
     for formInfo in form_info_list:
         #处理初始化
         formInfo.add_str+=f'''
         DataBy{formInfo.id_str.capitalize()}[data.{formInfo.id_str}]=data;
+        _DatasHashSet.Add(data);
     '''         
         formInfo.remove_str+=f'''
+                    _DatasHashSet.Remove(DataBy{formInfo.id_str.capitalize()}[data.{formInfo.id_str}]);
                     DataBy{formInfo.id_str.capitalize()}.Remove(data.{formInfo.id_str});
+                    
     '''
 
            
@@ -372,7 +378,12 @@ def dic_index_handle():
                         {{{k},_DataBy{formInfo.id_str.capitalize()}[{data[formInfo.id_str]}]}},
     '''
             formInfo.content_str+=f'''
+                    
                     }};
+                    foreach(var v in _DataBy{formInfo.id_str.capitalize()}.Values)
+                    {{
+                        _DatasHashSet.Add(v);
+                    }}
     '''
         for group,vs in combine_dic.items():
             type,name,prm=get_dic_info(formInfo,vs)
@@ -477,7 +488,7 @@ serialize_handle()
 # 打印找到的 Excel 文件
 for file in form_info_list:
     print('处理中：' + file.name)
-    with open(files_root_cs + file.name + 'Form.cs', 'w') as f:
+    with open(files_root_cs + file.name + 'Form.cs', 'w', encoding='utf-8') as f:
         f.write(file.get_result())
 
 

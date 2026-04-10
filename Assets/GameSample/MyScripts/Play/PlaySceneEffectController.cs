@@ -55,65 +55,73 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         }
         canvasDic.Clear(); updateFrame = 0;
     }
-    public void CreatEffect(int uid, Vector3 pos, float rot)
+    public void CreatEffect(int uid, Vector3 pos, float rot, Action<ImageHolder> beforeUpdate = null)
     {
         var clips = EffectForm.DataByUid[uid].clips;
-        foreach(var eft in clips)
+        foreach (var eft in clips)
         {
-        var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
+            var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
+            TimeManager.instance.CancelTimer(img.animTimer);
+            int cur = -1;
+            float startTime = Time.time;
 
-        TimeManager.instance.CancelTimer(img.animTimer);
-        int cur = -1;
-        float startTime = Time.time;
+            img.oriPos = pos;
+            img.oriRot = rot;
+            img.oriScale = Vector3.one;
 
-        img.oriPos = pos;
-        img.oriRot = rot;
-        img.oriScale = Vector3.one;
-
-        img.trs.position = pos;
-        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
-        img.trs.localScale = Vector3.one;
-        img.animTimer = TimeManager.instance.StartTimer(0, 0.02f, () =>
-        {
-            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            float progress = Time.time - startTime;
-
-            var clip = cur == -1 ? null : eft[cur];
-            if (cur == -1 || progress > eft[cur].time)
+            img.trs.position = pos;
+            img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
+            img.trs.localScale = Vector3.one;
+            img.animTimer = TimeManager.instance.StartTimerImmediate(0, 0.0001f, () =>
             {
-                startTime = Time.time;
-                cur++;
-                if (eft.Count <= cur)
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                float progress = Time.time - startTime;
+                var clip = cur == -1 ? null : eft[cur];
+                if (cur == -1 || progress > eft[cur].time)
                 {
-                    InstancePoolManager.instance.DeleteInstance(img.gameObject, effectPrefab);
-                    return true;
+                    startTime = Time.time;
+                    cur++;
+                    if (eft.Count <= cur)
+                    {
+                        InstancePoolManager.instance.DeleteInstance(img.gameObject, effectPrefab);
+                        return true;
+                    }
+
+                    clip = eft[cur];
+                    img.render.GetPropertyBlock(propBlock);
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
+
+
+                    propBlock.SetFloat("_Alpha", clip.opacity);
+                    img.render.SetPropertyBlock(propBlock);
+
+                    TimeManager.instance.AddCurFrameEndAction(() =>
+                    {
+                        beforeUpdate?.Invoke(img);
+                        img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
+                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+                        img.trs.localScale = img.oriScale + clip.scale;
+                    }, img.gameObject);
+                }
+                else if (clip.transition && eft.Count > cur + 1)
+                {
+                    img.render.GetPropertyBlock(propBlock);
+                    var clipNxt = eft[cur + 1];
+                    float rate = Mathf.Min(1, progress / eft[cur].time);
+                    propBlock.SetFloat("_Alpha", clip.opacity + (clipNxt.opacity - clip.opacity) * rate);
+                    img.render.SetPropertyBlock(propBlock);
+
+                    TimeManager.instance.AddCurFrameEndAction(() =>
+                    {
+                        beforeUpdate?.Invoke(img);
+                        img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
+                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
+                        img.trs.localScale = img.oriScale + Vector3.Lerp(clip.scale, clipNxt.scale, rate);
+                    }, img.gameObject);
                 }
 
-                clip = eft[cur];
-                img.render.GetPropertyBlock(propBlock);
-                propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
-
-                img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
-                img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
-                img.trs.localScale = img.oriScale + clip.scale;
-                propBlock.SetFloat("_Alpha", clip.opacity);
-                img.render.SetPropertyBlock(propBlock);
-            }
-            else if (clip.transition && eft.Count > cur + 1)
-            {
-                img.render.GetPropertyBlock(propBlock);
-                var clipNxt = eft[cur + 1];
-                float rate = Mathf.Min(1, progress / eft[cur].time);
-                img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
-                img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
-                img.trs.localScale = img.oriScale + Vector3.Lerp(clip.scale, clipNxt.scale, rate);
-                propBlock.SetFloat("_Alpha", clip.opacity + (clipNxt.opacity - clip.opacity) * rate);
-                img.render.SetPropertyBlock(propBlock);
-            }
-
-            return false;
-        }, img);
-
+                return false;
+            }, img);
         }
 
     }
@@ -165,7 +173,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     public void FloatingText(string txt, Vector3 pos)
     {
         var o = InstancePoolManager.instance.CreateInstance(canvasPrefab);
-        o.transform.position = pos+Vector3.up * 1.4f;
+        o.transform.position = pos + Vector3.up * 1.4f;
         o.SetActive(true);
         o.GetComponent<CanvasHolder>().ToastText(txt, 2);
         TimeManager.instance.StartTimer(3, 0, () =>

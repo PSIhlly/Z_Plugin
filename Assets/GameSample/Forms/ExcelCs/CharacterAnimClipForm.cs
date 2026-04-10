@@ -70,7 +70,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -82,13 +82,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<EquipPartType,ItemStyle>  _equipStyle;
                     /// <summary>
-                    ///装备样式
+                    ///瑁呭鏍峰紡
                     ///</summary>
                     public Dictionary<EquipPartType,ItemStyle>  equipStyle{
                                 get{return _equipStyle;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEquipstyle(this,_equipStyle,value); 
                     }
@@ -100,13 +100,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<EquipPartType,(float,float,int,float)>  _equipTrs;
                     /// <summary>
-                    ///装备位置
+                    ///瑁呭浣嶇疆
                     ///</summary>
                     public Dictionary<EquipPartType,(float,float,int,float)>  equipTrs{
                                 get{return _equipTrs;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEquiptrs(this,_equipTrs,value); 
                     }
@@ -118,13 +118,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<BodyPartType,string>  _partTex;
                     /// <summary>
-                    ///贴图名称
+                    ///璐村浘鍚嶇О
                     ///</summary>
                     public Dictionary<BodyPartType,string>  partTex{
                                 get{return _partTex;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeParttex(this,_partTex,value); 
                     }
@@ -168,6 +168,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -194,6 +195,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -281,6 +284,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -295,7 +299,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -320,7 +326,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

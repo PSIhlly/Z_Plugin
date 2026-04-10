@@ -47,6 +47,9 @@ namespace Z_Ui.Base
         private bool oriInited;
         private bool firstEnter = true;
         private bool quiting = false;
+
+
+        public List<Action> subShowAct = new List<Action>();
         public void OriInit()
         {
             if (oriInited)
@@ -116,13 +119,32 @@ namespace Z_Ui.Base
                 }
                 firstEnter = false;
                 ctrl.OnEnable();
-                UiManager.instance.uiOnShowEventLst.Add(() =>
+                
+                if (parent == null || (parent.ctrl != null && parent.ctrl.showed))
                 {
-                    if (ctrl.active)
-                        ctrl.OnShow();
-                });
+                    Show();
+                }
+                else
+                {
+                    parent.subShowAct.Add(Show);
+                }
+
             }
         }
+        private void Show()
+        {
+            if (ctrl.active)
+            {
+                ctrl.OnShow();
+                ctrl.showed = true;
+                for (int i = 0; i < subShowAct.Count; i++)
+                {
+                    subShowAct[i]();
+                }
+                subShowAct.Clear();
+            }
+        }
+
         protected void OnDisable()
         {
             if (binded)

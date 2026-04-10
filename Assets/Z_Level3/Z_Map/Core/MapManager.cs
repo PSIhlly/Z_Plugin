@@ -32,9 +32,11 @@ namespace Z_Map
         public const int ITEM_UNIT_MAX = 10;
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
-        public const bool OVERLAY_HIDE = true;
+        public const bool OVERLAY_HIDE = false;
         public const bool UPDATE_TILE_ALWAYS = false;
         public const bool UPDATE_ALL_CHARACTER = true;
+        public const bool UPDATE_ALL_OBJECT = true;
+        public const bool ENABLE_GRAVITY = false;
     }
     public static class DynamicGlobalSettings
     {
@@ -54,6 +56,7 @@ namespace Z_Map
         Create,
         Show,
         AfterUpdate,
+        BoundaryTouch,
         Hide,
     }
     public class ItemEvent : Z_Event
@@ -108,6 +111,7 @@ public class MapManager : Z_MonoManager<MapManager>
 
         utilCtrl = new MapUtilController(this);
         updateCtrl = new MapUpdateController(this);
+
     }
 
     #region external

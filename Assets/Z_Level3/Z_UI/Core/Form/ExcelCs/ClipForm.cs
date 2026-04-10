@@ -70,7 +70,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -82,13 +82,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _title;
                     /// <summary>
-                    ///±ÍÃ‚
+                    ///Ê†áÈ¢ò
                     ///</summary>
                     public string  title{
                                 get{return _title;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTitle(this,_title,value); 
                     }
@@ -100,13 +100,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainText;
                     /// <summary>
-                    ///ƒ⁄»›
+                    ///ÂÜÖÂÆπ
                     ///</summary>
                     public string  mainText{
                                 get{return _mainText;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMaintext(this,_mainText,value); 
                     }
@@ -118,13 +118,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainPictureName;
                     /// <summary>
-                    ///±≥æ∞Õº∆¨
+                    ///ËÉåÊôØÂõæÁâá
                     ///</summary>
                     public string  mainPictureName{
                                 get{return _mainPictureName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMainpicturename(this,_mainPictureName,value); 
                     }
@@ -136,13 +136,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainVideoName;
                     /// <summary>
-                    ///±≥æ∞ ”∆µ
+                    ///ËÉåÊôØËßÜÈ¢ë
                     ///</summary>
                     public string  mainVideoName{
                                 get{return _mainVideoName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMainvideoname(this,_mainVideoName,value); 
                     }
@@ -154,13 +154,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _profilePictureName;
                     /// <summary>
-                    ///Õ∑œÒÕº∆¨
+                    ///Â§¥ÂÉèÂõæÁâá
                     ///</summary>
                     public string  profilePictureName{
                                 get{return _profilePictureName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeProfilepicturename(this,_profilePictureName,value); 
                     }
@@ -172,13 +172,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _mainAudioName;
                     /// <summary>
-                    ///“Ù…˘
+                    ///Èü≥Â£∞
                     ///</summary>
                     public string  mainAudioName{
                                 get{return _mainAudioName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMainaudioname(this,_mainAudioName,value); 
                     }
@@ -228,6 +228,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -254,6 +255,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -353,6 +356,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -367,7 +371,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -392,7 +398,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

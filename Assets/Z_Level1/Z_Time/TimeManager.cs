@@ -13,21 +13,30 @@ namespace Z_Time
         static List<(Action, GameObject)> NextFrameList = new List<(Action, GameObject)>();
         static List<(Action, GameObject)> CurLateUpdateList = new List<(Action, GameObject)>();
         static List<Action> CurLateUpdateWithoutCheckList = new List<Action>();
+        static List<Action> CurFrameEndWithoutCheckList = new List<Action>();
         static List<(Action, GameObject)> NextBigFrameList = new List<(Action, GameObject)>();
+        static List<(Action, GameObject)> CurFrameEndList = new List<(Action, GameObject)>();
         static List<Action> NextUpdateWithoutCheckList = new List<Action>();
         static List<(Action, GameObject)> NextUpdateList = new List<(Action, GameObject)>();
-        
+
         static List<(Action, GameObject)> NextFixedFrameList = new List<(Action, GameObject)>();
         static string queueLock = "queue";
         int id = 0;
 
-        public Timer StartTimer(float delay,float interval, Func<bool> func, MonoBehaviour bind = null)
+        public Timer StartTimer(float delay, float interval, Func<bool> func, MonoBehaviour bind = null)
         {
-            Timer timer = new Timer() {
+            Timer timer = new Timer()
+            {
                 bind = bind == null ? this : bind
             };
             id++;
-            StartCoroutine(Work(id,timer, delay,interval, func));
+            StartCoroutine(Work(id, timer, delay, interval, func));
+            return timer;
+        }
+        public Timer StartTimerImmediate(float delay, float interval, Func<bool> func, MonoBehaviour bind = null)
+        {
+            var timer = StartTimer(delay, interval, func);
+            func();
             return timer;
         }
         public void CancelTimer(Timer timer)
@@ -37,13 +46,13 @@ namespace Z_Time
             timer.cancel = true;
         }
 
-        private IEnumerator Work(int id,Timer timer,float delay,float interval, Func<bool> func)
+        private IEnumerator Work(int id, Timer timer, float delay, float interval, Func<bool> func)
         {
             yield return new WaitForSeconds(delay);
             while (true)
             {
                 yield return new WaitForSeconds(interval);
-                if (timer.cancel|| timer.bind ==null|| timer.bind.gameObject==null||!timer.bind.gameObject.activeInHierarchy)
+                if (timer.cancel || timer.bind == null || timer.bind.gameObject == null || !timer.bind.gameObject.activeInHierarchy)
                     break;
 
                 if (func())
@@ -58,15 +67,24 @@ namespace Z_Time
         }
         public void AddCurLateUpdateAction(Action act, GameObject ins)
         {
-                CurLateUpdateList.Add((act, ins));
+            CurLateUpdateList.Add((act, ins));
         }
         public void AddCurLateUpdateWithoutCheckAction(Action act)
         {
             CurLateUpdateWithoutCheckList.Add(act);
         }
+        public void AddCurFrameEndWithoutCheckAction(Action act)
+        {
+            CurFrameEndWithoutCheckList.Add(act);
+        }
+        public void AddCurFrameEndAction(Action act, GameObject ins)
+        {
+            CurFrameEndList.Add((act, ins));
+        }
+
         public void AddNextUpdateWithoutCheckAction(Action act)
         {
-            lock(queueLock)
+            lock (queueLock)
             {
 
                 NextUpdateWithoutCheckList.Add(act);
@@ -77,7 +95,7 @@ namespace Z_Time
             lock (queueLock)
             {
 
-                NextUpdateList.Add((act,ins));
+                NextUpdateList.Add((act, ins));
             }
         }
         public void LateUpdate()
@@ -96,10 +114,14 @@ namespace Z_Time
             }
             CurLateUpdateList.Clear();
         }
+        public void Awake()
+        {
+            StartCoroutine(AtFrameEnd());
+        }
 
         public void Update()
         {
-            foreach(var act in NextBigFrameList)
+            foreach (var act in NextBigFrameList)
             {
                 NextFixedFrameList.Add(act);
             }
@@ -109,7 +131,7 @@ namespace Z_Time
 
             foreach (var act in NextFrameList)
             {
-                if(act.Item2!=null)
+                if (act.Item2 != null)
                 {
 
                     act.Item1?.Invoke();
@@ -133,7 +155,7 @@ namespace Z_Time
                     }
                 }
                 NextUpdateList.Clear();
-                
+
             }
         }
         public void FixedUpdate()
@@ -154,6 +176,26 @@ namespace Z_Time
             }
             NextFixedFrameList.Clear();
 
+        }
+        IEnumerator AtFrameEnd()
+        {
+            while (true)
+            {
+                yield return new WaitForEndOfFrame(); // 等待帧结束
+                foreach (var act in CurFrameEndWithoutCheckList)
+                {
+                    act?.Invoke();
+                }
+                CurFrameEndWithoutCheckList.Clear();
+                foreach (var act2 in CurFrameEndList)
+                {
+                    if (act2.Item2 != null)
+                        act2.Item1?.Invoke();
+                }
+                CurFrameEndList.Clear();
+
+
+            }
         }
     }
 }

@@ -30,9 +30,11 @@ namespace Z_Code
           
             if (data != null)
             {
-                ((MapUnit)(data.unit)).paramInfo[prm[1].str] = new MapObjectParamForm.Data(-1, prm[1].str, 0, "", "", "");
-                ((MapUnit)(data.unit)).paramInfo[prm[1].str].SetValue(prm[2]);
-                ((MapUnit)(data.unit)).paramInfo = ((MapUnit)(data.unit)).paramInfo;
+                var dic = ((MapUnit)(data.unit)).paramInfo;
+                if(!dic.ContainsKey(prm[1].str))
+                    dic[prm[1].str] = new MapObjectParamForm.Data(-1, prm[1].str, 0, "", "", "");
+                dic[prm[1].str].SetValue(prm[2]);
+                ((MapUnit)(data.unit)).paramInfo = dic;
             }
           
             return true;

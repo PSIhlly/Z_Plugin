@@ -71,7 +71,7 @@ private set{
                     
                     private string  _name;
                     /// <summary>
-                    ///Ãû×Ö
+                    ///åå­—
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -84,7 +84,7 @@ private set{
                     
                     private string  _icon;
                     /// <summary>
-                    ///Í¼±ê
+                    ///å›¾æ ‡
                     ///</summary>
                     public string  icon{
                                 get{return _icon;}
@@ -97,13 +97,13 @@ private set{
                     
                     private int  _count;
                     /// <summary>
-                    ///ÓµÓĞÊı
+                    ///æ‹¥æœ‰æ•°
                     ///</summary>
                     public int  count{
                                 get{return _count;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCount(this,_count,value); 
                     }
@@ -147,6 +147,7 @@ private set{
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -177,6 +178,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 {2,new Data(2,"Soul power","\\GameSample\\Imgs\\Item\\Soul Power.png",0)},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             

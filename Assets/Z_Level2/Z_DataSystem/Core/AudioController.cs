@@ -90,7 +90,7 @@ namespace Z_DataSystem
             else
             {
                 string[] allFiles = Directory.GetFiles(path);
-                // ¹ýÂË³öÍ¼Æ¬ÎÄ¼þ
+                // ï¿½ï¿½ï¿½Ë³ï¿½Í¼Æ¬ï¿½Ä¼ï¿½
                 foreach (string file in allFiles)
                 {
                     string extension = Path.GetExtension(file).ToLower();
@@ -111,16 +111,16 @@ namespace Z_DataSystem
         }
         public AudioAssetForm.Data CreateDataByClip(AudioClip clip, string name)
         {
-            return new AudioAssetForm.Data(-1, name, "", null, "", clip);
+            return new AudioAssetForm.Data(-1, name, "", null, "", clip,"");
         }
         public AudioAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new AudioAssetForm.Data(-1, name, "", data, "", null);
+            return new AudioAssetForm.Data(-1, name, "", data, "", null, "");
         }
         public AudioAssetForm.Data CreateDataByPath(string path, string name)
         {
             path = SaveAndLoad.GetRealPath(path);
-            return new AudioAssetForm.Data(-1, name, path, null, "", null);
+            return new AudioAssetForm.Data(-1, name, path, null, "", null, "");
         }
 
     }

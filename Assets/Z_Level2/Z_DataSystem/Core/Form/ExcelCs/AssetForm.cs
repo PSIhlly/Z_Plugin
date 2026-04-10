@@ -54,6 +54,8 @@ public static readonly int autoIdCnt=10000;
                 
         public static Action<Data,object,object> changeAssetAction;
                 
+        public static Action<Data,string,string> changeLabAction;
+                
 
 
         public partial class Data
@@ -67,7 +69,7 @@ public static readonly int autoIdCnt=10000;
                                 get{return _id;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeId(this,_id,value); 
                     }
@@ -79,13 +81,13 @@ public static readonly int autoIdCnt=10000;
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚≥∆£®À˜“˝£©
+                    ///ÂêçÁß∞ÔºàÁ¥¢ÂºïÔºâ
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -97,13 +99,13 @@ public static readonly int autoIdCnt=10000;
                     
                     private string  _path;
                     /// <summary>
-                    ///¬∑æ∂
+                    ///Ë∑ØÂæÑ
                     ///</summary>
                     public string  path{
                                 get{return _path;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePath(this,_path,value); 
                     }
@@ -115,13 +117,13 @@ public static readonly int autoIdCnt=10000;
                     
                     private byte[]  _bytes;
                     /// <summary>
-                    ///∂˛Ω¯÷∆Œƒº˛
+                    ///‰∫åËøõÂà∂Êñá‰ª∂
                     ///</summary>
                     public byte[]  bytes{
                                 get{return _bytes;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeBytes(this,_bytes,value); 
                     }
@@ -133,13 +135,13 @@ public static readonly int autoIdCnt=10000;
                     
                     private string  _hash;
                     /// <summary>
-                    ///π˛œ£
+                    ///ÂìàÂ∏å
                     ///</summary>
                     public string  hash{
                                 get{return _hash;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeHash(this,_hash,value); 
                     }
@@ -151,13 +153,13 @@ public static readonly int autoIdCnt=10000;
                     
                     private object  _asset;
                     /// <summary>
-                    ///‘À–– ±◊ ‘¥
+                    ///ËøêË°åÊó∂ËµÑÊ∫ê
                     ///</summary>
                     public object  asset{
                                 get{return _asset;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAsset(this,_asset,value); 
                     }
@@ -167,7 +169,25 @@ public static readonly int autoIdCnt=10000;
                  
                      }
                     
-            public Data(int id,string name,string path,byte[] bytes,string hash,object asset)
+                    private string  _lab;
+                    /// <summary>
+                    ///Ê†áÁ≠æ
+                    ///</summary>
+                    public string  lab{
+                                get{return _lab;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeLab(this,_lab,value); 
+                    }
+        
+                _lab = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string path,byte[] bytes,string hash,object asset,string lab)
             {
 
              this.id = id;
@@ -176,6 +196,7 @@ public static readonly int autoIdCnt=10000;
              this.bytes = bytes;
              this.hash = hash;
              this.asset = asset;
+             this.lab = lab;
 
             }
             public void Reset(Data data)
@@ -187,11 +208,12 @@ public static readonly int autoIdCnt=10000;
              this.bytes = data.bytes;
              this.hash = data.hash;
              this.asset = data.asset;
+             this.lab = data.lab;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset);
+        return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset,lab);
                 }
             
             public virtual  void BeforeGet()
@@ -201,10 +223,11 @@ public static readonly int autoIdCnt=10000;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",null,"",null);
+                   private static Data _defaultData=new Data(0,"","",null,"",null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -225,6 +248,16 @@ public static readonly int autoIdCnt=10000;
                 }
             }
     
+            static Dictionary<string, List<Data>> _DatasByLab;
+            public static Dictionary<string, List<Data>> DatasByLab
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLab;
+                }
+            }
+    
 
         static public void Init()
         {
@@ -241,7 +274,13 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DatasByPath = new Dictionary<string, List<Data>>() {
+    
+                };
+
+                    _DatasByLab = new Dictionary<string, List<Data>>() {
     
                 };
 
@@ -296,7 +335,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.SelectToken("hash")==null?defaultData.hash:jo.Get<string>("hash"),
 
-                    _defaultData.asset
+                    _defaultData.asset,
+
+                jo.SelectToken("lab")==null?defaultData.lab:jo.Get<string>("lab")
                     );
 
             return data;
@@ -319,6 +360,8 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             jo.Set<string>("hash",data.hash);
 
+            jo.Set<string>("lab",data.lab);
+
             return jo;
         }
 
@@ -338,10 +381,15 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     if(!DatasByPath.ContainsKey(data.path))
                         DatasByPath[data.path]=new List<Data>();
                     DatasByPath[data.path].Add(data);
+    
+                    if(!DatasByLab.ContainsKey(data.lab))
+                        DatasByLab[data.lab]=new List<Data>();
+                    DatasByLab[data.lab].Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -356,11 +404,17 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DatasByPath[data.path].Remove(data);
                     if(DatasByPath[data.path].Count==0)
                         DatasByPath.Remove(data.path);
+    
+                    DatasByLab[data.lab].Remove(data);
+                    if(DatasByLab[data.lab].Count==0)
+                        DatasByLab.Remove(data.lab);
     
 
             idChain.PushId(data.id);
@@ -385,7 +439,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 
@@ -469,6 +525,23 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 {
 
                 changeAssetAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLab(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByLab[oldV].Remove(data);
+                    if(DatasByLab[oldV].Count==0)
+                        DatasByLab.Remove(oldV);
+                    if(!DatasByLab.ContainsKey(newV))
+                        DatasByLab[newV]=new List<Data>();
+                    DatasByLab[newV].Add(data);
+ 
+                changeLabAction?.Invoke(data,oldV,newV);
                 }
                     
             }

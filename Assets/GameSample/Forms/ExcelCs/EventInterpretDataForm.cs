@@ -52,6 +52,8 @@ namespace Form
 
             InterpretDataForm.changeHeaptempAction+=ChangeHeaptemp;
 
+            InterpretDataForm.changeRootuidAction+=ChangeRootuid;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -91,6 +93,8 @@ namespace Form
                 
         public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeHeaptempAction;
                 
+        public static Action<Data,int,int> changeRootuidAction;
+                
         public static Action<Data,string,string> changeReleasetriggerAction;
                 
         public static Action<Data,int,int> changeBlockprogramuidAction;
@@ -102,13 +106,13 @@ namespace Form
 
                     private string  _releaseTrigger;
                     /// <summary>
-                    ///结束释放的trigger
+                    ///缁撴潫閲婃斁鐨則rigger
                     ///</summary>
                     public string  releaseTrigger{
                                 get{return _releaseTrigger;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeReleasetrigger(this,_releaseTrigger,value); 
                     }
@@ -120,13 +124,13 @@ namespace Form
                     
                     private int  _blockProgramUid;
                     /// <summary>
-                    ///阻塞的程序uid
+                    ///闃诲鐨勭▼搴弖id
                     ///</summary>
                     public int  blockProgramUid{
                                 get{return _blockProgramUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeBlockprogramuid(this,_blockProgramUid,value); 
                     }
@@ -136,11 +140,11 @@ namespace Form
                  
                      }
                     
-            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top,data.user,data.subInterpret,data.heapTemp)
+            public Data(InterpretDataForm.Data data):base(data.uid,data.stack,data.heap,data.program,data.p,data.top,data.user,data.subInterpret,data.heapTemp,data.rootUid)
             {
             }
             
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,List<BoxDataForm.Data> heapTemp,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top,user,subInterpret,heapTemp)
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,List<BoxDataForm.Data> heapTemp,int rootUid,string releaseTrigger,int blockProgramUid):base(uid,stack,heap,program,p,top,user,subInterpret,heapTemp,rootUid)
             {
 
              this.uid = uid;
@@ -152,6 +156,7 @@ namespace Form
              this.user = user;
              this.subInterpret = subInterpret;
              this.heapTemp = heapTemp;
+             this.rootUid = rootUid;
              this.releaseTrigger = releaseTrigger;
              this.blockProgramUid = blockProgramUid;
 
@@ -168,13 +173,14 @@ namespace Form
              this.user = data.user;
              this.subInterpret = data.subInterpret;
              this.heapTemp = data.heapTemp;
+             this.rootUid = data.rootUid;
              this.releaseTrigger = data.releaseTrigger;
              this.blockProgramUid = data.blockProgramUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp),releaseTrigger,blockProgramUid);
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp),rootUid,releaseTrigger,blockProgramUid);
                 }
             
             public override  void BeforeGet()
@@ -184,10 +190,11 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,null,"",0);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,null,0,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -216,6 +223,8 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -281,6 +290,8 @@ namespace Form
 
                 jo.SelectToken("heapTemp")==null?defaultData.heapTemp:jo.Get<List<BoxDataForm.Data>>("heapTemp"),
 
+                jo.SelectToken("rootUid")==null?defaultData.rootUid:jo.Get<int>("rootUid"),
+
                 jo.SelectToken("releaseTrigger")==null?defaultData.releaseTrigger:jo.Get<string>("releaseTrigger"),
 
                 jo.SelectToken("blockProgramUid")==null?defaultData.blockProgramUid:jo.Get<int>("blockProgramUid")
@@ -314,6 +325,8 @@ namespace Form
 
             jo.Set<List<BoxDataForm.Data>>("heapTemp",data.heapTemp);
 
+            jo.Set<int>("rootUid",data.rootUid);
+
             jo.Set<string>("releaseTrigger",data.releaseTrigger);
 
             jo.Set<int>("blockProgramUid",data.blockProgramUid);
@@ -337,6 +350,7 @@ namespace Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 InterpretDataForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -351,7 +365,9 @@ InterpretDataForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 InterpretDataForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -376,7 +392,9 @@ InterpretDataForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 
@@ -483,6 +501,16 @@ InterpretDataForm.RemoveData(uid);
                 {
 
                 changeHeaptempAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRootuid(InterpretDataForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRootuidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

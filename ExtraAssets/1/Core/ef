@@ -1,5 +1,75 @@
 [
   {
+    "uid": 17,
+    "name": "子弹销毁",
+    "code": "DestroyObject(self);\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DestroyObject"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 16,
+    "name": "灵梦E",
+    "code": "ShowEffectByCharacter(\"$ef$3$ef$\",self,1);\n",
+    "zCode": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "$ef$3$ef$"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowEffectByCharacter"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
     "uid": 15,
     "name": "装备武器",
     "code": "",
@@ -1262,8 +1332,26 @@
   {
     "uid": 2,
     "name": "主对话",
-    "code": "Pause();\nChangeBgm(\"$a$125a1694a6f9a35770d7964d8fa7984a53c6cd9c$a$\");\n十六夜说话(\"小心，这里有人要抓我\");\n十六夜说话(\"抓到我我就被嘿嘿嘿了\");\n十六夜说话(\"绝对不要被抓到\");\n爱丽丝说话(\"哈哈哈，我来了\");\n爱丽丝说话(\"抓到了把你送给群主\");\n",
+    "code": "ShowTip(\"emptaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\");\nPause();\nChangeBgm(\"$a$125a1694a6f9a35770d7964d8fa7984a53c6cd9c$a$\");\n十六夜说话(\"小心，这里有人要抓我\");\n十六夜说话(\"抓到我我就被嘿嘿嘿了\");\n十六夜说话(\"绝对不要被抓到\");\n爱丽丝说话(\"哈哈哈，我来了\");\n爱丽丝说话(\"抓到了把你送给群主\");\n",
     "zCode": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "emptaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowTip"
+      },
       {
         "v": "0"
       },
@@ -2515,7 +2603,7 @@
   },
   {
     "uid": 10,
-    "name": "子弹销毁",
+    "name": "子弹碰撞销毁",
     "code": "if(IsObjectEnableCollision(target))\n{\nDestroyObject(self);\n} \n;\n",
     "zCode": [
       {
@@ -2770,5 +2858,255 @@
     "returnValue": "void",
     "category": "主流程",
     "type": "抓"
+  },
+  {
+    "uid": 18,
+    "name": "大招",
+    "code": "Pause();\nimage=ShowImage(param1,0.3,3);\nSetImagePosition(image,-2,0.5,0);\nSetImagePosition(image,0.5,0.5,0.5);\nWait(1);\nSetImagePosition(image,2,0.5,0.5);\nContinue();\n",
+    "zCode": [
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Pause"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "param1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.3"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowImage"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "-2"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "17"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Continue"
+      }
+    ],
+    "paramCount": 1,
+    "returnValue": "void",
+    "category": "对话",
+    "type": "弹图"
+  },
+  {
+    "uid": 19,
+    "name": "灵梦Q",
+    "code": "大招(\"$i$ec2b631ac21db3e0dbc5cbb1247b406f0e9ac6ef$i$\");\nShowEffectByCharacter(\"$ef$2$ef$\",self,1);\n",
+    "zCode": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$ec2b631ac21db3e0dbc5cbb1247b406f0e9ac6ef$i$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "大招"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$ef$2$ef$"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowEffectByCharacter"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
   }
 ]

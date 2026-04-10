@@ -108,13 +108,13 @@ namespace Form
 
                     private string  _avatarTexName;
                     /// <summary>
-                    ///Õ∑œÒ√˚≥∆
+                    ///Â§¥ÂÉèÂêçÁß∞
                     ///</summary>
                     public string  avatarTexName{
                                 get{return _avatarTexName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAvatartexname(this,_avatarTexName,value); 
                     }
@@ -126,13 +126,13 @@ namespace Form
                     
                     private Dictionary<string,CharacterParamForm.Data>  _paramDic;
                     /// <summary>
-                    /// ˝æ›
+                    ///Êï∞ÊçÆ
                     ///</summary>
                     public Dictionary<string,CharacterParamForm.Data>  paramDic{
                                 get{return _paramDic;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeParamdic(this,_paramDic,value); 
                     }
@@ -144,13 +144,13 @@ namespace Form
                     
                     private Dictionary<string,CharacterAnimForm.Data>  _animDic;
                     /// <summary>
-                    ///∂Øª≠
+                    ///Âä®Áîª
                     ///</summary>
                     public Dictionary<string,CharacterAnimForm.Data>  animDic{
                                 get{return _animDic;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeAnimdic(this,_animDic,value); 
                     }
@@ -162,13 +162,13 @@ namespace Form
                     
                     private Dictionary<string,string>  _defaultAnimName;
                     /// <summary>
-                    ///‘§…Ë∂Øª≠√˚
+                    ///È¢ÑËÆæÂä®ÁîªÂêç
                     ///</summary>
                     public Dictionary<string,string>  defaultAnimName{
                                 get{return _defaultAnimName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDefaultanimname(this,_defaultAnimName,value); 
                     }
@@ -180,13 +180,13 @@ namespace Form
                     
                     private FaceType  _faceType;
                     /// <summary>
-                    ///≥ØœÚ¿‡–Õ
+                    ///ÊúùÂêëÁ±ªÂûã
                     ///</summary>
                     public FaceType  faceType{
                                 get{return _faceType;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeFacetype(this,_faceType,value); 
                     }
@@ -198,13 +198,13 @@ namespace Form
                     
                     private string  _speedParamName;
                     /// <summary>
-                    ///ÀŸ∂»≤Œ ˝√˚
+                    ///ÈÄüÂ∫¶ÂèÇÊï∞Âêç
                     ///</summary>
                     public string  speedParamName{
                                 get{return _speedParamName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSpeedparamname(this,_speedParamName,value); 
                     }
@@ -216,13 +216,13 @@ namespace Form
                     
                     private string  _hpParamName;
                     /// <summary>
-                    ///—™¡ø≤Œ ˝√˚
+                    ///Ë°ÄÈáèÂèÇÊï∞Âêç
                     ///</summary>
                     public string  hpParamName{
                                 get{return _hpParamName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeHpparamname(this,_hpParamName,value); 
                     }
@@ -234,13 +234,13 @@ namespace Form
                     
                     private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    /// ¬º˛
+                    ///‰∫ã‰ª∂
                     ///</summary>
                     public Dictionary<string,EventTriggerForm.Data>  events{
                                 get{return _events;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEvents(this,_events,value); 
                     }
@@ -252,13 +252,13 @@ namespace Form
                     
                     private Dictionary<EquipPartType,int>  _equips;
                     /// <summary>
-                    ///◊∞±∏£®µ¿æﬂuid£©
+                    ///Ë£ÖÂ§áÔºàÈÅìÂÖ∑uidÔºâ
                     ///</summary>
                     public Dictionary<EquipPartType,int>  equips{
                                 get{return _equips;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEquips(this,_equips,value); 
                     }
@@ -270,13 +270,13 @@ namespace Form
                     
                     private string  _desc;
                     /// <summary>
-                    ///√Ë ˆ
+                    ///ÊèèËø∞
                     ///</summary>
                     public string  desc{
                                 get{return _desc;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDesc(this,_desc,value); 
                     }
@@ -288,13 +288,13 @@ namespace Form
                     
                     private string  _tachie;
                     /// <summary>
-                    ///¡¢ªÊ
+                    ///Á´ãÁªò
                     ///</summary>
                     public string  tachie{
                                 get{return _tachie;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTachie(this,_tachie,value); 
                     }
@@ -306,13 +306,13 @@ namespace Form
                     
                     private bool  _unique;
                     /// <summary>
-                    ///±æ»À
+                    ///Êú¨‰∫∫
                     ///</summary>
                     public bool  unique{
                                 get{return _unique;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUnique(this,_unique,value); 
                     }
@@ -324,13 +324,13 @@ namespace Form
                     
                     private Dictionary<SkillType,int>  _skill;
                     /// <summary>
-                    ///ººƒ‹
+                    ///ÊäÄËÉΩ
                     ///</summary>
                     public Dictionary<SkillType,int>  skill{
                                 get{return _skill;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSkill(this,_skill,value); 
                     }
@@ -342,13 +342,13 @@ namespace Form
                     
                     private float  _recoveryTime;
                     /// <summary>
-                    ///»°œ˚Ω©÷± ±º‰¥¡(s)
+                    ///ÂèñÊ∂àÂÉµÁõ¥Êó∂Èó¥Êà≥(s)
                     ///</summary>
                     public float  recoveryTime{
                                 get{return _recoveryTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeRecoverytime(this,_recoveryTime,value); 
                     }
@@ -360,13 +360,13 @@ namespace Form
                     
                     private bool  _enableNav;
                     /// <summary>
-                    ///ø™∆Ù—∞¬∑
+                    ///ÂºÄÂêØÂØªË∑Ø
                     ///</summary>
                     public bool  enableNav{
                                 get{return _enableNav;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEnablenav(this,_enableNav,value); 
                     }
@@ -444,6 +444,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -512,9 +513,16 @@ namespace Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByNameProtouid = new Dictionary<(string,int), Data>() {
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabelProtouid = new Dictionary<(string,int), List<Data>>() {
     
@@ -681,6 +689,7 @@ namespace Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByNameProtouid[(data.name,data.protoUid)]=data;
     
@@ -709,7 +718,9 @@ ProductForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByNameProtouid.Remove((data.name,data.protoUid));
     
@@ -748,7 +759,9 @@ ProductForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

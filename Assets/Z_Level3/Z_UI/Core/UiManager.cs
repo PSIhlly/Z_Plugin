@@ -10,7 +10,7 @@ using Z_Time;
 using Z_Ui.Base;
 namespace Z_Ui
 {
-    [DefaultExecutionOrder(-20)]
+    [DefaultExecutionOrder(-200)]
     public class UiManager : Z_MonoManager<UiManager>
     {
         public List<GameObject> preloadUis;
@@ -20,7 +20,6 @@ namespace Z_Ui
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
         public Dictionary<string, List<UiHolder>> uiCtrlName2Uis = new Dictionary<string, List<UiHolder>>();
-        public List<Action> uiOnShowEventLst = new List<Action>();
         protected override void Awake()
         {
             base.Awake();
@@ -37,7 +36,6 @@ namespace Z_Ui
         }
         public void Update()
         {
-            InvokeEvents();
         }
         public T GetUi<T>() where T : UiCtrl, new()
         {
@@ -60,7 +58,6 @@ namespace Z_Ui
             uiHolder.ctrl.SetShow(true, param);
 
             uiHolder.transform.SetAsLastSibling();
-            InvokeEvents();
             return uiHolder;
         }
         public void CloseUi<T>() where T : UiCtrl, new()
@@ -139,14 +136,7 @@ namespace Z_Ui
                 }
 
         }
-        public void InvokeEvents()
-        {
-            for (int id = 0; id < uiOnShowEventLst.Count; id++)
-            {
-                uiOnShowEventLst[id]();
-            }
-            uiOnShowEventLst.Clear();
-        }
+
     }
 
 }

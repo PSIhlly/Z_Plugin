@@ -31,8 +31,15 @@ public class StoryLifeEvent : Z_Event
 {
     public StoryLifeEventType type;
 }
+public enum CharacterSkillEventType
+{
+    Use = 0,
+    Ready = 1,
+}
+
 public class CharacterSkillEvent : Z_Event
 {
+    public CharacterSkillEventType type;
     public CharacterProductForm.Data data;
     public int skillUid;
 }
@@ -61,7 +68,7 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
 
     public void OnEvent(StoryItemEvent evt)
     {
-        var heap = new Dictionary<string,BoxDataForm.Data>() { {"self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.ITEM, evt.data.uid.ToString())) } };
+        var heap = new Dictionary<string, BoxDataForm.Data>() { { "self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.ITEM, evt.data.uid.ToString())) } };
         switch (evt.type)
         {
             case StoryItemEventType.Add:
@@ -80,7 +87,7 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
     public void OnEvent(StoryCharacterEvent evt)
     {
         var heap = new Dictionary<string, BoxDataForm.Data>() { { "self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) }, };
-   
+
         switch (evt.type)
         {
             case StoryCharacterEventType.ParamChange:
@@ -98,10 +105,15 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
     }
     public void OnEvent(CharacterSkillEvent evt)
     {
-        var heap = new Dictionary<string, BoxDataForm.Data>() { { "target", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SKILL, evt.skillUid.ToString())) },
-        { "self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) }};
-        _super.TriggerEventExecute(SkillProductForm.DataByUid[evt.skillUid].events.GetDv("invoke", null), 0, heap);
-
-        
+        switch (evt.type)
+        {
+            case CharacterSkillEventType.Use:
+                var heap = new Dictionary<string, BoxDataForm.Data>() { 
+                  { "target", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SKILL, evt.skillUid.ToString())) },
+                  {"self", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) }
+                };
+                _super.TriggerEventExecute(SkillProductForm.DataByUid[evt.skillUid].events.GetDv("invoke", null), 0, heap);
+                break;
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
                     dir = GetDirection(dir);
                     PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * dir);
                 },
-                canStartFunc = () => GameManager.instance.curProgress.blockProgramUid <= 0
+                canStartFunc = () => GameManager.instance.curProgress.blockProgramUid != 0
 
             });
             view.model_attackStick.SetShow(true, new UiStickParam()
@@ -59,7 +59,12 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
                 {
                     PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
                 },
-                canStartFunc = () => GameManager.instance.curProgress.blockProgramUid <= 0 && PlayManager.instance.sceneCtrl.GetCurOptSkill() == null
+                hideAct = () =>
+                {
+                    if (PlayManager.instance.sceneCtrl.GetCurOptSkill()== SkillType.LightAttack)
+                        PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
+                },
+                canStartFunc = () => GameManager.instance.curProgress.blockProgramUid != 0 && PlayManager.instance.sceneCtrl.GetCurOptSkill() == null
 
             });
         }

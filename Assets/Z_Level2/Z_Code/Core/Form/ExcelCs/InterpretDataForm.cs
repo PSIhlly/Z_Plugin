@@ -60,6 +60,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,List<BoxDataForm.Data>,List<BoxDataForm.Data>> changeHeaptempAction;
                 
+        public static Action<Data,int,int> changeRootuidAction;
+                
 
 
         public partial class Data
@@ -73,7 +75,7 @@ public static readonly int autoUidCnt=1000000;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -85,13 +87,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<BoxDataForm.Data>  _stack;
                     /// <summary>
-                    ///’ª
+                    ///Ê†à
                     ///</summary>
                     public List<BoxDataForm.Data>  stack{
                                 get{return _stack;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeStack(this,_stack,value); 
                     }
@@ -103,13 +105,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Dictionary<string,BoxDataForm.Data>  _heap;
                     /// <summary>
-                    ///∂—
+                    ///Â†Ü
                     ///</summary>
                     public Dictionary<string,BoxDataForm.Data>  heap{
                                 get{return _heap;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeHeap(this,_heap,value); 
                     }
@@ -121,13 +123,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private ProgramDataForm.Data  _program;
                     /// <summary>
-                    ///≥Ã–Ú
+                    ///Á®ãÂ∫è
                     ///</summary>
                     public ProgramDataForm.Data  program{
                                 get{return _program;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeProgram(this,_program,value); 
                     }
@@ -139,13 +141,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _p;
                     /// <summary>
-                    ///≥Ã–Úº∆ ˝∆˜
+                    ///Á®ãÂ∫èËÆ°Êï∞Âô®
                     ///</summary>
                     public int  p{
                                 get{return _p;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeP(this,_p,value); 
                     }
@@ -157,13 +159,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _top;
                     /// <summary>
-                    ///’ª∂•
+                    ///Ê†àÈ°∂
                     ///</summary>
                     public int  top{
                                 get{return _top;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTop(this,_top,value); 
                     }
@@ -175,13 +177,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private int  _user;
                     /// <summary>
-                    ///µ˜”√’ﬂid
+                    ///Ë∞ÉÁî®ËÄÖid
                     ///</summary>
                     public int  user{
                                 get{return _user;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUser(this,_user,value); 
                     }
@@ -193,13 +195,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private InterpretDataForm.Data  _subInterpret;
                     /// <summary>
-                    ///◊”Ω‚ Õ∆˜
+                    ///Â≠êËß£ÈáäÂô®
                     ///</summary>
                     public InterpretDataForm.Data  subInterpret{
                                 get{return _subInterpret;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSubinterpret(this,_subInterpret,value); 
                     }
@@ -211,13 +213,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private List<BoxDataForm.Data>  _heapTemp;
                     /// <summary>
-                    ///¡Ÿ ±∂—
+                    ///‰∏¥Êó∂Â†Ü
                     ///</summary>
                     public List<BoxDataForm.Data>  heapTemp{
                                 get{return _heapTemp;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeHeaptemp(this,_heapTemp,value); 
                     }
@@ -227,7 +229,25 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,List<BoxDataForm.Data> heapTemp)
+                    private int  _rootUid;
+                    /// <summary>
+                    ///Ê†πËß£ÈáäÂô®Uid
+                    ///</summary>
+                    public int  rootUid{
+                                get{return _rootUid;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeRootuid(this,_rootUid,value); 
+                    }
+        
+                _rootUid = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,List<BoxDataForm.Data> stack,Dictionary<string,BoxDataForm.Data> heap,ProgramDataForm.Data program,int p,int top,int user,InterpretDataForm.Data subInterpret,List<BoxDataForm.Data> heapTemp,int rootUid)
             {
 
              this.uid = uid;
@@ -239,6 +259,7 @@ public static readonly int autoUidCnt=1000000;
              this.user = user;
              this.subInterpret = subInterpret;
              this.heapTemp = heapTemp;
+             this.rootUid = rootUid;
 
             }
             public void Reset(Data data)
@@ -253,11 +274,12 @@ public static readonly int autoUidCnt=1000000;
              this.user = data.user;
              this.subInterpret = data.subInterpret;
              this.heapTemp = data.heapTemp;
+             this.rootUid = data.rootUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp));
+        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp),rootUid);
                 }
             
             public virtual  void BeforeGet()
@@ -267,10 +289,11 @@ public static readonly int autoUidCnt=1000000;
             }
         }
 
-                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,null);
+                   private static Data _defaultData=new Data(0,null,null,null,0,0,0,null,null,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -297,6 +320,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -354,7 +379,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("subInterpret")==null?defaultData.subInterpret:jo.Get<InterpretDataForm.Data>("subInterpret"),
 
-                jo.SelectToken("heapTemp")==null?defaultData.heapTemp:jo.Get<List<BoxDataForm.Data>>("heapTemp")
+                jo.SelectToken("heapTemp")==null?defaultData.heapTemp:jo.Get<List<BoxDataForm.Data>>("heapTemp"),
+
+                jo.SelectToken("rootUid")==null?defaultData.rootUid:jo.Get<int>("rootUid")
                     );
 
             return data;
@@ -385,6 +412,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<List<BoxDataForm.Data>>("heapTemp",data.heapTemp);
 
+            jo.Set<int>("rootUid",data.rootUid);
+
             return jo;
         }
 
@@ -404,6 +433,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -418,7 +448,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -443,7 +475,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 
@@ -550,6 +584,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeHeaptempAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRootuid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRootuidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

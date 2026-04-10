@@ -74,7 +74,7 @@ public static readonly int autoIdCnt=100;
                                 get{return _id;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeId(this,_id,value); 
                     }
@@ -86,13 +86,13 @@ public static readonly int autoIdCnt=100;
                     
                     private List<string>  _subPrefabUnitName;
                     /// <summary>
-                    ///子预制件
+                    ///瀛愰鍒朵欢
                     ///</summary>
                     public List<string>  subPrefabUnitName{
                                 get{return _subPrefabUnitName;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSubprefabunitname(this,_subPrefabUnitName,value); 
                     }
@@ -104,13 +104,13 @@ public static readonly int autoIdCnt=100;
                     
                     private List<Vector3>  _subPrefabUnitPos;
                     /// <summary>
-                    ///子预制件坐标
+                    ///瀛愰鍒朵欢鍧愭爣
                     ///</summary>
                     public List<Vector3>  subPrefabUnitPos{
                                 get{return _subPrefabUnitPos;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSubprefabunitpos(this,_subPrefabUnitPos,value); 
                     }
@@ -122,13 +122,13 @@ public static readonly int autoIdCnt=100;
                     
                     private List<Vector3>  _subPrefabUnitScale;
                     /// <summary>
-                    ///子预制件缩放
+                    ///瀛愰鍒朵欢缂╂斁
                     ///</summary>
                     public List<Vector3>  subPrefabUnitScale{
                                 get{return _subPrefabUnitScale;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSubprefabunitscale(this,_subPrefabUnitScale,value); 
                     }
@@ -140,13 +140,13 @@ public static readonly int autoIdCnt=100;
                     
                     private List<string>  _subUnitTexsName;
                     /// <summary>
-                    ///子预制件贴图
+                    ///瀛愰鍒朵欢璐村浘
                     ///</summary>
                     public List<string>  subUnitTexsName{
                                 get{return _subUnitTexsName;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSubunittexsname(this,_subUnitTexsName,value); 
                     }
@@ -158,13 +158,13 @@ public static readonly int autoIdCnt=100;
                     
                     private bool  _isObstacle;
                     /// <summary>
-                    ///是否可通行
+                    ///鏄惁鍙�氳
                     ///</summary>
                     public bool  isObstacle{
                                 get{return _isObstacle;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeIsobstacle(this,_isObstacle,value); 
                     }
@@ -212,6 +212,7 @@ public static readonly int autoIdCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -238,6 +239,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -333,6 +336,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -347,7 +351,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
 
             idChain.PushId(data.id);
@@ -372,7 +378,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

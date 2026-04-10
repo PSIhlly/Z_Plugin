@@ -72,7 +72,7 @@ public static readonly int autoUidCnt=1000000;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -84,13 +84,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3  _mapUnitSize;
                     /// <summary>
-                    ///单位图块大小
+                    ///鍗曚綅鍥惧潡澶у皬
                     ///</summary>
                     public Vector3  mapUnitSize{
                                 get{return _mapUnitSize;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMapunitsize(this,_mapUnitSize,value); 
                     }
@@ -102,13 +102,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3Int  _logicSize;
                     /// <summary>
-                    ///逻辑大小
+                    ///閫昏緫澶у皬
                     ///</summary>
                     public Vector3Int  logicSize{
                                 get{return _logicSize;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeLogicsize(this,_logicSize,value); 
                     }
@@ -120,13 +120,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private Vector3Int  _viewSize;
                     /// <summary>
-                    ///视口大小
+                    ///瑙嗗彛澶у皬
                     ///</summary>
                     public Vector3Int  viewSize{
                                 get{return _viewSize;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeViewsize(this,_viewSize,value); 
                     }
@@ -138,13 +138,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _mapJa;
                     /// <summary>
-                    ///地图数据
+                    ///鍦板浘鏁版嵁
                     ///</summary>
                     public string  mapJa{
                                 get{return _mapJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMapja(this,_mapJa,value); 
                     }
@@ -156,13 +156,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _objectJa;
                     /// <summary>
-                    ///景物数据
+                    ///鏅墿鏁版嵁
                     ///</summary>
                     public string  objectJa{
                                 get{return _objectJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeObjectja(this,_objectJa,value); 
                     }
@@ -174,13 +174,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _characterJa;
                     /// <summary>
-                    ///单位数据
+                    ///鍗曚綅鏁版嵁
                     ///</summary>
                     public string  characterJa{
                                 get{return _characterJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCharacterja(this,_characterJa,value); 
                     }
@@ -192,13 +192,13 @@ public static readonly int autoUidCnt=1000000;
                     
                     private string  _itemJa;
                     /// <summary>
-                    ///道具数据
+                    ///閬撳叿鏁版嵁
                     ///</summary>
                     public string  itemJa{
                                 get{return _itemJa;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeItemja(this,_itemJa,value); 
                     }
@@ -250,6 +250,7 @@ public static readonly int autoUidCnt=1000000;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -276,6 +277,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -379,6 +382,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -393,7 +397,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -418,7 +424,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

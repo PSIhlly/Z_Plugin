@@ -93,7 +93,7 @@ namespace Z_Map.Form
         {
 
                 /// <summary>
-                ///单位逻辑
+                ///鍗曚綅閫昏緫
                 ///</summary>
                 public ItemUnit unit
                 {
@@ -105,13 +105,13 @@ namespace Z_Map.Form
 
                     private bool  _enteredScene;
                     /// <summary>
-                    ///进入过所属scene
+                    ///杩涘叆杩囨墍灞瀞cene
                     ///</summary>
                     public bool  enteredScene{
                                 get{return _enteredScene;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEnteredscene(this,_enteredScene,value); 
                     }
@@ -173,6 +173,7 @@ namespace Z_Map.Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -201,6 +202,8 @@ namespace Z_Map.Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -318,6 +321,7 @@ namespace Z_Map.Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -332,7 +336,9 @@ UnitForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 UnitForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -357,7 +363,9 @@ UnitForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

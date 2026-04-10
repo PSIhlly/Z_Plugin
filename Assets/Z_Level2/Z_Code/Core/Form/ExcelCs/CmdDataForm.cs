@@ -71,7 +71,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -83,13 +83,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚≥∆
+                    ///ÂêçÁß∞
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -101,13 +101,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _prmNames;
                     /// <summary>
-                    ///≤Œ ˝√˚≥∆
+                    ///ÂèÇÊï∞ÂêçÁß∞
                     ///</summary>
                     public List<string>  prmNames{
                                 get{return _prmNames;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePrmnames(this,_prmNames,value); 
                     }
@@ -119,13 +119,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _prmTypes;
                     /// <summary>
-                    ///≤Œ ˝¿‡–Õ
+                    ///ÂèÇÊï∞Á±ªÂûã
                     ///</summary>
                     public List<string>  prmTypes{
                                 get{return _prmTypes;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePrmtypes(this,_prmTypes,value); 
                     }
@@ -137,13 +137,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _retNames;
                     /// <summary>
-                    ///∑µªÿ÷µ√˚≥∆
+                    ///ËøîÂõûÂÄºÂêçÁß∞
                     ///</summary>
                     public List<string>  retNames{
                                 get{return _retNames;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeRetnames(this,_retNames,value); 
                     }
@@ -155,13 +155,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<string>  _retTypes;
                     /// <summary>
-                    ///∑µªÿ÷µ¿‡–Õ
+                    ///ËøîÂõûÂÄºÁ±ªÂûã
                     ///</summary>
                     public List<string>  retTypes{
                                 get{return _retTypes;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeRettypes(this,_retTypes,value); 
                     }
@@ -173,13 +173,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _desc;
                     /// <summary>
-                    ///√Ë ˆ
+                    ///ÊèèËø∞
                     ///</summary>
                     public string  desc{
                                 get{return _desc;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDesc(this,_desc,value); 
                     }
@@ -191,13 +191,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _defaultCode;
                     /// <summary>
-                    ///ƒ¨»œ¥˙¬Î
+                    ///ÈªòËÆ§‰ª£Á†Å
                     ///</summary>
                     public string  defaultCode{
                                 get{return _defaultCode;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDefaultcode(this,_defaultCode,value); 
                     }
@@ -249,6 +249,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -290,9 +291,9 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 {3,new Data(3,"-",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} - {0}","1-1")},
 
-                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£®{1}£©*£®{0}£©","1*1")},
+                {4,new Data(4,"*",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"Ôºà{1}Ôºâ*Ôºà{0}Ôºâ","1*1")},
 
-                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"£®{1}£©/£®{0}£©","1/1")},
+                {5,new Data(5,"/",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"Ôºà{1}Ôºâ/Ôºà{0}Ôºâ","1/1")},
 
                 {6,new Data(6,"=",new List<string>(){"a","b",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"{1} = {0}","var=1;")},
 
@@ -331,6 +332,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 {23,new Data(23,"GetValues",new List<string>(){"var",},new List<string>(){"var",},new List<string>(){"list",},new List<string>(){"var",},"{0} 's values list","GetValues(a)")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"Print",_DataByUid[1]},
@@ -379,7 +382,12 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
     
                         {"GetValues",_DataByUid[23]},
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();
@@ -484,6 +492,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -500,7 +509,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -527,7 +538,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

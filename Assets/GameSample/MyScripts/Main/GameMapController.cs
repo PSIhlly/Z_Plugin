@@ -14,6 +14,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Texture;
 using Z_Time;
+using Z_UnitSystem.Form;
 using static UnityEngine.Rendering.DebugUI;
 
 
@@ -34,7 +35,7 @@ namespace Z_Map
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
-                        if (jo != null && jo[productKey] != null)
+                        if (jo != null && jo[productKey].Type!= JTokenType.Null)
                         {
                             _productInfo.Item1 = (int)jo[productKey][0];
                             _productInfo.Item2 = (int)jo[productKey][1];
@@ -45,8 +46,6 @@ namespace Z_Map
             }
             set
             {
-                var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
-                data.extra = GetProductInfoString(jo,value);
                 _productInfo = value;
             }
 
@@ -110,16 +109,15 @@ namespace Z_Map
             }
             set
             {
-
-                var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
-               
-                data.extra = GetParamInfoString(jo, value);
                 _paramInfo = value;
             }
         }
         public static string GetParamInfoString(JObject ori, Dictionary<string, GameParamForm.Data> info)
         {
-            ori.Set(paramKey, info);
+            if(info!=null)
+            {
+                ori.Set(paramKey, info);
+            }
             return ori.ToString();
         }
     }
@@ -140,6 +138,19 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public GameMapController(GameManager super) : base(super)
     {
         Z_EventHelper.Register(this);
+        UnitForm.beforeGetAction += (data) =>
+        {
+            if (data.unit is MapUnit mapU)
+            {
+                var jo = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
+
+                MapUnit.GetProductInfoString(jo, mapU.productInfo);
+
+               MapUnit.GetParamInfoString(jo, mapU.paramInfo);
+                data.extra = jo.ToString();
+            }
+
+        };
     }
 
     public Dictionary<(string, int), Texture2D> alphaTextureDic = new Dictionary<(string, int), Texture2D>();

@@ -244,6 +244,10 @@ namespace PlayerTouchOpt
     {
 
             public PlaySceneMessage.UiPlaySceneMessageCtrl page_PlaySceneMessage;
+            public GameObject go_eStick;
+            public UiStickCtrl model_eStick;
+            public GameObject go_qStick;
+            public UiStickCtrl model_qStick;
             public PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt;
             public GameObject go_noScene;
             public GameObject go_map;
@@ -259,17 +263,21 @@ namespace PlayerTouchOpt
         {
 
             page_PlaySceneMessage = (PlaySceneMessage.UiPlaySceneMessageCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
-            page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            go_noScene = uiHolder.elementTrsLst[2].gameObject;
-            go_map = uiHolder.elementTrsLst[3].gameObject;
-            go_menu = uiHolder.elementTrsLst[4].gameObject;
-            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            go_teamer = uiHolder.elementTrsLst[6].gameObject;
-            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            go_func = uiHolder.elementTrsLst[8].gameObject;
-            btn_map = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            btn_menu = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            btn_data = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            go_eStick = uiHolder.elementTrsLst[1].gameObject;
+            model_eStick = (UiStickCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            go_qStick = uiHolder.elementTrsLst[3].gameObject;
+            model_qStick = (UiStickCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            go_noScene = uiHolder.elementTrsLst[6].gameObject;
+            go_map = uiHolder.elementTrsLst[7].gameObject;
+            go_menu = uiHolder.elementTrsLst[8].gameObject;
+            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            go_teamer = uiHolder.elementTrsLst[10].gameObject;
+            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            go_func = uiHolder.elementTrsLst[12].gameObject;
+            btn_map = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_data = uiHolder.elementTrsLst[15].GetComponent<Btn>();
         }
 
     }
@@ -296,12 +304,16 @@ namespace PlayerTouchOpt
 
             view.page_PlaySceneMessage = new PlaySceneMessage.UiPlaySceneMessageCtrl();
             view.page_PlaySceneMessage.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_eStick = new UiStickCtrl();
+            view.model_eStick.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.model_qStick = new UiStickCtrl();
+            view.model_qStick.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
             view.page_PlayerTouchOpt = new PlayerTouchOpt.UiPlayerTouchOptCtrl();
-            view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.model_ParamShow = new UiParamShowCtrl();
-            view.model_ParamShow.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_ParamShow.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.sub_teamer = new UiTeamerCtrl();
-            view.sub_teamer.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.sub_teamer.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
         }
 
     }

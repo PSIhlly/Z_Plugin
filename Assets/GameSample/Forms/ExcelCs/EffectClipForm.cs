@@ -78,7 +78,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -90,13 +90,13 @@ public static readonly int autoUidCnt=100;
                     
                     private string  _tex;
                     /// <summary>
-                    ///Õº∆¨√˚
+                    ///ÂõæÁâáÂêç
                     ///</summary>
                     public string  tex{
                                 get{return _tex;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTex(this,_tex,value); 
                     }
@@ -108,13 +108,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _time;
                     /// <summary>
-                    ///πÿº¸ ±øÃ£®√Î£©
+                    ///ÂÖ≥ÈîÆÊó∂ÂàªÔºàÁßíÔºâ
                     ///</summary>
                     public float  time{
                                 get{return _time;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTime(this,_time,value); 
                     }
@@ -126,13 +126,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Vector3  _pos;
                     /// <summary>
-                    ///Œª÷√
+                    ///‰ΩçÁΩÆ
                     ///</summary>
                     public Vector3  pos{
                                 get{return _pos;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePos(this,_pos,value); 
                     }
@@ -144,13 +144,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _rot;
                     /// <summary>
-                    ///–˝◊™
+                    ///ÊóãËΩ¨
                     ///</summary>
                     public float  rot{
                                 get{return _rot;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeRot(this,_rot,value); 
                     }
@@ -162,13 +162,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Vector3  _scale;
                     /// <summary>
-                    ///¥Û–°
+                    ///Â§ßÂ∞è
                     ///</summary>
                     public Vector3  scale{
                                 get{return _scale;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeScale(this,_scale,value); 
                     }
@@ -180,13 +180,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _opacity;
                     /// <summary>
-                    ///Õ∏√˜∂»
+                    ///ÈÄèÊòéÂ∫¶
                     ///</summary>
                     public float  opacity{
                                 get{return _opacity;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeOpacity(this,_opacity,value); 
                     }
@@ -198,13 +198,13 @@ public static readonly int autoUidCnt=100;
                     
                     private bool  _transition;
                     /// <summary>
-                    ///π˝∂…
+                    ///ËøáÊ∏°
                     ///</summary>
                     public bool  transition{
                                 get{return _transition;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTransition(this,_transition,value); 
                     }
@@ -256,6 +256,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -282,6 +283,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -385,6 +388,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -399,7 +403,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -424,7 +430,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

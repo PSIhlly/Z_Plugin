@@ -80,13 +80,13 @@ namespace Form
 
                     private string  _prefabName;
                     /// <summary>
-                    ///‘§÷∆√˚≥∆
+                    ///È¢ÑÂà∂ÂêçÁß∞
                     ///</summary>
                     public string  prefabName{
                                 get{return _prefabName;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePrefabname(this,_prefabName,value); 
                     }
@@ -98,7 +98,7 @@ namespace Form
                     
                     private float  _step;
                     /// <summary>
-                    ///Ω◊ ˝
+                    ///Èò∂Êï∞
                     ///</summary>
                     public float  step{
                                 get{return _step;}
@@ -151,6 +151,7 @@ private set{
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -207,6 +208,8 @@ private set{
                 {100004,new Data(100004,"5slope","map5Slope","z_map_a$alpha$0",5f,"")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
                         {"plain",_DataById[100001]},
@@ -217,7 +220,12 @@ private set{
     
                         {"5slope",_DataById[100004]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -332,6 +340,7 @@ private set{
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -352,7 +361,9 @@ MapBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -383,7 +394,9 @@ MapBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

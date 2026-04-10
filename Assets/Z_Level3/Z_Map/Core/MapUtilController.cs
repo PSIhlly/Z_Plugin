@@ -20,6 +20,7 @@ namespace Z_Map
     }
     public class MapUtilController : Z_Controller<MapManager>
     {
+        Vector3[] tryDir = new Vector3[] { Vector3.forward * 0.1f, Vector3.back * 0.1f, Vector3.left * 0.1f, Vector3.right * 0.1f };
         public MapUtilController(MapManager super) : base(super)
         {
         }
@@ -53,6 +54,16 @@ namespace Z_Map
 
             return _super.data.maps.ContainsKey((x, y, z));
         }
+        public bool IsOnBoundary(Vector3 pos)
+        {
+            for (int i = 0; i < tryDir.Length; i++)
+            {
+                if (!InArea(pos + tryDir[i]))
+                    return true;
+            }
+            return false;
+        }
+
         public Vector3Int RealPos2MapPosInt(Vector3 pos)
         {
             pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
@@ -88,14 +99,24 @@ namespace Z_Map
             Vector3Int mapPos = RealPos2MapPosInt(pos);
             //groundFirst
             int floor = -1;
-            if (_super.data.mapXZ2Y.ContainsKey((mapPos.x, mapPos.z)))
+            if (GlobalSettings.ENABLE_GRAVITY)
             {
-                foreach (var u in _super.data.mapXZ2Y[(mapPos.x, mapPos.z)])
+                if (_super.data.mapXZ2Y.ContainsKey((mapPos.x, mapPos.z)))
                 {
-                    if (u <= mapPos.y && u > floor)
+                    foreach (var u in _super.data.mapXZ2Y[(mapPos.x, mapPos.z)])
                     {
-                        floor = u;
+                        if (u <= mapPos.y && u > floor)
+                        {
+                            floor = u;
+                        }
                     }
+                }
+
+            }else
+            {
+                if (_super.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                {
+                    floor = 1;
                 }
             }
 

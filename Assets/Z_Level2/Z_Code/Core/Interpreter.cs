@@ -1,12 +1,11 @@
 //#define INTERPRETER_DEBUG 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Z_Code.Form;
 using Z_Debug;
 using static Z_Code.Form.InterpretDataForm;
+
 namespace Z_Code
 {
     public enum Op
@@ -47,6 +46,7 @@ namespace Z_Code
             }
             public partial class Data
             {
+                public int debugId;
                 protected Interpreter _interpreter;
                 public virtual RetInfo Interpret()
                 {
@@ -118,74 +118,78 @@ namespace Z_Code
 
         public RetInfo Interpret()
         {
-
-            int cnt = data.program.zCode.Count;
+            var zCode = data.program.zCode;
+            int cnt = zCode.Count;
+            Dictionary<string, BoxDataForm.Data> heap = data.heap;
+            List<BoxDataForm.Data> stack = data.stack;
             BoxDataForm.Data box = null;
             BoxDataForm.Data box2 = null;
             BoxDataForm.Data realBox = null;
 #if INTERPRETER_DEBUG
             {
-                Z_Log.Log("[Start]");
+                Z_Log.Log(data.debugId+"[Start]" + data.program.code);
             }
 #endif
             for (; data.p < cnt; data.p++)
             {
+                int opCode = int.Parse(zCode[data.p]);
 #if INTERPRETER_DEBUG
-                Z_Log.Log(data.p + ":" + (Op)int.Parse(data.program.zCode[data.p]));
+                Z_Log.Log(data.p + ":" + (Op)opCode);
 
                 Z_Log.Log("{Current Stacks:}");
-                for (int i=0;i<data.stack.Count;i++)
+                for (int i=0;i<stack.Count;i++)
                 {
-                    Z_Log.Log("{"+i+" val:"+ data.stack[i].valName+" num:"+ data.stack[i].num+" str:"+ data.stack[i].str+" dic:"+ data.stack[i].dic.Count+ "}");
+                    Z_Log.Log("{"+i+" val:"+ stack[i].valName+" num:"+ stack[i].num+" str:"+ stack[i].str+" dic:"+ stack[i].dic.Count+ "}");
                 }
 #endif
 
-                switch ((Op)(int.Parse(data.program.zCode[data.p])))
+                switch ((Op)opCode)
                 {
                     case Op.PushNum:
                         data.p++;
-                        Push(CodeHelper.CreateBoxByNum(float.Parse(data.program.zCode[data.p])));
+                        Push(CodeHelper.CreateBoxByNum(float.Parse(zCode[data.p])));
                         break;
                     case Op.PushStr:
                         data.p++;
-                        Push(CodeHelper.CreateBoxByStr(data.program.zCode[data.p]));
+                        Push(CodeHelper.CreateBoxByStr(zCode[data.p]));
                         break;
                     case Op.Get:
                         data.p++;
-                        var nm = data.program.zCode[data.p];
-                        Push(CodeHelper.CreateBoxByVal(nm));
+                        Push(CodeHelper.CreateBoxByVal(zCode[data.p]));
                         break;
                     case Op.Call:
-                        string funcName = data.program.zCode[data.p + 1];
+                        string funcName = zCode[data.p + 1];
 #if INTERPRETER_DEBUG
                         Z_Log.Log(" invoke" + funcName);
 #endif
                         try
                         {
-                            if (BaseData.cmdDic.ContainsKey(funcName))
+                            if (BaseData.cmdDic.TryGetValue(funcName, out var cmdTemplate))
                             {
-                                var cmd = BaseData.cmdDic[funcName].GetNew();
+                                var cmd = cmdTemplate.GetNew();
                                 var form = cmd.GetForm();
-                                var prmCount = (int)GetNum(data.stack[data.top]);
+                                int prmCount = (int)GetNum(stack[data.top]);
                                 var prm = new BoxDataForm.Data[prmCount];
-                                for (int i = 0; i < prm.Length; i++)
+                                for (int i = 0; i < prmCount; i++)
                                 {
-                                    prm[i] = GetBox(data.stack[data.top - i - 1]);
+                                    prm[i] = GetBox(stack[data.top - i - 1]);
                                 }
                                 if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
                                 {
-                                    cmd.Execute(prm, data.heap, asyncTask);
+                                    cmd.Execute(prm, heap, asyncTask);
                                 }
 
                                 if (asyncTask.IsComplete())
                                 {
-                                    //Delay
                                     data.p++;
-                                    for (int i = 0; i <= prm.Length; i++)
+                                    int removeCount = prmCount + 1;
+                                    for (int i = 0; i < removeCount; i++)
                                     {
                                         Pop();
                                     }
-                                    for (int i = 0; i < (form.retNames == null ? 0 : form.retNames.Count); i++)
+                                    var retNames = form.retNames;
+                                    int retCount = retNames == null ? 0 : retNames.Count;
+                                    for (int i = 0; i < retCount; i++)
                                     {
                                         Push(asyncTask.res[i]);
                                     }
@@ -197,33 +201,32 @@ namespace Z_Code
                                 }
 
                             }
-                            else if (ProgramDataForm.DataByName.ContainsKey(funcName))
+                            else if (ProgramDataForm.DataByName.TryGetValue(funcName, out var func))
                             {
-                                var func = ProgramDataForm.DataByName[funcName];
-
-                                var prmCount = (int)GetNum(data.stack[data.top]);
+                                int prmCount = (int)GetNum(stack[data.top]);
                                 var prm = new BoxDataForm.Data[prmCount];
                                 var newHeap = new Dictionary<string, BoxDataForm.Data>();
-                                for (int i = 0; i < prm.Length; i++)
+                                for (int i = 0; i < prmCount; i++)
                                 {
-                                    newHeap[$"param{i + 1}"] = GetBox(data.stack[data.top - i - 1]).DeepCopy();
+                                    newHeap[$"param{i + 1}"] = GetBox(stack[data.top - i - 1]).DeepCopy();
                                 }
                                 if (data.subInterpret == null)
                                 {
-                                    data.subInterpret = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), newHeap, func, 0, -1, 0, null, new List<BoxDataForm.Data>());
+                                    data.subInterpret = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), newHeap, func, 0, -1, 0, null, new List<BoxDataForm.Data>(), data.rootUid == 0 ? data.uid : data.rootUid);
                                 }
                                 var ret = data.subInterpret.Interpret();
 
                                 if (ret.complete)
                                 {
                                     data.heapTemp.Clear();
-                                    //Delay
                                     data.p++;
-                                    for (int i = 0; i < prm.Length; i++)
+                                    var subHeap = data.subInterpret.heap;
+                                    for (int i = 0; i < prmCount; i++)
                                     {
-                                        GetBox(data.stack[data.top - i - 1]).Reset(data.subInterpret.heap[$"param{i + 1}"]);
+                                        GetBox(stack[data.top - i - 1]).Reset(subHeap[$"param{i + 1}"]);
                                     }
-                                    for (int i = 0; i <= prm.Length; i++)
+                                    int removeCount = prmCount + 1;
+                                    for (int i = 0; i < removeCount; i++)
                                     {
                                         Pop();
                                     }
@@ -251,14 +254,15 @@ namespace Z_Code
                     case Op.Equal:
                         box = GetBox(Pop());
                         box2 = GetBox(Pop());
-                        if(box.str==null&& box2.str == null)
+                        if (box.str == null && box2.str == null)
                         {
                             Push(CodeHelper.CreateBoxByNum(GetNum(box) == GetNum(box2) ? 1 : 0));
-                        }else 
+                        }
+                        else
                         {
                             Push(CodeHelper.CreateBoxByNum(GetStr(box) == GetStr(box2) ? 1 : 0));
                         }
-                        
+
                         break;
                     case Op.Greater:
                         Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) > GetNum(Pop()) ? 1 : 0));
@@ -296,24 +300,24 @@ namespace Z_Code
                         realBox = GetBox(box);
                         if (box.str != null)
                         {
-                            data.heap[box.valName].dic[box.str] = GetBox(Pop()).DeepCopy();
+                            heap[box.valName].dic[box.str] = GetBox(Pop()).DeepCopy();
                         }
                         else
                         {
-                            data.heap[box.valName] = GetBox(Pop()).DeepCopy();
+                            heap[box.valName] = GetBox(Pop()).DeepCopy();
                         }
                         break;
                     case Op.Plus:
-                         box = GetBox(Pop());
-                         box2 = GetBox(Pop());
-                        if(box.dic.Count>0&&box2.dic.Count>0)
+                        box = GetBox(Pop());
+                        box2 = GetBox(Pop());
+                        if (box.dic.Count > 0 && box2.dic.Count > 0)
                         {
                             var ret = CodeHelper.CreateBox();
-                            foreach(var pair in box.dic)
+                            foreach (var pair in box.dic)
                             {
-                                if (box2.dic.ContainsKey(pair.Key))
+                                if (box2.dic.TryGetValue(pair.Key, out var val2))
                                 {
-                                    ret.dic[pair.Key]=ValuePlus(pair.Value, box2.dic[pair.Key]);
+                                    ret.dic[pair.Key] = ValuePlus(pair.Value, val2);
                                 }
                             }
                             Push(ret);
@@ -334,9 +338,9 @@ namespace Z_Code
                             var ret = CodeHelper.CreateBox();
                             foreach (var pair in box.dic)
                             {
-                                if (box2.dic.ContainsKey(pair.Key))
+                                if (box2.dic.TryGetValue(pair.Key, out var val2))
                                 {
-                                    ret.dic[pair.Key] = ValueMinus(pair.Value, box2.dic[pair.Key]);
+                                    ret.dic[pair.Key] = ValueMinus(pair.Value, val2);
                                 }
                             }
                             Push(ret);
@@ -357,16 +361,16 @@ namespace Z_Code
                         break;
                     case Op.Jump:
                         data.p++;
-                        data.p = int.Parse(data.program.zCode[data.p]) - 1;
+                        data.p = int.Parse(zCode[data.p]) - 1;
                         break;
                     case Op.IfFalseJump:
                         data.p++;
                         if (GetNum(Pop()) == 0)
                         {
-                            data.p = int.Parse(data.program.zCode[data.p]) - 1;
+                            data.p = int.Parse(zCode[data.p]) - 1;
                         }
                         break;
-                    case Op.Sub://take same
+                    case Op.Sub:
                         box = Pop();
                         string paramName = Pop().valName;
                         box = CodeHelper.CreateBoxByVal(box.valName);
@@ -389,14 +393,14 @@ namespace Z_Code
                     case Op.Ret:
                         box = Pop();
                         realBox = GetBox(box);
-                        
+
                         return new RetInfo()
                         {
                             ret = realBox,
                             complete = true
                         };
                     default:
-                        Z_Log.Log($"op:{int.Parse(data.program.zCode[data.p])} not found����");
+                        Z_Log.Log($"op:{opCode} not found");
                         break;
 
                 }
@@ -410,8 +414,9 @@ namespace Z_Code
 
         private BoxDataForm.Data Pop()
         {
-            var res = data.stack[data.top];
-            data.stack.RemoveAt(data.top);
+            int idx = data.top;
+            var res = data.stack[idx];
+            data.stack.RemoveAt(idx);
             data.top--;
             return res;
         }
@@ -422,28 +427,31 @@ namespace Z_Code
         }
         private BoxDataForm.Data GetBox(BoxDataForm.Data box)
         {
-            if (!string.IsNullOrEmpty(box.valName))
+            string valName = box.valName;
+            if (!string.IsNullOrEmpty(valName))
             {
-                if (!data.heap.ContainsKey(box.valName))
+                var heap = data.heap;
+                if (!heap.TryGetValue(valName, out var heapBox))
                 {
-                    data.heap[box.valName] = CodeHelper.CreateBox();
+                    heapBox = CodeHelper.CreateBox();
+                    heap[valName] = heapBox;
                 }
-                if (box.str != null)
+                string boxStr = box.str;
+                if (boxStr != null)
                 {
-                    if (!data.heap[box.valName].dic.ContainsKey(box.str))
+                    if (!heapBox.dic.TryGetValue(boxStr, out var dicBox))
                     {
-
-                        data.heap[box.valName].dic[box.str] = CodeHelper.CreateBox();
+                        dicBox = CodeHelper.CreateBox();
+                        heapBox.dic[boxStr] = dicBox;
                     }
-                    return data.heap[box.valName].dic[box.str];
+                    return dicBox;
                 }
                 else
                 {
 #if INTERPRETER_DEBUG
-                    Debug.Log(box.valName + " means " + CodeHelper.GetBoxContent(data.heap[box.valName]));
+                    Debug.Log(valName + " means " + CodeHelper.GetBoxContent(heapBox));
 #endif
-
-                    return data.heap[box.valName];
+                    return heapBox;
                 }
             }
             return box;
@@ -470,30 +478,30 @@ namespace Z_Code
         {
             if (box1.str == null && box2.str == null)
             {
-                return (CodeHelper.CreateBoxByNum(GetNum(box1) + GetNum(box2)));
+                return CodeHelper.CreateBoxByNum(GetNum(box1) + GetNum(box2));
             }
             else if (box1.str != null && box2.str == null)
             {
-                return  (CodeHelper.CreateBoxByStr(GetStr(box1) + GetNum(box2)));
+                return CodeHelper.CreateBoxByStr(GetStr(box1) + GetNum(box2));
             }
             else if (box1.str == null && box2.str != null)
             {
-                return  (CodeHelper.CreateBoxByStr(GetNum(box1) + GetStr(box2)));
+                return CodeHelper.CreateBoxByStr(GetNum(box1) + GetStr(box2));
             }
             else
             {
-                return  (CodeHelper.CreateBoxByStr(GetStr(box1) + GetStr(box2)));
+                return CodeHelper.CreateBoxByStr(GetStr(box1) + GetStr(box2));
             }
         }
         private BoxDataForm.Data ValueMinus(BoxDataForm.Data box1, BoxDataForm.Data box2)
         {
             if (box1.str == null && box2.str == null)
             {
-                return (CodeHelper.CreateBoxByNum(GetNum(box1) - GetNum(box2)));
+                return CodeHelper.CreateBoxByNum(GetNum(box1) - GetNum(box2));
             }
             else
             {
-                return (CodeHelper.CreateBoxByStr("error"));
+                return CodeHelper.CreateBoxByStr("error");
             }
         }
 

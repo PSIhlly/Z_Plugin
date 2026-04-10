@@ -13,6 +13,7 @@ namespace Z_Map
         public MapUnit(UnitForm.Data data) : base(data)
         {
         }
+
         public TileUnit belongTile
         {
             get

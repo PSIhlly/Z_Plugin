@@ -70,7 +70,7 @@ public static readonly int autoIdCnt=100;
                                 get{return _id;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeId(this,_id,value); 
                     }
@@ -82,13 +82,13 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚◊÷
+                    ///ÂêçÂ≠ó
                     ///</summary>
                     public string  name{
                                 get{return _name;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeName(this,_name,value); 
                     }
@@ -100,13 +100,13 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _desc;
                     /// <summary>
-                    ///ºÚΩÈ
+                    ///ÁÆÄ‰ªã
                     ///</summary>
                     public string  desc{
                                 get{return _desc;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDesc(this,_desc,value); 
                     }
@@ -118,13 +118,13 @@ public static readonly int autoIdCnt=100;
                     
                     private string  _icon;
                     /// <summary>
-                    ///∑‚√Ê
+                    ///Â∞ÅÈù¢
                     ///</summary>
                     public string  icon{
                                 get{return _icon;}
  set{
 
-                    if(_DataById!=null&&_DataById.ContainsValue(this))
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeIcon(this,_icon,value); 
                     }
@@ -168,6 +168,7 @@ public static readonly int autoIdCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -194,6 +195,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -281,6 +284,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -295,7 +299,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
 
             idChain.PushId(data.id);
@@ -320,7 +326,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

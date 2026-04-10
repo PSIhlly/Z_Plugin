@@ -114,6 +114,7 @@ namespace Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -151,521 +152,523 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1000001,new Data(1000001,"terrain","Terrain","µØĞÎ")},
+                {1000001,new Data(1000001,"terrain","Terrain","åœ°å½¢")},
 
-                {1000002,new Data(1000002,"texture","Texture","ÌùÍ¼")},
+                {1000002,new Data(1000002,"texture","Texture","è´´å›¾")},
 
-                {1000003,new Data(1000003,"transitionMask","Transition mask","¹ı¶ÉÕÚÕÖ")},
+                {1000003,new Data(1000003,"transitionMask","Transition mask","è¿‡æ¸¡é®ç½©")},
 
-                {1000004,new Data(1000004,"object","Object","ÎïÌå")},
+                {1000004,new Data(1000004,"object","Object","ç‰©ä½“")},
 
-                {1000005,new Data(1000005,"item","item","µÀ¾ß")},
+                {1000005,new Data(1000005,"item","item","é“å…·")},
 
-                {1000006,new Data(1000006,"erase","Erase","Çå³ı")},
+                {1000006,new Data(1000006,"erase","Erase","æ¸…é™¤")},
 
-                {1000007,new Data(1000007,"all erase","All erase","È«²¿Çå³ı")},
+                {1000007,new Data(1000007,"all erase","All erase","å…¨éƒ¨æ¸…é™¤")},
 
-                {1000008,new Data(1000008,"remain terrain","Remain terrain","±£ÁôµØÃæ")},
+                {1000008,new Data(1000008,"remain terrain","Remain terrain","ä¿ç•™åœ°é¢")},
 
-                {1000009,new Data(1000009,"texture only","Terrain texture only","½öµØÃæÌùÍ¼")},
+                {1000009,new Data(1000009,"texture only","Terrain texture only","ä»…åœ°é¢è´´å›¾")},
 
-                {1000010,new Data(1000010,"maxYTip","The height must be less than the ceiling of this level.","¸ß¶È±ØĞëĞ¡ÓÚ¸Ã²ãÌì»¨°å")},
+                {1000010,new Data(1000010,"maxYTip","The height must be less than the ceiling of this level.","é«˜åº¦å¿…é¡»å°äºè¯¥å±‚å¤©èŠ±æ¿")},
 
-                {1000011,new Data(1000011,"minYTip","The height must be greater than the floor of this level.","¸ß¶È±ØĞë´óÓÚ¸Ã²ãµØ°å")},
+                {1000011,new Data(1000011,"minYTip","The height must be greater than the floor of this level.","é«˜åº¦å¿…é¡»å¤§äºè¯¥å±‚åœ°æ¿")},
 
-                {1000012,new Data(1000012,"Choose main character","Choose main character","Ñ¡ÔñÖ÷½Ç")},
+                {1000012,new Data(1000012,"Choose main character","Choose main character","é€‰æ‹©ä¸»è§’")},
 
-                {1000013,new Data(1000013,"Choose Hp param","Choose Hp param","Ñ¡ÔñÑªÁ¿²ÎÊı")},
+                {1000013,new Data(1000013,"Choose Hp param","Choose Hp param","é€‰æ‹©è¡€é‡å‚æ•°")},
 
-                {1000014,new Data(1000014,"Choose Speed param","Choose Speed param","Ñ¡ÔñÒÆËÙ²ÎÊı")},
+                {1000014,new Data(1000014,"Choose Speed param","Choose Speed param","é€‰æ‹©ç§»é€Ÿå‚æ•°")},
 
-                {1000015,new Data(1000015,"Choose anim","Choose anim","Ñ¡Ôñ¶¯»­")},
+                {1000015,new Data(1000015,"Choose anim","Choose anim","é€‰æ‹©åŠ¨ç”»")},
 
-                {1000016,new Data(1000016,"input value","Input value","ÊäÈëÖµ")},
+                {1000016,new Data(1000016,"input value","Input value","è¾“å…¥å€¼")},
 
-                {1000017,new Data(1000017,"icon","Icon","Í¼±ê")},
+                {1000017,new Data(1000017,"icon","Icon","å›¾æ ‡")},
 
-                {1000018,new Data(1000018,"avatar","Avatar","Í·Ïñ")},
+                {1000018,new Data(1000018,"avatar","Avatar","å¤´åƒ")},
 
-                {1000019,new Data(1000019,"overview","Overview","¼ò½é")},
+                {1000019,new Data(1000019,"overview","Overview","ç®€ä»‹")},
 
-                {1000020,new Data(1000020,"parameter","Parameter","²ÎÊı")},
+                {1000020,new Data(1000020,"parameter","Parameter","å‚æ•°")},
 
-                {1000021,new Data(1000021,"character","Character","ÈËÎï")},
+                {1000021,new Data(1000021,"character","Character","äººç‰©")},
 
-                {1000022,new Data(1000022,"mapObject","Map object","µØÍ¼ÔªËØ")},
+                {1000022,new Data(1000022,"mapObject","Map object","åœ°å›¾å…ƒç´ ")},
 
-                {1000023,new Data(1000023,"globalParameter","Global parameter","È«¾Ö²ÎÊı")},
+                {1000023,new Data(1000023,"globalParameter","Global parameter","å…¨å±€å‚æ•°")},
 
-                {1000024,new Data(1000024,"characterParameter","Character parameter","ÈËÎï²ÎÊı")},
+                {1000024,new Data(1000024,"characterParameter","Character parameter","äººç‰©å‚æ•°")},
 
-                {1000025,new Data(1000025,"itemParameter","Item parameter","µÀ¾ß²ÎÊı")},
+                {1000025,new Data(1000025,"itemParameter","Item parameter","é“å…·å‚æ•°")},
 
-                {1000026,new Data(1000026,"config","Config","Éè¶¨")},
+                {1000026,new Data(1000026,"config","Config","è®¾å®š")},
 
-                {1000027,new Data(1000027,"event","Event","ÊÂ¼ş")},
+                {1000027,new Data(1000027,"event","Event","äº‹ä»¶")},
 
-                {1000028,new Data(1000028,"scene","Scene","³¡¾°")},
+                {1000028,new Data(1000028,"scene","Scene","åœºæ™¯")},
 
-                {1000029,new Data(1000029,"name","Name","Ãû³Æ")},
+                {1000029,new Data(1000029,"name","Name","åç§°")},
 
-                {1000030,new Data(1000030,"introduction","Introduction","½éÉÜ")},
+                {1000030,new Data(1000030,"introduction","Introduction","ä»‹ç»")},
 
-                {1000031,new Data(1000031,"mainCharacter","Main character","Ö÷½Ç")},
+                {1000031,new Data(1000031,"mainCharacter","Main character","ä¸»è§’")},
 
-                {1000032,new Data(1000032,"appearance","Appearance ","Íâ¹Û")},
+                {1000032,new Data(1000032,"appearance","Appearance ","å¤–è§‚")},
 
-                {1000033,new Data(1000033,"dialog","dialog","¶Ô»°")},
+                {1000033,new Data(1000033,"dialog","dialog","å¯¹è¯")},
 
-                {1000034,new Data(1000034,"tips","tips","ÌáÊ¾")},
+                {1000034,new Data(1000034,"tips","tips","æç¤º")},
 
-                {1000035,new Data(1000035,"empty","empty","¿Õ")},
+                {1000035,new Data(1000035,"empty","empty","ç©º")},
 
-                {1000036,new Data(1000036,"if","if","Èç¹û")},
+                {1000036,new Data(1000036,"if","if","å¦‚æœ")},
 
-                {1000037,new Data(1000037,"then","then","Âú×ãÖ´ĞĞ")},
+                {1000037,new Data(1000037,"then","then","æ»¡è¶³æ‰§è¡Œ")},
 
-                {1000038,new Data(1000038,"else","else","²»Âú×ãÖ´ĞĞ")},
+                {1000038,new Data(1000038,"else","else","ä¸æ»¡è¶³æ‰§è¡Œ")},
 
-                {1000039,new Data(1000039,"content","content","ÄÚÈİ")},
+                {1000039,new Data(1000039,"content","content","å†…å®¹")},
 
-                {1000040,new Data(1000040,"conditionJudge","condition judge","Ìõ¼ş")},
+                {1000040,new Data(1000040,"conditionJudge","condition judge","æ¡ä»¶")},
 
-                {1000041,new Data(1000041,"execute","execute","Ö´ĞĞÄÚÈİ")},
+                {1000041,new Data(1000041,"execute","execute","æ‰§è¡Œå†…å®¹")},
 
-                {1000042,new Data(1000042,"text","text","ÎÄ±¾")},
+                {1000042,new Data(1000042,"text","text","æ–‡æœ¬")},
 
-                {1000043,new Data(1000043,"num","num","ÊıÖµ")},
+                {1000043,new Data(1000043,"num","num","æ•°å€¼")},
 
-                {1000044,new Data(1000044,"dialogClip","dialog clip","¶Ô»°Æ¬¶Î")},
+                {1000044,new Data(1000044,"dialogClip","dialog clip","å¯¹è¯ç‰‡æ®µ")},
 
-                {1000045,new Data(1000045,"value","value","Öµ")},
+                {1000045,new Data(1000045,"value","value","å€¼")},
 
-                {1000046,new Data(1000046,"logic","logic","Âß¼­")},
+                {1000046,new Data(1000046,"logic","logic","é€»è¾‘")},
 
-                {1000047,new Data(1000047,"window","window","´°Ìå")},
+                {1000047,new Data(1000047,"window","window","çª—ä½“")},
 
-                {1000048,new Data(1000048,"min","Min","×îĞ¡")},
+                {1000048,new Data(1000048,"min","Min","æœ€å°")},
 
-                {1000049,new Data(1000049,"max","Max","×î´ó")},
+                {1000049,new Data(1000049,"max","Max","æœ€å¤§")},
 
-                {1000050,new Data(1000050,"hpParameter","Hp parameter","ÑªÁ¿²ÎÊı")},
+                {1000050,new Data(1000050,"hpParameter","Hp parameter","è¡€é‡å‚æ•°")},
 
-                {1000051,new Data(1000051,"moveSpeedParameter","Move speed parameter","ÒÆËÙ²ÎÊı")},
+                {1000051,new Data(1000051,"moveSpeedParameter","Move speed parameter","ç§»é€Ÿå‚æ•°")},
 
-                {1000052,new Data(1000052,"idleAnim","Idle anim","´ı»ú¶¯»­")},
+                {1000052,new Data(1000052,"idleAnim","Idle anim","å¾…æœºåŠ¨ç”»")},
 
-                {1000053,new Data(1000053,"moveAnim","Move anim","ÒÆ¶¯¶¯»­")},
+                {1000053,new Data(1000053,"moveAnim","Move anim","ç§»åŠ¨åŠ¨ç”»")},
 
-                {1000054,new Data(1000054,"interval(s)","Interval(s)","¼ä¸ô(Ãë)")},
+                {1000054,new Data(1000054,"interval(s)","Interval(s)","é—´éš”(ç§’)")},
 
-                {1000055,new Data(1000055,"import","Import","µ¼Èë")},
+                {1000055,new Data(1000055,"import","Import","å¯¼å…¥")},
 
-                {1000056,new Data(1000056,"UpperPart","Upper part","ÉÏ°ëÉí")},
+                {1000056,new Data(1000056,"UpperPart","Upper part","ä¸ŠåŠèº«")},
 
-                {1000057,new Data(1000057,"LowerPart","Lower part","ÏÂ°ëÉí")},
+                {1000057,new Data(1000057,"LowerPart","Lower part","ä¸‹åŠèº«")},
 
-                {1000058,new Data(1000058,"equipSetting","Equip setting","×°±¸ÉèÖÃ")},
+                {1000058,new Data(1000058,"equipSetting","Equip setting","è£…å¤‡è®¾ç½®")},
 
-                {1000059,new Data(1000059,"layer","Layer","²ã¼¶")},
+                {1000059,new Data(1000059,"layer","Layer","å±‚çº§")},
 
-                {1000060,new Data(1000060,"scale","Scale","Ëõ·Å")},
+                {1000060,new Data(1000060,"scale","Scale","ç¼©æ”¾")},
 
-                {1000061,new Data(1000061,"height","Height","¸ß")},
+                {1000061,new Data(1000061,"height","Height","é«˜")},
 
-                {1000062,new Data(1000062,"width","Width","¿í")},
+                {1000062,new Data(1000062,"width","Width","å®½")},
 
-                {1000063,new Data(1000063,"length","Length","³¤")},
+                {1000063,new Data(1000063,"length","Length","é•¿")},
 
-                {1000064,new Data(1000064,"model","Model","Ä£ĞÍ")},
+                {1000064,new Data(1000064,"model","Model","æ¨¡å‹")},
 
-                {1000065,new Data(1000065,"style","Style","ÑùÊ½")},
+                {1000065,new Data(1000065,"style","Style","æ ·å¼")},
 
-                {1000066,new Data(1000066,"onUseEvent","On use event","Ê¹ÓÃÊÂ¼ş")},
+                {1000066,new Data(1000066,"onUseEvent","On use event","ä½¿ç”¨äº‹ä»¶")},
 
-                {1000067,new Data(1000067,"price(coins)","Price(Coins)","¼Û¸ñ(»õ±ÒÊı)")},
+                {1000067,new Data(1000067,"price(coins)","Price(Coins)","ä»·æ ¼(è´§å¸æ•°)")},
 
-                {1000068,new Data(1000068,"canEquip","Can equipped","¿É×°±¸")},
+                {1000068,new Data(1000068,"canEquip","Can equipped","å¯è£…å¤‡")},
 
-                {1000069,new Data(1000069,"onEquipEvent","On equip event","×°±¸ÊÂ¼ş")},
+                {1000069,new Data(1000069,"onEquipEvent","On equip event","è£…å¤‡äº‹ä»¶")},
 
-                {1000070,new Data(1000070,"onDisequipEvent","On disequip event","Ğ¶ÏÂÊÂ¼ş")},
+                {1000070,new Data(1000070,"onDisequipEvent","On disequip event","å¸ä¸‹äº‹ä»¶")},
 
-                {1000071,new Data(1000071,"part_1","Part","²¿Î»")},
+                {1000071,new Data(1000071,"part_1","Part","éƒ¨ä½")},
 
-                {1000072,new Data(1000072,"Cube","Cube","·½¿é")},
+                {1000072,new Data(1000072,"Cube","Cube","æ–¹å—")},
 
-                {1000073,new Data(1000073,"Sphere","Sphere","Çò")},
+                {1000073,new Data(1000073,"Sphere","Sphere","çƒ")},
 
-                {1000074,new Data(1000074,"verticalView","vertical view","¸©ÊÓÍ¼")},
+                {1000074,new Data(1000074,"verticalView","vertical view","ä¿¯è§†å›¾")},
 
-                {1000075,new Data(1000075,"leftView","leftView","×óÊÓÍ¼")},
+                {1000075,new Data(1000075,"leftView","leftView","å·¦è§†å›¾")},
 
-                {1000076,new Data(1000076,"frontView","frontView","Ç°ÊÓÍ¼")},
+                {1000076,new Data(1000076,"frontView","frontView","å‰è§†å›¾")},
 
-                {1000077,new Data(1000077,"condition","Condition","Ìõ¼ş")},
+                {1000077,new Data(1000077,"condition","Condition","æ¡ä»¶")},
 
-                {1000078,new Data(1000078,"fixed","Fixed","¹Ì¶¨")},
+                {1000078,new Data(1000078,"fixed","Fixed","å›ºå®š")},
 
-                {1000079,new Data(1000079,"onCharacterTouchEvent","On character touch event","ÈËÎï½Ó´¥ÊÂ¼ş")},
+                {1000079,new Data(1000079,"onCharacterTouchEvent","On character touch event","äººç‰©æ¥è§¦äº‹ä»¶")},
 
-                {1000080,new Data(1000080,"onCharacterLeaveEvent","On character leave event","ÈËÎïÀë¿ªÊÂ¼ş")},
+                {1000080,new Data(1000080,"onCharacterLeaveEvent","On character leave event","äººç‰©ç¦»å¼€äº‹ä»¶")},
 
-                {1000081,new Data(1000081,"onObjectTouchEvent","On object touch event","ÎïÌå½Ó´¥ÊÂ¼ş")},
+                {1000081,new Data(1000081,"onObjectTouchEvent","On object touch event","ç‰©ä½“æ¥è§¦äº‹ä»¶")},
 
-                {1000082,new Data(1000082,"onObjectLeaveEvent","On object leave event","ÎïÌåÀë¿ªÊÂ¼ş")},
+                {1000082,new Data(1000082,"onObjectLeaveEvent","On object leave event","ç‰©ä½“ç¦»å¼€äº‹ä»¶")},
 
-                {1000083,new Data(1000083,"onShowEvent","OnShow","³öÏÖÊÂ¼ş")},
+                {1000083,new Data(1000083,"onShowEvent","OnShow","å‡ºç°äº‹ä»¶")},
 
-                {1000084,new Data(1000084,"customEvent","Custom event","×Ô¶¨ÒåÊÂ¼ş")},
+                {1000084,new Data(1000084,"customEvent","Custom event","è‡ªå®šä¹‰äº‹ä»¶")},
 
-                {1000085,new Data(1000085,"globalEvent","Global event","È«¾ÖÊÂ¼ş")},
+                {1000085,new Data(1000085,"globalEvent","Global event","å…¨å±€äº‹ä»¶")},
 
-                {1000086,new Data(1000086,"category","Category","Ò»¼¶·ÖÀà")},
+                {1000086,new Data(1000086,"category","Category","ä¸€çº§åˆ†ç±»")},
 
-                {1000087,new Data(1000087,"type","Type","¶ş¼¶·ÖÀà")},
+                {1000087,new Data(1000087,"type","Type","äºŒçº§åˆ†ç±»")},
 
-                {1000088,new Data(1000088,"edit","Edit","±à¼­")},
+                {1000088,new Data(1000088,"edit","Edit","ç¼–è¾‘")},
 
-                {1000089,new Data(1000089,"onBeginEvent","On begin event","¿ªÄ»ÊÂ¼ş")},
+                {1000089,new Data(1000089,"onBeginEvent","On begin event","å¼€å¹•äº‹ä»¶")},
 
-                {1000090,new Data(1000090,"skillEvent","Skill event","¼¼ÄÜÊÂ¼ş")},
+                {1000090,new Data(1000090,"skillEvent","Skill event","æŠ€èƒ½äº‹ä»¶")},
 
-                {1000091,new Data(1000091,"map","Map","µØÍ¼")},
+                {1000091,new Data(1000091,"map","Map","åœ°å›¾")},
 
-                {1000092,new Data(1000092,"setPos","Set position","ÉèÖÃÎ»ÖÃ")},
+                {1000092,new Data(1000092,"setPos","Set position","è®¾ç½®ä½ç½®")},
 
-                {1000093,new Data(1000093,"partSetting","Part setting","²¿Î»ÉèÖÃ")},
+                {1000093,new Data(1000093,"partSetting","Part setting","éƒ¨ä½è®¾ç½®")},
 
-                {1000094,new Data(1000094,"enablePart","Enable part","ÆôÓÃ²¿Î»")},
+                {1000094,new Data(1000094,"enablePart","Enable part","å¯ç”¨éƒ¨ä½")},
 
-                {1000095,new Data(1000095,"itemStyle","Item style","µÀ¾ßÍâ¹ÛÑùÊ½")},
+                {1000095,new Data(1000095,"itemStyle","Item style","é“å…·å¤–è§‚æ ·å¼")},
 
-                {1000096,new Data(1000096,"code","Code","´úÂë")},
+                {1000096,new Data(1000096,"code","Code","ä»£ç ")},
 
-                {1000097,new Data(1000097,"entry","Entry","ÁĞ±í")},
+                {1000097,new Data(1000097,"entry","Entry","åˆ—è¡¨")},
 
-                {1000098,new Data(1000098,"chooseModel","Choose model","Ñ¡ÔñÄ£ĞÍ")},
+                {1000098,new Data(1000098,"chooseModel","Choose model","é€‰æ‹©æ¨¡å‹")},
 
-                {1000099,new Data(1000099,"chooseEquipPart","Choose equip part","Ñ¡Ôñ×°±¸²¿Î»")},
+                {1000099,new Data(1000099,"chooseEquipPart","Choose equip part","é€‰æ‹©è£…å¤‡éƒ¨ä½")},
 
-                {1000100,new Data(1000100,"","","ÎŞ")},
+                {1000100,new Data(1000100,"","","æ— ")},
 
-                {1000101,new Data(1000101,"LeftHand","Left hand","×óÊÖ")},
+                {1000101,new Data(1000101,"LeftHand","Left hand","å·¦æ‰‹")},
 
-                {1000102,new Data(1000102,"RightHand","Right hand","ÓÒÊÖ")},
+                {1000102,new Data(1000102,"RightHand","Right hand","å³æ‰‹")},
 
-                {1000103,new Data(1000103,"Head","Head","Í·")},
+                {1000103,new Data(1000103,"Head","Head","å¤´")},
 
-                {1000104,new Data(1000104,"Body","Body","ÉíÌå")},
+                {1000104,new Data(1000104,"Body","Body","èº«ä½“")},
 
-                {1000105,new Data(1000105,"label","Label","±êÇ©")},
+                {1000105,new Data(1000105,"label","Label","æ ‡ç­¾")},
 
-                {1000106,new Data(1000106,"Choose show equipped item style","Choose show equipped item style","Ñ¡Ôñ×°±¸µÄµÀ¾ßÍâ¹ÛÑùÊ½")},
+                {1000106,new Data(1000106,"Choose show equipped item style","Choose show equipped item style","é€‰æ‹©è£…å¤‡çš„é“å…·å¤–è§‚æ ·å¼")},
 
-                {1000107,new Data(1000107,"Quad","Quad","Ãæ")},
+                {1000107,new Data(1000107,"Quad","Quad","é¢")},
 
-                {1000108,new Data(1000108,"Capsule","Capsule","½ºÄÒ")},
+                {1000108,new Data(1000108,"Capsule","Capsule","èƒ¶å›Š")},
 
-                {1000109,new Data(1000109,"unclassified","Unclassified","Î´·ÖÀà")},
+                {1000109,new Data(1000109,"unclassified","Unclassified","æœªåˆ†ç±»")},
 
-                {1000110,new Data(1000110,"Please create a new one or select one from the following","Please create a new one or select one from the following.","Çë´ÓÏÂ·½ĞÂ½¨»òÑ¡ÔñÒ»Ïî")},
+                {1000110,new Data(1000110,"Please create a new one or select one from the following","Please create a new one or select one from the following.","è¯·ä»ä¸‹æ–¹æ–°å»ºæˆ–é€‰æ‹©ä¸€é¡¹")},
 
-                {1000111,new Data(1000111,"center_1","Center","¾ÓÖĞ")},
+                {1000111,new Data(1000111,"center_1","Center","å±…ä¸­")},
 
-                {1000112,new Data(1000112,"Texture Layer Set","Texture layer set","ÌùÍ¼²ã¼¶ÉèÖÃ")},
+                {1000112,new Data(1000112,"Texture Layer Set","Texture layer set","è´´å›¾å±‚çº§è®¾ç½®")},
 
-                {1000113,new Data(1000113,"view position","View position","µ±Ç°Î»ÖÃ")},
+                {1000113,new Data(1000113,"view position","View position","å½“å‰ä½ç½®")},
 
-                {1000114,new Data(1000114,"tool","Tool","¹¤¾ß")},
+                {1000114,new Data(1000114,"tool","Tool","å·¥å…·")},
 
-                {1000115,new Data(1000115,"rotation","Rotation","Ğı×ª")},
+                {1000115,new Data(1000115,"rotation","Rotation","æ—‹è½¬")},
 
-                {1000116,new Data(1000116,"position","Position","Î»ÖÃ")},
+                {1000116,new Data(1000116,"position","Position","ä½ç½®")},
 
-                {1000117,new Data(1000117,"rotate 90¡ã","Rotate 90¡ã","Ğı×ª90¡ã")},
+                {1000117,new Data(1000117,"rotate 90Â°","Rotate 90Â°","æ—‹è½¬90Â°")},
 
-                {1000118,new Data(1000118,"align","Align","¶ÔÆë")},
+                {1000118,new Data(1000118,"align","Align","å¯¹é½")},
 
-                {1000119,new Data(1000119,"resetCount","Reset count","ÖØÖÃÊıÁ¿")},
+                {1000119,new Data(1000119,"resetCount","Reset count","é‡ç½®æ•°é‡")},
 
-                {1000120,new Data(1000120,"ui","UI","½çÃæ")},
+                {1000120,new Data(1000120,"ui","UI","ç•Œé¢")},
 
-                {1000121,new Data(1000121,"notice","Notice","Í¨Öª")},
+                {1000121,new Data(1000121,"notice","Notice","é€šçŸ¥")},
 
-                {1000122,new Data(1000122,"Choose command","Choose command","Ñ¡ÔñÃüÁî")},
+                {1000122,new Data(1000122,"Choose command","Choose command","é€‰æ‹©å‘½ä»¤")},
 
-                {1000123,new Data(1000123,"show type","Show type","ÏÔÊ¾·½Ê½")},
+                {1000123,new Data(1000123,"show type","Show type","æ˜¾ç¤ºæ–¹å¼")},
 
-                {1000124,new Data(1000124,"AlwaysWithPanel","Always with panel","×ÜÊÇÇÒÔÚÃæ°å")},
+                {1000124,new Data(1000124,"AlwaysWithPanel","Always with panel","æ€»æ˜¯ä¸”åœ¨é¢æ¿")},
 
-                {1000125,new Data(1000125,"Always","Always","×ÜÊÇ")},
+                {1000125,new Data(1000125,"Always","Always","æ€»æ˜¯")},
 
-                {1000126,new Data(1000126,"OnlyNotZero","Only not zero","·ÇÁã")},
+                {1000126,new Data(1000126,"OnlyNotZero","Only not zero","éé›¶")},
 
-                {1000127,new Data(1000127,"Hide","Hide","Òş²Ø")},
+                {1000127,new Data(1000127,"Hide","Hide","éšè—")},
 
-                {1000128,new Data(1000128,"tachie","Tachie","Á¢»æ")},
+                {1000128,new Data(1000128,"tachie","Tachie","ç«‹ç»˜")},
 
-                {1000129,new Data(1000129,"description","Description","¼ò½é")},
+                {1000129,new Data(1000129,"description","Description","ç®€ä»‹")},
 
-                {1000130,new Data(1000130,"effect","Effect","ÌØĞ§")},
+                {1000130,new Data(1000130,"effect","Effect","ç‰¹æ•ˆ")},
 
-                {1000131,new Data(1000131,"sustain(s)","Sustain(s)","³ÖĞø(Ãë)")},
+                {1000131,new Data(1000131,"sustain(s)","Sustain(s)","æŒç»­(ç§’)")},
 
-                {1000132,new Data(1000132,"transition","Transition","¹ı¶É")},
+                {1000132,new Data(1000132,"transition","Transition","è¿‡æ¸¡")},
 
-                {1000133,new Data(1000133,"opacity","Opacity","²»Í¸Ã÷¶È")},
+                {1000133,new Data(1000133,"opacity","Opacity","ä¸é€æ˜åº¦")},
 
-                {1000134,new Data(1000134,"image","Image","Í¼Æ¬")},
+                {1000134,new Data(1000134,"image","Image","å›¾ç‰‡")},
 
-                {1000135,new Data(1000135,"onTriggerEvent","On trigger event","´¥·¢ÊÂ¼ş")},
+                {1000135,new Data(1000135,"onTriggerEvent","On trigger event","è§¦å‘äº‹ä»¶")},
 
-                {1000136,new Data(1000136,"triggerCondition","Trigger condition","´¥·¢Ìõ¼ş")},
+                {1000136,new Data(1000136,"triggerCondition","Trigger condition","è§¦å‘æ¡ä»¶")},
 
-                {1000137,new Data(1000137,"Choose effect","Choose effect","Ñ¡ÔñÌØĞ§")},
+                {1000137,new Data(1000137,"Choose effect","Choose effect","é€‰æ‹©ç‰¹æ•ˆ")},
 
-                {1000138,new Data(1000138,"Choose perspective","Choose perspective","Ñ¡ÔñÊÓ½Ç")},
+                {1000138,new Data(1000138,"Choose perspective","Choose perspective","é€‰æ‹©è§†è§’")},
 
-                {1000139,new Data(1000139,"perspective","Perspective","ÊÓ½Ç")},
+                {1000139,new Data(1000139,"perspective","Perspective","è§†è§’")},
 
-                {1000140,new Data(1000140,"Overhead","Overhead","¸©ÊÓ")},
+                {1000140,new Data(1000140,"Overhead","Overhead","ä¿¯è§†")},
 
-                {1000141,new Data(1000141,"Isometric","Isometric","Ğ±ÊÓ")},
+                {1000141,new Data(1000141,"Isometric","Isometric","æ–œè§†")},
 
-                {1000142,new Data(1000142,"ShowAdvancedDialog","Show dialog(advanced)","ÏÔÊ¾¶Ô»°(¸ß¼¶)")},
+                {1000142,new Data(1000142,"ShowAdvancedDialog","Show dialog(advanced)","æ˜¾ç¤ºå¯¹è¯(é«˜çº§)")},
 
-                {1000143,new Data(1000143,"const","Const","³£Á¿")},
+                {1000143,new Data(1000143,"const","Const","å¸¸é‡")},
 
-                {1000144,new Data(1000144,"trigger","Trigger","´¥·¢")},
+                {1000144,new Data(1000144,"trigger","Trigger","è§¦å‘")},
 
-                {1000145,new Data(1000145,"NoLimit","no limit","²»ÏŞÖÆ")},
+                {1000145,new Data(1000145,"NoLimit","no limit","ä¸é™åˆ¶")},
 
-                {1000146,new Data(1000146,"Once","once","Ò»´ÎĞÔ")},
+                {1000146,new Data(1000146,"Once","once","ä¸€æ¬¡æ€§")},
 
-                {1000147,new Data(1000147,"OnceDuring","once during triggering","ÆÚ¼äÒ»´Î")},
+                {1000147,new Data(1000147,"OnceDuring","once during triggering","æœŸé—´ä¸€æ¬¡")},
 
-                {1000148,new Data(1000148,"unique","unique","Î¨Ò»µÄ")},
+                {1000148,new Data(1000148,"unique","unique","å”¯ä¸€çš„")},
 
-                {1000149,new Data(1000149,"Choose trigger condition","Choose trigger condition","Ñ¡Ôñ´¥·¢Ìõ¼ş")},
+                {1000149,new Data(1000149,"Choose trigger condition","Choose trigger condition","é€‰æ‹©è§¦å‘æ¡ä»¶")},
 
-                {1000150,new Data(1000150,"insert","insert","²åÈë")},
+                {1000150,new Data(1000150,"insert","insert","æ’å…¥")},
 
-                {1000151,new Data(1000151,"basic","Basic","»ù´¡")},
+                {1000151,new Data(1000151,"basic","Basic","åŸºç¡€")},
 
-                {1000152,new Data(1000152,"Text","Text","ÎÄ±¾")},
+                {1000152,new Data(1000152,"Text","Text","æ–‡æœ¬")},
 
-                {1000153,new Data(1000153,"variable","Variable","±äÁ¿")},
+                {1000153,new Data(1000153,"variable","Variable","å˜é‡")},
 
-                {1000154,new Data(1000154,"LocalVar","Local variable","¾Ö²¿±äÁ¿")},
+                {1000154,new Data(1000154,"LocalVar","Local variable","å±€éƒ¨å˜é‡")},
 
-                {1000155,new Data(1000155,"ShowTip","Show Tip","ÏÔÊ¾ÌáÊ¾")},
+                {1000155,new Data(1000155,"ShowTip","Show Tip","æ˜¾ç¤ºæç¤º")},
 
-                {1000156,new Data(1000156,"SetLocalVar","Set local variable","ÉèÖÃ¾Ö²¿±äÁ¿")},
+                {1000156,new Data(1000156,"SetLocalVar","Set local variable","è®¾ç½®å±€éƒ¨å˜é‡")},
 
-                {1000157,new Data(1000157,"ShowDialog","Show dialog","ÏÔÊ¾¶Ô»°")},
+                {1000157,new Data(1000157,"ShowDialog","Show dialog","æ˜¾ç¤ºå¯¹è¯")},
 
-                {1000158,new Data(1000158,"ShowEffect","Show effect","ÏÔÊ¾ÌØĞ§")},
+                {1000158,new Data(1000158,"ShowEffect","Show effect","æ˜¾ç¤ºç‰¹æ•ˆ")},
 
-                {1000159,new Data(1000159,"ShowCurrentDialog","Show current dialog","ÏÔÊ¾µ±Ç°¶Ô»°")},
+                {1000159,new Data(1000159,"ShowCurrentDialog","Show current dialog","æ˜¾ç¤ºå½“å‰å¯¹è¯")},
 
-                {1000160,new Data(1000160,"CloseCurrentDialog","Close current dialog","¹Ø±Õµ±Ç°¶Ô»°")},
+                {1000160,new Data(1000160,"CloseCurrentDialog","Close current dialog","å…³é—­å½“å‰å¯¹è¯")},
 
-                {1000161,new Data(1000161,"SetDialogBackground","Set dialog background","ÉèÖÃ¶Ô»°±³¾°")},
+                {1000161,new Data(1000161,"SetDialogBackground","Set dialog background","è®¾ç½®å¯¹è¯èƒŒæ™¯")},
 
-                {1000162,new Data(1000162,"SetDialogContent","Set dialog content","ÉèÖÃ¶Ô»°ÄÚÈİ")},
+                {1000162,new Data(1000162,"SetDialogContent","Set dialog content","è®¾ç½®å¯¹è¯å†…å®¹")},
 
-                {1000163,new Data(1000163,"SetDialogAvatar","Set dialog avatar","ÉèÖÃ¶Ô»°Í·Ïñ")},
+                {1000163,new Data(1000163,"SetDialogAvatar","Set dialog avatar","è®¾ç½®å¯¹è¯å¤´åƒ")},
 
-                {1000164,new Data(1000164,"SetDialogTitle","Set dialog title","ÉèÖÃ¶Ô»°±êÌâ")},
+                {1000164,new Data(1000164,"SetDialogTitle","Set dialog title","è®¾ç½®å¯¹è¯æ ‡é¢˜")},
 
-                {1000165,new Data(1000165,"SetDialogVideo","Set dialog video","ÉèÖÃ¶Ô»°ÊÓÆµ")},
+                {1000165,new Data(1000165,"SetDialogVideo","Set dialog video","è®¾ç½®å¯¹è¯è§†é¢‘")},
 
-                {1000166,new Data(1000166,"SetDialogAudio","Set dialog audio","ÉèÖÃ¶Ô»°ÒôÆµ")},
+                {1000166,new Data(1000166,"SetDialogAudio","Set dialog audio","è®¾ç½®å¯¹è¯éŸ³é¢‘")},
 
-                {1000167,new Data(1000167,"ResetDialog","Reset dialog","ÖØÖÃ¶Ô»°")},
+                {1000167,new Data(1000167,"ResetDialog","Reset dialog","é‡ç½®å¯¹è¯")},
 
-                {1000168,new Data(1000168,"ShowImage","Show image","ÏÔÊ¾Í¼Æ¬")},
+                {1000168,new Data(1000168,"ShowImage","Show image","æ˜¾ç¤ºå›¾ç‰‡")},
 
-                {1000169,new Data(1000169,"imageAdvanced","Image(Advanced)","Í¼Æ¬(¸ß¼¶)")},
+                {1000169,new Data(1000169,"imageAdvanced","Image(Advanced)","å›¾ç‰‡(é«˜çº§)")},
 
-                {1000170,new Data(1000170,"CreateImage","Create image","´´½¨Í¼Æ¬")},
+                {1000170,new Data(1000170,"CreateImage","Create image","åˆ›å»ºå›¾ç‰‡")},
 
-                {1000171,new Data(1000171,"DeleteImage","Delete image","É¾³ıÍ¼Æ¬")},
+                {1000171,new Data(1000171,"DeleteImage","Delete image","åˆ é™¤å›¾ç‰‡")},
 
-                {1000172,new Data(1000172,"SetImagePos","Set image position","ÉèÖÃÍ¼Æ¬Î»ÖÃ")},
+                {1000172,new Data(1000172,"SetImagePos","Set image position","è®¾ç½®å›¾ç‰‡ä½ç½®")},
 
-                {1000173,new Data(1000173,"SetImageOpacity","Set image opacity","ÉèÖÃÍ¼Æ¬²»Í¸Ã÷¶È")},
+                {1000173,new Data(1000173,"SetImageOpacity","Set image opacity","è®¾ç½®å›¾ç‰‡ä¸é€æ˜åº¦")},
 
-                {1000174,new Data(1000174,"SetImageRotate","Set image rotate","ÉèÖÃÍ¼Æ¬Ğı×ª")},
+                {1000174,new Data(1000174,"SetImageRotate","Set image rotate","è®¾ç½®å›¾ç‰‡æ—‹è½¬")},
 
-                {1000175,new Data(1000175,"process","Process","Á÷³Ì")},
+                {1000175,new Data(1000175,"process","Process","æµç¨‹")},
 
-                {1000176,new Data(1000176,"Wait","Wait","µÈ´ı")},
+                {1000176,new Data(1000176,"Wait","Wait","ç­‰å¾…")},
 
-                {1000177,new Data(1000177,"If","If","Èç¹û")},
+                {1000177,new Data(1000177,"If","If","å¦‚æœ")},
 
-                {1000178,new Data(1000178,"For","For","Ñ­»·")},
+                {1000178,new Data(1000178,"For","For","å¾ªç¯")},
 
-                {1000179,new Data(1000179,"Pause","Pause","ÔİÍ£")},
+                {1000179,new Data(1000179,"Pause","Pause","æš‚åœ")},
 
-                {1000180,new Data(1000180,"Continue","Continue","¼ÌĞø")},
+                {1000180,new Data(1000180,"Continue","Continue","ç»§ç»­")},
 
-                {1000181,new Data(1000181,"GameOver","Game over","ÓÎÏ·½áÊø")},
+                {1000181,new Data(1000181,"GameOver","Game over","æ¸¸æˆç»“æŸ")},
 
-                {1000182,new Data(1000182,"Save","Save","±£´æ")},
+                {1000182,new Data(1000182,"Save","Save","ä¿å­˜")},
 
-                {1000183,new Data(1000183,"Load","Load","¶ÁÈ¡")},
+                {1000183,new Data(1000183,"Load","Load","è¯»å–")},
 
-                {1000184,new Data(1000184,"DestroyObject","Destroy object","Ïú»ÙÎïÌå")},
+                {1000184,new Data(1000184,"DestroyObject","Destroy object","é”€æ¯ç‰©ä½“")},
 
-                {1000185,new Data(1000185,"GenerateObject","Generate object","´´½¨ÎïÌå")},
+                {1000185,new Data(1000185,"GenerateObject","Generate object","åˆ›å»ºç‰©ä½“")},
 
-                {1000186,new Data(1000186,"MoveObject","Move object","ÒÆ¶¯ÎïÌå")},
+                {1000186,new Data(1000186,"MoveObject","Move object","ç§»åŠ¨ç‰©ä½“")},
 
-                {1000187,new Data(1000187,"GetSelfObjectID","Get self object ID","»ñÈ¡ÎïÌå×Ô¼ºID")},
+                {1000187,new Data(1000187,"GetSelfObjectID","Get self object ID","è·å–ç‰©ä½“è‡ªå·±ID")},
 
-                {1000188,new Data(1000188,"GetTriggerObjectID","Get trigger object ID","»ñÈ¡´¥·¢ÎïÌåID")},
+                {1000188,new Data(1000188,"GetTriggerObjectID","Get trigger object ID","è·å–è§¦å‘ç‰©ä½“ID")},
 
-                {1000189,new Data(1000189,"Num","Number","Êı×Ö")},
+                {1000189,new Data(1000189,"Num","Number","æ•°å­—")},
 
-                {1000190,new Data(1000190,"math","Math","ÊıÑ§")},
+                {1000190,new Data(1000190,"math","Math","æ•°å­¦")},
 
-                {1000191,new Data(1000191,"Add","Add","¼Ó")},
+                {1000191,new Data(1000191,"Add","Add","åŠ ")},
 
-                {1000192,new Data(1000192,"Subtract","Subtract","¼õ")},
+                {1000192,new Data(1000192,"Subtract","Subtract","å‡")},
 
-                {1000193,new Data(1000193,"Multiply","Multiply","³Ë")},
+                {1000193,new Data(1000193,"Multiply","Multiply","ä¹˜")},
 
-                {1000194,new Data(1000194,"Divide","Divide","³ı")},
+                {1000194,new Data(1000194,"Divide","Divide","é™¤")},
 
-                {1000195,new Data(1000195,"Greater","Greater","´óÓÚ")},
+                {1000195,new Data(1000195,"Greater","Greater","å¤§äº")},
 
-                {1000196,new Data(1000196,"Less","Less","Ğ¡ÓÚ")},
+                {1000196,new Data(1000196,"Less","Less","å°äº")},
 
-                {1000197,new Data(1000197,"Equal","Equal","µÈÓÚ")},
+                {1000197,new Data(1000197,"Equal","Equal","ç­‰äº")},
 
-                {1000198,new Data(1000198,"NotEqual","Not equal","²»µÈÓÚ")},
+                {1000198,new Data(1000198,"NotEqual","Not equal","ä¸ç­‰äº")},
 
-                {1000199,new Data(1000199,"idle","idle anim","ÏĞÖÃ¶¯»­")},
+                {1000199,new Data(1000199,"idle","idle anim","é—²ç½®åŠ¨ç”»")},
 
-                {1000200,new Data(1000200,"idle0","idle anim with up","³¯ÉÏÏĞÖÃ¶¯»­")},
+                {1000200,new Data(1000200,"idle0","idle anim with up","æœä¸Šé—²ç½®åŠ¨ç”»")},
 
-                {1000201,new Data(1000201,"idle1","idle anim with down","³¯ÏÂÏĞÖÃ¶¯»­")},
+                {1000201,new Data(1000201,"idle1","idle anim with down","æœä¸‹é—²ç½®åŠ¨ç”»")},
 
-                {1000202,new Data(1000202,"idle2","idle anim with left","³¯×óÏĞÖÃ¶¯»­")},
+                {1000202,new Data(1000202,"idle2","idle anim with left","æœå·¦é—²ç½®åŠ¨ç”»")},
 
-                {1000203,new Data(1000203,"idle3","idle anim with right","³¯ÓÒÏĞÖÃ¶¯»­")},
+                {1000203,new Data(1000203,"idle3","idle anim with right","æœå³é—²ç½®åŠ¨ç”»")},
 
-                {1000204,new Data(1000204,"move","move anim","ÒÆ¶¯¶¯»­")},
+                {1000204,new Data(1000204,"move","move anim","ç§»åŠ¨åŠ¨ç”»")},
 
-                {1000205,new Data(1000205,"move0","move anim with up","³¯ÉÏÒÆ¶¯¶¯»­")},
+                {1000205,new Data(1000205,"move0","move anim with up","æœä¸Šç§»åŠ¨åŠ¨ç”»")},
 
-                {1000206,new Data(1000206,"move1","move anim with down","³¯ÏÂÒÆ¶¯¶¯»­")},
+                {1000206,new Data(1000206,"move1","move anim with down","æœä¸‹ç§»åŠ¨åŠ¨ç”»")},
 
-                {1000207,new Data(1000207,"move2","move anim with left","³¯×óÒÆ¶¯¶¯»­")},
+                {1000207,new Data(1000207,"move2","move anim with left","æœå·¦ç§»åŠ¨åŠ¨ç”»")},
 
-                {1000208,new Data(1000208,"move3","move anim with right","³¯ÓÒÒÆ¶¯¶¯»­")},
+                {1000208,new Data(1000208,"move3","move anim with right","æœå³ç§»åŠ¨åŠ¨ç”»")},
 
-                {1000209,new Data(1000209,"Choose faceType","Choose face type","Ñ¡Ôñ³¯ÏòÀàĞÍ")},
+                {1000209,new Data(1000209,"Choose faceType","Choose face type","é€‰æ‹©æœå‘ç±»å‹")},
 
-                {1000210,new Data(1000210,"Fixed","Fixed","¹Ì¶¨")},
+                {1000210,new Data(1000210,"Fixed","Fixed","å›ºå®š")},
 
-                {1000211,new Data(1000211,"FourDirection","Four direction","ËÄÏò")},
+                {1000211,new Data(1000211,"FourDirection","Four direction","å››å‘")},
 
-                {1000212,new Data(1000212,"Flexible","Flexible","Áé»î")},
+                {1000212,new Data(1000212,"Flexible","Flexible","çµæ´»")},
 
-                {1000213,new Data(1000213,"faceType","Face type","³¯ÏòÀàĞÍ")},
+                {1000213,new Data(1000213,"faceType","Face type","æœå‘ç±»å‹")},
 
-                {1000214,new Data(1000214,"Image","Image","Í¼Æ¬")},
+                {1000214,new Data(1000214,"Image","Image","å›¾ç‰‡")},
 
-                {1000215,new Data(1000215,"onPerSecondEvent","on per second event","Ã¿ÃëÊÂ¼ş")},
+                {1000215,new Data(1000215,"onPerSecondEvent","on per second event","æ¯ç§’äº‹ä»¶")},
 
-                {1000216,new Data(1000216,"Specific param and  character  change event","Specific param and  character  change event","ÌØ¶¨Íæ¼ÒºÍÊôĞÔ ¸Ä±äµÄÊÂ¼ş")},
+                {1000216,new Data(1000216,"Specific param and  character  change event","Specific param and  character  change event","ç‰¹å®šç©å®¶å’Œå±æ€§ æ”¹å˜çš„äº‹ä»¶")},
 
-                {1000217,new Data(1000217,"Gain specific item event","Gain specific item event","»ñµÃÖ¸¶¨µÀ¾ßµÄÊÂ¼ş")},
+                {1000217,new Data(1000217,"Gain specific item event","Gain specific item event","è·å¾—æŒ‡å®šé“å…·çš„äº‹ä»¶")},
 
-                {1000218,new Data(1000218,"Lost specific item event","Lost specific item event","Ê§È¥Ö¸¶¨µÀ¾ßµÄÊÂ¼ş")},
+                {1000218,new Data(1000218,"Lost specific item event","Lost specific item event","å¤±å»æŒ‡å®šé“å…·çš„äº‹ä»¶")},
 
-                {1000219,new Data(1000219,"onGainItemEvent","On gain item event","»ñµÃµÀ¾ßÊÂ¼ş")},
+                {1000219,new Data(1000219,"onGainItemEvent","On gain item event","è·å¾—é“å…·äº‹ä»¶")},
 
-                {1000220,new Data(1000220,"onLostItemEvent","On lost item event","Ê§È¥µÀ¾ßÊÂ¼ş")},
+                {1000220,new Data(1000220,"onLostItemEvent","On lost item event","å¤±å»é“å…·äº‹ä»¶")},
 
-                {1000221,new Data(1000221,"onCharacterParamChangeEvent","On character param change event","Íæ¼ÒÊôĞÔ±ä»¯ÊÂ¼ş")},
+                {1000221,new Data(1000221,"onCharacterParamChangeEvent","On character param change event","ç©å®¶å±æ€§å˜åŒ–äº‹ä»¶")},
 
-                {1000222,new Data(1000222,"Choose character","Choose character","Ñ¡ÔñÈËÎï")},
+                {1000222,new Data(1000222,"Choose character","Choose character","é€‰æ‹©äººç‰©")},
 
-                {1000223,new Data(1000223,"Choose item","Choose item","Ñ¡ÔñµÀ¾ß")},
+                {1000223,new Data(1000223,"Choose item","Choose item","é€‰æ‹©é“å…·")},
 
-                {1000224,new Data(1000224,"Choose param","Choose param","Ñ¡Ôñ²ÎÊı")},
+                {1000224,new Data(1000224,"Choose param","Choose param","é€‰æ‹©å‚æ•°")},
 
-                {1000225,new Data(1000225,"Any item","Any item","ÈÎÒâµÀ¾ß")},
+                {1000225,new Data(1000225,"Any item","Any item","ä»»æ„é“å…·")},
 
-                {1000226,new Data(1000226,"Any character","Any character","ÈÎÒâÈËÎï")},
+                {1000226,new Data(1000226,"Any character","Any character","ä»»æ„äººç‰©")},
 
-                {1000227,new Data(1000227,"Any param","Any param","ÈÎÒâ²ÎÊı")},
+                {1000227,new Data(1000227,"Any param","Any param","ä»»æ„å‚æ•°")},
 
-                {1000228,new Data(1000228,"Any","Any","ÈÎÒâ")},
+                {1000228,new Data(1000228,"Any","Any","ä»»æ„")},
 
-                {1000229,new Data(1000229,"GainItem","Gain item","»ñµÃµÀ¾ß")},
+                {1000229,new Data(1000229,"GainItem","Gain item","è·å¾—é“å…·")},
 
-                {1000230,new Data(1000230,"LostItem","Lost item","Ê§È¥µÀ¾ß")},
+                {1000230,new Data(1000230,"LostItem","Lost item","å¤±å»é“å…·")},
 
-                {1000231,new Data(1000231,"system","System","ÏµÍ³")},
+                {1000231,new Data(1000231,"system","System","ç³»ç»Ÿ")},
 
-                {1000232,new Data(1000232,"GetSelfCharacterID","Get self character ID","»ñÈ¡ÈËÎï×Ô¼ºID")},
+                {1000232,new Data(1000232,"GetSelfCharacterID","Get self character ID","è·å–äººç‰©è‡ªå·±ID")},
 
-                {1000233,new Data(1000233,"GetTriggerCharacterID","Get trigger character ID","»ñÈ¡´¥·¢ÈËÎïID")},
+                {1000233,new Data(1000233,"GetTriggerCharacterID","Get trigger character ID","è·å–è§¦å‘äººç‰©ID")},
 
-                {1000234,new Data(1000234,"SetCharacterParameter","Set character's Parameter","ÉèÖÃÈËÎï²ÎÊı")},
+                {1000234,new Data(1000234,"SetCharacterParameter","Set character's Parameter","è®¾ç½®äººç‰©å‚æ•°")},
 
-                {1000235,new Data(1000235,"GetCurrentCharacterID","Get current character ID","»ñÈ¡µ±Ç°²Ù×÷ÈËÎïID")},
+                {1000235,new Data(1000235,"GetCurrentCharacterID","Get current character ID","è·å–å½“å‰æ“ä½œäººç‰©ID")},
 
-                {1000236,new Data(1000236,"Avg","AVG","ÎÄ×ÖÍ¼Æ¬ÓÎÏ·")},
+                {1000236,new Data(1000236,"Avg","AVG","æ–‡å­—å›¾ç‰‡æ¸¸æˆ")},
 
-                {1000237,new Data(1000237,"AvgAdvanced","AVG(Advanced)","ÎÄ×ÖÍ¼Æ¬ÓÎÏ·£¨½ø½×£©")},
+                {1000237,new Data(1000237,"AvgAdvanced","AVG(Advanced)","æ–‡å­—å›¾ç‰‡æ¸¸æˆï¼ˆè¿›é˜¶ï¼‰")},
 
-                {1000238,new Data(1000238,"Rpg","RPG","½ÇÉ«°çÑİÓÎÏ·")},
+                {1000238,new Data(1000238,"Rpg","RPG","è§’è‰²æ‰®æ¼”æ¸¸æˆ")},
 
-                {1000239,new Data(1000239,"RpgAdvanced","RPG(Advanced)","½ÇÉ«°çÑİÓÎÏ·£¨½ø½×£©")},
+                {1000239,new Data(1000239,"RpgAdvanced","RPG(Advanced)","è§’è‰²æ‰®æ¼”æ¸¸æˆï¼ˆè¿›é˜¶ï¼‰")},
 
-                {1000240,new Data(1000240,"Avg_desc","Text adventure game (AVG) editor mode is the easiest to use; the creator only needs to create text and illustrations to complete the game.","ÎÄ×ÖÍ¼Æ¬ÓÎÏ·(AVG)Ä£Ê½ÊÇ×îÈİÒ×Ê¹ÓÃµÄ£¬×÷ÕßÖ»ĞèÖÆ×÷ÎÄ×ÖºÍ²åÍ¼£¬¼´¿ÉÍê³ÉÓÎÏ·")},
+                {1000240,new Data(1000240,"Avg_desc","Text adventure game (AVG) editor mode is the easiest to use; the creator only needs to create text and illustrations to complete the game.","æ–‡å­—å›¾ç‰‡æ¸¸æˆ(AVG)æ¨¡å¼æ˜¯æœ€å®¹æ˜“ä½¿ç”¨çš„ï¼Œä½œè€…åªéœ€åˆ¶ä½œæ–‡å­—å’Œæ’å›¾ï¼Œå³å¯å®Œæˆæ¸¸æˆ")},
 
-                {1000241,new Data(1000241,"AvgAdvanced_desc","An advanced version of the text adventure image game editor mode, allowing customization of pop-up images, videos, and music, as well as making certain choices and logical decisions.","ÎÄ×ÖÍ¼Æ¬ÓÎÏ·Ä£Ê½µÄ½ø½×°æ£¬¿É×Ô¶¨Òåµ¯³öÍ¼Æ¬¡¢ÊÓÆµ¡¢ÒôÀÖ£¬Ò²¿ÉÒÔ½øĞĞÒ»Ğ©Ñ¡ÔñºÍÂß¼­ÅĞ¶Ï")},
+                {1000241,new Data(1000241,"AvgAdvanced_desc","An advanced version of the text adventure image game editor mode, allowing customization of pop-up images, videos, and music, as well as making certain choices and logical decisions.","æ–‡å­—å›¾ç‰‡æ¸¸æˆæ¨¡å¼çš„è¿›é˜¶ç‰ˆï¼Œå¯è‡ªå®šä¹‰å¼¹å‡ºå›¾ç‰‡ã€è§†é¢‘ã€éŸ³ä¹ï¼Œä¹Ÿå¯ä»¥è¿›è¡Œä¸€äº›é€‰æ‹©å’Œé€»è¾‘åˆ¤æ–­")},
 
-                {1000242,new Data(1000242,"Rpg_desc","The role-playing game (RPG) mode includes the full set of features from text-based and image-based games, with the additional concepts of players, items, scenes, and maps.","½ÇÉ«°çÑİÓÎÏ·(RPG)Ä£Ê½°üº¬ÎÄ×ÖÍ¼Æ¬ÓÎÏ·µÄÈ«Ì×¹¦ÄÜ£¬¶îÍâÒıÈëÁËÍæ¼Ò¡¢ÎïÆ·¡¢³¡¾°¡¢µØÍ¼µÈ¸ÅÄî")},
+                {1000242,new Data(1000242,"Rpg_desc","The role-playing game (RPG) mode includes the full set of features from text-based and image-based games, with the additional concepts of players, items, scenes, and maps.","è§’è‰²æ‰®æ¼”æ¸¸æˆ(RPG)æ¨¡å¼åŒ…å«æ–‡å­—å›¾ç‰‡æ¸¸æˆçš„å…¨å¥—åŠŸèƒ½ï¼Œé¢å¤–å¼•å…¥äº†ç©å®¶ã€ç‰©å“ã€åœºæ™¯ã€åœ°å›¾ç­‰æ¦‚å¿µ")},
 
-                {1000243,new Data(1000243,"RpgAdvanced_desc","An advanced version of the role-playing game mode, additionally introducing concepts such as skills, equipment, special effects, and scene transitions.","½ÇÉ«°çÑİÓÎÏ·Ä£Ê½µÄ½ø½×°æ£¬¶îÍâÒıÈëÁË¼¼ÄÜ¡¢×°±¸¡¢ÌØĞ§¡¢³¡¾°ÇĞ»»µÈ¸ÅÄî")},
+                {1000243,new Data(1000243,"RpgAdvanced_desc","An advanced version of the role-playing game mode, additionally introducing concepts such as skills, equipment, special effects, and scene transitions.","è§’è‰²æ‰®æ¼”æ¸¸æˆæ¨¡å¼çš„è¿›é˜¶ç‰ˆï¼Œé¢å¤–å¼•å…¥äº†æŠ€èƒ½ã€è£…å¤‡ã€ç‰¹æ•ˆã€åœºæ™¯åˆ‡æ¢ç­‰æ¦‚å¿µ")},
 
-                {1000244,new Data(1000244,"select editor style","Select editor style","Ñ¡Ôñ±à¼­Æ÷Ä£Ê½")},
+                {1000244,new Data(1000244,"select editor style","Select editor style","é€‰æ‹©ç¼–è¾‘å™¨æ¨¡å¼")},
 
-                {1000245,new Data(1000245,"extern","Extern","Íâ²¿µÄ")},
+                {1000245,new Data(1000245,"extern","Extern","å¤–éƒ¨çš„")},
 
-                {1000246,new Data(1000246,"internal","Internal","ÄÚ²¿µÄ")},
+                {1000246,new Data(1000246,"internal","Internal","å†…éƒ¨çš„")},
 
-                {1000247,new Data(1000247,"test","Test","²âÊÔ")},
+                {1000247,new Data(1000247,"test","Test","æµ‹è¯•")},
 
-                {1000248,new Data(1000248,"cantSaveWhenTest","can't save when test","²âÊÔÊ±²»ÄÜ±£´æ")},
+                {1000248,new Data(1000248,"cantSaveWhenTest","can't save when test","æµ‹è¯•æ—¶ä¸èƒ½ä¿å­˜")},
 
-                {1000249,new Data(1000249,"sceneObjectParameter","Scene object parameter","¾°Îï²ÎÊı")},
+                {1000249,new Data(1000249,"sceneObjectParameter","Scene object parameter","æ™¯ç‰©å‚æ•°")},
 
-                {1000250,new Data(1000250,"Choose Skill","Choose Skill","Ñ¡Ôñ¼¼ÄÜ")},
+                {1000250,new Data(1000250,"Choose Skill","Choose Skill","é€‰æ‹©æŠ€èƒ½")},
 
-                {1000251,new Data(1000251,"collision","Collision","Åö×²")},
+                {1000251,new Data(1000251,"collision","Collision","ç¢°æ’")},
 
-                {1000252,new Data(1000252,"isConsume","Consume","ÊÇÏûºÄÆ·")},
+                {1000252,new Data(1000252,"isConsume","Consume","æ˜¯æ¶ˆè€—å“")},
 
-                {1000253,new Data(1000253,"priority","Priority","ÓÅÏÈ¼¶")},
+                {1000253,new Data(1000253,"priority","Priority","ä¼˜å…ˆçº§")},
 
-                {1000254,new Data(1000254,"Up","Up","ÉÏ")},
+                {1000254,new Data(1000254,"Up","Up","ä¸Š")},
 
-                {1000255,new Data(1000255,"Down","Down","ÏÂ")},
+                {1000255,new Data(1000255,"Down","Down","ä¸‹")},
 
-                {1000256,new Data(1000256,"Left","Left","×ó")},
+                {1000256,new Data(1000256,"Left","Left","å·¦")},
 
-                {1000257,new Data(1000257,"Right","Right","ÓÒ")},
+                {1000257,new Data(1000257,"Right","Right","å³")},
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByKey = new Dictionary<string, Data>() {
     
                         {"terrain",_DataById[1000001]},
@@ -900,7 +903,7 @@ namespace Form
     
                         {"position",_DataById[1000116]},
     
-                        {"rotate 90¡ã",_DataById[1000117]},
+                        {"rotate 90Â°",_DataById[1000117]},
     
                         {"align",_DataById[1000118]},
     
@@ -1182,7 +1185,12 @@ namespace Form
     
                         {"Right",_DataById[1000257]},
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();
@@ -1277,6 +1285,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByKey[data.key]=data;
     
@@ -1293,7 +1302,9 @@ TextBaseForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByKey.Remove(data.key);
     
@@ -1320,7 +1331,9 @@ TextBaseForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

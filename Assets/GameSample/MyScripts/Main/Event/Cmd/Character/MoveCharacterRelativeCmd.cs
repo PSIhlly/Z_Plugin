@@ -35,26 +35,30 @@ namespace Z_Code
             var heapTemp = asyncTask.interpreter.data.heapTemp;
 
             var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(heapTemp[0].str, GlobalEventHelper.CHARACTER)];
-            var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
+
             GameManager.instance.evtCtrl.StartTask(() =>
             {
-                var relaPos = new Vector3(heapTemp[1].dic["x"].num, heapTemp[1].dic["height"].num, heapTemp[1].dic["y"].num);
-                var time = Mathf.Max(0.0001f, heapTemp[2].num);
-                var step = Mathf.Min(1, Time.deltaTime / time) * relaPos;
-
-
-                var oldPos = data.pos;
-                
+                var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
+                if (data != null)
                 {
-                    if (data.unit is CharacterUnit o)
+                    var relaPos = new Vector3(heapTemp[1].dic["x"].num, heapTemp[1].dic["height"].num, heapTemp[1].dic["y"].num);
+                    var time = Mathf.Max(0.0001f, heapTemp[2].num);
+                    var step = Mathf.Min(1, Time.deltaTime / time) * relaPos;
+
+
+                    var oldPos = data.pos;
+
                     {
-                        o.Move(step);
+                        if (data.unit is CharacterUnit o)
+                        {
+                            o.Move(step);
+                        }
                     }
+                    var realStep = (data.pos - oldPos);
+                    heapTemp[1].dic["x"].num -= realStep.x;
+                    heapTemp[1].dic["z"].num -= realStep.z;
+                    heapTemp[1].dic["height"].num -= realStep.y;
                 }
-                var realStep = (data.pos - oldPos);
-                heapTemp[1].dic["x"].num -= realStep.x;
-                heapTemp[1].dic["z"].num -= realStep.z;
-                heapTemp[1].dic["height"].num -= realStep.y;
                 heapTemp[2].num -= Time.deltaTime;
                 if (heapTemp[2].num <= 0)
                 {

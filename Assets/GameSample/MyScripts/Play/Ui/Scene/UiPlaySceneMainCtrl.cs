@@ -2,22 +2,91 @@ using Form;
 using Ui.ParamShow;
 using Ui.PlayData;
 using Ui.PlaySceneMenu;
+using Ui.Stick;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Map.Analysis;
 using Z_Ui;
 using Z_Ui.Base;
 
 namespace Ui.PlaySceneMain
 {
 
-    public partial class UiPlaySceneMainCtrl : IZ_Listener<StoryCharacterEvent>
+    public partial class UiPlaySceneMainCtrl : IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>
     {
         Color[] colors = new Color[] { Color.red, Color.blue, Color.yellow };
         UiContainer<UiTeamerCtrl> teamerCon;
         UiContainer<UiParamShowCtrl> prmCon;
+
+        UiStickParam eParam;
+        UiStickParam qParam;
         public override void OnCreate()
         {
+            void Drag(Vector3 dir, SkillType type)
+            {
+                PlayManager.instance.sceneCtrl.SetPlayerRotation(dir, 360);
+                PlayManager.instance.sceneCtrl.SetCurOptSkill(SkillType.Q);
+            }
+            void Up(Vector3 dir, SkillType type)
+            {
+                var character = CharacterProductForm.DataByUid.GetDv(GameManager.instance.curProgress.characterUid, null);
+                if (character != null && character.skill.ContainsKey(type))
+                    PlayManager.instance.infoCtrl.UseSkill(character.uid, character.skill[type], false);
+                PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
+            }
+            void Hide(SkillType type)
+            {
+                if (PlayManager.instance.sceneCtrl.GetCurOptSkill() == type)
+                    PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
+            }
+            ;
+            eParam = new UiStickParam()
+            {
+                dragAct = (dir) =>
+                {
+                    Drag(dir, SkillType.E);
+                },
+                upAct = (dir) =>
+                {
+                    Up(dir, SkillType.E);
+                },
+                hideAct = () =>
+                {
+                    Hide(SkillType.E);
+                },
+                canStartFunc = () =>
+                {
+#if UNITY_STANDALONE_WIN
+            return false;
+#endif
+                    return PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.E);
+                }
+            };
+            qParam = new UiStickParam()
+            {
+                dragAct = (dir) =>
+                {
+                    Drag(dir, SkillType.Q);
+                },
+                upAct = (dir) =>
+                {
+                    Up(dir, SkillType.Q);
+                },
+                hideAct = () =>
+                {
+                    Hide(SkillType.Q);
+                },
+                canStartFunc = () =>
+                {
+#if UNITY_STANDALONE_WIN
+            return false;
+#endif
+                    return PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.Q);
+                }
+            };
+
 #if UNITY_STANDALONE_WIN
             view.page_PlayerTouchOpt.SetShow(false);
 #else
@@ -30,11 +99,17 @@ namespace Ui.PlaySceneMain
             });
             view.btn_data.onClick.AddListener(() =>
             {
-                if (GameManager.instance.curProgress.blockProgramUid <= 0)
+                if (GameManager.instance.curProgress.blockProgramUid != 0)
                 {
                     UiManager.instance.ShowUi<UiPlayDataCtrl>();
                 }
             });
+
+
+            view.model_eStick.SetShow(true, eParam);
+            view.model_qStick.SetShow(true, qParam);
+
+
             teamerCon = new UiContainer<UiTeamerCtrl>(view.go_teamer);
             prmCon = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
         }
@@ -46,16 +121,23 @@ namespace Ui.PlaySceneMain
                 Refresh();
             }
         }
+        public void OnEvent(CharacterSkillEvent evt)
+        {
+            Refresh();
+        }
 
         public override void OnShow()
         {
-            this.Register();
+            this.Register<StoryCharacterEvent>();
+            this.Register<CharacterSkillEvent>();
             Refresh();
         }
         public override void OnHide()
         {
-            this.Unregister();
+            this.Unregister<StoryCharacterEvent>();
+            this.Unregister<CharacterSkillEvent>();
         }
+
 
         public void Refresh()
         {
@@ -74,8 +156,8 @@ namespace Ui.PlaySceneMain
             prmCon.Clear();
             foreach (var prm in cur.paramDic.Values)
             {
-                var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name,null);
-                if (protoPrm!=null)
+                var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name, null);
+                if (protoPrm != null)
                 {
                     switch (protoPrm.showType)
                     {
@@ -90,12 +172,20 @@ namespace Ui.PlaySceneMain
                             break;
                     }
                 }
-                
+
             }
             prmCon.Refresh();
 
             view.go_noScene.SetActive((int)GameManager.instance.curProgress.editorStyle < 2);
+
+            if (view.model_eStick.active != PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.E))
+                view.model_eStick.SetShow(!view.model_eStick.active, eParam);
+
+            if (view.model_qStick.active != PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.Q))
+                view.model_qStick.SetShow(!view.model_qStick.active, qParam);
+
         }
+
     }
     public partial class UiTeamerParam
     {

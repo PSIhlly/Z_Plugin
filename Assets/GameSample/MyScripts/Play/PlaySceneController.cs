@@ -84,7 +84,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
-        curOptSkill = null; 
+        curOptSkill = null;
         setPlayerRot = null;
         downPos = Vector2.zero;
 
@@ -128,6 +128,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct(ch.uid);
 
+                Debug.Log(Time.frameCount + ":" + newCharacter.uid +" replaced "+ ch.uid);
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
@@ -136,9 +137,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             {
                 data.name = ch.name;
                 data.unit.productInfo = (ch.uid, -1);
+                Debug.Log(Time.frameCount + ":" + " hold " + ch.uid);
                 _characterDic[ch] = data;
             }
         }
+
+
         _playerM = null;
         _playerG = null;
         RefreshCurrentCharacter();
@@ -154,7 +158,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void End()
     {
-        
+
         GameManager.instance.evtCtrl.ClearSceneEvent();
         GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         enable = false;
@@ -186,7 +190,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void OnMouse(bool drag, bool release, Vector3 pos, Vector3 dir)
     {
-        if (GameManager.instance.curProgress.blockProgramUid > 0)
+        if (GameManager.instance.curProgress.blockProgramUid != 0)
         {
             return;
         }
@@ -371,8 +375,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     #region op
     public void OnEvent(InputKeyEvent evt)
     {
-        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid != 0)
             return;
+
         var cur = evt.key.Where((o) => o == KeyCode.W || o == KeyCode.S || o == KeyCode.A || o == KeyCode.D);
         var step = Vector3.zero;
         foreach (var c in cur)
@@ -419,11 +424,28 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         {
             PlayManager.instance.infoCtrl.ChooseCurrentCharacter(GameManager.instance.curProgress.teamActive[tar]);
         }
+
+        if (evt.key.Contains(KeyCode.E))
+        {
+            if (_playerG != null && _playerG.skill.ContainsKey(SkillType.E) && SkillProductForm.DataByUid.ContainsKey(_playerG.skill[SkillType.E]))
+            {
+                var data = SkillProductForm.DataByUid[_playerG.skill[SkillType.E]];
+                _super.infoCtrl.UseSkill(_playerG.uid, data.uid, false);
+            }
+        }
+        if (evt.key.Contains(KeyCode.Q))
+        {
+            if (_playerG != null && _playerG.skill.ContainsKey(SkillType.Q) && SkillProductForm.DataByUid.ContainsKey(_playerG.skill[SkillType.Q]))
+            {
+                var data = SkillProductForm.DataByUid[_playerG.skill[SkillType.Q]];
+                _super.infoCtrl.UseSkill(_playerG.uid, data.uid, false);
+            }
+        }
     }
 
     public void OnEvent(InputMouseEvent evt)
     {
-        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid != 0)
             return;
         if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)
         {
@@ -433,7 +455,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseDownEvent evt)
     {
-        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid != 0)
             return;
         if (evt.ui == null)
         {
@@ -447,7 +469,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseUpEvent evt)
     {
-        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid != 0)
             return;
 
         if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)
@@ -459,7 +481,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void OnEvent(InputMouseMoveEvent evt)
     {
-        if (!enable || GameManager.instance.curProgress.blockProgramUid > 0)
+        if (!enable || GameManager.instance.curProgress.blockProgramUid != 0)
             return;
         OnMouseMove(evt.pos);
     }

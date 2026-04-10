@@ -101,7 +101,7 @@ namespace Z_Fight.Form
         {
 
                 /// <summary>
-                ///µ•Œª¬ﬂº≠
+                ///Âçï‰ΩçÈÄªËæë
                 ///</summary>
                 public WeaponUnit unit
                 {
@@ -113,13 +113,13 @@ namespace Z_Fight.Form
 
                     private int  _fightUid;
                     /// <summary>
-                    ///≥÷”–’ﬂ
+                    ///ÊåÅÊúâËÄÖ
                     ///</summary>
                     public int  fightUid{
                                 get{return _fightUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeFightuid(this,_fightUid,value); 
                     }
@@ -131,13 +131,13 @@ namespace Z_Fight.Form
                     
                     private List<int>  _weaponBulletsId;
                     /// <summary>
-                    ///◊”µØ¿‡–Õ¡–±Ì
+                    ///Â≠êÂºπÁ±ªÂûãÂàóË°®
                     ///</summary>
                     public List<int>  weaponBulletsId{
                                 get{return _weaponBulletsId;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeWeaponbulletsid(this,_weaponBulletsId,value); 
                     }
@@ -149,13 +149,13 @@ namespace Z_Fight.Form
                     
                     private int  _curWeaponBulletAid;
                     /// <summary>
-                    ///µ±«∞ π”√◊”µØid
+                    ///ÂΩìÂâç‰ΩøÁî®Â≠êÂºπid
                     ///</summary>
                     public int  curWeaponBulletAid{
                                 get{return _curWeaponBulletAid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCurweaponbulletaid(this,_curWeaponBulletAid,value); 
                     }
@@ -167,13 +167,13 @@ namespace Z_Fight.Form
                     
                     private float  _cdRemain;
                     /// <summary>
-                    ///…‰ÀŸ¿‰»¥ ±≥§”‡ £
+                    ///Â∞ÑÈÄüÂÜ∑Âç¥Êó∂Èïø‰ΩôÂâ©
                     ///</summary>
                     public float  cdRemain{
                                 get{return _cdRemain;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCdremain(this,_cdRemain,value); 
                     }
@@ -185,13 +185,13 @@ namespace Z_Fight.Form
                     
                     private int  _magazineRemain;
                     /// <summary>
-                    ///µØº–”‡ £
+                    ///ÂºπÂ§π‰ΩôÂâ©
                     ///</summary>
                     public int  magazineRemain{
                                 get{return _magazineRemain;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMagazineremain(this,_magazineRemain,value); 
                     }
@@ -261,6 +261,7 @@ namespace Z_Fight.Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -289,6 +290,8 @@ namespace Z_Fight.Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -422,6 +425,7 @@ namespace Z_Fight.Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 UnitForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -436,7 +440,9 @@ UnitForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 UnitForm.RemoveData(uid);
             uidChain.PushId(data.uid);
@@ -461,7 +467,9 @@ UnitForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

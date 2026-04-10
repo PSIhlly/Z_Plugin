@@ -46,6 +46,8 @@ namespace Form
 
             TexAssetForm.changeAssetAction+=ChangeAsset;
 
+            TexAssetForm.changeLabAction+=ChangeLab;
+
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
                 return GetJoByData(data);
@@ -79,16 +81,18 @@ namespace Form
                 
         public static Action<Data,object,object> changeAssetAction;
                 
+        public static Action<Data,string,string> changeLabAction;
+                
 
 
         public partial class Data : TexAssetForm.Data
         {
 
-            public Data(TexAssetForm.Data data):base(data.id,data.name,data.path,data.bytes,data.hash,data.asset)
+            public Data(TexAssetForm.Data data):base(data.id,data.name,data.path,data.bytes,data.hash,data.asset,data.lab)
             {
             }
             
-            public Data(int id,string name,string path,byte[] bytes,string hash,object asset):base(id,name,path,bytes,hash,asset)
+            public Data(int id,string name,string path,byte[] bytes,string hash,object asset,string lab):base(id,name,path,bytes,hash,asset,lab)
             {
 
              this.id = id;
@@ -97,6 +101,7 @@ namespace Form
              this.bytes = bytes;
              this.hash = hash;
              this.asset = asset;
+             this.lab = lab;
 
             }
             public void Reset(Data data)
@@ -108,11 +113,12 @@ namespace Form
              this.bytes = data.bytes;
              this.hash = data.hash;
              this.asset = data.asset;
+             this.lab = data.lab;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset);
+        return new Data(sameId? id:idChain.GetId(),name,path,bytes,hash,asset,lab);
                 }
             
             public override  void BeforeGet()
@@ -122,10 +128,11 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",null,"",null);
+                   private static Data _defaultData=new Data(0,"","",null,"",null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -143,6 +150,16 @@ namespace Form
                 {
                     Init();
                     return _DatasByPath;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByLab;
+            public static Dictionary<string, List<Data>> DatasByLab
+            {
+                get
+                {
+                    Init();
+                    return _DatasByLab;
                 }
             }
     
@@ -184,15 +201,31 @@ namespace Form
                 _DataById = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByName = new Dictionary<string, Data>() {
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DataByHash = new Dictionary<string, Data>() {
     
+                    
                     };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
                     _DatasByPath = new Dictionary<string, List<Data>>() {
+    
+                };
+
+                    _DatasByLab = new Dictionary<string, List<Data>>() {
     
                 };
 
@@ -253,7 +286,9 @@ namespace Form
 
                 jo.SelectToken("hash")==null?defaultData.hash:jo.Get<string>("hash"),
 
-                    _defaultData.asset
+                    _defaultData.asset,
+
+                jo.SelectToken("lab")==null?defaultData.lab:jo.Get<string>("lab")
                     );
 
             return data;
@@ -274,6 +309,8 @@ namespace Form
 
             jo.Set<string>("hash",data.hash);
 
+            jo.Set<string>("lab",data.lab);
+
             return jo;
         }
 
@@ -293,6 +330,7 @@ namespace Form
             idChain.PopId(data.id);
 
         DataById[data.id]=data;
+        _DatasHashSet.Add(data);
     
                     DataByName[data.name]=data;
     
@@ -301,6 +339,10 @@ namespace Form
                     if(!DatasByPath.ContainsKey(data.path))
                         DatasByPath[data.path]=new List<Data>();
                     DatasByPath[data.path].Add(data);
+    
+                    if(!DatasByLab.ContainsKey(data.lab))
+                        DatasByLab[data.lab]=new List<Data>();
+                    DatasByLab[data.lab].Add(data);
     
 TexAssetForm.AddData(data);
             childAddAction?.Invoke(data);
@@ -315,7 +357,9 @@ TexAssetForm.AddData(data);
                
             var data=DataById[id];
 
+                    _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
+                    
     
                     DataByName.Remove(data.name);
     
@@ -324,6 +368,10 @@ TexAssetForm.AddData(data);
                     DatasByPath[data.path].Remove(data);
                     if(DatasByPath[data.path].Count==0)
                         DatasByPath.Remove(data.path);
+    
+                    DatasByLab[data.lab].Remove(data);
+                    if(DatasByLab[data.lab].Count==0)
+                        DatasByLab.Remove(data.lab);
     
 TexAssetForm.RemoveData(id);
             idChain.PushId(data.id);
@@ -348,7 +396,9 @@ TexAssetForm.RemoveData(id);
             foreach(var key in keys)
             {
                 if(key < idChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 
@@ -438,6 +488,23 @@ TexAssetForm.RemoveData(id);
                 {
 
                 changeAssetAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLab(TexAssetForm.Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                    DatasByLab[oldV].Remove(data);
+                    if(DatasByLab[oldV].Count==0)
+                        DatasByLab.Remove(oldV);
+                    if(!DatasByLab.ContainsKey(newV))
+                        DatasByLab[newV]=new List<Data>();
+                    DatasByLab[newV].Add(data);
+ 
+                changeLabAction?.Invoke(data,oldV,newV);
                 }
                     
             }

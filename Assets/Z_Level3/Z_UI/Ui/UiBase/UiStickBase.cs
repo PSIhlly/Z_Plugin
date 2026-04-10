@@ -23,6 +23,7 @@ namespace Ui.Stick
             public GameObject go_area;
             public RectTransform rtf_area;
             public RectTransform rtf_stick;
+            public Img img_stick;
         public UiStickView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -30,6 +31,7 @@ namespace Ui.Stick
             go_area = uiHolder.elementTrsLst[1].gameObject;
             rtf_area = uiHolder.elementTrsLst[2].GetComponent<RectTransform>();
             rtf_stick = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
+            img_stick = uiHolder.elementTrsLst[4].GetComponent<Img>();
         }
 
     }

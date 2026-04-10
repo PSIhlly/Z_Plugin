@@ -97,7 +97,7 @@ namespace Z_Map.Form
         {
 
                 /// <summary>
-                ///µ•Œª¬ﬂº≠
+                ///Âçï‰ΩçÈÄªËæë
                 ///</summary>
                 public TileUnit unit
                 {
@@ -109,13 +109,13 @@ namespace Z_Map.Form
 
                     private Dictionary<int,string>  _texNameDic;
                     /// <summary>
-                    ///Œ∆¿Ì√˚◊÷£®À˜“˝£©
+                    ///Á∫πÁêÜÂêçÂ≠óÔºàÁ¥¢ÂºïÔºâ
                     ///</summary>
                     public Dictionary<int,string>  texNameDic{
                                 get{return _texNameDic;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTexnamedic(this,_texNameDic,value); 
                     }
@@ -127,13 +127,13 @@ namespace Z_Map.Form
                     
                     private Vector3Int  _mapPos;
                     /// <summary>
-                    ///¿Î…¢Œª÷√
+                    ///Á¶ªÊï£‰ΩçÁΩÆ
                     ///</summary>
                     public Vector3Int  mapPos{
                                 get{return _mapPos;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeMappos(this,_mapPos,value); 
                     }
@@ -145,13 +145,13 @@ namespace Z_Map.Form
                     
                     private bool  _enteredScene;
                     /// <summary>
-                    ///Ω¯»Îπ˝À˘ Ùscene
+                    ///ËøõÂÖ•ËøáÊâÄÂ±ûscene
                     ///</summary>
                     public bool  enteredScene{
                                 get{return _enteredScene;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEnteredscene(this,_enteredScene,value); 
                     }
@@ -217,6 +217,7 @@ namespace Z_Map.Form
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -255,9 +256,16 @@ namespace Z_Map.Form
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
                     _DataByMappos = new Dictionary<Vector3Int, Data>() {
     
+                    
                     };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
     
 
             childInitAction?.Invoke();
@@ -384,6 +392,7 @@ namespace Z_Map.Form
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
                     DataByMappos[data.mapPos]=data;
     
@@ -400,7 +409,9 @@ UnitForm.AddData(data);
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
                     DataByMappos.Remove(data.mapPos);
     
@@ -427,7 +438,9 @@ UnitForm.RemoveData(uid);
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

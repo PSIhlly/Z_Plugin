@@ -7,14 +7,14 @@ using Z_DesignStyle;
 
 namespace Z_Ui.Base
 {
-    public class UiContainer<T> where T : UiCtrl,new()
+    public class UiContainer<T> where T : UiCtrl, new()
     {
         public GameObject ori;
-        
+
         private bool cycle;
         public List<UiParam> paramLst = new List<UiParam>();
         UiPool uiPool;
-        
+
         protected class UiPool : Z_Pool<GameObject>
         {
             public GameObject ori;
@@ -30,7 +30,7 @@ namespace Z_Ui.Base
             }
             public override GameObject New()
             {
-                var newGo= GameObject.Instantiate(ori, ori.transform.parent);
+                var newGo = GameObject.Instantiate(ori, ori.transform.parent);
                 newGo.SetActive(false);
                 return newGo;
             }
@@ -38,7 +38,7 @@ namespace Z_Ui.Base
         List<UiHolder> curUis;
         Dictionary<UiParam, UiHolder> prm2Ui;
         int curRenderId;
-        public UiContainer(GameObject ori,bool cycle=true)
+        public UiContainer(GameObject ori, bool cycle = true)
         {
             ori.SetActive(false);
             this.ori = ori;
@@ -50,19 +50,20 @@ namespace Z_Ui.Base
                     ori = ori
                 };
             }
-            
+
             curUis = new List<UiHolder>();
             prm2Ui = new Dictionary<UiParam, UiHolder>();
         }
 
         public virtual void Clear()
         {
-            foreach(var ui in curUis)
+            foreach (var ui in curUis)
             {
-                if(cycle)
+                if (cycle)
                 {
                     uiPool.Push(ui.gameObject);
-                }else
+                }
+                else
                 {
                     GameObject.Destroy(ui.gameObject);
                 }
@@ -76,7 +77,8 @@ namespace Z_Ui.Base
             if (cycle)
             {
                 uiPool.Push(go);
-            }else
+            }
+            else
             {
                 GameObject.Destroy(go);
             }
@@ -91,7 +93,7 @@ namespace Z_Ui.Base
             }
             else
             {
-                holder = GameObject.Instantiate(ori,ori.transform.parent).GetComponent<UiHolder>();
+                holder = GameObject.Instantiate(ori, ori.transform.parent).GetComponent<UiHolder>();
             }
             var ctrl = holder.ctrl;
 
@@ -105,9 +107,9 @@ namespace Z_Ui.Base
             curUis.Add(holder);
             return holder.gameObject;
         }
-        public virtual void Add(UiParam param=null,int id=-1)
+        public virtual void Add(UiParam param = null, int id = -1)
         {
-            if(id==-1)
+            if (id == -1)
                 paramLst.Add(param);
             else
                 paramLst.Insert(id, param);
@@ -125,10 +127,13 @@ namespace Z_Ui.Base
         {
             if (offsets == null)
                 offsets = new List<Vector3>();
-            for(curRenderId = 0; curRenderId < paramLst.Count; curRenderId++)
+            for (curRenderId = 0; curRenderId < paramLst.Count; curRenderId++)
             {
-                var go=AddReal(paramLst[curRenderId]);
-                prm2Ui[paramLst[curRenderId]]=go.GetComponent<UiHolder>();
+                var go = AddReal(paramLst[curRenderId]);
+                if (curRenderId < paramLst.Count)
+                {
+                    prm2Ui[paramLst[curRenderId]] = go.GetComponent<UiHolder>();
+                }
             }
             curRenderId = 0;
         }

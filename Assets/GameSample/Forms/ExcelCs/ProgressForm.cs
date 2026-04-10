@@ -94,7 +94,7 @@ public static readonly int autoUidCnt=100;
                                 get{return _uid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUid(this,_uid,value); 
                     }
@@ -106,13 +106,13 @@ public static readonly int autoUidCnt=100;
                     
                     private float  _seconds;
                     /// <summary>
-                    ///Ê±³¤
+                    ///æ—¶é•¿
                     ///</summary>
                     public float  seconds{
                                 get{return _seconds;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSeconds(this,_seconds,value); 
                     }
@@ -124,13 +124,13 @@ public static readonly int autoUidCnt=100;
                     
                     private int  _sceneId;
                     /// <summary>
-                    ///Íæ¼ÒËù´¦sceneId
+                    ///ç©å®¶æ‰€å¤„sceneId
                     ///</summary>
                     public int  sceneId{
                                 get{return _sceneId;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeSceneid(this,_sceneId,value); 
                     }
@@ -142,13 +142,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Vector3  _pos;
                     /// <summary>
-                    ///Íæ¼ÒÎ»ÖÃ
+                    ///ç©å®¶ä½ç½®
                     ///</summary>
                     public Vector3  pos{
                                 get{return _pos;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangePos(this,_pos,value); 
                     }
@@ -160,13 +160,13 @@ public static readonly int autoUidCnt=100;
                     
                     private int  _characterUid;
                     /// <summary>
-                    ///Íæ¼Ò½ÇÉ«Uid
+                    ///ç©å®¶è§’è‰²Uid
                     ///</summary>
                     public int  characterUid{
                                 get{return _characterUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCharacteruid(this,_characterUid,value); 
                     }
@@ -178,13 +178,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<int>  _bag;
                     /// <summary>
-                    ///±³°ü£¨µÀ¾ßuid£©
+                    ///èƒŒåŒ…ï¼ˆé“å…·uidï¼‰
                     ///</summary>
                     public List<int>  bag{
                                 get{return _bag;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeBag(this,_bag,value); 
                     }
@@ -196,13 +196,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<int>  _team;
                     /// <summary>
-                    ///¶ÓÎé£¨ÈËÎïuid£©
+                    ///é˜Ÿä¼ï¼ˆäººç‰©uidï¼‰
                     ///</summary>
                     public List<int>  team{
                                 get{return _team;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTeam(this,_team,value); 
                     }
@@ -214,13 +214,13 @@ public static readonly int autoUidCnt=100;
                     
                     private List<int>  _teamActive;
                     /// <summary>
-                    ///³öÕ½¶ÓÎé£¨ÈËÎïuid£©
+                    ///å‡ºæˆ˜é˜Ÿä¼ï¼ˆäººç‰©uidï¼‰
                     ///</summary>
                     public List<int>  teamActive{
                                 get{return _teamActive;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTeamactive(this,_teamActive,value); 
                     }
@@ -232,13 +232,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<string,string>  _uiStyleImageName;
                     /// <summary>
-                    ///uiÑùÊ½Í¼Æ¬Ãû³Æ
+                    ///uiæ ·å¼å›¾ç‰‡åç§°
                     ///</summary>
                     public Dictionary<string,string>  uiStyleImageName{
                                 get{return _uiStyleImageName;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeUistyleimagename(this,_uiStyleImageName,value); 
                     }
@@ -250,13 +250,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<string,EventTriggerForm.Data>  _events;
                     /// <summary>
-                    ///ÊÂ¼ş
+                    ///äº‹ä»¶
                     ///</summary>
                     public Dictionary<string,EventTriggerForm.Data>  events{
                                 get{return _events;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEvents(this,_events,value); 
                     }
@@ -268,13 +268,13 @@ public static readonly int autoUidCnt=100;
                     
                     private CameraMode  _cameraMode;
                     /// <summary>
-                    ///Ïà»úÊÓ½Ç
+                    ///ç›¸æœºè§†è§’
                     ///</summary>
                     public CameraMode  cameraMode{
                                 get{return _cameraMode;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeCameramode(this,_cameraMode,value); 
                     }
@@ -286,13 +286,13 @@ public static readonly int autoUidCnt=100;
                     
                     private ClipForm.Data  _dialogCache;
                     /// <summary>
-                    ///¶Ô»°»º´æ
+                    ///å¯¹è¯ç¼“å­˜
                     ///</summary>
                     public ClipForm.Data  dialogCache{
                                 get{return _dialogCache;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeDialogcache(this,_dialogCache,value); 
                     }
@@ -304,13 +304,13 @@ public static readonly int autoUidCnt=100;
                     
                     private Dictionary<int,List<string>>  _triggeredOnceEvts;
                     /// <summary>
-                    ///´¥·¢¹ıµÄÒ»´ÎĞÔÊÂ¼ş
+                    ///è§¦å‘è¿‡çš„ä¸€æ¬¡æ€§äº‹ä»¶
                     ///</summary>
                     public Dictionary<int,List<string>>  triggeredOnceEvts{
                                 get{return _triggeredOnceEvts;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeTriggeredonceevts(this,_triggeredOnceEvts,value); 
                     }
@@ -322,13 +322,13 @@ public static readonly int autoUidCnt=100;
                     
                     private bool  _notFirstTime;
                     /// <summary>
-                    ///·ÇµÚÒ»´Î½øÈë
+                    ///éç¬¬ä¸€æ¬¡è¿›å…¥
                     ///</summary>
                     public bool  notFirstTime{
                                 get{return _notFirstTime;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeNotfirsttime(this,_notFirstTime,value); 
                     }
@@ -340,13 +340,13 @@ public static readonly int autoUidCnt=100;
                     
                     private int  _blockProgramUid;
                     /// <summary>
-                    ///×èÈûµÄ³ÌĞòuid
+                    ///é˜»å¡çš„ç¨‹åºuid
                     ///</summary>
                     public int  blockProgramUid{
                                 get{return _blockProgramUid;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeBlockprogramuid(this,_blockProgramUid,value); 
                     }
@@ -358,13 +358,13 @@ public static readonly int autoUidCnt=100;
                     
                     private EditorStyle  _editorStyle;
                     /// <summary>
-                    ///±à¼­Ä£Ê½
+                    ///ç¼–è¾‘æ¨¡å¼
                     ///</summary>
                     public EditorStyle  editorStyle{
                                 get{return _editorStyle;}
  set{
 
-                    if(_DataByUid!=null&&_DataByUid.ContainsValue(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
                        ChangeEditorstyle(this,_editorStyle,value); 
                     }
@@ -432,6 +432,7 @@ public static readonly int autoUidCnt=100;
                    public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataByUid;
             public static Dictionary<int, Data> DataByUid
             {
@@ -458,6 +459,8 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
                 _DataByUid = new Dictionary<int, Data>() {
 
                 };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -593,6 +596,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             uidChain.PopId(data.uid);
 
         DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
     
 
             childAddAction?.Invoke(data);
@@ -607,7 +611,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                
             var data=DataByUid[uid];
 
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
                     DataByUid.Remove(data.uid);
+                    
     
 
             uidChain.PushId(data.uid);
@@ -632,7 +638,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             foreach(var key in keys)
             {
                 if(key < uidChain.cnt)
-                    RemoveData(key);
+                    {
+                        RemoveData(key);
+                    }
             }
         }
 

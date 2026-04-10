@@ -10,6 +10,7 @@ using Z_DataSystem.Form;
 using Z_Math;
 using Z_String;
 using Z_Texture;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using static UnityEngine.GUI;
@@ -84,7 +85,10 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                 id = -1
             });
             clipsCon.Refresh();
-            UiManager.Rebuild(view.go_clips.transform.parent.gameObject);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(view.go_content, true);
+            },gameObject);
         }
     }
     public partial class UiClipsParam

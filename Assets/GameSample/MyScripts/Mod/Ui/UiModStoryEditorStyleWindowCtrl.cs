@@ -33,7 +33,7 @@ namespace Ui.ModStoryEditorStyleWindow
             {
 
             });
-            styleCon = new UiContainer<UiStyleCtrl>(view.go_style);
+            styleCon = new UiContainer<UiStyleCtrl>(this, view.go_style);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();

@@ -32,9 +32,9 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         UiScrViewContainer<UiItemCtrl> itemCon;
         public override void OnCreate()
         {
-            catCon = new UiScrViewContainer<UiCategoryCtrl>(view.go_category, view.scr_categorys);
-            typeCon = new UiScrViewContainer<UiTypeCtrl>(view.go_type, view.scr_types);
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            catCon = new UiScrViewContainer<UiCategoryCtrl>(this, view.go_category, view.scr_categorys);
+            typeCon = new UiScrViewContainer<UiTypeCtrl>(this, view.go_type, view.scr_types);
+            itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_edit.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModStoryEventEditWindowCtrl>(new UiModStoryEventEditWindowParam()

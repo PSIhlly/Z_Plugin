@@ -25,7 +25,7 @@ namespace Ui.PlaySceneMain.PlaySceneMessage
         UiContainer<UiMessageCtrl> con;
         public override void OnCreate()
         {
-            con = new UiContainer<UiMessageCtrl>(view.go_message);
+            con = new UiContainer<UiMessageCtrl>(this, view.go_message);
 
         }
         public void AddMessage(string content)

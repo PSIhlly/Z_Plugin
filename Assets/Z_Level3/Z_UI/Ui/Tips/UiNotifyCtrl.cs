@@ -39,12 +39,12 @@ namespace Ui.Notify
         UiContainer<UiInputAreaCtrl> inputAreaCon;
         public override void OnCreate()
         {
-            tipCon = new UiContainer<UiTipCtrl>(view.sub_Tip.gameObject);
-            chooseCon = new UiContainer<UiChooseCtrl>(view.sub_Choose.gameObject);
-            quickChooseCon = new UiContainer<UiQuickChooseCtrl>(view.sub_QuickChoose.gameObject);
-            popupCon = new UiContainer<UiPopupCtrl>(view.sub_Popup.gameObject);
-            multipleChooseCon = new UiContainer<UiMultipleChooseCtrl>(view.sub_MultipleChoose.gameObject);
-            inputAreaCon = new UiContainer<UiInputAreaCtrl>(view.sub_InputArea.gameObject);
+            tipCon = new UiContainer<UiTipCtrl>(this, view.sub_Tip.gameObject);
+            chooseCon = new UiContainer<UiChooseCtrl>(this, view.sub_Choose.gameObject);
+            quickChooseCon = new UiContainer<UiQuickChooseCtrl>(this, view.sub_QuickChoose.gameObject);
+            popupCon = new UiContainer<UiPopupCtrl>(this, view.sub_Popup.gameObject);
+            multipleChooseCon = new UiContainer<UiMultipleChooseCtrl>(this, view.sub_MultipleChoose.gameObject);
+            inputAreaCon = new UiContainer<UiInputAreaCtrl>(this, view.sub_InputArea.gameObject);
 
 
             view.btn_back.onClick.AddListener(() =>

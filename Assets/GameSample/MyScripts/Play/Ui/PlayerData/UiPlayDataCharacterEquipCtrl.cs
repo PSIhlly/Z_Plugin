@@ -28,7 +28,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
         public override void OnCreate()
         {
 
-            gameEquipCon = new UiScrViewContainer<UiGameEquipCtrl>(view.go_gameEquip, view.scr_gameEquip);
+            gameEquipCon = new UiScrViewContainer<UiGameEquipCtrl>(this, view.go_gameEquip, view.scr_gameEquip);
             view.btn_unequip.onClick.AddListener(() =>
             {
                 PlayManager.instance.infoCtrl.Unequip(model.data.uid, model.selPart);
@@ -40,7 +40,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
                     PlayManager.instance.infoCtrl.Equip(model.data.uid, it.uid, model.selPart);
                 }, model.selPart);
             });
-            gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(view.go_gameArgs, view.scr_gameArgs);
+            gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(this, view.go_gameArgs, view.scr_gameArgs);
 
         }
         public override void OnShow()

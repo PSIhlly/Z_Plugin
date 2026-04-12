@@ -28,7 +28,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterData
         UiScrViewContainer<UiGameArgsCtrl> gameArgsCon;
         public override void OnCreate()
         {
-            gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(view.go_gameArgs, view.scr_gameArgs);
+            gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(this, view.go_gameArgs, view.scr_gameArgs);
         }
         public override void OnShow()
         {

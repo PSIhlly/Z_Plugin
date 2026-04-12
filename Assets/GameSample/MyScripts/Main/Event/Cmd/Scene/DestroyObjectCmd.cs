@@ -40,16 +40,7 @@ namespace Z_Code
             {
                 MapManager.instance.RemoveItem(i.data);
             }
-            else if (unit is CharacterUnit c)
-            {
-                var form = CharacterProductForm.DataByUid.GetDv(c.productInfo.Item1, null);
-                if (form != null && !form.unique)
-                {
-                    CharacterProductForm.RemoveData(form.uid);
-                    MapManager.instance.RemoveCharacter(c.data);
-                }
-
-            }
+            
             return true;
         }
     }

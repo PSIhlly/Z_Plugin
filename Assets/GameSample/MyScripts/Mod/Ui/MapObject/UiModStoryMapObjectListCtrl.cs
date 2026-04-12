@@ -31,8 +31,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         public override void OnCreate()
         {
             model.datas = new Dictionary<string, List<MapBaseForm.Data>>();
-            labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
-            itemCon = new UiScrViewContainer<UiBigItemCtrl>(view.go_bigItem, view.scr_bigItems);
+            labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
+            itemCon = new UiScrViewContainer<UiBigItemCtrl>(this, view.go_bigItem, view.scr_bigItems);
             view.btn_back.onClick.AddListener(() =>
             {
                 parent.SelType(0);

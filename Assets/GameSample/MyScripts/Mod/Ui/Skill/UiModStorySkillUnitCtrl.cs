@@ -61,6 +61,8 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit
                 model.selPage = param.selPage;
                 model.data = param.data;
             }
+            else
+                return;
             Refresh();
         }
         public void Refresh()

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Ui.ModStory.ModStoryItem.ModStoryItemUnit;
+using UnityEngine;
 
 namespace Ui.ModStory.ModStoryItem
 {
@@ -46,7 +47,6 @@ namespace Ui.ModStory.ModStoryItem
         }
         public void Refresh()
         {
-
             view.page_ModStoryItemList.SetShow(model.selPage == 0);
             view.page_ModStoryItemUnit.SetShow(model.selPage == 1, new UiModStoryItemUnitParam() { data = model.data });
         }

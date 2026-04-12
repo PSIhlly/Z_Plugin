@@ -101,8 +101,10 @@ namespace Z_Map
 
             HashSet<MapUnit> existUnit = new HashSet<MapUnit>();
             bool moved = false;
+            int times=0;
             while (dirQue.Count > 0)
             {
+                times++;
                 dir = dirQue.Dequeue();
                 var mag = dir.magnitude;
                 var avoidDir = new List<Vector3>();
@@ -195,7 +197,9 @@ namespace Z_Map
                 {
                     moved = true;
                     manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
+
                 }
+                   
             }
             if(moved)
             {

@@ -107,7 +107,7 @@ namespace Z_Code
     public class Interpreter
     {
         public InterpretDataForm.Data data;
-
+        Op? opCode;
         InterpretAsyncTask asyncTask;
 
         public Interpreter(InterpretDataForm.Data interpret)
@@ -115,7 +115,7 @@ namespace Z_Code
             data = interpret;
             asyncTask = new InterpretAsyncTask(this);
         }
-
+        List<Op> ops;
         public RetInfo Interpret()
         {
             var zCode = data.program.zCode;
@@ -130,9 +130,10 @@ namespace Z_Code
                 Z_Log.Log(data.debugId+"[Start]" + data.program.code);
             }
 #endif
-            for (; data.p < cnt; data.p++)
+            for (; data.p < cnt; data.p++, opCode = null)
             {
-                int opCode = int.Parse(zCode[data.p]);
+                if (opCode == null)
+                    opCode = (Op)(int.Parse(zCode[data.p]));
 #if INTERPRETER_DEBUG
                 Z_Log.Log(data.p + ":" + (Op)opCode);
 
@@ -143,7 +144,7 @@ namespace Z_Code
                 }
 #endif
 
-                switch ((Op)opCode)
+                switch (opCode)
                 {
                     case Op.PushNum:
                         data.p++;

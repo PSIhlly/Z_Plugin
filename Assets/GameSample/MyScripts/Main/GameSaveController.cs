@@ -121,12 +121,7 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         var storyCoreFolder = Main2StoryManager.GetStoryCoreFolder(id);
         SaveAndLoad.Save(storyCoreFolder + "/" + storyFormFileName, StoryForm.GetJoByData(StoryForm.DataById[id]).ToString());
-        foreach (var data in StoryForm.DataById.Values)
-        {
-            var nm = data.icon;
-            SaveTex(nm, storyCoreFolder);
 
-        }
     }
 
     public void SaveMaterial(string storyCoreFolder)
@@ -360,8 +355,6 @@ public class GameSaveController : Z_Controller<GameManager>
                 var form = StoryForm.GetDataByJo(JObject.Parse(SaveAndLoad.Load<string>(coreFolder + storyFormFileName)));
                 form.id = id;//矫正
                 StoryForm.AddData(form);
-                var nm = form.icon;
-                LoadTex(nm, coreFolder);
             }
         }
     }

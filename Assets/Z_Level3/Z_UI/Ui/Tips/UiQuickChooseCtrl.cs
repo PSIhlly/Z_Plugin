@@ -20,7 +20,7 @@ namespace Ui.Notify
         UiContainer<UiQuickItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiContainer<UiQuickItemCtrl>(view.go_quickItem);
+            con = new UiContainer<UiQuickItemCtrl>(this, view.go_quickItem);
 
         }
         public override void Close()

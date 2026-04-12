@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Ui.EventChoose;
 using Ui.ModStoryEventTriggerWindow;
 using Unity.VisualScripting.FullSerializer;
+using UnityEngine;
 using UnityEngine.Video;
 using Z_Code.Form;
 using Z_DesignStyle;
@@ -37,11 +38,12 @@ namespace Ui.EventCustomTrigger
         public override void OnCreate()
         {
             this.Register();
-            con = new UiContainer<UiTriggerCtrl>(view.go_trigger);
+            con = new UiContainer<UiTriggerCtrl>(this, view.go_trigger);
         }
         public override void OnShow()
         {
         }
+ 
         public void Set(UiEventCustomTriggerParam prm)
         {
             model.prm = prm;

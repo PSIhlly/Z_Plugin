@@ -43,8 +43,8 @@ namespace Ui.ModStoryEventTriggerWindow
         public override void OnCreate()
         {
             this.Register();
-            evtCon = new UiContainer<UiEventCtrl>(view.go_event);
-            prmCon = new UiContainer<UiPrmCtrl>(view.go_prm);
+            evtCon = new UiContainer<UiEventCtrl>(this, view.go_event);
+            prmCon = new UiContainer<UiPrmCtrl>(this, view.go_prm);
             view.btn_bbg.onClick.AddListener(() =>
             {
                 Close();
@@ -56,6 +56,8 @@ namespace Ui.ModStoryEventTriggerWindow
             view.btn_delete.onClick.AddListener(() =>
             {
                 model.prm.dic.Remove(model.prm.trigger.name);
+
+                Z_EventHelper.Invoke(new EventModifyEvent());
                 Close();
             });
         }

@@ -41,8 +41,8 @@ namespace Ui.ModStoryEventEditWindow
         public override void OnCreate()
         {
 
-            unitCon = new UiContainer<UiUnitCtrl>(view.go_unit, false);
-            itemCon = new UiContainer<UiItemCtrl>(view.go_item, false);
+            unitCon = new UiContainer<UiUnitCtrl>(this, view.go_unit, false);
+            itemCon = new UiContainer<UiItemCtrl>(this, view.go_item, false);
 
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();

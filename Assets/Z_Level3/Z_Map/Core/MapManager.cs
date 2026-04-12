@@ -100,7 +100,7 @@ public class MapManager : Z_MonoManager<MapManager>
     public MapUtilController utilCtrl;
     public MapUpdateController updateCtrl;
 
-
+    public bool enable;
 
 
     public override void Init()
@@ -122,6 +122,7 @@ public class MapManager : Z_MonoManager<MapManager>
         Init();
         mainGo.SetActive(true);
         this.data = data;
+        enable = true;
         updateCtrl.Begin();
 
         navigationCtrl.Build();
@@ -258,6 +259,7 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         updateCtrl.End();
 
+        enable = false;
         mainGo.SetActive(false);
         if (data != null)
         {

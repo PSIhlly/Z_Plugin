@@ -27,11 +27,19 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             var data = MapObjectForm.DataByName[prm[0].str];
+
             var key = data.id.ToString();
             var newObjectData = MapManager.instance.AddObject(key, MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)), data.name, null);
-            GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName( GlobalEventHelper.SCENEOBJECT,newObjectData.uid.ToString())) };
+            if (newObjectData != null)
+            {
+                GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);
+                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, newObjectData.uid.ToString())) };
 
+            }
+            else
+            {
+                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(0) };
+            }
             return true;
         }
     }

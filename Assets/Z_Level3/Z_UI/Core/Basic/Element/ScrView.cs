@@ -31,6 +31,7 @@ namespace Z_Ui.Base
         private int cnt;
         private bool inited;
         private List<Vector3> offsets;
+        private int visitId;
 
         public RectTransform cell;
 
@@ -62,7 +63,7 @@ namespace Z_Ui.Base
 
         HashSet<int> needs = new HashSet<int>();
         List<int> lastShows = new List<int>();
-        const bool DEBUG=false;
+        const bool DEBUG = false;
 
         protected override void Start()
         {
@@ -93,9 +94,9 @@ namespace Z_Ui.Base
                 if (DEBUG)
                     Debug.Log("[sv]������" + totRow);
 
-                    content.sizeDelta += new Vector2(width - content.rect.width, Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
-       
-                
+                content.sizeDelta += new Vector2(width - content.rect.width, Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
+
+
                 content.sizeDelta += Vector2.right * offsetMax * 2.5f;
 
             }
@@ -106,10 +107,10 @@ namespace Z_Ui.Base
                     offsetMax = Math.Min(offsetMax, offset.y);
                 }
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
- 
-      
+
+
                 content.sizeDelta += new Vector2(Mathf.Max(totColumn, columnCnt) * (cell.rect.width + xSpacing) - content.rect.width, height - content.rect.height);
-             
+
 
                 content.sizeDelta += Vector2.up * offsetMax * 2.5f;
             }
@@ -122,9 +123,9 @@ namespace Z_Ui.Base
             //stretch back
             cell.sizeDelta += cellSize - new Vector2(cell.rect.width, cell.rect.height);
 
-            if(DEBUG)
+            if (DEBUG)
             {
-                Debug.Log("[sv]ԭʼ��ߴ磺" + cell.rect.width + "*" + cell.rect.height + "  ������" + columnCnt + "��" + $",({height} - {top}) / ({cell.rect.height} + {ySpacing})"+"="+ rowCnt + "�У����ߴ磺" + content.rect.width + "*" + content.rect.height);
+                Debug.Log("[sv]ԭʼ��ߴ磺" + cell.rect.width + "*" + cell.rect.height + "  ������" + columnCnt + "��" + $",({height} - {top}) / ({cell.rect.height} + {ySpacing})" + "=" + rowCnt + "�У����ߴ磺" + content.rect.width + "*" + content.rect.height);
             }
             UpdateInfo(normalizedPosition);
         }
@@ -150,7 +151,7 @@ namespace Z_Ui.Base
                 if (dir == Direction.Vertical)
                 {
                     unitSize = new Vector2(width / columnCnt * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
-                    
+
                 }
                 else
                 {
@@ -177,7 +178,7 @@ namespace Z_Ui.Base
 
                 int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / (unitSize.y + ySpacing));
                 needs.Clear();
-                while (contentCorners[1].y - curRowId * (unitSize.y + ySpacing)-top > viewPortCorners[0].y)
+                while (contentCorners[1].y - curRowId * (unitSize.y + ySpacing) - top > viewPortCorners[0].y)
                 {
                     for (int i = 0; i < columnCnt; i++)
                     {
@@ -189,7 +190,8 @@ namespace Z_Ui.Base
                     curRowId++;
                 }
                 UpdateDic();
-
+                visitId++;
+                var cur = visitId;
                 foreach (var id in needs)
                 {
                     int row = id / columnCnt;
@@ -197,16 +199,20 @@ namespace Z_Ui.Base
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
 
 
-                    relaPos.x +=( xSpacing * (column) + left) * content.lossyScale.x;
-                    relaPos.y -=( ySpacing * (row) + top) * content.lossyScale.y;
+                    relaPos.x += (xSpacing * (column) + left) * content.lossyScale.x;
+                    relaPos.y -= (ySpacing * (row) + top) * content.lossyScale.y;
                     Add(id, contentCorners[1] + relaPos);
+                    if (cur != visitId)
+                    {
+                        break;
+                    }
                 }
             }
             else
             {
                 int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / (unitSize.x + xSpacing));
                 needs.Clear();
-                while (contentCorners[1].x + curColumnId * (unitSize.x + xSpacing)+left < viewPortCorners[2].x)
+                while (contentCorners[1].x + curColumnId * (unitSize.x + xSpacing) + left < viewPortCorners[2].x)
                 {
                     for (int i = 0; i < rowCnt; i++)
                     {
@@ -218,6 +224,8 @@ namespace Z_Ui.Base
                     curColumnId++;
                 }
                 UpdateDic();
+                visitId++;
+                var cur = visitId;
                 foreach (var id in needs)
                 {
 
@@ -225,11 +233,15 @@ namespace Z_Ui.Base
                     int row = id % rowCnt;
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
 
-                    relaPos.x += (xSpacing * (column) + left)* content.lossyScale.x;
+                    relaPos.x += (xSpacing * (column) + left) * content.lossyScale.x;
 
-                    relaPos.y -= (ySpacing * (row) + top)*content.lossyScale.y;
+                    relaPos.y -= (ySpacing * (row) + top) * content.lossyScale.y;
 
                     Add(id, contentCorners[1] + relaPos);
+                    if (cur != visitId)
+                    {
+                        break;
+                    }
                 }
             }
 

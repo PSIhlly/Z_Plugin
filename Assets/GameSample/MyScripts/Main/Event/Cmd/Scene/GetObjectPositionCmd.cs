@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 using Z_Code.Form;
 using Z_DesignStyle;
 using Z_Map;
@@ -27,16 +28,22 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             
-            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
-            if(data!=null)
+            var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT),null); 
+            var box = CodeHelper.CreateBox();
+            if (data!=null)
             {
-                var box=CodeHelper.CreateBox();
+                
                 var vec = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
                 box.dic["x"] = CodeHelper.CreateBoxByNum(vec.x);
                 box.dic["height"] = CodeHelper.CreateBoxByNum(vec.y);
                 box.dic["y"] = CodeHelper.CreateBoxByNum(vec.z);
-                asyncTask.res = new BoxDataForm.Data[] { box };
+            }else
+            {
+                box.dic["x"] = CodeHelper.CreateBoxByNum(0);
+                box.dic["height"] = CodeHelper.CreateBoxByNum(0);
+                box.dic["y"] = CodeHelper.CreateBoxByNum(0);
             }
+            asyncTask.res = new BoxDataForm.Data[] { box };
             return true;
         }
     }

@@ -26,7 +26,7 @@ namespace Ui.Notify
         UiContainer<UiSelectionCtrl> con;
         public override void OnCreate()
         {
-            con = new UiContainer<UiSelectionCtrl>(view.sub_Selection.gameObject);
+            con = new UiContainer<UiSelectionCtrl>(this, view.sub_Selection.gameObject);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();

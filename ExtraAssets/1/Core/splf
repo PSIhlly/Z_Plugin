@@ -46,10 +46,10 @@
   },
   {
     "uid": 3,
-    "name": "攻击",
+    "name": "怪攻击",
     "label": "攻击",
     "protoUid": 0,
-    "icon": "$i$5418776c97885aa1761d1860306b10bddd71753a$i$",
+    "icon": "$i$8b7d1fee47011caa51789c752652722d567a81af$i$",
     "paramDic": [
       {
         "k": "伤害",
@@ -80,7 +80,7 @@
           "name": "invoke",
           "evt": [
             {
-              "v": "十六夜攻击"
+              "v": "怪攻击"
             }
           ],
           "type": 0

@@ -37,7 +37,7 @@ namespace Form
             var ch = CharacterProductForm.DataByUid.GetDv(characterUid, null);
             if (id < 0)
             {
-               
+
                 if (ch != null)
                 {
                     id = ch.skill.GetDv((SkillType)(-id), 0);
@@ -48,12 +48,12 @@ namespace Form
             {
                 if (ch != null)
                 {
-                    foreach(var sk in ch.skill.Values)
+                    foreach (var sk in ch.skill.Values)
                     {
                         var cur = DataByUid.GetDv(sk, null);
-                        if(cur!=null)
+                        if (cur != null)
                         {
-                            if(cur.protoUid == id)
+                            if (cur.protoUid == id)
                             {
                                 return cur;
                             }
@@ -97,18 +97,31 @@ public static partial class GlobalEventHelper
     public static string UIIMAGE = "$ui$";
     public static string VECTOR = "$vt$";
     public static string SKILL = "$sk$";
+    public static Dictionary<(string, string), int> idCache = new Dictionary<(string, string), int>();
+    public static Dictionary<(string, string) ,string> nameCache = new Dictionary<(string, string), string>();
 
     public static string GetName(string mark, string name = "")
     {
-        return $"{mark}{name}{mark}";
+        if (!nameCache.ContainsKey((name, mark)))
+        {
+            nameCache[(name, mark)] = $"{mark}{name}{mark}";
+        }
+        return nameCache[(name, mark)];
     }
     public static int GetId(string name, string mark)
     {
-        if (IsAsset(name, mark))
+        if (!idCache.ContainsKey((name, mark)))
         {
-            return int.Parse(name.Split(mark)[1]);
+            if (IsAsset(name, mark))
+            {
+                idCache[(name, mark)] = int.Parse(name.Split(mark)[1]);
+            }
+            else
+            {
+                return 0;
+            }
         }
-        return 0;
+        return idCache[(name, mark)];
     }
     public static bool IsAsset(string name, string mark)
     {
@@ -208,7 +221,10 @@ public class GameEventController : Z_Controller<GameManager>
     }
     public void StartTask(Func<bool> func)
     {
-        tasks.Add(func);
+        if (!func())
+        {
+            tasks.Add(func);
+        }
     }
 
     public void LateUpdate()
@@ -331,7 +347,7 @@ public class GameEventController : Z_Controller<GameManager>
     {
         if (evt == null)
             return;
-        var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(),0, releaseTrigger, 0);
+        var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;
         EventInterpretDataForm.AddData(data);
 

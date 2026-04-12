@@ -26,7 +26,7 @@ namespace Ui.Notify
         UiScrViewContainer<UiItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item,view.scr_items);
+            con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();

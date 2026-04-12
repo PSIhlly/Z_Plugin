@@ -48,7 +48,7 @@ namespace Ui.PlayData.PlayDataCharacter
 
             });
 
-            itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameCharacters);
+            itemCon = new UiScrViewContainer<UiGameItemCtrl>(this, view.go_gameItem, view.scr_gameCharacters);
 
         }
         public override void OnShow()

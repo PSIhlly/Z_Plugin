@@ -9,6 +9,7 @@ namespace Z_Map
 {
     public class CanvasHolder : MonoBehaviour
     {
+
         private Transform _trs;
         public TextMeshProUGUI textProto;
         public TextMeshProUGUI toastTextProto;
@@ -27,6 +28,25 @@ namespace Z_Map
                 }
                 return _trs;
             }
+        }
+        public void Reset()
+        {
+            foreach(var obj in textDic.Values)
+            {
+                Destroy(obj.gameObject);
+            }
+            foreach (var obj in sliderDic.Values)
+            {
+                Destroy(obj.gameObject);
+            }
+            foreach (var obj in sliderTextDic.Values)
+            {
+                Destroy(obj.gameObject);
+            }
+            textDic.Clear();
+            sliderDic.Clear();
+            sliderTextDic.Clear();
+
         }
         public void ShowText(string text, int key = -1)
         {

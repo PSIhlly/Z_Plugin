@@ -13,7 +13,9 @@ namespace Z_Ui.Base
         public UiHolder uiHolder;
         public GameObject gameObject => uiHolder?.gameObject;
         public bool inited;
+
         public bool showed;
+
         public bool active
         {
             get

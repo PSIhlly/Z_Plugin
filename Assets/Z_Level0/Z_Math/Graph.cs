@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 namespace Z_Math
 {
     public static class Graph
     {
-        public static float DELTA = 0.05f;
+        public static float DELTA = 0.0005f;
         public static bool dDebug;
 
         private static readonly Vector3[] s_CubeCornerOffsets = new Vector3[]
@@ -298,25 +299,18 @@ namespace Z_Math
 
 
         #region Intersect
+        static HashSet<Vector3> exist = new HashSet<Vector3>(10);
         public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
             avoidDir = Vector3.zero;
-            bool fromIn = false;
-            bool toIn = false;
+
             float mag = dir.magnitude;
             dis = mag;
-            HashSet<Vector3> exist = new HashSet<Vector3>();
             Vector3 aCenter = (aCubeEightPoints[0] + aCubeEightPoints[7]) * 0.5f;
             Vector3 bCenter = (bCubeEightPoints[0] + bCubeEightPoints[7]) * 0.5f;
+            exist.Clear();
 
-            if (IsCubesOverlap(aCubeEightPoints, bCubeEightPoints))
-            {
-                fromIn = true;
-                if (mag <= 0)
-                {
-                    return IntersectType.Inner;
-                }
-            }
+
 
             float touchTime = 0;
             float avoidTime = 1;
@@ -332,22 +326,34 @@ namespace Z_Math
             if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
             if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
             if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
+            if (avoidTime < 0)
+                avoidTime = 0;
+            if (touchTime > 1)
+                touchTime = 1;
+            if (touchTime > avoidTime)
+            {
+                touchTime = 1;
+            }
+            bool fromIn = false;
+            bool toIn = false;
+            if (touchTime == 0)
+            {
+                fromIn = true;
+            }
 
-            if (fromIn)
+            if (touchTime < 1)
+            {
+                toIn = true;
+            }
+
+            if (fromIn)//out
             {
                 avoidTime = 1;
                 touchTime = 0;
                 if (Vector3.Dot((aCenter - bCenter), dir) >= 0)
                     touchTime = 1;
             }
-            if (touchTime > avoidTime)
-            {
-                touchTime = 1;
-            }
-            if (IsCubesOverlap(ElementwisePlus(aCubeEightPoints, dir), bCubeEightPoints))
-            {
-                toIn = true;
-            }
+
 
             dis = mag * touchTime;
             avoidDir = avoidDir.normalized;
@@ -400,8 +406,7 @@ namespace Z_Math
 
             float touchTime = 0;
             float avoidTime = 1;
-
-            HashSet<Vector3> exist = new HashSet<Vector3>();
+            exist.Clear();
 
             Vector3 normal1, normal2, normal3;
             GetFaceNormals(cubeEightPoints, out normal1, out normal2, out normal3);
@@ -1065,74 +1070,100 @@ namespace Z_Math
         private static bool CalcTouchTimeAndAvoidTime(float aMin, float aMax, float bMin, float bMax, float dir, ref float touchTime, ref float avoidTime, out int avoidDir)
         {
             avoidDir = 0;
-            if (Mathf.Abs(aMax - bMin) < DELTA)
-            {
-                avoidDir = -1;
-            }
-            else if (Mathf.Abs(aMin - bMax) < DELTA)
-            {
-                avoidDir = 1;
-            }
-            if (Mathf.Abs(dir) <= 0)
-            {
-                if (aMax <= bMin || aMin >= bMax)
-                {
-                    avoidTime = 0;
-                    touchTime = 1;
-                    return true;
-                }
-            }
-
-            if (aMin >= bMax)
-            {
-                if (dir < 0)
-                {
-                    touchTime = Mathf.Max(touchTime, (bMax - aMin) / dir);
-                }
-                else
-                {
-                    avoidTime = 0;
-                    touchTime = 1;
-                    return true;
-                }
-
-            }
-            else if (aMax <= bMin)
+            if (aMax < bMin)// [] {}
             {
                 if (dir > 0)
                 {
+                    avoidDir = -1;
                     touchTime = Mathf.Max(touchTime, (bMin - aMax) / dir);
-                }
-                else
-                {
-                    avoidTime = 0;
-                    touchTime = 1;
-                    return true;
-                }
-            }
-
-            if (aMin <= bMin)
-            {
-                if (dir < 0)
-                {
-                    avoidTime = Mathf.Min(avoidTime, (bMin - aMax) / dir);
-                }
-                else
-                {
                     avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
                 }
+                else
+                {
+                    avoidDir = 1;
+                    touchTime = 1;
+                    avoidTime = 0;
+                    return true;
+                }
+
             }
-            else
+            else if (aMax > bMin && aMax < bMax && aMin < bMin)//[{]}
             {
                 if (dir > 0)
                 {
+                    avoidDir = -1;
+                    touchTime = Mathf.Max(touchTime, 0);
                     avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
                 }
                 else
                 {
-                    avoidTime = Mathf.Min(avoidTime, (bMin - aMax) / dir);
+                    avoidDir = 1;
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
                 }
             }
+            else if (aMax < bMax && aMin > bMin)//{[]}
+            {
+                if (dir > 0)
+                {
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                    avoidDir = (bMax - aMin) > (aMax - bMin) ? -1 : 1;
+                }
+                else
+                {
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
+                    avoidDir = (bMax - aMin) > (aMax - bMin) ? 1 : -1;
+                }
+            }
+            else if (aMax > bMax && aMin < bMin)//[{}]
+            {
+                if (dir > 0)
+                {
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                    avoidDir = (bMax - aMin) > (aMax - bMin) ? -1 : 1;
+                }
+                else
+                {
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
+                    avoidDir = (bMax - aMin) > (aMax - bMin) ? 1 : -1;
+                }
+            }
+            else if (aMax > bMax && aMin > bMin && aMin < bMax)//{[}]
+            {
+                if (dir > 0)
+                {
+                    avoidDir = 1;
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                }
+                else
+                {
+                    avoidDir = -1;
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
+                }
+            }
+            else if (aMin > bMax)//{}[]
+            {
+                if (dir >= 0)
+                {
+                    avoidDir = 1;
+                    touchTime = 1;
+                    avoidTime = 0;
+                    return true;
+                }
+                else
+                {
+                    avoidDir = -1;
+                    touchTime = Mathf.Max(touchTime, (aMin - bMax) / -dir);
+                    avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
+                }
+            }
+
             return false;
         }
         public static float Cross(Vector2 from, Vector2 to, Vector2 o)

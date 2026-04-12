@@ -8,7 +8,7 @@ namespace Z_Ui.Base
     public class UiScrViewContainer<T> : UiContainer<T> where T : UiCtrl, new()
     {
         private ScrView sv;
-        public UiScrViewContainer(GameObject ori, ScrView sv) : base(ori,true)
+        public UiScrViewContainer(UiCtrl ctrl,GameObject ori, ScrView sv) : base(ctrl,ori,true)
         {
             this.sv = sv;
             sv.ContainerAdd = (id) => { return AddReal(paramLst[id]); };

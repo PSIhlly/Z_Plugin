@@ -21,8 +21,8 @@ namespace Ui.ZCodeEntry
         public override void OnCreate()
         {
 
-            unitCon = new UiContainer<UiUnitCtrl>(view.go_unit, false);
-            itemCon = new UiContainer<UiItemCtrl>(view.go_item);
+            unitCon = new UiContainer<UiUnitCtrl>(this,view.go_unit, false);
+            itemCon = new UiContainer<UiItemCtrl>(this, view.go_item);
 
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();

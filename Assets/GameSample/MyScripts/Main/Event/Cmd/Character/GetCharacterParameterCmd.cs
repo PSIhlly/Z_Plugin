@@ -33,7 +33,6 @@ namespace Z_Code
             }
             else
             {
-                Debug.LogError("未找到" + prm[0].str);
                 asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBox() };
             }
             return true;

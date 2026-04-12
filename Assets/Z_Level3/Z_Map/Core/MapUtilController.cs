@@ -56,41 +56,55 @@ namespace Z_Map
         }
         public bool IsOnBoundary(Vector3 pos)
         {
-            for (int i = 0; i < tryDir.Length; i++)
-            {
-                if (!InArea(pos + tryDir[i]))
-                    return true;
-            }
+            if (_super.enable)
+                for (int i = 0; i < tryDir.Length; i++)
+                {
+                    if (!InArea(pos + tryDir[i]))
+                        return true;
+                }
             return false;
         }
 
         public Vector3Int RealPos2MapPosInt(Vector3 pos)
         {
-            pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
+            if (_super.enable)
+                pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
             return new Vector3Int((int)Math.Round(pos.x), (int)(pos.y), (int)Math.Round(pos.z));
         }
         public Vector3 RealPos2MapPos(Vector3 pos)
         {
-            pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
+            if (_super.enable)
+                pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
             return pos;
         }
         public Vector3 MapPos2RealPos(Vector3 pos)
         {
-            return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
+            if (_super.enable)
+                return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
+            return pos;
         }
         public Vector3 MapPos2RealPos(Vector3Int pos)
         {
-            return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
+            if (_super.enable)
+                return Z_Math.Graph.ElementwiseMultiply(pos, _super.data.mainData.mapUnitSize);
+            else
+                return pos;
         }
 
         public Vector3Int GetClosestInArea(Vector3Int pos)
         {
-            var newPos = SearchClosedValid(MapPos2RealPos(pos));
+            Vector3 newPos = pos;
+            if (_super.enable)
+            {
+                newPos = SearchClosedValid(MapPos2RealPos(pos));
+            }
             return RealPos2MapPosInt(newPos);
         }
         public Vector3 GetClosestInArea(Vector3 pos)
         {
-            var newPos = SearchClosedValid(pos);
+            var newPos = pos;
+            if (_super.enable)
+                newPos = SearchClosedValid(pos);
             return newPos;
         }
         private Vector3 SearchClosedValid(Vector3 pos)
@@ -112,7 +126,8 @@ namespace Z_Map
                     }
                 }
 
-            }else
+            }
+            else
             {
                 if (_super.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
                 {

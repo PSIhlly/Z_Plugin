@@ -110,8 +110,8 @@ namespace Ui.PlaySceneMain
             view.model_qStick.SetShow(true, qParam);
 
 
-            teamerCon = new UiContainer<UiTeamerCtrl>(view.go_teamer);
-            prmCon = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
+            teamerCon = new UiContainer<UiTeamerCtrl>(this, view.go_teamer);
+            prmCon = new UiContainer<UiParamShowCtrl>(this, view.model_ParamShow.gameObject);
         }
 
         public void OnEvent(StoryCharacterEvent evt)
@@ -202,7 +202,7 @@ namespace Ui.PlaySceneMain
         UiContainer<UiParamShowCtrl> con;
         public override void OnCreate()
         {
-            con = new UiContainer<UiParamShowCtrl>(view.model_ParamShow.gameObject);
+            con = new UiContainer<UiParamShowCtrl>(this, view.model_ParamShow.gameObject);
             view.btn_.onClick.AddListener(() =>
             {
                 PlayManager.instance.infoCtrl.ChooseCurrentCharacter(model.data.uid);

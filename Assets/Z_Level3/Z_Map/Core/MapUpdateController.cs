@@ -622,7 +622,7 @@ namespace Z_Map
             avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
             var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
-
+ 
             foreach (var cur in trigger.GetMeshes(type))
             {
                 float dis = CheckCollide(cur, unit,dir, type,out var avoidDirTmp,out var assistTmp);

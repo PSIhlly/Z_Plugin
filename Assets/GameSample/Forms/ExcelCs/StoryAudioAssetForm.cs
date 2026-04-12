@@ -282,7 +282,7 @@ namespace Form
 
                     _defaultData.path,
 
-                jo.SelectToken("bytes")==null?defaultData.bytes:jo.Get<byte[]>("bytes"),
+                    _defaultData.bytes,
 
                 jo.SelectToken("hash")==null?defaultData.hash:jo.Get<string>("hash"),
 
@@ -304,8 +304,6 @@ namespace Form
             jo.Set<int>("id",data.id);
 
             jo.Set<string>("name",data.name);
-
-            jo.Set<byte[]>("bytes",data.bytes);
 
             jo.Set<string>("hash",data.hash);
 

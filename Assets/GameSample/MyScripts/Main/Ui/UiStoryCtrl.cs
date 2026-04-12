@@ -29,7 +29,7 @@ namespace Ui.Story
         UiScrViewContainer<UiItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_back.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiEnterMainCtrl>();

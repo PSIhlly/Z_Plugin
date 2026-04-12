@@ -101,6 +101,8 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
         {
             if (param != null)
                 model.data = param.data;
+            else
+                return;
             Refresh();
         }
         public void Refresh()

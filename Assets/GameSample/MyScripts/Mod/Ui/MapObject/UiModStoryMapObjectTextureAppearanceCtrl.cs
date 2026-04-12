@@ -32,7 +32,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTex(model.data.name);

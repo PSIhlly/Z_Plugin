@@ -9,6 +9,7 @@ using Z_Texture;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using UnityEngine;
+using Z_DesignStyle;
 
 namespace Ui.ModStory.ModStoryOverview
 {
@@ -64,7 +65,7 @@ namespace Ui.ModStory.ModStoryOverview
  
         public void Refresh()
         {
-            view.img_image.sprite = TexAssetForm.DataByName[GameManager.instance.curStory.icon].GetSprite();
+            view.img_image.sprite = TexAssetForm.DataByName.GetDk(GameManager.instance.curStory.icon,"").GetSprite();
             view.ipt_introduction.Set(GameManager.instance.curStory.desc);
             view.ipt_name.Set(GameManager.instance.curStory.name);
         }

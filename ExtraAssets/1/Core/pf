@@ -55,19 +55,6 @@
           ],
           "type": 0
         }
-      },
-      {
-        "k": "onCharacterParamChangeEvent$1$HP",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterParamChangeEvent$1$HP",
-          "evt": [
-            {
-              "v": "胜利"
-            }
-          ],
-          "type": 0
-        }
       }
     ],
     "cameraMode": 0,

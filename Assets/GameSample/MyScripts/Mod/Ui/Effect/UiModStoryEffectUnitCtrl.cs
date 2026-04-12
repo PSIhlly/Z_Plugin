@@ -32,7 +32,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
         UiContainer<UiClipsCtrl> clipsCon;
         public override void OnCreate()
         {
-            clipsCon = new UiContainer<UiClipsCtrl>(view.go_clips);
+            clipsCon = new UiContainer<UiClipsCtrl>(this, view.go_clips);
             view.btn_back.onClick.AddListener(() =>
             {
                 parent.SelPage(0);
@@ -104,7 +104,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
         UiScrViewContainer<UiEffectCtrl> effectCon;
         public override void OnCreate()
         {
-            effectCon = new UiScrViewContainer<UiEffectCtrl>(view.go_effect, view.scr_effects);
+            effectCon = new UiScrViewContainer<UiEffectCtrl>(this, view.go_effect, view.scr_effects);
 
             view.btn_new.onClick.AddListener(() =>
             {

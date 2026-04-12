@@ -84,9 +84,9 @@ namespace Ui.PlayData.PlayDataBackpack
                 }
                 Refresh();
             });
-            itemCon = new UiScrViewContainer<UiGameItemCtrl>(view.go_gameItem, view.scr_gameItems);
-            labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
-            gameArgCon = new UiScrViewContainer<UiGameArgsCtrl>(view.go_gameArgs, view.scr_gameArgs);
+            itemCon = new UiScrViewContainer<UiGameItemCtrl>(this, view.go_gameItem, view.scr_gameItems);
+            labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
+            gameArgCon = new UiScrViewContainer<UiGameArgsCtrl>(this, view.go_gameArgs, view.scr_gameArgs);
         }
         public override void OnShow()
         {

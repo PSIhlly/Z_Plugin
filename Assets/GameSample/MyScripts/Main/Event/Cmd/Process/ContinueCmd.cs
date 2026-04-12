@@ -19,7 +19,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new ContinueCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            if(GameManager.instance.curProgress.blockProgramUid == asyncTask.interpreter.data.uid)
+            if(GameManager.instance.curProgress.blockProgramUid ==(asyncTask.interpreter.data.rootUid==0? asyncTask.interpreter.data.uid: asyncTask.interpreter.data.rootUid))
             {
                 GameManager.instance.curProgress.blockProgramUid = 0;
             }

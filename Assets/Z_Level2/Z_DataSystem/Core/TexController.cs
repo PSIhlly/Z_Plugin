@@ -36,9 +36,12 @@ namespace Z_DataSystem.Form
                     {
                         asset = TextureHelper.GetTextureByPath(path);
                     }
-                    else
+                    else if(path!=null)
                     {
                         asset = TextureHelper.GetTextureByByte(bytes);
+                    }else
+                    {
+                        asset = TextureHelper.transparentTexture;
                     }
                 }
                 return _texture;

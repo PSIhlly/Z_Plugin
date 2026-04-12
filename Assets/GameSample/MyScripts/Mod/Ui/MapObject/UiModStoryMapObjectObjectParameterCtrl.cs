@@ -25,7 +25,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         UiScrViewContainer<UiArgIptCtrl> argIptCon;
         public override void OnCreate()
         {
-            argIptCon = new UiScrViewContainer<UiArgIptCtrl>(view.go_argIpt, view.scr_argIpts);
+            argIptCon = new UiScrViewContainer<UiArgIptCtrl>(this, view.go_argIpt, view.scr_argIpts);
         }
         public override void OnShow()
         {

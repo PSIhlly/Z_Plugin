@@ -27,7 +27,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
-            con = new UiContainer<UiMapSceneCtrl>(view.go_mapScene);
+            con = new UiContainer<UiMapSceneCtrl>(this, view.go_mapScene);
             view.btn_import.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportMapMiniMap();

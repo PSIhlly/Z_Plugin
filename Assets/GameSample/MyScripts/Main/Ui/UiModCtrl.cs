@@ -11,6 +11,7 @@ using Ui.EnterMain;
 using Z_Text;
 using Z_DataSystem.Form;
 using Ui.ModStoryEditorStyleWindow;
+using Z_DesignStyle;
 
 namespace Ui.Mod
 {
@@ -19,7 +20,7 @@ namespace Ui.Mod
         UiScrViewContainer<UiItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_back.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiEnterMainCtrl>();
@@ -95,7 +96,7 @@ namespace Ui.Mod
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
+                view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon,"$i$$i$").GetSprite();
             }
         }
 

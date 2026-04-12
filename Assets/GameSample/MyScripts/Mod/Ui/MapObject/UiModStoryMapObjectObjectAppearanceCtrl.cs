@@ -35,7 +35,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_reset.onClick.AddListener(() =>
             {
                 model.data.model.subPrefabUnitScale[model.id] = Vector3.one;

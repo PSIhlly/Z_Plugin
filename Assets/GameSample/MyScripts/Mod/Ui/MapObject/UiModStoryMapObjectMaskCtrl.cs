@@ -33,7 +33,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
         public override void OnCreate()
         {
             conditions = new GameObject[6] {view.go_mask0, view.go_mask1, view.go_mask2, view.go_mask3, view.go_mask4, view.go_mask5 };
-            con = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteMask(model.data.name);

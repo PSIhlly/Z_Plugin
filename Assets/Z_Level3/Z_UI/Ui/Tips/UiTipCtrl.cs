@@ -10,7 +10,7 @@ using Z_Ui.Notify;
 
 namespace Ui.Notify
 {
-   
+
     public partial class UiTipModel
     {
         public Timer removeTimer;
@@ -31,16 +31,19 @@ namespace Ui.Notify
                 model.info = param.info;
             }
             TimeManager.instance.CancelTimer(model.removeTimer);
-            model.removeTimer = TimeManager.instance.StartTimer(param.info.time - Time.time,0, () =>
+            model.removeTimer = TimeManager.instance.StartTimer(param.info.time - Time.time, 0, () =>
             {
                 parent.RemoveTip(model.info.id);
                 return true;
             }, uiHolder);
 
-
             UiManager.Rebuild(gameObject);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(gameObject);
+            }, gameObject);
 
-            
+
         }
 
     }

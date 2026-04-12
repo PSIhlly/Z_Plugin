@@ -91,11 +91,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                     ModManager.instance.assetCtrl.ImportCharacterAnim(parent.model.data.uid, model.data.name, model.dir,model.part, model.id);
                 }
             });
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
-            dirCon = new UiContainer<UiDirCtrl>(view.go_dir);
-            enablePartCon = new UiScrViewContainer<UiToggleCtrl>(view.go_toggle, view.scr_enableParts);
-            partCon = new UiScrViewContainer<UiPartCtrl>(view.go_part, view.scr_parts);
-            equipPartCon = new UiScrViewContainer<UiEquipPartCtrl>(view.go_equipPart, view.scr_equipParts);
+            itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
+            dirCon = new UiContainer<UiDirCtrl>(this, view.go_dir);
+            enablePartCon = new UiScrViewContainer<UiToggleCtrl>(this, view.go_toggle, view.scr_enableParts);
+            partCon = new UiScrViewContainer<UiPartCtrl>(this, view.go_part, view.scr_parts);
+            equipPartCon = new UiScrViewContainer<UiEquipPartCtrl>(this, view.go_equipPart, view.scr_equipParts);
             view.btn_plus.onClick.AddListener(() =>
             {
                 var o = model.data.animClip[model.dir][model.id].equipTrs[model.equipPart];

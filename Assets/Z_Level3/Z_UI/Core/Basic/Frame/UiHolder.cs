@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -45,11 +46,9 @@ namespace Z_Ui.Base
 
         public bool binded => ctrl != null;
         private bool oriInited;
-        private bool firstEnter = true;
         private bool quiting = false;
+        int visitId;
 
-
-        public List<Action> subShowAct = new List<Action>();
         public void OriInit()
         {
             if (oriInited)
@@ -101,7 +100,7 @@ namespace Z_Ui.Base
         }
         protected void Update()
         {
-            if (binded)
+            if (binded && ctrl.showed)
             {
                 ctrl.OnUpdate();
             }
@@ -109,42 +108,81 @@ namespace Z_Ui.Base
 
         protected void OnEnable()
         {
-
             if (binded)
             {
-                if (firstEnter)
-                {
-                    ctrl.OnCreate();
-                    ctrl.inited = true;
-                }
-                firstEnter = false;
-                ctrl.OnEnable();
-                
-                if (parent == null || (parent.ctrl != null && parent.ctrl.showed))
-                {
-                    Show();
-                }
-                else
-                {
-                    parent.subShowAct.Add(Show);
-                }
 
+/*                var pa = this;
+                while (pa.parent != null)
+                {
+                    pa = pa.parent;
+                }*/
+                Create();
+                ctrl.OnEnable();
+                Show();
+                CheckShow();
+            }
+        }
+        public void Create()
+        {
+            if (binded && gameObject != null && gameObject.activeInHierarchy)
+            {
+                CreateSelf();
+                visitId++;
+                var cur = visitId;
+                foreach (var sub in subUiHolderLst)
+                {
+                    sub.Create();
+                    if (cur != visitId)
+                        break;
+                }
+            }
+        }
+        private void CreateSelf()
+        {
+            if (!ctrl.inited)
+            {
+                ctrl.inited = true;
+                ctrl.OnCreate();
             }
         }
         private void Show()
         {
-            if (ctrl.active)
+            if (binded && gameObject != null && gameObject.activeInHierarchy)
             {
-                ctrl.OnShow();
-                ctrl.showed = true;
-                for (int i = 0; i < subShowAct.Count; i++)
+                ShowSelf();
+                var cur = visitId;
+                foreach (var sub in subUiHolderLst)
                 {
-                    subShowAct[i]();
+                    sub.Show();
+                    if (cur != visitId)
+                        break;
                 }
-                subShowAct.Clear();
             }
         }
-
+        
+        private void ShowSelf()
+        {
+            if (!ctrl.showed)
+            {
+                ctrl.showed = true;
+                ctrl.OnShow();
+            }
+        }
+        private void CheckShow()
+        {
+            if (binded && gameObject != null)
+            {
+                if (ctrl.showed && !ctrl.active)
+                {
+                    ctrl.showed = false;
+                    ctrl.OnHide();
+                }
+                foreach (var sub in subUiHolderLst)
+                {
+                    sub.CheckShow();
+                }
+            }
+        }
         protected void OnDisable()
         {
             if (binded)
@@ -154,6 +192,7 @@ namespace Z_Ui.Base
                     ctrl.OnHide();
                 }
                 ctrl.OnDisable();
+                ctrl.showed = false;
             }
         }
         protected void OnApplicationQuit()

@@ -44,7 +44,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 GameManager.instance.curStory.icon = data.name;
-                GameManager.instance.saveCtrl.AddTex(data);
+                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(400, 400)
         });

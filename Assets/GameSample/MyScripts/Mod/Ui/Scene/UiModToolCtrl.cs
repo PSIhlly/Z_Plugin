@@ -151,8 +151,8 @@ namespace Ui.ModSceneMain.ModTool
 
         public override void OnCreate()
         {
-            conData = new UiScrViewContainer<UiToolItemCtrl>(view.go_toolItem, view.scr_tool);
-            conType = new UiScrViewContainer<UiToolTypeItemCtrl>(view.go_toolTypeItem, view.scr_toolType);
+            conData = new UiScrViewContainer<UiToolItemCtrl>(this, view.go_toolItem, view.scr_tool);
+            conType = new UiScrViewContainer<UiToolTypeItemCtrl>(this, view.go_toolTypeItem, view.scr_toolType);
 
             var to = parent.view.go_toolPos.transform.position - view.go_toolContentPos.transform.position;
             var showAct = new Action(uiHolder, new PositionSetEvent(uiHolder.transform, uiHolder.transform.position, uiHolder.transform.position + to, 0.2f));

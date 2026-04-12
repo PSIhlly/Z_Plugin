@@ -34,8 +34,11 @@ namespace Z_Code
             }
             else
             {
-                Debug.LogError("未找到" + prm[0].str);
-                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBox() };
+                var prmData = MapObjectParamForm.DataByName.GetDv(prm[1].str, null);
+                if (prmData != null)
+                    asyncTask.res = new BoxDataForm.Data[] { prmData.GetValue().Copy() };
+                else
+                    asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBox()};
             }
             return true;
         }

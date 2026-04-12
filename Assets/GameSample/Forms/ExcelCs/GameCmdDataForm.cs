@@ -366,7 +366,7 @@ namespace Form
 
                 {100041,new Data(100041,"SetCharacterParameter",new List<string>(){"character","paramName","value",},new List<string>(){"character","string","var",},null,new List<string>(){"void",},"Set Character {0} 's {1} = {2}","SetCharacterParameter(self,\"empty\",1);","character","parameter",EditorStyle.Rpg,"")},
 
-                {100042,new Data(100042,"GetCurrentCharacter",null,null,new List<string>(){"character",},new List<string>(){"character",},"Get currently used character ID","GetCurrentCharacter()","character","system",EditorStyle.Rpg,"")},
+                {100042,new Data(100042,"GetCurrentCharacter",null,null,new List<string>(){"character",},new List<string>(){"character",},"Get currently used character","GetCurrentCharacter()","character","system",EditorStyle.Rpg,"")},
 
                 {100043,new Data(100043,"MoveCharacterRelative",new List<string>(){"character","pos","transitionTime",},new List<string>(){"character","vector","num",},null,new List<string>(){"void",},"character {0} : Move to relative coordinates({1}),last {2} seconds","MoveCharacterRelative(self,NewVector(1,1,0),1);","character","transform",EditorStyle.RpgAdvanced,"")},
 
@@ -467,6 +467,10 @@ namespace Form
                 {100092,new Data(100092,"IsUnobstructed",new List<string>(){"from","to","radius",},new List<string>(){"vector","vector","num",},new List<string>(){"unobstructed",},new List<string>(){"num",},"sphere with {2} radius from {0} to {1} is unobstructed(collidable object)","IsUnobstructed(NewVector(1,1,0),NewVector(1,1,0),0.2)","sceneObject","detect",EditorStyle.Rpg,"")},
 
                 {100093,new Data(100093,"ShowEffectByCharacter",new List<string>(){"effect","character","ignoreRotation",},new List<string>(){"effect","character","num",},null,new List<string>(){"void",},"Show character:{1} Effect{0} ignore rotation?{2} ","ShowEffectByCharacter(\"$ef$$ef$\",self,1);","effect","system",EditorStyle.RpgAdvanced,"")},
+
+                {100094,new Data(100094,"GetVectorByRotation",new List<string>(){"rotation",},new List<string>(){"num",},new List<string>(){"vector",},new List<string>(){"vector",},"Get Vector By Rotation {0}","GetVectorByRotation(0);","basic","math",EditorStyle.Rpg,"")},
+
+                {100095,new Data(100095,"DestroyCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0}: Destroy","DestroyCharacter(self);","character","system",EditorStyle.Rpg,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -656,6 +660,10 @@ namespace Form
                         {"IsUnobstructed",_DataByUid[100092]},
     
                         {"ShowEffectByCharacter",_DataByUid[100093]},
+    
+                        {"GetVectorByRotation",_DataByUid[100094]},
+    
+                        {"DestroyCharacter",_DataByUid[100095]},
     
                     
                     };
@@ -898,6 +906,10 @@ namespace Form
 
                     _DatasByCategoryType[("effect","system")].Add(_DataByUid[100093]);
 
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100094]);
+
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100095]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -1099,6 +1111,10 @@ namespace Form
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100092]);
 
                     _DatasByCategory["effect"].Add(_DataByUid[100093]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100094]);
+
+                    _DatasByCategory["character"].Add(_DataByUid[100095]);
 
 
             childInitAction?.Invoke();

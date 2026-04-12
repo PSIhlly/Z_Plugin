@@ -51,7 +51,7 @@ namespace Ui.DialogHistory
         UiScrViewContainer<UiHistoryItemCtrl> con;
         public override void OnCreate()
         {
-            con = new UiScrViewContainer<UiHistoryItemCtrl>(view.go_historyItem, view.scr_tt);
+            con = new UiScrViewContainer<UiHistoryItemCtrl>(this, view.go_historyItem, view.scr_tt);
             view.btn_back.onClick.AddListener(() =>
             {
                 Z_EventHelper.Invoke(new ShowTypeEvent()

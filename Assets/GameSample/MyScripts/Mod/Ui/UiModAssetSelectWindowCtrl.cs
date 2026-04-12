@@ -87,7 +87,7 @@ namespace Ui.ModAssetSelectWindow
                 }
                 Close();
             });
-            itemCon = new UiScrViewContainer<UiItemCtrl>(view.go_item, view.scr_items);
+            itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
 
         }
         public override void OnShow()

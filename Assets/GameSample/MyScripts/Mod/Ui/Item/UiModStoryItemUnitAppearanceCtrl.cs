@@ -28,8 +28,8 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
-            styleCon = new UiScrViewContainer<UiStyleCtrl>(view.go_style, view.scr_styles);
-            itemCon = new UiScrViewContainer<UiItemCtrl> ( view.go_item,view.scr_items);
+            styleCon = new UiScrViewContainer<UiStyleCtrl>(this, view.go_style, view.scr_styles);
+            itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_reset.onClick.AddListener(() =>
             {
                 model.data.model.subPrefabUnitScale[model.id] = Vector3.one;

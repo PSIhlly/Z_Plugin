@@ -26,7 +26,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryItemParameter
         public override void OnCreate()
         {
 
-            argCon = new UiScrViewContainer<UiArgCtrl>(view.go_arg, view.scr_args);
+            argCon = new UiScrViewContainer<UiArgCtrl>(this, view.go_arg, view.scr_args);
 
         }
         public override void OnShow()

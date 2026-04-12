@@ -28,8 +28,8 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
         public override void OnCreate()
         {
 
-            labCon = new UiScrViewContainer<UiLabCtrl>(view.go_lab, view.scr_labs);
-            itemCon = new UiScrViewContainer<UiBigItemCtrl>(view.go_bigItem, view.scr_bigItems);
+            labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
+            itemCon = new UiScrViewContainer<UiBigItemCtrl>(this, view.go_bigItem, view.scr_bigItems);
 
         }
         public override void OnShow()

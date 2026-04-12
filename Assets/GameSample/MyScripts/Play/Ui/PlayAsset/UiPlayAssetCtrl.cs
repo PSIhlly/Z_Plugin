@@ -24,6 +24,7 @@ namespace Ui.PlayAsset
     }
     public partial class UiPlayAssetModel
     {
+        public int visitId;
     }
     public partial class UiPlayAssetCtrl : IZ_Listener<PlayAssetEvent>
     {
@@ -32,7 +33,7 @@ namespace Ui.PlayAsset
         float time;
         public override void OnCreate()
         {
-            imageCon = new UiContainer<UiImageCtrl>(view.go_image);
+            imageCon = new UiContainer<UiImageCtrl>(this, view.go_image);
         }
 
 
@@ -55,6 +56,7 @@ namespace Ui.PlayAsset
                     data = data
                 });
             }
+            //Debug.Log(ImageUiItemForm.DataByUid.Values.Count + " " + Time.frameCount);
             imageCon.Refresh();
 
         }
@@ -85,6 +87,7 @@ namespace Ui.PlayAsset
             model.prm.data.ctrl = this;
             rect.sizeDelta = new Vector2(model.prm.data.size.x, model.prm.data.size.y);
             view.img_.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultEventTexName()).GetSprite();
+
             Refresh();
         }
         public override void OnUpdate()

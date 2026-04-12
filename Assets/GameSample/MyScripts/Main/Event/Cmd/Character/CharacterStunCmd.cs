@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Z_Code.Form;
 using Z_DataSystem;
+using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
 using Z_Math;
@@ -28,8 +29,11 @@ namespace Z_Code
         public override CmdBase GetNew() => new CharacterStunCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER)];
-            productData.recoveryTime = Math.Max(productData.recoveryTime, GameManager.instance.curProgress.seconds + prm[1].num);
+            var productData = CharacterProductForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), null);
+            if (productData != null)
+            {
+                productData.recoveryTime = Math.Max(productData.recoveryTime, GameManager.instance.curProgress.seconds + prm[1].num);
+            }
             return true;
         }
     }

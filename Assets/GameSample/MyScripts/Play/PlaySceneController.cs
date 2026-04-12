@@ -132,6 +132,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
+                
             }
             else
             {
@@ -141,9 +142,18 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 _characterDic[ch] = data;
             }
         }
+        //object correct
+        foreach (var data in ObjectUnitForm.DataByUid.Values)
+        {
+            var cur=MapObjectForm.DataById.GetDv(data.unit.productInfo.Item1, null);
+            if (cur!=null)
+            {
+                data.isObstacle = cur.collision;
+            }
+        }
 
 
-        _playerM = null;
+            _playerM = null;
         _playerG = null;
         RefreshCurrentCharacter();
     }

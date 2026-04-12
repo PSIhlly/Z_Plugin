@@ -78,6 +78,19 @@ namespace Form
             {
                 base.ToProduct(protoUid);
                 CheckSkillProduct();
+                CheckParam();
+            }
+            public void CheckParam()
+            {
+                if (paramDic != null)
+                {
+                    var oldParam = paramDic;
+                    paramDic = new Dictionary<string, CharacterParamForm.Data>();
+                    foreach (var pair in oldParam)
+                    {
+                        paramDic[pair.Key] = pair.Value.Copy();
+                    }
+                }
             }
             public void CheckSkillProduct()
             {
@@ -103,6 +116,7 @@ namespace Form
                     skill = newSkillDic;
                 }
             }
+
             public bool CanShow(string prmName)
             {
                 if (!paramDic.ContainsKey(prmName) || !CharacterParamForm.DataByName.ContainsKey(prmName))

@@ -29,8 +29,8 @@ namespace Ui.Notify
         UiScrViewContainer<UiSubItemCtrl> itemCon;
         public override void OnCreate()
         {
-            colCon = new UiContainer<UiColumnCtrl>(view.go_column);
-            itemCon = new UiScrViewContainer<UiSubItemCtrl>(view.go_subItem, view.scr_subItems);
+            colCon = new UiContainer<UiColumnCtrl>(this, view.go_column);
+            itemCon = new UiScrViewContainer<UiSubItemCtrl>(this, view.go_subItem, view.scr_subItems);
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();
@@ -142,7 +142,7 @@ namespace Ui.Notify
         UiScrViewContainer<UiLabelCtrl> lableCon;
         public override void OnCreate()
         {
-            lableCon = new UiScrViewContainer<UiLabelCtrl>(view.go_label, view.scr_labels);
+            lableCon = new UiScrViewContainer<UiLabelCtrl>(this, view.go_label, view.scr_labels);
             rect.SetSiblingIndex(rect.parent.childCount-2);
         }
 

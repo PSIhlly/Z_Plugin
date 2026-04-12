@@ -14,6 +14,7 @@ namespace Z_Ui.Base
         private bool cycle;
         public List<UiParam> paramLst = new List<UiParam>();
         UiPool uiPool;
+        private UiCtrl belongCtrl;
 
         protected class UiPool : Z_Pool<GameObject>
         {
@@ -38,8 +39,10 @@ namespace Z_Ui.Base
         List<UiHolder> curUis;
         Dictionary<UiParam, UiHolder> prm2Ui;
         int curRenderId;
-        public UiContainer(GameObject ori, bool cycle = true)
+        int visitId;
+        public UiContainer(UiCtrl ctrl, GameObject ori, bool cycle = true)
         {
+            this.belongCtrl = ctrl;
             ori.SetActive(false);
             this.ori = ori;
             this.cycle = cycle;
@@ -67,6 +70,10 @@ namespace Z_Ui.Base
                 {
                     GameObject.Destroy(ui.gameObject);
                 }
+                if (ui.parent != null && ui.parent.subUiHolderLst.Contains(ui))
+                {
+                    ui.parent.subUiHolderLst.Remove(ui);
+                }
             }
             curUis.Clear();
             paramLst.Clear();
@@ -82,7 +89,12 @@ namespace Z_Ui.Base
             {
                 GameObject.Destroy(go);
             }
-            curUis.Remove(go.GetComponent<UiHolder>());
+            var ui = go.GetComponent<UiHolder>();
+            if (ui.parent != null && ui.parent.subUiHolderLst.Contains(ui))
+            {
+                ui.parent.subUiHolderLst.Remove(ui);
+            }
+            curUis.Remove(ui);
         }
         public GameObject AddReal(UiParam param = null)
         {
@@ -102,8 +114,14 @@ namespace Z_Ui.Base
                 ctrl = new T();
                 holder.SubUiBind(ctrl);
             }
+
+            holder.parent = belongCtrl.uiHolder;
+            belongCtrl.uiHolder.subUiHolderLst.Add(holder);
+
             ctrl.SetParam(param);
             holder.gameObject.SetActive(true);
+
+
             curUis.Add(holder);
             return holder.gameObject;
         }
@@ -127,13 +145,16 @@ namespace Z_Ui.Base
         {
             if (offsets == null)
                 offsets = new List<Vector3>();
+            visitId++;
+            var cur = visitId;
             for (curRenderId = 0; curRenderId < paramLst.Count; curRenderId++)
             {
                 var go = AddReal(paramLst[curRenderId]);
-                if (curRenderId < paramLst.Count)
+                if(cur!=visitId)
                 {
-                    prm2Ui[paramLst[curRenderId]] = go.GetComponent<UiHolder>();
+                    return;
                 }
+                prm2Ui[paramLst[curRenderId]] = go.GetComponent<UiHolder>();
             }
             curRenderId = 0;
         }

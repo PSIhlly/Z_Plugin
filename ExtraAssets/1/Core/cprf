@@ -1,5 +1,1313 @@
 [
   {
+    "uid": 7,
+    "name": "黏液怪",
+    "label": "怪",
+    "avatarTexName": "$i$3283e308714da9223c612ff759c83a9ee0a653a7$i$",
+    "paramDic": [
+      {
+        "k": "HP",
+        "v": {
+          "uid": 2,
+          "name": "HP",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "showType": 3
+        }
+      },
+      {
+        "k": "速度",
+        "v": {
+          "uid": 1,
+          "name": "速度",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 5,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "showType": 0
+        }
+      }
+    ],
+    "protoUid": 0,
+    "animDic": [
+      {
+        "k": "anim",
+        "v": {
+          "uid": 0,
+          "name": "anim",
+          "animClip": [
+            {
+              "k": 0,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 1,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$0c4cea9aad3674430a2596fe6c70f2c1c3545ed8$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$4ac23ea2c067c42a256d1d62b08704d36bd698f2$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$0c4cea9aad3674430a2596fe6c70f2c1c3545ed8$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$26e27f178259d087c3ae95dc08dbd1490fafd68c$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 2,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$3283e308714da9223c612ff759c83a9ee0a653a7$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$b54862da604d14f87dd424b029af839c3f2749d7$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$3283e308714da9223c612ff759c83a9ee0a653a7$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$943e84e50621593afc927ab7fa7a35cff75e375b$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 3,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$cb895e5676587b2bf75a1d48d1e95d1055663e96$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$d49cc698bc22a3769397cb1251ebf71c39fd53aa$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$cb895e5676587b2bf75a1d48d1e95d1055663e96$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$e31aeb9d5e1e6ead060b9b29813aef1f4f6b5ef0$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 4,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$1639136783ced699473d5bbad55a3bd13275c5c5$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$ab27087cd467db64db7969e2c99d9cb8943f6771$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$ab27087cd467db64db7969e2c99d9cb8943f6771$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$bdd3c0c45c08368e8d110f6e937f65a3e5b848ba$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      }
+    ],
+    "defaultAnimName": [
+      {
+        "k": "idle",
+        "v": "anim"
+      },
+      {
+        "k": "move",
+        "v": "anim"
+      },
+      {
+        "k": "idle0",
+        "v": "anim"
+      },
+      {
+        "k": "move0",
+        "v": "anim"
+      },
+      {
+        "k": "idle1",
+        "v": "anim"
+      },
+      {
+        "k": "move1",
+        "v": "anim"
+      },
+      {
+        "k": "idle2",
+        "v": "anim"
+      },
+      {
+        "k": "move2",
+        "v": "anim"
+      },
+      {
+        "k": "idle3",
+        "v": "anim"
+      },
+      {
+        "k": "move3",
+        "v": "anim"
+      }
+    ],
+    "faceType": 1,
+    "speedParamName": "速度",
+    "hpParamName": "HP",
+    "events": [
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [
+            {
+              "v": "怪行为"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "equips": [],
+    "desc": "",
+    "tachie": "reservedI$character",
+    "unique": false,
+    "skill": [
+      {
+        "k": 0,
+        "v": 3
+      }
+    ],
+    "recoveryTime": 0.0,
+    "enableNav": false
+  },
+  {
     "uid": 10,
     "name": "博丽灵梦",
     "label": "",
@@ -3090,7 +4398,11 @@
         "v": {
           "uid": -1,
           "name": "onPerSecondEvent",
-          "evt": [],
+          "evt": [
+            {
+              "v": "爱丽丝行为"
+            }
+          ],
           "type": 0
         }
       },

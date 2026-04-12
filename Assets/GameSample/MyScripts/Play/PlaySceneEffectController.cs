@@ -67,7 +67,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
             img.oriPos = pos;
             img.oriRot = rot;
-            img.oriScale = Vector3.one;
+            img.oriScale = Vector3.zero;
 
             img.trs.position = pos;
             img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
@@ -95,13 +95,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     propBlock.SetFloat("_Alpha", clip.opacity);
                     img.render.SetPropertyBlock(propBlock);
 
-                    TimeManager.instance.AddCurFrameEndAction(() =>
-                    {
-                        beforeUpdate?.Invoke(img);
-                        img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
-                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
-                        img.trs.localScale = img.oriScale + clip.scale;
-                    }, img.gameObject);
+
+                    beforeUpdate?.Invoke(img);
+                    img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
+                    img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+                    img.trs.localScale = clip.scale;
+
                 }
                 else if (clip.transition && eft.Count > cur + 1)
                 {
@@ -111,13 +110,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     propBlock.SetFloat("_Alpha", clip.opacity + (clipNxt.opacity - clip.opacity) * rate);
                     img.render.SetPropertyBlock(propBlock);
 
-                    TimeManager.instance.AddCurFrameEndAction(() =>
-                    {
-                        beforeUpdate?.Invoke(img);
-                        img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
-                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
-                        img.trs.localScale = img.oriScale + Vector3.Lerp(clip.scale, clipNxt.scale, rate);
-                    }, img.gameObject);
+
+                    beforeUpdate?.Invoke(img);
+                    img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
+                    img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
+                    img.trs.localScale = Vector3.Lerp(clip.scale, clipNxt.scale, rate);
+
                 }
 
                 return false;
@@ -136,7 +134,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 if (!CharacterUnitForm.DataByUid.ContainsKey(pair.Key))
                 {
                     temps.Add(pair.Key);
-
+                    pair.Value.Reset();
                     InstancePoolManager.instance.DeleteInstance(pair.Value.gameObject, canvasPrefab);
 
                 }
@@ -158,8 +156,8 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         }
         var canvas = GetCanvas(unitData);
         canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
-        var paramInfo = unitData.unit.paramInfo;
-        var lst = unitData.isMine ? needShowParamName : needShowParamNameWithoutPlayer;
+        var paramInfo = productData.paramDic;
+        var lst = unitData.unit.productInfo.Item1 == GameManager.instance.curProgress.characterUid ? needShowParamName : needShowParamNameWithoutPlayer;
 
         for (int i = 0, icnt = lst.Count; i < icnt; i++)
         {
@@ -203,8 +201,11 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 break;
             case MapEventType.AfterUpdate:
                 //manage nav
-                if (evt.unit.ins != null)
+                if (evt.unit.isVising)
+                {
                     BindCanvas(evt.unit.data);
+
+                }
                 break;
         }
     }

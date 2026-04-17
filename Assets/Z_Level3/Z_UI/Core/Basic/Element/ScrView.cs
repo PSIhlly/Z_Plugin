@@ -164,11 +164,11 @@ namespace Z_Ui.Base
                 //not main dir use average
                 if (dir == Direction.Vertical)
                 {
-                    unitSize = new Vector2(width / columnCnt * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
+                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
                 }
                 else
                 {
-                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, height / rowCnt * content.lossyScale.y);
+                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
                 }
 
             }

@@ -23,7 +23,21 @@ namespace Form
     {
         public static void AddData(TexAssetForm.Data data)
         {
-            AddData((Data)data);
+            AddData(new Data(data));
+        }
+    }
+    public static partial class StoryAudioAssetForm
+    {
+        public static void AddData(AudioAssetForm.Data data)
+        {
+            AddData(new Data(data));
+        }
+    }
+    public static partial class StoryVideoAssetForm
+    {
+        public static void AddData(VideoAssetForm.Data data)
+        {
+            AddData(new Data(data));
         }
     }
 }
@@ -44,7 +58,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 GameManager.instance.curStory.icon = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(400, 400)
         });
@@ -232,7 +245,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     MapTextureForm.DataByName[name].texsName.Add(data.name);
                 }
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -272,7 +284,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     MapMaskForm.DataByName[name].texsName.Add(data.name);
                 }
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -350,7 +361,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     MapObjectForm.DataById[uid].model.subUnitTexsName.Add(data.name);
                 }
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -429,7 +439,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[uid].avatarTexName = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -441,7 +450,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[characterUid].tachie = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -535,7 +543,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     anim.animClip[dir][id].partTex[part] = data.name;
                 }
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -604,7 +611,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     clip.tex = data.name;
                 }
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(1000, 1000)
         });
@@ -651,7 +657,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 var skillData = SkillProductForm.DataByUid[skillUid];
                 skillData.icon = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -681,7 +686,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                GameManager.instance.saveCtrl.AddStoryTex(data);
                 act?.Invoke(data);
             },
         });
@@ -692,7 +696,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                GameManager.instance.saveCtrl.AddStoryVideo(data);
                 act?.Invoke(data);
             },
         });
@@ -703,7 +706,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                GameManager.instance.saveCtrl.AddStoryAudio(data);
                 act?.Invoke(data);
             },
         });
@@ -808,7 +810,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 callback?.Invoke(data.name);
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -844,7 +845,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 ItemProductForm.DataByUid[itemUid].iconTexName = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -908,7 +908,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     itemData.model.subUnitTexsName.Add(data.name);
                 }
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -922,7 +921,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 var itemData = ItemProductForm.DataByUid[itemUid];
                 itemData.styleTex[style] = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -983,7 +981,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 SceneForm.DataByName[name].miniMap = data.name;
-                GameManager.instance.saveCtrl.AddStoryTex(data);
             },
             sizeLimit = new Vector2Int(100, 100)
         });

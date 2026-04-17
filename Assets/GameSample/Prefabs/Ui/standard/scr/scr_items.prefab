@@ -271,7 +271,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1928835650763918356, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_Name
-      value: go|sta_item
+      value: go_item
       objectReference: {fileID: 0}
     - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y

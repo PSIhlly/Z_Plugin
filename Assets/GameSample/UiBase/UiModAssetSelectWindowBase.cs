@@ -15,6 +15,60 @@ namespace Ui.ModAssetSelectWindow
 
 
 
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_valid;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModAssetSelectWindowCtrl parent=>(UiModAssetSelectWindowCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
+
+
+
     public partial class UiItemParam:UiParam
     {
     }
@@ -23,6 +77,8 @@ namespace Ui.ModAssetSelectWindow
     {
 
             public GameObject go_item;
+            public Sta sta_exist;
+            public Btn btn_new;
             public Btn btn_;
             public Sta sta_;
             public Img img_;
@@ -31,10 +87,12 @@ namespace Ui.ModAssetSelectWindow
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[6].GetComponent<Txt>();
         }
 
     }
@@ -75,27 +133,33 @@ namespace Ui.ModAssetSelectWindow
 
             public MediaPlayer mp_;
             public Btn btn_bg;
+            public ScrView scr_labs;
             public ScrView scr_items;
-            public Btn btn_import;
-            public Sta sta_import;
-            public Btn btn_;
-            public Sta sta_;
+            public Sta sta_selected;
             public Btn btn_close;
+            public Btn btn_delete;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
             public GameObject go_item;
             public UiItemCtrl sub_item;
+            public Btn btn_;
+            public Sta sta_;
         public UiModAssetSelectWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
             mp_ = uiHolder.elementTrsLst[0].GetComponent<MediaPlayer>();
             btn_bg = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            btn_import = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            sta_import = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            btn_ = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[6].GetComponent<Sta>();
-            btn_close = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            go_item = uiHolder.elementTrsLst[8].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            scr_labs = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            scr_items = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
+            sta_selected = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            btn_close = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            go_lab = uiHolder.elementTrsLst[7].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[9].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            btn_ = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[12].GetComponent<Sta>();
         }
 
     }
@@ -120,8 +184,10 @@ namespace Ui.ModAssetSelectWindow
             model=new UiModAssetSelectWindowModel();
 
 
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_item = new UiItemCtrl();
-            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

@@ -138,7 +138,6 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             {
                 data.name = ch.name;
                 data.unit.productInfo = (ch.uid, -1);
-                Debug.Log(Time.frameCount + ":" + " hold " + ch.uid);
                 _characterDic[ch] = data;
             }
         }
@@ -151,6 +150,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.isObstacle = cur.collision;
             }
         }
+        MapManager.instance.navigationCtrl.InitMap();
 
 
             _playerM = null;

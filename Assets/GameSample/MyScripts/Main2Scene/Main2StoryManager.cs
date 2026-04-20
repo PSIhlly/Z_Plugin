@@ -91,6 +91,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         string storyFolder = GetStoryFolderNameById(storyId);
         StoryTexAssetForm.Clear();
         GameManager.instance.curStory = StoryForm.DataById[storyId];
+
     }
     public void UnloadStoryUgc()
     {
@@ -163,7 +164,6 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
          }*/
         data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 1, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
 
-        DynamicGlobalSettings.cameraMode = ProgressForm.DataByUid[1].cameraMode;
         MapManager.instance.Begin(data);
 
 

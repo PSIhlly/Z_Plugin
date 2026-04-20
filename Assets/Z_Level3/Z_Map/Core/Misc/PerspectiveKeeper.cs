@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Z_Map;
 using Z_Math;
@@ -9,6 +10,7 @@ public class PerspectiveKeeper : MonoBehaviour
     private Vector3 insLastRot;
     private Transform ins;
     public bool enableFixedYRotation;
+    public bool applyYRotationToLocalZ = true;
     public float fixedYRotation;
 
     [SerializeField]
@@ -22,7 +24,7 @@ public class PerspectiveKeeper : MonoBehaviour
         }
         set
         {
-            _deepth= value;
+            _deepth = value;
             if (ins != null)
             {
                 UpdateModel();
@@ -45,9 +47,17 @@ public class PerspectiveKeeper : MonoBehaviour
         {
             UpdateModel();
             insLastRot = ins.eulerAngles;
+
+
+            
             if (enableFixedYRotation)
             {
                 transform.eulerAngles = transform.eulerAngles.NewSetY(fixedYRotation);
+            }
+            else if (applyYRotationToLocalZ)
+            {
+                transform.eulerAngles = transform.eulerAngles.NewSetY(fixedYRotation);
+                transform.localEulerAngles = transform.localEulerAngles.NewSetZ(-ins.eulerAngles.y);
             }
         }
 

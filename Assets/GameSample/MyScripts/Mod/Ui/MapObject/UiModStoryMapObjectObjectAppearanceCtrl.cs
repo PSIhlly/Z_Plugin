@@ -68,6 +68,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data.name = s;
                 Refresh();
             };
+            view.ipt_posHeight.onFinishInput += (s) =>
+            {
+                model.data.model.subPrefabUnitPos[model.id] = model.data.model.subPrefabUnitPos[model.id].NewSetY(StringHelper.ToFloat(s, 0, false));
+                Refresh();
+            };
             view.ipt_height.onFinishInput += (s) =>
             {
 
@@ -112,6 +117,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.model_axis.SetShow(false);
             if (model.id != -1)
             {
+                view.ipt_posHeight.Set(model.data.model.subPrefabUnitPos[model.id].y.ToString("0.##"));
                 view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
                 view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("0.##"));
                 view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));

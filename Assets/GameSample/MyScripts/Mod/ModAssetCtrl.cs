@@ -594,7 +594,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(EffectForm.DataByName.Keys);
         }
-        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) } }));
+        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) } },false));
     }
     public void DeleteEffect(int effectUid)
     {

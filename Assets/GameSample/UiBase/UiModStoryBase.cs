@@ -3976,6 +3976,7 @@ namespace ModStoryMapObjectObjectAppearance
             public Ipt ipt_width;
             public Ipt ipt_length;
             public Ipt ipt_height;
+            public Ipt ipt_posHeight;
             public Btn btn_reset;
             public Btn btn_model;
             public Btn btn_image;
@@ -3997,16 +3998,17 @@ namespace ModStoryMapObjectObjectAppearance
             ipt_width = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             ipt_length = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
             ipt_height = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
-            btn_reset = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_model = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            btn_image = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            rimg_image = uiHolder.elementTrsLst[11].GetComponent<RImg>();
-            rtf_image = uiHolder.elementTrsLst[12].GetComponent<RectTransform>();
-            rtf_axis = uiHolder.elementTrsLst[13].GetComponent<RectTransform>();
-            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[15].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
-            txt_model = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            ipt_posHeight = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
+            btn_reset = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            btn_model = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            btn_image = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            rimg_image = uiHolder.elementTrsLst[12].GetComponent<RImg>();
+            rtf_image = uiHolder.elementTrsLst[13].GetComponent<RectTransform>();
+            rtf_axis = uiHolder.elementTrsLst[14].GetComponent<RectTransform>();
+            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[16].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            txt_model = uiHolder.elementTrsLst[18].GetComponent<Txt>();
         }
 
     }
@@ -4724,6 +4726,8 @@ namespace ModStoryEffectUnit
             public UiClipsCtrl sub_clips;
             public Ipt ipt_name;
             public Ipt ipt_label;
+            public Btn btn_ground;
+            public Sta sta_ground;
         public UiModStoryEffectUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -4734,6 +4738,8 @@ namespace ModStoryEffectUnit
             sub_clips = (UiClipsCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             ipt_name = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             ipt_label = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
+            btn_ground = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_ground = uiHolder.elementTrsLst[8].GetComponent<Sta>();
         }
 
     }

@@ -69,7 +69,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     private CharacterUnitForm.Data _playerM;
     private CharacterProductForm.Data _playerG;
     private Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data> _characterDic;
-
+    private int updateNavFrame;
     #region internal Var
     private string _fileName;
     public string fileName { get => _fileName; }
@@ -84,6 +84,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public void Begin(int id)
     {
+        updateNavFrame = 0;
         curOptSkill = null;
         setPlayerRot = null;
         downPos = Vector2.zero;
@@ -128,11 +129,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 var newCharacter = ch.Copy(false);
                 newCharacter.ToProduct(ch.uid);
 
-                Debug.Log(Time.frameCount + ":" + newCharacter.uid +" replaced "+ ch.uid);
+                Debug.Log(Time.frameCount + ":" + newCharacter.uid + " replaced " + ch.uid);
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
-                
+
             }
             else
             {
@@ -144,16 +145,16 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         //object correct
         foreach (var data in ObjectUnitForm.DataByUid.Values)
         {
-            var cur=MapObjectForm.DataById.GetDv(data.unit.productInfo.Item1, null);
-            if (cur!=null)
+            var cur = MapObjectForm.DataById.GetDv(data.unit.productInfo.Item1, null);
+            if (cur != null)
             {
                 data.isObstacle = cur.collision;
             }
         }
-        MapManager.instance.navigationCtrl.InitMap();
+        MapManager.instance.navigationCtrl.UpdateMap(int.MaxValue);
 
 
-            _playerM = null;
+        _playerM = null;
         _playerG = null;
         RefreshCurrentCharacter();
     }
@@ -290,6 +291,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         GameManager.instance.evtCtrl.sceneTriggerCtrl.evts?.Invoke();
         GameManager.instance.evtCtrl.sceneTriggerCtrl.evts -= GameManager.instance.evtCtrl.sceneTriggerCtrl.evts;
+
+        if (updateNavFrame < Time.frameCount)
+        {
+            MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count*3 + ObjectUnitForm.DataByUid.Count) / 50,10));
+            updateNavFrame = Time.frameCount + 60;
+        }
     }
     public void SetCamera(float x, float y, float z)
     {

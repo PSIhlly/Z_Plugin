@@ -138,6 +138,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public GameMapController(GameManager super) : base(super)
     {
         Z_EventHelper.Register(this);
+        ProgressForm.changeCameramodeAction += (data,old,now) =>
+        {
+            DynamicGlobalSettings.cameraMode = now;
+        };
+
         UnitForm.beforeGetAction += (data) =>
         {
             if (data.unit is MapUnit mapU)

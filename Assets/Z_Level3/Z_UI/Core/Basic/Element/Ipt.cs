@@ -28,9 +28,9 @@ namespace Z_Ui.Base
             });
             onDeselect.AddListener((v) =>
             {
-                
                 if (invokeAction&& oldStr != text)
                 {
+                    oldStr = text;
                     onFinishInput?.Invoke(v);
                 }
             });
@@ -38,6 +38,7 @@ namespace Z_Ui.Base
             {
                 if (invokeAction && oldStr != text)
                 {
+                    oldStr = text;
                     onFinishInput?.Invoke(v);
                 }
             });

@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Security.Policy;
 using UnityEngine;
 using Z_DesignStyle;
 using Z_Map.Form;
@@ -30,7 +32,7 @@ namespace Z_Map.Analysis
     }
     public class NavigationController : Z_Controller<MapManager>
     {
-        public NavigationController(MapManager super):base(super)
+        public NavigationController(MapManager super) : base(super)
         { }
         NaviComponent bfs;
         public Dictionary<(int, int, int), NavUnit> navUnits;
@@ -38,36 +40,73 @@ namespace Z_Map.Analysis
         public void Build()
         {
             step = _super.data.mainData.mapUnitSize.y * 1 / 10;
-            InitMap();
+            navUnits = new Dictionary<(int, int, int), NavUnit>(_super.data.maps.Count);
+            UpdateMap(int.MaxValue);
             bfs = new Bfs(this);
         }
-
-        public void InitMap()
+        Vector3Int[] tryDir = new Vector3Int[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
+        Vector2[] offset = new Vector2[] { Vector2.right * 0.25f, Vector2.left * 0.25f, Vector2.up * 0.25f, Vector2.down * 0.25f };
+        List<TileUnitForm.Data> curUpdateTileList = new List<TileUnitForm.Data>();
+        List<ObjectUnitForm.Data> curUpdateObjList = new List<ObjectUnitForm.Data>();
+        int curUpdateCount = 0;
+        public void UpdateMap(int step)
         {
-            Vector3Int[] tryDir = new Vector3Int[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
-            Vector2[] offset = new Vector2[] { Vector2.right * 0.25f, Vector2.left * 0.25f, Vector2.up * 0.25f, Vector2.down * 0.25f };
-
-            navUnits = new Dictionary<(int, int, int), NavUnit>(_super.data.maps.Count);
-
+            _super.StartCoroutine(UpdateInternal(step));
+        }
+        IEnumerator UpdateInternal(int step)
+        {
+            int times = step;
+            curUpdateCount = 0;
             //build single unit
-            foreach (var map in _super.data.maps.Values)
+            curUpdateTileList.Clear();
+            curUpdateTileList.AddRange(_super.data.maps.Values);
+            for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
             {
-                var navUnit = new NavUnit();
+                times++;
+                if (times >= step)
+                {
+                    times = 0;
+                    yield return null;
+                }
+                if (!_super.enable)
+                {
+                    yield break;
+                }
+                var map = curUpdateTileList[curUpdateCount];
+                if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
+                    continue;
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
-                navUnits[pos] = navUnit;
-                navUnit.cantPassParts = new HashSet<Dir>();
-                navUnit.links = new List<NavUnit>();
-                navUnit.realPos = _super.data.maps[pos].pos;
-                navUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
-                navUnit.isNull = _super.data.maps[pos].scale == Vector3.zero;
+                if (!navUnits.ContainsKey(pos))
+                {
+                    var newUnit = new NavUnit();
+                    navUnits[pos] = newUnit;
+                    newUnit.cantPassParts = new HashSet<Dir>();
+                    newUnit.links = new List<NavUnit>();
+                    newUnit.realPos = _super.data.maps[pos].pos;
+                    newUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
+                    newUnit.isNull = _super.data.maps[pos].scale == Vector3.zero;
+                }
             }
-
-            //4 dir link
-            foreach (var map in _super.data.maps.Values)
+            curUpdateCount = 0;
+            for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
             {
+                times++;
+                if (times >= step)
+                {
+                    times = 0;
+                    yield return null;
+                }
+                if (!_super.enable)
+                {
+                    yield break;
+                }
+                var map = curUpdateTileList[curUpdateCount];
+                if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
+                    continue;
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
-                var navUnit = navUnits[pos];
 
+                var navUnit = navUnits[pos];
+                navUnit.links.Clear();
                 for (int m = -1; m <= 1; m++)
                     for (int l = 0; l < 4; l++)
                     {
@@ -81,20 +120,35 @@ namespace Z_Map.Analysis
                         //can move
                         if (Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
                         {
-
                             navUnit.links.Add(navUnits[(linkPos.x, linkPos.y, linkPos.z)]);
                         }
                     }
             }
-
-            foreach (var obs in ObjectUnitForm.DataByUid.Values)
+            curUpdateObjList.Clear();
+            curUpdateObjList.AddRange(ObjectUnitForm.DataByUid.Values);
+            curUpdateCount = 0;
+            var hash = new Dictionary<(int, int, int), HashSet<Dir>>();
+            for (; curUpdateCount < curUpdateObjList.Count; curUpdateCount++)
             {
+                var obs = curUpdateObjList[curUpdateCount];
+                times++;
+                if (times >= step)
+                {
+                    times = 0;
+                    yield return null;
+                }
+                if (!_super.enable)
+                {
+                    yield break;
+                }
+                if (!ObjectUnitForm.DataByUid.ContainsKey(obs.uid))
+                    continue;
                 if (obs != null && obs.isObstacle)
                 {
 
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
-                        Vector3[] points = Mesh.GetMesh(bc, obs.pos+Vector3.up * obs.scale.y / 2, obs.euler, Graph.ElementwiseMultiply(bc.transform.lossyScale, obs.scale)).positions;
+                        Vector3[] points = Mesh.GetMesh(bc, obs.pos + Vector3.up * obs.scale.y / 2, obs.euler, Graph.ElementwiseMultiply(bc.transform.lossyScale, obs.scale)).positions;
                         var overlapPoses = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),
@@ -108,14 +162,40 @@ namespace Z_Map.Analysis
                             {
                                 if (InArea(mapPos) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(pos.x, pos.z) + offset[i]))
                                 {
-                                    navUnits[(mapPos.x, mapPos.y, mapPos.z)].cantPassParts.Add((Dir)i);
+                                    if (!hash.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                                        hash[(mapPos.x, mapPos.y, mapPos.z)] = new HashSet<Dir>();
+                                    hash[(mapPos.x, mapPos.y, mapPos.z)].Add((Dir)i);
                                 }
                             }
                         }
                     }
                 }
             }
+            curUpdateCount = 0;
+            for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
+            {
+                times++;
+                if (times >= step)
+                {
+                    times = 0;
+                    yield return null;
+                }
+                if(!_super.enable)
+                {
+                    yield break;
+                }
+                var map = curUpdateTileList[curUpdateCount];
+                if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
+                    continue;
+                (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
+                if (hash.ContainsKey(pos))
+                    navUnits[pos].cantPassParts = hash[pos];
+            }
         }
+
+
+
+
         public Vector3 GetNormalWithoutY(Vector3 tar)
         {
             tar.y = 0;

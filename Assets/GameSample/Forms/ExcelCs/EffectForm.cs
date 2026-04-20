@@ -57,6 +57,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,List<List<EffectClipForm.Data>>,List<List<EffectClipForm.Data>>> changeClipsAction;
                 
+        public static Action<Data,bool,bool> changeGroundAction;
+                
 
 
         public partial class Data
@@ -134,13 +136,32 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string label,List<List<EffectClipForm.Data>> clips)
+                    private bool  _ground;
+                    /// <summary>
+                    ///地面特效
+                    ///</summary>
+                    public bool  ground{
+                                get{return _ground;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeGround(this,_ground,value); 
+                    }
+        
+                _ground = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string label,List<List<EffectClipForm.Data>> clips,bool ground)
             {
 
              this.uid = uid;
              this.name = name;
              this.label = label;
              this.clips = clips;
+             this.ground = ground;
 
             }
             public void Reset(Data data)
@@ -150,11 +171,12 @@ public static readonly int autoUidCnt=100;
              this.name = data.name;
              this.label = data.label;
              this.clips = data.clips;
+             this.ground = data.ground;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,new List<List<EffectClipForm.Data>>(clips));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,new List<List<EffectClipForm.Data>>(clips),ground);
                 }
             
             public virtual  void BeforeGet()
@@ -164,7 +186,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",null);
+                   private static Data _defaultData=new Data(0,"","",null,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -277,7 +299,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.SelectToken("clips")==null?defaultData.clips:jo.Get<List<List<EffectClipForm.Data>>>("clips")
+                jo.SelectToken("clips")==null?defaultData.clips:jo.Get<List<List<EffectClipForm.Data>>>("clips"),
+
+                jo.SelectToken("ground")==null?defaultData.ground:jo.Get<bool>("ground")
                     );
 
             return data;
@@ -297,6 +321,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("label",data.label);
 
             jo.Set<List<List<EffectClipForm.Data>>>("clips",data.clips);
+
+            jo.Set<bool>("ground",data.ground);
 
             return jo;
         }
@@ -440,6 +466,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeClipsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeGround(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeGroundAction?.Invoke(data,oldV,newV);
                 }
                     
             }

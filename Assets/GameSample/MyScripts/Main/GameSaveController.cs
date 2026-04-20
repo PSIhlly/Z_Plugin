@@ -565,6 +565,7 @@ public class GameSaveController : Z_Controller<GameManager>
             {
                 ProgressForm.AddData(form);
             }
+            DynamicGlobalSettings.cameraMode = GameManager.instance.curProgress.cameraMode;
         }
     }
 

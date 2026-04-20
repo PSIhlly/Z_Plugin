@@ -52,6 +52,11 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                 model.data.label = s;
                 Refresh();
             };
+            view.btn_ground.onClick.AddListener(() =>
+            {
+                model.data.ground = !model.data.ground;
+                Refresh();
+            });
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteEffect(parent.model.data.uid);
@@ -69,6 +74,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
         }
         public void Refresh()
         {
+            view.sta_ground.ChangeState(model.data.ground ? 1 : 0);
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
 

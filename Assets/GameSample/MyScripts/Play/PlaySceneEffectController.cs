@@ -57,20 +57,28 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     }
     public void CreatEffect(int uid, Vector3 pos, float rot, Action<ImageHolder> beforeUpdate = null)
     {
-        var clips = EffectForm.DataByUid[uid].clips;
+        var data = EffectForm.DataByUid[uid];
+        var clips = data.clips;
         foreach (var eft in clips)
         {
             var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
+
+            if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground)
+                img.trs.eulerAngles = Vector3.right*90;
+            else
+                img.trs.eulerAngles = Vector3.right * 45;
+
             TimeManager.instance.CancelTimer(img.animTimer);
             int cur = -1;
             float startTime = Time.time;
 
             img.oriPos = pos;
+
             img.oriRot = rot;
             img.oriScale = Vector3.zero;
 
             img.trs.position = pos;
-            img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(rot);
+            img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-rot);
             img.trs.localScale = Vector3.one;
             img.animTimer = TimeManager.instance.StartTimerImmediate(0, 0.0001f, () =>
             {
@@ -98,7 +106,11 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
                     beforeUpdate?.Invoke(img);
                     img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
-                    img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+
+                    if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground)
+                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+                    else
+                        img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-(img.oriRot + clip.rot));
                     img.trs.localScale = clip.scale;
 
                 }
@@ -113,7 +125,11 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
                     beforeUpdate?.Invoke(img);
                     img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
-                    img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
+
+                    if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground) img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
+                    else
+                        img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate)));
+
                     img.trs.localScale = Vector3.Lerp(clip.scale, clipNxt.scale, rate);
 
                 }
@@ -155,7 +171,17 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             return;
         }
         var canvas = GetCanvas(unitData);
-        canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
+        switch (GameManager.instance.curProgress.cameraMode)
+        {
+            case CameraMode.Overhead:
+                canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
+                canvas.transform.eulerAngles = Vector3.zero;
+                break;
+            case CameraMode.Isometric:
+                canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f;
+                canvas.transform.eulerAngles = Vector3.right * 45;
+                break;
+        }
         var paramInfo = productData.paramDic;
         var lst = unitData.unit.productInfo.Item1 == GameManager.instance.curProgress.characterUid ? needShowParamName : needShowParamNameWithoutPlayer;
 
@@ -171,7 +197,16 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     public void FloatingText(string txt, Vector3 pos)
     {
         var o = InstancePoolManager.instance.CreateInstance(canvasPrefab);
-        o.transform.position = pos + Vector3.up * 1.4f;
+        switch (GameManager.instance.curProgress.cameraMode)
+        {
+            case CameraMode.Overhead:
+
+                o.transform.position = pos + Vector3.up * 1.4f;
+                break;
+            case CameraMode.Isometric:
+                o.transform.position = pos + Vector3.up * 0.5f;
+                break;
+        }
         o.SetActive(true);
         o.GetComponent<CanvasHolder>().ToastText(txt, 2);
         TimeManager.instance.StartTimer(3, 0, () =>

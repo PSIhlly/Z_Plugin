@@ -1,20 +1,14 @@
 [
   {
-    "uid": 17,
-    "name": "子弹销毁",
-    "code": "ShowEffect(\"$ef$1$ef$\",GetObjectPosition(self),0);\nDestroyObject(self);\n\n",
+    "uid": 19,
+    "name": "灵梦Q",
+    "code": "大招(\"$i$ec2b631ac21db3e0dbc5cbb1247b406f0e9ac6ef$i$\");\nShowEffectByCharacter(\"$ef$2$ef$\",self,1);\nfor(j=0;j<50;j=j+10)\n{\nWait(0.2);\nfor(i=0;i<=5;i=i+1)\n{\npos=GetCharacterPosition(self);\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetObjectRotation(newObject,j+(i)*(60),0);\nSetSceneObjectParameter(newObject,\"移动方向\",GetObjectForwardVector(newObject));\n }\n ;\n }\n ;\n",
     "zCode": [
       {
         "v": "1"
       },
       {
-        "v": "$ef$1$ef$"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
+        "v": "$i$ec2b631ac21db3e0dbc5cbb1247b406f0e9ac6ef$i$"
       },
       {
         "v": "0"
@@ -26,60 +20,13 @@
         "v": "2"
       },
       {
-        "v": "GetObjectPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowEffect"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
+        "v": "大招"
       },
       {
         "v": "1"
       },
       {
-        "v": "2"
-      },
-      {
-        "v": "DestroyObject"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "十六夜攻击"
-  },
-  {
-    "uid": 16,
-    "name": "灵梦E",
-    "code": "ShowEffectByCharacter(\"$ef$3$ef$\",self,1);\nfor(i=1;i<=3;i=i+1)\n{\nWait(0.2);\npos=GetCharacterPosition(self);\nfor(j=0;j<360;j=j+60)\n{\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetObjectRotation(newObject,j,0);\nSetSceneObjectParameter(newObject,\"移动方向\",GetObjectForwardVector(newObject));\n }\n ;\n }\n ;\n",
-    "zCode": [
-      {
-        "v": "1"
-      },
-      {
-        "v": "$ef$3$ef$"
+        "v": "$ef$2$ef$"
       },
       {
         "v": "14"
@@ -109,7 +56,52 @@
         "v": "0"
       },
       {
-        "v": "1"
+        "v": "0"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "j"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "50"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "j"
+      },
+      {
+        "v": "19"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "123"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.2"
+      },
+      {
+        "v": "17"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
       },
       {
         "v": "14"
@@ -124,7 +116,7 @@
         "v": "0"
       },
       {
-        "v": "3"
+        "v": "5"
       },
       {
         "v": "14"
@@ -139,16 +131,7 @@
         "v": "15"
       },
       {
-        "v": "111"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.2"
-      },
-      {
-        "v": "17"
+        "v": "113"
       },
       {
         "v": "14"
@@ -176,42 +159,6 @@
       },
       {
         "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "j"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "360"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "j"
-      },
-      {
-        "v": "19"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "101"
       },
       {
         "v": "1"
@@ -283,10 +230,28 @@
         "v": "newObject"
       },
       {
+        "v": "0"
+      },
+      {
+        "v": "60"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "7"
+      },
+      {
         "v": "14"
       },
       {
         "v": "j"
+      },
+      {
+        "v": "3"
       },
       {
         "v": "0"
@@ -352,7 +317,37 @@
         "v": "0"
       },
       {
-        "v": "60"
+        "v": "1"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "36"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "10"
       },
       {
         "v": "14"
@@ -376,7 +371,1518 @@
         "v": "16"
       },
       {
-        "v": "39"
+        "v": "21"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 18,
+    "name": "大招",
+    "code": "Pause();\nimage=ShowImage(param1,0.3,3);\nSetImagePosition(image,-2,0.5,0);\nSetImagePosition(image,0.5,0.5,0.5);\nWait(1);\nSetImagePosition(image,2,0.5,0.5);\nContinue();\n",
+    "zCode": [
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Pause"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "param1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.3"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowImage"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "-2"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "17"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.5"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Continue"
+      }
+    ],
+    "paramCount": 1,
+    "returnValue": "void",
+    "category": "对话",
+    "type": "弹图"
+  },
+  {
+    "uid": 14,
+    "name": "受伤",
+    "code": "FloatingText(delta,GetCharacterPosition(self));\nif(GetCharacterParameter(self,\"HP\")<=0)\n{\nif(self==GetCurrentCharacter())\n{\n战败();\n} \nelse \n{\nDestroyCharacter(self);\n}\n;\n} \n;\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "delta"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "FloatingText"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "HP"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterParameter"
+      },
+      {
+        "v": "20"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "48"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCurrentCharacter"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "10"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "40"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "战败"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "46"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DestroyCharacter"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "48"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "抓"
+  },
+  {
+    "uid": 11,
+    "name": "胜利",
+    "code": "if(GetCharacterParameter(self,\"HP\")<=0)\n{\nPause();\n十六夜说话(\"哈哈哈，我赢了\");\nShowAdvancedDialog(\"$i$$i$\",\"$i$$i$\",\"\",\"\",\"$a$$a$\",\"$v$1853b510390967b73b6a4941ae13cf62678d4a47$v$\",1);\nGameOver();\n} \n;\n",
+    "zCode": [
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "HP"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterParameter"
+      },
+      {
+        "v": "20"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "47"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Pause"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "哈哈哈，我赢了"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "十六夜说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": ""
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": ""
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$a$$a$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$v$1853b510390967b73b6a4941ae13cf62678d4a47$v$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowAdvancedDialog"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GameOver"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "47"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "开局"
+  },
+  {
+    "uid": 10,
+    "name": "子弹碰撞销毁",
+    "code": "if(IsObjectEnableCollision(target))\n{\nShowEffect(\"$ef$1$ef$\",GetObjectPosition(self),0);\nif(GetSceneObjectParameter(target,\"可破坏\")==1)\n{\nDestroyObject(target);\n} \n;\nDestroyObject(self);\n} \n;\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "IsObjectEnableCollision"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "51"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$ef$1$ef$"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetObjectPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowEffect"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "可破坏"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetSceneObjectParameter"
+      },
+      {
+        "v": "10"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "43"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DestroyObject"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "43"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DestroyObject"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "51"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 9,
+    "name": "子弹移动",
+    "code": "dir=GetSceneObjectParameter(self,\"移动方向\");\ndir.x=(dir.x)*(80);\ndir.height=(dir.height)*(80);\ndir.y=(dir.y)*(80);\nMoveObjectRelative(self,dir,10);\nDestroyObject(self);\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "移动方向"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetSceneObjectParameter"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "80"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "x"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "x"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "80"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "height"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "height"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "80"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "y"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "7"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "y"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "13"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "dir"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "10"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "MoveObjectRelative"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DestroyObject"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 8,
+    "name": "子弹",
+    "code": "if(GetSceneObjectParameter(self,\"所属人物\")!=target)\n{\nCharacterStun(target,0.1);\nSetCharacterParameter(target,\"HP\",GetCharacterParameter(target,\"HP\")-1);\nShowEffect(\"$ef$1$ef$\",GetCharacterPosition(target),0);\nPlayAudio(\"$a$ee0a73d25c28d6e9441c99cc6bc98c64191fa092$a$\");\nDestroyObject(self);\n} \n;\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "所属人物"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetSceneObjectParameter"
+      },
+      {
+        "v": "11"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "68"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "CharacterStun"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "HP"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "HP"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterParameter"
+      },
+      {
+        "v": "6"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetCharacterParameter"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$ef$1$ef$"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "target"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowEffect"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$a$ee0a73d25c28d6e9441c99cc6bc98c64191fa092$a$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "PlayAudio"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DestroyObject"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "68"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 6,
+    "name": "怪行为",
+    "code": "SetCharacterNavigate(self,GetCharacterPosition(GetCurrentCharacter()));\nWait(0.4);\nlst=GetCharactersInArea(GetCharacterPosition(self),30);\nlen=Len(lst);\nfor(i=0;i<len;i=i+1)\n{\nif(lst[i]!=self)\n{\nif(IsUnobstructed(GetCharacterPosition(self),GetCharacterPosition(lst[i]),0.2)==1)\n{\nSetCharacterRotation(self,GetLookAtRotation(GetCharacterPosition(self),GetCharacterPosition(lst[i])),0);\ni=9999;\nUseSkill(self,\"$sk$3$sk$\",0);\n} \n;\n} \n;\n }\n ;\n",
+    "zCode": [
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCurrentCharacter"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetCharacterNavigate"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.4"
+      },
+      {
+        "v": "17"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "30"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharactersInArea"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "lst"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "lst"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Len"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "len"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "len"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "19"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "145"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "lst"
+      },
+      {
+        "v": "12"
+      },
+      {
+        "v": "11"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "135"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "lst"
+      },
+      {
+        "v": "12"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.2"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "IsUnobstructed"
+      },
+      {
+        "v": "10"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "133"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "lst"
+      },
+      {
+        "v": "12"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetCharacterPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GetLookAtRotation"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetCharacterRotation"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "9999"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "i"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$sk$3$sk$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "UseSkill"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "133"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "135"
       },
       {
         "v": "0"
@@ -406,28 +1912,533 @@
         "v": "16"
       },
       {
-        "v": "15"
+        "v": "46"
       }
     ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "十六夜攻击"
-  },
-  {
-    "uid": 15,
-    "name": "装备武器",
-    "code": "",
-    "zCode": [],
     "paramCount": 0,
     "returnValue": "void",
     "category": "主流程",
     "type": "抓"
   },
   {
-    "uid": 13,
-    "name": "灵梦攻击",
-    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPosition(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
+    "uid": 5,
+    "name": "战败",
+    "code": "Return 0;\n爱丽丝说话(\"我来草拟了\");\n爱丽丝说话(\"乖乖进小黑屋\");\nShowDialog(\"$i$e9114f916f2f59943fdf8851f9e3fe705ca24352$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"十六夜咲夜\",\"呜呜呜\");\nGameOver();\n",
+    "zCode": [
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "22"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "我来草拟了"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "爱丽丝说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "乖乖进小黑屋"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "爱丽丝说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$e9114f916f2f59943fdf8851f9e3fe705ca24352$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "十六夜咲夜"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "呜呜呜"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowDialog"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "GameOver"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "0",
+    "category": "主流程",
+    "type": "抓"
+  },
+  {
+    "uid": 3,
+    "name": "十六夜说话",
+    "code": "image=ShowImagePermanently(\"$i$19508f0b678ea185963bb35d68dc233388399f35$i$\",1.7);\nSetImagePosition(image,0.3,0,0);\nShowDialog(\"$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"十六夜咲夜\",param1);\nDeleteImage(image,0);\n",
+    "zCode": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$19508f0b678ea185963bb35d68dc233388399f35$i$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1.7"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowImagePermanently"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.3"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "十六夜咲夜"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "param1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowDialog"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DeleteImage"
+      }
+    ],
+    "paramCount": 1,
+    "returnValue": "void",
+    "category": "对话",
+    "type": "十六夜"
+  },
+  {
+    "uid": 2,
+    "name": "主对话",
+    "code": "Pause();\nChangeBgm(\"$a$125a1694a6f9a35770d7964d8fa7984a53c6cd9c$a$\");\n十六夜说话(\"小心，这里有人要抓我\");\n十六夜说话(\"抓到我我就被嘿嘿嘿了\");\n十六夜说话(\"绝对不要被抓到\");\n爱丽丝说话(\"哈哈哈，我来了\");\n爱丽丝说话(\"抓到了把你送给群主\");\n",
+    "zCode": [
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "Pause"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$a$125a1694a6f9a35770d7964d8fa7984a53c6cd9c$a$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ChangeBgm"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "小心，这里有人要抓我"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "十六夜说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "抓到我我就被嘿嘿嘿了"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "十六夜说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "绝对不要被抓到"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "十六夜说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "哈哈哈，我来了"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "爱丽丝说话"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "抓到了把你送给群主"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "爱丽丝说话"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "开局"
+  },
+  {
+    "uid": 4,
+    "name": "爱丽丝说话",
+    "code": "image=ShowImagePermanently(\"$i$31ecf5fedb44d2e7e59806675ab3e9f58cda6e1a$i$\",0.7);\nSetImagePosition(image,0.7,0,0);\nShowDialog(\"$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$\",\"$i$a4383dd53fe99319f6b689f989a3a03316160e08$i$\",\"爱丽丝\",param1);\nDeleteImage(image,0);\n",
+    "zCode": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$31ecf5fedb44d2e7e59806675ab3e9f58cda6e1a$i$"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.7"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowImagePermanently"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.7"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "SetImagePosition"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "$i$a4383dd53fe99319f6b689f989a3a03316160e08$i$"
+      },
+      {
+        "v": "1"
+      },
+      {
+        "v": "爱丽丝"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "param1"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "ShowDialog"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "image"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "DeleteImage"
+      }
+    ],
+    "paramCount": 1,
+    "returnValue": "void",
+    "category": "对话",
+    "type": "爱丽丝"
+  },
+  {
+    "uid": 7,
+    "name": "怪攻击",
+    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPosition(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"子弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
     "zCode": [
       {
         "v": "14"
@@ -535,7 +2546,7 @@
         "v": "1"
       },
       {
-        "v": "札弹"
+        "v": "子弹"
       },
       {
         "v": "14"
@@ -712,7 +2723,7 @@
     "paramCount": 0,
     "returnValue": "void",
     "category": "主流程",
-    "type": "十六夜攻击"
+    "type": "攻击"
   },
   {
     "uid": 12,
@@ -1302,9 +3313,9 @@
     "type": "十六夜攻击"
   },
   {
-    "uid": 7,
-    "name": "怪攻击",
-    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPosition(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"子弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
+    "uid": 13,
+    "name": "灵梦攻击",
+    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPosition(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
     "zCode": [
       {
         "v": "14"
@@ -1412,7 +3423,7 @@
         "v": "1"
       },
       {
-        "v": "子弹"
+        "v": "札弹"
       },
       {
         "v": "14"
@@ -1589,2092 +3600,28 @@
     "paramCount": 0,
     "returnValue": "void",
     "category": "主流程",
-    "type": "攻击"
+    "type": "十六夜攻击"
   },
   {
-    "uid": 4,
-    "name": "爱丽丝说话",
-    "code": "image=ShowImagePermanently(\"$i$31ecf5fedb44d2e7e59806675ab3e9f58cda6e1a$i$\",0.7);\nSetImagePosition(image,0.7,0,0);\nShowDialog(\"$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$\",\"$i$a4383dd53fe99319f6b689f989a3a03316160e08$i$\",\"爱丽丝\",param1);\nDeleteImage(image,0);\n",
-    "zCode": [
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$31ecf5fedb44d2e7e59806675ab3e9f58cda6e1a$i$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.7"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowImagePermanently"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.7"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetImagePosition"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$a4383dd53fe99319f6b689f989a3a03316160e08$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "爱丽丝"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "param1"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowDialog"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DeleteImage"
-      }
-    ],
-    "paramCount": 1,
-    "returnValue": "void",
-    "category": "对话",
-    "type": "爱丽丝"
-  },
-  {
-    "uid": 2,
-    "name": "主对话",
-    "code": "Pause();\nChangeBgm(\"$a$125a1694a6f9a35770d7964d8fa7984a53c6cd9c$a$\");\n十六夜说话(\"小心，这里有人要抓我\");\n十六夜说话(\"抓到我我就被嘿嘿嘿了\");\n十六夜说话(\"绝对不要被抓到\");\n爱丽丝说话(\"哈哈哈，我来了\");\n爱丽丝说话(\"抓到了把你送给群主\");\n",
-    "zCode": [
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "Pause"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$a$125a1694a6f9a35770d7964d8fa7984a53c6cd9c$a$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ChangeBgm"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "小心，这里有人要抓我"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "十六夜说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "抓到我我就被嘿嘿嘿了"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "十六夜说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "绝对不要被抓到"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "十六夜说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "哈哈哈，我来了"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "爱丽丝说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "抓到了把你送给群主"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "爱丽丝说话"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "开局"
-  },
-  {
-    "uid": 3,
-    "name": "十六夜说话",
-    "code": "image=ShowImagePermanently(\"$i$19508f0b678ea185963bb35d68dc233388399f35$i$\",1.7);\nSetImagePosition(image,0.3,0,0);\nShowDialog(\"$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"十六夜咲夜\",param1);\nDeleteImage(image,0);\n",
-    "zCode": [
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$19508f0b678ea185963bb35d68dc233388399f35$i$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1.7"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowImagePermanently"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.3"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetImagePosition"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "十六夜咲夜"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "param1"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowDialog"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DeleteImage"
-      }
-    ],
-    "paramCount": 1,
-    "returnValue": "void",
-    "category": "对话",
-    "type": "十六夜"
-  },
-  {
-    "uid": 5,
-    "name": "战败",
-    "code": "Return 0;\n爱丽丝说话(\"我来草拟了\");\n爱丽丝说话(\"乖乖进小黑屋\");\nShowDialog(\"$i$e9114f916f2f59943fdf8851f9e3fe705ca24352$i$\",\"$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$\",\"十六夜咲夜\",\"呜呜呜\");\nGameOver();\n",
-    "zCode": [
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "22"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "我来草拟了"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "爱丽丝说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "乖乖进小黑屋"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "爱丽丝说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$e9114f916f2f59943fdf8851f9e3fe705ca24352$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$830efb1eaf1b91de980cd33fac7789904719fa83$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "十六夜咲夜"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "呜呜呜"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowDialog"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GameOver"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "0",
-    "category": "主流程",
-    "type": "抓"
-  },
-  {
-    "uid": 6,
-    "name": "怪行为",
-    "code": "SetCharacterNavigate(self,GetCharacterPosition(GetCurrentCharacter()));\nWait(0.4);\nlst=GetCharactersInArea(GetCharacterPosition(self),30);\nlen=Len(lst);\nfor(i=0;i<len;i=i+1)\n{\nif(lst[i]!=self)\n{\nif(IsUnobstructed(GetCharacterPosition(self),GetCharacterPosition(lst[i]),0.2)==1)\n{\nSetCharacterRotation(self,GetLookAtRotation(GetCharacterPosition(self),GetCharacterPosition(lst[i])),0);\ni=9999;\nUseSkill(self,\"$sk$3$sk$\",0);\n} \n;\n} \n;\n }\n ;\n",
-    "zCode": [
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCurrentCharacter"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetCharacterNavigate"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.4"
-      },
-      {
-        "v": "17"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "30"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharactersInArea"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "lst"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "lst"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "Len"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "len"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "len"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "19"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "145"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "lst"
-      },
-      {
-        "v": "12"
-      },
-      {
-        "v": "11"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "135"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "lst"
-      },
-      {
-        "v": "12"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.2"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "IsUnobstructed"
-      },
-      {
-        "v": "10"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "133"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "lst"
-      },
-      {
-        "v": "12"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetLookAtRotation"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetCharacterRotation"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "9999"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$sk$3$sk$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "UseSkill"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "133"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "135"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "46"
-      }
-    ],
+    "uid": 15,
+    "name": "装备武器",
+    "code": "",
+    "zCode": [],
     "paramCount": 0,
     "returnValue": "void",
     "category": "主流程",
     "type": "抓"
   },
   {
-    "uid": 8,
-    "name": "子弹",
-    "code": "if(GetSceneObjectParameter(self,\"所属人物\")!=target)\n{\nCharacterStun(target,0.1);\nSetCharacterParameter(target,\"HP\",GetCharacterParameter(target,\"HP\")-1);\nShowEffect(\"$ef$1$ef$\",GetCharacterPosition(target),0);\nPlayAudio(\"$a$ee0a73d25c28d6e9441c99cc6bc98c64191fa092$a$\");\nDestroyObject(self);\n} \n;\n",
-    "zCode": [
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "所属人物"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetSceneObjectParameter"
-      },
-      {
-        "v": "11"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "68"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.1"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "CharacterStun"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "HP"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "HP"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterParameter"
-      },
-      {
-        "v": "6"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetCharacterParameter"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$ef$1$ef$"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowEffect"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$a$ee0a73d25c28d6e9441c99cc6bc98c64191fa092$a$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "PlayAudio"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DestroyObject"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "68"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "十六夜攻击"
-  },
-  {
-    "uid": 9,
-    "name": "子弹移动",
-    "code": "dir=GetSceneObjectParameter(self,\"移动方向\");\ndir.x=(dir.x)*(80);\ndir.height=(dir.height)*(80);\ndir.y=(dir.y)*(80);\nMoveObjectRelative(self,dir,10);\nDestroyObject(self);\n",
-    "zCode": [
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "移动方向"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetSceneObjectParameter"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "80"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "x"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "13"
-      },
-      {
-        "v": "7"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "x"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "13"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "80"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "height"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "13"
-      },
-      {
-        "v": "7"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "height"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "13"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "80"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "y"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "13"
-      },
-      {
-        "v": "7"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "y"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "13"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "dir"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "10"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "MoveObjectRelative"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DestroyObject"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "十六夜攻击"
-  },
-  {
-    "uid": 10,
-    "name": "子弹碰撞销毁",
-    "code": "if(IsObjectEnableCollision(target))\n{\nShowEffect(\"$ef$1$ef$\",GetObjectPosition(self),0);\nif(GetSceneObjectParameter(target,\"可破坏\")==1)\n{\nDestroyObject(target);\n} \n;\nDestroyObject(self);\n} \n;\n",
-    "zCode": [
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "IsObjectEnableCollision"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "51"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$ef$1$ef$"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetObjectPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowEffect"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "可破坏"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetSceneObjectParameter"
-      },
-      {
-        "v": "10"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "43"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "target"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DestroyObject"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "43"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DestroyObject"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "51"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "十六夜攻击"
-  },
-  {
-    "uid": 11,
-    "name": "胜利",
-    "code": "if(GetCharacterParameter(self,\"HP\")<=0)\n{\nPause();\n十六夜说话(\"哈哈哈，我赢了\");\nShowAdvancedDialog(\"$i$$i$\",\"$i$$i$\",\"\",\"\",\"$a$$a$\",\"$v$1853b510390967b73b6a4941ae13cf62678d4a47$v$\",1);\nGameOver();\n} \n;\n",
-    "zCode": [
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "HP"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterParameter"
-      },
-      {
-        "v": "20"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "47"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "Pause"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "哈哈哈，我赢了"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "十六夜说话"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$i$$i$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": ""
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": ""
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$a$$a$"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$v$1853b510390967b73b6a4941ae13cf62678d4a47$v$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "7"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowAdvancedDialog"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GameOver"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "47"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "开局"
-  },
-  {
-    "uid": 14,
-    "name": "受伤",
-    "code": "FloatingText(delta,GetCharacterPosition(self));\nif(GetCharacterParameter(self,\"HP\")<=0)\n{\nif(self==GetCurrentCharacter())\n{\n战败();\n} \nelse \n{\nDestroyCharacter(self);\n}\n;\n} \n;\n",
-    "zCode": [
-      {
-        "v": "14"
-      },
-      {
-        "v": "delta"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterPosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "FloatingText"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "HP"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCharacterParameter"
-      },
-      {
-        "v": "20"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "48"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "GetCurrentCharacter"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "10"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "40"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "战败"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "46"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "self"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "DestroyCharacter"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "48"
-      }
-    ],
-    "paramCount": 0,
-    "returnValue": "void",
-    "category": "主流程",
-    "type": "抓"
-  },
-  {
-    "uid": 18,
-    "name": "大招",
-    "code": "Pause();\nimage=ShowImage(param1,0.3,3);\nSetImagePosition(image,-2,0.5,0);\nSetImagePosition(image,0.5,0.5,0.5);\nWait(1);\nSetImagePosition(image,2,0.5,0.5);\nContinue();\n",
-    "zCode": [
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "Pause"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "param1"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.3"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "3"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "ShowImage"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "-2"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.5"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetImagePosition"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.5"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.5"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.5"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetImagePosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "17"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "image"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.5"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.5"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "4"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "SetImagePosition"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "Continue"
-      }
-    ],
-    "paramCount": 1,
-    "returnValue": "void",
-    "category": "对话",
-    "type": "弹图"
-  },
-  {
-    "uid": 19,
-    "name": "灵梦Q",
-    "code": "大招(\"$i$ec2b631ac21db3e0dbc5cbb1247b406f0e9ac6ef$i$\");\nShowEffectByCharacter(\"$ef$2$ef$\",self,1);\nfor(j=0;j<50;j=j+10)\n{\nWait(0.2);\nfor(i=0;i<=5;i=i+1)\n{\npos=GetCharacterPosition(self);\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetObjectRotation(newObject,j+(i)*(60),0);\nSetSceneObjectParameter(newObject,\"移动方向\",GetObjectForwardVector(newObject));\n }\n ;\n }\n ;\n",
+    "uid": 16,
+    "name": "灵梦E",
+    "code": "ShowEffectByCharacter(\"$ef$3$ef$\",self,1);\nfor(i=1;i<=3;i=i+1)\n{\nWait(0.2);\npos=GetCharacterPosition(self);\nfor(j=0;j<360;j=j+60)\n{\nnewObject=GenerateObject(\"札弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetObjectRotation(newObject,j,0);\nSetSceneObjectParameter(newObject,\"移动方向\",GetObjectForwardVector(newObject));\n }\n ;\n }\n ;\n",
     "zCode": [
       {
         "v": "1"
       },
       {
-        "v": "$i$ec2b631ac21db3e0dbc5cbb1247b406f0e9ac6ef$i$"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "2"
-      },
-      {
-        "v": "大招"
-      },
-      {
-        "v": "1"
-      },
-      {
-        "v": "$ef$2$ef$"
+        "v": "$ef$3$ef$"
       },
       {
         "v": "14"
@@ -3704,52 +3651,7 @@
         "v": "0"
       },
       {
-        "v": "0"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "j"
-      },
-      {
-        "v": "9"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "50"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "j"
-      },
-      {
-        "v": "19"
-      },
-      {
-        "v": "15"
-      },
-      {
-        "v": "123"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0.2"
-      },
-      {
-        "v": "17"
-      },
-      {
-        "v": "0"
-      },
-      {
-        "v": "0"
+        "v": "1"
       },
       {
         "v": "14"
@@ -3764,7 +3666,7 @@
         "v": "0"
       },
       {
-        "v": "5"
+        "v": "3"
       },
       {
         "v": "14"
@@ -3779,7 +3681,16 @@
         "v": "15"
       },
       {
-        "v": "113"
+        "v": "111"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0.2"
+      },
+      {
+        "v": "17"
       },
       {
         "v": "14"
@@ -3807,6 +3718,42 @@
       },
       {
         "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "j"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "360"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "j"
+      },
+      {
+        "v": "19"
+      },
+      {
+        "v": "15"
+      },
+      {
+        "v": "101"
       },
       {
         "v": "1"
@@ -3878,28 +3825,10 @@
         "v": "newObject"
       },
       {
-        "v": "0"
-      },
-      {
-        "v": "60"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "i"
-      },
-      {
-        "v": "7"
-      },
-      {
         "v": "14"
       },
       {
         "v": "j"
-      },
-      {
-        "v": "3"
       },
       {
         "v": "0"
@@ -3965,6 +3894,36 @@
         "v": "0"
       },
       {
+        "v": "60"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "j"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "j"
+      },
+      {
+        "v": "9"
+      },
+      {
+        "v": "16"
+      },
+      {
+        "v": "39"
+      },
+      {
+        "v": "0"
+      },
+      {
         "v": "1"
       },
       {
@@ -3989,37 +3948,78 @@
         "v": "16"
       },
       {
-        "v": "36"
+        "v": "15"
+      }
+    ],
+    "paramCount": 0,
+    "returnValue": "void",
+    "category": "主流程",
+    "type": "十六夜攻击"
+  },
+  {
+    "uid": 17,
+    "name": "子弹销毁",
+    "code": "ShowEffect(\"$ef$1$ef$\",GetObjectPosition(self),0);\nDestroyObject(self);\n\n",
+    "zCode": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "$ef$1$ef$"
+      },
+      {
+        "v": "14"
+      },
+      {
+        "v": "self"
       },
       {
         "v": "0"
       },
       {
-        "v": "10"
+        "v": "1"
       },
       {
-        "v": "14"
+        "v": "2"
       },
       {
-        "v": "j"
+        "v": "GetObjectPosition"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
+      },
+      {
+        "v": "0"
       },
       {
         "v": "3"
       },
       {
+        "v": "2"
+      },
+      {
+        "v": "ShowEffect"
+      },
+      {
         "v": "14"
       },
       {
-        "v": "j"
+        "v": "self"
       },
       {
-        "v": "9"
+        "v": "0"
       },
       {
-        "v": "16"
+        "v": "1"
       },
       {
-        "v": "21"
+        "v": "2"
+      },
+      {
+        "v": "DestroyObject"
       }
     ],
     "paramCount": 0,

@@ -1,7 +1,7 @@
 [
   {
-    "uid": 2,
-    "name": "灵梦Q",
+    "uid": 3,
+    "name": "灵梦E",
     "label": "",
     "clips": [
       {
@@ -9,11 +9,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
-              "time": 1.0,
-              "pos": "0|0|0",
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "time": 0.5,
+              "pos": "0|0.1|0",
               "rot": 0.0,
-              "scale": "1|1|1",
+              "scale": "0|0|0",
               "opacity": 0.0,
               "transition": true
             }
@@ -21,11 +21,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
               "time": 1.0,
-              "pos": "0|0|0",
+              "pos": "0|0.1|0",
               "rot": 180.0,
-              "scale": "6|6|6",
+              "scale": "4|4|4",
               "opacity": 1.0,
               "transition": true
             }
@@ -33,11 +33,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
               "time": 1.0,
-              "pos": "0|0|0",
+              "pos": "0|0.1|0",
               "rot": 359.0,
-              "scale": "6|6|6",
+              "scale": "4|4|4",
               "opacity": 1.0,
               "transition": true
             }
@@ -45,9 +45,9 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
-              "time": 2.0,
-              "pos": "0|0|0",
+              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "time": 0.5,
+              "pos": "0|0.1|0",
               "rot": 0.0,
               "scale": "0|0|0",
               "opacity": 0.0,
@@ -56,7 +56,8 @@
           }
         ]
       }
-    ]
+    ],
+    "ground": true
   },
   {
     "uid": 1,
@@ -70,7 +71,7 @@
               "uid": -1,
               "tex": "$i$54f3250f3f11117ceb83c80084650e1935c96d8e$i$",
               "time": 0.1,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 1.0,
@@ -86,7 +87,7 @@
               "uid": -1,
               "tex": "$i$09714d17b684bd5fe3a0f7b6b65e630e8843477d$i$",
               "time": 0.1,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 0.0,
@@ -98,7 +99,7 @@
               "uid": -1,
               "tex": "$i$09714d17b684bd5fe3a0f7b6b65e630e8843477d$i$",
               "time": 0.1,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 1.0,
@@ -114,7 +115,7 @@
               "uid": -1,
               "tex": "$i$c4e9d084e6d5adb45ea06461716f52d5349cbf62$i$",
               "time": 0.2,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 0.0,
@@ -126,7 +127,7 @@
               "uid": -1,
               "tex": "$i$c4e9d084e6d5adb45ea06461716f52d5349cbf62$i$",
               "time": 0.1,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 1.0,
@@ -142,7 +143,7 @@
               "uid": -1,
               "tex": "$i$e7a6adc868e1148a33d0ec8d60fb21b03a55e40f$i$",
               "time": 0.3,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 0.0,
@@ -154,7 +155,7 @@
               "uid": -1,
               "tex": "$i$e7a6adc868e1148a33d0ec8d60fb21b03a55e40f$i$",
               "time": 0.1,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 1.0,
@@ -170,7 +171,7 @@
               "uid": -1,
               "tex": "$i$e26e26e08f4980dd95557011feab0155db8bd472$i$",
               "time": 1.4,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 0.0,
@@ -182,7 +183,7 @@
               "uid": -1,
               "tex": "$i$e26e26e08f4980dd95557011feab0155db8bd472$i$",
               "time": 0.1,
-              "pos": "0|1.2|0",
+              "pos": "0|0.2|0",
               "rot": 0.0,
               "scale": "1|1|1",
               "opacity": 1.0,
@@ -191,11 +192,12 @@
           }
         ]
       }
-    ]
+    ],
+    "ground": false
   },
   {
-    "uid": 3,
-    "name": "灵梦E",
+    "uid": 2,
+    "name": "灵梦Q",
     "label": "",
     "clips": [
       {
@@ -203,11 +205,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
-              "time": 0.5,
-              "pos": "0|0|0",
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "time": 1.0,
+              "pos": "0|0.1|0",
               "rot": 0.0,
-              "scale": "0|0|0",
+              "scale": "1|1|1",
               "opacity": 0.0,
               "transition": true
             }
@@ -215,11 +217,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
               "time": 1.0,
-              "pos": "0|0|0",
+              "pos": "0|0.1|0",
               "rot": 180.0,
-              "scale": "4|4|4",
+              "scale": "6|6|6",
               "opacity": 1.0,
               "transition": true
             }
@@ -227,11 +229,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
               "time": 1.0,
-              "pos": "0|0|0",
+              "pos": "0|0.1|0",
               "rot": 359.0,
-              "scale": "4|4|4",
+              "scale": "6|6|6",
               "opacity": 1.0,
               "transition": true
             }
@@ -239,9 +241,9 @@
           {
             "v": {
               "uid": -1,
-              "tex": "$i$6b4bfa6b6c7b33cac5cc0b3f8638620447d08e6f$i$",
-              "time": 0.5,
-              "pos": "0|0|0",
+              "tex": "$i$84867236fac1626ca12565356fcaa8981d854c1c$i$",
+              "time": 2.0,
+              "pos": "0|0.1|0",
               "rot": 0.0,
               "scale": "0|0|0",
               "opacity": 0.0,
@@ -250,6 +252,7 @@
           }
         ]
       }
-    ]
+    ],
+    "ground": true
   }
 ]

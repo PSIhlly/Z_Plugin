@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cameraMode": 0,
+    "cameraMode": 1,
     "dialogCache": {
       "uid": 0,
       "title": "",

@@ -33,8 +33,8 @@
     "paramDic": []
   },
   {
-    "id": 3,
-    "name": "玉弹",
+    "id": 4,
+    "name": "树1",
     "icon": "reservedI$",
     "model": {
       "id": 0,
@@ -45,82 +45,29 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|0|0"
+          "v": "0|0.2|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.4|1|0.4"
+          "v": "1.2|1.5|1"
         }
       ],
       "subUnitTexsName": [
         {
-          "v": "$i$8b7d1fee47011caa51789c752652722d567a81af$i$"
+          "v": "$i$e32573ebe6f1bb5f5bd4b49e80f63f9a449f632b$i$"
         }
       ],
       "isObstacle": false
     },
     "label": "",
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": "子弹"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": "子弹移动"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": "子弹碰撞销毁"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onBoundaryTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onBoundaryTouchEvent",
-          "evt": [
-            {
-              "v": "子弹销毁"
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
+    "collision": true,
+    "events": [],
     "paramDic": []
   },
   {
-    "id": 9,
-    "name": "札弹",
+    "id": 2,
+    "name": "桶",
     "icon": "reservedI$",
     "model": {
       "id": 0,
@@ -131,77 +78,24 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|0|0"
+          "v": "0|-0.1|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.5|0.5|0.5"
+          "v": "0.8|0.8|0.8"
         }
       ],
       "subUnitTexsName": [
         {
-          "v": "$i$0659ebd8a4ec5e78b8f328f64f76b8a7d7588783$i$"
+          "v": "$i$9578df8425aa198f883cdee80b9eb73e0c834318$i$"
         }
       ],
       "isObstacle": false
     },
     "label": "",
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": "子弹"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": "子弹追踪"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": "子弹碰撞销毁"
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onBoundaryTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onBoundaryTouchEvent",
-          "evt": [
-            {
-              "v": "子弹销毁"
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
+    "collision": true,
+    "events": [],
     "paramDic": [
       {
         "k": "可破坏",
@@ -210,8 +104,8 @@
           "name": "New0",
           "valueType": 0,
           "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
-          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}"
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}"
         }
       }
     ]
@@ -346,8 +240,8 @@
     ]
   },
   {
-    "id": 2,
-    "name": "桶",
+    "id": 9,
+    "name": "札弹",
     "icon": "reservedI$",
     "model": {
       "id": 0,
@@ -363,19 +257,72 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.6|0.6|0.8"
+          "v": "0.5|0.5|0.5"
         }
       ],
       "subUnitTexsName": [
         {
-          "v": "$i$9578df8425aa198f883cdee80b9eb73e0c834318$i$"
+          "v": "$i$0659ebd8a4ec5e78b8f328f64f76b8a7d7588783$i$"
         }
       ],
       "isObstacle": false
     },
     "label": "",
-    "collision": true,
-    "events": [],
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": "子弹"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": "子弹追踪"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": "子弹碰撞销毁"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": "子弹销毁"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
     "paramDic": [
       {
         "k": "可破坏",
@@ -384,15 +331,15 @@
           "name": "New0",
           "valueType": 0,
           "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
-          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}"
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}"
         }
       }
     ]
   },
   {
-    "id": 4,
-    "name": "树1",
+    "id": 3,
+    "name": "玉弹",
     "icon": "reservedI$",
     "model": {
       "id": 0,
@@ -408,19 +355,72 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1.2|1|1.5"
+          "v": "0.4|1|0.4"
         }
       ],
       "subUnitTexsName": [
         {
-          "v": "$i$e32573ebe6f1bb5f5bd4b49e80f63f9a449f632b$i$"
+          "v": "$i$8b7d1fee47011caa51789c752652722d567a81af$i$"
         }
       ],
       "isObstacle": false
     },
     "label": "",
-    "collision": true,
-    "events": [],
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": "子弹"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": "子弹移动"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": "子弹碰撞销毁"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": "子弹销毁"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
     "paramDic": []
   }
 ]

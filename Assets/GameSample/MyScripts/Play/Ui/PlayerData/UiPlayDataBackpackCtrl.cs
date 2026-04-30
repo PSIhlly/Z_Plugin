@@ -144,7 +144,7 @@ namespace Ui.PlayData.PlayDataBackpack
                         });
                 }
                 var equipCharacter = PlayManager.instance.infoCtrl.GetTeamEquipedCharacter(model.sel.uid, out var part);
-                view.sta_showArea.ChangeState(model.sel.canEquipe ? (equipCharacter != null ? 2 : 1) : 0);
+                view.sta_showArea.ChangeState(model.sel.canEquipe&&GameManager.instance.curProgress.enableEquip ? (equipCharacter != null ? 2 : 1) : 0);
             }
             gameArgCon.Refresh();
         }

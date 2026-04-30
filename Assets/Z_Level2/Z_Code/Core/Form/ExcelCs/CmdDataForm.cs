@@ -235,7 +235,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(prmNames),new List<string>(prmTypes),new List<string>(retNames),new List<string>(retTypes),desc,defaultCode);
+        return new Data(sameId? uid:uidChain.GetId(),name,prmNames==null?new List<string>():new List<string>(prmNames),prmTypes==null?new List<string>():new List<string>(prmTypes),retNames==null?new List<string>():new List<string>(retNames),retTypes==null?new List<string>():new List<string>(retTypes),desc,defaultCode);
                 }
             
             public virtual  void BeforeGet()

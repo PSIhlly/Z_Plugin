@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Unity.Burst.Intrinsics;
 using Z_Code;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Text;
 using Z_Texture;
 using Z_Ui.Base;
@@ -38,7 +39,7 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterData
         public void Refresh()
         {
 
-            view.img_tachie.sprite = TexAssetForm.DataByName[model.data.tachie].GetSprite();
+            view.img_illustration.sprite = TexAssetForm.DataByName.GetDk(model.data.illustration,GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
             view.txt_desc.text = model.data.desc;
             view.txt_name.text= model.data.name;
             gameArgsCon.Clear();

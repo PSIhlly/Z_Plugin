@@ -154,7 +154,7 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new List<string>(evt),type);
+        return new Data(sameId? uid:uidChain.GetId(),name,evt==null?new List<string>():new List<string>(evt),type);
                 }
             
             public virtual  void BeforeGet()

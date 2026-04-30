@@ -154,7 +154,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new Dictionary<EquipPartType,ItemStyle>(equipStyle),new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),new Dictionary<BodyPartType,string>(partTex));
+        return new Data(sameId? uid:uidChain.GetId(),equipStyle==null?new Dictionary<EquipPartType,ItemStyle>():new Dictionary<EquipPartType,ItemStyle>(equipStyle),equipTrs==null?new Dictionary<EquipPartType,(float,float,int,float)>():new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),partTex==null?new Dictionary<BodyPartType,string>():new Dictionary<BodyPartType,string>(partTex));
                 }
             
             public virtual  void BeforeGet()

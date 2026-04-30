@@ -38,14 +38,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                     }, items);
 
             });
-            view.btn_hpArgument.onClick.AddListener(() =>
-            {
-                ModManager.instance.assetCtrl.ChooseCharacterParam(TextManager.instance.GetTxt("Choose Hp param"), (item) =>
-                {
-                    model.data.hpParamName = item.content;
-                    Refresh();
-                });
-            });
+           
             view.btn_moveSpeedParameter.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseCharacterParam(TextManager.instance.GetTxt("Choose Speed param"), (item) =>
@@ -124,7 +117,6 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public void Refresh()
         {
-            view.txt_hpArgument.text = model.data.hpParamName;
             view.txt_moveSpeedParameter.text = model.data.speedParamName;
 
             view.txt_faceType.oriText = model.data.faceType.ToString();
@@ -142,6 +134,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
             view.model_EventChooseBoundaryTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onBoundaryTouchEvent" });
+            view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
 
             view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
 
@@ -155,7 +148,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.txt_passive2.text = model.data.skill.ContainsKey(SkillType.Passive) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.Passive]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.Passive]].name : "";
 
-
+            view.go_skills.SetActive(GameManager.instance.curProgress.enableSkill);
 
 
         }

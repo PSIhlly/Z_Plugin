@@ -143,6 +143,8 @@ public class PlayManager : Z_MonoManager<PlayManager>
             newItem.ToProduct(uid);
             items.Add(newItem.uid);
         }
+        progress.bag = items;
+
         var characters = new List<int>();
         var charactersActive = new List<int>();
 

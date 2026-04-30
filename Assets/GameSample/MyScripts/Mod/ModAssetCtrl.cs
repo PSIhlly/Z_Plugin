@@ -183,6 +183,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             obj.paramDic = obj.paramDic;//refresh
         }
     }
+    
     public void CreateSkillArg(string name)
     {
         if (SkillParamForm.DataByName.Keys.Count > GlobalSettings.SKILL_PARAM_MAX)
@@ -366,6 +367,25 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
 
     }
+
+    public void ChooseSceneObjectParam(string title, Action<EntryItem> act, EntryItem addItem = null)
+    {
+        var items = new EntryItem();
+        if (addItem != null)
+        {
+            items.Add(addItem);
+        }
+        foreach (var data in MapObjectParamForm.DataByName.Values)
+        {
+            items.Add(data.name);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
     #endregion
 
     #region character
@@ -429,7 +449,36 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
+    public void ChooseActiveCharacter(string title, Action<CharacterProductForm.Data> act, EntryItem addItem = null)
+    {
+        var items = new EntryItem();
+        if (addItem != null)
+        {
+            items.Add(addItem);
+        }
 
+        foreach (var uid in GameManager.instance.curProgress.team)
+        {
+            var data = CharacterProductForm.DataByUid.GetDv(uid, null);
+            if (data != null)
+            {
+                items.Add(data.name, TexAssetForm.DataByName[data.avatarTexName].GetSprite());
+            }
+        }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+            true, (item) =>
+            {
+                if (item == addItem)
+                {
+                    act?.Invoke(null);
+                }
+                else
+                {
+                    act?.Invoke(CharacterProductForm.DataByNameProtouid.GetDv((item.content, 0), null));
+                }
+                return true;
+            }, items);
+    }
 
 
     public void ImportCharacterAvatar(int uid)
@@ -443,13 +492,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             sizeLimit = new Vector2Int(100, 100)
         });
     }
-    public void ImportCharacterTachie(int characterUid)
+    public void ImportCharacterIllustration(int characterUid)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
             onComplete = (data) =>
             {
-                CharacterProductForm.DataByUid[characterUid].tachie = data.name;
+                CharacterProductForm.DataByUid[characterUid].illustration = data.name;
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -584,7 +633,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         EffectForm.DataByUid[effectUid].clips.RemoveAt(id);
     }
-    public void DeleteEffectClip(int effectUid,int id1, int id2)
+    public void DeleteEffectClip(int effectUid, int id1, int id2)
     {
         EffectForm.DataByUid[effectUid].clips[id1].RemoveAt(id2);
     }
@@ -594,7 +643,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(EffectForm.DataByName.Keys);
         }
-        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) } },false));
+        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalNameHelper.GetDefaultTexName()) } }, false));
     }
     public void DeleteEffect(int effectUid)
     {
@@ -673,6 +722,24 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             true, (item) =>
             {
                 act?.Invoke(SkillProductForm.DataByUid[item.id]);
+                return true;
+            }, items);
+    }
+    public void ChooseSkillParam(string title, Action<EntryItem> act, EntryItem addItem = null)
+    {
+        var items = new EntryItem();
+        if (addItem != null)
+        {
+            items.Add(addItem);
+        }
+        foreach (var data in SkillParamForm.DataByName.Values)
+        {
+            items.Add(data.name);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(item);
                 return true;
             }, items);
     }
@@ -871,7 +938,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             styleTex[style] = GlobalNameHelper.GetDefaultTexName();
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true, new Dictionary<string, CharacterParamForm.Data>()));
     }
     public void DeleteItem(int itemUid)
     {
@@ -955,7 +1022,24 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
-
+    public void ChooseItemParam(string title, Action<EntryItem> act, EntryItem addItem = null)
+    {
+        var items = new EntryItem();
+        if (addItem != null)
+        {
+            items.Add(addItem);
+        }
+        foreach (var data in ItemParamForm.DataByName.Values)
+        {
+            items.Add(data.name);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(item);
+                return true;
+            }, items);
+    }
     #endregion
 
     #region scene

@@ -272,7 +272,7 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra);
                 }
             
             public virtual  void BeforeGet()

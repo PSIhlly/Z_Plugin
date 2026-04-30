@@ -81,6 +81,14 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,EditorStyle,EditorStyle> changeEditorstyleAction;
                 
+        public static Action<Data,bool,bool> changeEnableequipAction;
+                
+        public static Action<Data,bool,bool> changeEnableskillAction;
+                
+        public static Action<Data,bool,bool> changeEnablefreechangeactiveteamerAction;
+                
+        public static Action<Data,bool,bool> changeEnablefreechangeskillAction;
+                
 
 
         public partial class Data
@@ -374,7 +382,79 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid,EditorStyle editorStyle)
+                    private bool  _enableEquip;
+                    /// <summary>
+                    ///启用装备
+                    ///</summary>
+                    public bool  enableEquip{
+                                get{return _enableEquip;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEnableequip(this,_enableEquip,value); 
+                    }
+        
+                _enableEquip = value;
+                }
+                 
+                     }
+                    
+                    private bool  _enableSkill;
+                    /// <summary>
+                    ///启用技能
+                    ///</summary>
+                    public bool  enableSkill{
+                                get{return _enableSkill;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEnableskill(this,_enableSkill,value); 
+                    }
+        
+                _enableSkill = value;
+                }
+                 
+                     }
+                    
+                    private bool  _enableFreeChangeActiveTeamer;
+                    /// <summary>
+                    ///启用随时出战
+                    ///</summary>
+                    public bool  enableFreeChangeActiveTeamer{
+                                get{return _enableFreeChangeActiveTeamer;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEnablefreechangeactiveteamer(this,_enableFreeChangeActiveTeamer,value); 
+                    }
+        
+                _enableFreeChangeActiveTeamer = value;
+                }
+                 
+                     }
+                    
+                    private bool  _enableFreeChangeSkill;
+                    /// <summary>
+                    ///启用随时改技能
+                    ///</summary>
+                    public bool  enableFreeChangeSkill{
+                                get{return _enableFreeChangeSkill;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEnablefreechangeskill(this,_enableFreeChangeSkill,value); 
+                    }
+        
+                _enableFreeChangeSkill = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill)
             {
 
              this.uid = uid;
@@ -393,6 +473,10 @@ public static readonly int autoUidCnt=100;
              this.notFirstTime = notFirstTime;
              this.blockProgramUid = blockProgramUid;
              this.editorStyle = editorStyle;
+             this.enableEquip = enableEquip;
+             this.enableSkill = enableSkill;
+             this.enableFreeChangeActiveTeamer = enableFreeChangeActiveTeamer;
+             this.enableFreeChangeSkill = enableFreeChangeSkill;
 
             }
             public void Reset(Data data)
@@ -414,11 +498,15 @@ public static readonly int autoUidCnt=100;
              this.notFirstTime = data.notFirstTime;
              this.blockProgramUid = data.blockProgramUid;
              this.editorStyle = data.editorStyle;
+             this.enableEquip = data.enableEquip;
+             this.enableSkill = data.enableSkill;
+             this.enableFreeChangeActiveTeamer = data.enableFreeChangeActiveTeamer;
+             this.enableFreeChangeSkill = data.enableFreeChangeSkill;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,new List<int>(bag),new List<int>(team),new List<int>(teamActive),new Dictionary<string,string>(uiStyleImageName),new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle);
+        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill);
                 }
             
             public virtual  void BeforeGet()
@@ -428,7 +516,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg);
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg,false,false,false,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -532,7 +620,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("blockProgramUid")==null?defaultData.blockProgramUid:jo.Get<int>("blockProgramUid"),
 
-                jo.SelectToken("editorStyle")==null?defaultData.editorStyle:jo.Get<EditorStyle>("editorStyle")
+                jo.SelectToken("editorStyle")==null?defaultData.editorStyle:jo.Get<EditorStyle>("editorStyle"),
+
+                jo.SelectToken("enableEquip")==null?defaultData.enableEquip:jo.Get<bool>("enableEquip"),
+
+                jo.SelectToken("enableSkill")==null?defaultData.enableSkill:jo.Get<bool>("enableSkill"),
+
+                jo.SelectToken("enableFreeChangeActiveTeamer")==null?defaultData.enableFreeChangeActiveTeamer:jo.Get<bool>("enableFreeChangeActiveTeamer"),
+
+                jo.SelectToken("enableFreeChangeSkill")==null?defaultData.enableFreeChangeSkill:jo.Get<bool>("enableFreeChangeSkill")
                     );
 
             return data;
@@ -576,6 +672,14 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<int>("blockProgramUid",data.blockProgramUid);
 
             jo.Set<EditorStyle>("editorStyle",data.editorStyle);
+
+            jo.Set<bool>("enableEquip",data.enableEquip);
+
+            jo.Set<bool>("enableSkill",data.enableSkill);
+
+            jo.Set<bool>("enableFreeChangeActiveTeamer",data.enableFreeChangeActiveTeamer);
+
+            jo.Set<bool>("enableFreeChangeSkill",data.enableFreeChangeSkill);
 
             return jo;
         }
@@ -817,6 +921,46 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeEditorstyleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnableequip(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnableequipAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnableskill(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnableskillAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnablefreechangeactiveteamer(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnablefreechangeactiveteamerAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnablefreechangeskill(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnablefreechangeskillAction?.Invoke(data,oldV,newV);
                 }
                     
             }

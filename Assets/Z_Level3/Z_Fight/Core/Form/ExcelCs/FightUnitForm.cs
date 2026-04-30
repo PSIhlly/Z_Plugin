@@ -357,7 +357,7 @@ namespace Z_Fight.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<int,int>(itemIdCountDic),new List<int>(curUsingWeaponsSid),new List<int>(curReloadWeaponsSid),alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,itemIdCountDic==null?new Dictionary<int,int>():new Dictionary<int,int>(itemIdCountDic),curUsingWeaponsSid==null?new List<int>():new List<int>(curUsingWeaponsSid),curReloadWeaponsSid==null?new List<int>():new List<int>(curReloadWeaponsSid),alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra);
                 }
             
             public override  void BeforeGet()

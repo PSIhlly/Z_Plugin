@@ -236,6 +236,58 @@ namespace PlayerTouchOpt
     {
         
     }
+
+
+
+    public partial class UiActionParam:UiParam
+    {
+    }
+
+    public partial class UiActionView:UiView
+    {
+
+            public GameObject go_action;
+            public Img img_;
+            public Btn btn_;
+            public Txt txt_;
+        public UiActionView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_action = uiHolder.elementTrsLst[0].gameObject;
+            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiActionCtrl:UiCtrl
+    {
+        public UiActionView view;
+        public UiActionModel model;
+        public UiActionParam param;
+        public UiPlaySceneMainCtrl parent=>(UiPlaySceneMainCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiActionParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiActionView(uiHolder);
+            model=new UiActionModel();
+
+
+        }
+
+    }
+    public partial class UiActionModel:UiModel
+    {
+        
+    }
     public partial class UiPlaySceneMainParam:UiParam
     {
     }
@@ -256,6 +308,8 @@ namespace PlayerTouchOpt
             public GameObject go_teamer;
             public UiTeamerCtrl sub_teamer;
             public GameObject go_func;
+            public GameObject go_action;
+            public UiActionCtrl sub_action;
             public Btn btn_map;
             public Btn btn_menu;
             public Btn btn_data;
@@ -275,9 +329,11 @@ namespace PlayerTouchOpt
             go_teamer = uiHolder.elementTrsLst[10].gameObject;
             sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
             go_func = uiHolder.elementTrsLst[12].gameObject;
-            btn_map = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            btn_menu = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            btn_data = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            go_action = uiHolder.elementTrsLst[13].gameObject;
+            sub_action = (UiActionCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            btn_map = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            btn_menu = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            btn_data = uiHolder.elementTrsLst[17].GetComponent<Btn>();
         }
 
     }
@@ -314,6 +370,8 @@ namespace PlayerTouchOpt
             view.model_ParamShow.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.sub_teamer = new UiTeamerCtrl();
             view.sub_teamer.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.sub_action = new UiActionCtrl();
+            view.sub_action.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
         }
 
     }

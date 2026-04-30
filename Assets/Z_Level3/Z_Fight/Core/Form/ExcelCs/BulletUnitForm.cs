@@ -203,7 +203,7 @@ namespace Z_Fight.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,weaponBulletId,rangeLast,attackerUid,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra);
+        return new Data(sameId? uid:uidChain.GetId(),name,weaponBulletId,rangeLast,attackerUid,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra);
                 }
             
             public override  void BeforeGet()

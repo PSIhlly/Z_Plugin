@@ -274,8 +274,20 @@ PrefabInstance:
       value: go_item
       objectReference: {fileID: 0}
     - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -2.7179031
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3975392061340340404, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -339,35 +351,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 255.1775
+      value: -223.2194
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 237.8466
+      value: -65.8901
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.0000025522
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000005722
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6817592591530964852, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y

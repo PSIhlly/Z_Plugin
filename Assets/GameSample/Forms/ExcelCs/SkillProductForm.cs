@@ -276,7 +276,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,protoUid,icon,new Dictionary<string,SkillParamForm.Data>(paramDic),new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,protoUid,icon,paramDic==null?new Dictionary<string,SkillParamForm.Data>():new Dictionary<string,SkillParamForm.Data>(paramDic),skillTypes==null?new List<SkillType>():new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
                 }
             
             public override  void BeforeGet()

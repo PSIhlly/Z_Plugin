@@ -8,27 +8,23 @@ using Z_Ui.Notify;
 
 namespace Z_Code
 {
-    public class ShowDialogCmd : CmdBase
+    public class CharacterChatCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new ShowDialogCmd());
+            Register(new CharacterChatCmd());
         }
-        public override string GetName() => "ShowDialog";
-        public override CmdBase GetNew() => new ShowDialogCmd();
+        public override string GetName() => "CharacterChat";
+        public override CmdBase GetNew() => new CharacterChatCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             asyncTask.interpreter.data.heapTemp.Clear();
             foreach (var p in prm)
                 asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
             var heapTemp = asyncTask.interpreter.data.heapTemp;
-
-            DialogManager.instance.Begin(heapTemp[2].str,  heapTemp[3].str , heapTemp[0].str ,"", heapTemp[1].str,"", () =>
-            {
-                asyncTask.Complete();
-            });
-            return false;
+            PlayManager.instance.effectCtrl.ChatText(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), prm[1].str, prm[2].str, prm[3].num);
+            return true;
         }
     }
 }

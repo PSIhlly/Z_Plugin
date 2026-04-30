@@ -96,7 +96,7 @@ namespace Ui.Mod
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon,"$i$$i$").GetSprite();
+                view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon, GlobalNameHelper.GetExternDefaultTexName()).GetSprite();
             }
         }
 

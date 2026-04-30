@@ -166,7 +166,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,new List<string>(texsName),label,new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texsName==null?new List<string>():new List<string>(texsName),label,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events));
                 }
             
             public override  void BeforeGet()

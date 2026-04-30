@@ -44,7 +44,7 @@ namespace Ui.Notify
 
             foreach (var item in model.info.items.subs.Values)
             {
-                con.Add(new UiItemParam()
+                con.Add(new UiQuickItemParam()
                 {
                     cur = item
                 });
@@ -70,7 +70,10 @@ namespace Ui.Notify
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.model.info.func(model.cur);
+                if(parent.model.info.func(model.cur))
+                {
+                    parent.Close();
+                }
             });
         }
         public override void OnShow()
@@ -84,7 +87,7 @@ namespace Ui.Notify
         public void Refresh()
         {
             view.txt_.text = model.cur.content;
-            view.img_.sprite = model.cur.sprite;
+           // view.img_.sprite = model.cur.sprite==null?model.cur.sprite;
         }
     }
 

@@ -122,7 +122,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,new List<string>(texsName),label);
+        return new Data(sameId? id:idChain.GetId(),name,icon,texsName==null?new List<string>():new List<string>(texsName),label);
                 }
             
             public override  void BeforeGet()

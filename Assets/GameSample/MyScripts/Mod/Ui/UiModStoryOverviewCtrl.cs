@@ -22,7 +22,7 @@ namespace Ui.ModStory.ModStoryOverview
     {
 
     }
-    public partial class UiModStoryOverviewCtrl:IZ_Listener<AssetEvent>
+    public partial class UiModStoryOverviewCtrl : IZ_Listener<AssetEvent>
     {
 
         public override void OnCreate()
@@ -32,12 +32,12 @@ namespace Ui.ModStory.ModStoryOverview
             {
                 ModManager.instance.assetCtrl.ImportStoryTex();
             });
-            view.ipt_name.onFinishInput += (s)=>
+            view.ipt_name.onFinishInput += (s) =>
             {
                 GameManager.instance.curStory.name = s;
                 Refresh();
             };
-            view.ipt_introduction.onFinishInput+=(s)=>
+            view.ipt_introduction.onFinishInput += (s) =>
             {
                 GameManager.instance.curStory.desc = s;
                 Refresh();
@@ -58,14 +58,14 @@ namespace Ui.ModStory.ModStoryOverview
         }
         public override void Close()
         {
-            
+
             base.Close();
 
         }
- 
+
         public void Refresh()
         {
-            view.img_image.sprite = TexAssetForm.DataByName.GetDk(GameManager.instance.curStory.icon,"").GetSprite();
+            view.img_image.sprite = TexAssetForm.DataByName.GetDk(GameManager.instance.curStory.icon, GlobalNameHelper.GetDefaultStoryTexName()).GetSprite();
             view.ipt_introduction.Set(GameManager.instance.curStory.desc);
             view.ipt_name.Set(GameManager.instance.curStory.name);
         }

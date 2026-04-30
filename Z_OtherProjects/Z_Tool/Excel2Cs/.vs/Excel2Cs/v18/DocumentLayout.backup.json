@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:Excel2Cs.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:formBaseInfo.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\dataAnalysis.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:dataAnalysis.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{6C5A4C73-450D-41B4-8CE9-E40D89BA86AA}|Excel2Cs.pyproj|solutionrelative:formBaseInfo.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,27 +26,29 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "formBaseInfo.py",
               "DocumentMoniker": "D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py",
               "RelativeDocumentMoniker": "formBaseInfo.py",
               "ToolTip": "D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\formBaseInfo.py",
               "RelativeToolTip": "formBaseInfo.py",
-              "ViewState": "AgIAABIBAAAAAAAAAAApwBoBAABAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-03-08T11:07:00.172Z"
+              "ViewState": "AgIAAGUAAAAAAAAAAAAAAG8AAAAKAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHfSURBVDhPpZCxaxNhGMZ/9zVJaUuDUlq1FBWLZBFTCXo4BFyU1qGKi4OkIHhkzF/g0KF00M2lR9YUdDDQQVAcJILoQUd1UNRmkhoRm8RL777v7nOoCZd4AcEH3uF5nvd73vd74X\u002BgtTai3LIsHeWDEEJct217a1DvwbIs7bpubFUqFW3b9naxWLwWfSOipAvHcfqqi0KhkMtms3cty1rsaomeG4FpmoMSANVqlXQ6nQMWgacMC4hOBchduEj\u002ByjKjScGh8SS1Wq3nxQZEN3j1eY/Vrfe8rTeQvsf89ARLS1cz5XIZ/uUGXxptQiVRUhJIybudXaZn52a7vbEBpmkyNb/A69YM9W8tDEJOTI2hpI\u002BSkvOZH2f13sNAB\u002B07sV9wHIdH9Unquz9RvoeUPtL3UFISKkky\u002BAT7HwTi6FpsgGma3N9\u002Bg5I\u002BKaFZyU8wOpJChwHnjiuE9wKCXyC/zsQGOI7DeELjtiUPbgky6Wd/HA3KBelC4AIpNfQGl88cQ0mfI5PugRhKkM2DUk0INYwtPI/dAGAlf4rbl06T6DyBVgeCABJzYPhwcm0V8ICNvwJKpVIf37h3IxSyKVAuBMDIYQAMw1jvaxwGrYNl3Xq5o79vat3Y3Nedj4\u002B11je7/m\u002BXOuyzFtDhUgAAAABJRU5ErkJggg==",
+              "WhenOpened": "2026-03-08T11:07:00.172Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "dataAnalysis.py",
               "DocumentMoniker": "D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\dataAnalysis.py",
               "RelativeDocumentMoniker": "dataAnalysis.py",
               "ToolTip": "D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\dataAnalysis.py",
               "RelativeToolTip": "dataAnalysis.py",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvwkAAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-03-08T11:06:58.213Z"
+              "ViewState": "AgIAACIAAAAAAAAAAAAAAAkAAAASAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHfSURBVDhPpZCxaxNhGMZ/9zVJaUuDUlq1FBWLZBFTCXo4BFyU1qGKi4OkIHhkzF/g0KF00M2lR9YUdDDQQVAcJILoQUd1UNRmkhoRm8RL777v7nOoCZd4AcEH3uF5nvd73vd74X\u002BgtTai3LIsHeWDEEJct217a1DvwbIs7bpubFUqFW3b9naxWLwWfSOipAvHcfqqi0KhkMtms3cty1rsaomeG4FpmoMSANVqlXQ6nQMWgacMC4hOBchduEj\u002ByjKjScGh8SS1Wq3nxQZEN3j1eY/Vrfe8rTeQvsf89ARLS1cz5XIZ/uUGXxptQiVRUhJIybudXaZn52a7vbEBpmkyNb/A69YM9W8tDEJOTI2hpI\u002BSkvOZH2f13sNAB\u002B07sV9wHIdH9Unquz9RvoeUPtL3UFISKkky\u002BAT7HwTi6FpsgGma3N9\u002Bg5I\u002BKaFZyU8wOpJChwHnjiuE9wKCXyC/zsQGOI7DeELjtiUPbgky6Wd/HA3KBelC4AIpNfQGl88cQ0mfI5PugRhKkM2DUk0INYwtPI/dAGAlf4rbl06T6DyBVgeCABJzYPhwcm0V8ICNvwJKpVIf37h3IxSyKVAuBMDIYQAMw1jvaxwGrYNl3Xq5o79vat3Y3Nedj4\u002B11je7/m\u002BXOuyzFtDhUgAAAABJRU5ErkJggg==",
+              "WhenOpened": "2026-03-08T11:06:58.213Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -56,7 +58,7 @@
               "RelativeDocumentMoniker": "Excel2Cs.py",
               "ToolTip": "D:\\Works\\Unity\u0027s\\Personal\\Z_Plugin\\Z_Plugin\\Z_OtherProjects\\Z_Tool\\Excel2Cs\\Excel2Cs.py",
               "RelativeToolTip": "Excel2Cs.py",
-              "ViewState": "AgIAALYBAAAAAAAAAAAAAMIBAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAG0BAAAAAAAAAAAAAIABAAAYAAAAAAAAAA==",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHfSURBVDhPpZCxaxNhGMZ/9zVJaUuDUlq1FBWLZBFTCXo4BFyU1qGKi4OkIHhkzF/g0KF00M2lR9YUdDDQQVAcJILoQUd1UNRmkhoRm8RL777v7nOoCZd4AcEH3uF5nvd73vd74X\u002BgtTai3LIsHeWDEEJct217a1DvwbIs7bpubFUqFW3b9naxWLwWfSOipAvHcfqqi0KhkMtms3cty1rsaomeG4FpmoMSANVqlXQ6nQMWgacMC4hOBchduEj\u002ByjKjScGh8SS1Wq3nxQZEN3j1eY/Vrfe8rTeQvsf89ARLS1cz5XIZ/uUGXxptQiVRUhJIybudXaZn52a7vbEBpmkyNb/A69YM9W8tDEJOTI2hpI\u002BSkvOZH2f13sNAB\u002B07sV9wHIdH9Unquz9RvoeUPtL3UFISKkky\u002BAT7HwTi6FpsgGma3N9\u002Bg5I\u002BKaFZyU8wOpJChwHnjiuE9wKCXyC/zsQGOI7DeELjtiUPbgky6Wd/HA3KBelC4AIpNfQGl88cQ0mfI5PugRhKkM2DUk0INYwtPI/dAGAlf4rbl06T6DyBVgeCABJzYPhwcm0V8ICNvwJKpVIf37h3IxSyKVAuBMDIYQAMw1jvaxwGrYNl3Xq5o79vat3Y3Nedj4\u002B11je7/m\u002BXOuyzFtDhUgAAAABJRU5ErkJggg==",
               "WhenOpened": "2026-03-08T11:06:36.55Z",
               "EditorCaption": ""

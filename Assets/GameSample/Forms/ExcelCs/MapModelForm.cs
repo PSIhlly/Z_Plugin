@@ -198,7 +198,7 @@ public static readonly int autoIdCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),new List<string>(subPrefabUnitName),new List<Vector3>(subPrefabUnitPos),new List<Vector3>(subPrefabUnitScale),new List<string>(subUnitTexsName),isObstacle);
+        return new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<string>():new List<string>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<string>():new List<string>(subUnitTexsName),isObstacle);
                 }
             
             public virtual  void BeforeGet()

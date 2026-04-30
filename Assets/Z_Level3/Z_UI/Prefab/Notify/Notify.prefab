@@ -2665,8 +2665,8 @@ MonoBehaviour:
   dir: 1
   xSpacing: 0
   ySpacing: 30
-  top: 0
-  left: 0
+  top: 30
+  left: 30
   cell: {fileID: 3358784229704946627}
   fiilType: 0
 --- !u!1 &7795912855661144399

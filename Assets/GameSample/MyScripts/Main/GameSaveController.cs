@@ -193,7 +193,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveAssets(string storyCoreFolder)
     {
-        SaveStoryTex("$i$$i$", storyCoreFolder);
+        SaveStoryTex(GlobalNameHelper.GetExternDefaultTexName(), storyCoreFolder);
         SaveAndLoad.Save(storyCoreFolder + "/" + imageAssetFormFileName, StoryTexAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + audioAssetFormFileName, StoryAudioAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + videoAssetFormFileName, StoryVideoAssetForm.GetJaByDatas().ToString());

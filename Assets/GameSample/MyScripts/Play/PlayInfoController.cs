@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using TuanjieMuse.Chat.ViewModel;
@@ -33,7 +34,9 @@ public enum StoryItemEventType
 {
     Add,
     Remove,
-    Use
+    Use,
+    Equip,
+    Unequip
 }
 public class StoryItemEvent : Z_Event
 {
@@ -107,7 +110,8 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     {
         enable = true;
         bagName2UidDic.Clear();
-        foreach (var uid in GameManager.instance.curProgress.bag)
+        var bagTmp = new List<int>(GameManager.instance.curProgress.bag);
+        foreach (var uid in bagTmp)
         {
             GainItem(uid, false, false);
         }
@@ -146,11 +150,17 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             float oldValue = prm.GetValue().num;
             if (prm != null)
             {
+                var maxPrm = string.IsNullOrEmpty(prm.max) ? null : data.paramDic.GetDv(prm.max, null);
+                float max = maxPrm == null ? GlobalSettings.MAX : maxPrm.GetValue().num;
+                var minPrm = string.IsNullOrEmpty(prm.min) ? null : data.paramDic.GetDv(prm.min, null);
+                float min = minPrm == null ? 0 : minPrm.GetValue().num;
                 if (value is float num)
                 {
-                    var min = prm.GetMin().num;
-                    var max = prm.GetMax().num;
-                    prm.SetValue(Mathf.Min(Mathf.Max(num, min), max));
+                    prm.SetValue(Math.Max(min, Math.Min(num, max)));
+                }
+                else if (value is BoxDataForm.Data box && box.str == null)
+                {
+                    prm.SetValue(Math.Max(min, Math.Min(box.num, max)));
                 }
                 else
                 {
@@ -199,6 +209,8 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     }
     public bool CanUseSkill(int characterUid, SkillType type)
     {
+        if (!GameManager.instance.curProgress.enableSkill)
+            return false;
         var character = CharacterProductForm.DataByUid.GetDv(characterUid, null);
         if (character != null && character.skill.ContainsKey(type))
         {
@@ -212,6 +224,8 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     }
     public void UseSkill(int characterUid, int skillUid, bool ignoreCd)
     {
+        if (!GameManager.instance.curProgress.enableSkill)
+            return;
         var character = CharacterProductForm.DataByUid[characterUid];
         var skill = SkillProductForm.DataByUid[skillUid];
         if (ignoreCd || (skill.lastUseTime == 0 || skill.lastUseTime + skill.cd < GameManager.instance.curProgress.seconds))
@@ -237,9 +251,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             {
                 if (value is float num)
                 {
-                    var min = prm.GetMin().num;
-                    var max = prm.GetMax().num;
-                    prm.SetValue(Mathf.Min(Mathf.Max(num, min), max));
+                    prm.SetValue(Mathf.Min(num, prm.GetValue().num));
                 }
                 else
                 {
@@ -434,6 +446,22 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             }
             Unequip(characterUid, part);
             ch.equips[part] = itemUid;
+
+            foreach (var add in CharacterParamForm.DataByName)
+            {
+                var v = add.Value.GetValue().num;
+                if(item.paramDicCharacter.ContainsKey(add.Key))
+                {
+                    v= item.paramDicCharacter[add.Key].GetValue().num;
+                }
+
+                if (ch.paramDic.ContainsKey(add.Key))
+                {
+                    ChangeCharacterParam(characterUid, add.Key, ch.paramDic[add.Key].GetValue().num + v);
+                }
+            }
+
+            Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Equip, data = item });
         }
     }
     public void Unequip(int characterUid, EquipPartType part)
@@ -441,7 +469,27 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         var ch = CharacterProductForm.DataByUid.GetDv(characterUid, null);
         if (ch != null)
         {
+            var item = ItemProductForm.DataByUid.GetDv(ch.equips.GetDv(part, 0), null);
             ch.equips[part] = 0;
+            if (item != null)
+            {
+                foreach (var add in CharacterParamForm.DataByName)
+                {
+                    var v = add.Value.GetValue().num;
+                    if (item.paramDicCharacter.ContainsKey(add.Key))
+                    {
+                        v = item.paramDicCharacter[add.Key].GetValue().num;
+                    }
+
+                    if (ch.paramDic.ContainsKey(add.Key))
+                    {
+                        ChangeCharacterParam(characterUid, add.Key, ch.paramDic[add.Key].GetValue().num - v);
+                    }
+                }
+
+                Z_EventHelper.Invoke(new StoryItemEvent() { type = StoryItemEventType.Unequip, data = item });
+            }
+
         }
     }
     public void ChooseEquipItems(string title, Action<ItemProductForm.Data> act, EquipPartType part)

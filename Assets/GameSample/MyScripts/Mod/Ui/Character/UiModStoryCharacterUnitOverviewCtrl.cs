@@ -10,6 +10,7 @@ using Z_String;
 using Z_DataSystem.Form;
 using UnityEngine;
 using Z_DataSystem;
+using Z_DesignStyle;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitOverview
 {
@@ -51,9 +52,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 model.data.label = s;
                 Refresh();
             };
-            view.btn_tachie.onClick.AddListener(() =>
+            view.btn_illustration.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportCharacterTachie(model.data.uid);
+                ModManager.instance.assetCtrl.ImportCharacterIllustration(model.data.uid);
             });
             view.ipt_desc.onFinishInput += (s) =>
             {
@@ -77,8 +78,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
-            view.img_image.sprite = TexAssetForm.DataByName[model.data.avatarTexName].GetSprite();
-            view.img_tachie.sprite = TexAssetForm.DataByName[model.data.tachie].GetSprite();
+            view.img_image.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName, GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
+            view.img_illustration.sprite = TexAssetForm.DataByName.GetDk(model.data.illustration, GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
             view.ipt_desc.Set(model.data.desc);
         }
         public void OnEvent(AssetEvent evt)

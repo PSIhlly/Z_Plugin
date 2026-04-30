@@ -91,7 +91,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeDescAction;
                 
-        public static Action<Data,string,string> changeTachieAction;
+        public static Action<Data,string,string> changeIllustrationAction;
                 
         public static Action<Data,bool,bool> changeUniqueAction;
                 
@@ -286,20 +286,20 @@ namespace Form
                  
                      }
                     
-                    private string  _tachie;
+                    private string  _illustration;
                     /// <summary>
                     ///立绘
                     ///</summary>
-                    public string  tachie{
-                                get{return _tachie;}
+                    public string  illustration{
+                                get{return _illustration;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeTachie(this,_tachie,value); 
+                       ChangeIllustration(this,_illustration,value); 
                     }
         
-                _tachie = value;
+                _illustration = value;
                 }
                  
                      }
@@ -380,7 +380,7 @@ namespace Form
             {
             }
             
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string tachie,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -397,7 +397,7 @@ namespace Form
              this.events = events;
              this.equips = equips;
              this.desc = desc;
-             this.tachie = tachie;
+             this.illustration = illustration;
              this.unique = unique;
              this.skill = skill;
              this.recoveryTime = recoveryTime;
@@ -421,7 +421,7 @@ namespace Form
              this.events = data.events;
              this.equips = data.equips;
              this.desc = data.desc;
-             this.tachie = data.tachie;
+             this.illustration = data.illustration;
              this.unique = data.unique;
              this.skill = data.skill;
              this.recoveryTime = data.recoveryTime;
@@ -430,7 +430,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,new Dictionary<string,CharacterAnimForm.Data>(animDic),new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<EquipPartType,int>(equips),desc,tachie,unique,new Dictionary<SkillType,int>(skill),recoveryTime,enableNav);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav);
                 }
             
             public override  void BeforeGet()
@@ -611,7 +611,7 @@ namespace Form
 
                 jo.SelectToken("desc")==null?defaultData.desc:jo.Get<string>("desc"),
 
-                jo.SelectToken("tachie")==null?defaultData.tachie:jo.Get<string>("tachie"),
+                jo.SelectToken("illustration")==null?defaultData.illustration:jo.Get<string>("illustration"),
 
                 jo.SelectToken("unique")==null?defaultData.unique:jo.Get<bool>("unique"),
 
@@ -660,7 +660,7 @@ namespace Form
 
             jo.Set<string>("desc",data.desc);
 
-            jo.Set<string>("tachie",data.tachie);
+            jo.Set<string>("illustration",data.illustration);
 
             jo.Set<bool>("unique",data.unique);
 
@@ -956,12 +956,12 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeTachie(Data superData,string oldV,string newV)
+            public static void ChangeIllustration(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTachieAction?.Invoke(data,oldV,newV);
+                changeIllustrationAction?.Invoke(data,oldV,newV);
                 }
                     
             }

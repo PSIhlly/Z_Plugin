@@ -181,7 +181,7 @@ namespace Z_Map.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),isObstacle,name,prefabName,pos,euler,scale,updateType,new List<int>(collidingUnitUid),extra,enteredScene);
+        return new Data(sameId? uid:uidChain.GetId(),isObstacle,name,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene);
                 }
             
             public override  void BeforeGet()

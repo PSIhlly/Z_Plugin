@@ -66,6 +66,8 @@ namespace Ui.Notify
                     Add(param.popupInfo);
                 if (param.inputAreaInfo != null)
                     Add(param.inputAreaInfo);
+                if (param.quickChooseInfo != null)
+                    Add(param.quickChooseInfo);
 
             }
         }

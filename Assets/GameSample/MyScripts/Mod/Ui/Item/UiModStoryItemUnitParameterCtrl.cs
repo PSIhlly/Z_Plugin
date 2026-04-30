@@ -8,6 +8,8 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_String;
 using Z_Code;
+using Z_DataSystem.Form;
+using Z_Text;
 
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
 {
@@ -43,17 +45,25 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
                     data = data
                 });
             }
+            foreach (var data in CharacterParamForm.DataByName.Values)
+            {
+                argIptCon.Add(new UiArgIptParam()
+                {
+                    data = data
+                });
+            }
+            
             argIptCon.Refresh();
         }
     }
 
     public partial class UiArgIptParam
     {
-        public ItemParamForm.Data data;
+        public GameParamForm.Data data;
     }
     public partial class UiArgIptModel
     {
-        public ItemParamForm.Data data;
+        public GameParamForm.Data data;
     }
     public partial class UiArgIptCtrl
     {
@@ -63,9 +73,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
 
             view.btn_min.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseBasicCmd(model.data.GetMin(), () =>
+                ModManager.instance.assetCtrl.ChooseItemParam(TextManager.instance.GetTxt("choose value min parameter"), (item) =>
                 {
+                    model.data.min = item.content;
                     Refresh();
+                }, new Z_Ui.Notify.EntryItem()
+                {
+                    content = ""
                 });
             });
             view.btn_value.onClick.AddListener(() =>
@@ -77,9 +91,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
             });
             view.btn_max.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseBasicCmd(model.data.GetMax(), () =>
+                ModManager.instance.assetCtrl.ChooseItemParam(TextManager.instance.GetTxt("choose value max parameter"), (item) =>
                 {
+                    model.data.max = item.content;
                     Refresh();
+                }, new Z_Ui.Notify.EntryItem()
+                {
+                    content = ""
                 });
             });
 
@@ -91,11 +109,18 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
         }
         public void Refresh()
         {
+            if(model.data is ItemParamForm.Data itemData)
+            {
+                view.txt_.text = model.data.name;
+            }
+            else if (model.data is CharacterParamForm.Data chData)
+            {
+                view.txt_.text = model.data.name + $"( + {TextManager.instance.GetTxt("character")})";
+            }
 
-            view.txt_.text = model.data.name;
-            view.txt_min.text=(model.data.GetMin().GetBoxContent());
+            view.txt_min.text=model.data.min;
             view.txt_value.text=(model.data.GetValue().GetBoxContent());
-            view.txt_max.text=(model.data.GetMax().GetBoxContent());
+            view.txt_max.text=model.data.max;
         }
     }
 

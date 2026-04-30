@@ -188,7 +188,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,collision,new Dictionary<string,EventTriggerForm.Data>(events),new Dictionary<string,MapObjectParamForm.Data>(paramDic));
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic));
                 }
             
             public override  void BeforeGet()

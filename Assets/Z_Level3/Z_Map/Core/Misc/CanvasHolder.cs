@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Time;
+using Z_Ui;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace Z_Map
 {
@@ -14,6 +18,11 @@ namespace Z_Map
         public TextMeshProUGUI textProto;
         public TextMeshProUGUI toastTextProto;
         public Slider sliderProto;
+        public Timer chatTimer;
+
+        public GameObject chat;
+        public Image chatImg;
+        public TextMeshProUGUI chatText;
 
         private Dictionary<int, TextMeshProUGUI> textDic = new Dictionary<int, TextMeshProUGUI>();
         private Dictionary<int, Slider> sliderDic = new Dictionary<int, Slider>();
@@ -31,7 +40,7 @@ namespace Z_Map
         }
         public void Reset()
         {
-            foreach(var obj in textDic.Values)
+            foreach (var obj in textDic.Values)
             {
                 Destroy(obj.gameObject);
             }
@@ -68,6 +77,32 @@ namespace Z_Map
             sliderDic[key].value = v / max;
             sliderTextDic[sliderDic[key]].text = $"{v}/{max}";
         }
+        public void Chat(string text, string img, float lastTime)
+        {
+            chat.SetActive(true);
+            chatText.text = text;
+            var data = TexAssetForm.DataByName.GetDv(img, null);
+            bool imgValid = data != null && data.name != GlobalNameHelper.GetExternDefaultTexName();
+            chatImg.gameObject.SetActive(imgValid);
+            if (imgValid)
+            {
+                chatImg.sprite = data.GetSprite();
+            }
+
+            float timeCur = 0;
+            TimeManager.instance.CancelTimer(chatTimer);
+            chatTimer = TimeManager.instance.StartTimer(0, 0.0001f, () =>
+            {
+                timeCur += Time.deltaTime;
+                if (timeCur > lastTime)
+                {
+                    chat.SetActive(false);
+                    return true;
+                }
+                return false;
+            }, this);
+            UiManager.Rebuild(chat.gameObject);
+        }
         public void ToastText(string text, float lastTime)
         {
             GameObject tmp = Instantiate(toastTextProto.gameObject, toastTextProto.transform.parent);
@@ -75,7 +110,7 @@ namespace Z_Map
             var textTmp = tmp.GetComponent<TextMeshProUGUI>();
             textTmp.text = text;
             var oriPos = trs.position;
-            var tarPos = trs.position + Vector3.up  + Vector3.forward ;
+            var tarPos = trs.position + Vector3.up + Vector3.forward;
             tmp.transform.position = oriPos;
             float timeCur = 0;
             TimeManager.instance.StartTimer(0, 0.0001f, () =>

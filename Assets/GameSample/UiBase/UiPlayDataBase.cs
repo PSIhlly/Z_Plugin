@@ -348,7 +348,7 @@ namespace PlayDataCharacterData
             public ScrView scr_gameArgs;
             public Txt txt_desc;
             public Txt txt_name;
-            public Img img_tachie;
+            public Img img_illustration;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
             public UiGameArgsCtrl sub_gameArgs;
@@ -358,7 +358,7 @@ namespace PlayDataCharacterData
             scr_gameArgs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             txt_desc = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             txt_name = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            img_tachie = uiHolder.elementTrsLst[3].GetComponent<Img>();
+            img_illustration = uiHolder.elementTrsLst[3].GetComponent<Img>();
             go_gameArgs = uiHolder.elementTrsLst[4].gameObject;
             sta_gameArgs = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;

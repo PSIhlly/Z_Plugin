@@ -231,7 +231,7 @@ def create_data_handle():
         for key,val in formInfo.var_type_dic.items():
             if key is not formInfo.id_str:
                 if val.startswith('List') or val.startswith('Dictionary'):
-                    con_copy_str+=f'new {val}({key}),'
+                    con_copy_str+=f'{key}==null?new {val}():new {val}({key}),'
                 else:
                     con_copy_str+=key+','
             if 'override' in formInfo.var_config_dic[key]:

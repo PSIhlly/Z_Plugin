@@ -46,7 +46,7 @@ namespace Z_Ui.Dialog
         public bool enabled;
         public int curId;
         bool inited;
-        bool autoClose;
+        bool clickOrAutoClose;
         List<ClipForm.Data> historyClips;
         public override void Init()
         {
@@ -72,11 +72,11 @@ namespace Z_Ui.Dialog
             settings.menuAct = menuAct;
         }
 
-        public void Begin(string title, string mainText, string mainPicture, string mainVideo, string profilePicture, string mainAudio, Action onComplete, bool autoClose = true)
+        public void Begin(string title, string mainText, string mainPicture, string mainVideo, string profilePicture, string mainAudio, Action onComplete, bool clickOrAutoClose = true)
         {
-            Begin(new List<string>() { title }, new List<string>() { mainText }, new List<string>() { mainPicture }, new List<string>() { mainVideo }, new List<string>() { profilePicture }, new List<string>() { mainAudio }, onComplete, autoClose);
+            Begin(new List<string>() { title }, new List<string>() { mainText }, new List<string>() { mainPicture }, new List<string>() { mainVideo }, new List<string>() { profilePicture }, new List<string>() { mainAudio }, onComplete, clickOrAutoClose);
         }
-        public void Begin(List<string> titleLst, List<string> mainTextLst, List<string> mainPictureLst, List<string> mainVideoLst, List<string> profilePictureLst, List<string> mainAudioLst, Action onComplete, bool autoClose = true)
+        public void Begin(List<string> titleLst, List<string> mainTextLst, List<string> mainPictureLst, List<string> mainVideoLst, List<string> profilePictureLst, List<string> mainAudioLst, Action onComplete, bool clickOrAutoClose = true)
         {
             clipLst.Clear();
             for (int i = 0, icnt = titleLst.Count; i < icnt; i++)
@@ -84,15 +84,15 @@ namespace Z_Ui.Dialog
                 var clip = new ClipForm.Data(-1, titleLst[i], mainTextLst[i], mainPictureLst[i], mainVideoLst[i], profilePictureLst[i], mainAudioLst[i]);
                 clipLst.Add(clip);
             }
-            Begin(clipLst, onComplete, autoClose);
+            Begin(clipLst, onComplete, clickOrAutoClose);
         }
-        public void Begin(ClipForm.Data clip, Action onComplete, bool autoClose = true)
+        public void Begin(ClipForm.Data clip, Action onComplete, bool clickOrAutoClose = true)
         {
-            Begin(new List<ClipForm.Data>() { clip }, onComplete, autoClose);
+            Begin(new List<ClipForm.Data>() { clip }, onComplete, clickOrAutoClose);
         }
-        public void Begin(List<ClipForm.Data> clipLst, Action onComplete, bool autoClose = true)
+        public void Begin(List<ClipForm.Data> clipLst, Action onComplete, bool clickOrAutoClose = true)
         {
-            this.autoClose = autoClose;
+            this.clickOrAutoClose = clickOrAutoClose;
             enabled = true;
             this.clipLst = clipLst;
             this.onComplete = onComplete;
@@ -129,16 +129,12 @@ namespace Z_Ui.Dialog
             UiManager.instance.CloseUi<UiDialogHistoryCtrl>();
         }
         #endregion
-        public void End()
-        {
-            InternalEnd();
-            Close();
-        }
+
 
         private void InternalEnd()
         {
             enabled = false;
-            if (autoClose)
+            if (clickOrAutoClose)
             {
                 Close();
             }

@@ -279,7 +279,7 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),new List<BoxDataForm.Data>(stack),new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,new List<BoxDataForm.Data>(heapTemp),rootUid);
+        return new Data(sameId? uid:uidChain.GetId(),stack==null?new List<BoxDataForm.Data>():new List<BoxDataForm.Data>(stack),heap==null?new Dictionary<string,BoxDataForm.Data>():new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,heapTemp==null?new List<BoxDataForm.Data>():new List<BoxDataForm.Data>(heapTemp),rootUid);
                 }
             
             public virtual  void BeforeGet()

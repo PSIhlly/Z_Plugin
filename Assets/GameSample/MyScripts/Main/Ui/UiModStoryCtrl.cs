@@ -123,7 +123,7 @@ namespace Ui.ModStory
             view.page_ModStoryCharacter.SetShow(model.curUi == view.page_ModStoryCharacter);
             view.sta_character.ChangeState(model.curUi == view.page_ModStoryCharacter ? 1 : 0);
 
-            view.btn_skill.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3);
+            view.btn_skill.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3&&GameManager.instance.curProgress.enableSkill);
             view.page_ModStorySkill.SetShow(model.curUi == view.page_ModStorySkill);
             view.sta_skill.ChangeState(model.curUi == view.page_ModStorySkill ? 1 : 0);
 

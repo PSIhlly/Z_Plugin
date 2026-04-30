@@ -24,11 +24,15 @@ namespace ModStoryConfigInit
 
             public Btn btn_mainCharacter;
             public Txt txt_mainCharacter;
+            public Btn btn_perspective;
+            public Txt txt_perspective;
         public UiModStoryConfigInitView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_mainCharacter = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             txt_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            btn_perspective = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            txt_perspective = uiHolder.elementTrsLst[3].GetComponent<Txt>();
         }
 
     }
@@ -76,11 +80,31 @@ namespace ModStoryConfigGlobal
 
             public Btn btn_mainCharacter;
             public Txt txt_mainCharacter;
+            public Btn btn_enableEquip;
+            public Sta sta_enableEquip;
+            public Btn btn_enableSkill;
+            public Sta sta_enableSkill;
+            public GameObject go_teamItem;
+            public ScrView scr_team;
+            public GameObject go_activeTeamItem;
+            public ScrView scr_activeTeam;
+            public GameObject go_bagItem;
+            public ScrView scr_bag;
         public UiModStoryConfigGlobalView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_mainCharacter = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             txt_mainCharacter = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            btn_enableEquip = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            sta_enableEquip = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            btn_enableSkill = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            sta_enableSkill = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            go_teamItem = uiHolder.elementTrsLst[6].gameObject;
+            scr_team = uiHolder.elementTrsLst[7].GetComponent<ScrView>();
+            go_activeTeamItem = uiHolder.elementTrsLst[8].gameObject;
+            scr_activeTeam = uiHolder.elementTrsLst[9].GetComponent<ScrView>();
+            go_bagItem = uiHolder.elementTrsLst[10].gameObject;
+            scr_bag = uiHolder.elementTrsLst[11].GetComponent<ScrView>();
         }
 
     }
@@ -111,6 +135,150 @@ namespace ModStoryConfigGlobal
     public partial class UiModStoryConfigGlobalModel:UiModel
     {
         
+    }
+}
+
+namespace ModStoryConfigTeamItem
+{
+    public partial class UiTeamItemParam:UiParam
+    {
+    }
+
+    public partial class UiTeamItemView:UiView
+    {
+            public GameObject go_exist;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
+            public Img img_;
+            public Txt txt_;
+        public UiTeamItemView(UiHolder uiHolder):base(uiHolder)
+        {
+            go_exist = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            img_ = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+        }
+    }
+    public partial class UiTeamItemCtrl:UiCtrl
+    {
+        public UiTeamItemView view;
+        public UiTeamItemModel model;
+        public UiTeamItemParam param;
+        public UiModStoryConfigCtrl parent=>(UiModStoryConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiTeamItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+            base.BindHolderRecursively(uiHolder);
+            view = new UiTeamItemView(uiHolder);
+            model=new UiTeamItemModel();
+        }
+    }
+    public partial class UiTeamItemModel:UiModel
+    {
+    }
+}
+
+namespace ModStoryConfigActiveTeamItem
+{
+    public partial class UiActiveTeamItemParam:UiParam
+    {
+    }
+
+    public partial class UiActiveTeamItemView:UiView
+    {
+            public GameObject go_exist;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
+            public Img img_;
+            public Txt txt_;
+        public UiActiveTeamItemView(UiHolder uiHolder):base(uiHolder)
+        {
+            go_exist = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            img_ = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+        }
+    }
+    public partial class UiActiveTeamItemCtrl:UiCtrl
+    {
+        public UiActiveTeamItemView view;
+        public UiActiveTeamItemModel model;
+        public UiActiveTeamItemParam param;
+        public UiModStoryConfigCtrl parent=>(UiModStoryConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiActiveTeamItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+            base.BindHolderRecursively(uiHolder);
+            view = new UiActiveTeamItemView(uiHolder);
+            model=new UiActiveTeamItemModel();
+        }
+    }
+    public partial class UiActiveTeamItemModel:UiModel
+    {
+    }
+}
+
+namespace ModStoryConfigBagItem
+{
+    public partial class UiBagItemParam:UiParam
+    {
+    }
+
+    public partial class UiBagItemView:UiView
+    {
+            public GameObject go_exist;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
+            public Img img_;
+            public Txt txt_;
+        public UiBagItemView(UiHolder uiHolder):base(uiHolder)
+        {
+            go_exist = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            img_ = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+        }
+    }
+    public partial class UiBagItemCtrl:UiCtrl
+    {
+        public UiBagItemView view;
+        public UiBagItemModel model;
+        public UiBagItemParam param;
+        public UiModStoryConfigCtrl parent=>(UiModStoryConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiBagItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+            base.BindHolderRecursively(uiHolder);
+            view = new UiBagItemView(uiHolder);
+            model=new UiBagItemModel();
+        }
+    }
+    public partial class UiBagItemModel:UiModel
+    {
     }
 }
 

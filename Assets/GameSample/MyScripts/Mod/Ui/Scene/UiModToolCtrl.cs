@@ -430,7 +430,7 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon,GlobalNameHelper.GetDefaultTexName()).GetSprite();
+            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon, GlobalNameHelper.GetExternDefaultTexName()).GetSprite();
 
             view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
 

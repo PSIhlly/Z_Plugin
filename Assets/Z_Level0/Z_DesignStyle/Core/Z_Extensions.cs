@@ -24,11 +24,11 @@ namespace Z_DesignStyle
         int id,
         TValue defaultValue = default)
         {
-            // Ğ£Ñé×ÖµäÊÇ·ñÎªnull
+            // æ ¡éªŒå­—å…¸æ˜¯å¦ä¸ºnull
             if (lst == null || lst.Count<=id)
                 return defaultValue;
 
-            // ´æÔÚ¼üÔò·µ»Ø¶ÔÓ¦Öµ£¬·ñÔò·µ»ØÄ¬ÈÏÖµ
+            // å­˜åœ¨é”®åˆ™è¿”å›å¯¹åº”å€¼ï¼Œå¦åˆ™è¿”å›é»˜è®¤å€¼
             return lst[id];
         }
 
@@ -37,11 +37,11 @@ namespace Z_DesignStyle
         TKey key,
         TValue defaultValue = default)
     {
-            // Ğ£Ñé×ÖµäÊÇ·ñÎªnull
+            // æ ¡éªŒå­—å…¸æ˜¯å¦ä¸ºnull
             if (dict == null || key == null)
                 return defaultValue;
 
-        // ´æÔÚ¼üÔò·µ»Ø¶ÔÓ¦Öµ£¬·ñÔò·µ»ØÄ¬ÈÏÖµ
+        // å­˜åœ¨é”®åˆ™è¿”å›å¯¹åº”å€¼ï¼Œå¦åˆ™è¿”å›é»˜è®¤å€¼
         return dict.TryGetValue(key, out TValue value) ? value : defaultValue;
     }
 
@@ -50,11 +50,11 @@ namespace Z_DesignStyle
         TKey key,
         TKey defaultKey = default)
         {
-            // Ğ£Ñé×ÖµäÊÇ·ñÎªnull
+            // æ ¡éªŒå­—å…¸æ˜¯å¦ä¸ºnull
             if (dict == null)
                 return default;
 
-            // ´æÔÚ¼üÔò·µ»Ø¶ÔÓ¦Öµ£¬·ñÔò·µ»ØÄ¬ÈÏÖµ
+            // å­˜åœ¨é”®åˆ™è¿”å›å¯¹åº”å€¼ï¼Œå¦åˆ™è¿”å›é»˜è®¤å€¼
             return dict.TryGetValue(key, out TValue value) ? value : dict[defaultKey];
         }
     }

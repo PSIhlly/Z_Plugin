@@ -86,7 +86,8 @@ namespace Ui.PlayData.PlayDataCharacter
             {
                 data = model.sel
             });
-            view.btn_skill.gameObject.SetActive(false);
+            view.btn_skill.gameObject.SetActive(GameManager.instance.curProgress.enableSkill);
+            view.btn_equip.gameObject.SetActive(GameManager.instance.curProgress.enableEquip);
             /*            view.sta_skill.ChangeState(model.module == 3 ? 1 : 0);
                         view.page_PlayDataCharacterSkill.SetActive(model.module == 3, new UiPlayDataCharacterSkillParam()
                         {

@@ -64,7 +64,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
 
             if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground)
-                img.trs.eulerAngles = Vector3.right*90;
+                img.trs.eulerAngles = Vector3.right * 90;
             else
                 img.trs.eulerAngles = Vector3.right * 45;
 
@@ -164,35 +164,42 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
     public void BindCanvas(CharacterUnitForm.Data unitData)
     {
+
         var productData = CharacterProductForm.DataByUid.GetDv(unitData.unit.productInfo.Item1, null);
         if (productData == null)
         {
             canvasDic.Remove(unitData.uid);
             return;
         }
-        var canvas = GetCanvas(unitData);
-        switch (GameManager.instance.curProgress.cameraMode)
+        TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
         {
-            case CameraMode.Overhead:
-                canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
-                canvas.transform.eulerAngles = Vector3.zero;
-                break;
-            case CameraMode.Isometric:
-                canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f;
-                canvas.transform.eulerAngles = Vector3.right * 45;
-                break;
-        }
-        var paramInfo = productData.paramDic;
-        var lst = unitData.unit.productInfo.Item1 == GameManager.instance.curProgress.characterUid ? needShowParamName : needShowParamNameWithoutPlayer;
-
-        for (int i = 0, icnt = lst.Count; i < icnt; i++)
-        {
-            if (paramInfo.ContainsKey(lst[i]))
+            var canvas = GetCanvas(unitData);
+            switch (GameManager.instance.curProgress.cameraMode)
             {
-                canvas.ShowSlider(paramInfo[lst[i]].GetValue().num, paramInfo[lst[i]].GetMax().num, i);
+                case CameraMode.Overhead:
+                    canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
+                    canvas.transform.eulerAngles = Vector3.zero;
+                    break;
+                case CameraMode.Isometric:
+                    canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f;
+                    canvas.transform.eulerAngles = Vector3.right * 45;
+                    break;
+            }
+            var paramInfo = productData.paramDic;
+            var lst = unitData.unit.productInfo.Item1 == GameManager.instance.curProgress.characterUid ? needShowParamName : needShowParamNameWithoutPlayer;
+
+            for (int i = 0, icnt = lst.Count; i < icnt; i++)
+            {
+                if (paramInfo.ContainsKey(lst[i]))
+                {
+                    canvas.ShowSlider(paramInfo[lst[i]].GetValue().num, i);
+                }
+
             }
 
-        }
+
+        });
+
     }
     public void FloatingText(string txt, Vector3 pos)
     {
@@ -201,10 +208,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         {
             case CameraMode.Overhead:
 
+                o.transform.eulerAngles = Vector3.right * 90;
                 o.transform.position = pos + Vector3.up * 1.4f;
                 break;
             case CameraMode.Isometric:
                 o.transform.position = pos + Vector3.up * 0.5f;
+                o.transform.eulerAngles = Vector3.right * 45;
                 break;
         }
         o.SetActive(true);
@@ -214,6 +223,18 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             InstancePoolManager.instance.DeleteInstance(o, canvasPrefab);
             return true;
         }, o.GetComponent<CanvasHolder>());
+    }
+
+    public void ChatText(int characterUid, string txt, string img, float time)
+    {
+        var productData = CharacterProductForm.DataByUid.GetDv(characterUid, null);
+        var unit = _super.sceneCtrl.GetCharacterUnit(characterUid);
+        if (productData == null || unit == null || !canvasDic.ContainsKey(unit.uid))
+        {
+            return;
+        }
+        var canvas = canvasDic[unit.uid];
+        canvas.Chat(txt, img, time);
     }
     public CanvasHolder GetCanvas(CharacterUnitForm.Data unitData)
     {

@@ -176,7 +176,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,new List<List<EffectClipForm.Data>>(clips),ground);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,clips==null?new List<List<EffectClipForm.Data>>():new List<List<EffectClipForm.Data>>(clips),ground);
                 }
             
             public virtual  void BeforeGet()

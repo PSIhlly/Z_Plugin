@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_Code;
@@ -30,6 +31,17 @@ public enum SceneEventType
     Object = 3,
     Item = 4,
     Character = 5
+}
+
+public class SceneActionEvent : Z_Event
+{
+    public int unitUid;
+    public SceneActionEventType type;
+}
+public enum SceneActionEventType
+{
+    Add,
+    Remove
 }
 
 namespace Z_Map
@@ -76,9 +88,8 @@ namespace Z_Map
             }
 
         }
-        public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap)
+        public EventTriggerForm.Data GetEvt(string name)
         {
-
             EventTriggerForm.Data trigger = null;
             if (evtDic.ContainsKey(name) && evtDic[name].evt.Count > 0)
             {
@@ -99,13 +110,15 @@ namespace Z_Map
                     trigger = it.events[name];
                 }
             }
+            return trigger;
+        }
+        public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap)
+        {
+            var trigger= GetEvt(name);
             if (trigger != null)
             {
-
                 GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, defaultHeap);
-
             }
-
             return true;
         }
 
@@ -124,6 +137,8 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
         Z_EventHelper.Register<CharacterEvent>(this);
         Z_EventHelper.Register<StoryLifeEvent>(this);
     }
+
+    string interActKey = "onInteractEvent";
     public void OnEvent(CollideEvent evt)
     {
         GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
@@ -152,24 +167,29 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 switch (evt.type)
                 {
                     case CollideEventType.TriggerEnter:
-                        if (evt.b is CharacterUnit)
+                        if (evt.b is CharacterUnit chU)
                         {
                             mapUnit.ExecuteEvt("onCharacterTouchEvent", heap);
+                            if (mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM.uid)
+                                Z_EventHelper.Invoke(new SceneActionEvent() { unitUid = mapUnit.data.uid, type = SceneActionEventType.Add });
                         }
                         else if (evt.b is ObjectUnit)
                         {
                             mapUnit.ExecuteEvt("onObjectTouchEvent", heap);
                         }
+                       
+                        
                         break;
                     case CollideEventType.TriggerExit:
-                        if (evt.b is CharacterUnit)
+                        if (evt.b is CharacterUnit chU2)
                         {
                             mapUnit.ExecuteEvt("onCharacterLeaveEvent", heap);
+                            if (chU2.data.uid == PlayManager.instance.sceneCtrl.playerM.uid)
+                                Z_EventHelper.Invoke(new SceneActionEvent() { unitUid = mapUnit.data.uid, type = SceneActionEventType.Remove });
                         }
                         else if (evt.b is ObjectUnit)
                         {
                             mapUnit.ExecuteEvt("onObjectLeaveEvent", heap);
-
                         }
                         break;
                 }

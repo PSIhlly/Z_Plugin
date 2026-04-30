@@ -78,6 +78,9 @@ namespace Ui.ModStory.ModStoryParameter
             view.page_ModStoryConfig.SetShow(model.selPage == 4);
             view.sta_config.ChangeState(model.selPage == 4 ? 1 : 0);
 
+
+            view.btn_skillParameter.gameObject.SetActive(GameManager.instance.curProgress.enableSkill);
+
         }
     }
 

@@ -29,6 +29,8 @@ namespace Z_Ui.Notify
         }
         public void Add(EntryItem item)
         {
+            if (item.content == null)
+                item.content = "";
             subs[item.content] = item;
         }
         public void Merge(string addMark,EntryItem item)

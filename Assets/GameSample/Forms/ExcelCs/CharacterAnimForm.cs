@@ -198,7 +198,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>(animClip),animTimeInterval,scale,new Dictionary<BodyPartType,bool>(partEnable));
+        return new Data(sameId? uid:uidChain.GetId(),name,animClip==null?new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>():new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>(animClip),animTimeInterval,scale,partEnable==null?new Dictionary<BodyPartType,bool>():new Dictionary<BodyPartType,bool>(partEnable));
                 }
             
             public virtual  void BeforeGet()

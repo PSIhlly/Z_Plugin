@@ -169,7 +169,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),str,valName,num,new Dictionary<string,BoxDataForm.Data>(dic));
+        return new Data(sameId? uid:uidChain.GetId(),str,valName,num,dic==null?new Dictionary<string,BoxDataForm.Data>():new Dictionary<string,BoxDataForm.Data>(dic));
                 }
             
             public virtual  void BeforeGet()

@@ -40,42 +40,23 @@ namespace Form
         {
             beforeGetAction = (data) =>
             {
-                data.min = BoxDataForm.GetJoByData(data.GetMin()).ToString();
                 data.v = BoxDataForm.GetJoByData(data.GetValue()).ToString();
-                data.max = BoxDataForm.GetJoByData(data.GetMax()).ToString();
             };
         }
 
         public partial class Data
         {
             BoxDataForm.Data _boxValue;
-            BoxDataForm.Data _boxMin;
-            BoxDataForm.Data _boxMax;
             public BoxDataForm.Data GetValue()
             {
                 return Get(ref _boxValue,v);
             }
-            public BoxDataForm.Data GetMin()
-            {
-                return Get(ref _boxMin,min);
-            }
-            public BoxDataForm.Data GetMax()
-            {
-                return Get(ref _boxMax,max);
-            }
+
             public void SetValue(object v)
             {
                 Set(GetValue(), v);
             }
-            public void SetMin(object v)
-            {
-                Set(GetMin(), v);
-            }
-            public void SetMax(object v)
-            {
-                Set(GetMax(), v);
-            }
-            
+          
             private BoxDataForm.Data Get(ref BoxDataForm.Data box,string str)
             {
                 if (box == null)
@@ -137,15 +118,19 @@ public static partial class GlobalSettings
     public static int TEXTURE_MAX = 100000;
     public static int TEXTURE_MASK_MAX = 100000;
     public static int OBJECT_MAX = 100000;
+    public static float MAX = 999999999;
 }
 public static class GlobalNameHelper
 {
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
     public static string GetRuntimePrefabName(string name = "") => "runtime$" + name;
     public static string GetDefaultTexName(string name = "") => "reservedI$" + name;
+    public static string GetExternDefaultTexName(string name = "") => AssetManager.instance.texCtrl.GetName();
 
     public static string GetDefaultVideoName(string name = "") => "reservedV$" + name;
+    public static string GetExternDefaultVideoName(string name = "") => AssetManager.instance.videoCtrl.GetName();
     public static string GetDefaultAudioName(string name = "") => "reservedA$" + name;
+    public static string GetExternDefaultAudioName(string name = "") => AssetManager.instance.audioCtrl.GetName();
     public static bool IsInnerAssetName(string name)
     {
         return !AssetManager.instance.texCtrl.IsAsset(name) && !AssetManager.instance.audioCtrl.IsAsset(name) && !AssetManager.instance.videoCtrl.IsAsset(name);

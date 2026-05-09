@@ -31,7 +31,8 @@ namespace Z_Map
         public override void Show()
         {
             base.Show();
-
+            if(DynamicGlobalSettings.playing)
+                data.unlock = true;
 
             Z_EventHelper.Invoke(new TileEvent()
             {

@@ -213,6 +213,9 @@ namespace Ui.PlaySceneMain
                 }
             }
             actCon.Refresh();
+
+            view.page_PlaySceneMinimap.Refresh();
+            view.page_PlaySceneMission.Refresh();
         }
 
         public void OnEvent(SceneActionEvent evt)

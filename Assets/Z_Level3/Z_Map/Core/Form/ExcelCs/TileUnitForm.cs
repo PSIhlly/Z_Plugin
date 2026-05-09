@@ -91,6 +91,8 @@ namespace Z_Map.Form
                 
         public static Action<Data,bool,bool> changeEnteredsceneAction;
                 
+        public static Action<Data,bool,bool> changeUnlockAction;
+                
 
 
         public partial class Data : UnitForm.Data
@@ -161,11 +163,29 @@ namespace Z_Map.Form
                  
                      }
                     
+                    private bool  _unlock;
+                    /// <summary>
+                    ///迷雾解锁
+                    ///</summary>
+                    public bool  unlock{
+                                get{return _unlock;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeUnlock(this,_unlock,value); 
+                    }
+        
+                _unlock = value;
+                }
+                 
+                     }
+                    
             public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
             
-            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
+            public Data(int uid,string name,Dictionary<int,string> texNameDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,bool unlock):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -180,6 +200,7 @@ namespace Z_Map.Form
              this.collidingUnitUid = collidingUnitUid;
              this.extra = extra;
              this.enteredScene = enteredScene;
+             this.unlock = unlock;
 
                     _unit=new TileUnit(this);
 
@@ -199,11 +220,12 @@ namespace Z_Map.Form
              this.collidingUnitUid = data.collidingUnitUid;
              this.extra = data.extra;
              this.enteredScene = data.enteredScene;
+             this.unlock = data.unlock;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,texNameDic==null?new Dictionary<int,string>():new Dictionary<int,string>(texNameDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene);
+        return new Data(sameId? uid:uidChain.GetId(),name,texNameDic==null?new Dictionary<int,string>():new Dictionary<int,string>(texNameDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,unlock);
                 }
             
             public override  void BeforeGet()
@@ -213,7 +235,7 @@ namespace Z_Map.Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false);
+                   private static Data _defaultData=new Data(0,"",new Dictionary<int,string>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -336,7 +358,9 @@ namespace Z_Map.Form
 
                 jo.SelectToken("extra")==null?defaultData.extra:jo.Get<string>("extra"),
 
-                jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene")
+                jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene"),
+
+                jo.SelectToken("unlock")==null?defaultData.unlock:jo.Get<bool>("unlock")
                     );
 
             return data;
@@ -372,6 +396,8 @@ namespace Z_Map.Form
             jo.Set<string>("extra",data.extra);
 
             jo.Set<bool>("enteredScene",data.enteredScene);
+
+            jo.Set<bool>("unlock",data.unlock);
 
             return jo;
         }
@@ -580,6 +606,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeEnteredsceneAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUnlock(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUnlockAction?.Invoke(data,oldV,newV);
                 }
                     
             }

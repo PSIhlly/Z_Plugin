@@ -79,6 +79,8 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,MapObjectParamForm.Data>,Dictionary<string,MapObjectParamForm.Data>> changeParamdicAction;
                 
+        public static Action<Data,string,string> changeMinimapiconAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -156,11 +158,29 @@ namespace Form
                  
                      }
                     
+                    private string  _minimapIcon;
+                    /// <summary>
+                    ///小地图标识
+                    ///</summary>
+                    public string  minimapIcon{
+                                get{return _minimapIcon;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeMinimapicon(this,_minimapIcon,value); 
+                    }
+        
+                _minimapIcon = value;
+                }
+                 
+                     }
+                    
             public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.label)
             {
             }
             
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic):base(id,name,icon,label)
+            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,string minimapIcon):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -171,6 +191,7 @@ namespace Form
              this.collision = collision;
              this.events = events;
              this.paramDic = paramDic;
+             this.minimapIcon = minimapIcon;
 
             }
             public void Reset(Data data)
@@ -184,11 +205,12 @@ namespace Form
              this.collision = data.collision;
              this.events = data.events;
              this.paramDic = data.paramDic;
+             this.minimapIcon = data.minimapIcon;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic));
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,label,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon);
                 }
             
             public override  void BeforeGet()
@@ -198,7 +220,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -250,7 +272,7 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){})},
+                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -335,7 +357,9 @@ namespace Form
 
                 jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
-                jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic")
+                jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic"),
+
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
                     );
 
             return data;
@@ -363,6 +387,8 @@ namespace Form
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             jo.Set<Dictionary<string,MapObjectParamForm.Data>>("paramDic",data.paramDic);
+
+            jo.Set<string>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -546,6 +572,16 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeParamdicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMinimapiconAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -211,6 +211,11 @@ namespace Z_Map
                         unit = this
                     });
                 }
+                Z_EventHelper.Invoke(new CharacterEvent()
+                {
+                    type = MapEventType.Move,
+                    unit = this
+                });
             }
 
         }

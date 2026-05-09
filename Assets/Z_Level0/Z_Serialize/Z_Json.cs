@@ -25,6 +25,14 @@ namespace Z_ByteSerialize
             {
                 jo[key] = null;
             }
+            else if (value is Vector2 v2)
+            {
+                jo[key] = v2.x + "|" + v2.y;
+            }
+            else if (value is Vector2Int v2i)
+            {
+                jo[key] = v2i.x + "|" + v2i.y;
+            }
             else if (value is Vector3 v3)
             {
                 jo[key] = v3.x + "|" + v3.y + "|" + v3.z;
@@ -96,6 +104,16 @@ namespace Z_ByteSerialize
                 {
                     string[] str = jo.Get<string>(key).Split("|");
                     return new Vector3Int(int.Parse(str[0]), int.Parse(str[1]), int.Parse(str[2]));
+                }
+                else if (tp == typeof(Vector2))
+                {
+                    string[] str = jo.Get<string>(key).Split("|");
+                    return new Vector2(float.Parse(str[0]), float.Parse(str[1]));
+                }
+                else if (tp == typeof(Vector2Int))
+                {
+                    string[] str = jo.Get<string>(key).Split("|");
+                    return new Vector2Int(int.Parse(str[0]), int.Parse(str[1]));
                 }
                 else if (IsIList(tp))
                 {

@@ -21,6 +21,7 @@ using Z_Code;
 using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_Debug;
 using Z_DesignStyle;
 using Z_Input;
 using Z_Language;
@@ -30,6 +31,7 @@ using Z_Texture;
 using Z_Ui;
 using Z_Ui.Dialog;
 using Z_UnitSystem;
+using static UnityEngine.Rendering.DebugUI.Table;
 namespace Form
 {
 
@@ -49,21 +51,21 @@ namespace Form
             BoxDataForm.Data _boxValue;
             public BoxDataForm.Data GetValue()
             {
-                return Get(ref _boxValue,v);
+                return Get(ref _boxValue, v);
             }
 
             public void SetValue(object v)
             {
                 Set(GetValue(), v);
             }
-          
-            private BoxDataForm.Data Get(ref BoxDataForm.Data box,string str)
+
+            private BoxDataForm.Data Get(ref BoxDataForm.Data box, string str)
             {
                 if (box == null)
                 {
                     try
                     {
-                        if(!string.IsNullOrEmpty(str))
+                        if (!string.IsNullOrEmpty(str))
                             box = BoxDataForm.GetDataByJo(JObject.Parse(str));
                         else
                             box = CodeHelper.CreateBox();
@@ -162,6 +164,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public override void Init()
     {
+
         base.Init();
         AudioManager.instance.BgmStreaming(GlobalSettings.BGM_FILE_NAME);
         LanguageManager.instance.SetLanguage(Language.Cn);
@@ -181,12 +184,11 @@ public class GameManager : Z_MonoManager<GameManager>
 
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, AssetManager.instance.texCtrl.GetName()));
 
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName("")));
+        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultStoryTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(Texture2D.whiteTexture, GlobalNameHelper.GetDefaultEventTexName()));
 
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultCharacterTexName()));
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName()));
         saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(new Texture2D(1, 1), GlobalNameHelper.GetDefaultModelTexName()));
 
 

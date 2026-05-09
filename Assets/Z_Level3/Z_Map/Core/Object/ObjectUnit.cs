@@ -96,6 +96,13 @@ namespace Z_Map
                     type = MapEventType.BoundaryTouch,
                     unit = this
                 });
+            }else
+            {
+                Z_EventHelper.Invoke(new ObjectEvent()
+                {
+                    type = MapEventType.Move,
+                    unit = this
+                });
             }
         }
         public override void Remove()

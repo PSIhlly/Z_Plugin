@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using Unity.VisualScripting;
 using UnityEngine;
 using Z_ByteSerialize;
@@ -192,7 +193,13 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             {
                 if (paramInfo.ContainsKey(lst[i]))
                 {
-                    canvas.ShowSlider(paramInfo[lst[i]].GetValue().num, i);
+                    var prm = paramInfo[lst[i]];
+                    var maxPrm = string.IsNullOrEmpty(prm.max) ? null : paramInfo.GetDv(prm.max, null);
+                    float max = maxPrm == null ? GlobalSettings.MAX : maxPrm.GetValue().num;
+                    var minPrm = string.IsNullOrEmpty(prm.min) ? null : paramInfo.GetDv(prm.min, null);
+                    float min = minPrm == null ? 0 : minPrm.GetValue().num;
+
+                    canvas.ShowSlider(prm.GetValue().num - min, max - min, i);
                 }
 
             }

@@ -32,14 +32,16 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public override void OnCreate()
         {
 
-
-
             view.btn_collision.onClick.AddListener(() =>
             {
                 model.data.collision = !model.data.collision;
                 Refresh();
             });
-           
+            view.btn_minimapIcon.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportObjectMinimap(model.data.id);
+                Refresh();
+            });
         }
         public override void OnShow()
         {
@@ -58,6 +60,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
             view.model_EventChooseBoundaryTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onBoundaryTouchEvent" });
             view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
+
+            view.model_EventChooseClickMinimap.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onClickMinimapEvent" });
+            view.model_EventChooseClickMinimap.SetShow(GameManager.instance.curProgress.enableMinimap);
+
+            view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
+            view.img_minimapIcon.sprite = TexAssetForm.DataByName.GetDk(model.data.minimapIcon, GlobalNameHelper.GetDefaultStoryTexName()).GetSprite();
 
         }
     }

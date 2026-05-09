@@ -87,6 +87,8 @@ namespace Z_Map.Form
                 
         public static Action<Data,bool,bool> changeEnteredsceneAction;
                 
+        public static Action<Data,string,string> changeMinimapiconAction;
+                
 
 
         public partial class Data : UnitForm.Data
@@ -121,11 +123,29 @@ namespace Z_Map.Form
                  
                      }
                     
+                    private string  _minimapIcon;
+                    /// <summary>
+                    ///小地图icon
+                    ///</summary>
+                    public string  minimapIcon{
+                                get{return _minimapIcon;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeMinimapicon(this,_minimapIcon,value); 
+                    }
+        
+                _minimapIcon = value;
+                }
+                 
+                     }
+                    
             public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
             
-            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
+            public Data(int uid,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,string minimapIcon):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -138,6 +158,7 @@ namespace Z_Map.Form
              this.collidingUnitUid = collidingUnitUid;
              this.extra = extra;
              this.enteredScene = enteredScene;
+             this.minimapIcon = minimapIcon;
 
                     _unit=new ItemUnit(this);
 
@@ -155,11 +176,12 @@ namespace Z_Map.Form
              this.collidingUnitUid = data.collidingUnitUid;
              this.extra = data.extra;
              this.enteredScene = data.enteredScene;
+             this.minimapIcon = data.minimapIcon;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene);
+        return new Data(sameId? uid:uidChain.GetId(),name,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,minimapIcon);
                 }
             
             public override  void BeforeGet()
@@ -169,7 +191,7 @@ namespace Z_Map.Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false);
+                   private static Data _defaultData=new Data(0,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -269,7 +291,9 @@ namespace Z_Map.Form
 
                 jo.SelectToken("extra")==null?defaultData.extra:jo.Get<string>("extra"),
 
-                jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene")
+                jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene"),
+
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
                     );
 
             return data;
@@ -301,6 +325,8 @@ namespace Z_Map.Form
             jo.Set<string>("extra",data.extra);
 
             jo.Set<bool>("enteredScene",data.enteredScene);
+
+            jo.Set<string>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -482,6 +508,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeEnteredsceneAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMinimapiconAction?.Invoke(data,oldV,newV);
                 }
                     
             }

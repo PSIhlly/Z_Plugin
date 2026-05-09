@@ -48,6 +48,10 @@ namespace Ui.ModStory.ModStoryMap
         public override void OnShow()
         {
             model.selPage = 0;
+            if(!GameManager.instance.curProgress.enableLargeMap)
+            {
+                model.selPage = 1;
+            }
             if (param != null)
                 model.selPage = param.selPage;
             Refresh();
@@ -55,7 +59,8 @@ namespace Ui.ModStory.ModStoryMap
 
         public void Refresh()
         {
-            view.page_ModStoryMapMap.SetShow(model.selPage == 0);
+            view.btn_map.gameObject.SetActive(GameManager.instance.curProgress.enableLargeMap);
+            view.page_ModStoryMapMap.SetShow(model.selPage == 0 );
             view.sta_map.ChangeState(model.selPage == 0 ? 1 : 0);
 
             view.page_ModStoryMapScene.SetShow(model.selPage == 1);

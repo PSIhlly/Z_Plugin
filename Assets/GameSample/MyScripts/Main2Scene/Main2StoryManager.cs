@@ -29,7 +29,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", GlobalNameHelper.GetDefaultTexName()));
             SceneForm.Clear();
-            var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(), (0.5f, 0.5f));
+            var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(),Vector2.zero  ,false,false);
             SceneForm.AddData(sceneData);
             CharacterParamForm.Clear();
             CharacterProductForm.Clear();
@@ -44,7 +44,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle,false,false,true,true);
+            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle,false,false,true,true,true,true,true,"");
             ProgressForm.AddData(progress);
             var data = new GameMapData();
             data.Init();
@@ -125,11 +125,13 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     public async void StartLoadSceneUgc(int sceneId)
     {
         bool ok = await StartLoadScene(ModManager.instance.GetStoryCoreFolder(), sceneId);
+        DynamicGlobalSettings.playing = false;
         ModManager.instance.BeginScene(sceneId);
     }
     public async void StartLoadScenePlay(int sceneId)
     {
         bool ok = await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId);
+        DynamicGlobalSettings.playing = true;
         PlayManager.instance.BeginScene(sceneId);
     }
 
@@ -163,7 +165,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
              });
          }*/
         data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 1, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
-
+         
         MapManager.instance.Begin(data);
 
 

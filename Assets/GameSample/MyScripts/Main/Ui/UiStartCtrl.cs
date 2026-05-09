@@ -1,13 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Form;
 using Item;
+using System.Collections;
+using System.Collections.Generic;
+using Ui.EnterMain;
+using Ui.Mod;
+using Ui.Story;
+using UnityEngine;
+using Z_Debug;
 using Z_Texture;
 using Z_Ui;
-using Ui.Mod;
-using Ui.EnterMain;
-using Ui.Story;
 
 namespace Ui.Start
 {
@@ -15,6 +16,8 @@ namespace Ui.Start
     {
         public override void OnCreate()
         {
+
+
             base.OnCreate();
             view.btn_ori.onClick.AddListener(() =>
             {

@@ -65,7 +65,27 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
 
     #endregion
+    #region mission
+    public void CreateMission(string name)
+    {
+        if (MissionForm.DataByName.Keys.Count > GlobalSettings.CHARACTER_PARAM_MAX)
+            return;
 
+        if (string.IsNullOrEmpty(name))
+        {
+            name = StringHelper.GetUniqueName(MissionForm.DataByName.Keys);
+        }
+
+    }
+    public void DeleteMission(string name)
+    {
+        MissionForm.RemoveData(MissionForm.DataByName[name].id);
+    }
+    public void RenameMission(string oldName, string newName)
+    {
+        MissionForm.DataByName[oldName].name = newName;
+    }
+    #endregion
     #region param
 
     public void CreateCharacterArg(string name)
@@ -331,7 +351,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic,""));
     }
     public void DeleteObjectUnit(string name, int id)
     {
@@ -385,6 +405,18 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 act?.Invoke(item);
                 return true;
             }, items);
+    }
+    public void ImportObjectMinimap(int uid)
+    {
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
+        {
+            onComplete = (data) =>
+            {
+                MapObjectForm.DataById[uid].minimapIcon = data.name;
+            },
+            sizeLimit = new Vector2Int(100, 100)
+        });
+
     }
     #endregion
 
@@ -550,7 +582,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false, new Dictionary<SkillType, int>(), 0, false));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultCharacterTexName(), paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalNameHelper.GetDefaultCharacterTexName(), false, new Dictionary<SkillType, int>(), 0, false,""));
     }
     public void DeleteCharacter(int uid)
     {
@@ -617,6 +649,18 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             anim.animClip[dir] = new List<CharacterAnimClipForm.Data>();
         }
         anim.animClip[dir].Add(CreateCharacterAnimClip());
+    }
+    public void ImportCharacterMinimap(int uid)
+    {
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
+        {
+            onComplete = (data) =>
+            {
+                CharacterProductForm.DataByUid[uid].minimapIcon = data.name;
+            },
+            sizeLimit = new Vector2Int(100, 100)
+        });
+
     }
     #endregion
 
@@ -938,7 +982,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             styleTex[style] = GlobalNameHelper.GetDefaultTexName();
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true, new Dictionary<string, CharacterParamForm.Data>()));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalNameHelper.GetDefaultTexName(), dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true, new Dictionary<string, CharacterParamForm.Data>(),""));
     }
     public void DeleteItem(int itemUid)
     {
@@ -1040,12 +1084,31 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
+
+    public void ImportItemMinimap(int uid)
+    {
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
+        {
+            onComplete = (data) =>
+            {
+                ItemProductForm.DataByUid[uid].minimapIcon = data.name;
+            },
+            sizeLimit = new Vector2Int(100, 100)
+        });
+
+    }
     #endregion
 
     #region scene
     public void ImportMapMiniMap()
     {
-
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
+        {
+            onComplete = (data) =>
+            {
+                GameManager.instance.curProgress.largeMap = data.name;
+            },
+        });
 
     }
 
@@ -1055,7 +1118,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(SceneForm.DataByName.Keys);
         }
-        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), (0.5f, 0.5f)));
+        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), Vector2.zero,false,false));
     }
 
     public void ImportSceneMiniMap(string name)
@@ -1066,7 +1129,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 SceneForm.DataByName[name].miniMap = data.name;
             },
-            sizeLimit = new Vector2Int(100, 100)
         });
 
     }

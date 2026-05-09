@@ -33,6 +33,14 @@ namespace Z_DesignStyle
 
                 return d1[key];
             }
+            public T2 GetFirst(T1 key)
+            {
+                if (!d1.ContainsKey(key))
+                    d1[key] = new List<T2>();
+                if (d1[key].Count > 0)
+                return d1[key][0];
+                return default(T2);
+            }
             public void Move(T1 t1, T2 cur, T2 old)
             {
                 Del(t1,old);

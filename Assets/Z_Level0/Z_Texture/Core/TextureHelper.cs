@@ -24,8 +24,9 @@ namespace Z_Texture
                     for (int y = 0; y < 5; y++)
                         for (int x = 0; x < 5; x++)
                         {
-                            _transparentTexture.SetPixel(x, y, new Color(0, 0, 0, 1));
+                            _transparentTexture.SetPixel(x, y, Color.clear);
                         }
+                    _transparentTexture.Apply();
                 }
                 return _transparentTexture;
             }

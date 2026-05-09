@@ -41,6 +41,7 @@ namespace Z_Map
     public static class DynamicGlobalSettings
     {
         public static CameraMode cameraMode;
+        public static bool playing;
         public static bool pauseNav;
     }
 
@@ -56,6 +57,7 @@ namespace Z_Map
         Create,
         Show,
         AfterUpdate,
+        Move,
         BoundaryTouch,
         Hide,
     }

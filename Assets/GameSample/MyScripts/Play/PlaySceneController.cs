@@ -133,7 +133,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
-
+                if (string.IsNullOrEmpty(data.minimapIcon))
+                {
+                    data.minimapIcon = newCharacter.minimapIcon;
+                }
             }
             else
             {
@@ -149,8 +152,25 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             if (cur != null)
             {
                 data.isObstacle = cur.collision;
+                if (string.IsNullOrEmpty(data.minimapIcon))
+                {
+                    data.minimapIcon = cur.minimapIcon;
+                }
             }
         }
+        //item correct
+        foreach (var data in ItemUnitForm.DataByUid.Values)
+        {
+            var cur = CharacterProductForm.DataByUid.GetDv(data.unit.productInfo.Item1, null);
+            if (cur != null)
+            {
+                if (string.IsNullOrEmpty(data.minimapIcon))
+                {
+                    data.minimapIcon = cur.minimapIcon;
+                }
+            }
+        }
+
         MapManager.instance.navigationCtrl.UpdateMap(int.MaxValue);
 
 
@@ -169,8 +189,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void End()
     {
-
         GameManager.instance.evtCtrl.ClearSceneEvent();
+
         GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         enable = false;
 
@@ -294,7 +314,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         if (updateNavFrame < Time.frameCount)
         {
-            MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count*3 + ObjectUnitForm.DataByUid.Count) / 50,10));
+            MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count * 3 + ObjectUnitForm.DataByUid.Count) / 50, 10));
             updateNavFrame = Time.frameCount + 60;
         }
     }

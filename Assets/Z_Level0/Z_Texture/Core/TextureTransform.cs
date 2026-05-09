@@ -118,6 +118,35 @@ namespace Z_Texture
 
         }
 
+        public static Texture2D FlipTexture(Texture2D original, bool flipX, bool flipY)
+        {
+            if (!flipX && !flipY)
+                return original;
+
+            int width = original.width;
+            int height = original.height;
+            Texture2D flippedTexture = new Texture2D(width, height);
+
+            Color32[] originalPixels = original.GetPixels32();
+            Color32[] flippedPixels = new Color32[originalPixels.Length];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int srcX = flipX ? width - 1 - x : x;
+                    int srcY = flipY ? height - 1 - y : y;
+                    int originalIndex = srcX + srcY * width;
+                    int flippedIndex = x + y * width;
+                    flippedPixels[flippedIndex] = originalPixels[originalIndex];
+                }
+            }
+
+            flippedTexture.SetPixels32(flippedPixels);
+            flippedTexture.Apply();
+            return flippedTexture;
+        }
+
     }
 
 

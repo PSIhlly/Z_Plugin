@@ -58,7 +58,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
                     return true;
                 }, items);
             });
-
+            view.btn_minimapIcon.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportItemMinimap(model.data.uid);
+                Refresh();
+            });
         }
         public override void OnShow()
         {
@@ -84,8 +88,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
             view.model_EventChooseBoundaryTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onBoundaryTouchEvent" });
             view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
+            view.model_EventChooseClickMinimap.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onClickMinimapEvent" });
+            view.model_EventChooseClickMinimap.SetShow(GameManager.instance.curProgress.enableMinimap);
 
             view.go_equip.SetActive(GameManager.instance.curProgress.enableEquip);
+
+            view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
+            view.img_minimapIcon.sprite = TexAssetForm.DataByName.GetDk(model.data.minimapIcon, GlobalNameHelper.GetDefaultStoryTexName()).GetSprite();
         }
     }
 

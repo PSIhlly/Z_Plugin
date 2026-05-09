@@ -172,7 +172,9 @@ public static partial class GlobalEventHelper
             case "onObjectTouchEvent":
             case "onObjectLeaveEvent":
             case "onShowEvent":
+            case "onBoundaryTouchEvent":
             case "onPerSecondEvent":
+            case "onInteractEvent":
                 return true;
         }
         return false;

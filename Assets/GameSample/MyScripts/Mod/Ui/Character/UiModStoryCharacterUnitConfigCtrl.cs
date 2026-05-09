@@ -1,6 +1,7 @@
 using Form;
 using System;
 using Ui.AnimChoose;
+using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Text;
 using Z_Ui.Notify;
@@ -108,7 +109,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 });
             });
 
-
+            view.btn_minimapIcon.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportCharacterMinimap(model.data.uid); 
+                Refresh();
+            });
         }
         public override void OnShow()
         {
@@ -135,6 +140,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
             view.model_EventChooseBoundaryTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onBoundaryTouchEvent" });
             view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
+            view.model_EventChooseClickMinimap.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onClickMinimapEvent" });
+            view.model_EventChooseClickMinimap.SetShow(GameManager.instance.curProgress.enableMinimap);
 
             view.txt_lightAttack.text = model.data.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(model.data.skill[SkillType.LightAttack]) ? SkillProductForm.DataByUid[model.data.skill[SkillType.LightAttack]].name : "";
 
@@ -150,6 +157,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
 
             view.go_skills.SetActive(GameManager.instance.curProgress.enableSkill);
 
+            view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
+            view.img_minimapIcon.sprite = TexAssetForm.DataByName.GetDk(model.data.minimapIcon, GlobalNameHelper.GetDefaultStoryTexName()).GetSprite();
 
         }
     }

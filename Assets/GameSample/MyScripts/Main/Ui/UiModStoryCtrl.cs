@@ -1,17 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Form;
 using Item;
-using Z_Texture;
-using Z_Ui.Base;
-using Z_Ui;
-using Z_DataSystem;
-using Ui.Mod;
+using System.Collections;
+using System.Collections.Generic;
 using Ui.Loading;
-using Z_Ui.Notify;
-using Z_Text;
+using Ui.Mod;
+using Ui.ModStory.ModStoryMission;
 using Ui.ModStoryEditorStyleWindow;
+using UnityEngine;
+using Z_DataSystem;
+using Z_Text;
+using Z_Texture;
+using Z_Ui;
+using Z_Ui.Base;
+using Z_Ui.Notify;
 
 namespace Ui.ModStory
 {
@@ -44,7 +45,7 @@ namespace Ui.ModStory
                 GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
                 NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
             });
-            
+
             view.btn_overview.onClick.AddListener(() =>
             {
                 model.curUi = view.page_ModStoryOverview;
@@ -90,6 +91,10 @@ namespace Ui.ModStory
                 model.curUi = view.page_ModStoryMap;
                 Refresh();
             });
+            view.btn_mission.onClick.AddListener(() =>
+            {
+                UiManager.instance.ShowUi<UiModStoryMissionCtrl>();
+            });
             view.btn_style.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModStoryEditorStyleWindowCtrl>(new UiModStoryEditorStyleWindowParam()
@@ -105,7 +110,6 @@ namespace Ui.ModStory
 
         public override void OnShow()
         {
-            //model.curUi = view.sub;
             Refresh();
         }
         public void Refresh()
@@ -123,7 +127,7 @@ namespace Ui.ModStory
             view.page_ModStoryCharacter.SetShow(model.curUi == view.page_ModStoryCharacter);
             view.sta_character.ChangeState(model.curUi == view.page_ModStoryCharacter ? 1 : 0);
 
-            view.btn_skill.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3&&GameManager.instance.curProgress.enableSkill);
+            view.btn_skill.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3 && GameManager.instance.curProgress.enableSkill);
             view.page_ModStorySkill.SetShow(model.curUi == view.page_ModStorySkill);
             view.sta_skill.ChangeState(model.curUi == view.page_ModStorySkill ? 1 : 0);
 
@@ -138,6 +142,10 @@ namespace Ui.ModStory
             view.btn_effect.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 3);
             view.page_ModStoryEffect.SetShow(model.curUi == view.page_ModStoryEffect);
             view.sta_effect.ChangeState(model.curUi == view.page_ModStoryEffect ? 1 : 0);
+
+            view.btn_mission.gameObject.SetActive((int)GameManager.instance.curProgress.editorStyle >= 2 && GameManager.instance.curProgress.enableMission);
+            view.page_ModStoryMission.SetShow(model.curUi == view.page_ModStoryMission);
+            view.sta_mission.ChangeState(model.curUi == view.page_ModStoryMission ? 1 : 0);
 
             view.page_ModStoryEvent.SetShow(model.curUi == view.page_ModStoryEvent);
             view.sta_event.ChangeState(model.curUi == view.page_ModStoryEvent ? 1 : 0);

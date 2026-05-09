@@ -25,15 +25,15 @@ namespace Z_Map
                 else
                 if (this is ObjectUnit obj)
                 {
-                    return MapManager.instance.updateCtrl.objectTileDic.Get(obj)[0];
+                    return MapManager.instance.updateCtrl.objectTileDic.GetFirst(obj);
                 }
                 else if (this is ItemUnit item)
                 {
-                    return MapManager.instance.updateCtrl.itemTileDic.Get(item)[0];
+                    return MapManager.instance.updateCtrl.itemTileDic.GetFirst(item);
                 }
                 else if (this is CharacterUnit character)
                 {
-                    return MapManager.instance.updateCtrl.characterTileDic.Get(character)[0];
+                    return MapManager.instance.updateCtrl.characterTileDic.GetFirst(character);
                 }
                 return null;
             }

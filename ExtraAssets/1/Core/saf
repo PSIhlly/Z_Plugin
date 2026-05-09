@@ -2,10 +2,9 @@
   {
     "uid": 1,
     "name": "scene",
-    "miniMap": "reservedI$",
-    "pos": {
-      "Item1": 0.5,
-      "Item2": 0.5
-    }
+    "miniMap": "$i$$i$",
+    "pos": "0.4922517|0.4237401",
+    "unlock": false,
+    "hideInLargeMap": false
   }
 ]

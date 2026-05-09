@@ -55,7 +55,11 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeMinimapAction;
                 
-        public static Action<Data,(float,float),(float,float)> changePosAction;
+        public static Action<Data,Vector2,Vector2> changePosAction;
+                
+        public static Action<Data,bool,bool> changeUnlockAction;
+                
+        public static Action<Data,bool,bool> changeHideinlargemapAction;
                 
 
 
@@ -116,11 +120,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private (float,float)  _pos;
+                    private Vector2  _pos;
                     /// <summary>
                     ///相对位置
                     ///</summary>
-                    public (float,float)  pos{
+                    public Vector2  pos{
                                 get{return _pos;}
  set{
 
@@ -134,13 +138,51 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string miniMap,(float,float) pos)
+                    private bool  _unlock;
+                    /// <summary>
+                    ///解锁
+                    ///</summary>
+                    public bool  unlock{
+                                get{return _unlock;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeUnlock(this,_unlock,value); 
+                    }
+        
+                _unlock = value;
+                }
+                 
+                     }
+                    
+                    private bool  _hideInLargeMap;
+                    /// <summary>
+                    ///大地图隐藏
+                    ///</summary>
+                    public bool  hideInLargeMap{
+                                get{return _hideInLargeMap;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeHideinlargemap(this,_hideInLargeMap,value); 
+                    }
+        
+                _hideInLargeMap = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string miniMap,Vector2 pos,bool unlock,bool hideInLargeMap)
             {
 
              this.uid = uid;
              this.name = name;
              this.miniMap = miniMap;
              this.pos = pos;
+             this.unlock = unlock;
+             this.hideInLargeMap = hideInLargeMap;
 
             }
             public void Reset(Data data)
@@ -150,11 +192,13 @@ public static readonly int autoUidCnt=100;
              this.name = data.name;
              this.miniMap = data.miniMap;
              this.pos = data.pos;
+             this.unlock = data.unlock;
+             this.hideInLargeMap = data.hideInLargeMap;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos);
+        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap);
                 }
             
             public virtual  void BeforeGet()
@@ -164,7 +208,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",(0f,0f));
+                   private static Data _defaultData=new Data(0,"","",Vector2.zero,false,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -263,7 +307,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("miniMap")==null?defaultData.miniMap:jo.Get<string>("miniMap"),
 
-                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<(float,float)>("pos")
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector2>("pos"),
+
+                jo.SelectToken("unlock")==null?defaultData.unlock:jo.Get<bool>("unlock"),
+
+                jo.SelectToken("hideInLargeMap")==null?defaultData.hideInLargeMap:jo.Get<bool>("hideInLargeMap")
                     );
 
             return data;
@@ -282,7 +330,11 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("miniMap",data.miniMap);
 
-            jo.Set<(float,float)>("pos",data.pos);
+            jo.Set<Vector2>("pos",data.pos);
+
+            jo.Set<bool>("unlock",data.unlock);
+
+            jo.Set<bool>("hideInLargeMap",data.hideInLargeMap);
 
             return jo;
         }
@@ -405,12 +457,32 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangePos(Data superData,(float,float) oldV,(float,float) newV)
+            public static void ChangePos(Data superData,Vector2 oldV,Vector2 newV)
             {
                 if(superData is Data data)
                 {
 
                 changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeUnlock(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeUnlockAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeHideinlargemap(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeHideinlargemapAction?.Invoke(data,oldV,newV);
                 }
                     
             }

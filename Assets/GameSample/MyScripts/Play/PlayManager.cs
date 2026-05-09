@@ -36,6 +36,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
 
     public PlaySceneEffectController effectCtrl;
+    public PlayMapController mapCtrl;
     // public ModAssetCtrl assetCtrl;
     public override void Init()
     {
@@ -55,7 +56,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
 
         effectCtrl = new PlaySceneEffectController(this);
-        //  assetCtrl = new ModAssetCtrl(this);
+        mapCtrl = new PlayMapController(this);
     }
 
 
@@ -123,12 +124,14 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         _sceneCtrl.Begin(id);
         _infoCtrl.Begin();
+        mapCtrl.Begin();
     }
 
     public void EndScene()
     {
         _sceneCtrl.End();
         _infoCtrl.End();
+        mapCtrl.End();
     }
 
     #endregion

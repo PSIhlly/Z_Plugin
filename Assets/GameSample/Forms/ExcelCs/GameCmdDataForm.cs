@@ -476,6 +476,14 @@ namespace Form
 
                 {100096,new Data(100096,"CharacterChat",new List<string>(){"character","content","icon","showTime",},new List<string>(){"character","string","img","num",},null,new List<string>(){"void",},"Character {0} img:{2},chat:{1},last {4} times","CharacterChat(self,\"empty\",\"$i$$i$\",3);","ui","dialog",EditorStyle.Rpg,"")},
 
+                {100097,new Data(100097,"IsMissionAdded",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"added",},new List<string>(){"num",},"Mission {0} is added?","IsMissionAdded(\"empty\")","mission","system",EditorStyle.Rpg,"")},
+
+                {100098,new Data(100098,"HasMissionDone",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"done",},new List<string>(){"num",},"Mission {0} has done?","HasMissionDone(\"empty\")","mission","system",EditorStyle.Rpg,"")},
+
+                {100099,new Data(100099,"AddMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Add mission {0}","MissionAdd(\"empty\");","mission","system",EditorStyle.Rpg,"")},
+
+                {100100,new Data(100100,"DoneMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Done mission {0}","MissionDone(\"empty\");","mission","system",EditorStyle.Rpg,"")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -673,6 +681,14 @@ namespace Form
     
                         {"CharacterChat",_DataByUid[100096]},
     
+                        {"IsMissionAdded",_DataByUid[100097]},
+    
+                        {"HasMissionDone",_DataByUid[100098]},
+    
+                        {"AddMission",_DataByUid[100099]},
+    
+                        {"DoneMission",_DataByUid[100100]},
+    
                     
                     };
                     foreach(var v in _DataByUid.Values)
@@ -727,6 +743,8 @@ namespace Form
                             {("basic","list"),new List<Data>()},
         
                             {("sceneObject","detect"),new List<Data>()},
+        
+                            {("mission","system"),new List<Data>()},
         
                 };
 
@@ -922,6 +940,14 @@ namespace Form
 
                     _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100096]);
 
+                    _DatasByCategoryType[("mission","system")].Add(_DataByUid[100097]);
+
+                    _DatasByCategoryType[("mission","system")].Add(_DataByUid[100098]);
+
+                    _DatasByCategoryType[("mission","system")].Add(_DataByUid[100099]);
+
+                    _DatasByCategoryType[("mission","system")].Add(_DataByUid[100100]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -937,6 +963,8 @@ namespace Form
                             {"character",new List<Data>()},
         
                             {"skill",new List<Data>()},
+        
+                            {"mission",new List<Data>()},
         
                 };
 
@@ -1131,6 +1159,14 @@ namespace Form
                     _DatasByCategory["ui"].Add(_DataByUid[100095]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100096]);
+
+                    _DatasByCategory["mission"].Add(_DataByUid[100097]);
+
+                    _DatasByCategory["mission"].Add(_DataByUid[100098]);
+
+                    _DatasByCategory["mission"].Add(_DataByUid[100099]);
+
+                    _DatasByCategory["mission"].Add(_DataByUid[100100]);
 
 
             childInitAction?.Invoke();

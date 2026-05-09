@@ -11,9 +11,9 @@
           "uid": -1,
           "name": "攻击力",
           "valueType": 0,
-          "min": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
-          "max": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
           "showType": 0
         }
       }
@@ -64,6 +64,8 @@
     "price": 0,
     "canEquipe": true,
     "events": [],
-    "isConsume": true
+    "isConsume": true,
+    "paramDicCharacter": [],
+    "minimapIcon": ""
   }
 ]

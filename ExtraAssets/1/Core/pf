@@ -5,25 +5,20 @@
     "sceneId": 1,
     "pos": "500|1000|500",
     "characterUid": 10,
-    "bag": [],
+    "bag": [
+      {
+        "v": 5
+      }
+    ],
     "team": [
       {
         "v": 1
-      },
-      {
-        "v": 2
       },
       {
         "v": 10
       }
     ],
     "teamActive": [
-      {
-        "v": 1
-      },
-      {
-        "v": 2
-      },
       {
         "v": 10
       }
@@ -70,6 +65,14 @@
     "triggeredOnceEvts": [],
     "notFirstTime": false,
     "blockProgramUid": 0,
-    "editorStyle": 3
+    "editorStyle": 3,
+    "enableEquip": true,
+    "enableSkill": true,
+    "enableFreeChangeActiveTeamer": false,
+    "enableFreeChangeSkill": false,
+    "enableMinimap": true,
+    "enableLargeMap": true,
+    "enableMission": true,
+    "largeMap": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$"
   }
 ]

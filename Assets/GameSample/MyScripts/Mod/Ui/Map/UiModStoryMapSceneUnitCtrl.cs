@@ -47,6 +47,10 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
                 Main2StoryManager.instance.StartLoadSceneUgc(model.data.uid);
                 UiManager.instance.CloseUi<UiModStoryCtrl>();
             });
+            view.btn_hideInLargeMap.onClick.AddListener(() => {
+                model.data.hideInLargeMap = !model.data.hideInLargeMap;
+                Refresh();
+            });
         }
 
         public void OnEvent(AssetEvent evt)
@@ -69,6 +73,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
         {
             view.img_map.sprite = TexAssetForm.DataByName[model.data.miniMap].GetSprite();
             view.ipt_name.Set(model.data.name);
+            view.sta_hideInLargeMap.ChangeState(model.data.hideInLargeMap?1:0);
         }
     }
 }

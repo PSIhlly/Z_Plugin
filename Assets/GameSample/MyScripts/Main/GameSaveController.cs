@@ -193,7 +193,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveAssets(string storyCoreFolder)
     {
-        SaveStoryTex(GlobalNameHelper.GetExternDefaultTexName(), storyCoreFolder);
+        
         SaveAndLoad.Save(storyCoreFolder + "/" + imageAssetFormFileName, StoryTexAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + audioAssetFormFileName, StoryAudioAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + videoAssetFormFileName, StoryVideoAssetForm.GetJaByDatas().ToString());
@@ -531,6 +531,11 @@ public class GameSaveController : Z_Controller<GameManager>
                 StoryVideoAssetForm.AddData(form);
                 form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
             }
+        }
+        if(!StoryTexAssetForm.DataByName.ContainsKey(GlobalNameHelper.GetExternDefaultTexName()))
+        {
+            StoryTexAssetForm.AddData(new StoryTexAssetForm.Data(AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture), GlobalNameHelper.GetExternDefaultTexName())));
+
         }
     }
 

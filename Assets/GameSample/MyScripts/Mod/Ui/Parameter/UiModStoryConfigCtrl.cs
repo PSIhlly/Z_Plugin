@@ -86,6 +86,24 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
                 Refresh();
             });
 
+            view.btn_minimap.onClick.AddListener(() =>
+            {
+                GameManager.instance.curProgress.enableMinimap = !GameManager.instance.curProgress.enableMinimap;
+                Refresh();
+            });
+
+            view.btn_largeMap.onClick.AddListener(() =>
+            {
+                GameManager.instance.curProgress.enableLargeMap = !GameManager.instance.curProgress.enableLargeMap;
+                Refresh();
+            });
+
+            view.btn_mission.onClick.AddListener(() =>
+            {
+                GameManager.instance.curProgress.enableMission = !GameManager.instance.curProgress.enableMission;
+                Refresh();
+            });
+
             view.btn_deleteActiveTeamer.onClick.AddListener(() =>
             {
                 if (GameManager.instance.curProgress.characterUid == model.selActiveTeamerUid)
@@ -161,6 +179,9 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
 
             view.sta_equip.ChangeState(GameManager.instance.curProgress.enableEquip ? 1 : 0);
             view.sta_skill.ChangeState(GameManager.instance.curProgress.enableSkill ? 1 : 0);
+            view.sta_minimap.ChangeState(GameManager.instance.curProgress.enableMinimap ? 1 : 0);
+            view.sta_largeMap.ChangeState(GameManager.instance.curProgress.enableLargeMap ? 1 : 0);
+            view.sta_mission.ChangeState(GameManager.instance.curProgress.enableMission ? 1 : 0);
         }
     }
 

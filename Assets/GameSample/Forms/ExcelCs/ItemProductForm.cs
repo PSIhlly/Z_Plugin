@@ -97,6 +97,8 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,CharacterParamForm.Data>,Dictionary<string,CharacterParamForm.Data>> changeParamdiccharacterAction;
                 
+        public static Action<Data,string,string> changeMinimapiconAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -336,11 +338,29 @@ namespace Form
                  
                      }
                     
+                    private string  _minimapIcon;
+                    /// <summary>
+                    ///小地图标识
+                    ///</summary>
+                    public string  minimapIcon{
+                                get{return _minimapIcon;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeMinimapicon(this,_minimapIcon,value); 
+                    }
+        
+                _minimapIcon = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.label,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,int protoUid,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events,bool isConsume,Dictionary<string,CharacterParamForm.Data> paramDicCharacter):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,int protoUid,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events,bool isConsume,Dictionary<string,CharacterParamForm.Data> paramDicCharacter,string minimapIcon):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -360,6 +380,7 @@ namespace Form
              this.events = events;
              this.isConsume = isConsume;
              this.paramDicCharacter = paramDicCharacter;
+             this.minimapIcon = minimapIcon;
 
             }
             public void Reset(Data data)
@@ -382,11 +403,12 @@ namespace Form
              this.events = data.events;
              this.isConsume = data.isConsume;
              this.paramDicCharacter = data.paramDicCharacter;
+             this.minimapIcon = data.minimapIcon;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,paramDic==null?new Dictionary<string,ItemParamForm.Data>():new Dictionary<string,ItemParamForm.Data>(paramDic),protoUid,model,desc,amount,maxAmountPer,equip,styleTex==null?new Dictionary<ItemStyle,string>():new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isConsume,paramDicCharacter==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDicCharacter));
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,paramDic==null?new Dictionary<string,ItemParamForm.Data>():new Dictionary<string,ItemParamForm.Data>(paramDic),protoUid,model,desc,amount,maxAmountPer,equip,styleTex==null?new Dictionary<ItemStyle,string>():new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isConsume,paramDicCharacter==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDicCharacter),minimapIcon);
                 }
             
             public override  void BeforeGet()
@@ -396,7 +418,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},0,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<string,CharacterParamForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},0,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<string,CharacterParamForm.Data>(){},"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -571,7 +593,9 @@ namespace Form
 
                 jo.SelectToken("isConsume")==null?defaultData.isConsume:jo.Get<bool>("isConsume"),
 
-                jo.SelectToken("paramDicCharacter")==null?defaultData.paramDicCharacter:jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDicCharacter")
+                jo.SelectToken("paramDicCharacter")==null?defaultData.paramDicCharacter:jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDicCharacter"),
+
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
                     );
 
             return data;
@@ -617,6 +641,8 @@ namespace Form
             jo.Set<bool>("isConsume",data.isConsume);
 
             jo.Set<Dictionary<string,CharacterParamForm.Data>>("paramDicCharacter",data.paramDicCharacter);
+
+            jo.Set<string>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -930,6 +956,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeParamdiccharacterAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeMinimapiconAction?.Invoke(data,oldV,newV);
                 }
                     
             }

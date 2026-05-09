@@ -9,6 +9,8 @@ using Z_Texture;
 using Z_DataSystem;
 using UnityEngine;
 using Z_DataSystem.Form;
+using Ui.Axis;
+using Z_DesignStyle;
 
 namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
 {
@@ -19,7 +21,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
     }
     public partial class UiModStoryMapMapModel
     {
-
+        public SceneForm.Data sel;
     }
     public partial class UiModStoryMapMapCtrl : IZ_Listener<AssetEvent>
     {
@@ -43,7 +45,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
 
         public override void OnShow()
         {
-
+            model.sel = null;
             Refresh();
         }
         public override void Close()
@@ -53,10 +55,34 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         }
         public void Refresh()
         {
-            //view.img_map.sprite = TexAssetForm.DataByName[GameManager.instance.curProgress.miniMap].GetSprite();
+            view.img_map.sprite = TexAssetForm.DataByName.GetDk(GameManager.instance.curProgress.largeMap,GlobalNameHelper.GetDefaultTexName()).GetSprite();
+
+            RefreshScenes();
+            view.model_axis.SetShow(false);
+
+            if (model.sel != null)
+            {
+                view.model_axis.SetShow(true, new UiAxisParam()
+                {
+                    pos = model.sel.pos,
+                    limitRtf = view.img_map.rectTransform,
+                    noRotate = true,
+                    onTrsChange = (tp) =>
+                    {
+                        model.sel.pos = tp.Item1;
+                        RefreshScenes();
+                    }
+                });
+            }
+
+        }
+        private void RefreshScenes()
+        {
             con.Clear();
             foreach (var data in SceneForm.DataByUid.Values)
             {
+                if (data.hideInLargeMap)
+                    continue;
                 con.Add(new UiMapSceneParam()
                 {
                     data = data
@@ -75,8 +101,15 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
 
     }
     public partial class UiMapSceneCtrl
-    { 
-
+    {
+        public override void OnCreate()
+        {
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.model.sel = model.data;
+                parent.Refresh();
+            });
+        }
         public override void OnShow()
         {
             model.data = param.data;
@@ -89,7 +122,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         public void Refresh()
         {
             view.txt_.text = model.data.name;
-            gameObject.transform.position = Z_Math.Graph.GetRealPos(new Vector2(model.data.pos.Item1, model.data.pos.Item2),parent.rect);
+            gameObject.transform.position = Z_Math.Graph.GetRealPos(model.data.pos, parent.view.img_map.rectTransform);
         }
     }
 }

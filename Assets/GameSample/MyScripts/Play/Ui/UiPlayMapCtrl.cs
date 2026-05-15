@@ -21,30 +21,31 @@ using Z_Ui.Base;
 using Z_UnitSystem.Form;
 using static UnityEngine.Rendering.DebugUI.Table;
 
-
-namespace Ui.PlaySceneMap
+namespace Ui.PlayMap
 {
 
-    public partial class UiPlaySceneMapParam
+    public partial class UiPlayMapParam
     {
 
     }
-    public partial class UiPlaySceneMapModel
+    public partial class UiPlayMapModel
     {
         public int cur = 0;
         public int y = 0;
         public bool isArea;
     }
-    public partial class UiPlaySceneMapCtrl
+    public partial class UiPlayMapCtrl
     {
         public PlayMapController mapCtrl;
         private float lastRefreshTime;
         UiContainer<UiMarkCtrl> markCon;
         UiContainer<UiSceneCtrl> sceneCon;
+        UiContainer<UiMissionCtrl> missionCon;
         public override void OnCreate()
         {
             markCon = new UiContainer<UiMarkCtrl>(this, view.go_mark);
             sceneCon = new UiContainer<UiSceneCtrl>(this, view.go_scene);
+            missionCon = new UiContainer<UiMissionCtrl>(this, view.go_mission);
             view.btn_world.onClick.AddListener(() =>
             {
                 model.isArea = false;
@@ -116,6 +117,18 @@ namespace Ui.PlaySceneMap
                 if (lastRefreshTime < GameManager.instance.curProgress.seconds)
                 {
                     lastRefreshTime = GameManager.instance.curProgress.seconds + 0.3f;
+
+                    missionCon.Clear();
+                    var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
+                    if (missionData != null)
+                    {
+                        missionCon.Add(new UiMissionParam()
+                        {
+                            data = missionData
+                        });
+                    }
+                    missionCon.Refresh();
+
                     markCon.Clear();
                     var marks = PlayManager.instance.mapCtrl.dic;
                     foreach (var mark in marks)
@@ -133,6 +146,8 @@ namespace Ui.PlaySceneMap
                         
                     }
                     markCon.Refresh();
+
+                  
                 }
             }
             else
@@ -189,6 +204,50 @@ namespace Ui.PlaySceneMap
             view.img_mark.sprite = model.prm.icon;
             var relativePos = new Vector2((model.prm.pos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.pos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
             view.go_mark.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
+            
+        }
+    }
+
+    public partial class UiMissionParam
+    {
+        public MissionForm.Data data;
+    }
+    public partial class UiMissionModel
+    {
+        public UiMissionParam prm;
+    }
+    public partial class UiMissionCtrl
+    {
+        Timer timer;
+        public override void OnCreate()
+        {
+            view.btn_mission.onClick.AddListener(() =>
+            {
+                TimeManager.instance.CancelTimer(timer);
+                view.txt_.text = model.prm.data.name;
+                TimeManager.instance.StartTimer(5, 0, () =>
+                {
+                    view.txt_.text = "";
+                    return true;
+                },uiHolder);
+            });
+        }
+        public override void OnShow()
+        {
+            model.prm = param;
+            Refresh();
+        }
+        public override void OnDisable()
+        {
+            TimeManager.instance.CancelTimer(timer);
+            view.txt_.text="";
+        }
+
+        public void Refresh()
+        {
+            var relativePos = new Vector2((model.prm.data.targetPos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.data.targetPos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
+            view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
+            view.rtf_area.sizeDelta.Set(model.prm.data.radius*2, model.prm.data.radius*2);
         }
     }
 

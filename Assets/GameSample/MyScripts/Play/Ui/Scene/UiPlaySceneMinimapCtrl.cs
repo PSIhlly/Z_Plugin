@@ -7,7 +7,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using Ui.PlaySceneMap;
+using Ui.PlayMap;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_Debug;
@@ -38,12 +38,14 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
         public PlayMapController mapCtrl;
         private float lastRefreshTime;
         UiContainer<UiMarkCtrl> con;
+        UiContainer<UiMissionCtrl> missionCon;
         public override void OnCreate()
         {
             con = new UiContainer<UiMarkCtrl>(this, view.go_mark);
+            missionCon = new UiContainer<UiMissionCtrl>(this, view.go_mission);
             view.btn_map.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiPlaySceneMapCtrl>();
+                UiManager.instance.ShowUi<UiPlayMapCtrl>();
             });
         }
         public override void OnEnable()
@@ -107,6 +109,18 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
             if (lastRefreshTime < GameManager.instance.curProgress.seconds)
             {
                 lastRefreshTime = GameManager.instance.curProgress.seconds + 0.3f;
+                missionCon.Clear();
+                view.rtf_guide.gameObject.SetActive(false);
+                var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
+                if (missionData != null)
+                {
+                    missionCon.Add(new UiMissionParam()
+                    {
+                        data = missionData
+                    });
+                }
+                missionCon.Refresh();
+
                 con.Clear();
                 var marks = PlayManager.instance.mapCtrl.dic.Values;
                 foreach (var mark in marks)
@@ -118,6 +132,9 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
                     });
                 }
                 con.Refresh();
+
+
+
             }
 
 
@@ -150,6 +167,52 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
             var relativePos = new Vector2((model.prm.pos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.pos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
             
             view.go_mark.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
+        }
+    }
+
+    public partial class UiMissionParam
+    {
+        public MissionForm.Data data;
+    }
+    public partial class UiMissionModel
+    {
+        public UiMissionParam prm;
+    }
+    public partial class UiMissionCtrl
+    {
+        public override void OnCreate()
+        {
+        }
+        public override void OnShow()
+        {
+            model.prm = param;
+            Refresh();
+        }
+
+        public void Refresh()
+        {
+            var relativePos = new Vector2((model.prm.data.targetPos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.data.targetPos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
+            view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
+            view.rtf_area.sizeDelta.Set(model.prm.data.radius * 2, model.prm.data.radius * 2);
+            if(GameManager.instance.curProgress.curMissionId == model.prm.data.id )
+            {
+            Vector2 center = parent.view.btn_map.transform.position;
+            float diameter = parent.view.btn_map.image.rectTransform.rect.width;
+            float radius = diameter / 2;
+            Vector2 missionPos = view.go_mission.transform.position;
+            Vector2 direction = missionPos - center;
+            float distance = direction.magnitude;
+
+            if (distance > radius)
+            {
+                parent.view.rtf_guide.gameObject.SetActive(true);
+                Vector2 guidePos = center + direction.normalized * radius;
+                parent.view.rtf_guide.position = guidePos;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                parent.view.rtf_guide.eulerAngles = new Vector3(0, 0, angle - 90);
+            }
+            }
+            
         }
     }
 

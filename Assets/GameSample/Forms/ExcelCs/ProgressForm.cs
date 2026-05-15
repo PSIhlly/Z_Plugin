@@ -97,6 +97,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeLargemapAction;
                 
+        public static Action<Data,int,int> changeCurmissionidAction;
+                
 
 
         public partial class Data
@@ -534,7 +536,25 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,string largeMap)
+                    private int  _curMissionId;
+                    /// <summary>
+                    ///当前任务
+                    ///</summary>
+                    public int  curMissionId{
+                                get{return _curMissionId;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeCurmissionid(this,_curMissionId,value); 
+                    }
+        
+                _curMissionId = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,string largeMap,int curMissionId)
             {
 
              this.uid = uid;
@@ -561,6 +581,7 @@ public static readonly int autoUidCnt=100;
              this.enableLargeMap = enableLargeMap;
              this.enableMission = enableMission;
              this.largeMap = largeMap;
+             this.curMissionId = curMissionId;
 
             }
             public void Reset(Data data)
@@ -590,11 +611,12 @@ public static readonly int autoUidCnt=100;
              this.enableLargeMap = data.enableLargeMap;
              this.enableMission = data.enableMission;
              this.largeMap = data.largeMap;
+             this.curMissionId = data.curMissionId;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill,enableMinimap,enableLargeMap,enableMission,largeMap);
+        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill,enableMinimap,enableLargeMap,enableMission,largeMap,curMissionId);
                 }
             
             public virtual  void BeforeGet()
@@ -604,7 +626,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg,false,false,false,false,false,false,false,"");
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg,false,false,false,false,false,false,false,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -724,7 +746,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("enableMission")==null?defaultData.enableMission:jo.Get<bool>("enableMission"),
 
-                jo.SelectToken("largeMap")==null?defaultData.largeMap:jo.Get<string>("largeMap")
+                jo.SelectToken("largeMap")==null?defaultData.largeMap:jo.Get<string>("largeMap"),
+
+                jo.SelectToken("curMissionId")==null?defaultData.curMissionId:jo.Get<int>("curMissionId")
                     );
 
             return data;
@@ -784,6 +808,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("enableMission",data.enableMission);
 
             jo.Set<string>("largeMap",data.largeMap);
+
+            jo.Set<int>("curMissionId",data.curMissionId);
 
             return jo;
         }
@@ -1105,6 +1131,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeLargemapAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCurmissionid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCurmissionidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

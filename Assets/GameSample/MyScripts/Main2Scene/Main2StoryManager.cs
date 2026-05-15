@@ -44,7 +44,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle,false,false,true,true,true,true,true,"");
+            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle,false,false,true,true,true,true,true,"",0);
             ProgressForm.AddData(progress);
             var data = new GameMapData();
             data.Init();
@@ -202,6 +202,12 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameManager.instance.mapCtrl.Reset();
         GameManager.instance.characterCtrl.Reset();
         GameManager.instance.curScene = null;
+    }
+    public void ChangeScene(int sceneId)
+    {
+        UnloadScenePlay();
+
+        StartLoadScenePlay(sceneId);
     }
     #endregion
 

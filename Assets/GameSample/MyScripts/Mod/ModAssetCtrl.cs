@@ -1137,6 +1137,22 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         SceneForm.RemoveData(uid);
         GameManager.instance.saveCtrl.DeleteSceneMap(ModManager.instance.GetStoryCoreFolder(), uid);
     }
+
+    public void ChooseScene(string title, Action<SceneForm.Data> act)
+    {
+        var items = new EntryItem();
+
+        foreach (var data in SceneForm.DataByUid.Values)
+        {
+            items.Add(data.name, StoryTexAssetForm.DataByName.GetDk(data.miniMap,GlobalNameHelper.GetExternDefaultTexName()).GetSprite(), data.uid);
+        }
+        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+            true, (item) =>
+            {
+                act?.Invoke(SceneForm.DataByUid[item.id]);
+                return true;
+            }, items);
+    }
     #endregion
 
 }

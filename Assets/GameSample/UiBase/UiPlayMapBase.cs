@@ -5,7 +5,7 @@ using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
 using Z_Texture;using RenderHeads.Media.AVProVideo;
-namespace Ui.PlaySceneMap
+namespace Ui.PlayMap
 
 {
 
@@ -39,7 +39,7 @@ namespace Ui.PlaySceneMap
         public UiMarkView view;
         public UiMarkModel model;
         public UiMarkParam param;
-        public UiPlaySceneMapCtrl parent=>(UiPlaySceneMapCtrl)uiHolder.parent.ctrl;
+        public UiPlayMapCtrl parent=>(UiPlayMapCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -59,6 +59,60 @@ namespace Ui.PlaySceneMap
 
     }
     public partial class UiMarkModel:UiModel
+    {
+        
+    }
+
+
+
+    public partial class UiMissionParam:UiParam
+    {
+    }
+
+    public partial class UiMissionView:UiView
+    {
+
+            public GameObject go_mission;
+            public Img img_mission;
+            public Btn btn_mission;
+            public RectTransform rtf_area;
+            public Txt txt_;
+        public UiMissionView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_mission = uiHolder.elementTrsLst[0].gameObject;
+            img_mission = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            btn_mission = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            rtf_area = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiMissionCtrl:UiCtrl
+    {
+        public UiMissionView view;
+        public UiMissionModel model;
+        public UiMissionParam param;
+        public UiPlayMapCtrl parent=>(UiPlayMapCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiMissionParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiMissionView(uiHolder);
+            model=new UiMissionModel();
+
+
+        }
+
+    }
+    public partial class UiMissionModel:UiModel
     {
         
     }
@@ -91,7 +145,7 @@ namespace Ui.PlaySceneMap
         public UiSceneView view;
         public UiSceneModel model;
         public UiSceneParam param;
-        public UiPlaySceneMapCtrl parent=>(UiPlaySceneMapCtrl)uiHolder.parent.ctrl;
+        public UiPlayMapCtrl parent=>(UiPlayMapCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
@@ -114,11 +168,11 @@ namespace Ui.PlaySceneMap
     {
         
     }
-    public partial class UiPlaySceneMapParam:UiParam
+    public partial class UiPlayMapParam:UiParam
     {
     }
 
-    public partial class UiPlaySceneMapView:UiView
+    public partial class UiPlayMapView:UiView
     {
 
             public Btn btn_bg;
@@ -132,12 +186,16 @@ namespace Ui.PlaySceneMap
             public Img img_mark;
             public Btn btn_mark;
             public UiMarkCtrl sub_mark;
+            public GameObject go_mission;
+            public Img img_mission;
+            public Btn btn_mission;
+            public UiMissionCtrl sub_mission;
             public Img img_largeMap;
             public GameObject go_scene;
             public Img img_scene;
             public UiSceneCtrl sub_scene;
             public Img img_real;
-        public UiPlaySceneMapView(UiHolder uiHolder):base(uiHolder)
+        public UiPlayMapView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_bg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
@@ -151,24 +209,28 @@ namespace Ui.PlaySceneMap
             img_mark = uiHolder.elementTrsLst[8].GetComponent<Img>();
             btn_mark = uiHolder.elementTrsLst[9].GetComponent<Btn>();
             sub_mark = (UiMarkCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            img_largeMap = uiHolder.elementTrsLst[11].GetComponent<Img>();
-            go_scene = uiHolder.elementTrsLst[12].gameObject;
-            img_scene = uiHolder.elementTrsLst[13].GetComponent<Img>();
-            sub_scene = (UiSceneCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
-            img_real = uiHolder.elementTrsLst[15].GetComponent<Img>();
+            go_mission = uiHolder.elementTrsLst[11].gameObject;
+            img_mission = uiHolder.elementTrsLst[12].GetComponent<Img>();
+            btn_mission = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sub_mission = (UiMissionCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            img_largeMap = uiHolder.elementTrsLst[15].GetComponent<Img>();
+            go_scene = uiHolder.elementTrsLst[16].gameObject;
+            img_scene = uiHolder.elementTrsLst[17].GetComponent<Img>();
+            sub_scene = (UiSceneCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            img_real = uiHolder.elementTrsLst[19].GetComponent<Img>();
         }
 
     }
-    public partial class UiPlaySceneMapCtrl:UiCtrl
+    public partial class UiPlayMapCtrl:UiCtrl
     {
-        public UiPlaySceneMapView view;
-        public UiPlaySceneMapModel model;
-        public UiPlaySceneMapParam param;
+        public UiPlayMapView view;
+        public UiPlayMapModel model;
+        public UiPlayMapParam param;
         
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiPlaySceneMapParam)param;
+            this.param = (UiPlayMapParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -176,18 +238,20 @@ namespace Ui.PlaySceneMap
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiPlaySceneMapView(uiHolder);
-            model=new UiPlaySceneMapModel();
+            view = new UiPlayMapView(uiHolder);
+            model=new UiPlayMapModel();
 
 
             view.sub_mark = new UiMarkCtrl();
             view.sub_mark.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_mission = new UiMissionCtrl();
+            view.sub_mission.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.sub_scene = new UiSceneCtrl();
-            view.sub_scene.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_scene.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }
-    public partial class UiPlaySceneMapModel:UiModel
+    public partial class UiPlayMapModel:UiModel
     {
         
     }

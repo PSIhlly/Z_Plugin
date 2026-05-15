@@ -30,6 +30,17 @@ using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
 using static UnityEditor.Progress;
+public enum MissionEventType
+{
+    Add,
+    Fail,
+    Done
+}
+public class MissionEvent : Z_Event
+{
+    public MissionEventType type;
+    public MissionForm.Data data;
+}
 public enum StoryItemEventType
 {
     Add,
@@ -86,12 +97,13 @@ public interface ExternalPlayInfoController
 
     public void ChooseCurrentCharacter(int characterUid);
 }
-public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>
+public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>, IZ_Listener<MissionEvent>
 {
     Dictionary<string, List<int>> bagName2UidDic;
     public PlayInfoController(PlayManager super) : base(super)
     {
         Z_EventHelper.Register<CollideEvent>(this);
+        Z_EventHelper.Register<MissionEvent>(this);
         bagName2UidDic = new Dictionary<string, List<int>>();
     }
 
@@ -450,9 +462,9 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             foreach (var add in CharacterParamForm.DataByName)
             {
                 var v = add.Value.GetValue().num;
-                if(item.paramDicCharacter.ContainsKey(add.Key))
+                if (item.paramDicCharacter.ContainsKey(add.Key))
                 {
-                    v= item.paramDicCharacter[add.Key].GetValue().num;
+                    v = item.paramDicCharacter[add.Key].GetValue().num;
                 }
 
                 if (ch.paramDic.ContainsKey(add.Key))
@@ -587,6 +599,35 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
                     {
                         GainItem(obj.productInfo.Item1);
                         MapManager.instance.RemoveItem(obj.data);
+                    }
+                }
+                break;
+
+
+        }
+
+    }
+    public void OnEvent(MissionEvent evt)
+    {
+        if (!enable)
+            return;
+        switch (evt.type)
+        {
+            case MissionEventType.Add:
+                if (GameManager.instance.curProgress.curMissionId == 0)
+                    GameManager.instance.curProgress.curMissionId = evt.data.id;
+                break;
+            case MissionEventType.Done:
+            case MissionEventType.Fail:
+                if (GameManager.instance.curProgress.curMissionId == evt.data.id)
+                {
+                    foreach (var mission in MissionForm.DataById.Values)
+                    {
+                        if (mission.received && !mission.fail && !mission.done)
+                        {
+                            GameManager.instance.curProgress.curMissionId = mission.id;
+                            break;
+                        }
                     }
                 }
                 break;

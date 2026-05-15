@@ -65,6 +65,12 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,bool,bool> changeFailAction;
                 
+        public static Action<Data,int,int> changeTargetsceneidAction;
+                
+        public static Action<Data,Vector3,Vector3> changeTargetposAction;
+                
+        public static Action<Data,float,float> changeRadiusAction;
+                
 
 
         public partial class Data
@@ -214,7 +220,61 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-            public Data(int id,string name,string label,string desc,bool show,bool received,bool done,bool fail)
+                    private int  _targetSceneId;
+                    /// <summary>
+                    ///目标场景id
+                    ///</summary>
+                    public int  targetSceneId{
+                                get{return _targetSceneId;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeTargetsceneid(this,_targetSceneId,value); 
+                    }
+        
+                _targetSceneId = value;
+                }
+                 
+                     }
+                    
+                    private Vector3  _targetPos;
+                    /// <summary>
+                    ///目标位置
+                    ///</summary>
+                    public Vector3  targetPos{
+                                get{return _targetPos;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeTargetpos(this,_targetPos,value); 
+                    }
+        
+                _targetPos = value;
+                }
+                 
+                     }
+                    
+                    private float  _radius;
+                    /// <summary>
+                    ///半径
+                    ///</summary>
+                    public float  radius{
+                                get{return _radius;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeRadius(this,_radius,value); 
+                    }
+        
+                _radius = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,string label,string desc,bool show,bool received,bool done,bool fail,int targetSceneId,Vector3 targetPos,float radius)
             {
 
              this.id = id;
@@ -225,6 +285,9 @@ public static readonly int autoIdCnt=100;
              this.received = received;
              this.done = done;
              this.fail = fail;
+             this.targetSceneId = targetSceneId;
+             this.targetPos = targetPos;
+             this.radius = radius;
 
             }
             public void Reset(Data data)
@@ -238,11 +301,14 @@ public static readonly int autoIdCnt=100;
              this.received = data.received;
              this.done = data.done;
              this.fail = data.fail;
+             this.targetSceneId = data.targetSceneId;
+             this.targetPos = data.targetPos;
+             this.radius = data.radius;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,label,desc,show,received,done,fail);
+        return new Data(sameId? id:idChain.GetId(),name,label,desc,show,received,done,fail,targetSceneId,targetPos,radius);
                 }
             
             public virtual  void BeforeGet()
@@ -252,7 +318,7 @@ public static readonly int autoIdCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",false,false,false,false);
+                   private static Data _defaultData=new Data(0,"","","",false,false,false,false,0,Vector3.zero,0f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -373,7 +439,13 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.SelectToken("done")==null?defaultData.done:jo.Get<bool>("done"),
 
-                jo.SelectToken("fail")==null?defaultData.fail:jo.Get<bool>("fail")
+                jo.SelectToken("fail")==null?defaultData.fail:jo.Get<bool>("fail"),
+
+                jo.SelectToken("targetSceneId")==null?defaultData.targetSceneId:jo.Get<int>("targetSceneId"),
+
+                jo.SelectToken("targetPos")==null?defaultData.targetPos:jo.Get<Vector3>("targetPos"),
+
+                jo.SelectToken("radius")==null?defaultData.radius:jo.Get<float>("radius")
                     );
 
             return data;
@@ -401,6 +473,12 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             jo.Set<bool>("done",data.done);
 
             jo.Set<bool>("fail",data.fail);
+
+            jo.Set<int>("targetSceneId",data.targetSceneId);
+
+            jo.Set<Vector3>("targetPos",data.targetPos);
+
+            jo.Set<float>("radius",data.radius);
 
             return jo;
         }
@@ -584,6 +662,36 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 {
 
                 changeFailAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTargetsceneid(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTargetsceneidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTargetpos(Data superData,Vector3 oldV,Vector3 newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTargetposAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeRadius(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeRadiusAction?.Invoke(data,oldV,newV);
                 }
                     
             }

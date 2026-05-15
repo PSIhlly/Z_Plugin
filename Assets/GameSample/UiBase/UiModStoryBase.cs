@@ -5316,6 +5316,11 @@ namespace ModStoryMissionUnit
             public Btn btn_show;
             public Sta sta_show;
             public Ipt ipt_desc;
+            public Btn btn_guideScene;
+            public Txt txt_guideScene;
+            public Ipt ipt_guidePosSetX;
+            public Ipt ipt_guidePosSetZ;
+            public Ipt ipt_guidePosSetY;
         public UiModStoryMissionUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -5326,6 +5331,11 @@ namespace ModStoryMissionUnit
             btn_show = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             sta_show = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             ipt_desc = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
+            btn_guideScene = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            txt_guideScene = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            ipt_guidePosSetX = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            ipt_guidePosSetZ = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_guidePosSetY = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
         }
 
     }

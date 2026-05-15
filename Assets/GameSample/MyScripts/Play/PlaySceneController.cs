@@ -365,6 +365,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         if (_playerM == null || _playerM.unit.ins == null)
             return;
         _playerM.unit.ins.transform.position = pos;
+        _playerM.pos = pos;
+        GameManager.instance.curProgress.pos = pos;
     }
     public void SetPlayerMove(Vector3 dir)
     {

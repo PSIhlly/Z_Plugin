@@ -208,7 +208,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 switch (evt.type)
                 {
                     case MapEventType.Create:
-                        mapUnit.ExecuteEvt("onShowEvent", heap);
+                        mapUnit.ExecuteEvt("onShowEvent", heap);//create enterScene leaveScene destroy
                         break;
                 }
             }

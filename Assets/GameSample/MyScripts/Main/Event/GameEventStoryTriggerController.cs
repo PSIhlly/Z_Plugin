@@ -20,16 +20,7 @@ using Z_Time;
 using Z_Math;
 using System.Xml.Linq;
 using System.Linq;
-public enum MissionEventType
-{
-    Add,
-    Done
-}
-public class MissionEvent : Z_Event
-{
-    public MissionEventType type;
-    public MissionForm.Data data;
-}
+
 
 public enum StoryLifeEventType
 {

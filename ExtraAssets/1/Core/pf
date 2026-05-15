@@ -73,6 +73,7 @@
     "enableMinimap": true,
     "enableLargeMap": true,
     "enableMission": true,
-    "largeMap": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$"
+    "largeMap": "$i$b9b5c711b8e091a79d9d64ba82c10dc0bba2bc6b$i$",
+    "curMissionId": 0
   }
 ]

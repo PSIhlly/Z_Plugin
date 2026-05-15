@@ -125,54 +125,6 @@ namespace PlaySceneMission
 
 
 
-
-
-
-    public partial class UiMessageParam:UiParam
-    {
-    }
-
-    public partial class UiMessageView:UiView
-    {
-
-            public GameObject go_message;
-            public Txt txt_;
-        public UiMessageView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_message = uiHolder.elementTrsLst[0].gameObject;
-            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiMessageCtrl:UiCtrl
-    {
-        public UiMessageView view;
-        public UiMessageModel model;
-        public UiMessageParam param;
-        public UiPlaySceneMissionCtrl parent=>(UiPlaySceneMissionCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiMessageParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiMessageView(uiHolder);
-            model=new UiMessageModel();
-
-
-        }
-
-    }
-    public partial class UiMessageModel:UiModel
-    {
-        
-    }
     public partial class UiPlaySceneMissionParam:UiParam
     {
     }
@@ -180,15 +132,15 @@ namespace PlaySceneMission
     public partial class UiPlaySceneMissionView:UiView
     {
 
-            public GameObject go_message;
-            public UiMessageCtrl sub_message;
+            public Txt txt_;
+            public Txt txt_distance;
             public GameObject go_mission;
             public Btn btn_mission;
         public UiPlaySceneMissionView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_message = uiHolder.elementTrsLst[0].gameObject;
-            sub_message = (UiMessageCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            txt_distance = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             go_mission = uiHolder.elementTrsLst[2].gameObject;
             btn_mission = uiHolder.elementTrsLst[3].GetComponent<Btn>();
         }
@@ -215,8 +167,6 @@ namespace PlaySceneMission
             model=new UiPlaySceneMissionModel();
 
 
-            view.sub_message = new UiMessageCtrl();
-            view.sub_message.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
         }
 
     }
@@ -343,6 +293,56 @@ namespace PlaySceneMinimap
     {
         
     }
+
+
+
+    public partial class UiMissionParam:UiParam
+    {
+    }
+
+    public partial class UiMissionView:UiView
+    {
+
+            public GameObject go_mission;
+            public Img img_mission;
+            public RectTransform rtf_area;
+        public UiMissionView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_mission = uiHolder.elementTrsLst[0].gameObject;
+            img_mission = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            rtf_area = uiHolder.elementTrsLst[2].GetComponent<RectTransform>();
+        }
+
+    }
+    public partial class UiMissionCtrl:UiCtrl
+    {
+        public UiMissionView view;
+        public UiMissionModel model;
+        public UiMissionParam param;
+        public UiPlaySceneMinimapCtrl parent=>(UiPlaySceneMinimapCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiMissionParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiMissionView(uiHolder);
+            model=new UiMissionModel();
+
+
+        }
+
+    }
+    public partial class UiMissionModel:UiModel
+    {
+        
+    }
     public partial class UiPlaySceneMinimapParam:UiParam
     {
     }
@@ -351,6 +351,7 @@ namespace PlaySceneMinimap
     {
 
             public Btn btn_map;
+            public RectTransform rtf_guide;
             public GameObject go_self;
             public RectTransform rtf_self;
             public RectTransform rtf_area;
@@ -358,19 +359,26 @@ namespace PlaySceneMinimap
             public GameObject go_mark;
             public Img img_mark;
             public UiMarkCtrl sub_mark;
+            public GameObject go_mission;
+            public Img img_mission;
+            public UiMissionCtrl sub_mission;
             public Img img_real;
         public UiPlaySceneMinimapView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_map = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            go_self = uiHolder.elementTrsLst[1].gameObject;
-            rtf_self = uiHolder.elementTrsLst[2].GetComponent<RectTransform>();
-            rtf_area = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
-            rimg_unlock = uiHolder.elementTrsLst[4].GetComponent<RImg>();
-            go_mark = uiHolder.elementTrsLst[5].gameObject;
-            img_mark = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            sub_mark = (UiMarkCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            img_real = uiHolder.elementTrsLst[8].GetComponent<Img>();
+            rtf_guide = uiHolder.elementTrsLst[1].GetComponent<RectTransform>();
+            go_self = uiHolder.elementTrsLst[2].gameObject;
+            rtf_self = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
+            rtf_area = uiHolder.elementTrsLst[4].GetComponent<RectTransform>();
+            rimg_unlock = uiHolder.elementTrsLst[5].GetComponent<RImg>();
+            go_mark = uiHolder.elementTrsLst[6].gameObject;
+            img_mark = uiHolder.elementTrsLst[7].GetComponent<Img>();
+            sub_mark = (UiMarkCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            go_mission = uiHolder.elementTrsLst[9].gameObject;
+            img_mission = uiHolder.elementTrsLst[10].GetComponent<Img>();
+            sub_mission = (UiMissionCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            img_real = uiHolder.elementTrsLst[12].GetComponent<Img>();
         }
 
     }
@@ -397,6 +405,8 @@ namespace PlaySceneMinimap
 
             view.sub_mark = new UiMarkCtrl();
             view.sub_mark.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_mission = new UiMissionCtrl();
+            view.sub_mission.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

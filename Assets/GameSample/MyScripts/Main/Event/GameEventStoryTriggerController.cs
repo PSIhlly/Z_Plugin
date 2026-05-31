@@ -26,6 +26,7 @@ public enum StoryLifeEventType
 {
     FirstEnter = 0,
     EverySecond = 1,
+    Leave = 2,
 }
 public class StoryLifeEvent : Z_Event
 {
@@ -58,10 +59,13 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryLifeEventType.FirstEnter:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onBeginEvent", null), 0, null);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onBeginEvent", null), 0, null);
                 break;
             case StoryLifeEventType.EverySecond:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onPerSecondEvent", null), 0, null);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onPerSecondEvent", null), 0, null);
+                break;
+            case StoryLifeEventType.Leave:
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onLeaveEvent", null), 0, null);
                 break;
         }
     }
@@ -72,14 +76,14 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         switch (evt.type)
         {
             case StoryItemEventType.Add:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onGainItemEvent", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent${evt.data.uid}", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onGainItemEvent$", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onGainItemEvent", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onGainItemEvent${evt.data.uid}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onGainItemEvent$", null), 0, heap);
                 break;
             case StoryItemEventType.Remove:
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onLostItemEvent", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent${evt.data.uid}", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onLostItemEvent$", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onLostItemEvent", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onLostItemEvent${evt.data.uid}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onLostItemEvent$", null), 0, heap);
                 break;
         }
     }
@@ -93,10 +97,10 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
             case StoryCharacterEventType.ParamChange:
                 heap["target"] = CodeHelper.CreateBoxByStr(evt.name);
                 heap["delta"] = CodeHelper.CreateBoxByNum((float)evt.obj);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv("onCharacterParamChangeEvent", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}$", null), 0, heap);
-                _super.TriggerEventExecute(GameManager.instance.curProgress.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}${evt.name}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onCharacterParamChangeEvent", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onCharacterParamChangeEvent$${evt.name}", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}$", null), 0, heap);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onCharacterParamChangeEvent${evt.data.protoUid}${evt.name}", null), 0, heap);
                 break;
             case StoryCharacterEventType.SkillParamChange:
                 heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SKILL, evt.name));

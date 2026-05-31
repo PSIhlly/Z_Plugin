@@ -35,11 +35,7 @@ namespace Z_Code
             var pos= new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
             if (scene != null && ch != null)
             {
-                if (scene.uid != GameManager.instance.curProgress.curMissionId)
-                {
-                    Main2StoryManager.instance.ChangeScene(scene.uid);
-                }
-                PlayManager.instance.sceneCtrl.SetPlayerPos(pos);
+                GameManager.instance.curProgress.targetScene = (scene.uid, pos);
             }
             return true;
         }

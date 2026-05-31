@@ -1118,7 +1118,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(SceneForm.DataByName.Keys);
         }
-        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), Vector2.zero,false,false));
+        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), Vector2.zero,false,false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(), false));
     }
 
     public void ImportSceneMiniMap(string name)

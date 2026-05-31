@@ -64,6 +64,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.model_EventChooseClickMinimap.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onClickMinimapEvent" });
             view.model_EventChooseClickMinimap.SetShow(GameManager.instance.curProgress.enableMinimap);
 
+            view.model_EventChooseLeaveScene.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onLeaveSceneEvent" });
+
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
             view.img_minimapIcon.sprite = TexAssetForm.DataByName.GetDk(model.data.minimapIcon, GlobalNameHelper.GetDefaultStoryTexName()).GetSprite();
 

@@ -91,6 +91,8 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.model_EventChooseClickMinimap.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onClickMinimapEvent" });
             view.model_EventChooseClickMinimap.SetShow(GameManager.instance.curProgress.enableMinimap);
 
+            view.model_EventChooseLeaveScene.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onLeaveSceneEvent" });
+
             view.go_equip.SetActive(GameManager.instance.curProgress.enableEquip);
 
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);

@@ -32,13 +32,6 @@ namespace Ui.ModStory.ModStoryEvent
                 Refresh();
 
             });
-            view.btn_globalEvent.onClick.AddListener(() =>
-            {
-                model.selPage = 1;
-                Refresh();
-
-            });
-
         }
         public override void OnShow()
         {
@@ -57,9 +50,6 @@ namespace Ui.ModStory.ModStoryEvent
         {
             view.page_ModStoryEventCustom.SetShow(model.selPage == 0);
             view.sta_customEvent.ChangeState(model.selPage == 0 ? 1 : 0);
-            view.page_ModStoryEventConfig.SetShow(model.selPage == 1);
-            view.sta_globalEvent.ChangeState(model.selPage == 1 ? 1 : 0);
-
         }
     }
 

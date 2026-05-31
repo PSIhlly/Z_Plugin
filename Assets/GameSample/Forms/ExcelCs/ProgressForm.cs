@@ -67,15 +67,9 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Dictionary<string,string>,Dictionary<string,string>> changeUistyleimagenameAction;
                 
-        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
-                
         public static Action<Data,CameraMode,CameraMode> changeCameramodeAction;
                 
         public static Action<Data,ClipForm.Data,ClipForm.Data> changeDialogcacheAction;
-                
-        public static Action<Data,Dictionary<int,List<string>>,Dictionary<int,List<string>>> changeTriggeredonceevtsAction;
-                
-        public static Action<Data,bool,bool> changeNotfirsttimeAction;
                 
         public static Action<Data,int,int> changeBlockprogramuidAction;
                 
@@ -98,6 +92,12 @@ public static readonly int autoUidCnt=100;
         public static Action<Data,string,string> changeLargemapAction;
                 
         public static Action<Data,int,int> changeCurmissionidAction;
+                
+        public static Action<Data,(int,Vector3),(int,Vector3)> changeTargetsceneAction;
+                
+        public static Action<Data,bool,bool> changeBanscenechangeAction;
+                
+        public static Action<Data,EventState,EventState> changeEventstateAction;
                 
 
 
@@ -266,24 +266,6 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private Dictionary<string,EventTriggerForm.Data>  _events;
-                    /// <summary>
-                    ///事件
-                    ///</summary>
-                    public Dictionary<string,EventTriggerForm.Data>  events{
-                                get{return _events;}
- set{
-
-                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeEvents(this,_events,value); 
-                    }
-        
-                _events = value;
-                }
-                 
-                     }
-                    
                     private CameraMode  _cameraMode;
                     /// <summary>
                     ///相机视角
@@ -316,42 +298,6 @@ public static readonly int autoUidCnt=100;
                     }
         
                 _dialogCache = value;
-                }
-                 
-                     }
-                    
-                    private Dictionary<int,List<string>>  _triggeredOnceEvts;
-                    /// <summary>
-                    ///触发过的一次性事件
-                    ///</summary>
-                    public Dictionary<int,List<string>>  triggeredOnceEvts{
-                                get{return _triggeredOnceEvts;}
- set{
-
-                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeTriggeredonceevts(this,_triggeredOnceEvts,value); 
-                    }
-        
-                _triggeredOnceEvts = value;
-                }
-                 
-                     }
-                    
-                    private bool  _notFirstTime;
-                    /// <summary>
-                    ///非第一次进入
-                    ///</summary>
-                    public bool  notFirstTime{
-                                get{return _notFirstTime;}
- set{
-
-                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeNotfirsttime(this,_notFirstTime,value); 
-                    }
-        
-                _notFirstTime = value;
                 }
                  
                      }
@@ -554,7 +500,61 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,Dictionary<string,EventTriggerForm.Data> events,CameraMode cameraMode,ClipForm.Data dialogCache,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,string largeMap,int curMissionId)
+                    private (int,Vector3)  _targetScene;
+                    /// <summary>
+                    ///目标scene
+                    ///</summary>
+                    public (int,Vector3)  targetScene{
+                                get{return _targetScene;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeTargetscene(this,_targetScene,value); 
+                    }
+        
+                _targetScene = value;
+                }
+                 
+                     }
+                    
+                    private bool  _banSceneChange;
+                    /// <summary>
+                    ///禁止场景传送
+                    ///</summary>
+                    public bool  banSceneChange{
+                                get{return _banSceneChange;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeBanscenechange(this,_banSceneChange,value); 
+                    }
+        
+                _banSceneChange = value;
+                }
+                 
+                     }
+                    
+                    private EventState  _eventState;
+                    /// <summary>
+                    ///事件状态
+                    ///</summary>
+                    public EventState  eventState{
+                                get{return _eventState;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEventstate(this,_eventState,value); 
+                    }
+        
+                _eventState = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,CameraMode cameraMode,ClipForm.Data dialogCache,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,string largeMap,int curMissionId,(int,Vector3) targetScene,bool banSceneChange,EventState eventState)
             {
 
              this.uid = uid;
@@ -566,11 +566,8 @@ public static readonly int autoUidCnt=100;
              this.team = team;
              this.teamActive = teamActive;
              this.uiStyleImageName = uiStyleImageName;
-             this.events = events;
              this.cameraMode = cameraMode;
              this.dialogCache = dialogCache;
-             this.triggeredOnceEvts = triggeredOnceEvts;
-             this.notFirstTime = notFirstTime;
              this.blockProgramUid = blockProgramUid;
              this.editorStyle = editorStyle;
              this.enableEquip = enableEquip;
@@ -582,6 +579,9 @@ public static readonly int autoUidCnt=100;
              this.enableMission = enableMission;
              this.largeMap = largeMap;
              this.curMissionId = curMissionId;
+             this.targetScene = targetScene;
+             this.banSceneChange = banSceneChange;
+             this.eventState = eventState;
 
             }
             public void Reset(Data data)
@@ -596,11 +596,8 @@ public static readonly int autoUidCnt=100;
              this.team = data.team;
              this.teamActive = data.teamActive;
              this.uiStyleImageName = data.uiStyleImageName;
-             this.events = data.events;
              this.cameraMode = data.cameraMode;
              this.dialogCache = data.dialogCache;
-             this.triggeredOnceEvts = data.triggeredOnceEvts;
-             this.notFirstTime = data.notFirstTime;
              this.blockProgramUid = data.blockProgramUid;
              this.editorStyle = data.editorStyle;
              this.enableEquip = data.enableEquip;
@@ -612,11 +609,14 @@ public static readonly int autoUidCnt=100;
              this.enableMission = data.enableMission;
              this.largeMap = data.largeMap;
              this.curMissionId = data.curMissionId;
+             this.targetScene = data.targetScene;
+             this.banSceneChange = data.banSceneChange;
+             this.eventState = data.eventState;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),cameraMode,dialogCache,triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill,enableMinimap,enableLargeMap,enableMission,largeMap,curMissionId);
+        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),cameraMode,dialogCache,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill,enableMinimap,enableLargeMap,enableMission,largeMap,curMissionId,targetScene,banSceneChange,eventState);
                 }
             
             public virtual  void BeforeGet()
@@ -626,7 +626,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},new Dictionary<string,EventTriggerForm.Data>(){},CameraMode.Overhead,ClipForm.defaultData,new Dictionary<int,List<string>>(){},false,0,EditorStyle.Avg,false,false,false,false,false,false,false,"",0);
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},CameraMode.Overhead,ClipForm.defaultData,0,EditorStyle.Avg,false,false,false,false,false,false,false,"",0,(0,Vector3.zero),false,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -718,15 +718,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("uiStyleImageName")==null?defaultData.uiStyleImageName:jo.Get<Dictionary<string,string>>("uiStyleImageName"),
 
-                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
-
                 jo.SelectToken("cameraMode")==null?defaultData.cameraMode:jo.Get<CameraMode>("cameraMode"),
 
                 jo.SelectToken("dialogCache")==null?defaultData.dialogCache:jo.Get<ClipForm.Data>("dialogCache"),
-
-                jo.SelectToken("triggeredOnceEvts")==null?defaultData.triggeredOnceEvts:jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
-
-                jo.SelectToken("notFirstTime")==null?defaultData.notFirstTime:jo.Get<bool>("notFirstTime"),
 
                 jo.SelectToken("blockProgramUid")==null?defaultData.blockProgramUid:jo.Get<int>("blockProgramUid"),
 
@@ -748,7 +742,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("largeMap")==null?defaultData.largeMap:jo.Get<string>("largeMap"),
 
-                jo.SelectToken("curMissionId")==null?defaultData.curMissionId:jo.Get<int>("curMissionId")
+                jo.SelectToken("curMissionId")==null?defaultData.curMissionId:jo.Get<int>("curMissionId"),
+
+                jo.SelectToken("targetScene")==null?defaultData.targetScene:jo.Get<(int,Vector3)>("targetScene"),
+
+                jo.SelectToken("banSceneChange")==null?defaultData.banSceneChange:jo.Get<bool>("banSceneChange"),
+
+                jo.SelectToken("eventState")==null?defaultData.eventState:jo.Get<EventState>("eventState")
                     );
 
             return data;
@@ -779,15 +779,9 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<Dictionary<string,string>>("uiStyleImageName",data.uiStyleImageName);
 
-            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
-
             jo.Set<CameraMode>("cameraMode",data.cameraMode);
 
             jo.Set<ClipForm.Data>("dialogCache",data.dialogCache);
-
-            jo.Set<Dictionary<int,List<string>>>("triggeredOnceEvts",data.triggeredOnceEvts);
-
-            jo.Set<bool>("notFirstTime",data.notFirstTime);
 
             jo.Set<int>("blockProgramUid",data.blockProgramUid);
 
@@ -810,6 +804,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("largeMap",data.largeMap);
 
             jo.Set<int>("curMissionId",data.curMissionId);
+
+            jo.Set<(int,Vector3)>("targetScene",data.targetScene);
+
+            jo.Set<bool>("banSceneChange",data.banSceneChange);
+
+            jo.Set<EventState>("eventState",data.eventState);
 
             return jo;
         }
@@ -985,16 +985,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeEventsAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
             public static void ChangeCameramode(Data superData,CameraMode oldV,CameraMode newV)
             {
                 if(superData is Data data)
@@ -1011,26 +1001,6 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeDialogcacheAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeTriggeredonceevts(Data superData,Dictionary<int,List<string>> oldV,Dictionary<int,List<string>> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeTriggeredonceevtsAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeNotfirsttime(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeNotfirsttimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -1141,6 +1111,36 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeCurmissionidAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTargetscene(Data superData,(int,Vector3) oldV,(int,Vector3) newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTargetsceneAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBanscenechange(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBanscenechangeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEventstate(Data superData,EventState oldV,EventState newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEventstateAction?.Invoke(data,oldV,newV);
                 }
                     
             }

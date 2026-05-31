@@ -20,6 +20,7 @@ using Z_Text;
 using Z_Ui.Notify;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
+using static UnityEditor.PlayerSettings;
 using static Z_Code.Form.InterpretDataForm;
 public class EventModifyEvent : Z_Event
 {
@@ -27,7 +28,6 @@ public class EventModifyEvent : Z_Event
 }
 namespace Form
 {
-
 
     public static partial class SkillProductForm
     {
@@ -88,6 +88,11 @@ public enum TriggerType
     OnceDuring
 }
 
+public enum EventState
+{
+    Normal,
+    Leave,
+}
 public static partial class GlobalEventHelper
 {
     public static string CHARACTER = "$ch$";
@@ -98,7 +103,7 @@ public static partial class GlobalEventHelper
     public static string VECTOR = "$vt$";
     public static string SKILL = "$sk$";
     public static Dictionary<(string, string), int> idCache = new Dictionary<(string, string), int>();
-    public static Dictionary<(string, string) ,string> nameCache = new Dictionary<(string, string), string>();
+    public static Dictionary<(string, string), string> nameCache = new Dictionary<(string, string), string>();
 
     public static string GetName(string mark, string name = "")
     {
@@ -232,13 +237,51 @@ public class GameEventController : Z_Controller<GameManager>
     public void LateUpdate()
     {
         //lifeEvent
-        if (!GameManager.instance.curProgress.notFirstTime)
+        if (!GameManager.instance.curScene.notFirstTime)
         {
-            GameManager.instance.curProgress.notFirstTime = true;
+            GameManager.instance.curScene.notFirstTime = true;
             Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.FirstEnter });
         }
+        if (GameManager.instance.curProgress.targetScene.Item1 != GameManager.instance.curScene.uid)
+        {
+            if (GameManager.instance.curProgress.eventState != EventState.Leave)
+            {
+                GameManager.instance.curProgress.eventState = EventState.Leave;
+                EventInterpretDataForm.DataByUid.Clear();
+                tasks.Clear();
+                Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.Leave }); 
+                foreach (var data in UnitForm.DataByUid.Values)
+                {
+                    if(data.unit is MapUnit unit)
+                    {
+                        var evt = unit.evtDic.GetDv("onLeaveSceneEvent", null);
+                        if(evt!=null)
+                        {
+                            TriggerEventExecute(evt, data.uid, null);
+                        }
+                    }
+                }
 
-        var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
+            }
+            var lstLeave = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
+            ManageEventDatas(lstLeave);
+            if (EventInterpretDataForm.DataByUid.Count == 0)
+            {
+                Main2StoryManager.instance.ChangeScene(GameManager.instance.curProgress.targetScene.Item1);
+                PlayManager.instance.sceneCtrl.SetPlayerPos(GameManager.instance.curProgress.targetScene.Item2);
+            }
+
+        }
+        else
+        {
+            var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
+            ManageEventDatas(lst);
+        }
+
+
+    }
+    private void ManageEventDatas(List<EventInterpretDataForm.Data> lst)
+    {
         releaseTriggerTuple.Clear();
         foreach (var data in lst)
         {
@@ -286,12 +329,10 @@ public class GameEventController : Z_Controller<GameManager>
         }
         foreach (var trigger in releaseTriggerTuple)
         {
-            if (GameManager.instance.curProgress.triggeredOnceEvts.ContainsKey(trigger.Item1))
-                GameManager.instance.curProgress.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
+            if (GameManager.instance.curScene.triggeredOnceEvts.ContainsKey(trigger.Item1))
+                GameManager.instance.curScene.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
         }
-
     }
-
 
 
     public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap)
@@ -301,7 +342,7 @@ public class GameEventController : Z_Controller<GameManager>
             return;
         }
         List<string> triggered;
-        var dict = GameManager.instance.curProgress.triggeredOnceEvts;
+        var dict = GameManager.instance.curScene.triggeredOnceEvts;
         switch (trigger.type)
         {
             case TriggerType.Once:
@@ -348,6 +389,8 @@ public class GameEventController : Z_Controller<GameManager>
     public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "")
     {
         if (evt == null)
+            return;
+        if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent")
             return;
         var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;

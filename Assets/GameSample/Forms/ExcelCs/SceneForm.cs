@@ -61,6 +61,12 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,bool,bool> changeHideinlargemapAction;
                 
+        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
+                
+        public static Action<Data,Dictionary<int,List<string>>,Dictionary<int,List<string>>> changeTriggeredonceevtsAction;
+                
+        public static Action<Data,bool,bool> changeNotfirsttimeAction;
+                
 
 
         public partial class Data
@@ -174,7 +180,61 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string miniMap,Vector2 pos,bool unlock,bool hideInLargeMap)
+                    private Dictionary<string,EventTriggerForm.Data>  _events;
+                    /// <summary>
+                    ///事件
+                    ///</summary>
+                    public Dictionary<string,EventTriggerForm.Data>  events{
+                                get{return _events;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEvents(this,_events,value); 
+                    }
+        
+                _events = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<int,List<string>>  _triggeredOnceEvts;
+                    /// <summary>
+                    ///触发过的一次性事件
+                    ///</summary>
+                    public Dictionary<int,List<string>>  triggeredOnceEvts{
+                                get{return _triggeredOnceEvts;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeTriggeredonceevts(this,_triggeredOnceEvts,value); 
+                    }
+        
+                _triggeredOnceEvts = value;
+                }
+                 
+                     }
+                    
+                    private bool  _notFirstTime;
+                    /// <summary>
+                    ///非第一次进入
+                    ///</summary>
+                    public bool  notFirstTime{
+                                get{return _notFirstTime;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeNotfirsttime(this,_notFirstTime,value); 
+                    }
+        
+                _notFirstTime = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,string name,string miniMap,Vector2 pos,bool unlock,bool hideInLargeMap,Dictionary<string,EventTriggerForm.Data> events,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime)
             {
 
              this.uid = uid;
@@ -183,6 +243,9 @@ public static readonly int autoUidCnt=100;
              this.pos = pos;
              this.unlock = unlock;
              this.hideInLargeMap = hideInLargeMap;
+             this.events = events;
+             this.triggeredOnceEvts = triggeredOnceEvts;
+             this.notFirstTime = notFirstTime;
 
             }
             public void Reset(Data data)
@@ -194,11 +257,14 @@ public static readonly int autoUidCnt=100;
              this.pos = data.pos;
              this.unlock = data.unlock;
              this.hideInLargeMap = data.hideInLargeMap;
+             this.events = data.events;
+             this.triggeredOnceEvts = data.triggeredOnceEvts;
+             this.notFirstTime = data.notFirstTime;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap);
+        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime);
                 }
             
             public virtual  void BeforeGet()
@@ -208,7 +274,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",Vector2.zero,false,false);
+                   private static Data _defaultData=new Data(0,"","",Vector2.zero,false,false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<int,List<string>>(){},false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -311,7 +377,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("unlock")==null?defaultData.unlock:jo.Get<bool>("unlock"),
 
-                jo.SelectToken("hideInLargeMap")==null?defaultData.hideInLargeMap:jo.Get<bool>("hideInLargeMap")
+                jo.SelectToken("hideInLargeMap")==null?defaultData.hideInLargeMap:jo.Get<bool>("hideInLargeMap"),
+
+                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
+
+                jo.SelectToken("triggeredOnceEvts")==null?defaultData.triggeredOnceEvts:jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
+
+                jo.SelectToken("notFirstTime")==null?defaultData.notFirstTime:jo.Get<bool>("notFirstTime")
                     );
 
             return data;
@@ -335,6 +407,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("unlock",data.unlock);
 
             jo.Set<bool>("hideInLargeMap",data.hideInLargeMap);
+
+            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+
+            jo.Set<Dictionary<int,List<string>>>("triggeredOnceEvts",data.triggeredOnceEvts);
+
+            jo.Set<bool>("notFirstTime",data.notFirstTime);
 
             return jo;
         }
@@ -483,6 +561,36 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeHideinlargemapAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEventsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTriggeredonceevts(Data superData,Dictionary<int,List<string>> oldV,Dictionary<int,List<string>> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTriggeredonceevtsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeNotfirsttime(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeNotfirsttimeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

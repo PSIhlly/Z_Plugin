@@ -29,7 +29,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", GlobalNameHelper.GetDefaultTexName()));
             SceneForm.Clear();
-            var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(),Vector2.zero  ,false,false);
+            var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(),Vector2.zero  ,false,false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(),  false);
             SceneForm.AddData(sceneData);
             CharacterParamForm.Clear();
             CharacterProductForm.Clear();
@@ -44,7 +44,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), new Dictionary<string, EventTriggerForm.Data>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), new Dictionary<int, List<string>>(), false, 0, defaultStyle,false,false,true,true,true,true,true,"",0);
+            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(),  CameraMode.Overhead, ClipForm.defaultData.Copy(),   0, defaultStyle,false,false,true,true,true,true,true,"",0,(1,Vector3.zero),false,EventState.Normal); 
             ProgressForm.AddData(progress);
             var data = new GameMapData();
             data.Init();
@@ -60,7 +60,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                     var dialogEvt = EventProgramDataForm.DataByName["mainDialog"];
                     dialogEvt.ApplyCode(@"ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");GameOver();");
 
-                    progress.events["onBeginEvent"] = new EventTriggerForm.Data(-1, "onBeginEvent", new List<string>() { "mainDialog" }, default);
+                    sceneData.events["onBeginEvent"] = new EventTriggerForm.Data(-1, "onBeginEvent", new List<string>() { "mainDialog" }, default);
                     break;
                 case EditorStyle.Rpg:
                 case EditorStyle.RpgAdvanced:

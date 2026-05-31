@@ -484,6 +484,8 @@ namespace Form
 
                 {100100,new Data(100100,"DoneMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Done mission {0}","MissionDone(\"empty\");","mission","system",EditorStyle.Rpg,"")},
 
+                {100101,new Data(100101,"MoveToScene",new List<string>(){"sceneName","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Move to Scene {0} position: {1}","MoveToScene(\"empty\",NewVector(1,1,0));","character","system",EditorStyle.Rpg,"")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -688,6 +690,8 @@ namespace Form
                         {"AddMission",_DataByUid[100099]},
     
                         {"DoneMission",_DataByUid[100100]},
+    
+                        {"MoveToScene",_DataByUid[100101]},
     
                     
                     };
@@ -948,6 +952,8 @@ namespace Form
 
                     _DatasByCategoryType[("mission","system")].Add(_DataByUid[100100]);
 
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100101]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -1167,6 +1173,8 @@ namespace Form
                     _DatasByCategory["mission"].Add(_DataByUid[100099]);
 
                     _DatasByCategory["mission"].Add(_DataByUid[100100]);
+
+                    _DatasByCategory["character"].Add(_DataByUid[100101]);
 
 
             childInitAction?.Invoke();

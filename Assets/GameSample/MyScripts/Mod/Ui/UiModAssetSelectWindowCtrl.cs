@@ -33,6 +33,7 @@ namespace Ui.ModAssetSelectWindow
         public UiModAssetSelectWindowParam prm;
         public AssetForm.Data sel;
         public string curLab;
+        public bool isSetLabelMode;
     }
     public partial class UiModAssetSelectWindowCtrl : IZ_Listener<AssetEvent>
     {
@@ -80,6 +81,14 @@ namespace Ui.ModAssetSelectWindow
             {
                 Close();
             });
+            view.btn_setLabel.onClick.AddListener(() =>
+            {
+                if (model.sel != null)
+                {
+                    model.isSetLabelMode = !model.isSetLabelMode;
+                    Refresh();
+                }
+            });
 
             itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
@@ -88,6 +97,7 @@ namespace Ui.ModAssetSelectWindow
         public override void OnShow()
         {
             model.prm = param;
+            model.isSetLabelMode = false;
             if(model.curLab!=null)
             {
                 if (model.prm is UiModAssetSelectTexWindowParam && !StoryTexAssetForm.DatasByLab.ContainsKey(model.curLab))
@@ -112,6 +122,7 @@ namespace Ui.ModAssetSelectWindow
             RefreshLabs();
             RefreshItems();
             view.sta_selected.ChangeState(model.sel != null ? 1 : 0);
+            view.sta_setLabel.ChangeState(model.isSetLabelMode ? 1 : 0);
         }
         void RefreshLabs()
         {
@@ -146,10 +157,7 @@ namespace Ui.ModAssetSelectWindow
             {
                 labCon.Add(new UiLabParam() { lab = lab });
             }
-            if (model.sel != null)
-            {
-                labCon.Add(new UiLabParam() { lab = TextManager.instance.GetTxt("new") });
-            }
+            labCon.Add(new UiLabParam() { lab = TextManager.instance.GetTxt("new") });
             labCon.Refresh();
         }
         void RefreshItems()
@@ -257,14 +265,22 @@ namespace Ui.ModAssetSelectWindow
         {
             view.btn_.onClick.AddListener(() =>
             {
-                if (model.prm.lab == TextManager.instance.GetTxt("new"))
+                if (parent.model.isSetLabelMode && parent.model.sel != null)
+                {
+                    parent.model.sel.lab = model.prm.lab;
+                    parent.SetCurLab(model.prm.lab);
+                    parent.model.isSetLabelMode = false;
+                    parent.Refresh();
+                }
+                else if (model.prm.lab == TextManager.instance.GetTxt("new"))
                 {
                     if(parent.model.sel != null)
                     {
                         NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("inputNewLab"), true, (v) =>
                         {
                             parent.model.sel.lab = v;
-                            parent.model.sel = null;
+                            parent.SetCurLab(model.prm.lab);
+                            parent.model.isSetLabelMode = false;
                             parent.Refresh();
                             return true;
                         });

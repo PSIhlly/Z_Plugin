@@ -45,7 +45,7 @@ namespace Ui.ModStory.ModStoryMapObject
         }
         public void SelData(MapBaseForm.Data data)
         {
-            model.data = data;
+            model.data = data; 
             Refresh();
         }
         public void Refresh()

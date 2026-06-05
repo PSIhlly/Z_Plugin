@@ -292,7 +292,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos, objectData.name, prms);
+                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos,GlobalNameHelper.GetRuntimeMapObjectPrefabName(objectData.id), prms);
                                 GameManager.instance.mapCtrl.RegisterObject(newObjectData, objectData);
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
@@ -321,7 +321,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newItemData = mapMgr.AddItem(data.name, finalPos, data.name, prms);
+                                var newItemData = mapMgr.AddItem(data.name, finalPos, GlobalNameHelper.GetRuntimeMapItemPrefabName(data.uid), prms);
                                 newItemData.unit.productInfo = (data.uid, -1);
                                 newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
                             }

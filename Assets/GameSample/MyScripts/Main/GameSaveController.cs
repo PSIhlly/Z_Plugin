@@ -778,7 +778,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
         foreach (var form in MapObjectForm.DataById.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(form.name, form.model, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalNameHelper.GetRuntimeMapObjectPrefabName(form.id), form.model, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }
@@ -805,7 +805,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
         foreach (var form in ItemProductForm.DataByUid.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(form.name, form.model, true, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalNameHelper.GetRuntimeMapItemPrefabName(form.uid), form.model, true, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }

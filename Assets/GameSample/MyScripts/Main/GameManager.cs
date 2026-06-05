@@ -126,7 +126,10 @@ public static class GlobalNameHelper
 {
     public static string defaultLab="unclassified";
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
+
     public static string GetRuntimePrefabName(string name = "") => "runtime$" + name;
+    public static string GetRuntimeMapObjectPrefabName(int mapObjectId) => GetRuntimePrefabName("obj$" + mapObjectId);
+    public static string GetRuntimeMapItemPrefabName(int mapItemId) => GetRuntimePrefabName("item$" + mapItemId);
     public static string GetDefaultTexName(string name = "") => "reservedI$" + name;
     public static string GetExternDefaultTexName(string name = "") => AssetManager.instance.texCtrl.GetName();
 

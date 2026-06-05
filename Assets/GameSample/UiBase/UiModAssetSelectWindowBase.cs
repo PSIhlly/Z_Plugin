@@ -144,6 +144,8 @@ namespace Ui.ModAssetSelectWindow
             public UiItemCtrl sub_item;
             public Btn btn_;
             public Sta sta_;
+            public Btn btn_setLabel;
+            public Sta sta_setLabel;
         public UiModAssetSelectWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -160,6 +162,8 @@ namespace Ui.ModAssetSelectWindow
             sub_item = (UiItemCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
             btn_ = uiHolder.elementTrsLst[11].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_setLabel = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_setLabel = uiHolder.elementTrsLst[14].GetComponent<Sta>();
         }
 
     }

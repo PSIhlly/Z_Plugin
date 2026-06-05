@@ -219,7 +219,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             {
                 var texs = parent.model.data.model.subUnitTexsName[0];
                 var texName = texs != null && texs.Count > model.id ? texs[model.id] : null;
-                view.txt_.text = texName ?? "";
+                view.txt_.text = "";
                 if (texName != null && TexAssetForm.DataByName.ContainsKey(texName))
                 {
                     view.img_.sprite = TexAssetForm.DataByName[texName].GetSprite();

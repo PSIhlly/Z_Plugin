@@ -266,6 +266,7 @@ namespace Ui.ModSceneMain.ModTool
         public override void OnShow()
         {
             model.curType = MapTypeForm.DataById[1];
+            model.curData = null;
             Refresh();
 
         }
@@ -275,6 +276,8 @@ namespace Ui.ModSceneMain.ModTool
 
             foreach (var data in MapTypeForm.DataById.Values)
             {
+                if (data.id == 3 || data.id == 1)
+                    continue;
                 conType.Add(new UiToolTypeItemParam()
                 {
                     data = data

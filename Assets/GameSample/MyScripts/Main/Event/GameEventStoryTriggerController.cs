@@ -1,37 +1,29 @@
 using Form;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
-using Z_DataSystem;
-using Z_DesignStyle;
-using Z_Map;
-using Z_UnitSystem;
-using Z_Debug;
-using Z_Code.Form;
-using Z_Ui.Notify;
-using Z_Text;
-using System;
 using Z_ByteSerialize;
 using Z_Code;
-using Unity.VisualScripting;
+using Z_Code.Form;
+using Z_DataSystem;
 using Z_DataSystem.Form;
-using Z_Time;
+using Z_Debug;
+using Z_DesignStyle;
+using Z_Map;
 using Z_Math;
-using System.Xml.Linq;
-using System.Linq;
+using Z_Text;
+using Z_Time;
+using Z_Ui.Notify;
+using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 
-public enum StoryLifeEventType
-{
-    FirstEnter = 0,
-    EverySecond = 1,
-    Leave = 2,
-}
-public class StoryLifeEvent : Z_Event
-{
-    public StoryLifeEventType type;
-}
+
 public enum CharacterSkillEventType
 {
     Use = 0,
@@ -58,14 +50,27 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
     {
         switch (evt.type)
         {
+            case StoryLifeEventType.Enter:
             case StoryLifeEventType.FirstEnter:
-                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onBeginEvent", null), 0, null);
+                _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onEnterEvent", null), 0, null);
                 break;
             case StoryLifeEventType.EverySecond:
                 _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onPerSecondEvent", null), 0, null);
                 break;
             case StoryLifeEventType.Leave:
+                _super.ClearScene();
                 _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv("onLeaveEvent", null), 0, null);
+                foreach (var data in UnitForm.DataByUid.Values)
+                {
+                    if (data.unit is MapUnit unit)
+                    {
+                        var unitEvt = unit.evtDic.GetDv("onLeaveSceneEvent", null);
+                        if (unitEvt != null)
+                        {
+                            _super.TriggerEventExecute(unitEvt, data.uid, null);
+                        }
+                    }
+                }
                 break;
         }
     }

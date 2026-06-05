@@ -228,22 +228,10 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {200001,new Data(200001,"floor","z_map_b$floor$0",0f,new List<string>(){"z_map_b$floor$0",},"",new Dictionary<string,EventTriggerForm.Data>(){})},
-
-                {200002,new Data(200002,"grass","z_map_b$grass$0",0f,new List<string>(){"z_map_b$grass$0",},"",new Dictionary<string,EventTriggerForm.Data>(){})},
-
-                {200003,new Data(200003,"road","z_map_b$road$0",0f,new List<string>(){"z_map_b$road$0",},"",new Dictionary<string,EventTriggerForm.Data>(){})},
-
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
                     _DataByName = new Dictionary<string, Data>() {
-    
-                        {"floor",_DataById[200001]},
-    
-                        {"grass",_DataById[200002]},
-    
-                        {"road",_DataById[200003]},
     
                     
                     };
@@ -254,15 +242,7 @@ namespace Form
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
-                            {"",new List<Data>()},
-        
                 };
-
-                    _DatasByLabel[""].Add(_DataById[200001]);
-
-                    _DatasByLabel[""].Add(_DataById[200002]);
-
-                    _DatasByLabel[""].Add(_DataById[200003]);
 
 
             childInitAction?.Invoke();

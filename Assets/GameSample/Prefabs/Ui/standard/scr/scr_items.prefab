@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -691.44, y: 0.00082402}
+  m_AnchoredPosition: {x: -691.44, y: 0.0008239746}
   m_SizeDelta: {x: 241.31, y: 754.47}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &44647669220062786
@@ -351,35 +351,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0.79062784
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0.8924511
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.23026635
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.08428201
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -223.2194
+      value: 9.457608
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.y
-      value: -65.8901
+      value: -8.849684
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -5.5956984
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 3.4480362
       objectReference: {fileID: 0}
     - target: {fileID: 6817592591530964852, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y

@@ -2,6 +2,7 @@ using Form;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Xml.Linq;
 using Ui.ModAssetSelectWindow;
@@ -57,7 +58,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                GameManager.instance.curStory.icon = data.name;
+                GameManager.instance.curStory.icon = data.GetBytes().ToList();
             },
             sizeLimit = new Vector2Int(400, 400)
         });
@@ -266,6 +267,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     MapTextureForm.DataByName[name].texsName.Add(data.name);
                 }
+                MapTextureForm.DataByName[name].icon = MapTextureForm.DataByName[name].texsName[0];
             },
             sizeLimit = new Vector2Int(100, 100)
         });
@@ -351,36 +353,34 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), MapModelForm.defaultData, lab, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic,""));
+        var modelData = MapModelForm.defaultData.Copy();
+        modelData.subUnitTexsName = new List<List<string>>() { new List<string>() };
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalNameHelper.GetDefaultTexName(), modelData, lab, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic,""));
     }
-    public void DeleteObjectUnit(string name, int id)
+    public void DeleteObjectUnitTex(string name, int texId)
     {
-
         var data = MapObjectForm.DataByName[name];
-        data.model.subPrefabUnitName.RemoveAt(id);
-        data.model.subPrefabUnitPos.RemoveAt(id);
-        data.model.subPrefabUnitScale.RemoveAt(id);
-        data.model.subUnitTexsName.RemoveAt(id);
+        data.model.subUnitTexsName[0].RemoveAt(texId);
     }
-    public void CreateObjectUnit(MapObjectForm.Data data)
+    public void CreateObjectUnitTex(int uid)
     {
-        data.model.subPrefabUnitName.Add("Cube");
-        data.model.subPrefabUnitPos.Add(Vector3.zero);
-        data.model.subPrefabUnitScale.Add(Vector3.one);
+        var data = MapObjectForm.DataById[uid];
+        data.model.subUnitTexsName[0].Add(null);
     }
-    public void ImportObjectUnitTex(int uid, int id)
+    public void ImportObjectUnitTex(int uid, int texId)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
             onComplete = (data) =>
             {
-                if (MapObjectForm.DataById[uid].model.subUnitTexsName.Count > id)
+                var model = MapObjectForm.DataById[uid].model;
+                if (model.subUnitTexsName[0].Count > texId)
                 {
-                    MapObjectForm.DataById[uid].model.subUnitTexsName[id] = data.name;
+                    model.subUnitTexsName[0][texId] = data.name;
                 }
                 else
                 {
-                    MapObjectForm.DataById[uid].model.subUnitTexsName.Add(data.name);
+                    model.subUnitTexsName[0].Add(data.name);
                 }
             },
             sizeLimit = new Vector2Int(100, 100)
@@ -989,35 +989,31 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         ItemProductForm.RemoveData(ItemProductForm.DataByUid[itemUid].uid);
     }
 
-    public void DeleteItemModelUnit(int itemUid, int id)
+    public void DeleteItemModelUnitTex(int itemUid, int texId)
     {
-
         var data = ItemProductForm.DataByUid[itemUid];
-        data.model.subPrefabUnitName.RemoveAt(id);
-        data.model.subPrefabUnitPos.RemoveAt(id);
-        data.model.subPrefabUnitScale.RemoveAt(id);
-        data.model.subUnitTexsName.RemoveAt(id);
+        data.model.subUnitTexsName[0].RemoveAt(texId);
     }
-    public void CreateItemModelUnit(ItemProductForm.Data data)
+    public void CreateItemModelUnitTex(int itemUid)
     {
-        data.model.subPrefabUnitName.Add("Cube");
-        data.model.subPrefabUnitPos.Add(Vector3.zero);
-        data.model.subPrefabUnitScale.Add(Vector3.one);
+        var data = ItemProductForm.DataByUid[itemUid];
+        data.model.subUnitTexsName[0].Add(null);
     }
-    public void ImportItemModelUnitTex(int itemUid, int id)
+    public void ImportItemModelUnitTex(int itemUid, int texId)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
             onComplete = (data) =>
             {
                 var itemData = ItemProductForm.DataByUid[itemUid];
-                if (itemData.model.subUnitTexsName.Count > id)
+                var model = itemData.model;
+                if (model.subUnitTexsName[0].Count > texId)
                 {
-                    itemData.model.subUnitTexsName[id] = data.name;
+                    model.subUnitTexsName[0][texId] = data.name;
                 }
                 else
                 {
-                    itemData.model.subUnitTexsName.Add(data.name);
+                    model.subUnitTexsName[0].Add(data.name);
                 }
             },
             sizeLimit = new Vector2Int(100, 100)

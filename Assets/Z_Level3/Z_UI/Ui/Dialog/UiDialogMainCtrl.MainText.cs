@@ -57,7 +57,7 @@ namespace Ui.DialogMain
                     model.isDisplaying = true;
                     model.nowWord = 0;
                     view.txt_.text = "";
-                    
+
                     Display();
 
                 }
@@ -120,7 +120,8 @@ namespace Ui.DialogMain
                         }
                         break;
                     case PlayType.ClipMainTextOver:
-                        if (model.nowWord < model.prm.clip.mainText.Length)
+
+                        if (model.prm.clip.mainText == null && model.nowWord < model.prm.clip.mainText.Length)
                         {
                             while (model.nowWord < model.prm.clip.mainText.Length)
                             {
@@ -131,6 +132,9 @@ namespace Ui.DialogMain
                         {
                             DelayForOver(0);
                         }
+                        break;
+                    case PlayType.ClipVideoOver:
+                        DelayForOver(0);
                         break;
                 }
             }

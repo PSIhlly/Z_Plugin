@@ -1,4 +1,5 @@
 using UnityEngine;
+using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
@@ -13,6 +14,7 @@ namespace Z_Map
         }
         private float degree = 0;
 
+        public Timer[] animTimer = new Timer[3];
         private PerspectiveKeeper[] _keepers;
         public PerspectiveKeeper[] keepers
         {

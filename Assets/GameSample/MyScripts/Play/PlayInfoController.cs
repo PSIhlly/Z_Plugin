@@ -58,7 +58,8 @@ public enum StoryCharacterEventType
 {
     ParamChange,
     SkillParamChange,
-    ChangeCharacter
+    ChangeCharacter,
+    ChangeTeamer
 }
 public class StoryCharacterEvent : Z_Event
 {
@@ -96,6 +97,8 @@ public interface ExternalPlayInfoController
     public void UseSkill(int characterUid, int skillUid, bool ignoreCd);
 
     public void ChooseCurrentCharacter(int characterUid);
+    public void ReplaceActiveTeamer(int oldUid, int newUid, int index);
+    public void ReplaceTeamer(int activeTeamerUid, int newUid);
 }
 public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>, IZ_Listener<MissionEvent>
 {
@@ -566,6 +569,39 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
                 data = ch
             });
         }
+    }
+
+    public void ReplaceActiveTeamer(int oldUid, int newUid, int index)
+    {
+        var teamActive = GameManager.instance.curProgress.teamActive;
+        if (oldUid == 0)
+        {
+            teamActive.Insert(index, newUid);
+        }
+        else
+        {
+            teamActive[index] = newUid;
+        }
+        Z_EventHelper.Invoke(new StoryCharacterEvent()
+        {
+            type = StoryCharacterEventType.ChangeTeamer,
+            data = CharacterProductForm.DataByUid.GetDv(newUid, null)
+        });
+    }
+
+    public void ReplaceTeamer(int activeTeamerUid, int newUid)
+    {
+        var teamActive = GameManager.instance.curProgress.teamActive;
+        var idx = teamActive.IndexOf(activeTeamerUid);
+        if (idx >= 0)
+        {
+            teamActive[idx] = newUid;
+        }
+        Z_EventHelper.Invoke(new StoryCharacterEvent()
+        {
+            type = StoryCharacterEventType.ChangeTeamer,
+            data = CharacterProductForm.DataByUid.GetDv(newUid, null)
+        });
     }
 
     public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act)

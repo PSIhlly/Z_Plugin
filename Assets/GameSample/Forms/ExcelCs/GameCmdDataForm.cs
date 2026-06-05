@@ -302,189 +302,193 @@ namespace Form
 
                 {100009,new Data(100009,"ShowDialog",new List<string>(){"background","avatar","title","content",},new List<string>(){"img","img","string","string",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0}","ShowDialog(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\");","ui","dialog",EditorStyle.Avg,"")},
 
-                {100010,new Data(100010,"ShowEffect",new List<string>(){"effect","pos","angle",},new List<string>(){"effect","vector","num",},null,new List<string>(){"void",},"Show Effect{0} {1} , angle{2}","ShowEffect(\"$ef$$ef$\",NewVector(1,1,0),0);","effect","system",EditorStyle.RpgAdvanced,"")},
+                {100010,new Data(100010,"ShowDialogWithIllustration",new List<string>(){"background","avatar","title","content","illustration","x","y","scale",},new List<string>(){"img","img","string","string","img","num","num","num",},null,new List<string>(){"void",},"Show Dialog{1}{2}:{3} bg:{0} (illustration:{4} pos x:{5} y:{6} scale:{7})","ShowDialogWithIllustration(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\",\"$i$$i$\",0.5,0.5,1)","ui","dialog",EditorStyle.AvgAdvanced,"")},
 
-                {100011,new Data(100011,"ShowVideo",new List<string>(){"video","loadingBackground",},new List<string>(){"video","img",},null,new List<string>(){"void",},"Show video{0} loading bg:{1}","ShowVideo(\"$v$$v$\",\"$i$$i$\");","ui","dialog",EditorStyle.AvgAdvanced,"")},
+                {100011,new Data(100011,"ShowEffect",new List<string>(){"effect","pos","angle",},new List<string>(){"effect","vector","num",},null,new List<string>(){"void",},"Show Effect{0} {1} , angle{2}","ShowEffect(\"$ef$$ef$\",NewVector(1,1,0),0);","effect","system",EditorStyle.RpgAdvanced,"")},
 
-                {100012,new Data(100012,"ShowImage",new List<string>(){"image","scale","showTime",},new List<string>(){"img","num","num",},new List<string>(){"image",},new List<string>(){"uiImg",},"Show Image:{0} ,scale {1}, last {2} seconds","ShowImage(\"$i$$i$\",1,1)","ui","image",EditorStyle.Avg,"image = ")},
+                {100012,new Data(100012,"ShowVideo",new List<string>(){"video","loadingBackground",},new List<string>(){"video","img",},null,new List<string>(){"void",},"Show video{0} loading bg:{1}","ShowVideo(\"$v$$v$\",\"$i$$i$\");","ui","dialog",EditorStyle.AvgAdvanced,"")},
 
-                {100013,new Data(100013,"ShowImagePermanently",new List<string>(){"image","scale",},new List<string>(){"img","num",},new List<string>(){"image",},new List<string>(){"uiImg",},"Show Image Permanently {0},scale {1}","ShowImagePermanently(\"$i$$i$\",1)","ui","image",EditorStyle.Avg,"image = ")},
+                {100013,new Data(100013,"ShowImage",new List<string>(){"image","scale","showTime",},new List<string>(){"img","num","num",},new List<string>(){"image",},new List<string>(){"uiImg",},"Show Image:{0} ,scale {1}, last {2} seconds","ShowImage(\"$i$$i$\",1,1)","ui","image",EditorStyle.Avg,"image = ")},
 
-                {100014,new Data(100014,"DeleteImage",new List<string>(){"image","afterTime",},new List<string>(){"uiImg","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(image,1);","ui","image",EditorStyle.Avg,"")},
+                {100014,new Data(100014,"ShowImagePermanently",new List<string>(){"image","scale",},new List<string>(){"img","num",},new List<string>(){"image",},new List<string>(){"uiImg",},"Show Image Permanently {0},scale {1}","ShowImagePermanently(\"$i$$i$\",1)","ui","image",EditorStyle.Avg,"image = ")},
 
-                {100015,new Data(100015,"SetImagePosition",new List<string>(){"image","x","y","transitionTime",},new List<string>(){"uiImg","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePosition(image,0.5,0.5,1);","ui","image",EditorStyle.AvgAdvanced,"")},
+                {100015,new Data(100015,"DeleteImage",new List<string>(){"image","afterTime",},new List<string>(){"uiImg","num",},null,new List<string>(){"void",},"Delete Image {0}  after {1} seconds","DeleteImage(image,1);","ui","image",EditorStyle.Avg,"")},
 
-                {100016,new Data(100016,"SetImageOpacity",new List<string>(){"image","opacity","transitionTime",},new List<string>(){"uiImg","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(image,1,1);","ui","image",EditorStyle.AvgAdvanced,"")},
+                {100016,new Data(100016,"SetImagePosition",new List<string>(){"image","x","y","transitionTime",},new List<string>(){"uiImg","num","num","num",},null,new List<string>(){"void",},"Set Image{0}: x {1} y {2} ,transition takes {3} seconds","SetImagePosition(image,0.5,0.5,1);","ui","image",EditorStyle.AvgAdvanced,"")},
 
-                {100017,new Data(100017,"SetImageRotate",new List<string>(){"image","angle","transitionTime",},new List<string>(){"uiImg","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(image,0,1);","ui","image",EditorStyle.AvgAdvanced,"")},
+                {100017,new Data(100017,"SetImageOpacity",new List<string>(){"image","opacity","transitionTime",},new List<string>(){"uiImg","num","num",},null,new List<string>(){"void",},"Set Image{0}: opacity {1},transition takes {2} seconds","SetImageOpacity(image,1,1);","ui","image",EditorStyle.AvgAdvanced,"")},
 
-                {100018,new Data(100018,"Add",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 + 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100018,new Data(100018,"SetImageRotate",new List<string>(){"image","angle","transitionTime",},new List<string>(){"uiImg","num","num",},null,new List<string>(){"void",},"Set Image{0}: angle {1},transition takes {2} seconds","SetImageRotate(image,0,1);","ui","image",EditorStyle.AvgAdvanced,"")},
 
-                {100019,new Data(100019,"Subtract",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 - 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100019,new Data(100019,"Add",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 + 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100020,new Data(100020,"Multiply",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 * 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100020,new Data(100020,"Subtract",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 - 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100021,new Data(100021,"Divide",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 / 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100021,new Data(100021,"Multiply",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 * 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100022,new Data(100022,"Wait",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Wait {0} seconds","Wait(1);","basic","process",EditorStyle.AvgAdvanced,"")},
+                {100022,new Data(100022,"Divide",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","1 / 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100023,new Data(100023,"If",null,null,null,new List<string>(){"void",},"","if(1){ }else{ }","basic","process",EditorStyle.AvgAdvanced,"")},
+                {100023,new Data(100023,"Wait",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Wait {0} seconds","Wait(1);","basic","process",EditorStyle.AvgAdvanced,"")},
 
-                {100024,new Data(100024,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i=i+1){ }","basic","process",EditorStyle.AvgAdvanced,"")},
+                {100024,new Data(100024,"If",null,null,null,new List<string>(){"void",},"","if(1){ }else{ }","basic","process",EditorStyle.AvgAdvanced,"")},
 
-                {100025,new Data(100025,"Greater",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 > 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100025,new Data(100025,"For",null,null,null,new List<string>(){"void",},"","for(i=1;i<5;i=i+1){ }","basic","process",EditorStyle.AvgAdvanced,"")},
 
-                {100026,new Data(100026,"Less",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 < 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100026,new Data(100026,"Greater",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 > 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100027,new Data(100027,"Equal",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 == 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100027,new Data(100027,"Less",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 < 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100028,new Data(100028,"NotEqual",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 != 1","basic","math",EditorStyle.AvgAdvanced,"")},
+                {100028,new Data(100028,"Equal",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 == 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100029,new Data(100029,"Pause",null,null,null,new List<string>(){"void",},"Pause","Pause();","basic","process",EditorStyle.Rpg,"")},
+                {100029,new Data(100029,"NotEqual",new List<string>(){"num","num",},new List<string>(){"num","num",},new List<string>(){"resault",},new List<string>(){"num",},"","0 != 1","basic","math",EditorStyle.AvgAdvanced,"")},
 
-                {100030,new Data(100030,"Continue",null,null,null,new List<string>(){"void",},"Continue","Continue();","basic","process",EditorStyle.Rpg,"")},
+                {100030,new Data(100030,"Pause",null,null,null,new List<string>(){"void",},"Pause","Pause();","basic","process",EditorStyle.Rpg,"")},
 
-                {100031,new Data(100031,"GameOver",null,null,null,new List<string>(){"void",},"Game over","GameOver();","basic","process",EditorStyle.Avg,"")},
+                {100031,new Data(100031,"Continue",null,null,null,new List<string>(){"void",},"Continue","Continue();","basic","process",EditorStyle.Rpg,"")},
 
-                {100032,new Data(100032,"Save",null,null,null,new List<string>(){"void",},"Save","Save();","basic","process",EditorStyle.Avg,"")},
+                {100032,new Data(100032,"GameOver",null,null,null,new List<string>(){"void",},"Game over","GameOver();","basic","process",EditorStyle.Avg,"")},
 
-                {100033,new Data(100033,"Load",null,null,null,new List<string>(){"void",},"Load","Load();","basic","process",EditorStyle.Avg,"")},
+                {100033,new Data(100033,"Save",null,null,null,new List<string>(){"void",},"Save","Save();","basic","process",EditorStyle.Avg,"")},
 
-                {100034,new Data(100034,"DestroyObject",new List<string>(){"object",},new List<string>(){"sceneObject",},null,new List<string>(){"void",},"object {0}: Destroy","DestroyObject(self);","sceneObject","system",EditorStyle.Rpg,"")},
+                {100034,new Data(100034,"Load",null,null,null,new List<string>(){"void",},"Load","Load();","basic","process",EditorStyle.Avg,"")},
 
-                {100035,new Data(100035,"GenerateObject",new List<string>(){"name","pos",},new List<string>(){"string","vector",},new List<string>(){"new Object",},new List<string>(){"sceneObject",},"object name {0}: Generate at coordinates({1}):","GenerateObject(\"empty\",NewVector(0,0,0))","sceneObject","system",EditorStyle.Rpg,"newObject = ")},
+                {100035,new Data(100035,"DestroyObject",new List<string>(){"object",},new List<string>(){"sceneObject",},null,new List<string>(){"void",},"object {0}: Destroy","DestroyObject(self);","sceneObject","system",EditorStyle.Rpg,"")},
 
-                {100036,new Data(100036,"MoveObjectRelative",new List<string>(){"object","pos","transitionTime",},new List<string>(){"sceneObject","vector","num",},null,new List<string>(){"void",},"object {0} : Move to relative coordinates({1}), last {2} seconds","MoveObjectRelative(self,NewVector(1,1,0),1);","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100036,new Data(100036,"GenerateObject",new List<string>(){"name","pos",},new List<string>(){"string","vector",},new List<string>(){"new Object",},new List<string>(){"sceneObject",},"object name {0}: Generate at coordinates({1}):","GenerateObject(\"empty\",NewVector(0,0,0))","sceneObject","system",EditorStyle.Rpg,"newObject = ")},
 
-                {100037,new Data(100037,"MoveObject",new List<string>(){"object","pos","transitionTime",},new List<string>(){"sceneObject","vector","num",},null,new List<string>(){"void",},"object {0} : Move to absolute coordinates({1}), last {2} seconds","MoveObject(self,NewVector(1,1,0),1);","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100037,new Data(100037,"MoveObjectRelative",new List<string>(){"object","pos","transitionTime",},new List<string>(){"sceneObject","vector","num",},null,new List<string>(){"void",},"object {0} : Move to relative coordinates({1}), last {2} seconds","MoveObjectRelative(self,NewVector(1,1,0),1);","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100038,new Data(100038,"GainItem",new List<string>(){"item","amount",},new List<string>(){"item","num",},null,new List<string>(){"void",},"Gain {0} x {1}","GainItem(\"empty\",1);","item","backpack",EditorStyle.Rpg,"")},
+                {100038,new Data(100038,"MoveObject",new List<string>(){"object","pos","transitionTime",},new List<string>(){"sceneObject","vector","num",},null,new List<string>(){"void",},"object {0} : Move to absolute coordinates({1}), last {2} seconds","MoveObject(self,NewVector(1,1,0),1);","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100039,new Data(100039,"LostItem",new List<string>(){"item","amount",},new List<string>(){"item","num",},null,new List<string>(){"void",},"Lost {0} x {1}","LostItem(\"empty\",1);","item","backpack",EditorStyle.Rpg,"")},
+                {100039,new Data(100039,"GainItem",new List<string>(){"item","amount",},new List<string>(){"item","num",},null,new List<string>(){"void",},"Gain {0} x {1}","GainItem(\"empty\",1);","item","backpack",EditorStyle.Rpg,"")},
 
-                {100040,new Data(100040,"SetCharacterParameter",new List<string>(){"character","paramName","value",},new List<string>(){"character","string","var",},null,new List<string>(){"void",},"Set Character {0} 's {1} = {2}","SetCharacterParameter(self,\"empty\",1);","character","parameter",EditorStyle.Rpg,"")},
+                {100040,new Data(100040,"LostItem",new List<string>(){"item","amount",},new List<string>(){"item","num",},null,new List<string>(){"void",},"Lost {0} x {1}","LostItem(\"empty\",1);","item","backpack",EditorStyle.Rpg,"")},
 
-                {100041,new Data(100041,"GetCurrentCharacter",null,null,new List<string>(){"character",},new List<string>(){"character",},"Get currently used character","GetCurrentCharacter()","character","system",EditorStyle.Rpg,"")},
+                {100041,new Data(100041,"SetCharacterParameter",new List<string>(){"character","paramName","value",},new List<string>(){"character","string","var",},null,new List<string>(){"void",},"Set Character {0} 's {1} = {2}","SetCharacterParameter(self,\"empty\",1);","character","parameter",EditorStyle.Rpg,"")},
 
-                {100042,new Data(100042,"MoveCharacterRelative",new List<string>(){"character","pos","transitionTime",},new List<string>(){"character","vector","num",},null,new List<string>(){"void",},"character {0} : Move to relative coordinates({1}),last {2} seconds","MoveCharacterRelative(self,NewVector(1,1,0),1);","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100042,new Data(100042,"GetCurrentCharacter",null,null,new List<string>(){"character",},new List<string>(){"character",},"Get currently used character","GetCurrentCharacter()","character","system",EditorStyle.Rpg,"")},
 
-                {100043,new Data(100043,"MoveCharacter",new List<string>(){"character","pos","transitionTime",},new List<string>(){"character","vector","num",},null,new List<string>(){"void",},"character {0} : Move to absolute coordinates({1}),last {2} seconds","MoveCharacter(self,NewVector(1,1,0),1);","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100043,new Data(100043,"MoveCharacterRelative",new List<string>(){"character","pos","transitionTime",},new List<string>(){"character","vector","num",},null,new List<string>(){"void",},"character {0} : Move to relative coordinates({1}),last {2} seconds","MoveCharacterRelative(self,NewVector(1,1,0),1);","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100044,new Data(100044,"SetCharacterNavigateRelative",new List<string>(){"character","pos",},new List<string>(){"num","vector",},null,new List<string>(){"void",},"character {0} : Navigate to relative coordinates({1})","SetCharacterNavigateRelative(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100044,new Data(100044,"MoveCharacter",new List<string>(){"character","pos","transitionTime",},new List<string>(){"character","vector","num",},null,new List<string>(){"void",},"character {0} : Move to absolute coordinates({1}),last {2} seconds","MoveCharacter(self,NewVector(1,1,0),1);","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100045,new Data(100045,"SetCharacterNavigate",new List<string>(){"character","pos",},new List<string>(){"num","vector",},null,new List<string>(){"void",},"character {0} : Navigate to absolute coordinates({1})","SetCharacterNavigate(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100045,new Data(100045,"SetCharacterNavigateRelative",new List<string>(){"character","pos",},new List<string>(){"num","vector",},null,new List<string>(){"void",},"character {0} : Navigate to relative coordinates({1})","SetCharacterNavigateRelative(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100046,new Data(100046,"GetCharacterPosition",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"pos",},new List<string>(){"vector",},"character {0} position","GetCharacterPosition(self)","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100046,new Data(100046,"SetCharacterNavigate",new List<string>(){"character","pos",},new List<string>(){"num","vector",},null,new List<string>(){"void",},"character {0} : Navigate to absolute coordinates({1})","SetCharacterNavigate(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100047,new Data(100047,"NewVector",new List<string>(){"x","y","height",},new List<string>(){"num","num","num",},new List<string>(){"vector",},new List<string>(){"vector",},"vector({0},{1},{2})","NewVector(0,0,0);","basic","const",EditorStyle.RpgAdvanced,"")},
+                {100047,new Data(100047,"GetCharacterPosition",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"pos",},new List<string>(){"vector",},"character {0} position","GetCharacterPosition(self)","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100048,new Data(100048,"StopCharacterNavigate",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0} : Navigate stop","StopCharacterNavigate(self)","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100048,new Data(100048,"NewVector",new List<string>(){"x","y","height",},new List<string>(){"num","num","num",},new List<string>(){"vector",},new List<string>(){"vector",},"vector({0},{1},{2})","NewVector(0,0,0);","basic","const",EditorStyle.RpgAdvanced,"")},
 
-                {100049,new Data(100049,"SetCharacterPositionRelative",new List<string>(){"character","pos",},new List<string>(){"character","vector",},null,new List<string>(){"void",},"character {0} : Set relative position ({1})","SetCharacterPositionRelative(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100049,new Data(100049,"StopCharacterNavigate",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0} : Navigate stop","StopCharacterNavigate(self)","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100050,new Data(100050,"SetCharacterPosition",new List<string>(){"character","pos",},new List<string>(){"character","vector",},null,new List<string>(){"void",},"character {0} : Set absolute position ({1})","SetCharacterPosition(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
+                {100050,new Data(100050,"SetCharacterPositionRelative",new List<string>(){"character","pos",},new List<string>(){"character","vector",},null,new List<string>(){"void",},"character {0} : Set relative position ({1})","SetCharacterPositionRelative(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100051,new Data(100051,"GetCharacterParameter",new List<string>(){"character","paramName",},new List<string>(){"character","string",},new List<string>(){"value",},new List<string>(){"var",},"Get Character {0} 's {1}","GetCharacterParameter(self,\"empty\")","character","parameter",EditorStyle.Rpg,"")},
+                {100051,new Data(100051,"SetCharacterPosition",new List<string>(){"character","pos",},new List<string>(){"character","vector",},null,new List<string>(){"void",},"character {0} : Set absolute position ({1})","SetCharacterPosition(self,NewVector(1,1,0));","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100052,new Data(100052,"SelfSceneObject",null,null,null,new List<string>(){"sceneObject",},"","self","sceneObject","system",EditorStyle.Rpg,"")},
+                {100052,new Data(100052,"GetCharacterParameter",new List<string>(){"character","paramName",},new List<string>(){"character","string",},new List<string>(){"value",},new List<string>(){"var",},"Get Character {0} 's {1}","GetCharacterParameter(self,\"empty\")","character","parameter",EditorStyle.Rpg,"")},
 
-                {100053,new Data(100053,"TriggerTargetSceneObject",null,null,null,new List<string>(){"sceneObject",},"","target","sceneObject","system",EditorStyle.Rpg,"")},
+                {100053,new Data(100053,"SelfSceneObject",null,null,null,new List<string>(){"sceneObject",},"","self","sceneObject","system",EditorStyle.Rpg,"")},
 
-                {100054,new Data(100054,"SelfCharacter",null,null,null,new List<string>(){"character",},"","self","character","system",EditorStyle.Rpg,"")},
+                {100054,new Data(100054,"TriggerTargetSceneObject",null,null,null,new List<string>(){"sceneObject",},"","target","sceneObject","system",EditorStyle.Rpg,"")},
 
-                {100055,new Data(100055,"TriggerTargetCharacter",null,null,null,new List<string>(){"character",},"","target","character","system",EditorStyle.Rpg,"")},
+                {100055,new Data(100055,"SelfCharacter",null,null,null,new List<string>(){"character",},"","self","character","system",EditorStyle.Rpg,"")},
 
-                {100056,new Data(100056,"Return",new List<string>(){"result",},new List<string>(){"var",},null,new List<string>(){"void",},"return {0}","Return result;","basic","process",EditorStyle.Avg,"")},
+                {100056,new Data(100056,"TriggerTargetCharacter",null,null,null,new List<string>(){"character",},"","target","character","system",EditorStyle.Rpg,"")},
 
-                {100057,new Data(100057,"GetSceneObjectParameter",new List<string>(){"sceneObject","paramName",},new List<string>(){"sceneObject","string",},new List<string>(){"value",},new List<string>(){"var",},"Get scene object {0} 's {1}","GetSceneObjectParameter(self,\"empty\")","sceneObject","parameter",EditorStyle.Rpg,"")},
+                {100057,new Data(100057,"Return",new List<string>(){"result",},new List<string>(){"var",},null,new List<string>(){"void",},"return {0}","Return result;","basic","process",EditorStyle.Avg,"")},
 
-                {100058,new Data(100058,"SetSceneObjectParameter",new List<string>(){"sceneObject","paramName","value",},new List<string>(){"sceneObject","string","var",},null,new List<string>(){"void",},"Set scene object {0} 's {1} = {2}","SetSceneObjectParameter(self,\"empty\",1);","sceneObject","parameter",EditorStyle.Rpg,"")},
+                {100058,new Data(100058,"GetSceneObjectParameter",new List<string>(){"sceneObject","paramName",},new List<string>(){"sceneObject","string",},new List<string>(){"value",},new List<string>(){"var",},"Get scene object {0} 's {1}","GetSceneObjectParameter(self,\"empty\")","sceneObject","parameter",EditorStyle.Rpg,"")},
 
-                {100059,new Data(100059,"GetCharacterRotation",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"angle",},new List<string>(){"num",},"character {0} rotation","GetCharacterRotation(self)","character","transform",EditorStyle.Rpg,"")},
+                {100059,new Data(100059,"SetSceneObjectParameter",new List<string>(){"sceneObject","paramName","value",},new List<string>(){"sceneObject","string","var",},null,new List<string>(){"void",},"Set scene object {0} 's {1} = {2}","SetSceneObjectParameter(self,\"empty\",1);","sceneObject","parameter",EditorStyle.Rpg,"")},
 
-                {100060,new Data(100060,"SetCharacterRotation",new List<string>(){"character","angle","transitionTime",},new List<string>(){"character","num","num",},null,new List<string>(){"void",},"Set character {0} rotation ={1}","SetCharacterRotation(self,180,0);","character","transform",EditorStyle.Rpg,"")},
+                {100060,new Data(100060,"GetCharacterRotation",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"angle",},new List<string>(){"num",},"character {0} rotation","GetCharacterRotation(self)","character","transform",EditorStyle.Rpg,"")},
 
-                {100061,new Data(100061,"GetCharacterForwardVector",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"direction",},new List<string>(){"vector",},"character {0} forward vector","GetCharacterForwardVector(self)","character","transform",EditorStyle.Rpg,"")},
+                {100061,new Data(100061,"SetCharacterRotation",new List<string>(){"character","angle","transitionTime",},new List<string>(){"character","num","num",},null,new List<string>(){"void",},"Set character {0} rotation ={1}","SetCharacterRotation(self,180,0);","character","transform",EditorStyle.Rpg,"")},
 
-                {100062,new Data(100062,"GetObjectRotation",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"angle",},new List<string>(){"num",},"scene object {0} rotation","GetObjectRotation(self)","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100062,new Data(100062,"GetCharacterForwardVector",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"direction",},new List<string>(){"vector",},"character {0} forward vector","GetCharacterForwardVector(self)","character","transform",EditorStyle.Rpg,"")},
 
-                {100063,new Data(100063,"SetObjectRotation",new List<string>(){"sceneObject","angle","transitionTime",},new List<string>(){"sceneObject","num","num",},null,new List<string>(){"void",},"Set scene object {0} rotation ={1}, last {2} seconds","SetObjectRotation(self,180,0);","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100063,new Data(100063,"GetObjectRotation",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"angle",},new List<string>(){"num",},"scene object {0} rotation","GetObjectRotation(self)","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100064,new Data(100064,"GetObjectForwardVector",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"direction",},new List<string>(){"vector",},"scene Object {0} forward vector","GetObjectForwardVector(self)","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100064,new Data(100064,"SetObjectRotation",new List<string>(){"sceneObject","angle","transitionTime",},new List<string>(){"sceneObject","num","num",},null,new List<string>(){"void",},"Set scene object {0} rotation ={1}, last {2} seconds","SetObjectRotation(self,180,0);","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100065,new Data(100065,"IsObjectEnableCollision",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"enabled",},new List<string>(){"num",},"scene Object {0} collision is enabled?","IsObjectEnableCollision(self)","sceneObject","system",EditorStyle.Rpg,"")},
+                {100065,new Data(100065,"GetObjectForwardVector",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"direction",},new List<string>(){"vector",},"scene Object {0} forward vector","GetObjectForwardVector(self)","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100066,new Data(100066,"GetCharacterRightVector",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"direction",},new List<string>(){"vector",},"character {0} right vector","GetCharacterRightVector(self)","character","transform",EditorStyle.Rpg,"")},
+                {100066,new Data(100066,"IsObjectEnableCollision",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"enabled",},new List<string>(){"num",},"scene Object {0} collision is enabled?","IsObjectEnableCollision(self)","sceneObject","system",EditorStyle.Rpg,"")},
 
-                {100067,new Data(100067,"GetObjectRightVector",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"direction",},new List<string>(){"vector",},"scene Object {0} right vector","GetObjectRightVector(self)","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100067,new Data(100067,"GetCharacterRightVector",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"direction",},new List<string>(){"vector",},"character {0} right vector","GetCharacterRightVector(self)","character","transform",EditorStyle.Rpg,"")},
 
-                {100068,new Data(100068,"IsObjectActive",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"active",},new List<string>(){"num",},"scene Object {0} is active?","IsObjectActive(self)","sceneObject","system",EditorStyle.Rpg,"")},
+                {100068,new Data(100068,"GetObjectRightVector",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"direction",},new List<string>(){"vector",},"scene Object {0} right vector","GetObjectRightVector(self)","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100069,new Data(100069,"IsCharacterActive",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"active",},new List<string>(){"num",},"character {0} is active?","IsCharacterActive(self)","character","transform",EditorStyle.Rpg,"")},
+                {100069,new Data(100069,"IsObjectActive",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"active",},new List<string>(){"num",},"scene Object {0} is active?","IsObjectActive(self)","sceneObject","system",EditorStyle.Rpg,"")},
 
-                {100070,new Data(100070,"ChangeBgm",new List<string>(){"bgm",},new List<string>(){"audio",},null,new List<string>(){"void",},"Bgm change to {0}","ChangeBgm(\"$a$$a$\");","basic","audio",EditorStyle.Avg,"")},
+                {100070,new Data(100070,"IsCharacterActive",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"active",},new List<string>(){"num",},"character {0} is active?","IsCharacterActive(self)","character","transform",EditorStyle.Rpg,"")},
 
-                {100071,new Data(100071,"CharacterPlayAnim",new List<string>(){"character","animName",},new List<string>(){"character","string",},null,new List<string>(){"void",},"Character {0} Play animation: {1}","CharacterPlayAnim(self,\"empty\");","character","anim",EditorStyle.Rpg,"")},
+                {100071,new Data(100071,"ChangeBgm",new List<string>(){"bgm",},new List<string>(){"audio",},null,new List<string>(){"void",},"Bgm change to {0}","ChangeBgm(\"$a$$a$\");","basic","audio",EditorStyle.Avg,"")},
 
-                {100072,new Data(100072,"CharacterStun",new List<string>(){"character","time",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0} stun {1} s","CharacterStun(self,1);","character","anim",EditorStyle.Rpg,"")},
+                {100072,new Data(100072,"CharacterPlayAnim",new List<string>(){"character","animName",},new List<string>(){"character","string",},null,new List<string>(){"void",},"Character {0} Play animation: {1}","CharacterPlayAnim(self,\"empty\");","character","anim",EditorStyle.Rpg,"")},
 
-                {100073,new Data(100073,"GetSkillParameter",new List<string>(){"skill","paramName",},new List<string>(){"skill","string",},new List<string>(){"value",},new List<string>(){"var",},"Get skill {0} 's {1}","GetSkillParameter(self,\"empty\")","skill","parameter",EditorStyle.Rpg,"")},
+                {100073,new Data(100073,"CharacterStun",new List<string>(){"character","time",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0} stun {1} s","CharacterStun(self,1);","character","anim",EditorStyle.Rpg,"")},
 
-                {100074,new Data(100074,"SetSkillParameter",new List<string>(){"skill","paramName","value",},new List<string>(){"skill","string","var",},null,new List<string>(){"void",},"Set skill {0} 's {1} = {2}","SetSkillParameter(self,\"empty\",1);","skill","parameter",EditorStyle.Rpg,"")},
+                {100074,new Data(100074,"GetSkillParameter",new List<string>(){"skill","paramName",},new List<string>(){"skill","string",},new List<string>(){"value",},new List<string>(){"var",},"Get skill {0} 's {1}","GetSkillParameter(self,\"empty\")","skill","parameter",EditorStyle.Rpg,"")},
 
-                {100075,new Data(100075,"TargetSkill",null,null,null,new List<string>(){"skill",},"","target","skill","system",EditorStyle.Rpg,"")},
+                {100075,new Data(100075,"SetSkillParameter",new List<string>(){"skill","paramName","value",},new List<string>(){"skill","string","var",},null,new List<string>(){"void",},"Set skill {0} 's {1} = {2}","SetSkillParameter(self,\"empty\",1);","skill","parameter",EditorStyle.Rpg,"")},
 
-                {100076,new Data(100076,"Effect",null,null,null,new List<string>(){"effect",},"","\"$ef$$ef$\"","basic","const",EditorStyle.Rpg,"")},
+                {100076,new Data(100076,"TargetSkill",null,null,null,new List<string>(){"skill",},"","target","skill","system",EditorStyle.Rpg,"")},
 
-                {100077,new Data(100077,"ParameterDelta",null,null,null,new List<string>(){"var",},"","delta","character","parameter",EditorStyle.Rpg,"")},
+                {100077,new Data(100077,"Effect",null,null,null,new List<string>(){"effect",},"","\"$ef$$ef$\"","basic","const",EditorStyle.Rpg,"")},
 
-                {100078,new Data(100078,"FloatingText",new List<string>(){"content","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Floating text: {0} at pos {1}","FloatingText(\"empty\",NewVector(1,1,0));","ui","notice",EditorStyle.Rpg,"")},
+                {100078,new Data(100078,"ParameterDelta",null,null,null,new List<string>(){"var",},"","delta","character","parameter",EditorStyle.Rpg,"")},
 
-                {100079,new Data(100079,"UseSkill",new List<string>(){"character","skill","ignoreCd",},new List<string>(){"character","skill","num",},null,new List<string>(){"void",},"Character {0} use skill {1},ignoreCd? {2}","UseSkill(self,\"$sk$$sk$\",0);","character","skill",EditorStyle.Rpg,"")},
+                {100079,new Data(100079,"FloatingText",new List<string>(){"content","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Floating text: {0} at pos {1}","FloatingText(\"empty\",NewVector(1,1,0));","ui","notice",EditorStyle.Rpg,"")},
 
-                {100080,new Data(100080,"Skill",null,null,null,new List<string>(){"skill",},"","\"$sk$$sk$\"","basic","const",EditorStyle.Rpg,"")},
+                {100080,new Data(100080,"UseSkill",new List<string>(){"character","skill","ignoreCd",},new List<string>(){"character","skill","num",},null,new List<string>(){"void",},"Character {0} use skill {1},ignoreCd? {2}","UseSkill(self,\"$sk$$sk$\",0);","character","skill",EditorStyle.Rpg,"")},
 
-                {100081,new Data(100081,"PlayAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Play {0}","PlayAudio(\"$a$$a$\");","basic","audio",EditorStyle.Rpg,"")},
+                {100081,new Data(100081,"Skill",null,null,null,new List<string>(){"skill",},"","\"$sk$$sk$\"","basic","const",EditorStyle.Rpg,"")},
 
-                {100082,new Data(100082,"GetCharactersInArea",new List<string>(){"pos","radius",},new List<string>(){"vector","num",},new List<string>(){"list",},new List<string>(){"var",},"characters in position {0} ,radius {1}","GetCharactersInArea(NewVector(1,1,0),5);","character","detect",EditorStyle.Rpg,"")},
+                {100082,new Data(100082,"PlayAudio",new List<string>(){"audio",},new List<string>(){"audio",},null,new List<string>(){"void",},"Play {0}","PlayAudio(\"$a$$a$\");","basic","audio",EditorStyle.Rpg,"")},
 
-                {100083,new Data(100083,"GetLength",null,null,null,null,"","Len(a)","basic","list",EditorStyle.Rpg,"")},
+                {100083,new Data(100083,"GetCharactersInArea",new List<string>(){"pos","radius",},new List<string>(){"vector","num",},new List<string>(){"list",},new List<string>(){"var",},"characters in position {0} ,radius {1}","GetCharactersInArea(NewVector(1,1,0),5);","character","detect",EditorStyle.Rpg,"")},
 
-                {100084,new Data(100084,"GetVarKeys",null,null,null,null,"","GetKeys(a)","basic","list",EditorStyle.Rpg,"")},
+                {100084,new Data(100084,"GetLength",null,null,null,null,"","Len(a)","basic","list",EditorStyle.Rpg,"")},
 
-                {100085,new Data(100085,"GetVarValues",null,null,null,null,"","GetValues(a)","basic","list",EditorStyle.Rpg,"")},
+                {100085,new Data(100085,"GetVarKeys",null,null,null,null,"","GetKeys(a)","basic","list",EditorStyle.Rpg,"")},
 
-                {100086,new Data(100086,"GetLookAtRotation",new List<string>(){"pos","pos",},new List<string>(){"vector","vector",},new List<string>(){"angle",},new List<string>(){"num",},"Get rotation of pos {0} look at {1}","GetLookAtRotation(NewVector(1,1,0),NewVector(1,1,0))","basic","math",EditorStyle.Rpg,"")},
+                {100086,new Data(100086,"GetVarValues",null,null,null,null,"","GetValues(a)","basic","list",EditorStyle.Rpg,"")},
 
-                {100087,new Data(100087,"GetObjectPosition",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"pos",},new List<string>(){"vector",},"scene Object {0} position","GetObjectPosition(self)","sceneObject","transform",EditorStyle.Rpg,"")},
+                {100087,new Data(100087,"GetLookAtRotation",new List<string>(){"pos","pos",},new List<string>(){"vector","vector",},new List<string>(){"angle",},new List<string>(){"num",},"Get rotation of pos {0} look at {1}","GetLookAtRotation(NewVector(1,1,0),NewVector(1,1,0))","basic","math",EditorStyle.Rpg,"")},
 
-                {100088,new Data(100088,"GetNormalizedVector",new List<string>(){"vector",},new List<string>(){"vector",},new List<string>(){"vector",},new List<string>(){"vector",},"Get Normalized {0}","GetNormalizedVector(NewVector(1,1,0))","basic","math",EditorStyle.Rpg,"")},
+                {100088,new Data(100088,"GetObjectPosition",new List<string>(){"sceneObject",},new List<string>(){"sceneObject",},new List<string>(){"pos",},new List<string>(){"vector",},"scene Object {0} position","GetObjectPosition(self)","sceneObject","transform",EditorStyle.Rpg,"")},
 
-                {100089,new Data(100089,"SetObjectPosition",new List<string>(){"sceneObject","pos",},new List<string>(){"sceneObject","vector",},null,new List<string>(){"void",},"scene Object {0} : Set absolute position ({1})","SetObjectPosition(self,NewVector(1,1,0));","character","transform",EditorStyle.Rpg,"")},
+                {100089,new Data(100089,"GetNormalizedVector",new List<string>(){"vector",},new List<string>(){"vector",},new List<string>(){"vector",},new List<string>(){"vector",},"Get Normalized {0}","GetNormalizedVector(NewVector(1,1,0))","basic","math",EditorStyle.Rpg,"")},
 
-                {100090,new Data(100090,"IsUnobstructed",new List<string>(){"from","to","radius",},new List<string>(){"vector","vector","num",},new List<string>(){"unobstructed",},new List<string>(){"num",},"sphere with {2} radius from {0} to {1} is unobstructed(collidable object)","IsUnobstructed(NewVector(1,1,0),NewVector(1,1,0),0.2)","sceneObject","detect",EditorStyle.Rpg,"")},
+                {100090,new Data(100090,"SetObjectPosition",new List<string>(){"sceneObject","pos",},new List<string>(){"sceneObject","vector",},null,new List<string>(){"void",},"scene Object {0} : Set absolute position ({1})","SetObjectPosition(self,NewVector(1,1,0));","character","transform",EditorStyle.Rpg,"")},
 
-                {100091,new Data(100091,"ShowEffectByCharacter",new List<string>(){"effect","character","ignoreRotation",},new List<string>(){"effect","character","num",},null,new List<string>(){"void",},"Show character:{1} Effect{0} ignore rotation?{2} ","ShowEffectByCharacter(\"$ef$$ef$\",self,1);","effect","system",EditorStyle.RpgAdvanced,"")},
+                {100091,new Data(100091,"IsUnobstructed",new List<string>(){"from","to","radius",},new List<string>(){"vector","vector","num",},new List<string>(){"unobstructed",},new List<string>(){"num",},"sphere with {2} radius from {0} to {1} is unobstructed(collidable object)","IsUnobstructed(NewVector(1,1,0),NewVector(1,1,0),0.2)","sceneObject","detect",EditorStyle.Rpg,"")},
 
-                {100092,new Data(100092,"GetVectorByRotation",new List<string>(){"rotation",},new List<string>(){"num",},new List<string>(){"vector",},new List<string>(){"vector",},"Get Vector By Rotation {0}","GetVectorByRotation(0)","basic","math",EditorStyle.Rpg,"")},
+                {100092,new Data(100092,"ShowEffectByCharacter",new List<string>(){"effect","character","ignoreRotation",},new List<string>(){"effect","character","num",},null,new List<string>(){"void",},"Show character:{1} Effect{0} ignore rotation?{2} ","ShowEffectByCharacter(\"$ef$$ef$\",self,1);","effect","system",EditorStyle.RpgAdvanced,"")},
 
-                {100093,new Data(100093,"DestroyCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0}: Destroy","DestroyCharacter(self);","character","system",EditorStyle.Rpg,"")},
+                {100093,new Data(100093,"GetVectorByRotation",new List<string>(){"rotation",},new List<string>(){"num",},new List<string>(){"vector",},new List<string>(){"vector",},"Get Vector By Rotation {0}","GetVectorByRotation(0)","basic","math",EditorStyle.Rpg,"")},
 
-                {100094,new Data(100094,"MakeChoice",new List<string>(){"options",},new List<string>(){"var",},new List<string>(){"resault",},new List<string>(){"var",},"Make choice from {0}","MakeChoice(options)","ui","notice",EditorStyle.AvgAdvanced,"res=")},
+                {100094,new Data(100094,"DestroyCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0}: Destroy","DestroyCharacter(self);","character","system",EditorStyle.Rpg,"")},
 
-                {100095,new Data(100095,"ShowDialogWithChoice",new List<string>(){"background","avatar","title","content","options",},new List<string>(){"img","img","string","string","var",},new List<string>(){"resault",},new List<string>(){"var",},"Show Dialog{1}{2}:{3} bg:{0},with choice{4}","ShowDialogWithChoice(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\",options);","ui","dialog",EditorStyle.AvgAdvanced,"")},
+                {100095,new Data(100095,"MakeChoice",new List<string>(){"options",},new List<string>(){"var",},new List<string>(){"resault",},new List<string>(){"var",},"Make choice from {0}","MakeChoice(options)","ui","window",EditorStyle.AvgAdvanced,"res=")},
 
-                {100096,new Data(100096,"CharacterChat",new List<string>(){"character","content","icon","showTime",},new List<string>(){"character","string","img","num",},null,new List<string>(){"void",},"Character {0} img:{2},chat:{1},last {4} times","CharacterChat(self,\"empty\",\"$i$$i$\",3);","ui","dialog",EditorStyle.Rpg,"")},
+                {100096,new Data(100096,"ShowDialogWithChoice",new List<string>(){"background","avatar","title","content","options",},new List<string>(){"img","img","string","string","var",},new List<string>(){"resault",},new List<string>(){"var",},"Show Dialog{1}{2}:{3} bg:{0},with choice{4}","ShowDialogWithChoice(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\",options);","ui","dialog",EditorStyle.AvgAdvanced,"")},
 
-                {100097,new Data(100097,"IsMissionAdded",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"added",},new List<string>(){"num",},"Mission {0} is added?","IsMissionAdded(\"empty\")","mission","system",EditorStyle.Rpg,"")},
+                {100097,new Data(100097,"CharacterChat",new List<string>(){"character","content","icon","showTime",},new List<string>(){"character","string","img","num",},null,new List<string>(){"void",},"Character {0} img:{2},chat:{1},last {4} times","CharacterChat(self,\"empty\",\"$i$$i$\",3);","ui","dialog",EditorStyle.Rpg,"")},
 
-                {100098,new Data(100098,"HasMissionDone",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"done",},new List<string>(){"num",},"Mission {0} has done?","HasMissionDone(\"empty\")","mission","system",EditorStyle.Rpg,"")},
+                {100098,new Data(100098,"IsMissionAdded",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"added",},new List<string>(){"num",},"Mission {0} is added?","IsMissionAdded(\"empty\")","mission","system",EditorStyle.Rpg,"")},
 
-                {100099,new Data(100099,"AddMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Add mission {0}","MissionAdd(\"empty\");","mission","system",EditorStyle.Rpg,"")},
+                {100099,new Data(100099,"HasMissionDone",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"done",},new List<string>(){"num",},"Mission {0} has done?","HasMissionDone(\"empty\")","mission","system",EditorStyle.Rpg,"")},
 
-                {100100,new Data(100100,"DoneMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Done mission {0}","MissionDone(\"empty\");","mission","system",EditorStyle.Rpg,"")},
+                {100100,new Data(100100,"AddMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Add mission {0}","MissionAdd(\"empty\");","mission","system",EditorStyle.Rpg,"")},
 
-                {100101,new Data(100101,"MoveToScene",new List<string>(){"sceneName","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Move to Scene {0} position: {1}","MoveToScene(\"empty\",NewVector(1,1,0));","character","system",EditorStyle.Rpg,"")},
+                {100101,new Data(100101,"DoneMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Done mission {0}","MissionDone(\"empty\");","mission","system",EditorStyle.Rpg,"")},
+
+                {100102,new Data(100102,"MoveToScene",new List<string>(){"sceneName","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Move to Scene {0} position: {1}","MoveToScene(\"empty\",NewVector(1,1,0));","basic","process",EditorStyle.AvgAdvanced,"")},
+
+                {100103,new Data(100103,"ShowTeamerSelect",null,null,null,new List<string>(){"void",},"Show Teamer Select","ShowTeamerSelect()","ui","window",EditorStyle.AvgAdvanced,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -509,189 +513,193 @@ namespace Form
     
                         {"ShowDialog",_DataByUid[100009]},
     
-                        {"ShowEffect",_DataByUid[100010]},
+                        {"ShowDialogWithIllustration",_DataByUid[100010]},
     
-                        {"ShowVideo",_DataByUid[100011]},
+                        {"ShowEffect",_DataByUid[100011]},
     
-                        {"ShowImage",_DataByUid[100012]},
+                        {"ShowVideo",_DataByUid[100012]},
     
-                        {"ShowImagePermanently",_DataByUid[100013]},
+                        {"ShowImage",_DataByUid[100013]},
     
-                        {"DeleteImage",_DataByUid[100014]},
+                        {"ShowImagePermanently",_DataByUid[100014]},
     
-                        {"SetImagePosition",_DataByUid[100015]},
+                        {"DeleteImage",_DataByUid[100015]},
     
-                        {"SetImageOpacity",_DataByUid[100016]},
+                        {"SetImagePosition",_DataByUid[100016]},
     
-                        {"SetImageRotate",_DataByUid[100017]},
+                        {"SetImageOpacity",_DataByUid[100017]},
     
-                        {"Add",_DataByUid[100018]},
+                        {"SetImageRotate",_DataByUid[100018]},
     
-                        {"Subtract",_DataByUid[100019]},
+                        {"Add",_DataByUid[100019]},
     
-                        {"Multiply",_DataByUid[100020]},
+                        {"Subtract",_DataByUid[100020]},
     
-                        {"Divide",_DataByUid[100021]},
+                        {"Multiply",_DataByUid[100021]},
     
-                        {"Wait",_DataByUid[100022]},
+                        {"Divide",_DataByUid[100022]},
     
-                        {"If",_DataByUid[100023]},
+                        {"Wait",_DataByUid[100023]},
     
-                        {"For",_DataByUid[100024]},
+                        {"If",_DataByUid[100024]},
     
-                        {"Greater",_DataByUid[100025]},
+                        {"For",_DataByUid[100025]},
     
-                        {"Less",_DataByUid[100026]},
+                        {"Greater",_DataByUid[100026]},
     
-                        {"Equal",_DataByUid[100027]},
+                        {"Less",_DataByUid[100027]},
     
-                        {"NotEqual",_DataByUid[100028]},
+                        {"Equal",_DataByUid[100028]},
     
-                        {"Pause",_DataByUid[100029]},
+                        {"NotEqual",_DataByUid[100029]},
     
-                        {"Continue",_DataByUid[100030]},
+                        {"Pause",_DataByUid[100030]},
     
-                        {"GameOver",_DataByUid[100031]},
+                        {"Continue",_DataByUid[100031]},
     
-                        {"Save",_DataByUid[100032]},
+                        {"GameOver",_DataByUid[100032]},
     
-                        {"Load",_DataByUid[100033]},
+                        {"Save",_DataByUid[100033]},
     
-                        {"DestroyObject",_DataByUid[100034]},
+                        {"Load",_DataByUid[100034]},
     
-                        {"GenerateObject",_DataByUid[100035]},
+                        {"DestroyObject",_DataByUid[100035]},
     
-                        {"MoveObjectRelative",_DataByUid[100036]},
+                        {"GenerateObject",_DataByUid[100036]},
     
-                        {"MoveObject",_DataByUid[100037]},
+                        {"MoveObjectRelative",_DataByUid[100037]},
     
-                        {"GainItem",_DataByUid[100038]},
+                        {"MoveObject",_DataByUid[100038]},
     
-                        {"LostItem",_DataByUid[100039]},
+                        {"GainItem",_DataByUid[100039]},
     
-                        {"SetCharacterParameter",_DataByUid[100040]},
+                        {"LostItem",_DataByUid[100040]},
     
-                        {"GetCurrentCharacter",_DataByUid[100041]},
+                        {"SetCharacterParameter",_DataByUid[100041]},
     
-                        {"MoveCharacterRelative",_DataByUid[100042]},
+                        {"GetCurrentCharacter",_DataByUid[100042]},
     
-                        {"MoveCharacter",_DataByUid[100043]},
+                        {"MoveCharacterRelative",_DataByUid[100043]},
     
-                        {"SetCharacterNavigateRelative",_DataByUid[100044]},
+                        {"MoveCharacter",_DataByUid[100044]},
     
-                        {"SetCharacterNavigate",_DataByUid[100045]},
+                        {"SetCharacterNavigateRelative",_DataByUid[100045]},
     
-                        {"GetCharacterPosition",_DataByUid[100046]},
+                        {"SetCharacterNavigate",_DataByUid[100046]},
     
-                        {"NewVector",_DataByUid[100047]},
+                        {"GetCharacterPosition",_DataByUid[100047]},
     
-                        {"StopCharacterNavigate",_DataByUid[100048]},
+                        {"NewVector",_DataByUid[100048]},
     
-                        {"SetCharacterPositionRelative",_DataByUid[100049]},
+                        {"StopCharacterNavigate",_DataByUid[100049]},
     
-                        {"SetCharacterPosition",_DataByUid[100050]},
+                        {"SetCharacterPositionRelative",_DataByUid[100050]},
     
-                        {"GetCharacterParameter",_DataByUid[100051]},
+                        {"SetCharacterPosition",_DataByUid[100051]},
     
-                        {"SelfSceneObject",_DataByUid[100052]},
+                        {"GetCharacterParameter",_DataByUid[100052]},
     
-                        {"TriggerTargetSceneObject",_DataByUid[100053]},
+                        {"SelfSceneObject",_DataByUid[100053]},
     
-                        {"SelfCharacter",_DataByUid[100054]},
+                        {"TriggerTargetSceneObject",_DataByUid[100054]},
     
-                        {"TriggerTargetCharacter",_DataByUid[100055]},
+                        {"SelfCharacter",_DataByUid[100055]},
     
-                        {"Return",_DataByUid[100056]},
+                        {"TriggerTargetCharacter",_DataByUid[100056]},
     
-                        {"GetSceneObjectParameter",_DataByUid[100057]},
+                        {"Return",_DataByUid[100057]},
     
-                        {"SetSceneObjectParameter",_DataByUid[100058]},
+                        {"GetSceneObjectParameter",_DataByUid[100058]},
     
-                        {"GetCharacterRotation",_DataByUid[100059]},
+                        {"SetSceneObjectParameter",_DataByUid[100059]},
     
-                        {"SetCharacterRotation",_DataByUid[100060]},
+                        {"GetCharacterRotation",_DataByUid[100060]},
     
-                        {"GetCharacterForwardVector",_DataByUid[100061]},
+                        {"SetCharacterRotation",_DataByUid[100061]},
     
-                        {"GetObjectRotation",_DataByUid[100062]},
+                        {"GetCharacterForwardVector",_DataByUid[100062]},
     
-                        {"SetObjectRotation",_DataByUid[100063]},
+                        {"GetObjectRotation",_DataByUid[100063]},
     
-                        {"GetObjectForwardVector",_DataByUid[100064]},
+                        {"SetObjectRotation",_DataByUid[100064]},
     
-                        {"IsObjectEnableCollision",_DataByUid[100065]},
+                        {"GetObjectForwardVector",_DataByUid[100065]},
     
-                        {"GetCharacterRightVector",_DataByUid[100066]},
+                        {"IsObjectEnableCollision",_DataByUid[100066]},
     
-                        {"GetObjectRightVector",_DataByUid[100067]},
+                        {"GetCharacterRightVector",_DataByUid[100067]},
     
-                        {"IsObjectActive",_DataByUid[100068]},
+                        {"GetObjectRightVector",_DataByUid[100068]},
     
-                        {"IsCharacterActive",_DataByUid[100069]},
+                        {"IsObjectActive",_DataByUid[100069]},
     
-                        {"ChangeBgm",_DataByUid[100070]},
+                        {"IsCharacterActive",_DataByUid[100070]},
     
-                        {"CharacterPlayAnim",_DataByUid[100071]},
+                        {"ChangeBgm",_DataByUid[100071]},
     
-                        {"CharacterStun",_DataByUid[100072]},
+                        {"CharacterPlayAnim",_DataByUid[100072]},
     
-                        {"GetSkillParameter",_DataByUid[100073]},
+                        {"CharacterStun",_DataByUid[100073]},
     
-                        {"SetSkillParameter",_DataByUid[100074]},
+                        {"GetSkillParameter",_DataByUid[100074]},
     
-                        {"TargetSkill",_DataByUid[100075]},
+                        {"SetSkillParameter",_DataByUid[100075]},
     
-                        {"Effect",_DataByUid[100076]},
+                        {"TargetSkill",_DataByUid[100076]},
     
-                        {"ParameterDelta",_DataByUid[100077]},
+                        {"Effect",_DataByUid[100077]},
     
-                        {"FloatingText",_DataByUid[100078]},
+                        {"ParameterDelta",_DataByUid[100078]},
     
-                        {"UseSkill",_DataByUid[100079]},
+                        {"FloatingText",_DataByUid[100079]},
     
-                        {"Skill",_DataByUid[100080]},
+                        {"UseSkill",_DataByUid[100080]},
     
-                        {"PlayAudio",_DataByUid[100081]},
+                        {"Skill",_DataByUid[100081]},
     
-                        {"GetCharactersInArea",_DataByUid[100082]},
+                        {"PlayAudio",_DataByUid[100082]},
     
-                        {"GetLength",_DataByUid[100083]},
+                        {"GetCharactersInArea",_DataByUid[100083]},
     
-                        {"GetVarKeys",_DataByUid[100084]},
+                        {"GetLength",_DataByUid[100084]},
     
-                        {"GetVarValues",_DataByUid[100085]},
+                        {"GetVarKeys",_DataByUid[100085]},
     
-                        {"GetLookAtRotation",_DataByUid[100086]},
+                        {"GetVarValues",_DataByUid[100086]},
     
-                        {"GetObjectPosition",_DataByUid[100087]},
+                        {"GetLookAtRotation",_DataByUid[100087]},
     
-                        {"GetNormalizedVector",_DataByUid[100088]},
+                        {"GetObjectPosition",_DataByUid[100088]},
     
-                        {"SetObjectPosition",_DataByUid[100089]},
+                        {"GetNormalizedVector",_DataByUid[100089]},
     
-                        {"IsUnobstructed",_DataByUid[100090]},
+                        {"SetObjectPosition",_DataByUid[100090]},
     
-                        {"ShowEffectByCharacter",_DataByUid[100091]},
+                        {"IsUnobstructed",_DataByUid[100091]},
     
-                        {"GetVectorByRotation",_DataByUid[100092]},
+                        {"ShowEffectByCharacter",_DataByUid[100092]},
     
-                        {"DestroyCharacter",_DataByUid[100093]},
+                        {"GetVectorByRotation",_DataByUid[100093]},
     
-                        {"MakeChoice",_DataByUid[100094]},
+                        {"DestroyCharacter",_DataByUid[100094]},
     
-                        {"ShowDialogWithChoice",_DataByUid[100095]},
+                        {"MakeChoice",_DataByUid[100095]},
     
-                        {"CharacterChat",_DataByUid[100096]},
+                        {"ShowDialogWithChoice",_DataByUid[100096]},
     
-                        {"IsMissionAdded",_DataByUid[100097]},
+                        {"CharacterChat",_DataByUid[100097]},
     
-                        {"HasMissionDone",_DataByUid[100098]},
+                        {"IsMissionAdded",_DataByUid[100098]},
     
-                        {"AddMission",_DataByUid[100099]},
+                        {"HasMissionDone",_DataByUid[100099]},
     
-                        {"DoneMission",_DataByUid[100100]},
+                        {"AddMission",_DataByUid[100100]},
     
-                        {"MoveToScene",_DataByUid[100101]},
+                        {"DoneMission",_DataByUid[100101]},
+    
+                        {"MoveToScene",_DataByUid[100102]},
+    
+                        {"ShowTeamerSelect",_DataByUid[100103]},
     
                     
                     };
@@ -748,6 +756,8 @@ namespace Form
         
                             {("sceneObject","detect"),new List<Data>()},
         
+                            {("ui","window"),new List<Data>()},
+        
                             {("mission","system"),new List<Data>()},
         
                 };
@@ -770,11 +780,11 @@ namespace Form
 
                     _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100009]);
 
-                    _DatasByCategoryType[("effect","system")].Add(_DataByUid[100010]);
+                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100010]);
 
-                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100011]);
+                    _DatasByCategoryType[("effect","system")].Add(_DataByUid[100011]);
 
-                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100012]);
+                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100012]);
 
                     _DatasByCategoryType[("ui","image")].Add(_DataByUid[100013]);
 
@@ -786,7 +796,7 @@ namespace Form
 
                     _DatasByCategoryType[("ui","image")].Add(_DataByUid[100017]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100018]);
+                    _DatasByCategoryType[("ui","image")].Add(_DataByUid[100018]);
 
                     _DatasByCategoryType[("basic","math")].Add(_DataByUid[100019]);
 
@@ -794,13 +804,13 @@ namespace Form
 
                     _DatasByCategoryType[("basic","math")].Add(_DataByUid[100021]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100022]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100022]);
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100023]);
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100024]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100025]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100025]);
 
                     _DatasByCategoryType[("basic","math")].Add(_DataByUid[100026]);
 
@@ -808,7 +818,7 @@ namespace Form
 
                     _DatasByCategoryType[("basic","math")].Add(_DataByUid[100028]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100029]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100029]);
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100030]);
 
@@ -818,23 +828,23 @@ namespace Form
 
                     _DatasByCategoryType[("basic","process")].Add(_DataByUid[100033]);
 
-                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100034]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100034]);
 
                     _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100035]);
 
-                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100036]);
+                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100036]);
 
                     _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100037]);
 
-                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100038]);
+                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100038]);
 
                     _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100039]);
 
-                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100040]);
+                    _DatasByCategoryType[("item","backpack")].Add(_DataByUid[100040]);
 
-                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100041]);
+                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100041]);
 
-                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100042]);
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100042]);
 
                     _DatasByCategoryType[("character","transform")].Add(_DataByUid[100043]);
 
@@ -844,107 +854,107 @@ namespace Form
 
                     _DatasByCategoryType[("character","transform")].Add(_DataByUid[100046]);
 
-                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100047]);
+                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100047]);
 
-                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100048]);
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100048]);
 
                     _DatasByCategoryType[("character","transform")].Add(_DataByUid[100049]);
 
                     _DatasByCategoryType[("character","transform")].Add(_DataByUid[100050]);
 
-                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100051]);
+                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100051]);
 
-                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100052]);
+                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100052]);
 
                     _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100053]);
 
-                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100054]);
+                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100054]);
 
                     _DatasByCategoryType[("character","system")].Add(_DataByUid[100055]);
 
-                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100056]);
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100056]);
 
-                    _DatasByCategoryType[("sceneObject","parameter")].Add(_DataByUid[100057]);
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100057]);
 
                     _DatasByCategoryType[("sceneObject","parameter")].Add(_DataByUid[100058]);
 
-                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100059]);
+                    _DatasByCategoryType[("sceneObject","parameter")].Add(_DataByUid[100059]);
 
                     _DatasByCategoryType[("character","transform")].Add(_DataByUid[100060]);
 
                     _DatasByCategoryType[("character","transform")].Add(_DataByUid[100061]);
 
-                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100062]);
+                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100062]);
 
                     _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100063]);
 
                     _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100064]);
 
-                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100065]);
+                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100065]);
 
-                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100066]);
+                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100066]);
 
-                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100067]);
+                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100067]);
 
-                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100068]);
+                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100068]);
 
-                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100069]);
+                    _DatasByCategoryType[("sceneObject","system")].Add(_DataByUid[100069]);
 
-                    _DatasByCategoryType[("basic","audio")].Add(_DataByUid[100070]);
+                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100070]);
 
-                    _DatasByCategoryType[("character","anim")].Add(_DataByUid[100071]);
+                    _DatasByCategoryType[("basic","audio")].Add(_DataByUid[100071]);
 
                     _DatasByCategoryType[("character","anim")].Add(_DataByUid[100072]);
 
-                    _DatasByCategoryType[("skill","parameter")].Add(_DataByUid[100073]);
+                    _DatasByCategoryType[("character","anim")].Add(_DataByUid[100073]);
 
                     _DatasByCategoryType[("skill","parameter")].Add(_DataByUid[100074]);
 
-                    _DatasByCategoryType[("skill","system")].Add(_DataByUid[100075]);
+                    _DatasByCategoryType[("skill","parameter")].Add(_DataByUid[100075]);
 
-                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100076]);
+                    _DatasByCategoryType[("skill","system")].Add(_DataByUid[100076]);
 
-                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100077]);
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100077]);
 
-                    _DatasByCategoryType[("ui","notice")].Add(_DataByUid[100078]);
+                    _DatasByCategoryType[("character","parameter")].Add(_DataByUid[100078]);
 
-                    _DatasByCategoryType[("character","skill")].Add(_DataByUid[100079]);
+                    _DatasByCategoryType[("ui","notice")].Add(_DataByUid[100079]);
 
-                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100080]);
+                    _DatasByCategoryType[("character","skill")].Add(_DataByUid[100080]);
 
-                    _DatasByCategoryType[("basic","audio")].Add(_DataByUid[100081]);
+                    _DatasByCategoryType[("basic","const")].Add(_DataByUid[100081]);
 
-                    _DatasByCategoryType[("character","detect")].Add(_DataByUid[100082]);
+                    _DatasByCategoryType[("basic","audio")].Add(_DataByUid[100082]);
 
-                    _DatasByCategoryType[("basic","list")].Add(_DataByUid[100083]);
+                    _DatasByCategoryType[("character","detect")].Add(_DataByUid[100083]);
 
                     _DatasByCategoryType[("basic","list")].Add(_DataByUid[100084]);
 
                     _DatasByCategoryType[("basic","list")].Add(_DataByUid[100085]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100086]);
+                    _DatasByCategoryType[("basic","list")].Add(_DataByUid[100086]);
 
-                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100087]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100087]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100088]);
+                    _DatasByCategoryType[("sceneObject","transform")].Add(_DataByUid[100088]);
 
-                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100089]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100089]);
 
-                    _DatasByCategoryType[("sceneObject","detect")].Add(_DataByUid[100090]);
+                    _DatasByCategoryType[("character","transform")].Add(_DataByUid[100090]);
 
-                    _DatasByCategoryType[("effect","system")].Add(_DataByUid[100091]);
+                    _DatasByCategoryType[("sceneObject","detect")].Add(_DataByUid[100091]);
 
-                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100092]);
+                    _DatasByCategoryType[("effect","system")].Add(_DataByUid[100092]);
 
-                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100093]);
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100093]);
 
-                    _DatasByCategoryType[("ui","notice")].Add(_DataByUid[100094]);
+                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100094]);
 
-                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100095]);
+                    _DatasByCategoryType[("ui","window")].Add(_DataByUid[100095]);
 
                     _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100096]);
 
-                    _DatasByCategoryType[("mission","system")].Add(_DataByUid[100097]);
+                    _DatasByCategoryType[("ui","dialog")].Add(_DataByUid[100097]);
 
                     _DatasByCategoryType[("mission","system")].Add(_DataByUid[100098]);
 
@@ -952,7 +962,11 @@ namespace Form
 
                     _DatasByCategoryType[("mission","system")].Add(_DataByUid[100100]);
 
-                    _DatasByCategoryType[("character","system")].Add(_DataByUid[100101]);
+                    _DatasByCategoryType[("mission","system")].Add(_DataByUid[100101]);
+
+                    _DatasByCategoryType[("basic","process")].Add(_DataByUid[100102]);
+
+                    _DatasByCategoryType[("ui","window")].Add(_DataByUid[100103]);
 
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
@@ -992,9 +1006,9 @@ namespace Form
 
                     _DatasByCategory["ui"].Add(_DataByUid[100009]);
 
-                    _DatasByCategory["effect"].Add(_DataByUid[100010]);
+                    _DatasByCategory["ui"].Add(_DataByUid[100010]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100011]);
+                    _DatasByCategory["effect"].Add(_DataByUid[100011]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100012]);
 
@@ -1008,7 +1022,7 @@ namespace Form
 
                     _DatasByCategory["ui"].Add(_DataByUid[100017]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100018]);
+                    _DatasByCategory["ui"].Add(_DataByUid[100018]);
 
                     _DatasByCategory["basic"].Add(_DataByUid[100019]);
 
@@ -1040,7 +1054,7 @@ namespace Form
 
                     _DatasByCategory["basic"].Add(_DataByUid[100033]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100034]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100034]);
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100035]);
 
@@ -1048,11 +1062,11 @@ namespace Form
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100037]);
 
-                    _DatasByCategory["item"].Add(_DataByUid[100038]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100038]);
 
                     _DatasByCategory["item"].Add(_DataByUid[100039]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100040]);
+                    _DatasByCategory["item"].Add(_DataByUid[100040]);
 
                     _DatasByCategory["character"].Add(_DataByUid[100041]);
 
@@ -1066,9 +1080,9 @@ namespace Form
 
                     _DatasByCategory["character"].Add(_DataByUid[100046]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100047]);
+                    _DatasByCategory["character"].Add(_DataByUid[100047]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100048]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100048]);
 
                     _DatasByCategory["character"].Add(_DataByUid[100049]);
 
@@ -1076,27 +1090,27 @@ namespace Form
 
                     _DatasByCategory["character"].Add(_DataByUid[100051]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100052]);
+                    _DatasByCategory["character"].Add(_DataByUid[100052]);
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100053]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100054]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100054]);
 
                     _DatasByCategory["character"].Add(_DataByUid[100055]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100056]);
+                    _DatasByCategory["character"].Add(_DataByUid[100056]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100057]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100057]);
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100058]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100059]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100059]);
 
                     _DatasByCategory["character"].Add(_DataByUid[100060]);
 
                     _DatasByCategory["character"].Add(_DataByUid[100061]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100062]);
+                    _DatasByCategory["character"].Add(_DataByUid[100062]);
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100063]);
 
@@ -1104,41 +1118,41 @@ namespace Form
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100065]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100066]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100066]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100067]);
+                    _DatasByCategory["character"].Add(_DataByUid[100067]);
 
                     _DatasByCategory["sceneObject"].Add(_DataByUid[100068]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100069]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100069]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100070]);
+                    _DatasByCategory["character"].Add(_DataByUid[100070]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100071]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100071]);
 
                     _DatasByCategory["character"].Add(_DataByUid[100072]);
 
-                    _DatasByCategory["skill"].Add(_DataByUid[100073]);
+                    _DatasByCategory["character"].Add(_DataByUid[100073]);
 
                     _DatasByCategory["skill"].Add(_DataByUid[100074]);
 
                     _DatasByCategory["skill"].Add(_DataByUid[100075]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100076]);
+                    _DatasByCategory["skill"].Add(_DataByUid[100076]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100077]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100077]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100078]);
+                    _DatasByCategory["character"].Add(_DataByUid[100078]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100079]);
+                    _DatasByCategory["ui"].Add(_DataByUid[100079]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100080]);
+                    _DatasByCategory["character"].Add(_DataByUid[100080]);
 
                     _DatasByCategory["basic"].Add(_DataByUid[100081]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100082]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100082]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100083]);
+                    _DatasByCategory["character"].Add(_DataByUid[100083]);
 
                     _DatasByCategory["basic"].Add(_DataByUid[100084]);
 
@@ -1146,27 +1160,27 @@ namespace Form
 
                     _DatasByCategory["basic"].Add(_DataByUid[100086]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100087]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100087]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100088]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100088]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100089]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100089]);
 
-                    _DatasByCategory["sceneObject"].Add(_DataByUid[100090]);
+                    _DatasByCategory["character"].Add(_DataByUid[100090]);
 
-                    _DatasByCategory["effect"].Add(_DataByUid[100091]);
+                    _DatasByCategory["sceneObject"].Add(_DataByUid[100091]);
 
-                    _DatasByCategory["basic"].Add(_DataByUid[100092]);
+                    _DatasByCategory["effect"].Add(_DataByUid[100092]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100093]);
+                    _DatasByCategory["basic"].Add(_DataByUid[100093]);
 
-                    _DatasByCategory["ui"].Add(_DataByUid[100094]);
+                    _DatasByCategory["character"].Add(_DataByUid[100094]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100095]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100096]);
 
-                    _DatasByCategory["mission"].Add(_DataByUid[100097]);
+                    _DatasByCategory["ui"].Add(_DataByUid[100097]);
 
                     _DatasByCategory["mission"].Add(_DataByUid[100098]);
 
@@ -1174,7 +1188,11 @@ namespace Form
 
                     _DatasByCategory["mission"].Add(_DataByUid[100100]);
 
-                    _DatasByCategory["character"].Add(_DataByUid[100101]);
+                    _DatasByCategory["mission"].Add(_DataByUid[100101]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100102]);
+
+                    _DatasByCategory["ui"].Add(_DataByUid[100103]);
 
 
             childInitAction?.Invoke();

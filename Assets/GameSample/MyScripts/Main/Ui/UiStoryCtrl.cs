@@ -1,5 +1,6 @@
 using Form;
 using Item;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -89,7 +90,15 @@ namespace Ui.Story
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
+                try
+                {
+                    view.img_.sprite = AssetManager.instance.texCtrl.CreateDataByBytes(model.data.icon.ToArray(), "tmp").GetSprite();
+                }
+                catch (Exception ex)
+                {
+                    Debug.Log(ex);
+                    TexAssetForm.DataByName[GlobalNameHelper.GetExternDefaultTexName()].GetSprite();
+                }
             }
         }
     }

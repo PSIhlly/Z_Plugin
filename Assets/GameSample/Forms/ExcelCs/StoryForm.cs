@@ -55,7 +55,7 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,string,string> changeDescAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,List<byte>,List<byte>> changeIconAction;
                 
 
 
@@ -116,11 +116,11 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-                    private string  _icon;
+                    private List<byte>  _icon;
                     /// <summary>
                     ///封面
                     ///</summary>
-                    public string  icon{
+                    public List<byte>  icon{
                                 get{return _icon;}
  set{
 
@@ -134,7 +134,7 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-            public Data(int id,string name,string desc,string icon)
+            public Data(int id,string name,string desc,List<byte> icon)
             {
 
              this.id = id;
@@ -154,7 +154,7 @@ public static readonly int autoIdCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,desc,icon);
+        return new Data(sameId? id:idChain.GetId(),name,desc,icon==null?new List<byte>():new List<byte>(icon));
                 }
             
             public virtual  void BeforeGet()
@@ -164,7 +164,7 @@ public static readonly int autoIdCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"","",null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -244,7 +244,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.SelectToken("desc")==null?defaultData.desc:jo.Get<string>("desc"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon")
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<List<byte>>("icon")
                     );
 
             return data;
@@ -263,7 +263,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             jo.Set<string>("desc",data.desc);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<List<byte>>("icon",data.icon);
 
             return jo;
         }
@@ -379,7 +379,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     
             }
             
-            public static void ChangeIcon(Data superData,string oldV,string newV)
+            public static void ChangeIcon(Data superData,List<byte> oldV,List<byte> newV)
             {
                 if(superData is Data data)
                 {

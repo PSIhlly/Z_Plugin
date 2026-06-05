@@ -32,7 +32,7 @@ namespace Z_Code
             if(data!=null)
             {
                 
-                var vec = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
+                var vec = GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos));
                 box.dic["x"] = CodeHelper.CreateBoxByNum(vec.x);
                 box.dic["height"] = CodeHelper.CreateBoxByNum(vec.y);
                 box.dic["y"] = CodeHelper.CreateBoxByNum(vec.z);

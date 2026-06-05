@@ -10,7 +10,7 @@ using Z_DataSystem.Form;
 using Z_Text;
 using Z_Ui.Notify;
 
-namespace Ui.PlayData.PlayDataBackpack
+namespace Ui.PlayDataBackpack
 {
 
     public partial class UiPlayDataBackpackParam
@@ -30,6 +30,10 @@ namespace Ui.PlayData.PlayDataBackpack
         UiScrViewContainer<UiGameArgsCtrl> gameArgCon;
         public override void OnCreate()
         {
+            view.btn_back.onClick.AddListener(() =>
+            {
+                Close();
+            });
 
             view.btn_.onClick.AddListener(() =>
             {

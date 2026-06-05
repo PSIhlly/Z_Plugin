@@ -12,6 +12,8 @@ using Z_Text;
 using Z_DataSystem.Form;
 using Ui.ModStoryEditorStyleWindow;
 using Z_DesignStyle;
+using Z_DataSystem;
+using System;
 
 namespace Ui.Mod
 {
@@ -96,7 +98,15 @@ namespace Ui.Mod
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon, GlobalNameHelper.GetExternDefaultTexName()).GetSprite();
+                try
+                {
+                    view.img_.sprite = AssetManager.instance.texCtrl.CreateDataByBytes(model.data.icon.ToArray(),"tmp").GetSprite();
+                }
+                catch(Exception ex)
+                {
+                    Debug.Log(ex);
+                    TexAssetForm.DataByName[GlobalNameHelper.GetExternDefaultTexName()].GetSprite();
+                }
             }
         }
 

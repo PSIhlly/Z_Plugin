@@ -30,12 +30,12 @@ namespace Ui.ModSceneMain
             set
             {
                 int.TryParse(value, out int v);
-                var x = Mathf.Max(Mathf.Min(v + ModManager.instance.sceneCtrl.offset, (int)MapManager.instance.sizeLimit.x), 0)*MapManager.instance.data.mainData.mapUnitSize.x;
-                ModManager.instance.sceneCtrl.SetCamera( x, (int)CameraInstance.instance.tarTrs.position.y, (int)CameraInstance.instance.tarTrs.position.z);
+                var x = Mathf.Max(Mathf.Min(GameManager.PlayerPosToMapPos(v), (int)MapManager.instance.sizeLimit.x), 0) * MapManager.instance.data.mainData.mapUnitSize.x;
+                ModManager.instance.sceneCtrl.SetCamera(x, (int)CameraInstance.instance.tarTrs.position.y, (int)CameraInstance.instance.tarTrs.position.z);
             }
             get
             {
-                return ((int)(CameraInstance.instance.tarTrs.position.x/ MapManager.instance.data.mainData.mapUnitSize.x) - ModManager.instance.sceneCtrl.offset).ToString();
+                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(new Vector3(CameraInstance.instance.tarTrs.position.x, 0, 0))).x.ToString("0.#");
             }
         }
         public string viewY
@@ -43,12 +43,12 @@ namespace Ui.ModSceneMain
             set
             {
                 int.TryParse(value, out int v);
-                var y = Mathf.Max(Mathf.Min(v+ ModManager.instance.sceneCtrl.offset, (int) MapManager.instance.sizeLimit.y), 0) * MapManager.instance.data.mainData.mapUnitSize.y;
+                var y = Mathf.Max(Mathf.Min(GameManager.PlayerPosToMapPos(v), (int)MapManager.instance.sizeLimit.y), 0) * MapManager.instance.data.mainData.mapUnitSize.y;
                 ModManager.instance.sceneCtrl.SetCamera((int)CameraInstance.instance.tarTrs.position.x, y, (int)CameraInstance.instance.tarTrs.position.z);
             }
             get
             {
-                return ((int)(CameraInstance.instance.tarTrs.position.y/ MapManager.instance.data.mainData.mapUnitSize.y) - ModManager.instance.sceneCtrl.offset).ToString();
+                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(new Vector3(0, CameraInstance.instance.tarTrs.position.y, 0))).y.ToString("0.#");
             }
         }
         public string viewZ
@@ -56,17 +56,17 @@ namespace Ui.ModSceneMain
             set
             {
                 int.TryParse(value, out int v);
-                var z = Mathf.Max(Mathf.Min(v+ ModManager.instance.sceneCtrl.offset, (int)MapManager.instance.sizeLimit.z),0) * MapManager.instance.data.mainData.mapUnitSize.z;
+                var z = Mathf.Max(Mathf.Min(GameManager.PlayerPosToMapPos(v), (int)MapManager.instance.sizeLimit.z), 0) * MapManager.instance.data.mainData.mapUnitSize.z;
                 ModManager.instance.sceneCtrl.SetCamera((int)CameraInstance.instance.tarTrs.position.x, (int)CameraInstance.instance.tarTrs.position.y, z);
 
             }
             get
             {
-                return ((int)(CameraInstance.instance.tarTrs.position.z/ MapManager.instance.data.mainData.mapUnitSize.z) - ModManager.instance.sceneCtrl.offset).ToString();
+                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(new Vector3(0, 0, CameraInstance.instance.tarTrs.position.z))).z.ToString("0.#");
             }
         }
     }
-        public partial class UiModSceneMainCtrl:IZ_Listener<CameraMoveEvent>
+    public partial class UiModSceneMainCtrl : IZ_Listener<CameraMoveEvent>
     {
         public override void OnCreate()
         {
@@ -77,7 +77,8 @@ namespace Ui.ModSceneMain
             });
             view.btn_view.onClick.AddListener(() =>
             {
-                ModManager.instance.sceneCtrl.SetCamera(ModManager.instance.sceneCtrl.offset * MapManager.instance.data.mainData.mapUnitSize.x, ModManager.instance.sceneCtrl.offset * MapManager.instance.data.mainData.mapUnitSize.y, ModManager.instance.sceneCtrl.offset * MapManager.instance.data.mainData.mapUnitSize.z);
+                var pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
+                ModManager.instance.sceneCtrl.SetCamera(pos.x, pos.y, pos.z);
                 Refresh();
             });
             view.ipt_viewPosSetX.onInput = (v) =>
@@ -108,6 +109,11 @@ namespace Ui.ModSceneMain
             Refresh();
 
         }
+        public override void OnShow()
+        {
+            model.designType = DesignType.MapObject;
+
+        }
 
         public void OnEvent(CameraMoveEvent evt)
         {
@@ -116,15 +122,15 @@ namespace Ui.ModSceneMain
 
         public void Refresh()
         {
-                view.ipt_viewPosSetX.Set(model.viewX);
-            
-                view.ipt_viewPosSetY.Set(model.viewY);
+            view.ipt_viewPosSetX.Set(model.viewX);
 
-                view.ipt_viewPosSetZ.Set(model.viewZ);
-            view.sta_mapObject.ChangeState(model.designType == DesignType.MapObject?1:0);
-            view.sta_event.ChangeState(model.designType == DesignType.Event?1:0);
+            view.ipt_viewPosSetY.Set(model.viewY);
+
+            view.ipt_viewPosSetZ.Set(model.viewZ);
+            view.sta_mapObject.ChangeState(model.designType == DesignType.MapObject ? 1 : 0);
+            view.sta_event.ChangeState(model.designType == DesignType.Event ? 1 : 0);
         }
     }
-   
-   
+
+
 }

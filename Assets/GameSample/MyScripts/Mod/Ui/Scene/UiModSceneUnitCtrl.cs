@@ -31,7 +31,7 @@ namespace Ui.ModSceneUnit
             set
             {
                 float.TryParse(value, out float v);
-                var x = (v + ModManager.instance.sceneCtrl.offset) * MapManager.instance.data.mainData.mapUnitSize.x;
+                var x = MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)).x;
                 var newPos = new Vector3(x, data.pos.y, data.pos.z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
@@ -41,7 +41,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return (data.pos.x / MapManager.instance.data.mainData.mapUnitSize.x - ModManager.instance.sceneCtrl.offset).ToString("0.##");
+                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos)).x.ToString("0.##");
             }
         }
         public string posY
@@ -53,8 +53,8 @@ namespace Ui.ModSceneUnit
                 TileUnitForm.Data belongMap = ((MapUnit)data.unit).belongTile.data;
 
 
-                float minV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset;
-                float maxV = belongMap.mapPos.y - ModManager.instance.sceneCtrl.offset + 0.9f;
+                float minV = GameManager.MapPosToPlayerPos(belongMap.mapPos.y);
+                float maxV = GameManager.MapPosToPlayerPos(belongMap.mapPos.y+ 0.9f);
 
                 if (v < minV)
                 {
@@ -66,7 +66,7 @@ namespace Ui.ModSceneUnit
                     v = maxV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("maxYTip"));
                 }
-                var newPos = new Vector3(data.pos.x, (v + ModManager.instance.sceneCtrl.offset) * MapManager.instance.data.mainData.mapUnitSize.y, data.pos.z);
+                var newPos = new Vector3(data.pos.x,MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)) .y, data.pos.z);
 
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
@@ -76,7 +76,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return (data.pos.y / MapManager.instance.data.mainData.mapUnitSize.y - ModManager.instance.sceneCtrl.offset).ToString("0.##");
+                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos)).y.ToString("0.##");
             }
         }
         public string posZ
@@ -84,7 +84,7 @@ namespace Ui.ModSceneUnit
             set
             {
                 float.TryParse(value, out float v);
-                var z = (v + ModManager.instance.sceneCtrl.offset) * MapManager.instance.data.mainData.mapUnitSize.z;
+                var z = MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)).z;
 
                 var newPos = new Vector3(data.pos.x, data.pos.y, z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
@@ -95,7 +95,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return (data.pos.z / MapManager.instance.data.mainData.mapUnitSize.z - ModManager.instance.sceneCtrl.offset).ToString("0.##");
+                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos)).z.ToString("0.##");
             }
         }
         public string angle
@@ -159,9 +159,9 @@ namespace Ui.ModSceneUnit
             view.btn_aligh.onClick.AddListener(() =>
             {
                 TileUnitForm.Data mapData = (TileUnitForm.Data)model.data.unit.superUnit.data;
-                model.posX = (mapData.mapPos.x - ModManager.instance.sceneCtrl.offset).ToString();
-                model.posY = (mapData.mapPos.y - ModManager.instance.sceneCtrl.offset).ToString();
-                model.posZ = (mapData.mapPos.z - ModManager.instance.sceneCtrl.offset).ToString();
+                model.posX = GameManager.MapPosToPlayerPos(mapData.mapPos.x).ToString();
+                model.posY = GameManager.MapPosToPlayerPos(mapData.mapPos.y).ToString();
+                model.posZ = GameManager.MapPosToPlayerPos(mapData.mapPos.z).ToString();
                 Refresh();
 
             });

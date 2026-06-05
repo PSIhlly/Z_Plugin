@@ -120,7 +120,7 @@ namespace Ui.PlayMap
 
                     missionCon.Clear();
                     var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                    if (missionData != null)
+                    if (missionData == null)
                     {
                         missionCon.Add(new UiMissionParam()
                         {
@@ -128,6 +128,9 @@ namespace Ui.PlayMap
                         });
                     }
                     missionCon.Refresh();
+
+
+
 
                     markCon.Clear();
                     var marks = PlayManager.instance.mapCtrl.dic;
@@ -248,6 +251,7 @@ namespace Ui.PlayMap
             var relativePos = new Vector2((model.prm.data.targetPos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.data.targetPos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
             view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
             view.rtf_area.sizeDelta.Set(model.prm.data.radius*2, model.prm.data.radius*2);
+            
         }
     }
 

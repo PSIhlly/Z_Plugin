@@ -31,7 +31,6 @@ public interface InternalModSceneController
 public interface ExternalModSceneController
 {
     public DesignType designType { get; set; }
-    public int offset { get; set; }
 
     public int layer { get; set; }
     public int cntX { get; set; }
@@ -70,7 +69,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     #region extern Var
     private DesignType _designType;
-    public int _offset = 500;
 
     private int _layer = 0;
     private int _cntX = 1;
@@ -84,7 +82,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     private MapBaseForm.Data _curData;
     public DesignType designType { get => _designType; set => _designType = value; }
 
-    public int offset { get => _offset; set => _offset = value; }
 
 
     public int layer { get => _layer; set => _layer = value; }
@@ -105,7 +102,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 5, 15);
-        CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), mapMgr.data.mainData.mapUnitSize);
+        CameraInstance.instance.tarTrs.position = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
         switch (DynamicGlobalSettings.cameraMode)
         {
             case CameraMode.Overhead:

@@ -29,7 +29,7 @@ namespace Z_Code
             var data = MapObjectForm.DataByName[prm[0].str];
 
             var key = data.id.ToString();
-            var newObjectData = MapManager.instance.AddObject(key, MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)), data.name, null);
+            var newObjectData = MapManager.instance.AddObject(key, MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num))), data.name, null);
             if (newObjectData != null)
             {
                 GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);

@@ -259,14 +259,16 @@ namespace Ui.ModAssetSelectWindow
             {
                 if (model.prm.lab == TextManager.instance.GetTxt("new"))
                 {
-                    NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("inputNewLab"), true, (v) =>
+                    if(parent.model.sel != null)
                     {
-                        parent.model.sel.lab = v;
-                        parent.Refresh();
-                        return true;
-                    });
-
-
+                        NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("inputNewLab"), true, (v) =>
+                        {
+                            parent.model.sel.lab = v;
+                            parent.model.sel = null;
+                            parent.Refresh();
+                            return true;
+                        });
+                    }
                 }
                 else
                 {

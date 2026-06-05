@@ -25,6 +25,12 @@ namespace Z_ByteSerialize
             {
                 jo[key] = null;
             }
+            else if (value is string str)
+            {
+                if (str == null)
+                    str = "";
+                jo[key] = JToken.FromObject(str);
+            }
             else if (value is Vector2 v2)
             {
                 jo[key] = v2.x + "|" + v2.y;
@@ -69,6 +75,22 @@ namespace Z_ByteSerialize
             {
 
                 jo[key] = (int)value;
+            }
+            else if (tp.IsGenericType && tp.GetGenericTypeDefinition() == typeof(Tuple<,>))
+            {
+                var tuple = value;
+                JObject subJo = new JObject();
+                subJo.Set(tp.GetGenericArguments()[0], "item1", tp.GetProperty("Item1").GetValue(tuple));
+                subJo.Set(tp.GetGenericArguments()[1], "item2", tp.GetProperty("Item2").GetValue(tuple));
+                jo[key] = subJo;
+            }
+            else if (tp.IsGenericType && tp.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
+            {
+                var tuple = value;
+                JObject subJo = new JObject();
+                subJo.Set(tp.GetGenericArguments()[0], "item1", tp.GetField("Item1").GetValue(tuple));
+                subJo.Set(tp.GetGenericArguments()[1], "item2", tp.GetField("Item2").GetValue(tuple));
+                jo[key] = subJo;
             }
             else
             {
@@ -148,6 +170,22 @@ namespace Z_ByteSerialize
                         }
                     }
                     return obj;
+                }
+                else if (tp.IsGenericType && tp.GetGenericTypeDefinition() == typeof(Tuple<,>))
+                {
+                    JObject subJo = (JObject)jo[key];
+                    var args = tp.GetGenericArguments();
+                    var item1 = subJo.Get(args[0], "item1");
+                    var item2 = subJo.Get(args[1], "item2");
+                    return Activator.CreateInstance(tp, item1, item2);
+                }
+                else if (tp.IsGenericType && tp.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
+                {
+                    JObject subJo = (JObject)jo[key];
+                    var args = tp.GetGenericArguments();
+                    var item1 = subJo.Get(args[0], "item1");
+                    var item2 = subJo.Get(args[1], "item2");
+                    return Activator.CreateInstance(tp, item1, item2);
                 }
                 else if (tp.IsEnum)
                 {

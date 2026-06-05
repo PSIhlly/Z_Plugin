@@ -1,0 +1,51 @@
+[
+  {
+    "uid": 1,
+    "name": "A1",
+    "miniMap": "reservedI$",
+    "pos": "0.3408709|0.5177268",
+    "unlock": false,
+    "hideInLargeMap": false,
+    "events": [
+      {
+        "k": "onEnterEvent",
+        "v": {
+          "uid": -1,
+          "name": "onEnterEvent",
+          "evt": [
+            {
+              "v": "开幕对话"
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveEvent",
+          "evt": [
+            {
+              "v": "New1"
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggeredOnceEvts": [],
+    "notFirstTime": false
+  },
+  {
+    "uid": 3,
+    "name": "A2",
+    "miniMap": "reservedI$",
+    "pos": "0.6745405|0.2979371",
+    "unlock": false,
+    "hideInLargeMap": false,
+    "events": [],
+    "triggeredOnceEvts": [],
+    "notFirstTime": false
+  }
+]

@@ -6,7 +6,7 @@ using Z_DesignStyle;
 using Z_Text;
 using Z_Ui.Base;
 
-namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
+namespace Ui.PlayDataCharacter.PlayDataCharacterEquip
 {
 
     public partial class UiPlayDataCharacterEquipParam
@@ -18,7 +18,6 @@ namespace Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip
         public CharacterProductForm.Data data;
         public EquipPartType selPart;
         public ItemProductForm.Data sel;
-
     }
     public partial class UiPlayDataCharacterEquipCtrl
     {

@@ -1,0 +1,44 @@
+[
+  {
+    "id": 3,
+    "name": "New0",
+    "icon": "reservedI$",
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": "Cube"
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": "$i$6b80978a27bfbac1e425b25b57cbf657be3e979f$i$"
+            },
+            {
+              "v": "$i$1c3664e947c4a0659416af0a0d431c94c17eb2f8$i$"
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false
+    },
+    "label": "",
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": ""
+  }
+]

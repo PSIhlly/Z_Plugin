@@ -1,0 +1,555 @@
+[
+  {
+    "uid": 1,
+    "name": "雾雨魔理沙",
+    "label": "自机",
+    "avatarTexName": "$i$1d80b78ca2feb696b86fbeb9964e49f7402dcd98$i$",
+    "paramDic": [
+      {
+        "k": "Hp",
+        "v": {
+          "uid": 1,
+          "name": "Hp",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 100.0,\r\n  \"dic\": []\r\n}",
+          "max": "HpMax",
+          "showType": 1
+        }
+      },
+      {
+        "k": "HpMax",
+        "v": {
+          "uid": -1,
+          "name": "HpMax",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 100.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 1
+        }
+      },
+      {
+        "k": "Speed",
+        "v": {
+          "uid": 2,
+          "name": "Speed",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      }
+    ],
+    "protoUid": 0,
+    "animDic": [
+      {
+        "k": "anim",
+        "v": {
+          "uid": 0,
+          "name": "anim",
+          "animClip": [
+            {
+              "k": 0,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$121a81e4e91d533f9e33755d337bc68f73038d9e$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "$i$121a81e4e91d533f9e33755d337bc68f73038d9e$i$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 1,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 2,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 3,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "k": 4,
+              "v": [
+                {
+                  "v": {
+                    "uid": 0,
+                    "equipStyle": [],
+                    "equipTrs": [
+                      {
+                        "k": 0,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 1,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 2,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 3,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      },
+                      {
+                        "k": 4,
+                        "v": {
+                          "Item1": 0.5,
+                          "Item2": 0.5,
+                          "Item3": 1,
+                          "Item4": 0.5
+                        }
+                      }
+                    ],
+                    "partTex": [
+                      {
+                        "k": 0,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 1,
+                        "v": "reservedI$"
+                      },
+                      {
+                        "k": 2,
+                        "v": "reservedI$"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "animTimeInterval": 0.2,
+          "scale": 1.0,
+          "partEnable": [
+            {
+              "k": 0,
+              "v": false
+            },
+            {
+              "k": 1,
+              "v": true
+            },
+            {
+              "k": 2,
+              "v": false
+            }
+          ]
+        }
+      }
+    ],
+    "defaultAnimName": [
+      {
+        "k": "idle",
+        "v": "anim"
+      },
+      {
+        "k": "move",
+        "v": "anim"
+      },
+      {
+        "k": "idle0",
+        "v": "anim"
+      },
+      {
+        "k": "move0",
+        "v": "anim"
+      },
+      {
+        "k": "idle1",
+        "v": "anim"
+      },
+      {
+        "k": "move1",
+        "v": "anim"
+      },
+      {
+        "k": "idle2",
+        "v": "anim"
+      },
+      {
+        "k": "move2",
+        "v": "anim"
+      },
+      {
+        "k": "idle3",
+        "v": "anim"
+      },
+      {
+        "k": "move3",
+        "v": "anim"
+      }
+    ],
+    "faceType": 0,
+    "speedParamName": "Speed",
+    "hpParamName": "Hp",
+    "events": [],
+    "equips": [],
+    "desc": "魔理沙是一个魔法使。身为一个人类却能够驱使强大的魔法，想在和灵梦竞争一般进行着在异变时插手进行妖怪降伏。",
+    "illustration": "$i$ce0db3835899e84095d7a525195235e1e6b58c7f$i$",
+    "unique": true,
+    "skill": [],
+    "recoveryTime": 0.0,
+    "enableNav": false,
+    "minimapIcon": ""
+  }
+]

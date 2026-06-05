@@ -197,6 +197,8 @@ namespace Options
             public Img img_func;
             public Btn btn_menu;
             public Img img_menu;
+            public Btn btn_skipVideo;
+            public Img img_skipVideo;
             public Btn btn_history;
             public Btn btn_hide;
             public Sta sta_skip;
@@ -211,12 +213,14 @@ namespace Options
             img_func = uiHolder.elementTrsLst[2].GetComponent<Img>();
             btn_menu = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             img_menu = uiHolder.elementTrsLst[4].GetComponent<Img>();
-            btn_history = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            btn_hide = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_skip = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_skip = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_autoPlay = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            btn_autoPlay = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            btn_skipVideo = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            img_skipVideo = uiHolder.elementTrsLst[6].GetComponent<Img>();
+            btn_history = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            btn_hide = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_skip = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_skip = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_autoPlay = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            btn_autoPlay = uiHolder.elementTrsLst[12].GetComponent<Btn>();
         }
 
     }

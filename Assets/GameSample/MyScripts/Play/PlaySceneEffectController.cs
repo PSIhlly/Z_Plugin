@@ -152,7 +152,10 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 {
                     temps.Add(pair.Key);
                     pair.Value.Reset();
-                    InstancePoolManager.instance.DeleteInstance(pair.Value.gameObject, canvasPrefab);
+                    if(pair.Value!=null)
+                    {
+                        InstancePoolManager.instance.DeleteInstance(pair.Value.gameObject, canvasPrefab);
+                    }
 
                 }
             }

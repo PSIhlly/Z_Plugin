@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Z_Ui.Base;
-using Z_Texture;
-using Z_String;
+using UnityEngine.TextCore.Text;
 using Z_Code;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
+using Z_String;
 using Z_Text;
+using Z_Texture;
+using Z_Ui.Base;
 
 namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
 {
@@ -38,11 +40,15 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
         {
 
             argIptCon.Clear();
-            foreach (var data in model.data.paramDic.Values)
+            foreach (var data in ItemParamForm.DataByName.Values)
             {
+                if(!model.data.paramDic.ContainsKey(data.name))
+                {
+                    model.data.paramDic[data.name] = data.Copy();
+                }
                 argIptCon.Add(new UiArgIptParam()
                 {
-                    data = data
+                    data = model.data.paramDic[data.name]
                 });
             }
             foreach (var data in CharacterParamForm.DataByName.Values)

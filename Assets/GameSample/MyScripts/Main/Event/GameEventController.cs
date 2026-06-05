@@ -203,6 +203,7 @@ public class GameEventController : Z_Controller<GameManager>
         storyTriggerCtrl = new GameEventStoryTriggerController(this);
         tasks = new List<Func<bool>>();
         releaseTriggerTuple = new HashSet<(int, string)>();
+
     }
     public void Reset()
     {
@@ -233,51 +234,17 @@ public class GameEventController : Z_Controller<GameManager>
             tasks.Add(func);
         }
     }
+    public void ClearScene()
+    {
+        EventInterpretDataForm.DataByUid.Clear();
+        tasks.Clear();
+    }
 
     public void LateUpdate()
     {
-        //lifeEvent
-        if (!GameManager.instance.curScene.notFirstTime)
-        {
-            GameManager.instance.curScene.notFirstTime = true;
-            Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.FirstEnter });
-        }
-        if (GameManager.instance.curProgress.targetScene.Item1 != GameManager.instance.curScene.uid)
-        {
-            if (GameManager.instance.curProgress.eventState != EventState.Leave)
-            {
-                GameManager.instance.curProgress.eventState = EventState.Leave;
-                EventInterpretDataForm.DataByUid.Clear();
-                tasks.Clear();
-                Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.Leave }); 
-                foreach (var data in UnitForm.DataByUid.Values)
-                {
-                    if(data.unit is MapUnit unit)
-                    {
-                        var evt = unit.evtDic.GetDv("onLeaveSceneEvent", null);
-                        if(evt!=null)
-                        {
-                            TriggerEventExecute(evt, data.uid, null);
-                        }
-                    }
-                }
 
-            }
-            var lstLeave = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
-            ManageEventDatas(lstLeave);
-            if (EventInterpretDataForm.DataByUid.Count == 0)
-            {
-                Main2StoryManager.instance.ChangeScene(GameManager.instance.curProgress.targetScene.Item1);
-                PlayManager.instance.sceneCtrl.SetPlayerPos(GameManager.instance.curProgress.targetScene.Item2);
-            }
-
-        }
-        else
-        {
-            var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
-            ManageEventDatas(lst);
-        }
-
+        var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
+        ManageEventDatas(lst);
 
     }
     private void ManageEventDatas(List<EventInterpretDataForm.Data> lst)
@@ -390,7 +357,7 @@ public class GameEventController : Z_Controller<GameManager>
     {
         if (evt == null)
             return;
-        if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent")
+        if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent"&& releaseTrigger != "onLeaveEvent")
             return;
         var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;
@@ -404,8 +371,8 @@ public class GameEventController : Z_Controller<GameManager>
         {
             if (!IsCorrect(retType, data.returnValue))
                 continue;
-            var cat = data.category == "" ? TextManager.instance.GetTxt("unclassified") : data.category;
-            var type = data.type == "" ? TextManager.instance.GetTxt("unclassified") : data.type;
+            var cat = data.category == "" ? TextManager.instance.GetTxt(GlobalNameHelper.defaultLab) : data.category;
+            var type = data.type == "" ? TextManager.instance.GetTxt(GlobalNameHelper.defaultLab) : data.type;
             if (!res.subs.ContainsKey(cat))
             {
                 res.Add(cat);
@@ -496,4 +463,5 @@ public class GameEventController : Z_Controller<GameManager>
             return allowRetType == retType;
         }
     }
+
 }

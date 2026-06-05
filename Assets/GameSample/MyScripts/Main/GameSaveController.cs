@@ -47,10 +47,14 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void Package(int storyId)
     {
-        var icon = Texture2D.whiteTexture;
-        if (TexAssetForm.DataByName.ContainsKey(GameManager.instance.curStory.icon))
+        Texture2D icon;
+        try
+        { 
+            icon = (Texture2D)AssetManager.instance.texCtrl.CreateDataByBytes(GameManager.instance.curStory.icon.ToArray(),"tmp").GetTex();
+        }
+        catch (Exception e)
         {
-            icon = (Texture2D)TexAssetForm.DataByName[GameManager.instance.curStory.icon].GetTex();
+            icon = Texture2D.whiteTexture;
         }
         File.WriteAllBytes(AssetManager.externPatn + storyId + ".png", TextureHelper.GetPNGWithExtraInfo(icon, System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)))));
     }
@@ -114,6 +118,17 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveEvent(path);
         SaveConfig(path);
         SaveScene(path);
+
+        foreach (var data in SceneForm.DataByUid.Values)
+        {
+            if (!SaveAndLoad.Exist(path + Main2StoryManager.GetSceneFileNameById(data.uid)))
+            {
+                var mapData = new GameMapData();
+                mapData.Init();
+                GameManager.instance.saveCtrl.SaveSceneMap(path + Main2StoryManager.GetSceneFileNameById(data.uid), mapData);
+            }
+        }
+
         SaveAndLoad.Delete(Main2StoryManager.GetStorySaveFolder(id));
         SaveAssets(path);
     }
@@ -193,7 +208,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveAssets(string storyCoreFolder)
     {
-        
+
         SaveAndLoad.Save(storyCoreFolder + "/" + imageAssetFormFileName, StoryTexAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + audioAssetFormFileName, StoryAudioAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + videoAssetFormFileName, StoryVideoAssetForm.GetJaByDatas().ToString());
@@ -510,8 +525,11 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var form in StoryTexAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
             {
-                StoryTexAssetForm.AddData(form);
-                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+                if (form != null)
+                {
+                    StoryTexAssetForm.AddData(form);
+                    form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+                }
             }
         }
         path = folder + audioAssetFormFileName;
@@ -532,7 +550,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
             }
         }
-        if(!StoryTexAssetForm.DataByName.ContainsKey(GlobalNameHelper.GetExternDefaultTexName()))
+        if (!StoryTexAssetForm.DataByName.ContainsKey(GlobalNameHelper.GetExternDefaultTexName()))
         {
             StoryTexAssetForm.AddData(new StoryTexAssetForm.Data(AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture), GlobalNameHelper.GetExternDefaultTexName())));
 
@@ -616,6 +634,8 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = StoryTexAssetForm.DataByName[data.name];
             StoryTexAssetForm.RemoveData(oldData.id);
         }
+        if (data.lab == null)
+            data.lab = "";
         StoryTexAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -631,6 +651,8 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = GameTexAssetForm.DataByName[data.name];
             GameTexAssetForm.RemoveData(oldData.id);
         }
+        if (data.lab == null)
+            data.lab = "";
         GameTexAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -654,6 +676,8 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = TexAssetForm.DataByName[data.name];
             TexAssetForm.RemoveData(oldData.id);
         }
+        if (data.lab == null)
+            data.lab = "";
         TexAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -670,6 +694,8 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = StoryAudioAssetForm.DataByName[data.name];
             StoryAudioAssetForm.RemoveData(oldData.id);
         }
+        if (data.lab == null)
+            data.lab = "";
         StoryAudioAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -686,6 +712,8 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = StoryVideoAssetForm.DataByName[data.name];
             StoryVideoAssetForm.RemoveData(oldData.id);
         }
+        if (data.lab == null)
+            data.lab = "";
         StoryVideoAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()

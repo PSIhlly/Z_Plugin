@@ -18,6 +18,7 @@ namespace Z_Ui.Dialog
     public enum PlayType
     {
         ClipMainTextOver,
+        ClipVideoOver,
         ClipSettingChange,
         ClipOver
     }

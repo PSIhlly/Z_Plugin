@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using Z_ByteSerialize;
@@ -20,9 +21,19 @@ namespace Z_DataSystem.Form
     {
         public partial class Data
         {
-            public void Play(MediaPlayer player)
+            public void Play(MediaPlayer player, Action onComplete)
             {
                 player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);
+                UnityAction<MediaPlayer, MediaPlayerEvent.EventType, ErrorCode> handler = null;
+                handler = (mp, et, errorCode) =>
+                {
+                    if (et == MediaPlayerEvent.EventType.FinishedPlaying)
+                    {
+                        player.Events.RemoveListener(handler);
+                        onComplete?.Invoke();
+                    }
+                };
+                player.Events.AddListener(handler);
             }
         }
     }

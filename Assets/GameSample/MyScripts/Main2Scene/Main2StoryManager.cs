@@ -1,4 +1,5 @@
 using Form;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         string storyFolder = GetStoryFolderNameById(storyId);
         if (!SaveAndLoad.Exist(GetStoryCoreFolder(storyFolder)))
         {
-            StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", GlobalNameHelper.GetDefaultTexName()));
+            StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", null));
             SceneForm.Clear();
             var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(),Vector2.zero  ,false,false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(),  false);
             SceneForm.AddData(sceneData);
@@ -44,7 +45,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, sceneData.uid, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(),  CameraMode.Overhead, ClipForm.defaultData.Copy(),   0, defaultStyle,false,false,true,true,true,true,true,"",0,(1,Vector3.zero),false,EventState.Normal); 
+            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(),  CameraMode.Overhead, ClipForm.defaultData.Copy(),   0, defaultStyle,false,false,true,true,true,true,true,"",0,(sceneData.uid, Vector3.zero),false,EventState.Normal); 
             ProgressForm.AddData(progress);
             var data = new GameMapData();
             data.Init();
@@ -60,18 +61,22 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                     var dialogEvt = EventProgramDataForm.DataByName["mainDialog"];
                     dialogEvt.ApplyCode(@"ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");GameOver();");
 
-                    sceneData.events["onBeginEvent"] = new EventTriggerForm.Data(-1, "onBeginEvent", new List<string>() { "mainDialog" }, default);
+                    sceneData.events["onEnterEvent"] = new EventTriggerForm.Data(-1, "onEnterEvent", new List<string>() { "mainDialog" }, default);
                     break;
                 case EditorStyle.Rpg:
                 case EditorStyle.RpgAdvanced:
                     var prmBox = CodeHelper.CreateBoxByNum(100);
-                    var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), BoxDataForm.GetJoByData(prmBox).ToString(), ParamShowType.AlwaysWithPanel);
+                    var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "HpMax", ParamShowType.AlwaysWithPanel);
+                    var hpMaxParamData = new CharacterParamForm.Data(-1, "HpMax", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", ParamShowType.AlwaysWithPanel);
                     prmBox.num = 5;
-                    var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), BoxDataForm.GetJoByData(prmBox).ToString(), default);
+                    var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", default);
                     CharacterParamForm.AddData(hpParamData);
                     CharacterParamForm.AddData(speedParamData);
                     player.hpParamName = "Hp";
                     player.speedParamName = "Speed";
+                    player.paramDic[player.hpParamName] = hpParamData.Copy();
+                    player.paramDic["HpMax"] = hpMaxParamData.Copy();
+                    player.paramDic[player.speedParamName] = speedParamData.Copy();
                     break;
             }
             GameManager.instance.saveCtrl.SaveCoreStory(storyId);
@@ -128,14 +133,14 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         DynamicGlobalSettings.playing = false;
         ModManager.instance.BeginScene(sceneId);
     }
-    public async void StartLoadScenePlay(int sceneId)
+    public async void StartLoadScenePlay(int sceneId,Action onMapComplete=null)
     {
-        bool ok = await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId);
+        bool ok = await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId, onMapComplete);
         DynamicGlobalSettings.playing = true;
         PlayManager.instance.BeginScene(sceneId);
     }
 
-    private async Task<bool> StartLoadScene(string storyFolder, int id)
+    private async Task<bool> StartLoadScene(string storyFolder, int id,Action onMapComplete=null)
     {
         if (!SaveAndLoad.Exist(storyFolder + "/" + GetSceneFileNameById(id)))
         {
@@ -167,7 +172,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 1, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
          
         MapManager.instance.Begin(data);
-
+        onMapComplete?.Invoke();
 
 
 
@@ -203,11 +208,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameManager.instance.characterCtrl.Reset();
         GameManager.instance.curScene = null;
     }
-    public void ChangeScene(int sceneId)
+    public void ChangeScene(int sceneId,Action oncomplete=null)
     {
         UnloadScenePlay();
 
-        StartLoadScenePlay(sceneId);
+        StartLoadScenePlay(sceneId, oncomplete);
     }
     #endregion
 

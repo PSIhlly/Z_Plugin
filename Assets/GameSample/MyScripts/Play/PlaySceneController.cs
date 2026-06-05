@@ -161,7 +161,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         //item correct
         foreach (var data in ItemUnitForm.DataByUid.Values)
         {
-            var cur = CharacterProductForm.DataByUid.GetDv(data.unit.productInfo.Item1, null);
+            var cur = ItemProductForm.DataByUid.GetDv(data.unit.productInfo.Item1, null);
             if (cur != null)
             {
                 if (string.IsNullOrEmpty(data.minimapIcon))
@@ -323,12 +323,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         CameraInstance.instance.tarTrs.position = new Vector3(x, y, z);
         //Z_EventHelper.Invoke(new CameraMoveEvent());
     }
-    public void EnterScene(int sceneId)
-    {
-        MapManager.instance.ClearEnteredScene();
-        Main2StoryManager.instance.UnloadScenePlay();
-        Main2StoryManager.instance.StartLoadScenePlay(sceneId);
-    }
+
     public CharacterUnitForm.Data GetCharacterUnit(int productUid)
     {
         var data = CharacterProductForm.DataByUid.GetDv(productUid, null);
@@ -362,11 +357,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetPlayerPos(Vector3 pos)
     {
+        GameManager.instance.curProgress.pos = pos;
         if (_playerM == null || _playerM.unit.ins == null)
             return;
         _playerM.unit.ins.transform.position = pos;
         _playerM.pos = pos;
-        GameManager.instance.curProgress.pos = pos;
     }
     public void SetPlayerMove(Vector3 dir)
     {

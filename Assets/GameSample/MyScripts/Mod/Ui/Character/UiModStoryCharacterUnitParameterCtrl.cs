@@ -37,11 +37,15 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
 
             argIptCon.Clear();
-            foreach (var data in model.data.paramDic.Values)
+            foreach (var data in CharacterParamForm.DataByName.Values)
             {
+                if (!model.data.paramDic.ContainsKey(data.name))
+                {
+                    model.data.paramDic[data.name] = data.Copy();
+                }
                 argIptCon.Add(new UiArgIptParam()
                 {
-                    data = data
+                    data = model.data.paramDic[data.name]
                 });
             }
             argIptCon.Refresh();

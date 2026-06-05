@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem.Form;
-using Ui.PlayData.PlayDataCharacter.PlayDataCharacterData;
-using Ui.PlayData.PlayDataCharacter.PlayDataCharacterEquip;
-using Ui.PlayData.PlayDataCharacter.PlayDataCharacterSkill;
+using Ui.PlayDataCharacter.PlayDataCharacterData;
+using Ui.PlayDataCharacter.PlayDataCharacterEquip;
+using Ui.PlayDataCharacter.PlayDataCharacterSkill;
 
-namespace Ui.PlayData.PlayDataCharacter
+namespace Ui.PlayDataCharacter
 {
 
     public partial class UiPlayDataCharacterParam
@@ -29,7 +29,10 @@ namespace Ui.PlayData.PlayDataCharacter
         UiScrViewContainer<UiGameItemCtrl> itemCon;
         public override void OnCreate()
         {
-
+            view.btn_back.onClick.AddListener(() =>
+            {
+                Close();
+            });
             view.btn_data.onClick.AddListener(() =>
             {
                 model.module = 1;
@@ -88,11 +91,11 @@ namespace Ui.PlayData.PlayDataCharacter
             });
             view.btn_skill.gameObject.SetActive(GameManager.instance.curProgress.enableSkill);
             view.btn_equip.gameObject.SetActive(GameManager.instance.curProgress.enableEquip);
-            /*            view.sta_skill.ChangeState(model.module == 3 ? 1 : 0);
-                        view.page_PlayDataCharacterSkill.SetActive(model.module == 3, new UiPlayDataCharacterSkillParam()
-                        {
-                            data = model.sel
-                        });*/
+            view.sta_skill.ChangeState(model.module == 3 ? 1 : 0);
+            view.page_PlayDataCharacterSkill.SetShow(model.module == 3, new UiPlayDataCharacterSkillParam()
+            {
+                data = model.sel
+            });
         }
         public void Sel(CharacterProductForm.Data data)
         {

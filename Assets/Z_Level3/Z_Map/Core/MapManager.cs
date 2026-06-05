@@ -194,7 +194,7 @@ public class MapManager : Z_MonoManager<MapManager>
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
         if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
         {
-            return null;
+            mapPos = utilCtrl.GetClosestInArea(mapPos);
         }
         var cData = this.data.AddCharacter(prefabName, isMine, extra);
         cData.pos = realPos;

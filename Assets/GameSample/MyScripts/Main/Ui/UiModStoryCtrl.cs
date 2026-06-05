@@ -93,7 +93,8 @@ namespace Ui.ModStory
             });
             view.btn_mission.onClick.AddListener(() =>
             {
-                UiManager.instance.ShowUi<UiModStoryMissionCtrl>();
+                model.curUi = view.page_ModStoryMission;
+                Refresh();
             });
             view.btn_style.onClick.AddListener(() =>
             {

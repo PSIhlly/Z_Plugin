@@ -548,7 +548,9 @@ namespace PlaySceneMinimap
             public GameObject go_action;
             public UiActionCtrl sub_action;
             public Btn btn_menu;
-            public Btn btn_data;
+            public Btn btn_dataBackpack;
+            public Btn btn_dataCharacter;
+            public Btn btn_dataTeam;
         public UiPlaySceneMainView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -569,7 +571,9 @@ namespace PlaySceneMinimap
             go_action = uiHolder.elementTrsLst[14].gameObject;
             sub_action = (UiActionCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
             btn_menu = uiHolder.elementTrsLst[16].GetComponent<Btn>();
-            btn_data = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            btn_dataBackpack = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            btn_dataCharacter = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            btn_dataTeam = uiHolder.elementTrsLst[19].GetComponent<Btn>();
         }
 
     }

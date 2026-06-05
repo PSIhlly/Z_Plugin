@@ -40,11 +40,15 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitParameter
         {
 
             argIptCon.Clear();
-            foreach (var data in model.data.paramDic.Values)
+            foreach (var data in SkillParamForm.DataByName.Values)
             {
+                if (!model.data.paramDic.ContainsKey(data.name))
+                {
+                    model.data.paramDic[data.name] = data.Copy();
+                }
                 argIptCon.Add(new UiArgIptParam()
                 {
-                    data = data
+                    data = model.data.paramDic[data.name]
                 });
             }
             argIptCon.Refresh();

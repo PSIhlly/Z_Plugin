@@ -46,6 +46,17 @@ namespace Z_DataSystem.Form
                 }
                 return _texture;
             }
+            public byte[] GetBytes()
+            {
+              
+                    if (bytes == null)
+                    {
+                        bytes = File.ReadAllBytes(path);
+                        return bytes;
+                    }
+                    
+                return null;
+            }
 
             public void GetSpriteAsync(Action<Sprite> onLoaded)
             {

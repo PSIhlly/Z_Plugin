@@ -37,7 +37,7 @@ namespace Ui.ModSceneMenu
                 if (Time.time - model.lastSaveTime > 60)
                 {
                     NotifyManager.instance.AddPopup(
-                        "",TextManager.instance.GetTxt("savePopupTitle"), true,
+                        "", TextManager.instance.GetTxt("savePopupTitle"), true,
                         new List<string>() { TextManager.instance.GetTxt("yes"), TextManager.instance.GetTxt("no") },
                         new List<Func<bool>>() {
                             ()=>{

@@ -6,6 +6,19 @@ using Z_DesignStyle;
 using Z_Ui;
 using Z_Ui.Loading;
 using Z_UnitSystem;
+
+public enum StoryLifeEventType
+{
+    FirstEnter = 0,
+    EverySecond = 1,
+    Enter = 3,
+    Leave = 2,
+}
+public class StoryLifeEvent : Z_Event
+{
+    public StoryLifeEventType type;
+}
+
 public enum ParamShowType
 {
     Always,
@@ -69,6 +82,40 @@ public class PlayManager : Z_MonoManager<PlayManager>
         {
             return;
         }
+        if (GameManager.instance.curProgress.targetScene.Item1 == GameManager.instance.curScene.uid && GameManager.instance.curProgress.sceneId != GameManager.instance.curScene.uid)
+        {
+            GameManager.instance.curProgress.sceneId = GameManager.instance.curScene.uid;
+            if (!GameManager.instance.curScene.notFirstTime)
+            {
+                GameManager.instance.curScene.notFirstTime = true;
+                Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.FirstEnter });
+            }
+            else
+            {
+
+                Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.Enter });
+            }
+        }
+        //lifeEvent
+        if (GameManager.instance.curProgress.targetScene.Item1 != GameManager.instance.curScene.uid && GameManager.instance.curProgress.eventState != EventState.Leave)
+        {
+            GameManager.instance.curProgress.eventState = EventState.Leave;
+            Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.Leave });
+        }
+
+
+        if (GameManager.instance.curProgress.eventState == EventState.Leave)
+        {
+            if (EventInterpretDataForm.DataByUid.Count == 0)
+            {
+                Main2StoryManager.instance.ChangeScene(GameManager.instance.curProgress.targetScene.Item1, () =>
+                {
+                    GameManager.instance.curProgress.pos = (MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2)));
+                });
+                GameManager.instance.curProgress.eventState = EventState.Normal;
+            }
+        }
+
         _sceneCtrl.Update();
         _infoCtrl.Update();
         effectCtrl.Update();
@@ -105,11 +152,22 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
         LoadingManager.instance.RemoveLoadItem("playData");
 
-        Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.sceneId);
+        Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.targetScene.Item1, () =>
+        {
+            if (GameManager.instance.curProgress.sceneId == 0)
+            {
+                GameManager.instance.curProgress.pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2));
+            }
+        });
+
+
         _assetCtrl.Begin();
 
         effectCtrl.Begin();
+
+
         enable = true;
+
     }
 
 
@@ -151,7 +209,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         var characters = new List<int>();
         var charactersActive = new List<int>();
 
-        foreach(var ch in CharacterProductForm.DataByUid.Values)
+        foreach (var ch in CharacterProductForm.DataByUid.Values)
         {
             ch.CheckSkillProduct();
         }

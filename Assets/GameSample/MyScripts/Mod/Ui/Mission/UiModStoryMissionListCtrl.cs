@@ -8,6 +8,7 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Text;
 
 namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
 {
@@ -54,7 +55,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
             }
             labCon.Refresh();
             itemCon.Clear();
-            var datas = MissionForm.DatasByLabel.GetDk(model.lab, null);
+            var datas = MissionForm.DatasByLabel.GetDv(model.lab, null);
             if (datas != null)
             {
                 foreach (var data in datas)
@@ -64,14 +65,13 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
                         data = data
                     });
                 }
-                itemCon.Add(new UiBigItemParam()
-                {
-                    data = null
-                });
+                
             }
+            itemCon.Add(new UiBigItemParam()
+            {
+                data = null
+            });
             itemCon.Refresh();
-
-
 
         }
     }
@@ -107,7 +107,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
 
             view.sta_valid.ChangeState(model.lab == "" ? 0 : 1);
             view.sta_.ChangeState(model.lab == parent.model.lab ? 1 : 0);
-            view.txt_.text = model.lab;
+            view.txt_.text = model.lab == "" ? TextManager.instance.GetTxt(GlobalNameHelper.defaultLab):model.lab;
         }
     }
 

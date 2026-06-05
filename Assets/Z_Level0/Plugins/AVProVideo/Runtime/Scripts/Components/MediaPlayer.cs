@@ -480,7 +480,7 @@ namespace RenderHeads.Media.AVProVideo
 		}
 
 		public bool OpenMedia(MediaPathType pathType, string path, bool autoPlay = true)
-		{Debug.Log(path);
+		{
 			_mediaSource = MediaSource.Path;
 			_mediaPath.Path = path;
 			_mediaPath.PathType = pathType;

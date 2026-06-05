@@ -57,7 +57,9 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,List<Vector3>,List<Vector3>> changeSubprefabunitscaleAction;
                 
-        public static Action<Data,List<string>,List<string>> changeSubunittexsnameAction;
+        public static Action<Data,List<List<string>>,List<List<string>>> changeSubunittexsnameAction;
+                
+        public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
         public static Action<Data,bool,bool> changeIsobstacleAction;
                 
@@ -138,11 +140,11 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-                    private List<string>  _subUnitTexsName;
+                    private List<List<string>>  _subUnitTexsName;
                     /// <summary>
                     ///子预制件贴图
                     ///</summary>
-                    public List<string>  subUnitTexsName{
+                    public List<List<string>>  subUnitTexsName{
                                 get{return _subUnitTexsName;}
  set{
 
@@ -152,6 +154,24 @@ public static readonly int autoIdCnt=100;
                     }
         
                 _subUnitTexsName = value;
+                }
+                 
+                     }
+                    
+                    private float  _animTimeInterval;
+                    /// <summary>
+                    ///动画间隔
+                    ///</summary>
+                    public float  animTimeInterval{
+                                get{return _animTimeInterval;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeAnimtimeinterval(this,_animTimeInterval,value); 
+                    }
+        
+                _animTimeInterval = value;
                 }
                  
                      }
@@ -174,7 +194,7 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-            public Data(int id,List<string> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale,List<string> subUnitTexsName,bool isObstacle)
+            public Data(int id,List<string> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale,List<List<string>> subUnitTexsName,float animTimeInterval,bool isObstacle)
             {
 
              this.id = id;
@@ -182,6 +202,7 @@ public static readonly int autoIdCnt=100;
              this.subPrefabUnitPos = subPrefabUnitPos;
              this.subPrefabUnitScale = subPrefabUnitScale;
              this.subUnitTexsName = subUnitTexsName;
+             this.animTimeInterval = animTimeInterval;
              this.isObstacle = isObstacle;
 
             }
@@ -193,12 +214,13 @@ public static readonly int autoIdCnt=100;
              this.subPrefabUnitPos = data.subPrefabUnitPos;
              this.subPrefabUnitScale = data.subPrefabUnitScale;
              this.subUnitTexsName = data.subUnitTexsName;
+             this.animTimeInterval = data.animTimeInterval;
              this.isObstacle = data.isObstacle;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<string>():new List<string>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<string>():new List<string>(subUnitTexsName),isObstacle);
+        return new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<string>():new List<string>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<List<string>>():new List<List<string>>(subUnitTexsName),animTimeInterval,isObstacle);
                 }
             
             public virtual  void BeforeGet()
@@ -208,7 +230,7 @@ public static readonly int autoIdCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,new List<string>(){"Cube",},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},new List<string>(){"z_map_b$floor$0",},false);
+                   private static Data _defaultData=new Data(0,new List<string>(){"Cube",},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},null,0f,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -290,7 +312,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.SelectToken("subPrefabUnitScale")==null?defaultData.subPrefabUnitScale:jo.Get<List<Vector3>>("subPrefabUnitScale"),
 
-                jo.SelectToken("subUnitTexsName")==null?defaultData.subUnitTexsName:jo.Get<List<string>>("subUnitTexsName"),
+                jo.SelectToken("subUnitTexsName")==null?defaultData.subUnitTexsName:jo.Get<List<List<string>>>("subUnitTexsName"),
+
+                jo.SelectToken("animTimeInterval")==null?defaultData.animTimeInterval:jo.Get<float>("animTimeInterval"),
 
                 jo.SelectToken("isObstacle")==null?defaultData.isObstacle:jo.Get<bool>("isObstacle")
                     );
@@ -313,7 +337,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             jo.Set<List<Vector3>>("subPrefabUnitScale",data.subPrefabUnitScale);
 
-            jo.Set<List<string>>("subUnitTexsName",data.subUnitTexsName);
+            jo.Set<List<List<string>>>("subUnitTexsName",data.subUnitTexsName);
+
+            jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
             jo.Set<bool>("isObstacle",data.isObstacle);
 
@@ -441,12 +467,22 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     
             }
             
-            public static void ChangeSubunittexsname(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeSubunittexsname(Data superData,List<List<string>> oldV,List<List<string>> newV)
             {
                 if(superData is Data data)
                 {
 
                 changeSubunittexsnameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAnimtimeinterval(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimtimeintervalAction?.Invoke(data,oldV,newV);
                 }
                     
             }

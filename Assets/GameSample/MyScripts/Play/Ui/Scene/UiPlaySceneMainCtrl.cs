@@ -1,7 +1,6 @@
 using Form;
 using System.Collections.Generic;
 using Ui.ParamShow;
-using Ui.PlayData;
 using Ui.PlaySceneMenu;
 using Ui.Stick;
 using Unity.VisualScripting.Dependencies.Sqlite;
@@ -17,6 +16,8 @@ using Z_Map.Analysis;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_UnitSystem.Form;
+using Ui.PlayDataBackpack;
+using Ui.PlayDataCharacter;
 
 namespace Ui.PlaySceneMain
 {
@@ -108,11 +109,18 @@ namespace Ui.PlaySceneMain
             {
                 UiManager.instance.ShowUi<UiPlaySceneMenuCtrl>();
             });
-            view.btn_data.onClick.AddListener(() =>
+            view.btn_dataBackpack.onClick.AddListener(() =>
             {
                 if (GameManager.instance.curProgress.blockProgramUid == 0)
                 {
-                    UiManager.instance.ShowUi<UiPlayDataCtrl>();
+                    UiManager.instance.ShowUi<UiPlayDataBackpackCtrl>();
+                }
+            });
+            view.btn_dataCharacter.onClick.AddListener(() =>
+            {
+                if (GameManager.instance.curProgress.blockProgramUid == 0)
+                {
+                    UiManager.instance.ShowUi<UiPlayDataCharacterCtrl>();
                 }
             });
 

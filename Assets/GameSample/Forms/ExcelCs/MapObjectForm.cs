@@ -272,14 +272,10 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},"")},
-
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
                     _DataByName = new Dictionary<string, Data>() {
-    
-                        {"wall",_DataById[400001]},
     
                     
                     };
@@ -290,11 +286,7 @@ namespace Form
     
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
-                            {"",new List<Data>()},
-        
                 };
-
-                    _DatasByLabel[""].Add(_DataById[400001]);
 
 
             childInitAction?.Invoke();

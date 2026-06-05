@@ -32,7 +32,7 @@ namespace Z_Code
             var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER)];
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
 
-            var pos = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
+            var pos = GameManager.PlayerPosToMapPos(MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)));
 
             if (data.unit is CharacterUnit o)
             {

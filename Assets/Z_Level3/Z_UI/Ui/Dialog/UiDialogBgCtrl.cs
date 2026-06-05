@@ -31,7 +31,13 @@ namespace Ui.DialogBg
                 if (videoData != null)
                 {
                     view.mp_.gameObject.SetActive(true);
-                    videoData.Play(view.mp_);
+                    videoData.Play(view.mp_, () =>
+                    {
+                        Z_EventHelper.Invoke(new ClipPlayEvent()
+                        {
+                            playType = PlayType.ClipVideoOver
+                        });
+                    });
                 }
             }
             var data = TexAssetForm.DataByName.GetDv(param.clip.mainPictureName, null);

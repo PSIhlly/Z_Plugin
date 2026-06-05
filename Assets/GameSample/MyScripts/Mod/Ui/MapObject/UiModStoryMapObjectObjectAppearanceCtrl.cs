@@ -38,18 +38,18 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_reset.onClick.AddListener(() =>
             {
-                model.data.model.subPrefabUnitScale[model.id] = Vector3.one;
-                model.data.model.subPrefabUnitPos[model.id] = Vector3.zero;
+                model.data.model.subPrefabUnitScale[0] = Vector3.one;
+                model.data.model.subPrefabUnitPos[0] = Vector3.zero;
                 Refresh();
             });
             view.btn_model.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseModel(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    model.data.model.subPrefabUnitName[model.id] = item.content;
+                    model.data.model.subPrefabUnitName[0] = item.content;
                     Refresh();
                 });
-              
+
             });
             view.btn_delete.onClick.AddListener(() =>
             {
@@ -59,9 +59,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             });
             view.btn_deleteUnit.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteObjectUnit(model.data.name,model.id);
-                model.id = -1;
-                Refresh();
+                if (model.id >= 0)
+                {
+                    ModManager.instance.assetCtrl.DeleteObjectUnitTex(model.data.name, model.id);
+                    model.id = -1;
+                    Refresh();
+                }
             });
             view.ipt_name.onFinishInput += (s) =>
             {
@@ -70,30 +73,35 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             };
             view.ipt_posHeight.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitPos[model.id] = model.data.model.subPrefabUnitPos[model.id].NewSetY(StringHelper.ToFloat(s, 0, false));
+                model.data.model.subPrefabUnitPos[0] = model.data.model.subPrefabUnitPos[0].NewSetY(StringHelper.ToFloat(s, 0, false));
                 Refresh();
             };
             view.ipt_height.onFinishInput += (s) =>
             {
 
-                model.data.model.subPrefabUnitScale[model.id]=model.data.model.subPrefabUnitScale[model.id].NewSetY(StringHelper.ToFloat(s, 1, true));
+                model.data.model.subPrefabUnitScale[0]=model.data.model.subPrefabUnitScale[0].NewSetY(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
             view.ipt_length.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[model.id]= model.data.model.subPrefabUnitScale[model.id].NewSetZ(StringHelper.ToFloat(s, 1, true));
+                model.data.model.subPrefabUnitScale[0]= model.data.model.subPrefabUnitScale[0].NewSetZ(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
             view.ipt_width.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[model.id]= model.data.model.subPrefabUnitScale[model.id].NewSetX(StringHelper.ToFloat(s, 1, true));
+                model.data.model.subPrefabUnitScale[0]= model.data.model.subPrefabUnitScale[0].NewSetX(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.id,model.id);
+                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.id, model.id);
                 Refresh();
             });
+            view.ipt_interval.onFinishInput += (s) =>
+            {
+                model.data.model.animTimeInterval = StringHelper.ToFloat(s, 0, true);
+                Refresh();
+            };
         }
         public override void OnShow()
         {
@@ -115,33 +123,39 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             DisplayCameraAreaManager.instance.Clear();
 
             view.model_axis.SetShow(false);
+
+            float rate = DisplayCameraAreaManager.instance.normalized2scene;
+            view.model_axis.SetShow(true, new UiAxisParam()
+            {
+                pos = new Vector2((model.data.model.subPrefabUnitPos[0].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[0].z + rate / 2) / rate),
+                limitRtf = view.rtf_image,
+                onTrsChange = (tp) => {
+                    model.data.model.subPrefabUnitPos[0] = new Vector3((tp.Item1.x * 2 - 1) * rate / 2, 0, (tp.Item1.y * 2 - 1) * rate / 2);
+                    RefreshView();
+                }
+            });
+            RefreshView();
+
             if (model.id != -1)
             {
-                view.ipt_posHeight.Set(model.data.model.subPrefabUnitPos[model.id].y.ToString("0.##"));
-                view.ipt_height.Set(model.data.model.subPrefabUnitScale[model.id].y.ToString("0.##"));
-                view.ipt_length.Set(model.data.model.subPrefabUnitScale[model.id].z.ToString("0.##"));
-                view.ipt_width.Set(model.data.model.subPrefabUnitScale[model.id].x.ToString("0.##"));
-
-                float rate = DisplayCameraAreaManager.instance.normalized2scene;
-                view.model_axis.SetShow(true, new UiAxisParam()
-                {
-                    pos = new Vector2((model.data.model.subPrefabUnitPos[model.id].x+ rate/2)/rate,( model.data.model.subPrefabUnitPos[model.id].z+rate/2)/rate),
-                    limitRtf = view.rtf_image,
-                    onTrsChange = (tp) => {
-                        model.data.model.subPrefabUnitPos[model.id] = new Vector3((tp.Item1.x*2-1) * rate / 2, 0, (tp.Item1.y*2-1) * rate / 2);
-                        
-                        RefreshView();
-                    }
-                });
-                RefreshView();
+                view.ipt_posHeight.Set(model.data.model.subPrefabUnitPos[0].y.ToString("0.##"));
+                view.ipt_height.Set(model.data.model.subPrefabUnitScale[0].y.ToString("0.##"));
+                view.ipt_length.Set(model.data.model.subPrefabUnitScale[0].z.ToString("0.##"));
+                view.ipt_width.Set(model.data.model.subPrefabUnitScale[0].x.ToString("0.##"));
             }
+            view.ipt_interval.Set(model.data.model.animTimeInterval.ToString("0.##"));
+
             itemCon.Clear();
-            for (int i = 0; i < model.data.model.subPrefabUnitName.Count; i++)
+            var texs = model.data.model.subUnitTexsName[0];
+            if (texs != null)
             {
-                itemCon.Add(new UiItemParam()
+                for (int i = 0; i < texs.Count; i++)
                 {
-                    id = i,
-                });
+                    itemCon.Add(new UiItemParam()
+                    {
+                        id = i,
+                    });
+                }
             }
             itemCon.Add(new UiItemParam()
             {
@@ -178,12 +192,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
     {
         public override void OnCreate()
         {
+            view.btn_new.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.CreateObjectUnitTex(parent.model.data.id);
+                parent.Refresh();
+            });
             view.btn_.onClick.AddListener(() =>
             {
-                if(model.id==-1)
-                {
-                    ModManager.instance.assetCtrl.CreateObjectUnit(parent.model.data);
-                }
                 parent.model.id = model.id;
                 parent.Refresh();
             });
@@ -202,7 +217,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.sta_exist.ChangeState(model.id >= 0 ? 1 : 0);
             if (model.id >= 0)
             {
-                view.txt_.text = TextManager.instance.GetTxt(parent.model.data.model.subPrefabUnitName[model.id].ToString());
+                var texs = parent.model.data.model.subUnitTexsName[0];
+                var texName = texs != null && texs.Count > model.id ? texs[model.id] : null;
+                view.txt_.text = texName ?? "";
+                if (texName != null && TexAssetForm.DataByName.ContainsKey(texName))
+                {
+                    view.img_.sprite = TexAssetForm.DataByName[texName].GetSprite();
+                }
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
             }
         }

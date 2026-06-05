@@ -14,7 +14,6 @@ namespace Z_Map
             get { return (TileUnit)base.unit; }
         }
 
-        public Timer[] animTimer = new Timer[3];
 
     }
 }

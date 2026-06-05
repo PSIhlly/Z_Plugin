@@ -214,7 +214,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                         return AnimDirecton.Up;
                     }
                 default:
-                    return AnimDirecton.Up;
+                    return AnimDirecton.Fixed;
             }
 
         }

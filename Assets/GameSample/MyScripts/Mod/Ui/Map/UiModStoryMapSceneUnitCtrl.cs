@@ -89,8 +89,9 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
 
         public void RefreshEvents()
         {
-            view.model_EventChooseBegin.Set(new EventChoose.UiEventChooseParam() { dic = dic, key = "onBeginEvent" });
+            view.model_EventChooseEnter.Set(new EventChoose.UiEventChooseParam() { dic = dic, key = "onEnterEvent" });
             view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = dic, key = "onPerSecondEvent" });
+            view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = dic, key = "onLeaveEvent" });
 
             view.model_EventChooseCharacterParamChange.Set(new EventChoose.UiEventChooseParam() { dic = dic, key = "onCharacterParamChangeEvent" });
             view.model_EventCustomTriggerCharacterParam.Set(new UiEventCustomTriggerParam() { dic = dic, defaultKey = "onCharacterParamChangeEvent$$", configs = new List<TriggerConfig>() {

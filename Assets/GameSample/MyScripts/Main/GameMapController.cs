@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -14,6 +15,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Texture;
 using Z_Time;
+using Z_UnitSystem;
 using Z_UnitSystem.Form;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -35,7 +37,7 @@ namespace Z_Map
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
-                        if (jo != null && jo[productKey].Type!= JTokenType.Null)
+                        if (jo != null && jo[productKey].Type != JTokenType.Null)
                         {
                             _productInfo.Item1 = (int)jo[productKey][0];
                             _productInfo.Item2 = (int)jo[productKey][1];
@@ -76,21 +78,21 @@ namespace Z_Map
                             _paramInfo = jo.Get<Dictionary<string, GameParamForm.Data>>(paramKey);
                         }
                     }
-                    if(this is CharacterUnit ch)
+                    if (this is CharacterUnit ch)
                     {
-                        var chp=CharacterProductForm.DataByUid.GetDv(ch.productInfo.Item1, null);
-                        if(chp!=null)
+                        var chp = CharacterProductForm.DataByUid.GetDv(ch.productInfo.Item1, null);
+                        if (chp != null)
                         {
-                            foreach(var pair in chp.paramDic)
+                            foreach (var pair in chp.paramDic)
                             {
-                                if(!_paramInfo.ContainsKey(pair.Key))
+                                if (!_paramInfo.ContainsKey(pair.Key))
                                 {
                                     _paramInfo[pair.Key] = pair.Value;
                                 }
                             }
                         }
                     }
-                    else if(this is ObjectUnit obj)
+                    else if (this is ObjectUnit obj)
                     {
                         var objp = CharacterProductForm.DataByUid.GetDv(obj.productInfo.Item1, null);
                         if (objp != null)
@@ -114,7 +116,7 @@ namespace Z_Map
         }
         public static string GetParamInfoString(JObject ori, Dictionary<string, GameParamForm.Data> info)
         {
-            if(info!=null)
+            if (info != null)
             {
                 ori.Set(paramKey, info);
             }
@@ -133,12 +135,14 @@ public enum AlphaTexBasic6
     OOOXXXXXX,
     XXXXXXXXX
 }
-public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEvent>
+public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<ItemEvent>
 {
     public GameMapController(GameManager super) : base(super)
     {
-        Z_EventHelper.Register(this);
-        ProgressForm.changeCameramodeAction += (data,old,now) =>
+        Z_EventHelper.Register<TileEvent>(this);
+        Z_EventHelper.Register<ObjectEvent>(this);
+        Z_EventHelper.Register<ItemEvent>(this);
+        ProgressForm.changeCameramodeAction += (data, old, now) =>
         {
             DynamicGlobalSettings.cameraMode = now;
         };
@@ -151,7 +155,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
                 MapUnit.GetProductInfoString(jo, mapU.productInfo);
 
-               MapUnit.GetParamInfoString(jo, mapU.paramInfo);
+                MapUnit.GetParamInfoString(jo, mapU.paramInfo);
                 data.extra = jo.ToString();
             }
 
@@ -159,7 +163,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     }
 
     public Dictionary<(string, int), Texture2D> alphaTextureDic = new Dictionary<(string, int), Texture2D>();
-    public Dictionary<TileUnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<TileUnitForm.Data, Dictionary<int, int>>();
+    public Dictionary<UnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<UnitForm.Data, Dictionary<int, int>>();
     public void Reset()
     {
         alphaTextureDic.Clear();
@@ -788,98 +792,96 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
 
     }
-    public void ShowFinalMat(TileInstance ins)
+    public void ShowFinalMat(MapInstance ins, int rendererId, List<string> animTexs, float interval, bool isMask = false)
     {
         var data = ins.unit.data;
         if (!animCurCache.ContainsKey(data))
         {
             animCurCache[data] = new Dictionary<int, int>();
         }
+        Renderer renderer = ins.renderers[rendererId];
 
-        for (int i = 0; i < ins.renderers.Length; i++)
+
+        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+        renderer.GetPropertyBlock(propBlock);
+
+        if (animTexs != null && animTexs.Count > 0)
         {
-            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            ins.renderers[i].GetPropertyBlock(propBlock);
 
-            if (data.texNameDic.ContainsKey(i) && MapTextureForm.DataByName.ContainsKey(data.texNameDic[i]))
+            if (isMask)
             {
 
-                int maskId = i + GlobalSettings.TERRAIN_LAYER_MAX;
-                if (data.texNameDic.ContainsKey(maskId) && MapMaskForm.DataByName.ContainsKey(data.texNameDic[maskId]))
+                int linkDesc = 0;
+                for (int x = -1; x <= 1; x++)
                 {
-                    var maskForm = MapMaskForm.DataByName[data.texNameDic[maskId]];
-
-                    int linkDesc = 0;
-                    for (int x = -1; x <= 1; x++)
+                    for (int z = -1; z <= 1; z++)
                     {
-                        for (int z = -1; z <= 1; z++)
+                        if (x == 0 && z == 0)
+                            continue;
+                        var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
+                        var pos = ((int)(x + mapPos.x), (int)(mapPos.y), (int)(z + mapPos.z));
+                        if (MapManager.instance.data.maps.ContainsKey(pos)
+                            && MapManager.instance.data.maps[pos].texNameDic.ContainsKey(rendererId)
+                            && MapManager.instance.data.maps[pos].texNameDic[rendererId] == animTexs[0])
                         {
-                            if (x == 0 && z == 0)
-                                continue;
-                            var pos = (x + data.mapPos.x, data.mapPos.y, z + data.mapPos.z);
-                            if (MapManager.instance.data.maps.ContainsKey(pos)
-                                && MapManager.instance.data.maps[pos].texNameDic.ContainsKey(i)
-                                && MapManager.instance.data.maps[pos].texNameDic[i] == data.texNameDic[i])
-                            {
-                                linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
-                            }
+                            linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
                         }
                     }
-                    propBlock.SetTexture("_AlphaTex", alphaTextureDic[(maskForm.name, linkDesc)]);
-
                 }
-                else
-                {
-                    propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
-                }
+                propBlock.SetTexture("_AlphaTex", alphaTextureDic[(animTexs[0], linkDesc)]);
 
-
-
-                ins.renderers[i].enabled = true;
-
-                var texForm = MapTextureForm.DataByName[data.texNameDic[i]];
-
-                TimeManager.instance.CancelTimer(ins.animTimer[i]);
-
-                if (texForm.animTimeInterval > 0)
-                {
-                    float all = texForm.animTimeInterval * texForm.texsName.Count;
-
-                    int cur = (int)((Time.time % all) / texForm.animTimeInterval);
-                    float timeProgress = (Time.time % texForm.animTimeInterval);
-
-                    ins.renderers[i].GetPropertyBlock(propBlock);
-                    animCurCache[data][i] = cur;
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].GetTex());
-                    int renderId = i;
-                    ins.animTimer[i] = TimeManager.instance.StartTimer(timeProgress, texForm.animTimeInterval, () =>
-                    {
-                        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                        ins.renderers[renderId].GetPropertyBlock(propBlock);
-                        cur = (cur + 1) % texForm.texsName.Count;
-                        animCurCache[data][renderId] = cur;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[cur]].GetTex());
-                        ins.renderers[renderId].SetPropertyBlock(propBlock);
-                        return false;
-                    }, ins);
-                }
-                else
-                {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[texForm.texsName[0]].GetTex());
-                }
             }
             else
             {
-                ins.renderers[i].enabled = false;
-                propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
+                propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
             }
 
 
 
-            ins.renderers[i].SetPropertyBlock(propBlock);
+            renderer.enabled = true;
+
+
+            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
+
+            if (interval > 0)
+            {
+                float all = interval * animTexs.Count;
+
+                int cur = (int)((Time.time % all) / interval);
+                float timeProgress = (Time.time % interval);
+
+                renderer.GetPropertyBlock(propBlock);
+                animCurCache[data][rendererId] = cur;
+                propBlock.SetTexture("_Tex", TexAssetForm.DataByName[animTexs[cur]].GetTex());
+                int tempId = rendererId;
+                ins.animTimer[rendererId] = TimeManager.instance.StartTimer(timeProgress, interval, () =>
+                {
+                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                    ins.renderers[tempId].GetPropertyBlock(propBlock);
+                    cur = (cur + 1) % animTexs.Count;
+                    animCurCache[data][tempId] = cur;
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[animTexs[cur]].GetTex());
+                    ins.renderers[tempId].SetPropertyBlock(propBlock);
+                    return false;
+                }, ins);
+            }
+            else
+            {
+                propBlock.SetTexture("_Tex", TexAssetForm.DataByName[animTexs[0]].GetTex());
+            }
         }
+        else if(!isMask)
+        {
+            renderer.enabled = false;
+            propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
+        }
+
+
+
+        renderer.SetPropertyBlock(propBlock);
+
     }
-    public void RegisterObject(ObjectUnitForm.Data newObjectData,MapObjectForm.Data objectData)
+    public void RegisterObject(ObjectUnitForm.Data newObjectData, MapObjectForm.Data objectData)
     {
         newObjectData.unit.productInfo = (objectData.id, -1);
         newObjectData.unit.paramInfo = new Dictionary<string, GameParamForm.Data>();
@@ -893,7 +895,51 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         switch (evt.type)
         {
             case MapEventType.Show:
-                ShowFinalMat((TileInstance)evt.unit.ins);
+                int i = 0;
+                for (; i < evt.unit.ins.renderers.Length; i++)
+                {
+                    var texName = evt.unit.data.texNameDic.GetDv(i, null);
+                    var data = MapTextureForm.DataByName.GetDv(texName, null);
+                    ShowFinalMat(evt.unit.ins, i, data != null ? data.texsName : null, data != null ? data.animTimeInterval : 0, false);
+                }
+                for (; i < evt.unit.ins.renderers.Length + GlobalSettings.TERRAIN_LAYER_MAX; i++)
+                {
+                    var texName = evt.unit.data.texNameDic.GetDv(i, null);
+                    var data = MapMaskForm.DataByName.GetDv(texName, null);
+
+                    ShowFinalMat(evt.unit.ins, i - evt.unit.ins.renderers.Length, data != null ? data.texsName : null, 0, true);
+
+                }
+                break;
+            case MapEventType.AfterUpdate:
+                break;
+        }
+    }
+    public void OnEvent(ObjectEvent evt)
+    {
+        switch (evt.type)
+        {
+            case MapEventType.Show:
+                var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                if (data != null && data.model.subUnitTexsName.Count > 0)
+                {
+                    ShowFinalMat(evt.unit.ins, 0, data.model.subUnitTexsName[0], data.model.animTimeInterval, false);
+                }
+                break;
+            case MapEventType.AfterUpdate:
+                break;
+        }
+    }
+    public void OnEvent(ItemEvent evt)
+    {
+        switch (evt.type)
+        {
+            case MapEventType.Show:
+                var data = ItemProductForm.DataByUid.GetDv(evt.unit.productInfo.Item1, null);
+                if (data != null && data.model.subUnitTexsName.Count > 0)
+                {
+                    ShowFinalMat(evt.unit.ins, 0, data.model.subUnitTexsName[0], data.model.animTimeInterval, false);
+                }
                 break;
             case MapEventType.AfterUpdate:
                 break;

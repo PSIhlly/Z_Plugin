@@ -58,10 +58,22 @@ namespace Ui.DialogMain
             {
                 view.btn_over.onClick.AddListener(() =>
                 {
-                    Z_EventHelper.Invoke(new ClipPlayEvent()
+                    if(string.IsNullOrEmpty(model.prm.clip.mainVideoName))
                     {
-                        playType = PlayType.ClipMainTextOver
-                    });
+                        Z_EventHelper.Invoke(new ClipPlayEvent()
+                        {
+                            playType = PlayType.ClipMainTextOver
+                        });
+                    }
+
+                });
+                view.btn_skipVideo.onClick.AddListener(() =>
+                {
+                     Z_EventHelper.Invoke(new ClipPlayEvent()
+                        {
+                            playType = PlayType.ClipVideoOver
+                        });
+
                 });
 
                 view.btn_autoPlay.onClick.AddListener(() =>
@@ -136,6 +148,7 @@ namespace Ui.DialogMain
                 model.prm = param;
                 view.go_func.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
                 view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed > 0 ? 1 : 0);
+                view.btn_skipVideo.gameObject.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainVideoName));
             }
         }
     }

@@ -11,6 +11,7 @@ using Z_DesignStyle;
 using Z_Map;
 using Z_Math;
 using Z_Texture;
+using Z_Time;
 using Z_UnitSystem;
 
 public class GameUtilController : Z_Controller<GameManager>
@@ -29,13 +30,13 @@ public class GameUtilController : Z_Controller<GameManager>
                     false,false
                 };
 
-        var res = CombineNewGoByPrefabs(name, new List<string>() { "Sphere", "Sphere" }, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero}, new List<Vector3>() { Vector3.one , Vector3.one}, showShaddowLst);
-        var renders=res.GetComponentsInChildren<Renderer>();
+        var res = CombineNewGoByPrefabs(name, new List<string>() { "Sphere", "Sphere" }, texRealName, new List<Vector3>() { Vector3.zero, Vector3.zero }, new List<Vector3>() { Vector3.one, Vector3.one }, showShaddowLst);
+        var renders = res.GetComponentsInChildren<Renderer>();
         renders[0].transform.GetComponent<PerspectiveKeeper>().deepth = 0.01f;
         renders[1].transform.GetComponent<PerspectiveKeeper>().deepth = 0.05f;
 
-        res.GetComponentsInChildren<SphereCollider>()[0].radius=0.4f;
-        GameObject.Destroy( res.GetComponentsInChildren<SphereCollider>()[2].gameObject);
+        res.GetComponentsInChildren<SphereCollider>()[0].radius = 0.4f;
+        GameObject.Destroy(res.GetComponentsInChildren<SphereCollider>()[2].gameObject);
         if (forGame)
         {
             res.AddComponent<CharacterInstance>();
@@ -48,7 +49,7 @@ public class GameUtilController : Z_Controller<GameManager>
         }
         return res;
     }
-    public GameObject CombineNewObjectByPrefabs(string name, MapModelForm.Data model, bool forGame,bool isItem=false)
+    public GameObject CombineNewObjectByPrefabs(string name, MapModelForm.Data model, bool forGame, bool isItem = false)
     {
         if (model == null)
             return new GameObject(name);
@@ -57,15 +58,21 @@ public class GameUtilController : Z_Controller<GameManager>
         for (int i = 0; i < model.subPrefabUnitName.Count; i++)
             showShadow.Add(true);
 
-        var res = CombineNewGoByPrefabs(name, model.subPrefabUnitName, model.subUnitTexsName, model.subPrefabUnitPos, model.subPrefabUnitScale, showShadow);
+        var lst0 = new List<string>();
+        foreach (var lst in model.subUnitTexsName)
+        {
+            lst0.Add(lst != null && lst.Count > 0 ? lst[0] : null);
+        }
+        var res = CombineNewGoByPrefabs(name, model.subPrefabUnitName, lst0, model.subPrefabUnitPos, model.subPrefabUnitScale, showShadow);
         if (forGame)
         {
             if (isItem)
                 res.AddComponent<ItemInstance>();
             else
                 res.AddComponent<ObjectInstance>();
+
         }
-            
+
         return res;
     }
     private GameObject CombineNewGoByPrefabs(string name, List<string> prefabKeys, List<string> texRealName, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow)
@@ -74,17 +81,17 @@ public class GameUtilController : Z_Controller<GameManager>
         for (int i = 0; i < prefabKeys.Count; i++)
         {
             var go = GameObject.Instantiate(GameObjectAssetForm.DataByName[prefabKeys[i]].GetGo(), res.transform);
-            go.transform.localPosition = poss[i] +Vector3.up/2;//Ì§¸ß
+            go.transform.localPosition = poss[i] + Vector3.up / 2;//Ì§ï¿½ï¿½
             go.transform.localScale = scales[i];
 
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             var render = go.GetComponentInChildren<Renderer>();
             render.GetPropertyBlock(propBlock);
-            if(texRealName[i] !=null&& !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
+            if (texRealName[i] != null && !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
             {
-                Debug.LogError(name+" miss tex " + texRealName[i]);
+                Debug.LogError(name + " miss tex " + texRealName[i]);
             }
-            if (texRealName[i]==null|| texRealName[i] == emptyTexName ||!TexAssetForm.DataByName.ContainsKey(texRealName[i]))
+            if (texRealName[i] == null || texRealName[i] == emptyTexName || !TexAssetForm.DataByName.ContainsKey(texRealName[i]))
             {
                 propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])
@@ -104,20 +111,20 @@ public class GameUtilController : Z_Controller<GameManager>
             }
             render.SetPropertyBlock(propBlock);
 
-            foreach(var com in go.GetComponentsInChildren<Collider>())
+            foreach (var com in go.GetComponentsInChildren<Collider>())
             {
                 var scale = com.transform.lossyScale;
-                if(com is BoxCollider box)
+                if (com is BoxCollider box)
                 {
-                    var trigger=com.gameObject.AddComponent<BoxCollider>();
-                    trigger.size = box.size+Graph.ElementwiseDivide(Vector3.one * 0.02f  , scale);
+                    var trigger = com.gameObject.AddComponent<BoxCollider>();
+                    trigger.size = box.size + Graph.ElementwiseDivide(Vector3.one * 0.02f, scale);
                     trigger.center = box.center;
                     trigger.isTrigger = true;
                 }
                 else if (com is SphereCollider sphere)
                 {
                     var trigger = com.gameObject.AddComponent<SphereCollider>();
-                    trigger.radius = sphere.radius+ 0.02f * Mathf.Max(scale.x, scale.y, scale.z);
+                    trigger.radius = sphere.radius + 0.02f * Mathf.Max(scale.x, scale.y, scale.z);
                     trigger.center = sphere.center;
                     trigger.isTrigger = true;
                 }

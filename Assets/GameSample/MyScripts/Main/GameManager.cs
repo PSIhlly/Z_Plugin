@@ -124,6 +124,7 @@ public static partial class GlobalSettings
 }
 public static class GlobalNameHelper
 {
+    public static string defaultLab="unclassified";
     public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
     public static string GetRuntimePrefabName(string name = "") => "runtime$" + name;
     public static string GetDefaultTexName(string name = "") => "reservedI$" + name;
@@ -257,7 +258,21 @@ public class GameManager : Z_MonoManager<GameManager>
 
 
     }
-
-
-
+    private static int playerPosToMapPosOffset = 500;
+    public static float PlayerPosToMapPos(float v)
+    {
+        return (v + playerPosToMapPosOffset);
+    }
+    public static float MapPosToPlayerPos(float v)
+    {
+        return (v  - playerPosToMapPosOffset) ;
+    }
+    public static Vector3 PlayerPosToMapPos(Vector3 playerPos)
+    {
+        return playerPos + Vector3.one * playerPosToMapPosOffset;
+    }
+    public static Vector3 MapPosToPlayerPos(Vector3 mapPos)
+    {
+        return mapPos - Vector3.one * playerPosToMapPosOffset;
+    }
 }

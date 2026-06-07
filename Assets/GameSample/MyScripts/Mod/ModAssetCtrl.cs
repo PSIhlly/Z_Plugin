@@ -59,8 +59,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 GameManager.instance.curStory.icon = data.GetBytes().ToList();
-            },
-            sizeLimit = new Vector2Int(400, 400)
+            }
         });
     }
 
@@ -268,8 +267,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     MapTextureForm.DataByName[name].texsName.Add(data.name);
                 }
                 MapTextureForm.DataByName[name].icon = MapTextureForm.DataByName[name].texsName[0];
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
     }
 
@@ -307,8 +305,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     MapMaskForm.DataByName[name].texsName.Add(data.name);
                 }
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -382,8 +379,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     model.subUnitTexsName[0].Add(data.name);
                 }
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -413,8 +409,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 MapObjectForm.DataById[uid].minimapIcon = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -520,8 +515,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[uid].avatarTexName = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
     }
     public void ImportCharacterIllustration(int characterUid)
@@ -531,8 +525,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[characterUid].illustration = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -624,8 +617,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     anim.animClip[dir][id].partTex[part] = data.name;
                 }
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
     }
     public void CreateCharacterAnim(int characterUid, string animName = null)
@@ -657,8 +649,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[uid].minimapIcon = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -704,8 +695,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     clip.tex = data.name;
                 }
-            },
-            sizeLimit = new Vector2Int(1000, 1000)
+            }
         });
     }
     public void ChooseEffect(string title, Action<EffectForm.Data> act)
@@ -750,8 +740,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 var skillData = SkillProductForm.DataByUid[skillUid];
                 skillData.icon = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
     }
     public void ChooseSkill(string title, Action<SkillProductForm.Data> act)
@@ -921,8 +910,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 callback?.Invoke(data.name);
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -956,8 +944,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 ItemProductForm.DataByUid[itemUid].iconTexName = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -1015,8 +1002,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     model.subUnitTexsName[0].Add(data.name);
                 }
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -1028,8 +1014,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 var itemData = ItemProductForm.DataByUid[itemUid];
                 itemData.styleTex[style] = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }
@@ -1088,8 +1073,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             onComplete = (data) =>
             {
                 ItemProductForm.DataByUid[uid].minimapIcon = data.name;
-            },
-            sizeLimit = new Vector2Int(100, 100)
+            }
         });
 
     }

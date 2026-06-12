@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "uid": 1,
+    "name": "爆炸1",
+    "label": "场景特效",
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 210000,
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      }
+    ],
+    "ground": false
+  }
+]

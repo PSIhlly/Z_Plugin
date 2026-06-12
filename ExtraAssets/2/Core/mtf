@@ -1,99 +1,15 @@
 [
   {
-    "id": 200001,
-    "name": "floor",
-    "icon": "z_map_b$floor$0",
-    "animTimeInterval": 0.0,
-    "texsName": [
-      {
-        "v": "z_map_b$floor$0"
-      }
-    ],
-    "label": "",
-    "events": []
-  },
-  {
-    "id": 200002,
-    "name": "grass",
-    "icon": "z_map_b$grass$0",
-    "animTimeInterval": 0.0,
-    "texsName": [
-      {
-        "v": "z_map_b$grass$0"
-      }
-    ],
-    "label": "",
-    "events": []
-  },
-  {
-    "id": 200003,
-    "name": "road",
-    "icon": "z_map_b$road$0",
-    "animTimeInterval": 0.0,
-    "texsName": [
-      {
-        "v": "z_map_b$road$0"
-      }
-    ],
-    "label": "",
-    "events": []
-  },
-  {
-    "id": 8,
-    "name": "花1",
-    "icon": "reservedI$",
-    "animTimeInterval": 1.0,
-    "texsName": [
-      {
-        "v": "$i$5afd141039c3c17f8cc38755bce46886a01d66f8$i$"
-      }
-    ],
-    "label": "",
-    "events": []
-  },
-  {
-    "id": 7,
-    "name": "草2",
-    "icon": "reservedI$",
-    "animTimeInterval": 1.0,
-    "texsName": [
-      {
-        "v": "$i$b3a725ea223754f8b6101d0152e64d7b879ce49a$i$"
-      }
-    ],
-    "label": "",
-    "events": []
-  },
-  {
     "id": 1,
-    "name": "草",
-    "icon": "reservedI$",
-    "animTimeInterval": 1.0,
-    "texsName": [
+    "name": "grass",
+    "icon": 110000,
+    "animTimeInterval": 0.0,
+    "texs": [
       {
-        "v": "$i$2dde2ba723f8ef888f95433f496969c1816887a0$i$"
+        "v": 110000
       }
     ],
-    "label": "",
-    "events": []
-  },
-  {
-    "id": 2,
-    "name": "水",
-    "icon": "reservedI$",
-    "animTimeInterval": 0.5,
-    "texsName": [
-      {
-        "v": "$i$b2bdb597af0a1d5997cd0a1138efc0a091de6175$i$"
-      },
-      {
-        "v": "$i$fae23912cf05c018cec52e00e19341596743e039$i$"
-      },
-      {
-        "v": "$i$289e52f8c5db9b0c98bfc3575562a9645573fd1d$i$"
-      }
-    ],
-    "label": "",
+    "label": "default",
     "events": []
   }
 ]

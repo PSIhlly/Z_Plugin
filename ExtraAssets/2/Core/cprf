@@ -1,14 +1,14 @@
 [
   {
-    "uid": 1,
+    "uid": 2,
     "name": "雾雨魔理沙",
     "label": "自机",
-    "avatarTexName": "$i$1d80b78ca2feb696b86fbeb9964e49f7402dcd98$i$",
+    "avatarTex": 2,
     "paramDic": [
       {
         "k": "Hp",
         "v": {
-          "uid": 1,
+          "uid": 3,
           "name": "Hp",
           "valueType": 0,
           "min": "",
@@ -24,15 +24,15 @@
           "name": "HpMax",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 100.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
           "max": "",
-          "showType": 1
+          "showType": 0
         }
       },
       {
         "k": "Speed",
         "v": {
-          "uid": 2,
+          "uid": 4,
           "name": "Speed",
           "valueType": 0,
           "min": "",
@@ -107,82 +107,15 @@
                     "partTex": [
                       {
                         "k": 0,
-                        "v": "reservedI$"
+                        "v": 210000
                       },
                       {
                         "k": 1,
-                        "v": "$i$121a81e4e91d533f9e33755d337bc68f73038d9e$i$"
+                        "v": 210000
                       },
                       {
                         "k": 2,
-                        "v": "reservedI$"
-                      }
-                    ]
-                  }
-                },
-                {
-                  "v": {
-                    "uid": 0,
-                    "equipStyle": [],
-                    "equipTrs": [
-                      {
-                        "k": 0,
-                        "v": {
-                          "Item1": 0.5,
-                          "Item2": 0.5,
-                          "Item3": 1,
-                          "Item4": 0.5
-                        }
-                      },
-                      {
-                        "k": 1,
-                        "v": {
-                          "Item1": 0.5,
-                          "Item2": 0.5,
-                          "Item3": 1,
-                          "Item4": 0.5
-                        }
-                      },
-                      {
-                        "k": 2,
-                        "v": {
-                          "Item1": 0.5,
-                          "Item2": 0.5,
-                          "Item3": 1,
-                          "Item4": 0.5
-                        }
-                      },
-                      {
-                        "k": 3,
-                        "v": {
-                          "Item1": 0.5,
-                          "Item2": 0.5,
-                          "Item3": 1,
-                          "Item4": 0.5
-                        }
-                      },
-                      {
-                        "k": 4,
-                        "v": {
-                          "Item1": 0.5,
-                          "Item2": 0.5,
-                          "Item3": 1,
-                          "Item4": 0.5
-                        }
-                      }
-                    ],
-                    "partTex": [
-                      {
-                        "k": 0,
-                        "v": "reservedI$"
-                      },
-                      {
-                        "k": 1,
-                        "v": "$i$121a81e4e91d533f9e33755d337bc68f73038d9e$i$"
-                      },
-                      {
-                        "k": 2,
-                        "v": "reservedI$"
+                        "v": 210000
                       }
                     ]
                   }
@@ -246,15 +179,15 @@
                     "partTex": [
                       {
                         "k": 0,
-                        "v": "reservedI$"
+                        "v": 210000
                       },
                       {
                         "k": 1,
-                        "v": "reservedI$"
+                        "v": 4
                       },
                       {
                         "k": 2,
-                        "v": "reservedI$"
+                        "v": 210000
                       }
                     ]
                   }
@@ -318,15 +251,15 @@
                     "partTex": [
                       {
                         "k": 0,
-                        "v": "reservedI$"
+                        "v": 210000
                       },
                       {
                         "k": 1,
-                        "v": "reservedI$"
+                        "v": 5
                       },
                       {
                         "k": 2,
-                        "v": "reservedI$"
+                        "v": 210000
                       }
                     ]
                   }
@@ -390,15 +323,15 @@
                     "partTex": [
                       {
                         "k": 0,
-                        "v": "reservedI$"
+                        "v": 210000
                       },
                       {
                         "k": 1,
-                        "v": "reservedI$"
+                        "v": 6
                       },
                       {
                         "k": 2,
-                        "v": "reservedI$"
+                        "v": 210000
                       }
                     ]
                   }
@@ -462,15 +395,15 @@
                     "partTex": [
                       {
                         "k": 0,
-                        "v": "reservedI$"
+                        "v": 210000
                       },
                       {
                         "k": 1,
-                        "v": "reservedI$"
+                        "v": 7
                       },
                       {
                         "k": 2,
-                        "v": "reservedI$"
+                        "v": 210000
                       }
                     ]
                   }
@@ -539,17 +472,17 @@
         "v": "anim"
       }
     ],
-    "faceType": 0,
+    "faceType": 1,
     "speedParamName": "Speed",
     "hpParamName": "Hp",
     "events": [],
     "equips": [],
-    "desc": "魔理沙是一个魔法使。身为一个人类却能够驱使强大的魔法，想在和灵梦竞争一般进行着在异变时插手进行妖怪降伏。",
-    "illustration": "$i$ce0db3835899e84095d7a525195235e1e6b58c7f$i$",
+    "desc": "人类魔法使",
+    "illustration": 3,
     "unique": true,
     "skill": [],
     "recoveryTime": 0.0,
     "enableNav": false,
-    "minimapIcon": ""
+    "minimapIcon": 210000
   }
 ]

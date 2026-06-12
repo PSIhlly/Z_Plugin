@@ -1,13 +1,13 @@
 [
   {
-    "id": 3,
-    "name": "New0",
-    "icon": "reservedI$",
+    "id": 1,
+    "name": "wall",
+    "icon": 110003,
     "model": {
-      "id": 0,
+      "id": 1,
       "subPrefabUnitName": [
         {
-          "v": "Cube"
+          "v": 120002
         }
       ],
       "subPrefabUnitPos": [
@@ -24,21 +24,18 @@
         {
           "v": [
             {
-              "v": "$i$6b80978a27bfbac1e425b25b57cbf657be3e979f$i$"
-            },
-            {
-              "v": "$i$1c3664e947c4a0659416af0a0d431c94c17eb2f8$i$"
+              "v": 110003
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
-      "isObstacle": false
+      "isObstacle": true
     },
-    "label": "",
-    "collision": false,
+    "label": "default",
+    "collision": true,
     "events": [],
     "paramDic": [],
-    "minimapIcon": ""
+    "minimapIcon": 210000
   }
 ]

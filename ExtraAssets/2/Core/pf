@@ -4,16 +4,16 @@
     "seconds": 0.0,
     "sceneId": 0,
     "pos": "500|1000|500",
-    "characterUid": 1,
+    "characterUid": 2,
     "bag": [],
     "team": [
       {
-        "v": 1
+        "v": 2
       }
     ],
     "teamActive": [
       {
-        "v": 1
+        "v": 2
       }
     ],
     "uiStyleImageName": [],
@@ -22,10 +22,10 @@
       "uid": 0,
       "title": "",
       "mainText": "",
-      "mainPictureName": "",
-      "mainVideoName": "",
-      "profilePictureName": "",
-      "mainAudioName": ""
+      "mainPicture": 0,
+      "mainVideo": 0,
+      "profilePicture": 0,
+      "mainAudio": 0
     },
     "blockProgramUid": 0,
     "editorStyle": 3,
@@ -34,13 +34,13 @@
     "enableFreeChangeActiveTeamer": true,
     "enableFreeChangeSkill": true,
     "enableMinimap": true,
-    "enableLargeMap": false,
+    "enableLargeMap": true,
     "enableMission": true,
-    "largeMap": "",
+    "largeMap": 210000,
     "curMissionId": 0,
     "targetScene": {
       "item1": 1,
-      "item2": "-3|0|0"
+      "item2": "0|0|0"
     },
     "banSceneChange": false,
     "eventState": 0

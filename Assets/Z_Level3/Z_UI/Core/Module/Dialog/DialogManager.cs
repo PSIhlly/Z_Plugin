@@ -73,11 +73,11 @@ namespace Z_Ui.Dialog
             settings.menuAct = menuAct;
         }
 
-        public void Begin(string title, string mainText, string mainPicture, string mainVideo, string profilePicture, string mainAudio, Action onComplete, bool clickOrAutoClose = true)
+        public void Begin(string title, string mainText, int mainPicture, int mainVideo, int profilePicture, int mainAudio, Action onComplete, bool clickOrAutoClose = true)
         {
-            Begin(new List<string>() { title }, new List<string>() { mainText }, new List<string>() { mainPicture }, new List<string>() { mainVideo }, new List<string>() { profilePicture }, new List<string>() { mainAudio }, onComplete, clickOrAutoClose);
+            Begin(new List<string>() { title }, new List<string>() { mainText }, new List<int>() { mainPicture }, new List<int>() { mainVideo }, new List<int>() { profilePicture }, new List<int>() { mainAudio }, onComplete, clickOrAutoClose);
         }
-        public void Begin(List<string> titleLst, List<string> mainTextLst, List<string> mainPictureLst, List<string> mainVideoLst, List<string> profilePictureLst, List<string> mainAudioLst, Action onComplete, bool clickOrAutoClose = true)
+        public void Begin(List<string> titleLst, List<string> mainTextLst, List<int> mainPictureLst, List<int> mainVideoLst, List<int> profilePictureLst, List<int> mainAudioLst, Action onComplete, bool clickOrAutoClose = true)
         {
             clipLst.Clear();
             for (int i = 0, icnt = titleLst.Count; i < icnt; i++)

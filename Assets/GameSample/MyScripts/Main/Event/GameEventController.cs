@@ -237,6 +237,7 @@ public class GameEventController : Z_Controller<GameManager>
     public void ClearScene()
     {
         EventInterpretDataForm.DataByUid.Clear();
+        GameManager.instance.curScene.triggeredOnceEvts.Clear();
         tasks.Clear();
     }
 
@@ -263,7 +264,20 @@ public class GameEventController : Z_Controller<GameManager>
             }
             else
             {
-                complete = data.Interpret().complete;
+                var retInfo = data.Interpret();
+                complete = retInfo.complete;
+                if (retInfo.errors.Count > 0)
+                {
+                    var errSb = new System.Text.StringBuilder();
+                    errSb.AppendLine($"程序 {data.program.name} 运行时错误:");
+                    for (int i = 0; i < retInfo.errors.Count && i < 10; i++)
+                    {
+                        errSb.AppendLine($"  - {retInfo.errors[i]}");
+                    }
+                    if (retInfo.errors.Count > 10)
+                        errSb.AppendLine($"  ... 还有 {retInfo.errors.Count - 10} 个");
+                    NotifyManager.instance.AddPopup("运行时错误", errSb.ToString(), true);
+                }
             }
             if (complete)
             {
@@ -323,10 +337,11 @@ public class GameEventController : Z_Controller<GameManager>
                     dict[user] = new List<string>();
                 }
                 dict[user].Add(trigger.name);
-                foreach (var nm in trigger.evt)
+                foreach (var id in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, trigger.name);
+                    Execute(EventProgramDataForm.DataByUid.GetDv(id, null), user, defaultHeap, trigger.name);
                 }
+                trigger.evt.Clear();//once can clear
                 break;
             case TriggerType.OnceDuring:
                 if (dict.TryGetValue(user, out triggered))
@@ -341,13 +356,13 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, trigger.name);
+                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user, defaultHeap, trigger.name);
                 }
                 break;
             default:
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByName.GetDv(nm, null), user, defaultHeap, trigger.name);
+                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user, defaultHeap, trigger.name);
                 }
                 break;
         }
@@ -367,12 +382,12 @@ public class GameEventController : Z_Controller<GameManager>
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {
         var res = new EntryItem();
-        foreach (var data in EventProgramDataForm.DataByName.Values)
+        foreach (var data in EventProgramDataForm.DataByUid.Values)
         {
             if (!IsCorrect(retType, data.returnValue))
                 continue;
-            var cat = data.category == "" ? TextManager.instance.GetTxt(GlobalNameHelper.defaultLab) : data.category;
-            var type = data.type == "" ? TextManager.instance.GetTxt(GlobalNameHelper.defaultLab) : data.type;
+            var cat = data.category == "" ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : data.category;
+            var type = data.type == "" ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : data.type;
             if (!res.subs.ContainsKey(cat))
             {
                 res.Add(cat);
@@ -381,7 +396,7 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 res.subs[cat].Add(type);
             }
-            res.subs[cat].subs[type].Add(data.name);
+            res.subs[cat].subs[type].Add(data.name,null,data.uid);
         }
         return res;
     }
@@ -437,7 +452,7 @@ public class GameEventController : Z_Controller<GameManager>
 
     public static EventTriggerForm.Data CreateTrigger(string key)
     {
-        return new EventTriggerForm.Data(-1, key, new List<string>(), default);
+        return new EventTriggerForm.Data(-1, key, new List<int>(), default);
     }
     public bool IsCorrect(string allowRetType, string retType)
     {

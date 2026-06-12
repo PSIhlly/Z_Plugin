@@ -1,5 +1,6 @@
 using Form;
 using Item;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Ui.Loading;
@@ -44,6 +45,40 @@ namespace Ui.ModStory
             {
                 GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
                 NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
+            });
+            view.btn_delete.onClick.AddListener(() =>
+            {
+                NotifyManager.instance.AddPopup(TextManager.instance.GetTxt("delete"), TextManager.instance.GetTxt("delete confirm"), true,
+                    new List<string>() { TextManager.instance.GetTxt("yes"), TextManager.instance.GetTxt("no") },
+                    new List<Func<bool>>()
+                    {
+                        ()=>
+                        {
+                            int id = GameManager.instance.curStory.id;
+                            Close();
+                            Main2StoryManager.instance.UnloadStoryUgc();
+
+                            Main2StoryManager.instance.DeleteStory(id);
+                            UiManager.instance.ShowUi<UiModCtrl>();
+                            return true;
+                        },
+                        ()=>
+                        {
+                            return true;
+                        }
+                    }, true);
+
+            });
+            view.btn_check.onClick.AddListener(() =>
+            {
+                NotifyManager.instance.AddPopup(TextManager.instance.GetTxt("check"), ModManager.instance.checkCtrl.Check(), true, enableScr: true);
+            });
+            view.btn_outPut.onClick.AddListener(() =>
+            {
+                NativeGallery.SaveImageToGallery(GameManager.instance.saveCtrl.Package(GameManager.instance.curStory.id), "GameMod", GameManager.instance.curStory.name + ".png", (su, p) =>
+                {
+                    NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
+                });
             });
 
             view.btn_overview.onClick.AddListener(() =>

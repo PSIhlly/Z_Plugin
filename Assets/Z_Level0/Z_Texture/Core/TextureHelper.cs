@@ -127,6 +127,33 @@ namespace Z_Texture
             File.Move(oldPath, newPath);
         }
 
+        public static List<GifFrameData> GetGifFramesByPath(string path)
+        {
+            if (!File.Exists(path))
+            {
+                Debug.LogError("GIF file not found: " + path);
+                return null;
+            }
+            return GifDecoder.Decode(File.ReadAllBytes(path));
+        }
+
+        public static List<GifFrameData> GetGifFramesByByte(byte[] data)
+        {
+            return GifDecoder.Decode(data);
+        }
+
+        public static List<Sprite> GetGifSpritesByPath(string path)
+        {
+            var frames = GetGifFramesByPath(path);
+            if (frames == null) return null;
+            var sprites = new List<Sprite>(frames.Count);
+            foreach (var frame in frames)
+            {
+                sprites.Add(GetSpriteByTexture(frame.texture));
+            }
+            return sprites;
+        }
+
         #region tool
         /// <summary>
         /// 计算Texture2D的SHA1哈希值（基于像素数据+纹理信息）

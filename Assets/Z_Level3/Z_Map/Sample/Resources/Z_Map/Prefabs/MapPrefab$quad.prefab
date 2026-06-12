@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1 &5171354936451872293
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 885576397687751182}
   - component: {fileID: 5204027392093806699}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: MapPrefab$quad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

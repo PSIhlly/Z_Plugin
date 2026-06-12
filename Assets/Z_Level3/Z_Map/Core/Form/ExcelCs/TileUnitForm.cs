@@ -15,262 +15,251 @@ namespace Z_Map.Form
     public static partial class TileUnitForm
     {
 
-
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()
         {
 
-            UnitForm.childInitAction += InitInternal;
+                UnitForm.childInitAction+=InitInternal;
 
 
-            UnitForm.childRemoveAction += RemoveChildren;
-            UnitForm.childAddAction += AddChildren;
+                UnitForm.childRemoveAction+=RemoveChildren;
+                UnitForm.childAddAction+=AddChildren;
+            
 
+            UnitForm.changeUidAction+=ChangeUid;
 
-            UnitForm.changeUidAction += ChangeUid;
+            UnitForm.changeNameAction+=ChangeName;
 
-            UnitForm.changeNameAction += ChangeName;
+            UnitForm.changePrefabnameAction+=ChangePrefabname;
 
-            UnitForm.changePrefabnameAction += ChangePrefabname;
+            UnitForm.changePosAction+=ChangePos;
 
-            UnitForm.changePosAction += ChangePos;
+            UnitForm.changeEulerAction+=ChangeEuler;
 
-            UnitForm.changeEulerAction += ChangeEuler;
+            UnitForm.changeScaleAction+=ChangeScale;
 
-            UnitForm.changeScaleAction += ChangeScale;
+            UnitForm.changeUpdatetypeAction+=ChangeUpdatetype;
 
-            UnitForm.changeUpdatetypeAction += ChangeUpdatetype;
+            UnitForm.changeCollidingunituidAction+=ChangeCollidingunituid;
 
-            UnitForm.changeCollidingunituidAction += ChangeCollidingunituid;
+            UnitForm.changeExtraAction+=ChangeExtra;
 
-            UnitForm.changeExtraAction += ChangeExtra;
-
-            Z_Json.extra[typeof(Data)] = ((obj) =>
-            {
-                if (obj is Data data)
-                    return GetJoByData(data);
-                return null;
-            }, (jo) =>
-            {
-                return GetDataByJo(jo);
-            }
-            );
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
-
+        
         private static bool inited;
 
-        public static Z_Chain.Chain uidChain => UnitForm.uidChain;
+        public static Z_Chain.Chain uidChain =>UnitForm.uidChain;
 
         public static Action<Data> addAction;
         public static Action<Data> removeAction;
         public static Action childInitAction;
         public static Action<Data> childRemoveAction;
         public static Action<Data> childAddAction;
-
+        
         public static Action<Data> beforeGetAction;
 
-        public static Action<Data, int, int> changeUidAction;
-
-        public static Action<Data, string, string> changeNameAction;
-
-        public static Action<Data, Dictionary<int, string>, Dictionary<int, string>> changeTexnamedicAction;
-
-        public static Action<Data, Vector3Int, Vector3Int> changeMapposAction;
-
-        public static Action<Data, string, string> changePrefabnameAction;
-
-        public static Action<Data, Vector3, Vector3> changePosAction;
-
-        public static Action<Data, Vector3, Vector3> changeEulerAction;
-
-        public static Action<Data, Vector3, Vector3> changeScaleAction;
-
-        public static Action<Data, UpdateType, UpdateType> changeUpdatetypeAction;
-
-        public static Action<Data, List<int>, List<int>> changeCollidingunituidAction;
-
-        public static Action<Data, string, string> changeExtraAction;
-
-        public static Action<Data, bool, bool> changeEnteredsceneAction;
-
-        public static Action<Data, bool, bool> changeUnlockAction;
-
+        public static Action<Data,int,int> changeUidAction;
+                
+        public static Action<Data,string,string> changeNameAction;
+                
+        public static Action<Data,Dictionary<int,int>,Dictionary<int,int>> changeTexdicAction;
+                
+        public static Action<Data,Vector3Int,Vector3Int> changeMapposAction;
+                
+        public static Action<Data,string,string> changePrefabnameAction;
+                
+        public static Action<Data,Vector3,Vector3> changePosAction;
+                
+        public static Action<Data,Vector3,Vector3> changeEulerAction;
+                
+        public static Action<Data,Vector3,Vector3> changeScaleAction;
+                
+        public static Action<Data,UpdateType,UpdateType> changeUpdatetypeAction;
+                
+        public static Action<Data,List<int>,List<int>> changeCollidingunituidAction;
+                
+        public static Action<Data,string,string> changeExtraAction;
+                
+        public static Action<Data,bool,bool> changeEnteredsceneAction;
+                
+        public static Action<Data,bool,bool> changeUnlockAction;
+                
 
 
         public partial class Data : UnitForm.Data
         {
 
-            /// <summary>
-            ///单位逻辑
-            ///</summary>
-            public TileUnit unit
-            {
-                get
+                /// <summary>
+                ///单位逻辑
+                ///</summary>
+                public TileUnit unit
                 {
-                    return (TileUnit)_unit;
-                }
-            }
-
-            private Dictionary<int, string> _texNameDic;
-            /// <summary>
-            ///纹理名字（索引）
-            ///</summary>
-            public Dictionary<int, string> texNameDic
-            {
-                get { return _texNameDic; }
-                set
-                {
-
-                    if (_DataByUid != null && _DatasHashSet.Contains(this))
+                    get
                     {
-                        ChangeTexnamedic(this, _texNameDic, value);
+                        return (TileUnit) _unit;
                     }
-
-                    _texNameDic = value;
                 }
 
-            }
+                    private Dictionary<int,int>  _texDic;
+                    /// <summary>
+                    ///纹理名字（索引）
+                    ///</summary>
+                    public Dictionary<int,int>  texDic{
+                                get{return _texDic;}
+ set{
 
-            private Vector3Int _mapPos;
-            /// <summary>
-            ///离散位置
-            ///</summary>
-            public Vector3Int mapPos
-            {
-                get { return _mapPos; }
-                set
-                {
-
-                    if (_DataByUid != null && _DatasHashSet.Contains(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                        ChangeMappos(this, _mapPos, value);
+                       ChangeTexdic(this,_texDic,value); 
                     }
-
-                    _mapPos = value;
+        
+                _texDic = value;
                 }
+                 
+                     }
+                    
+                    private Vector3Int  _mapPos;
+                    /// <summary>
+                    ///离散位置
+                    ///</summary>
+                    public Vector3Int  mapPos{
+                                get{return _mapPos;}
+ set{
 
-            }
-
-            private bool _enteredScene;
-            /// <summary>
-            ///进入过所属scene
-            ///</summary>
-            public bool enteredScene
-            {
-                get { return _enteredScene; }
-                set
-                {
-
-                    if (_DataByUid != null && _DatasHashSet.Contains(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                        ChangeEnteredscene(this, _enteredScene, value);
+                       ChangeMappos(this,_mapPos,value); 
                     }
-
-                    _enteredScene = value;
+        
+                _mapPos = value;
                 }
+                 
+                     }
+                    
+                    private bool  _enteredScene;
+                    /// <summary>
+                    ///进入过所属scene
+                    ///</summary>
+                    public bool  enteredScene{
+                                get{return _enteredScene;}
+ set{
 
-            }
-
-            private bool _unlock;
-            /// <summary>
-            ///迷雾解锁
-            ///</summary>
-            public bool unlock
-            {
-                get { return _unlock; }
-                set
-                {
-
-                    if (_DataByUid != null && _DatasHashSet.Contains(this))
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                        ChangeUnlock(this, _unlock, value);
+                       ChangeEnteredscene(this,_enteredScene,value); 
                     }
-
-                    _unlock = value;
+        
+                _enteredScene = value;
                 }
+                 
+                     }
+                    
+                    private bool  _unlock;
+                    /// <summary>
+                    ///迷雾解锁
+                    ///</summary>
+                    public bool  unlock{
+                                get{return _unlock;}
+ set{
 
-            }
-
-            public Data(UnitForm.Data data) : base(data.uid, data.name, data.prefabName, data.pos, data.euler, data.scale, data.updateType, data.collidingUnitUid, data.extra)
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeUnlock(this,_unlock,value); 
+                    }
+        
+                _unlock = value;
+                }
+                 
+                     }
+                    
+            public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
-
-            public Data(int uid, string name, Dictionary<int, string> texNameDic, Vector3Int mapPos, string prefabName, Vector3 pos, Vector3 euler, Vector3 scale, UpdateType updateType, List<int> collidingUnitUid, string extra, bool enteredScene, bool unlock) : base(uid, name, prefabName, pos, euler, scale, updateType, collidingUnitUid, extra)
+            
+            public Data(int uid,string name,Dictionary<int,int> texDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,bool unlock):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
-                this.uid = uid;
-                this.name = name;
-                this.texNameDic = texNameDic;
-                this.mapPos = mapPos;
-                this.prefabName = prefabName;
-                this.pos = pos;
-                this.euler = euler;
-                this.scale = scale;
-                this.updateType = updateType;
-                this.collidingUnitUid = collidingUnitUid;
-                this.extra = extra;
-                this.enteredScene = enteredScene;
-                this.unlock = unlock;
+             this.uid = uid;
+             this.name = name;
+             this.texDic = texDic;
+             this.mapPos = mapPos;
+             this.prefabName = prefabName;
+             this.pos = pos;
+             this.euler = euler;
+             this.scale = scale;
+             this.updateType = updateType;
+             this.collidingUnitUid = collidingUnitUid;
+             this.extra = extra;
+             this.enteredScene = enteredScene;
+             this.unlock = unlock;
 
-                _unit = new TileUnit(this);
+                    _unit=new TileUnit(this);
 
             }
             public void Reset(Data data)
             {
 
-                this.uid = data.uid;
-                this.name = data.name;
-                this.texNameDic = data.texNameDic;
-                this.mapPos = data.mapPos;
-                this.prefabName = data.prefabName;
-                this.pos = data.pos;
-                this.euler = data.euler;
-                this.scale = data.scale;
-                this.updateType = data.updateType;
-                this.collidingUnitUid = data.collidingUnitUid;
-                this.extra = data.extra;
-                this.enteredScene = data.enteredScene;
-                this.unlock = data.unlock;
+             this.uid = data.uid;
+             this.name = data.name;
+             this.texDic = data.texDic;
+             this.mapPos = data.mapPos;
+             this.prefabName = data.prefabName;
+             this.pos = data.pos;
+             this.euler = data.euler;
+             this.scale = data.scale;
+             this.updateType = data.updateType;
+             this.collidingUnitUid = data.collidingUnitUid;
+             this.extra = data.extra;
+             this.enteredScene = data.enteredScene;
+             this.unlock = data.unlock;
             }
 
-            public Data Copy(bool sameId = true)
-            {
-                return new Data(sameId ? uid : uidChain.GetId(), name, texNameDic == null ? new Dictionary<int, string>() : new Dictionary<int, string>(texNameDic), mapPos, prefabName, pos, euler, scale, updateType, collidingUnitUid == null ? new List<int>() : new List<int>(collidingUnitUid), extra, enteredScene, unlock);
-            }
-
-            public override void BeforeGet()
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? uid:uidChain.GetId(),name,texDic==null?new Dictionary<int,int>():new Dictionary<int,int>(texDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,unlock);
+                }
+            
+            public override  void BeforeGet()
             {
                 base.BeforeGet();
                 TileUnitForm.beforeGetAction?.Invoke(this);
             }
         }
 
-        private static Data _defaultData = new Data(0, "", new Dictionary<int, string>() { }, Vector3Int.zero, "", Vector3.zero, Vector3.zero, Vector3.zero, UpdateType.ShowOnly, null, "", false, false);
-        public static Data defaultData => _defaultData.Copy();
+                   private static Data _defaultData=new Data(0,"",new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,false);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
-        static HashSet<Data> _DatasHashSet;
-        static Dictionary<int, Data> _DataByUid;
-        public static Dictionary<int, Data> DataByUid
-        {
-            get
+            static HashSet<Data> _DatasHashSet;
+            static Dictionary<int, Data> _DataByUid;
+            public static Dictionary<int, Data> DataByUid
             {
-                Init();
-                return _DataByUid;
+                get
+                {
+                    Init();
+                    return _DataByUid;
+                }
             }
-        }
-
-        static Dictionary<Vector3Int, Data> _DataByMappos;
-        public static Dictionary<Vector3Int, Data> DataByMappos
-        {
-            get
+    
+            static Dictionary<Vector3Int, Data> _DataByMappos;
+            public static Dictionary<Vector3Int, Data> DataByMappos
             {
-                Init();
-                return _DataByMappos;
+                get
+                {
+                    Init();
+                    return _DataByMappos;
+                }
             }
-        }
-
+    
 
         static public void Init()
         {
@@ -280,50 +269,48 @@ namespace Z_Map.Form
         }
         public static void InitInternal()
         {
-            if (inited)
+            if(inited)
                 return;
-            inited = true;
+            inited=true;  
 
+        
 
+                _DataByUid = new Dictionary<int, Data>() {
 
-            _DataByUid = new Dictionary<int, Data>()
-            {
-
-            };
-            _DatasHashSet = new HashSet<Data>();
-
-            _DataByMappos = new Dictionary<Vector3Int, Data>()
-            {
-
-
-            };
-            foreach (var v in _DataByUid.Values)
-            {
-                _DatasHashSet.Add(v);
-            }
-
+                };
+                _DatasHashSet=new HashSet<Data>();
+                
+                    _DataByMappos = new Dictionary<Vector3Int, Data>() {
+    
+                    
+                    };
+                    foreach(var v in _DataByUid.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
+    
 
             childInitAction?.Invoke();
+            
 
-
-            foreach (var data in DataByUid.Values)
+            foreach(var data in DataByUid.Values)
             {
                 UnitForm.AddData(data);
             }
 
 
-
-
+        
+             
         }
 
 
         public static List<Data> GetDatasByJa(JArray ja)
         {
             Init();
-            List<Data> lst = new List<Data>();
-            foreach (JObject jo in ja)
+            List<Data> lst=new List<Data>();
+            foreach(JObject jo in ja)
             {
-                if (jo.Get<int>("uid") == 0)
+                if(jo.Get<int>("uid")==0)
                     continue;
                 lst.Add(GetDataByJo(jo));
             }
@@ -333,10 +320,10 @@ namespace Z_Map.Form
         public static JArray GetJaByDatas()
         {
             Init();
-            JArray ja = new JArray();
-            foreach (Data data in _DataByUid.Values)
+            JArray ja=new JArray();
+            foreach(Data data in _DataByUid.Values)
             {
-                if (data.uid == 0)
+                if(data.uid==0)
                     continue;
                 ja.Add(GetJoByData(data));
             }
@@ -347,33 +334,33 @@ namespace Z_Map.Form
         {
             Init();
 
-            Data data = new Data(
+            Data data=new Data(
 
-                jo.SelectToken("uid") == null ? defaultData.uid : jo.Get<int>("uid"),
+                jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.SelectToken("name") == null ? defaultData.name : jo.Get<string>("name"),
+                jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("texNameDic") == null ? defaultData.texNameDic : jo.Get<Dictionary<int, string>>("texNameDic"),
+                jo.SelectToken("texDic")==null?defaultData.texDic:jo.Get<Dictionary<int,int>>("texDic"),
 
-                jo.SelectToken("mapPos") == null ? defaultData.mapPos : jo.Get<Vector3Int>("mapPos"),
+                jo.SelectToken("mapPos")==null?defaultData.mapPos:jo.Get<Vector3Int>("mapPos"),
 
-                jo.SelectToken("prefabName") == null ? defaultData.prefabName : jo.Get<string>("prefabName"),
+                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.SelectToken("pos") == null ? defaultData.pos : jo.Get<Vector3>("pos"),
+                jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector3>("pos"),
 
-                jo.SelectToken("euler") == null ? defaultData.euler : jo.Get<Vector3>("euler"),
+                jo.SelectToken("euler")==null?defaultData.euler:jo.Get<Vector3>("euler"),
 
-                jo.SelectToken("scale") == null ? defaultData.scale : jo.Get<Vector3>("scale"),
+                jo.SelectToken("scale")==null?defaultData.scale:jo.Get<Vector3>("scale"),
 
-                jo.SelectToken("updateType") == null ? defaultData.updateType : jo.Get<UpdateType>("updateType"),
+                jo.SelectToken("updateType")==null?defaultData.updateType:jo.Get<UpdateType>("updateType"),
 
-                jo.SelectToken("collidingUnitUid") == null ? defaultData.collidingUnitUid : jo.Get<List<int>>("collidingUnitUid"),
+                jo.SelectToken("collidingUnitUid")==null?defaultData.collidingUnitUid:jo.Get<List<int>>("collidingUnitUid"),
 
-                jo.SelectToken("extra") == null ? defaultData.extra : jo.Get<string>("extra"),
+                jo.SelectToken("extra")==null?defaultData.extra:jo.Get<string>("extra"),
 
-                jo.SelectToken("enteredScene") == null ? defaultData.enteredScene : jo.Get<bool>("enteredScene"),
+                jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene"),
 
-                jo.SelectToken("unlock") == null ? defaultData.unlock : jo.Get<bool>("unlock")
+                jo.SelectToken("unlock")==null?defaultData.unlock:jo.Get<bool>("unlock")
                     );
 
             return data;
@@ -384,33 +371,33 @@ namespace Z_Map.Form
             Init();
             data.BeforeGet();
 
-            JObject jo = new JObject();
+            JObject jo=new JObject();
 
-            jo.Set<int>("uid", data.uid);
+            jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("name", data.name);
+            jo.Set<string>("name",data.name);
 
-            jo.Set<Dictionary<int, string>>("texNameDic", data.texNameDic);
+            jo.Set<Dictionary<int,int>>("texDic",data.texDic);
 
-            jo.Set<Vector3Int>("mapPos", data.mapPos);
+            jo.Set<Vector3Int>("mapPos",data.mapPos);
 
-            jo.Set<string>("prefabName", data.prefabName);
+            jo.Set<string>("prefabName",data.prefabName);
 
-            jo.Set<Vector3>("pos", data.pos);
+            jo.Set<Vector3>("pos",data.pos);
 
-            jo.Set<Vector3>("euler", data.euler);
+            jo.Set<Vector3>("euler",data.euler);
 
-            jo.Set<Vector3>("scale", data.scale);
+            jo.Set<Vector3>("scale",data.scale);
 
-            jo.Set<UpdateType>("updateType", data.updateType);
+            jo.Set<UpdateType>("updateType",data.updateType);
 
-            jo.Set<List<int>>("collidingUnitUid", data.collidingUnitUid);
+            jo.Set<List<int>>("collidingUnitUid",data.collidingUnitUid);
 
-            jo.Set<string>("extra", data.extra);
+            jo.Set<string>("extra",data.extra);
 
-            jo.Set<bool>("enteredScene", data.enteredScene);
+            jo.Set<bool>("enteredScene",data.enteredScene);
 
-            jo.Set<bool>("unlock", data.unlock);
+            jo.Set<bool>("unlock",data.unlock);
 
             return jo;
         }
@@ -419,42 +406,42 @@ namespace Z_Map.Form
         public static int AddData(Data data)
         {
             Init();
-            if (DataByUid.ContainsKey(data.uid))
+            if(DataByUid.ContainsKey(data.uid))
                 return data.uid;
-            if (data.uid == -1)
-            {
-                int uid = uidChain.GetId();
-                if (uid == -1)
+            if(data.uid==-1)
+            { 
+                int uid=uidChain.GetId();
+                if(uid==-1)
                     return -1;
-                data.uid = uid;
+                data.uid=uid;  
             }
             uidChain.PopId(data.uid);
 
-            DataByUid[data.uid] = data;
-            _DatasHashSet.Add(data);
-
-            DataByMappos[data.mapPos] = data;
-
-            UnitForm.AddData(data);
+        DataByUid[data.uid]=data;
+        _DatasHashSet.Add(data);
+    
+                    DataByMappos[data.mapPos]=data;
+    
+UnitForm.AddData(data);
             childAddAction?.Invoke(data);
             addAction?.Invoke(data);
             return data.uid;
         }
         public static void RemoveData(int uid)
-        {
+        {            
             Init();
-            if (!DataByUid.ContainsKey(uid))
+            if(!DataByUid.ContainsKey(uid))
                 return;
+               
+            var data=DataByUid[uid];
 
-            var data = DataByUid[uid];
-
-            _DatasHashSet.Remove(DataByUid[data.uid]);
-            DataByUid.Remove(data.uid);
-
-
-            DataByMappos.Remove(data.mapPos);
-
-            UnitForm.RemoveData(uid);
+                    _DatasHashSet.Remove(DataByUid[data.uid]);
+                    DataByUid.Remove(data.uid);
+                    
+    
+                    DataByMappos.Remove(data.mapPos);
+    
+UnitForm.RemoveData(uid);
             uidChain.PushId(data.uid);
             childRemoveAction?.Invoke(data);
             removeAction?.Invoke(data);
@@ -463,175 +450,176 @@ namespace Z_Map.Form
         {
             Init();
             var keys = new List<int>(DataByUid.Keys);
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
-                RemoveData(key);
+                    RemoveData(key);
             }
 
         }
-
+        
         public static void ClearAuto()
         {
             Init();
             var keys = new List<int>(DataByUid.Keys);
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
-                if (key < uidChain.cnt)
+                if(key < uidChain.cnt)
+                    {
+                        RemoveData(key);
+                    }
+            }
+        }
+
+         private static void RemoveChildren(UnitForm.Data data)
+        {
+            Init();
+            if(data is Data)
+               RemoveData(data.uid);      
+        }
+         private static void AddChildren(UnitForm.Data superData)
+        {
+            Init();
+            if(superData is Data data)
+               AddData(data);      
+        }
+        
+
+
+
+
+            public static void ChangeUid(UnitForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
                 {
-                    RemoveData(key);
+
+                changeUidAction?.Invoke(data,oldV,newV);
                 }
+                    
             }
-        }
-
-        private static void RemoveChildren(UnitForm.Data data)
-        {
-            Init();
-            if (data is Data)
-                RemoveData(data.uid);
-        }
-        private static void AddChildren(UnitForm.Data superData)
-        {
-            Init();
-            if (superData is Data data)
-                AddData(data);
-        }
-
-
-
-
-
-        public static void ChangeUid(UnitForm.Data superData, int oldV, int newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeName(UnitForm.Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeUidAction?.Invoke(data, oldV, newV);
+                changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeName(UnitForm.Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeTexdic(Data superData,Dictionary<int,int> oldV,Dictionary<int,int> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeNameAction?.Invoke(data, oldV, newV);
+                changeTexdicAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeTexnamedic(Data superData, Dictionary<int, string> oldV, Dictionary<int, string> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeMappos(Data superData,Vector3Int oldV,Vector3Int newV)
             {
+                if(superData is Data data)
+                {
 
-                changeTexnamedicAction?.Invoke(data, oldV, newV);
+                    DataByMappos.Remove(oldV);
+                    DataByMappos[newV]=data;
+ 
+                changeMapposAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeMappos(Data superData, Vector3Int oldV, Vector3Int newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangePrefabname(UnitForm.Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                DataByMappos.Remove(oldV);
-                DataByMappos[newV] = data;
-
-                changeMapposAction?.Invoke(data, oldV, newV);
+                changePrefabnameAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangePrefabname(UnitForm.Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangePos(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
             {
+                if(superData is Data data)
+                {
 
-                changePrefabnameAction?.Invoke(data, oldV, newV);
+                changePosAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangePos(UnitForm.Data superData, Vector3 oldV, Vector3 newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeEuler(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
             {
+                if(superData is Data data)
+                {
 
-                changePosAction?.Invoke(data, oldV, newV);
+                changeEulerAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeEuler(UnitForm.Data superData, Vector3 oldV, Vector3 newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeScale(UnitForm.Data superData,Vector3 oldV,Vector3 newV)
             {
+                if(superData is Data data)
+                {
 
-                changeEulerAction?.Invoke(data, oldV, newV);
+                changeScaleAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeScale(UnitForm.Data superData, Vector3 oldV, Vector3 newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeUpdatetype(UnitForm.Data superData,UpdateType oldV,UpdateType newV)
             {
+                if(superData is Data data)
+                {
 
-                changeScaleAction?.Invoke(data, oldV, newV);
+                changeUpdatetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeUpdatetype(UnitForm.Data superData, UpdateType oldV, UpdateType newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeCollidingunituid(UnitForm.Data superData,List<int> oldV,List<int> newV)
             {
+                if(superData is Data data)
+                {
 
-                changeUpdatetypeAction?.Invoke(data, oldV, newV);
+                changeCollidingunituidAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeCollidingunituid(UnitForm.Data superData, List<int> oldV, List<int> newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeExtra(UnitForm.Data superData,string oldV,string newV)
             {
+                if(superData is Data data)
+                {
 
-                changeCollidingunituidAction?.Invoke(data, oldV, newV);
+                changeExtraAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeExtra(UnitForm.Data superData, string oldV, string newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeEnteredscene(Data superData,bool oldV,bool newV)
             {
+                if(superData is Data data)
+                {
 
-                changeExtraAction?.Invoke(data, oldV, newV);
+                changeEnteredsceneAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeEnteredscene(Data superData, bool oldV, bool newV)
-        {
-            if (superData is Data data)
+            
+            public static void ChangeUnlock(Data superData,bool oldV,bool newV)
             {
+                if(superData is Data data)
+                {
 
-                changeEnteredsceneAction?.Invoke(data, oldV, newV);
+                changeUnlockAction?.Invoke(data,oldV,newV);
+                }
+                    
             }
-
-        }
-
-        public static void ChangeUnlock(Data superData, bool oldV, bool newV)
-        {
-            if (superData is Data data)
-            {
-
-                changeUnlockAction?.Invoke(data, oldV, newV);
-            }
-
-        }
-
+            
     }
 }
+        

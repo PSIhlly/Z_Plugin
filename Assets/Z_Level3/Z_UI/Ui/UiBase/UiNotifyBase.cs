@@ -572,21 +572,23 @@ namespace Ui.Notify
     public partial class UiPopupView:UiView
     {
 
-            public Txt txt_content;
+            public ScrView scr_;
             public Txt txt_title;
             public GameObject go_close;
             public Btn btn_close;
             public UiSelectionCtrl sub_Selection;
             public Txt txt_;
+            public Txt txt_content;
         public UiPopupView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_content = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            scr_ = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             go_close = uiHolder.elementTrsLst[2].gameObject;
             btn_close = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             sub_Selection = (UiSelectionCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             txt_ = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_content = uiHolder.elementTrsLst[6].GetComponent<Txt>();
         }
 
     }

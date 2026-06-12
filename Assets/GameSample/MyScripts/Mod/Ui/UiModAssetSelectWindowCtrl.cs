@@ -89,6 +89,14 @@ namespace Ui.ModAssetSelectWindow
                     Refresh();
                 }
             });
+            view.ipt_name.onFinishInput += (s) =>
+            {
+                if (model.sel != null)
+                {
+                    model.sel.name = s;
+                    Refresh();
+                }
+            };
 
             itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
@@ -123,6 +131,7 @@ namespace Ui.ModAssetSelectWindow
             RefreshItems();
             view.sta_selected.ChangeState(model.sel != null ? 1 : 0);
             view.sta_setLabel.ChangeState(model.isSetLabelMode ? 1 : 0);
+            view.ipt_name.Set(model.sel!=null ? model.sel.name : "");
         }
         void RefreshLabs()
         {
@@ -157,7 +166,8 @@ namespace Ui.ModAssetSelectWindow
             {
                 labCon.Add(new UiLabParam() { lab = lab });
             }
-            labCon.Add(new UiLabParam() { lab = TextManager.instance.GetTxt("new") });
+            if(model.sel!=null&&model.isSetLabelMode)
+                labCon.Add(new UiLabParam() { lab = TextManager.instance.GetTxt("new") });
             labCon.Refresh();
         }
         void RefreshItems()
@@ -214,6 +224,33 @@ namespace Ui.ModAssetSelectWindow
             model.sel = null;
             RefreshItems();
         }
+        public void Replace()
+        {
+            if (model.prm is UiModAssetSelectTexWindowParam texPrm)
+            {
+                AssetManager.instance.texCtrl.Select(texPrm.sizeLimit, (data) =>
+                {
+                    model.sel.bytes = data.bytes;
+                    Refresh();
+                });
+            }
+            else if (model.prm is UiModAssetSelectAudioWindowParam audioPrm)
+            {
+                AssetManager.instance.audioCtrl.Select((data) =>
+                {
+                    model.sel.bytes = data.bytes;
+                    Refresh();
+                });
+            }
+            else if (model.prm is UiModAssetSelectVideoWindowParam videoPrm)
+            {
+                AssetManager.instance.videoCtrl.Select((data) =>
+                {
+                    model.sel.bytes = data.bytes;
+                    Refresh();
+                });
+            }
+        }
         public void Import(string lab)
         {
             if (model.prm is UiModAssetSelectTexWindowParam texPrm)
@@ -221,7 +258,7 @@ namespace Ui.ModAssetSelectWindow
                 AssetManager.instance.texCtrl.Select(texPrm.sizeLimit, (data) =>
                 {
                     data.lab = lab;
-                    GameManager.instance.saveCtrl.AddStoryTex(data);
+                    GameManager.instance.saveCtrl.AddStoryTex(ref data);
                     Refresh();
                 });
             }
@@ -375,7 +412,7 @@ namespace Ui.ModAssetSelectWindow
                 view.sta_exist.ChangeState(1);
                 if (parent.model.prm is UiModAssetSelectTexWindowParam texPrm)
                 {
-                    view.img_.sprite = ((TexAssetForm.Data)model.prm.data).GetSprite();
+                    view.img_.BindTexData(((TexAssetForm.Data)model.prm.data));
                     view.txt_.text = ((TexAssetForm.Data)model.prm.data).name;
                 }
                 else if (parent.model.prm is UiModAssetSelectAudioWindowParam audioPrm)
@@ -387,7 +424,6 @@ namespace Ui.ModAssetSelectWindow
                 {
                     view.img_.sprite = TextureHelper.transparentSprite;
                 }
-                view.txt_.text = "";
                 view.sta_.ChangeState(parent.model.sel == model.prm.data ? 1 : 0);
 
             }

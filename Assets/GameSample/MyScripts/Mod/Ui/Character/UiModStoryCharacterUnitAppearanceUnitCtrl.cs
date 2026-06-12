@@ -81,7 +81,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             });
             view.btn_resetTex.onClick.AddListener(() =>
             {
-                model.data.animClip[model.dir][model.id].partTex[model.part] = GlobalNameHelper.GetDefaultTexName();
+                model.data.animClip[model.dir][model.id].partTex[model.part] = GlobalDefaultHelper.DefaultTexId;
                 Refresh();
             });
             view.btn_image.onClick.AddListener(() =>
@@ -257,10 +257,10 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         private void RefreshView()
         {
-            List<string> texNameLst = new List<string>() {
+            List<int> texNameLst = new List<int>() {
                 model.data.animClip[model.dir][model.id].partTex[BodyPartType.UpperPart],
-                null,
-                GlobalNameHelper.GetDefaultTexName()
+                -1,
+                GlobalDefaultHelper.DefaultTexId
                 };
             var showGo = GameManager.instance.utilCtrl.CombineNewCharacterByPrefabs("fakeChara", texNameLst, false);
             showGo.SetActive(true);
@@ -379,7 +379,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             if (model.prm.id != -1)
             {
                 view.txt_.text = "";
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.animClip[parent.model.dir][model.prm.id].partTex[BodyPartType.UpperPart]].GetSprite();
+                view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.animClip[parent.model.dir][model.prm.id].partTex[BodyPartType.UpperPart]]);
             }
 
         }

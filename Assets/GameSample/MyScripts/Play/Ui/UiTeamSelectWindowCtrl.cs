@@ -112,7 +112,7 @@ namespace Ui.TeamSelectWindow
                 if (data != null)
                 {
                     view.txt_.text = data.name;
-                    view.img_.sprite = TexAssetForm.DataByName[data.avatarTexName].GetSprite();
+                    view.img_.BindTexData(TexAssetForm.DataById[data.avatarTex]);
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace Ui.TeamSelectWindow
                 if (data != null)
                 {
                     view.txt_.text = data.name;
-                    view.img_.sprite = TexAssetForm.DataByName[data.avatarTexName].GetSprite();
+                    view.img_.BindTexData(TexAssetForm.DataById[data.avatarTex]);
                 }
             }
         }

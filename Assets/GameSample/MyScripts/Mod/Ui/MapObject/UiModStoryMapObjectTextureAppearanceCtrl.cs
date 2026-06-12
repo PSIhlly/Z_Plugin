@@ -35,7 +35,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteTex(model.data.name);
+                ModManager.instance.assetCtrl.DeleteTex(model.data.id);
                 parent.parent.SelType(1);
             });
             view.ipt_label.onFinishInput += (s) =>
@@ -55,13 +55,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             };
             view.btn_deleteTex.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteTexId(model.data.name, model.id);
+                ModManager.instance.assetCtrl.DeleteTexId(model.data.id, model.id);
                 model.id = -1;
                 Refresh();
             });
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportTex(model.data.name, model.id);
+                ModManager.instance.assetCtrl.ImportTex(model.data.id, model.id);
             });
         }
 
@@ -86,7 +86,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             view.sta_show.ChangeState(model.id >= 0 ? 1 : 0);
 
             con.Clear();
-            for (int i = 0; i < model.data.texsName.Count; i++)
+            for (int i = 0; i < model.data.texs.Count; i++)
             {
                 con.Add(new UiItemParam()
                 {
@@ -101,7 +101,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
             if (model.id >= 0)
             {
-                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].GetSprite();
+                view.img_image.BindTexData(TexAssetForm.DataById[model.data.texs[model.id]]);
             }
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
@@ -125,7 +125,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
             view.btn_new.onClick.AddListener(() =>
             {
-                parent.model.data.texsName.Add(GlobalNameHelper.GetDefaultTexName());
+                parent.model.data.texs.Add(GlobalDefaultHelper.DefaultTexId);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
@@ -146,7 +146,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             if (model.id != -1)
             {
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].GetSprite();
+                view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.texs[model.id]]);
             }
         }
     }

@@ -7,7 +7,7 @@ using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Time;
 using Z_Ui;
-using static Unity.Burst.Intrinsics.X86.Avx;
+using Z_Ui.Base;
 
 namespace Z_Map
 {
@@ -21,7 +21,7 @@ namespace Z_Map
         public Timer chatTimer;
 
         public GameObject chat;
-        public Image chatImg;
+        public Img chatImg;
         public TextMeshProUGUI chatText;
 
         private Dictionary<int, TextMeshProUGUI> textDic = new Dictionary<int, TextMeshProUGUI>();
@@ -77,16 +77,16 @@ namespace Z_Map
             sliderDic[key].value = v / max;
             sliderTextDic[sliderDic[key]].text = $"{v}/{max}";
         }
-        public void Chat(string text, string img, float lastTime)
+        public void Chat(string text, int img, float lastTime)
         {
             chat.SetActive(true);
             chatText.text = text;
-            var data = TexAssetForm.DataByName.GetDv(img, null);
-            bool imgValid = data != null && data.name != GlobalNameHelper.GetExternDefaultTexName();
+            var data = TexAssetForm.DataById.GetDv(img, null);
+            bool imgValid = data != null && data.id != GlobalDefaultHelper.ExternDefaultTexId;
             chatImg.gameObject.SetActive(imgValid);
             if (imgValid)
             {
-                chatImg.sprite = data.GetSprite();
+                chatImg.BindTexData(data);
             }
 
             float timeCur = 0;

@@ -24,10 +24,10 @@ public class Z_Ui_Sample : MonoBehaviour
     {
         var contentLst = new List<string>();
         var nameLst = new List<string>();
-        var bgLst = new List<string>();
-        var videoLst = new List<string>();
-        var audioLst = new List<string>();
-        var avatarLst = new List<string>();
+        var bgLst = new List<int>();
+        var videoLst = new List<int>();
+        var audioLst = new List<int>();
+        var avatarLst = new List<int>();
 
         foreach (var v in Sample_DialogForm.Datas.Values)
         {
@@ -39,15 +39,15 @@ public class Z_Ui_Sample : MonoBehaviour
                 var bgForm = Sample_ImgForm.Datas[v.background_imgId];
                 var bgTexData = AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + bgForm.path, bgForm.id + "bg");
                 TexAssetForm.AddData(bgTexData);
-                bgLst.Add(bgTexData.name);
+                bgLst.Add(bgTexData.id);
 
-                videoLst.Add("");
-                audioLst.Add("");
+                videoLst.Add(0);
+                audioLst.Add(0);
 
                 var avatarForm = Sample_ImgForm.Datas[Sample_NpcForm.Datas[v.speaker_npcId].avatar_imgId];
                 var avatarTexData = AssetManager.instance.texCtrl.CreateDataByPath(Application.dataPath + avatarForm.path, avatarForm.id + "avt");
                 TexAssetForm.AddData(avatarTexData);
-                avatarLst.Add(avatarTexData.name);
+                avatarLst.Add(avatarTexData.id);
             }
         }
         DialogManager.instance.Begin(nameLst, contentLst, bgLst, videoLst, avatarLst, audioLst, OnComplete);

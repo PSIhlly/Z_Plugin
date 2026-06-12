@@ -138,6 +138,7 @@ namespace Ui.ModAssetSelectWindow
             public Sta sta_selected;
             public Btn btn_close;
             public Btn btn_delete;
+            public Btn btn_replace;
             public GameObject go_lab;
             public UiLabCtrl sub_lab;
             public GameObject go_item;
@@ -146,6 +147,7 @@ namespace Ui.ModAssetSelectWindow
             public Sta sta_;
             public Btn btn_setLabel;
             public Sta sta_setLabel;
+            public Ipt ipt_name;
         public UiModAssetSelectWindowView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -156,14 +158,16 @@ namespace Ui.ModAssetSelectWindow
             sta_selected = uiHolder.elementTrsLst[4].GetComponent<Sta>();
             btn_close = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            go_lab = uiHolder.elementTrsLst[7].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[9].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            btn_ = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[12].GetComponent<Sta>();
-            btn_setLabel = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            sta_setLabel = uiHolder.elementTrsLst[14].GetComponent<Sta>();
+            btn_replace = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            go_lab = uiHolder.elementTrsLst[8].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[10].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            btn_ = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            btn_setLabel = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            sta_setLabel = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            ipt_name = uiHolder.elementTrsLst[16].GetComponent<Ipt>();
         }
 
     }

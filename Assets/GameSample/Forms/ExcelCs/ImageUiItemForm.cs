@@ -51,7 +51,7 @@ public static readonly int autoUidCnt=100;
 
         public static Action<Data,int,int> changeUidAction;
                 
-        public static Action<Data,string,string> changeTexnameAction;
+        public static Action<Data,int,int> changeTexAction;
                 
         public static Action<Data,Vector2,Vector2> changeSizeAction;
                 
@@ -104,20 +104,20 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _texName;
+                    private int  _tex;
                     /// <summary>
                     ///图片名称
                     ///</summary>
-                    public string  texName{
-                                get{return _texName;}
+                    public int  tex{
+                                get{return _tex;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeTexname(this,_texName,value); 
+                       ChangeTex(this,_tex,value); 
                     }
         
-                _texName = value;
+                _tex = value;
                 }
                  
                      }
@@ -374,11 +374,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string texName,Vector2 size,Vector2 oldPos,float posProgress,float posTime,Vector2 tarPos,float oldOpacity,float opacityProgress,float opacityTime,float tarOpacity,float oldEuler,float eulerProgress,float eulerTime,float tarEuler,float removeTime)
+            public Data(int uid,int tex,Vector2 size,Vector2 oldPos,float posProgress,float posTime,Vector2 tarPos,float oldOpacity,float opacityProgress,float opacityTime,float tarOpacity,float oldEuler,float eulerProgress,float eulerTime,float tarEuler,float removeTime)
             {
 
              this.uid = uid;
-             this.texName = texName;
+             this.tex = tex;
              this.size = size;
              this.oldPos = oldPos;
              this.posProgress = posProgress;
@@ -399,7 +399,7 @@ public static readonly int autoUidCnt=100;
             {
 
              this.uid = data.uid;
-             this.texName = data.texName;
+             this.tex = data.tex;
              this.size = data.size;
              this.oldPos = data.oldPos;
              this.posProgress = data.posProgress;
@@ -418,7 +418,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),texName,size,oldPos,posProgress,posTime,tarPos,oldOpacity,opacityProgress,opacityTime,tarOpacity,oldEuler,eulerProgress,eulerTime,tarEuler,removeTime);
+        return new Data(sameId? uid:uidChain.GetId(),tex,size,oldPos,posProgress,posTime,tarPos,oldOpacity,opacityProgress,opacityTime,tarOpacity,oldEuler,eulerProgress,eulerTime,tarEuler,removeTime);
                 }
             
             public virtual  void BeforeGet()
@@ -428,7 +428,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",default,default,0f,0f,default,0f,0f,0f,0f,0f,0f,0f,0f,999999f);
+                   private static Data _defaultData=new Data(0,0,default,default,0f,0f,default,0f,0f,0f,0f,0f,0f,0f,0f,999999f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -504,7 +504,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.SelectToken("texName")==null?defaultData.texName:jo.Get<string>("texName"),
+                jo.SelectToken("tex")==null?defaultData.tex:jo.Get<int>("tex"),
 
                 jo.SelectToken("size")==null?defaultData.size:jo.Get<Vector2>("size"),
 
@@ -547,7 +547,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("texName",data.texName);
+            jo.Set<int>("tex",data.tex);
 
             jo.Set<Vector2>("size",data.size);
 
@@ -671,12 +671,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeTexname(Data superData,string oldV,string newV)
+            public static void ChangeTex(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTexnameAction?.Invoke(data,oldV,newV);
+                changeTexAction?.Invoke(data,oldV,newV);
                 }
                     
             }

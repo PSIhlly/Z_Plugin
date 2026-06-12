@@ -11,7 +11,7 @@ public class GameMapData : MapInfo
 
     public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
     {
-        var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), extra, false,"");
+        var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;
@@ -25,12 +25,12 @@ public class GameMapData : MapInfo
     }
     public override ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
     {
-        var form = new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "",false,"");
+        var form = new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "",false,GlobalDefaultHelper.DefaultTexId);
         return form;
     }
     public override ObjectUnitForm.Data GetNewObject(string prefabName = "", object[] prms = null)
     {
-        var form = new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "", false,"");
+        var form = new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "", false, GlobalDefaultHelper.DefaultTexId);
         return form;
     }
 
@@ -41,7 +41,7 @@ public class GameMapData : MapInfo
 
     public override TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
     {
-        var form = new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
+        var form = new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("map"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;

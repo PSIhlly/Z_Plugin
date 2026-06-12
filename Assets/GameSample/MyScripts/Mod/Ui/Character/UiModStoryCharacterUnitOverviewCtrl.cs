@@ -78,8 +78,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
-            view.img_image.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName, GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
-            view.img_illustration.sprite = TexAssetForm.DataByName.GetDk(model.data.illustration, GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
+            view.img_image.BindTexData(TexAssetForm.DataById.GetDv(model.data.avatarTex, TexAssetForm.DataById[GlobalDefaultHelper.DefaultCharacterTexId]));
+            view.img_illustration.BindTexData(TexAssetForm.DataById.GetDv(model.data.illustration, TexAssetForm.DataById[GlobalDefaultHelper.DefaultCharacterTexId]));
             view.ipt_desc.Set(model.data.desc);
         }
         public void OnEvent(AssetEvent evt)

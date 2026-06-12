@@ -53,7 +53,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeMinimapAction;
+        public static Action<Data,int,int> changeMinimapAction;
                 
         public static Action<Data,Vector2,Vector2> changePosAction;
                 
@@ -108,11 +108,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _miniMap;
+                    private int  _miniMap;
                     /// <summary>
                     ///小地图
                     ///</summary>
-                    public string  miniMap{
+                    public int  miniMap{
                                 get{return _miniMap;}
  set{
 
@@ -234,7 +234,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,string miniMap,Vector2 pos,bool unlock,bool hideInLargeMap,Dictionary<string,EventTriggerForm.Data> events,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime)
+            public Data(int uid,string name,int miniMap,Vector2 pos,bool unlock,bool hideInLargeMap,Dictionary<string,EventTriggerForm.Data> events,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime)
             {
 
              this.uid = uid;
@@ -274,7 +274,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",Vector2.zero,false,false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<int,List<string>>(){},false);
+                   private static Data _defaultData=new Data(0,"",0,Vector2.zero,false,false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<int,List<string>>(){},false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -371,7 +371,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("miniMap")==null?defaultData.miniMap:jo.Get<string>("miniMap"),
+                jo.SelectToken("miniMap")==null?defaultData.miniMap:jo.Get<int>("miniMap"),
 
                 jo.SelectToken("pos")==null?defaultData.pos:jo.Get<Vector2>("pos"),
 
@@ -400,7 +400,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("miniMap",data.miniMap);
+            jo.Set<int>("miniMap",data.miniMap);
 
             jo.Set<Vector2>("pos",data.pos);
 
@@ -525,7 +525,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeMinimap(Data superData,string oldV,string newV)
+            public static void ChangeMinimap(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

@@ -301,7 +301,7 @@ namespace Ui.PlaySceneMain
             }
             con.Refresh();
 
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.avatarTexName, GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
+            view.img_.BindTexData(TexAssetForm.DataById.GetDk(model.data.avatarTex, GlobalDefaultHelper.DefaultCharacterTexId));
 
         }
     }

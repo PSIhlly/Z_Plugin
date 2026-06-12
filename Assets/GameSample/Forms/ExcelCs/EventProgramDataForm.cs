@@ -42,6 +42,8 @@ namespace Form
 
             ProgramDataForm.changeZcodeAction+=ChangeZcode;
 
+            ProgramDataForm.changeZcodemapAction+=ChangeZcodemap;
+
             ProgramDataForm.changeParamcountAction+=ChangeParamcount;
 
             ProgramDataForm.changeReturnvalueAction+=ChangeReturnvalue;
@@ -74,6 +76,8 @@ namespace Form
         public static Action<Data,string,string> changeCodeAction;
                 
         public static Action<Data,List<string>,List<string>> changeZcodeAction;
+                
+        public static Action<Data,List<int>,List<int>> changeZcodemapAction;
                 
         public static Action<Data,int,int> changeParamcountAction;
                 
@@ -124,17 +128,18 @@ namespace Form
                  
                      }
                     
-            public Data(ProgramDataForm.Data data):base(data.uid,data.name,data.code,data.zCode,data.paramCount,data.returnValue)
+            public Data(ProgramDataForm.Data data):base(data.uid,data.name,data.code,data.zCode,data.zCodeMap,data.paramCount,data.returnValue)
             {
             }
             
-            public Data(int uid,string name,string code,List<string> zCode,int paramCount,string returnValue,string category,string type):base(uid,name,code,zCode,paramCount,returnValue)
+            public Data(int uid,string name,string code,List<string> zCode,List<int> zCodeMap,int paramCount,string returnValue,string category,string type):base(uid,name,code,zCode,zCodeMap,paramCount,returnValue)
             {
 
              this.uid = uid;
              this.name = name;
              this.code = code;
              this.zCode = zCode;
+             this.zCodeMap = zCodeMap;
              this.paramCount = paramCount;
              this.returnValue = returnValue;
              this.category = category;
@@ -148,6 +153,7 @@ namespace Form
              this.name = data.name;
              this.code = data.code;
              this.zCode = data.zCode;
+             this.zCodeMap = data.zCodeMap;
              this.paramCount = data.paramCount;
              this.returnValue = data.returnValue;
              this.category = data.category;
@@ -156,7 +162,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,code,zCode==null?new List<string>():new List<string>(zCode),paramCount,returnValue,category,type);
+        return new Data(sameId? uid:uidChain.GetId(),name,code,zCode==null?new List<string>():new List<string>(zCode),zCodeMap==null?new List<int>():new List<int>(zCodeMap),paramCount,returnValue,category,type);
                 }
             
             public override  void BeforeGet()
@@ -166,7 +172,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",null,0,"","","");
+                   private static Data _defaultData=new Data(0,"","",null,null,0,"","","");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -178,6 +184,16 @@ namespace Form
                 {
                     Init();
                     return _DataByUid;
+                }
+            }
+    
+            static Dictionary<string, List<Data>> _DatasByName;
+            public static Dictionary<string, List<Data>> DatasByName
+            {
+                get
+                {
+                    Init();
+                    return _DatasByName;
                 }
             }
     
@@ -201,16 +217,6 @@ namespace Form
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
-                }
-            }
-    
 
         static public void Init()
         {
@@ -231,15 +237,10 @@ namespace Form
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DatasByName = new Dictionary<string, List<Data>>() {
     
-                    
-                    };
-                    foreach(var v in _DataByUid.Values)
-                    {
-                        _DatasHashSet.Add(v);
-                    }
-    
+                };
+
                     _DatasByCategoryType = new Dictionary<(string,string), List<Data>>() {
     
                 };
@@ -303,6 +304,8 @@ namespace Form
 
                 jo.SelectToken("zCode")==null?defaultData.zCode:jo.Get<List<string>>("zCode"),
 
+                jo.SelectToken("zCodeMap")==null?defaultData.zCodeMap:jo.Get<List<int>>("zCodeMap"),
+
                 jo.SelectToken("paramCount")==null?defaultData.paramCount:jo.Get<int>("paramCount"),
 
                 jo.SelectToken("returnValue")==null?defaultData.returnValue:jo.Get<string>("returnValue"),
@@ -329,6 +332,8 @@ namespace Form
             jo.Set<string>("code",data.code);
 
             jo.Set<List<string>>("zCode",data.zCode);
+
+            jo.Set<List<int>>("zCodeMap",data.zCodeMap);
 
             jo.Set<int>("paramCount",data.paramCount);
 
@@ -359,7 +364,9 @@ namespace Form
         DataByUid[data.uid]=data;
         _DatasHashSet.Add(data);
     
-                    DataByName[data.name]=data;
+                    if(!DatasByName.ContainsKey(data.name))
+                        DatasByName[data.name]=new List<Data>();
+                    DatasByName[data.name].Add(data);
     
                     if(!DatasByCategoryType.ContainsKey((data.category,data.type)))
                         DatasByCategoryType[(data.category,data.type)]=new List<Data>();
@@ -386,7 +393,9 @@ ProgramDataForm.AddData(data);
                     DataByUid.Remove(data.uid);
                     
     
-                    DataByName.Remove(data.name);
+                    DatasByName[data.name].Remove(data);
+                    if(DatasByName[data.name].Count==0)
+                        DatasByName.Remove(data.name);
     
                     DatasByCategoryType[(data.category,data.type)].Remove(data);
                     if(DatasByCategoryType[(data.category,data.type)].Count==0)
@@ -457,8 +466,12 @@ ProgramDataForm.RemoveData(uid);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DatasByName[oldV].Remove(data);
+                    if(DatasByName[oldV].Count==0)
+                        DatasByName.Remove(oldV);
+                    if(!DatasByName.ContainsKey(newV))
+                        DatasByName[newV]=new List<Data>();
+                    DatasByName[newV].Add(data);
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
@@ -481,6 +494,16 @@ ProgramDataForm.RemoveData(uid);
                 {
 
                 changeZcodeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeZcodemap(ProgramDataForm.Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeZcodemapAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -30,11 +30,11 @@ namespace Ui.DialogHistory
                 view.txt_title.gameObject.SetActive(!string.IsNullOrEmpty(param.clip.title));
                 view.txt_title.text = param.clip.title;
 
-                var profileData = TexAssetForm.DataByName.GetDv(param.clip.profilePictureName, null);
+                var profileData = TexAssetForm.DataById.GetDv(param.clip.profilePicture, null);
                 view.img_ProfilePicture.gameObject.SetActive(profileData != null);
 
                 if (profileData != null)
-                    view.img_ProfilePicture.sprite = profileData.GetSprite();
+                    view.img_ProfilePicture.BindTexData(profileData);
                 else
                     view.img_ProfilePicture.sprite = TextureHelper.transparentSprite;
             }

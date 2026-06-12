@@ -53,7 +53,7 @@ public static readonly int autoIdCnt=10000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
@@ -98,11 +98,11 @@ public static readonly int autoIdCnt=10000;
                  
                      }
                     
-                    private string  _icon;
+                    private int  _icon;
                     /// <summary>
                     ///图标
                     ///</summary>
-                    public string  icon{
+                    public int  icon{
                                 get{return _icon;}
  set{
 
@@ -134,7 +134,7 @@ public static readonly int autoIdCnt=10000;
                  
                      }
                     
-            public Data(int id,string name,string icon,string label)
+            public Data(int id,string name,int icon,string label)
             {
 
              this.id = id;
@@ -164,7 +164,7 @@ public static readonly int autoIdCnt=10000;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","");
+                   private static Data _defaultData=new Data(0,"",0,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -242,7 +242,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label")
                     );
@@ -261,7 +261,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<string>("label",data.label);
 
@@ -369,7 +369,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     
             }
             
-            public static void ChangeIcon(Data superData,string oldV,string newV)
+            public static void ChangeIcon(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

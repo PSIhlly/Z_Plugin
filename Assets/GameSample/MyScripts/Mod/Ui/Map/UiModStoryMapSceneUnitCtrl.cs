@@ -81,7 +81,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
         }
         public void Refresh()
         {
-            view.img_map.sprite = TexAssetForm.DataByName[model.data.miniMap].GetSprite();
+            view.img_map.BindTexData(TexAssetForm.DataById[model.data.miniMap]);
             view.ipt_name.Set(model.data.name);
             view.sta_hideInLargeMap.ChangeState(model.data.hideInLargeMap?1:0);
             RefreshEvents();

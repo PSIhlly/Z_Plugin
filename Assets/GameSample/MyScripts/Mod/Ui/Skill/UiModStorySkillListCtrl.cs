@@ -151,7 +151,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
+                view.img_.BindTexData(TexAssetForm.DataById[model.data.icon]);
             }
         }
     }

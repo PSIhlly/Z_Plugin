@@ -17,12 +17,12 @@ public class Z_Code_Sample : MonoBehaviour
         var dcpr = new Decompiler();
 
         /*var testCode = "Print(\"jiba\");";
-        ProgramDataForm.AddData(new ProgramDataForm.Data(-1, "Test", testCode, cpr.Compile(testCode, out _)));
+        ProgramDataForm.AddData(new ProgramDataForm.Data(-1, "Test", testCode, cpr.Compile(testCode, out _, out _, out _, out _), null, 0, ""));
 */
 
         var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
-        var res = cpr.Compile(code, out var syntaxs,out var count,out var ret);
-        var program = new ProgramDataForm.Data(-1, "", code, res,count,ret);
+        var res = cpr.Compile(code, out var syntaxs,out var count,out var ret,out var zCodeMap,out var errors);
+        var program = new ProgramDataForm.Data(-1, "", code, res, zCodeMap, count,ret);
 
 
         var itp = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), new Dictionary<string, BoxDataForm.Data>(), program, 0, -1, 0, null, new List<BoxDataForm.Data>(), 0);
@@ -37,7 +37,7 @@ public class Z_Code_Sample : MonoBehaviour
         rebuildBtn.onClick.AddListener(() =>
         {
             var code = gameObject.GetComponentInChildren<TMP_InputField>().text;
-            var res = cpr.Compile(code, out var syntaxs,out _,out _);
+            var res = cpr.Compile(code, out var syntaxs,out _,out _,out _,out var errors1);
             gameObject.GetComponentInChildren<TMP_InputField>().text = dcpr.Decompile(syntaxs);
         });
     }

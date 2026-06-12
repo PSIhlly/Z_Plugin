@@ -69,7 +69,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeLabelAction;
                 
-        public static Action<Data,string,string> changeIcontexnameAction;
+        public static Action<Data,int,int> changeIcontexnameAction;
                 
         public static Action<Data,Dictionary<string,ItemParamForm.Data>,Dictionary<string,ItemParamForm.Data>> changeParamdicAction;
                 
@@ -85,7 +85,7 @@ namespace Form
                 
         public static Action<Data,EquipPartType,EquipPartType> changeEquipAction;
                 
-        public static Action<Data,Dictionary<ItemStyle,string>,Dictionary<ItemStyle,string>> changeStyletexAction;
+        public static Action<Data,Dictionary<ItemStyle,int>,Dictionary<ItemStyle,int>> changeStyletexAction;
                 
         public static Action<Data,int,int> changePriceAction;
                 
@@ -97,18 +97,18 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,CharacterParamForm.Data>,Dictionary<string,CharacterParamForm.Data>> changeParamdiccharacterAction;
                 
-        public static Action<Data,string,string> changeMinimapiconAction;
+        public static Action<Data,int,int> changeMinimapiconAction;
                 
 
 
         public partial class Data : ProductForm.Data
         {
 
-                    private string  _iconTexName;
+                    private int  _iconTexName;
                     /// <summary>
                     ///图标名称
                     ///</summary>
-                    public string  iconTexName{
+                    public int  iconTexName{
                                 get{return _iconTexName;}
  set{
 
@@ -230,11 +230,11 @@ namespace Form
                  
                      }
                     
-                    private Dictionary<ItemStyle,string>  _styleTex;
+                    private Dictionary<ItemStyle,int>  _styleTex;
                     /// <summary>
                     ///装备位置
                     ///</summary>
-                    public Dictionary<ItemStyle,string>  styleTex{
+                    public Dictionary<ItemStyle,int>  styleTex{
                                 get{return _styleTex;}
  set{
 
@@ -338,11 +338,11 @@ namespace Form
                  
                      }
                     
-                    private string  _minimapIcon;
+                    private int  _minimapIcon;
                     /// <summary>
                     ///小地图标识
                     ///</summary>
-                    public string  minimapIcon{
+                    public int  minimapIcon{
                                 get{return _minimapIcon;}
  set{
 
@@ -360,7 +360,7 @@ namespace Form
             {
             }
             
-            public Data(int uid,string name,string label,string iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,int protoUid,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,string> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events,bool isConsume,Dictionary<string,CharacterParamForm.Data> paramDicCharacter,string minimapIcon):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,int iconTexName,Dictionary<string,ItemParamForm.Data> paramDic,int protoUid,MapModelForm.Data model,string desc,int amount,int maxAmountPer,EquipPartType equip,Dictionary<ItemStyle,int> styleTex,int price,bool canEquipe,Dictionary<string,EventTriggerForm.Data> events,bool isConsume,Dictionary<string,CharacterParamForm.Data> paramDicCharacter,int minimapIcon):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -408,7 +408,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,paramDic==null?new Dictionary<string,ItemParamForm.Data>():new Dictionary<string,ItemParamForm.Data>(paramDic),protoUid,model,desc,amount,maxAmountPer,equip,styleTex==null?new Dictionary<ItemStyle,string>():new Dictionary<ItemStyle,string>(styleTex),price,canEquipe,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isConsume,paramDicCharacter==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDicCharacter),minimapIcon);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,iconTexName,paramDic==null?new Dictionary<string,ItemParamForm.Data>():new Dictionary<string,ItemParamForm.Data>(paramDic),protoUid,model,desc,amount,maxAmountPer,equip,styleTex==null?new Dictionary<ItemStyle,int>():new Dictionary<ItemStyle,int>(styleTex),price,canEquipe,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isConsume,paramDicCharacter==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDicCharacter),minimapIcon);
                 }
             
             public override  void BeforeGet()
@@ -418,7 +418,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,ItemParamForm.Data>(){},0,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,string>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<string,CharacterParamForm.Data>(){},"");
+                   private static Data _defaultData=new Data(0,"","",0,new Dictionary<string,ItemParamForm.Data>(){},0,MapModelForm.defaultData,"",1,1,default,new Dictionary<ItemStyle,int>(){},0,false,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<string,CharacterParamForm.Data>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -567,7 +567,7 @@ namespace Form
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.SelectToken("iconTexName")==null?defaultData.iconTexName:jo.Get<string>("iconTexName"),
+                jo.SelectToken("iconTexName")==null?defaultData.iconTexName:jo.Get<int>("iconTexName"),
 
                 jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,ItemParamForm.Data>>("paramDic"),
 
@@ -583,7 +583,7 @@ namespace Form
 
                 jo.SelectToken("equip")==null?defaultData.equip:jo.Get<EquipPartType>("equip"),
 
-                jo.SelectToken("styleTex")==null?defaultData.styleTex:jo.Get<Dictionary<ItemStyle,string>>("styleTex"),
+                jo.SelectToken("styleTex")==null?defaultData.styleTex:jo.Get<Dictionary<ItemStyle,int>>("styleTex"),
 
                 jo.SelectToken("price")==null?defaultData.price:jo.Get<int>("price"),
 
@@ -595,7 +595,7 @@ namespace Form
 
                 jo.SelectToken("paramDicCharacter")==null?defaultData.paramDicCharacter:jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDicCharacter"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
                     );
 
             return data;
@@ -614,7 +614,7 @@ namespace Form
 
             jo.Set<string>("label",data.label);
 
-            jo.Set<string>("iconTexName",data.iconTexName);
+            jo.Set<int>("iconTexName",data.iconTexName);
 
             jo.Set<Dictionary<string,ItemParamForm.Data>>("paramDic",data.paramDic);
 
@@ -630,7 +630,7 @@ namespace Form
 
             jo.Set<EquipPartType>("equip",data.equip);
 
-            jo.Set<Dictionary<ItemStyle,string>>("styleTex",data.styleTex);
+            jo.Set<Dictionary<ItemStyle,int>>("styleTex",data.styleTex);
 
             jo.Set<int>("price",data.price);
 
@@ -642,7 +642,7 @@ namespace Form
 
             jo.Set<Dictionary<string,CharacterParamForm.Data>>("paramDicCharacter",data.paramDicCharacter);
 
-            jo.Set<string>("minimapIcon",data.minimapIcon);
+            jo.Set<int>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -803,7 +803,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeIcontexname(Data superData,string oldV,string newV)
+            public static void ChangeIcontexname(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -900,7 +900,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeStyletex(Data superData,Dictionary<ItemStyle,string> oldV,Dictionary<ItemStyle,string> newV)
+            public static void ChangeStyletex(Data superData,Dictionary<ItemStyle,int> oldV,Dictionary<ItemStyle,int> newV)
             {
                 if(superData is Data data)
                 {
@@ -960,7 +960,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            public static void ChangeMinimapicon(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

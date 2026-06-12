@@ -25,13 +25,13 @@ namespace Ui.DialogMain
         {
             public override void OnShow()
             {
-                var data = TexAssetForm.DataByName.GetDv(param.clip.profilePictureName, null);
+                var data = TexAssetForm.DataById.GetDv(param.clip.profilePicture, null);
                 if(data == null)
                 {
                     Close();
                 }else
                 {
-                    view.img_.sprite = data.GetSprite();
+                    view.img_.BindTexData(data);
                 }
             }
         }

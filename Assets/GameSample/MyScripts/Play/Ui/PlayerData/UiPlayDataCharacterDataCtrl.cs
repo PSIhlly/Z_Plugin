@@ -39,7 +39,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterData
         public void Refresh()
         {
 
-            view.img_tachie.sprite = TexAssetForm.DataByName.GetDk(model.data.illustration,GlobalNameHelper.GetDefaultCharacterTexName()).GetSprite();
+            view.img_tachie.BindTexData(TexAssetForm.DataById.GetDv(model.data.illustration, TexAssetForm.DataById[GlobalDefaultHelper.DefaultCharacterTexId]));
             view.txt_desc.text = model.data.desc;
             view.txt_name.text= model.data.name;
             gameArgsCon.Clear();

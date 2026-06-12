@@ -25,9 +25,9 @@ namespace Ui.DialogBg
         public override void OnShow()
         {
             view.mp_.gameObject.SetActive(false);
-            if (!string.IsNullOrEmpty(param.clip.mainVideoName))
+            if (param.clip.mainVideo>0)
             {
-                var videoData = VideoAssetForm.DataByName.GetDv(param.clip.mainVideoName, null);
+                var videoData = VideoAssetForm.DataById.GetDv(param.clip.mainVideo, null);
                 if (videoData != null)
                 {
                     view.mp_.gameObject.SetActive(true);
@@ -40,10 +40,10 @@ namespace Ui.DialogBg
                     });
                 }
             }
-            var data = TexAssetForm.DataByName.GetDv(param.clip.mainPictureName, null);
+            var data = TexAssetForm.DataById.GetDk(param.clip.mainPicture, GlobalDefaultHelper.DefaultTexId);
             if (data != null)
             {
-                view.img_.sprite = data.GetSprite(); 
+                view.img_.BindTexData(data); 
             }
         }
     }

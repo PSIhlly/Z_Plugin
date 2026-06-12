@@ -44,13 +44,31 @@ namespace Z_Code
     public class SyntaxAnalysis
     {
         public const bool DEBUG = true;
-        public List<SyntaxNode> Execute(List<LexicalNode> nodes)
+
+        /// <summary>
+        /// 错误列表
+        /// </summary>
+        private List<CompileError> _errors;
+
+        public List<SyntaxNode> Execute(List<LexicalNode> nodes, List<CompileError> errors = null)
         {
-            var res = BuildBlock(nodes, 0, nodes.Count - 1);
-            if (res.Count == 0)//not a block
+            _errors = errors ?? new List<CompileError>();
+
+            List<SyntaxNode> res = null;
+            try
             {
-                res = BuildStatement(nodes, 0, nodes.Count - 1);
+                res = BuildBlock(nodes, 0, nodes.Count - 1);
+                if (res.Count == 0)//not a block
+                {
+                    res = BuildStatement(nodes, 0, nodes.Count - 1);
+                }
             }
+            catch (Exception ex)
+            {
+                AddError(0, nodes.Count - 1, "语法分析", $"构建语法树失败: {ex.Message}", ex);
+                res = new List<SyntaxNode>();
+            }
+
             if (DEBUG)
             {
                 var test = new SyntaxNode(new Desc("test", CodeType.Action), res);
@@ -59,69 +77,93 @@ namespace Z_Code
 
             return res;
         }
+
+        /// <summary>
+        /// 添加错误
+        /// </summary>
+        private void AddError(int startIndex, int endIndex, string stage, string message, Exception ex = null)
+        {
+            _errors?.Add(new CompileError
+            {
+                StartIndex = startIndex,
+                EndIndex = endIndex,
+                LineNumber = 1, // 无法精确计算，使用默认值
+                ColumnNumber = 1,
+                Stage = stage,
+                Message = message,
+                Exception = ex
+            });
+        }
         private List<SyntaxNode> BuildBlock(List<LexicalNode> nodes, int l, int r)
         {
             List<SyntaxNode> statements = new List<SyntaxNode>();
 
             for (int i = l; i <= r; i++)
             {
-                if (nodes[i].desc.type == CodeType.Reserved)
+                try
                 {
-                    int oriPos = i;
-                    int split = 0;
-                    List<SyntaxNode> subStatements = new List<SyntaxNode>();
-                    switch (nodes[i].desc.code)
+                    if (nodes[i].desc.type == CodeType.Reserved)
                     {
-                        case "if":
-                            int endConditionIf = GetFirstDepth0(nodes, i + 1, r, ")");
-                            subStatements.AddRange(BuildStatement(nodes, i + 2, endConditionIf - 1));
+                        int oriPos = i;
+                        int split = 0;
+                        List<SyntaxNode> subStatements = new List<SyntaxNode>();
+                        switch (nodes[i].desc.code)
+                        {
+                            case "if":
+                                int endConditionIf = GetFirstDepth0(nodes, i + 1, r, ")");
+                                subStatements.AddRange(BuildStatement(nodes, i + 2, endConditionIf - 1));
 
-                            int endThenIf = GetFirstDepth0(nodes, endConditionIf + 1, r, "}");
-                            subStatements.Add(new SyntaxNode(new Desc("then", CodeType.Action), BuildBlock(nodes, endConditionIf + 2, endThenIf - 1)));
-                            i = endThenIf;
-                            if (endThenIf < r && (nodes[i + 1].desc.type == CodeType.Reserved && nodes[i + 1].desc.code == "else"))
-                            {
-                                int endElseIf = GetFirstDepth0(nodes, endThenIf + 2, r, "}");
-                                subStatements.Add(new SyntaxNode(new Desc("else", CodeType.Action), BuildBlock(nodes, endThenIf + 3, endElseIf - 1)));
-                                i = endElseIf;
-                            }
-                            break;
-                        case "for":
-                            int endForIf = GetFirstDepth0(nodes, i + 1, r, ")");
+                                int endThenIf = GetFirstDepth0(nodes, endConditionIf + 1, r, "}");
+                                subStatements.Add(new SyntaxNode(new Desc("then", CodeType.Action), BuildBlock(nodes, endConditionIf + 2, endThenIf - 1)));
+                                i = endThenIf;
+                                if (endThenIf < r && (nodes[i + 1].desc.type == CodeType.Reserved && nodes[i + 1].desc.code == "else"))
+                                {
+                                    int endElseIf = GetFirstDepth0(nodes, endThenIf + 2, r, "}");
+                                    subStatements.Add(new SyntaxNode(new Desc("else", CodeType.Action), BuildBlock(nodes, endThenIf + 3, endElseIf - 1)));
+                                    i = endElseIf;
+                                }
+                                break;
+                            case "for":
+                                int endForIf = GetFirstDepth0(nodes, i + 1, r, ")");
 
-                            split = GetFirstDepth0(nodes, i + 2, endForIf - 1, ";");
-                            subStatements.Add(BuildStatement(nodes, i + 2, split - 1)[0]);
-                            i = split + 1;
-                            split = GetFirstDepth0(nodes, i, endForIf - 1, ";");
-                            subStatements.Add(BuildStatement(nodes, i, split - 1)[0]);
-                            i = split + 1;
-                            subStatements.Add(BuildStatement(nodes, i, endForIf - 1)[0]);
+                                split = GetFirstDepth0(nodes, i + 2, endForIf - 1, ";");
+                                subStatements.Add(BuildStatement(nodes, i + 2, split - 1)[0]);
+                                i = split + 1;
+                                split = GetFirstDepth0(nodes, i, endForIf - 1, ";");
+                                subStatements.Add(BuildStatement(nodes, i, split - 1)[0]);
+                                i = split + 1;
+                                subStatements.Add(BuildStatement(nodes, i, endForIf - 1)[0]);
 
-                            int endForDo = GetFirstDepth0(nodes, endForIf + 1, r, "}");
-                            subStatements.Add(new SyntaxNode(new Desc("do", CodeType.Action), BuildBlock(nodes, endForIf + 2, endForDo)));
+                                int endForDo = GetFirstDepth0(nodes, endForIf + 1, r, "}");
+                                subStatements.Add(new SyntaxNode(new Desc("do", CodeType.Action), BuildBlock(nodes, endForIf + 2, endForDo)));
 
-                            i = endForDo;
-                            break;
-                        default:
-                            split = GetFirstDepth0(nodes, i, r, ";");
-                            if (split > 0)
-                            {
-                                subStatements.AddRange(BuildStatement(nodes, i, split - 1));
-                                i = split;
-                            }
-                            break;
+                                i = endForDo;
+                                break;
+                            default:
+                                split = GetFirstDepth0(nodes, i, r, ";");
+                                if (split > 0)
+                                {
+                                    subStatements.AddRange(BuildStatement(nodes, i, split - 1));
+                                    i = split;
+                                }
+                                break;
+                        }
+                        statements.Add(new SyntaxNode(nodes[oriPos].desc, subStatements));
+
                     }
-                    statements.Add(new SyntaxNode(nodes[oriPos].desc, subStatements));
-
+                    else
+                    {
+                        int split = GetFirstDepth0(nodes, i, r, ";");
+                        if (split > 0)
+                        {
+                            statements.AddRange(BuildStatement(nodes, i, split - 1));
+                            i = split;
+                        }
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    int split = GetFirstDepth0(nodes, i, r, ";");
-                    if (split > 0)
-                    {
-                        statements.AddRange(BuildStatement(nodes, i, split - 1));
-                        i = split;
-                    }
+                    AddError(i, i, "语法分析", $"构建代码块时处理节点 '{nodes[i].rawCode}' 出错: {ex.Message}", ex);
                 }
             }
             return statements;
@@ -129,17 +171,23 @@ namespace Z_Code
 
         private List<SyntaxNode> BuildStatement(List<LexicalNode> nodes, int l, int r)
         {
-
-            //ignore extern small bracket
-            while (GetFirstDepth0(nodes, l, r, ")") == r && GetFirstDepth0(nodes, l, r, "(") == l && l < r)
+            try
             {
-                l++;
-                r--;
+                //ignore extern small bracket
+                while (GetFirstDepth0(nodes, l, r, ")") == r && GetFirstDepth0(nodes, l, r, "(") == l && l < r)
+                {
+                    l++;
+                    r--;
+                }
+                while (GetFirstDepth0(nodes, l, r, "]") == r && GetFirstDepth0(nodes, l, r, "[") == l && l < r)
+                {
+                    l++;
+                    r--;
+                }
             }
-            while (GetFirstDepth0(nodes, l, r, "]") == r && GetFirstDepth0(nodes, l, r, "[") == l && l < r)
+            catch (Exception ex)
             {
-                l++;
-                r--;
+                AddError(l, r, "语法分析", $"处理括号时出错: {ex.Message}", ex);
             }
 
             List<SyntaxNode> res = new List<SyntaxNode>();
@@ -149,76 +197,93 @@ namespace Z_Code
                 //level1
                 for (int i = l; i <= r; i++)
                 {
-
-                    if (nodes[i].desc.type == CodeType.FuncName)
+                    try
                     {
-                        int endBkt = GetFirstDepth0(nodes, i + 1, r, ")");
-                        if (endBkt > 0)
+                        if (nodes[i].desc.type == CodeType.FuncName)
                         {
-                            cache.Add(new SyntaxNode(nodes[i].desc, BuildStatement(nodes, i + 1, endBkt)));
-                            i = endBkt;
+                            int endBkt = GetFirstDepth0(nodes, i + 1, r, ")");
+                            if (endBkt > 0)
+                            {
+                                cache.Add(new SyntaxNode(nodes[i].desc, BuildStatement(nodes, i + 1, endBkt)));
+                                i = endBkt;
+                            }
                         }
-                    }
-                    else if (nodes[i].desc.code == "(")
-                    {
-                        int endBkt = GetFirstDepth0(nodes, i, r, ")");
-                        if (endBkt > 0)
+                        else if (nodes[i].desc.code == "(")
                         {
-                            cache.Add(BuildStatement(nodes, i, endBkt)[0]);
-                            i = endBkt;
+                            int endBkt = GetFirstDepth0(nodes, i, r, ")");
+                            if (endBkt > 0)
+                            {
+                                cache.Add(BuildStatement(nodes, i, endBkt)[0]);
+                                i = endBkt;
+                            }
                         }
-                    }
-                    else if (nodes[i].desc.code == "[")
-                    {
-                        int endBkt = GetFirstDepth0(nodes, i, r, "]");
-                        if (endBkt > 0)
+                        else if (nodes[i].desc.code == "[")
                         {
-                            int cur = cache.Count;
+                            int endBkt = GetFirstDepth0(nodes, i, r, "]");
+                            if (endBkt > 0)
+                            {
+                                int cur = cache.Count;
+                                cache.Add(nodes[i]);
+                                cache.Add(BuildStatement(nodes, i, endBkt)[0]);
+                                SetSub(cache, nodes[i], ref cur, 1, 1);
+                                i = endBkt;
+                            }
+                        }
+                        else
+                        {
                             cache.Add(nodes[i]);
-                            cache.Add(BuildStatement(nodes, i, endBkt)[0]);
-                            SetSub(cache, nodes[i], ref cur, 1, 1);
-                            i = endBkt;
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        cache.Add(nodes[i]);
+                        AddError(i, i, "语法分析", $"构建语句时处理节点出错: {ex.Message}", ex);
                     }
                 }
 
                 //level2
-                for (int i = 0; i < cache.Count; i++)
+                try
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
+                    for (int i = 0; i < cache.Count; i++)
                     {
-                        switch (lex.desc.code)
+                        if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                         {
-                            case ".":
-                                SetSub(cache, lex, ref i, 1, 1);
-                                break;
+                            switch (lex.desc.code)
+                            {
+                                case ".":
+                                    SetSub(cache, lex, ref i, 1, 1);
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level2处理出错: {ex.Message}", ex); }
 
                 //level3
-                for (int i = 0; i < cache.Count; i++)
+                try
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
+                    for (int i = 0; i < cache.Count; i++)
                     {
-                        switch (lex.desc.code)
+                        if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                         {
-                            case "*":
-                            case "/":
-                                SetSub(cache, lex, ref i, 1, 1);
-                                break;
+                            switch (lex.desc.code)
+                            {
+                                case "*":
+                                case "/":
+                                    SetSub(cache, lex, ref i, 1, 1);
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level3处理出错: {ex.Message}", ex); }
+
                 //level3.5 combine negative
-                for (int i = cache.Count-1; i > 0 ; i--)
+                try
                 {
-                    if (cache[i].desc.type == CodeType.Num)
+                    for (int i = cache.Count-1; i > 0 ; i--)
                     {
+                        if (cache[i].desc.type == CodeType.Num)
+                        {
                        
                             if (cache[i - 1].desc.type == CodeType.Operator&&(i - 2 <= 0 || !IsValue(cache[i-2])))
                             {
@@ -231,68 +296,90 @@ namespace Z_Code
                                     break;
                                 }
                             }
+                        }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level3.5处理出错: {ex.Message}", ex); }
+
                 //level4
-                for (int i = 0; i < cache.Count; i++)
+                try
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
+                    for (int i = 0; i < cache.Count; i++)
                     {
-                        switch (lex.desc.code)
+                        if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                         {
-                            case "+":
-                            case "-":
-                                SetSub(cache, lex, ref i, 1, 1);
-                                break;
+                            switch (lex.desc.code)
+                            {
+                                case "+":
+                                case "-":
+                                    SetSub(cache, lex, ref i, 1, 1);
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level4处理出错: {ex.Message}", ex); }
+
                 //level4.5
-                for (int i = 0; i < cache.Count; i++)
+                try
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
+                    for (int i = 0; i < cache.Count; i++)
                     {
-                        switch (lex.desc.code)
+                        if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                         {
-                            case ">":
-                            case "<":
-                            case ">=":
-                            case "<=":
-                                SetSub(cache, lex, ref i, 1, 1);
-                                break;
+                            switch (lex.desc.code)
+                            {
+                                case ">":
+                                case "<":
+                                case ">=":
+                                case "<=":
+                                    SetSub(cache, lex, ref i, 1, 1);
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level4.5处理出错: {ex.Message}", ex); }
+
                 //level5
-                for (int i = 0; i < cache.Count; i++)
+                try
                 {
-                    if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
+                    for (int i = 0; i < cache.Count; i++)
                     {
-                        switch (lex.desc.code)
+                        if (cache[i] is LexicalNode lex && lex.desc.type == CodeType.Operator)
                         {
-                            case "=":
-                            case "==":
-                            case "!=":
-                                SetSub(cache, lex, ref i, 1, 1);
-                                break;
+                            switch (lex.desc.code)
+                            {
+                                case "=":
+                                case "==":
+                                case "!=":
+                                    SetSub(cache, lex, ref i, 1, 1);
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level5处理出错: {ex.Message}", ex); }
+
                 //level6
-                for (int i = 0; i < cache.Count; i++)
+                try
                 {
-                    if (cache[i] is LexicalNode lex)
+                    for (int i = 0; i < cache.Count; i++)
                     {
-                        switch (lex.desc.type)
+                        if (cache[i] is LexicalNode lex)
                         {
-                            case CodeType.Num:
-                            case CodeType.Str:
-                            case CodeType.VarName:
-                                cache[i] = new SyntaxNode(lex.desc);
-                                break;
+                            switch (lex.desc.type)
+                            {
+                                case CodeType.Num:
+                                case CodeType.Str:
+                                case CodeType.VarName:
+                                    cache[i] = new SyntaxNode(lex.desc);
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { AddError(l, r, "语法分析", $"Level6处理出错: {ex.Message}", ex); }
 
                 for (int i = 0; i < cache.Count; i++)
                 {

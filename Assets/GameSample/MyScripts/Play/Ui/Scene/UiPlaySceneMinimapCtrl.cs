@@ -84,7 +84,7 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
                     }
                     else
                     {
-                        view.img_real.sprite = StoryTexAssetForm.DataByName[mapCtrl.curScene.miniMap].GetSprite();
+                        view.img_real.BindTexData(StoryTexAssetForm.DataById[mapCtrl.curScene.miniMap]);
                     }
 
                     view.rimg_unlock.texture = mapCtrl.unlockTextureMap.GetDv(y);

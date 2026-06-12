@@ -50,6 +50,8 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,List<string>,List<string>> changeZcodeAction;
                 
+        public static Action<Data,List<int>,List<int>> changeZcodemapAction;
+                
         public static Action<Data,int,int> changeParamcountAction;
                 
         public static Action<Data,string,string> changeReturnvalueAction;
@@ -131,6 +133,24 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
+                    private List<int>  _zCodeMap;
+                    /// <summary>
+                    ///zCode映射
+                    ///</summary>
+                    public List<int>  zCodeMap{
+                                get{return _zCodeMap;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeZcodemap(this,_zCodeMap,value); 
+                    }
+        
+                _zCodeMap = value;
+                }
+                 
+                     }
+                    
                     private int  _paramCount;
                     /// <summary>
                     ///参数数量
@@ -167,13 +187,14 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,string code,List<string> zCode,int paramCount,string returnValue)
+            public Data(int uid,string name,string code,List<string> zCode,List<int> zCodeMap,int paramCount,string returnValue)
             {
 
              this.uid = uid;
              this.name = name;
              this.code = code;
              this.zCode = zCode;
+             this.zCodeMap = zCodeMap;
              this.paramCount = paramCount;
              this.returnValue = returnValue;
 
@@ -185,13 +206,14 @@ public static readonly int autoUidCnt=1000000;
              this.name = data.name;
              this.code = data.code;
              this.zCode = data.zCode;
+             this.zCodeMap = data.zCodeMap;
              this.paramCount = data.paramCount;
              this.returnValue = data.returnValue;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,code,zCode==null?new List<string>():new List<string>(zCode),paramCount,returnValue);
+        return new Data(sameId? uid:uidChain.GetId(),name,code,zCode==null?new List<string>():new List<string>(zCode),zCodeMap==null?new List<int>():new List<int>(zCodeMap),paramCount,returnValue);
                 }
             
             public virtual  void BeforeGet()
@@ -201,7 +223,7 @@ public static readonly int autoUidCnt=1000000;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",null,0,"");
+                   private static Data _defaultData=new Data(0,"","",null,null,0,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -241,7 +263,7 @@ uidChain=new Z_Chain.Chain (autoUidCnt);
 
                 _DataByUid = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"","",null,0,"")},
+                {1,new Data(1,"","",null,null,0,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -306,6 +328,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("zCode")==null?defaultData.zCode:jo.Get<List<string>>("zCode"),
 
+                jo.SelectToken("zCodeMap")==null?defaultData.zCodeMap:jo.Get<List<int>>("zCodeMap"),
+
                 jo.SelectToken("paramCount")==null?defaultData.paramCount:jo.Get<int>("paramCount"),
 
                 jo.SelectToken("returnValue")==null?defaultData.returnValue:jo.Get<string>("returnValue")
@@ -328,6 +352,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<string>("code",data.code);
 
             jo.Set<List<string>>("zCode",data.zCode);
+
+            jo.Set<List<int>>("zCodeMap",data.zCodeMap);
 
             jo.Set<int>("paramCount",data.paramCount);
 
@@ -460,6 +486,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeZcodeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeZcodemap(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeZcodemapAction?.Invoke(data,oldV,newV);
                 }
                     
             }

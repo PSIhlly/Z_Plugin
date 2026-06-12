@@ -59,7 +59,7 @@ namespace Z_DataSystem
         public abstract string GetMark();
         public abstract string[] GetSupportedExtensions();
 
-        public abstract string GetName(string name);
+        public abstract string GetName(int id);
 
         public abstract bool IsAsset(string name);
     }
@@ -71,7 +71,7 @@ namespace Z_DataSystem
         {
             this.ctrl = ctrl;
         }
-        public abstract void OnImportComplete(byte[] data);
+        public abstract void OnImportComplete(byte[] data,string name);
     }
     public static class AssetDefines
     {
@@ -133,13 +133,13 @@ namespace Z_DataSystem
                 Texture2D[] textures = Resources.LoadAll<Texture2D>(path);
                 foreach (var tex in textures)
                 {
-                    res.texs.Add((tex.name, new TexAssetForm.Data(-1, tex.name, "", null, "", tex, "")));
+                    res.texs.Add((tex.name, new TexAssetForm.Data(int.TryParse(tex.name, out var id) ? id : -1, tex.name, "", null, "", tex, "")));
                 }
 
                 GameObject[] gos = Resources.LoadAll<GameObject>(path);
                 foreach (var go in gos)
                 {
-                    res.gos.Add((go.name, new GameObjectAssetForm.Data(-1, go.name, "", null, "", go, "")));
+                    res.gos.Add((go.name, new GameObjectAssetForm.Data(int.TryParse(go.name, out var id) ? id : -1, go.name, "", null, "", go, "")));
                 }
 
             }

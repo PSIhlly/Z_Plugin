@@ -67,11 +67,11 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,float,float> changeAnimtimeintervalAction;
                 
-        public static Action<Data,List<string>,List<string>> changeTexsnameAction;
+        public static Action<Data,List<int>,List<int>> changeTexsAction;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
@@ -100,20 +100,20 @@ namespace Form
                  
                      }
                     
-                    private List<string>  _texsName;
+                    private List<int>  _texs;
                     /// <summary>
                     ///贴图名称
                     ///</summary>
-                    public List<string>  texsName{
-                                get{return _texsName;}
+                    public List<int>  texs{
+                                get{return _texs;}
  set{
 
                     if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeTexsname(this,_texsName,value); 
+                       ChangeTexs(this,_texs,value); 
                     }
         
-                _texsName = value;
+                _texs = value;
                 }
                  
                      }
@@ -140,14 +140,14 @@ namespace Form
             {
             }
             
-            public Data(int id,string name,string icon,float animTimeInterval,List<string> texsName,string label,Dictionary<string,EventTriggerForm.Data> events):base(id,name,icon,label)
+            public Data(int id,string name,int icon,float animTimeInterval,List<int> texs,string label,Dictionary<string,EventTriggerForm.Data> events):base(id,name,icon,label)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
              this.animTimeInterval = animTimeInterval;
-             this.texsName = texsName;
+             this.texs = texs;
              this.label = label;
              this.events = events;
 
@@ -159,14 +159,14 @@ namespace Form
              this.name = data.name;
              this.icon = data.icon;
              this.animTimeInterval = data.animTimeInterval;
-             this.texsName = data.texsName;
+             this.texs = data.texs;
              this.label = data.label;
              this.events = data.events;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texsName==null?new List<string>():new List<string>(texsName),label,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events));
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),label,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events));
                 }
             
             public override  void BeforeGet()
@@ -176,7 +176,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",0f,null,"",new Dictionary<string,EventTriggerForm.Data>(){});
+                   private static Data _defaultData=new Data(0,"",0,0f,null,"",new Dictionary<string,EventTriggerForm.Data>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -191,6 +191,16 @@ namespace Form
                 }
             }
     
+            static Dictionary<string, List<Data>> _DatasByName;
+            public static Dictionary<string, List<Data>> DatasByName
+            {
+                get
+                {
+                    Init();
+                    return _DatasByName;
+                }
+            }
+    
             static Dictionary<string, List<Data>> _DatasByLabel;
             public static Dictionary<string, List<Data>> DatasByLabel
             {
@@ -198,16 +208,6 @@ namespace Form
                 {
                     Init();
                     return _DatasByLabel;
-                }
-            }
-    
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
                 }
             }
     
@@ -231,15 +231,10 @@ namespace Form
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DatasByName = new Dictionary<string, List<Data>>() {
     
-                    
-                    };
-                    foreach(var v in _DataById.Values)
-                    {
-                        _DatasHashSet.Add(v);
-                    }
-    
+                };
+
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
                 };
@@ -295,11 +290,11 @@ namespace Form
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                 jo.SelectToken("animTimeInterval")==null?defaultData.animTimeInterval:jo.Get<float>("animTimeInterval"),
 
-                jo.SelectToken("texsName")==null?defaultData.texsName:jo.Get<List<string>>("texsName"),
+                jo.SelectToken("texs")==null?defaultData.texs:jo.Get<List<int>>("texs"),
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
@@ -320,11 +315,11 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
-            jo.Set<List<string>>("texsName",data.texsName);
+            jo.Set<List<int>>("texs",data.texs);
 
             jo.Set<string>("label",data.label);
 
@@ -351,7 +346,9 @@ namespace Form
         DataById[data.id]=data;
         _DatasHashSet.Add(data);
     
-                    DataByName[data.name]=data;
+                    if(!DatasByName.ContainsKey(data.name))
+                        DatasByName[data.name]=new List<Data>();
+                    DatasByName[data.name].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
@@ -374,7 +371,9 @@ MapBaseForm.AddData(data);
                     DataById.Remove(data.id);
                     
     
-                    DataByName.Remove(data.name);
+                    DatasByName[data.name].Remove(data);
+                    if(DatasByName[data.name].Count==0)
+                        DatasByName.Remove(data.name);
     
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
@@ -441,15 +440,19 @@ MapBaseForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DatasByName[oldV].Remove(data);
+                    if(DatasByName[oldV].Count==0)
+                        DatasByName.Remove(oldV);
+                    if(!DatasByName.ContainsKey(newV))
+                        DatasByName[newV]=new List<Data>();
+                    DatasByName[newV].Add(data);
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -469,12 +472,12 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeTexsname(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeTexs(Data superData,List<int> oldV,List<int> newV)
             {
                 if(superData is Data data)
                 {
 
-                changeTexsnameAction?.Invoke(data,oldV,newV);
+                changeTexsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

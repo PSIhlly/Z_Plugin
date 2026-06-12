@@ -53,7 +53,7 @@ public static readonly int autoUidCnt=1000000;
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,List<string>,List<string>> changeEvtAction;
+        public static Action<Data,List<int>,List<int>> changeEvtAction;
                 
         public static Action<Data,TriggerType,TriggerType> changeTypeAction;
                 
@@ -98,11 +98,11 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-                    private List<string>  _evt;
+                    private List<int>  _evt;
                     /// <summary>
-                    ///事件名称
+                    ///事件id
                     ///</summary>
-                    public List<string>  evt{
+                    public List<int>  evt{
                                 get{return _evt;}
  set{
 
@@ -134,7 +134,7 @@ public static readonly int autoUidCnt=1000000;
                  
                      }
                     
-            public Data(int uid,string name,List<string> evt,TriggerType type)
+            public Data(int uid,string name,List<int> evt,TriggerType type)
             {
 
              this.uid = uid;
@@ -154,7 +154,7 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,evt==null?new List<string>():new List<string>(evt),type);
+        return new Data(sameId? uid:uidChain.GetId(),name,evt==null?new List<int>():new List<int>(evt),type);
                 }
             
             public virtual  void BeforeGet()
@@ -164,7 +164,7 @@ public static readonly int autoUidCnt=1000000;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",new List<string>(),default);
+                   private static Data _defaultData=new Data(0,"",new List<int>(),default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -261,7 +261,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("evt")==null?defaultData.evt:jo.Get<List<string>>("evt"),
+                jo.SelectToken("evt")==null?defaultData.evt:jo.Get<List<int>>("evt"),
 
                 jo.SelectToken("type")==null?defaultData.type:jo.Get<TriggerType>("type")
                     );
@@ -280,7 +280,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<List<string>>("evt",data.evt);
+            jo.Set<List<int>>("evt",data.evt);
 
             jo.Set<TriggerType>("type",data.type);
 
@@ -395,7 +395,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeEvt(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeEvt(Data superData,List<int> oldV,List<int> newV)
             {
                 if(superData is Data data)
                 {

@@ -134,7 +134,6 @@ namespace Z_Ui.Base
         {
             if (!inited)
                 return;
-
             Vector3[] viewPortCorners = new Vector3[4];
             viewport.GetWorldCorners(viewPortCorners);
 
@@ -173,7 +172,12 @@ namespace Z_Ui.Base
 
             }
 
-            if (dir == Direction.Vertical)
+            if (unitSize.y<=0 ||unitSize.x<=0)
+            {
+                Debug.LogError("cell size error :"+ unitSize);
+                return;
+            }
+                if (dir == Direction.Vertical)
             {
 
                 int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / (unitSize.y + ySpacing));

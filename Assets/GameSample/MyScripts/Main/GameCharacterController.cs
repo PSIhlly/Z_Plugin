@@ -343,7 +343,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
                     animCurCache[part] = anim.name;
 
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[dirCur][cur].partTex[part]].GetTex());
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[anim.animClip[dirCur][cur].partTex[part]].GetTex());
                     var renderPart = part;
                     animTimer[part] = TimeManager.instance.StartTimer(timeProgress, anim.animTimeInterval, () =>
                     {
@@ -365,14 +365,14 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
                         }
                         cur = (cur + 1) % anim.animClip[dirCur].Count;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[dirCur][cur].partTex[renderPart]].GetTex());
+                        propBlock.SetTexture("_Tex", TexAssetForm.DataById[anim.animClip[dirCur][cur].partTex[renderPart]].GetTex());
                         render.SetPropertyBlock(propBlock);
                         return false;
                     }, data.unit.ins);
                 }
                 else
                 {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[anim.animClip[dirCur][0].partTex[part]].GetTex());
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[anim.animClip[dirCur][0].partTex[part]].GetTex());
                 }
                 render.SetPropertyBlock(propBlock);
             }

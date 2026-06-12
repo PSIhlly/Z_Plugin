@@ -71,7 +71,7 @@ namespace Form
                 
         public static Action<Data,int,int> changeProtouidAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,Dictionary<string,SkillParamForm.Data>,Dictionary<string,SkillParamForm.Data>> changeParamdicAction;
                 
@@ -92,11 +92,11 @@ namespace Form
         public partial class Data : ProductForm.Data
         {
 
-                    private string  _icon;
+                    private int  _icon;
                     /// <summary>
                     ///图标
                     ///</summary>
-                    public string  icon{
+                    public int  icon{
                                 get{return _icon;}
  set{
 
@@ -240,7 +240,7 @@ namespace Form
             {
             }
             
-            public Data(int uid,string name,string label,int protoUid,string icon,Dictionary<string,SkillParamForm.Data> paramDic,List<SkillType> skillTypes,int characterUid,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,int protoUid,int icon,Dictionary<string,SkillParamForm.Data> paramDic,List<SkillType> skillTypes,int characterUid,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
@@ -286,7 +286,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",0,"",new Dictionary<string,SkillParamForm.Data>(){},new List<SkillType>(),0,0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
+                   private static Data _defaultData=new Data(0,"","",0,0,new Dictionary<string,SkillParamForm.Data>(){},new List<SkillType>(),0,0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -437,7 +437,7 @@ namespace Form
 
                 jo.SelectToken("protoUid")==null?defaultData.protoUid:jo.Get<int>("protoUid"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                 jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,SkillParamForm.Data>>("paramDic"),
 
@@ -472,7 +472,7 @@ namespace Form
 
             jo.Set<int>("protoUid",data.protoUid);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<Dictionary<string,SkillParamForm.Data>>("paramDic",data.paramDic);
 
@@ -674,7 +674,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeIcon(Data superData,string oldV,string newV)
+            public static void ChangeIcon(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

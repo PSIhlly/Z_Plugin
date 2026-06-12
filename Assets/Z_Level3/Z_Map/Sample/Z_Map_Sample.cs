@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
 using Z_UnitSystem;
@@ -20,7 +21,8 @@ public class Z_Map_Sample : MonoBehaviour
             TexAssetForm.AddData(tex.Item2);
         }
         var data = new MapInfo();
-        data.Init();
+        var dic = GameManager.instance.innerAssetDic;
+        data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
         MapManager.instance.Begin(data);
     }
     public void Update()

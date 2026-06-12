@@ -2,6 +2,7 @@ using Form;
 using System;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.PackageManager;
 using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,7 @@ using Z_CodeVisual;
 using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
+using Z_Ui.Notify;
 using static UnityEditor.Progress;
 using static UnityEngine.InputManagerEntry;
 namespace Ui.ModStoryEventEditWindow
@@ -116,7 +118,9 @@ namespace Ui.ModStoryEventEditWindow
                         {
                             if (tp == "void" && !string.IsNullOrEmpty(data.allowAsVoid))
                                 code = $"{data.allowAsVoid}{code};";
-                            model.cpr.Compile(code, out var res, out _, out _);
+                            model.cpr.Compile(code, out var res, out _, out _,out _,out var errors);
+                            if (errors.Count > 0)
+                                NotifyManager.instance.AddTip(errors[0].ToString());
                             ReplaceNode(model.selUnit, res[0]);
                             ApplyEntry();
                         }, model.selUnit);
@@ -131,7 +135,9 @@ namespace Ui.ModStoryEventEditWindow
                             rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
                         }
                         rawCode += ");";
-                        model.cpr.Compile(rawCode, out var res, out _, out _);
+                        model.cpr.Compile(rawCode, out var res, out _, out _,out _,out var errors);
+                        if (errors.Count > 0)
+                            NotifyManager.instance.AddTip(errors[0].ToString());    
                         ReplaceNode(model.selUnit, res[0]);
                     }
 
@@ -179,7 +185,9 @@ namespace Ui.ModStoryEventEditWindow
                         }
 
 
-                        model.cpr.Compile(defaultCode, out var res, out _, out _);
+                        model.cpr.Compile(defaultCode, out var res, out _, out _,out _,out var errors);
+                        if (errors.Count > 0)
+                            NotifyManager.instance.AddTip(errors[0].ToString());
                         var parentLst=FindParentList(model.curEntry, model.selItem);
                         int id = parentLst.IndexOf(model.selItem);
                         foreach (var r in res)

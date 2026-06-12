@@ -133,7 +133,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
                 _characterDic[newCharacter] = data;
-                if (string.IsNullOrEmpty(data.minimapIcon))
+                if (data.minimapIcon<=0)
                 {
                     data.minimapIcon = newCharacter.minimapIcon;
                 }
@@ -152,7 +152,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             if (cur != null)
             {
                 data.isObstacle = cur.collision;
-                if (string.IsNullOrEmpty(data.minimapIcon))
+                if (data.minimapIcon <= 0)
                 {
                     data.minimapIcon = cur.minimapIcon;
                 }
@@ -164,7 +164,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             var cur = ItemProductForm.DataByUid.GetDv(data.unit.productInfo.Item1, null);
             if (cur != null)
             {
-                if (string.IsNullOrEmpty(data.minimapIcon))
+                if (data.minimapIcon<=0)
                 {
                     data.minimapIcon = cur.minimapIcon;
                 }
@@ -345,7 +345,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         if (unitData == null)
         {
-            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalNameHelper.GetRuntimePrefabName("character"), true, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
+            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalDefaultHelper.GetRuntimePrefabName("character"), true, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
         }
         _characterDic[data] = unitData;
         return unitData;

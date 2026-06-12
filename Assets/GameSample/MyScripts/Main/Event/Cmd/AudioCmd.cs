@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
+using Z_DataSystem;
 using Z_Text;
 using Z_Ui.Notify;
 
@@ -19,7 +20,7 @@ namespace Z_Code
         {
             ModManager.instance.assetCtrl.ImportAudio((form) =>
             {
-                act.Invoke($"\"{form.name}\"");
+                act.Invoke("\""+AssetManager.instance.audioCtrl.GetName(form.id)+ "\"");
             });
         }
         public override string GetName() => "Audio";

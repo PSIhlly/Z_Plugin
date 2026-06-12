@@ -89,7 +89,7 @@ namespace Z_Map.Form
                 
         public static Action<Data,bool,bool> changeEnteredsceneAction;
                 
-        public static Action<Data,string,string> changeMinimapiconAction;
+        public static Action<Data,int,int> changeMinimapiconAction;
                 
 
 
@@ -143,11 +143,11 @@ namespace Z_Map.Form
                  
                      }
                     
-                    private string  _minimapIcon;
+                    private int  _minimapIcon;
                     /// <summary>
                     ///小地图icon
                     ///</summary>
-                    public string  minimapIcon{
+                    public int  minimapIcon{
                                 get{return _minimapIcon;}
  set{
 
@@ -165,7 +165,7 @@ namespace Z_Map.Form
             {
             }
             
-            public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,string minimapIcon):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
+            public Data(int uid,bool isObstacle,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,int minimapIcon):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -213,7 +213,7 @@ namespace Z_Map.Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,"");
+                   private static Data _defaultData=new Data(0,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -317,7 +317,7 @@ namespace Z_Map.Form
 
                 jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
                     );
 
             return data;
@@ -352,7 +352,7 @@ namespace Z_Map.Form
 
             jo.Set<bool>("enteredScene",data.enteredScene);
 
-            jo.Set<string>("minimapIcon",data.minimapIcon);
+            jo.Set<int>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -548,7 +548,7 @@ UnitForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            public static void ChangeMinimapicon(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

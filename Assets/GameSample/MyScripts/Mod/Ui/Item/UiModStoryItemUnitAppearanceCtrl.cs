@@ -4,6 +4,7 @@ using Ui.Axis;
 using UnityEngine;
 using Z_DataSystem;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Math;
 using Z_String;
 using Z_Text;
@@ -39,7 +40,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             view.btn_model.onClick.AddListener(() => {
                 ModManager.instance.assetCtrl.ChooseModel(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    model.data.model.subPrefabUnitName[0] = item.content;
+                    model.data.model.subPrefabUnitName[0] = item.id;
                     Refresh();
                 });
             });
@@ -203,9 +204,9 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
 
         public void Refresh()
         {
-            view.sta_exist.ChangeState(GlobalNameHelper.IsInnerAssetName(parent.model.data.styleTex[model.style])?0:1);
+            view.sta_exist.ChangeState(GlobalDefaultHelper.IsInnerAssetName(parent.model.data.styleTex[model.style])?0:1);
             view.txt_.text = TextManager.instance.GetTxt(model.style.ToString());
-            view.img_.sprite = TexAssetForm.DataByName[parent.model.data.styleTex[model.style]].GetSprite();
+            view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.styleTex[model.style]]);
         }
     }
 
@@ -247,12 +248,10 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             if (model.id>=0)
             {
                 var texs = parent.model.data.model.subUnitTexsName[0];
-                var texName = texs != null && texs.Count > model.id ? texs[model.id] : null;
-                view.txt_.text = texName ?? "";
-                if (texName != null && TexAssetForm.DataByName.ContainsKey(texName))
-                {
-                    view.img_.sprite = TexAssetForm.DataByName[texName].GetSprite();
-                }
+                var tex = TexAssetForm.DataById.GetDk(texs != null && texs.Count > model.id ? texs[model.id] : GlobalDefaultHelper.DefaultTexId);
+                view.txt_.text = tex.name;
+                view.img_.BindTexData(tex);
+
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
             }
         }

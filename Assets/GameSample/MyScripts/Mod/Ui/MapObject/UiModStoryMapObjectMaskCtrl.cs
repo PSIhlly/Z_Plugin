@@ -36,7 +36,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
             con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             view.btn_delete.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.DeleteMask(model.data.name);
+                ModManager.instance.assetCtrl.DeleteMask(model.data.id);
                 parent.SelType(2);
             });
             view.ipt_label.onFinishInput += (s) =>
@@ -50,7 +50,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
            
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportMask(model.data.name, model.id);
+                ModManager.instance.assetCtrl.ImportMask(model.data.id, model.id);
             });
             view.btn_back.onClick.AddListener(() =>
             {
@@ -83,7 +83,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
 
             if (model.id >= 0)
             {
-                view.img_image.sprite = TexAssetForm.DataByName[model.data.texsName[model.id]].GetSprite();
+                view.img_image.BindTexData(TexAssetForm.DataById[model.data.texsName[model.id]]);
                 for(int i = 0;i< conditions.Length;i++)
                 {
                     conditions[i].SetActive(i == model.id);
@@ -109,7 +109,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
 
             view.btn_new.onClick.AddListener(() =>
             {
-                parent.model.data.texsName.Add("");
+                parent.model.data.texsName.Add(GlobalDefaultHelper.DefaultTexId);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
@@ -130,7 +130,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
             if (model.id >= 0)
             {
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
-                view.img_.sprite = TexAssetForm.DataByName[parent.model.data.texsName[model.id]].GetSprite();
+                view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.texsName[model.id]]);
             }
 
         }

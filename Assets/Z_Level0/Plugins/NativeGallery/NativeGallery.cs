@@ -470,11 +470,12 @@ public static class NativeGallery
 			string path = GetTemporarySavePath( filename );
 #if UNITY_EDITOR
 			Debug.Log( "SaveToGallery called successfully in the Editor" );
+            File.WriteAllBytes(path, mediaBytes);
 #else
 			File.WriteAllBytes( path, mediaBytes );
 #endif
 
-			SaveToGalleryInternal( path, album, mediaType, callback );
+            SaveToGalleryInternal( path, album, mediaType, callback );
 		}
 
 		return result;
@@ -590,7 +591,7 @@ public static class NativeGallery
 			if( ( mediaType & MediaType.Image ) == MediaType.Image )
 			{
 				editorFilters.Add( "Image files" );
-				editorFilters.Add( "png,jpg,jpeg" );
+				editorFilters.Add( "png,jpg,jpeg,gif" );
 			}
 
 			if( ( mediaType & MediaType.Video ) == MediaType.Video )

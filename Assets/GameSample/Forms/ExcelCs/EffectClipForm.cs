@@ -51,7 +51,7 @@ public static readonly int autoUidCnt=100;
 
         public static Action<Data,int,int> changeUidAction;
                 
-        public static Action<Data,string,string> changeTexAction;
+        public static Action<Data,int,int> changeTexAction;
                 
         public static Action<Data,float,float> changeTimeAction;
                 
@@ -88,11 +88,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _tex;
+                    private int  _tex;
                     /// <summary>
-                    ///图片名
+                    ///图片
                     ///</summary>
-                    public string  tex{
+                    public int  tex{
                                 get{return _tex;}
  set{
 
@@ -214,7 +214,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string tex,float time,Vector3 pos,float rot,Vector3 scale,float opacity,bool transition)
+            public Data(int uid,int tex,float time,Vector3 pos,float rot,Vector3 scale,float opacity,bool transition)
             {
 
              this.uid = uid;
@@ -252,7 +252,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0f,Vector3.zero,0f,Vector3.one,1f,false);
+                   private static Data _defaultData=new Data(0,0,0f,Vector3.zero,0f,Vector3.one,1f,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -328,7 +328,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("uid")==null?defaultData.uid:jo.Get<int>("uid"),
 
-                jo.SelectToken("tex")==null?defaultData.tex:jo.Get<string>("tex"),
+                jo.SelectToken("tex")==null?defaultData.tex:jo.Get<int>("tex"),
 
                 jo.SelectToken("time")==null?defaultData.time:jo.Get<float>("time"),
 
@@ -355,7 +355,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<int>("uid",data.uid);
 
-            jo.Set<string>("tex",data.tex);
+            jo.Set<int>("tex",data.tex);
 
             jo.Set<float>("time",data.time);
 
@@ -463,7 +463,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeTex(Data superData,string oldV,string newV)
+            public static void ChangeTex(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

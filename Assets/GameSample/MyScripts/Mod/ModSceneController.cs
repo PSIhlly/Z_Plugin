@@ -197,7 +197,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                                 if (terrainData.step == 0)
                                 {
-                                    mapData.prefabName = GlobalNameHelper.GetInternalPrefabName(terrainData.prefabName);
+                                    mapData.prefabName = terrainData.prefabName;
                                     mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), mapMgr.data.mainData.mapUnitSize);
 
                                 }
@@ -226,7 +226,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                         if (mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                         {
                                             var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
-                                            cur.prefabName = GlobalNameHelper.GetInternalPrefabName(terrainData.prefabName);
+                                            cur.prefabName = GlobalDefaultHelper.GetInternalPrefabName(terrainData.prefabName);
                                             switch (Z_Math.Graph.GetFourDirByEuler(angle))
                                             {
                                                 case Z_Math.Graph.FourDir.Up:
@@ -258,7 +258,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                     continue;
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
-                                mapData.texNameDic[layer] = textureData.name;
+                                mapData.texDic[layer] = textureData.id;
 
                             }
                     }
@@ -271,7 +271,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     continue;
 
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
-                                mapData.texNameDic[GlobalSettings.TERRAIN_LAYER_MAX + layer] = maskData.name;
+                                mapData.texDic[GlobalSettings.TERRAIN_LAYER_MAX + layer] = maskData.id;
                             }
                     }
                     else if (curData is MapObjectForm.Data objectData)
@@ -292,7 +292,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos,GlobalNameHelper.GetRuntimeMapObjectPrefabName(objectData.id), prms);
+                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos,GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(objectData.id), prms);
                                 GameManager.instance.mapCtrl.RegisterObject(newObjectData, objectData);
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
@@ -321,7 +321,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newItemData = mapMgr.AddItem(data.name, finalPos, GlobalNameHelper.GetRuntimeMapItemPrefabName(data.uid), prms);
+                                var newItemData = mapMgr.AddItem(data.name, finalPos, GlobalDefaultHelper.GetRuntimeMapItemPrefabName(data.uid), prms);
                                 newItemData.unit.productInfo = (data.uid, -1);
                                 newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
                             }
@@ -347,7 +347,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalNameHelper.GetRuntimePrefabName("character"), false,MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(),(data.uid, -1)));
+                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalDefaultHelper.GetRuntimePrefabName("character"), false,MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(),(data.uid, -1)));
                                 newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
                             }
                         });
@@ -383,8 +383,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                             if (eraseData.texture)
                             {
-                                if (mapData.texNameDic.ContainsKey(layer))
-                                    mapData.texNameDic.Remove(layer);
+                                if (mapData.texDic.ContainsKey(layer))
+                                    mapData.texDic.Remove(layer);
                             }
                         });
                     }

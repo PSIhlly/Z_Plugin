@@ -67,7 +67,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
@@ -145,7 +145,7 @@ private set{
             {
             }
             
-            public Data(int id,string name,string icon,string label,bool terrain,bool mObject,bool item,bool character,bool texture):base(id,name,icon,label)
+            public Data(int id,string name,int icon,string label,bool terrain,bool mObject,bool item,bool character,bool texture):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -185,7 +185,7 @@ private set{
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",false,false,false,false,false);
+                   private static Data _defaultData=new Data(0,"",0,"",false,false,false,false,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -237,11 +237,11 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {10000001,new Data(10000001,"all erase","","",true,true,true,true,false)},
+                {10000001,new Data(10000001,"all erase",0,"",true,true,true,true,false)},
 
-                {10000002,new Data(10000002,"texture only","","",false,false,false,false,true)},
+                {10000002,new Data(10000002,"texture only",0,"",false,false,false,false,true)},
 
-                {10000003,new Data(10000003,"remain terrain","","",false,true,true,true,false)},
+                {10000003,new Data(10000003,"remain terrain",0,"",false,true,true,true,false)},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -324,7 +324,7 @@ private set{
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
@@ -353,7 +353,7 @@ private set{
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<string>("label",data.label);
 
@@ -476,7 +476,7 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

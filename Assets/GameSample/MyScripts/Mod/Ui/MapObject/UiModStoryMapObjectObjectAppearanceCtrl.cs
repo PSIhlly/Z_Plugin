@@ -16,6 +16,7 @@ using Z_String;
 using Z_Math;
 using Z_DataSystem;
 using Ui.Axis;
+using Z_DesignStyle;
 
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjectObjectAppearance
 {
@@ -46,7 +47,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             {
                 ModManager.instance.assetCtrl.ChooseModel(TextManager.instance.GetTxt("chooseModel"), (item) =>
                 {
-                    model.data.model.subPrefabUnitName[0] = item.content;
+                    model.data.model.subPrefabUnitName[0] = item.id;
                     Refresh();
                 });
 
@@ -69,6 +70,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.ipt_name.onFinishInput += (s) =>
             {
                 model.data.name = s;
+                Refresh();
+            };
+            view.ipt_label.onFinishInput += (s) =>
+            {
+                model.data.label = s;
                 Refresh();
             };
             view.ipt_posHeight.onFinishInput += (s) =>
@@ -119,6 +125,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
 
             view.ipt_name.Set(model.data.name);
+            view.ipt_label.Set(model.data.label);
 
             DisplayCameraAreaManager.instance.Clear();
 
@@ -218,11 +225,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             if (model.id >= 0)
             {
                 var texs = parent.model.data.model.subUnitTexsName[0];
-                var texName = texs != null && texs.Count > model.id ? texs[model.id] : null;
+                var tex = TexAssetForm.DataById.GetDv(texs != null && texs.Count > model.id ? texs[model.id] : -1,null);
                 view.txt_.text = "";
-                if (texName != null && TexAssetForm.DataByName.ContainsKey(texName))
+                if (tex != null)
                 {
-                    view.img_.sprite = TexAssetForm.DataByName[texName].GetSprite();
+                    view.img_.BindTexData(tex);
                 }
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
             }

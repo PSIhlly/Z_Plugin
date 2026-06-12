@@ -43,32 +43,85 @@ namespace Z_Code
             {
                 public bool complete;
                 public BoxDataForm.Data ret = CodeHelper.CreateBox();
+                public List<InterpretError> errors = new List<InterpretError>();
             }
             public partial class Data
+        {
+            public int debugId;
+            protected Interpreter _interpreter;
+            public virtual RetInfo Interpret()
             {
-                public int debugId;
-                protected Interpreter _interpreter;
-                public virtual RetInfo Interpret()
+                if (_interpreter == null)
                 {
-                    if (_interpreter == null)
-                    {
-                        _interpreter = new Interpreter(this);
-                    }
-                    return _interpreter.Interpret();
+                    _interpreter = new Interpreter(this);
                 }
-                public void Reset()
-                {
-                    _interpreter.Reset();
-
-                    p = 0;
-                    stack.Clear();
-                    top = -1;
-                    heap.Clear();
-                }
+                return _interpreter.Interpret();
             }
+            public void Reset()
+            {
+                _interpreter.Reset();
+                p = 0;
+                stack.Clear();
+                top = -1;
+                heap.Clear();
+            }
+        }
 
+        /// <summary>
+        /// 解释器运行时错误
+        /// </summary>
+        public class InterpretError
+        {
+            /// <summary>
+            /// 当前指令地址（PC）
+            /// </summary>
+            public int Pc;
+
+            /// <summary>
+            /// 当前操作码
+            /// </summary>
+            public Op OpCode;
+
+            /// <summary>
+            /// 错误描述
+            /// </summary>
+            public string Message;
+
+            /// <summary>
+            /// 原始异常
+            /// </summary>
+            public Exception Exception;
+
+            /// <summary>
+            /// 原始代码中的行号（从1开始）
+            /// </summary>
+            public int LineNumber;
+
+            /// <summary>
+            /// 原始代码中的列号（从1开始）
+            /// </summary>
+            public int ColumnNumber;
+
+            /// <summary>
+            /// 原始代码中对应行的内容
+            /// </summary>
+            public string SourceLine;
+
+            /// <summary>
+            /// 程序名称
+            /// </summary>
+            public string ProgramName;
+
+            public override string ToString()
+            {
+                var programInfo = !string.IsNullOrEmpty(ProgramName) ? $"[{ProgramName}] " : "";
+                var location = LineNumber > 0 ? $"行{LineNumber}列{ColumnNumber}" : $"PC={Pc}";
+                var sourceInfo = !string.IsNullOrEmpty(SourceLine) ? $"\n  源代码: {SourceLine}" : "";
+                return $"{programInfo}{location}, Op={OpCode}: {Message}{sourceInfo}";
+            }
         }
     }
+}
     public class InterpretAsyncTask
     {
         public readonly Interpreter interpreter;
@@ -110,6 +163,11 @@ namespace Z_Code
         Op? opCode;
         InterpretAsyncTask asyncTask;
 
+        /// <summary>
+        /// 解释执行过程中收集的错误信息
+        /// </summary>
+        public readonly List<InterpretError> errors = new List<InterpretError>();
+
         public Interpreter(InterpretDataForm.Data interpret)
         {
             data = interpret;
@@ -118,6 +176,7 @@ namespace Z_Code
         List<Op> ops;
         public RetInfo Interpret()
         {
+            errors.Clear();
             var zCode = data.program.zCode;
             int cnt = zCode.Count;
             Dictionary<string, BoxDataForm.Data> heap = data.heap;
@@ -132,8 +191,16 @@ namespace Z_Code
 #endif
             for (; data.p < cnt; data.p++, opCode = null)
             {
-                if (opCode == null)
-                    opCode = (Op)(int.Parse(zCode[data.p]));
+                try
+                {
+                    if (opCode == null)
+                        opCode = (Op)(int.Parse(zCode[data.p]));
+                }
+                catch (Exception ex)
+                {
+                    AddError(data.p, "解析操作码失败", ex);
+                    return MakeRetInfo(true);
+                }
 #if INTERPRETER_DEBUG
                 Z_Log.Log(data.p + ":" + (Op)opCode);
 
@@ -144,6 +211,8 @@ namespace Z_Code
                 }
 #endif
 
+                try
+                {
                 switch (opCode)
                 {
                     case Op.PushNum:
@@ -198,7 +267,7 @@ namespace Z_Code
                                 }
                                 else
                                 {
-                                    return new RetInfo();
+                                    return MakeRetInfo(false);
                                 }
 
                             }
@@ -238,7 +307,7 @@ namespace Z_Code
                                 }
                                 else
                                 {
-                                    return new RetInfo();
+                                    return MakeRetInfo(false);
                                 }
                             }
                             else
@@ -248,7 +317,7 @@ namespace Z_Code
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError(funcName + " " + e);
+                            AddError(data.p, $"{funcName} 调用失败: {e.Message}", e);
                         }
 
                         break;
@@ -388,29 +457,115 @@ namespace Z_Code
                         if (box.num > 0)
                         {
                             Push(box);
-                            return new RetInfo();
+                            return MakeRetInfo(false);
                         }
                         break;
                     case Op.Ret:
                         box = Pop();
                         realBox = GetBox(box);
 
-                        return new RetInfo()
-                        {
-                            ret = realBox,
-                            complete = true
-                        };
+                        return MakeRetInfo(true, realBox);
                     default:
                         Z_Log.Log($"op:{opCode} not found");
                         break;
 
+                }
+                }
+                catch (Exception ex)
+                {
+                    AddError(data.p, $"执行 {opCode} 指令失败: {ex.Message}", ex);
                 }
 
 
             }
 
 
-            return new RetInfo() { complete = true };
+            return MakeRetInfo(true);
+        }
+
+        /// <summary>
+        /// 添加解释器运行时错误
+        /// </summary>
+        private void AddError(int pc, string message, Exception ex = null)
+        {
+            int lineNumber = 0;
+            int columnNumber = 0;
+            string sourceLine = null;
+
+            // 尝试从 zCodeMap 获取原始代码位置
+            var zCodeMap = data.program.zCodeMap;
+            var sourceCode = data.program.code;
+            if (zCodeMap != null && pc >= 0 && pc < zCodeMap.Count && !string.IsNullOrEmpty(sourceCode))
+            {
+                int codeIndex = zCodeMap[pc];
+                if (codeIndex >= 0 && codeIndex < sourceCode.Length)
+                {
+                    (lineNumber, columnNumber, sourceLine) = GetLineInfo(sourceCode, codeIndex);
+                }
+            }
+
+            errors.Add(new InterpretError
+            {
+                Pc = pc,
+                OpCode = opCode ?? 0,
+                Message = message,
+                Exception = ex,
+                LineNumber = lineNumber,
+                ColumnNumber = columnNumber,
+                SourceLine = sourceLine,
+                ProgramName = data.program?.name
+            });
+        }
+
+        /// <summary>
+        /// 根据字符索引获取行号、列号和行内容
+        /// </summary>
+        private (int line, int column, string lineContent) GetLineInfo(string code, int index)
+        {
+            if (string.IsNullOrEmpty(code) || index < 0 || index >= code.Length)
+            {
+                return (0, 0, null);
+            }
+
+            int line = 1;
+            int column = 1;
+            int lineStart = 0;
+
+            for (int i = 0; i <= index; i++)
+            {
+                if (code[i] == '\n')
+                {
+                    line++;
+                    column = 1;
+                    lineStart = i + 1;
+                }
+                else
+                {
+                    column++;
+                }
+            }
+
+            // 获取该行的内容
+            int lineEnd = code.IndexOf('\n', lineStart);
+            string lineContent = lineEnd >= 0 
+                ? code.Substring(lineStart, lineEnd - lineStart) 
+                : code.Substring(lineStart);
+
+            return (line, column, lineContent);
+        }
+
+        /// <summary>
+        /// 将错误信息填充到 RetInfo 中
+        /// </summary>
+        private RetInfo MakeRetInfo(bool complete, BoxDataForm.Data ret = null)
+        {
+            var info = new RetInfo
+            {
+                complete = complete,
+                ret = ret ?? CodeHelper.CreateBox(),
+            };
+            info.errors.AddRange(errors);
+            return info;
         }
 
         private BoxDataForm.Data Pop()

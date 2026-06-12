@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
+using Z_DataSystem;
 using Z_Ui.Dialog;
 using Z_Ui.Notify;
 
@@ -23,7 +24,7 @@ namespace Z_Code
             foreach (var p in prm)
                 asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
             var heapTemp = asyncTask.interpreter.data.heapTemp;
-            PlayManager.instance.effectCtrl.ChatText(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), prm[1].str, prm[2].str, prm[3].num);
+            PlayManager.instance.effectCtrl.ChatText(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), prm[1].str,AssetManager.instance.texCtrl.GetId(prm[2].str), prm[3].num);
             return true;
         }
     }

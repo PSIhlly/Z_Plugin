@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
@@ -50,22 +51,31 @@ namespace Ui.Notify
         public void Refresh()
         {
             con.Clear();
-
+            view.scr_.verticalNormalizedPosition = 0;
+            view.scr_.enabled = model.info.enableScr;
             view.txt_content.text = model.info.content;
             view.go_close.SetActive(model.info.canClose);
             view.txt_title.text = model.info.title;
-
-            for (int i = 0; i < model.info.selectionWords.Count; i++)
+            if(model.info.selectionWords!=null)
             {
-                con.Add(new UiSelectionParam()
+                for (int i = 0; i < model.info.selectionWords.Count; i++)
                 {
-                    name = model.info.selectionWords[i],
-                    func = model.info.funcs[i],
-                    id = i
-                });
+                    con.Add(new UiSelectionParam()
+                    {
+                        name = model.info.selectionWords[i],
+                        func = model.info.funcs[i],
+                        id = i
+                    });
+                }
             }
-
+            if (view.scr_.content.rect.height > 200)
+                view.scr_.GetComponent<RectTransform>().sizeDelta = new Vector2(view.scr_.GetComponent<RectTransform>().sizeDelta.x,Mathf.Min(view.scr_.content.rect.height+50f,500f));
             con.Refresh();
+            UiManager.Rebuild(gameObject, true);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(gameObject, true);
+            }, gameObject);
         }
 
     }

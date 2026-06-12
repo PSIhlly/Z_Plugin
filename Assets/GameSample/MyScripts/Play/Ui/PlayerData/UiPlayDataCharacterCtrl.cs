@@ -10,6 +10,7 @@ using Z_DataSystem.Form;
 using Ui.PlayDataCharacter.PlayDataCharacterData;
 using Ui.PlayDataCharacter.PlayDataCharacterEquip;
 using Ui.PlayDataCharacter.PlayDataCharacterSkill;
+using Z_DesignStyle;
 
 namespace Ui.PlayDataCharacter
 {
@@ -139,7 +140,7 @@ namespace Ui.PlayDataCharacter
         {
             view.sta_exist.ChangeState(1);
             view.txt_.text = model.data.name;
-            view.img_.sprite = TexAssetForm.DataByName[model.data.avatarTexName].GetSprite();
+            view.img_.BindTexData(TexAssetForm.DataById.GetDk(model.data.avatarTex, GlobalDefaultHelper.DefaultTexId));
             view.sta_.ChangeState(parent.model.sel == model.data ? 1 : 0);
         }
     }

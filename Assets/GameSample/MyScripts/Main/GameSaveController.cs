@@ -45,7 +45,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     #region package
 
-    public void Package(int storyId)
+    public byte[] Package(int storyId)
     {
         Texture2D icon;
         try
@@ -56,7 +56,7 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             icon = Texture2D.whiteTexture;
         }
-        File.WriteAllBytes(AssetManager.externPatn + storyId + ".png", TextureHelper.GetPNGWithExtraInfo(icon, System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId)))));
+        return TextureHelper.GetPNGWithExtraInfo(icon, System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId))));
     }
 
     #endregion
@@ -124,7 +124,8 @@ public class GameSaveController : Z_Controller<GameManager>
             if (!SaveAndLoad.Exist(path + Main2StoryManager.GetSceneFileNameById(data.uid)))
             {
                 var mapData = new GameMapData();
-                mapData.Init();
+                var dic = GameManager.instance.innerAssetDic;
+                mapData.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"],(TexAssetForm.Data) dic["defaultTileTexture"]);
                 GameManager.instance.saveCtrl.SaveSceneMap(path + Main2StoryManager.GetSceneFileNameById(data.uid), mapData);
             }
         }
@@ -215,32 +216,35 @@ public class GameSaveController : Z_Controller<GameManager>
 
         foreach (var data in StoryTexAssetForm.DataById.Values)
         {
-            SaveStoryTex(data.name, storyCoreFolder);
+            SaveStoryTex(data.id, storyCoreFolder);
         }
         foreach (var data in StoryAudioAssetForm.DataById.Values)
         {
-            SaveStoryAudio(data.name, storyCoreFolder);
+            SaveStoryAudio(data.id, storyCoreFolder);
         }
         foreach (var data in StoryVideoAssetForm.DataById.Values)
         {
-            SaveStoryVideo(data.name, storyCoreFolder);
+            SaveStoryVideo(data.id, storyCoreFolder);
         }
         SaveAndLoad.EachFile(storyCoreFolder + assetFolder, (name) =>
         {
-            if (!StoryTexAssetForm.DataByName.ContainsKey(name) && !StoryAudioAssetForm.DataByName.ContainsKey(name) && !StoryVideoAssetForm.DataByName.ContainsKey(name))
+            var id1 = AssetManager.instance.texCtrl.GetId(name);
+            var id2 = AssetManager.instance.audioCtrl.GetId(name);
+            var id3 = AssetManager.instance.videoCtrl.GetId(name);
+            if (!StoryTexAssetForm.DataById.ContainsKey(id1) && !StoryAudioAssetForm.DataById.ContainsKey(id2) && !StoryVideoAssetForm.DataById.ContainsKey(id3))
             {
                 SaveAndLoad.Delete(storyCoreFolder + assetFolder + name);
             }
         });
     }
     #region util
-    private void SaveTex(string texName, string path)
+    private void SaveTex(int texId, string path)
     {
-        var data = TexAssetForm.DataByName.GetDk(texName, null);
-        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(texName))
+        var data = TexAssetForm.DataById.GetDv(texId, null);
+        if (data != null && data.bytes != null && !GlobalDefaultHelper.IsInnerAssetName(texId))
         {
 
-            path = path + assetFolder + texName;
+            path = path + assetFolder + texId;
             if (!SaveAndLoad.Exist(path))
             {
                 SaveAndLoad.Save(path, data.bytes);
@@ -248,39 +252,39 @@ public class GameSaveController : Z_Controller<GameManager>
 
         }
     }
-    private void SaveStoryTex(string texName, string path)
+    private void SaveStoryTex(int texId, string path)
     {
-        var data = TexAssetForm.DataByName.GetDv(texName, null);
-        if (data != null && data.bytes != null && !GlobalNameHelper.IsInnerAssetName(texName))
+        var data = TexAssetForm.DataById.GetDv(texId, null);
+        if (data != null && data.bytes != null && !GlobalDefaultHelper.IsInnerAssetName(texId))
         {
-            var tex = StoryTexAssetForm.DataByName[texName];
-            path = path + assetFolder + texName;
+            var tex = StoryTexAssetForm.DataById[texId];
+            path = path + assetFolder + AssetManager.instance.texCtrl.GetName(texId);
             if (!SaveAndLoad.Exist(path))
             {
                 SaveAndLoad.Save(path, data.bytes);
             }
         }
     }
-    private void SaveStoryVideo(string videoName, string path)
+    private void SaveStoryVideo(int videoId, string path)
     {
-        var data = VideoAssetForm.DataByName.GetDv(videoName, null);
-        if (data != null && !GlobalNameHelper.IsInnerAssetName(videoName))
+        var data = VideoAssetForm.DataById.GetDv(videoId, null);
+        if (data != null && !GlobalDefaultHelper.IsInnerAssetName(videoId))
         {
-            var tex = VideoAssetForm.DataByName[videoName];
-            path = path + assetFolder + videoName;
+            var tex = VideoAssetForm.DataById[videoId];
+            path = path + assetFolder + AssetManager.instance.videoCtrl.GetName(videoId);
             if (!SaveAndLoad.Exist(path))
             {
                 SaveAndLoad.Copy(data.path, path);
             }
         }
     }
-    private void SaveStoryAudio(string audioName, string path)
+    private void SaveStoryAudio(int audioId, string path)
     {
-        var data = AudioAssetForm.DataByName.GetDv(audioName, null);
-        if (data != null && !GlobalNameHelper.IsInnerAssetName(audioName))
+        var data = AudioAssetForm.DataById.GetDv(audioId, null);
+        if (data != null && !GlobalDefaultHelper.IsInnerAssetName(audioId))
         {
-            var tex = AudioAssetForm.DataByName[audioName];
-            path = path + assetFolder + audioName;
+            var tex = AudioAssetForm.DataById[audioId];
+            path = path + assetFolder + AssetManager.instance.audioCtrl.GetName(audioId);
             if (!SaveAndLoad.Exist(path))
             {
                 SaveAndLoad.Copy(data.path, path);
@@ -435,7 +439,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
-            var icon = data.avatarTexName;
+            var icon = data.avatarTex;
 
             foreach (var anim in data.animDic.Values)
             {
@@ -528,7 +532,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 if (form != null)
                 {
                     StoryTexAssetForm.AddData(form);
-                    form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+                    form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.texCtrl.GetName(form.id));
                 }
             }
         }
@@ -538,7 +542,7 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in StoryAudioAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
             {
                 StoryAudioAssetForm.AddData(form);
-                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.audioCtrl.GetName(form.id));
             }
         }
         path = folder + videoAssetFormFileName;
@@ -547,14 +551,10 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in StoryVideoAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
             {
                 StoryVideoAssetForm.AddData(form);
-                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + form.name);
+                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.videoCtrl.GetName(form.id));
             }
         }
-        if (!StoryTexAssetForm.DataByName.ContainsKey(GlobalNameHelper.GetExternDefaultTexName()))
-        {
-            StoryTexAssetForm.AddData(new StoryTexAssetForm.Data(AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture), GlobalNameHelper.GetExternDefaultTexName())));
 
-        }
     }
 
     public void LoadEvent(string folder)
@@ -626,12 +626,12 @@ public class GameSaveController : Z_Controller<GameManager>
     #region util
 
 
-    public void AddStoryTex(TexAssetForm.Data rawData)
+    public void AddStoryTex(ref TexAssetForm.Data rawData)
     {
         StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData);
-        if (StoryTexAssetForm.DataByName.ContainsKey(data.name))
+        if (StoryTexAssetForm.DataById.ContainsKey(data.id))
         {
-            var oldData = StoryTexAssetForm.DataByName[data.name];
+            var oldData = StoryTexAssetForm.DataById[data.id];
             StoryTexAssetForm.RemoveData(oldData.id);
         }
         if (data.lab == null)
@@ -642,13 +642,15 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             importAssetName = data.name
         });
+        rawData = data;
+
     }
-    public void AddGameTex(TexAssetForm.Data rawData)
+    public void AddGameTex(ref TexAssetForm.Data rawData)
     {
         GameTexAssetForm.Data data = new GameTexAssetForm.Data(rawData);
-        if (GameTexAssetForm.DataByName.ContainsKey(data.name))
+        if (GameTexAssetForm.DataById.ContainsKey(data.id))
         {
-            var oldData = GameTexAssetForm.DataByName[data.name];
+            var oldData = GameTexAssetForm.DataById[data.id];
             GameTexAssetForm.RemoveData(oldData.id);
         }
         if (data.lab == null)
@@ -659,39 +661,15 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             importAssetName = data.name
         });
-    }
-    public void LoadTex(string texName, string path)
-    {
-        path = path + assetFolder + texName;
-        if (SaveAndLoad.Exist(path) && !TexAssetForm.DataByName.ContainsKey(texName))
-        {
-            AddTex(AssetManager.instance.texCtrl.CreateDataByPath(path, texName));
-        }
-    }
-    public void AddTex(TexAssetForm.Data rawData)
-    {
-        TexAssetForm.Data data = rawData;
-        if (TexAssetForm.DataByName.ContainsKey(data.name))
-        {
-            var oldData = TexAssetForm.DataByName[data.name];
-            TexAssetForm.RemoveData(oldData.id);
-        }
-        if (data.lab == null)
-            data.lab = "";
-        TexAssetForm.AddData(data);
-
-        Z_EventHelper.Invoke(new AssetEvent()
-        {
-            importAssetName = data.name
-        });
+        rawData = data; 
     }
 
     public void AddStoryAudio(AudioAssetForm.Data rawData)
     {
         StoryAudioAssetForm.Data data = new StoryAudioAssetForm.Data(rawData);
-        if (StoryAudioAssetForm.DataByName.ContainsKey(data.name))
+        if (StoryAudioAssetForm.DataById.ContainsKey(data.id))
         {
-            var oldData = StoryAudioAssetForm.DataByName[data.name];
+            var oldData = StoryAudioAssetForm.DataById[data.id];
             StoryAudioAssetForm.RemoveData(oldData.id);
         }
         if (data.lab == null)
@@ -707,9 +685,9 @@ public class GameSaveController : Z_Controller<GameManager>
     public void AddStoryVideo(VideoAssetForm.Data rawData)
     {
         StoryVideoAssetForm.Data data = new StoryVideoAssetForm.Data(rawData);
-        if (StoryVideoAssetForm.DataByName.ContainsKey(data.name))
+        if (StoryVideoAssetForm.DataById.ContainsKey(data.id))
         {
-            var oldData = StoryVideoAssetForm.DataByName[data.name];
+            var oldData = StoryVideoAssetForm.DataById[data.id];
             StoryVideoAssetForm.RemoveData(oldData.id);
         }
         if (data.lab == null)
@@ -771,14 +749,14 @@ public class GameSaveController : Z_Controller<GameManager>
         }
         foreach (var form in GameObjectAssetForm.DataById.Values)
         {
-            if (form.name.StartsWith(GlobalNameHelper.GetInternalPrefabName("")))
+            if (form.name.StartsWith(GlobalDefaultHelper.GetInternalPrefabName("")))
             {
                 InstancePoolManager.instance.AddPool(form.GetGo());
             }
         }
         foreach (var form in MapObjectForm.DataById.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalNameHelper.GetRuntimeMapObjectPrefabName(form.id), form.model, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.id), form.model, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }
@@ -799,18 +777,18 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var characterData in CharacterProductForm.DatasByProtouid[0])
             {
-                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.label, characterData.avatarTexName, characterData.uid));
+                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.avatarTex, characterData.label, characterData.uid));
             }
         }
 
         foreach (var form in ItemProductForm.DataByUid.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalNameHelper.GetRuntimeMapItemPrefabName(form.uid), form.model, true, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapItemPrefabName(form.uid), form.model, true, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }
 
-        var character = _super.utilCtrl.CombineNewCharacterByPrefabs(GlobalNameHelper.GetRuntimePrefabName("character"), new List<string>() { GlobalNameHelper.GetDefaultTexName(), GlobalNameHelper.GetDefaultTexName(), null }, true);
+        var character = _super.utilCtrl.CombineNewCharacterByPrefabs(GlobalDefaultHelper.GetRuntimePrefabName("character"), new List<int>() { GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, -1 }, true);
         character.transform.parent = InstancePoolManager.instance.defaultRoot;
         InstancePoolManager.instance.AddPool(character);
 

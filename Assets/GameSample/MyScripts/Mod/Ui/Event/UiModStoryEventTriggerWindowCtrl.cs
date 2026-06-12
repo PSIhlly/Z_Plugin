@@ -7,10 +7,12 @@ using Ui.ModStoryEventTrigger;
 using UnityEngine;
 using Z_Code.Form;
 using Z_DataSystem;
+using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
 using Z_Text;
 using Z_Texture;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -84,14 +86,18 @@ namespace Ui.ModStoryEventTriggerWindow
 
             view.txt_name.text = model.prm.trigger.name;
             evtCon.Clear();
-            foreach(var nm in model.prm.trigger.evt)
+            foreach(var uid in model.prm.trigger.evt)
             {
-                evtCon.Add(new UiEventParam() { nm = nm });
+                evtCon.Add(new UiEventParam() { uid = uid });
             }
             
-            evtCon.Add(new UiEventParam() { nm = null });
+            evtCon.Add(new UiEventParam() { uid = -1 });
             evtCon.Refresh();
             UiManager.Rebuild(gameObject, true);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                UiManager.Rebuild(gameObject, true);
+            }, gameObject);
         }
 
         public void OnEvent(EventModifyEvent evt)
@@ -133,7 +139,7 @@ namespace Ui.ModStoryEventTriggerWindow
 
     public partial class UiEventParam
     {
-        public string nm;
+        public int uid;
     }
     public partial class UiEventModel
     {
@@ -148,21 +154,21 @@ namespace Ui.ModStoryEventTriggerWindow
             {
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
                 {
-                    parent.model.prm.trigger.evt.Add(res.content);
+                    parent.model.prm.trigger.evt.Add(res.id);
                     Z_EventHelper.Invoke(new EventModifyEvent());
                 });
             });
             view.btn_delete.onClick.AddListener(() =>
             {
-                parent.model.prm.trigger.evt.Remove(model.prm.nm);
+                parent.model.prm.trigger.evt.Remove(model.prm.uid);
                 Z_EventHelper.Invoke(new EventModifyEvent());
             });
             view.btn_edit.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
                 {
-                    int pos=parent.model.prm.trigger.evt.IndexOf(model.prm.nm);
-                    parent.model.prm.trigger.evt[pos] = res.content;
+                    int pos=parent.model.prm.trigger.evt.IndexOf(model.prm.uid);
+                    parent.model.prm.trigger.evt[pos] = res.id;
                     Z_EventHelper.Invoke(new EventModifyEvent());
                 });
             });
@@ -174,8 +180,8 @@ namespace Ui.ModStoryEventTriggerWindow
         }
         public void Refresh()
         {
-            view.sta_.ChangeState(string.IsNullOrEmpty(model.prm.nm) ? 0 : 1);
-            view.txt_.text = model.prm.nm;
+            view.sta_.ChangeState(model.prm.uid==-1 ? 0 : 1);
+            view.txt_.text = EventProgramDataForm.DataByUid.GetDv(model.prm.uid, EventProgramDataForm.defaultData).name;
         }
     }
 }

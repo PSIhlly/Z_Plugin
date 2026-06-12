@@ -97,9 +97,10 @@ namespace Ui.ModStoryEventEditWindow
                                 CreateTxt(cur);
                             }
                         }
-                        else if (EventProgramDataForm.DataByName.ContainsKey(model.node.desc.code))
+                        else if (int.TryParse(model.node.desc.code, out int evtId) && EventProgramDataForm.DataByUid.ContainsKey(evtId))
                         {
-                            CreateTxt(model.node.desc.code + "(");
+                            var evtData = EventProgramDataForm.DataByUid[evtId];
+                            CreateTxt(evtData.name + "(");
                             for (int i = 0; i < model.node.subNodes.Count; i++)
                             {
                                 CreateTxt($"{(i > 0 ? "," : "")}param{i + 1}=");
@@ -121,7 +122,7 @@ namespace Ui.ModStoryEventEditWindow
 
                 if (AssetManager.instance.texCtrl.IsAsset(model.node.desc.code))
                 {
-                    view.img_.sprite = TexAssetForm.DataByName.GetDk(model.node.desc.code, GlobalNameHelper.GetDefaultTexName()).GetSprite();
+                    view.img_.BindTexData(TexAssetForm.DataById.GetDk(AssetManager.instance.texCtrl.GetId(model.node.desc.code), GlobalDefaultHelper.DefaultTexId));
                 }
             }
 

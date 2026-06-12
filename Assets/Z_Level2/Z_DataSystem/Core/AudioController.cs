@@ -37,9 +37,20 @@ namespace Z_DataSystem
             var parts = name.Split(GetMark());
             return parts.Length == 3 && string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[2]);
         }
-        public virtual string GetName(string name="")
+        public virtual string GetName(int id=-1)
         {
-            return $"{GetMark()}{name}{GetMark()}";
+            return $"{GetMark()}{id}{GetMark()}";
+        }
+        public int GetId(string name = "")
+        {
+            if (name == null)
+                return -1;
+            var parts = name.Split(GetMark());
+            if (parts.Length == 3 && int.TryParse(parts[1], out int id))
+            {
+                return id;
+            }
+            return -1;
         }
         public string GetMark() => AssetDefines.AUDIO_MARK;
         public string[] GetSupportedExtensions() => new[]
@@ -58,15 +69,15 @@ namespace Z_DataSystem
             public override void Run(AudioController ctrl)
             {
                 base.Run(ctrl);
-                NativeGallery.GetAudioFromGallery((path) => OnImportComplete(string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path)));
+                NativeGallery.GetAudioFromGallery((path) => OnImportComplete(string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path), Path.GetFileNameWithoutExtension(path)));
             }
-            public override void OnImportComplete(byte[] data)
+            public override void OnImportComplete(byte[] data,string name)
             {
                 if (data != null)
                 {
                     var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
                     File.WriteAllBytes(AssetManager.cachePath + nm, data);
-                    var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, nm);
+                    var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, name);
                     callback?.Invoke(form);
                     Z_EventHelper.Invoke(new AssetEvent()
                     {

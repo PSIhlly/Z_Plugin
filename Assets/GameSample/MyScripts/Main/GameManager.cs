@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using TreeEditor;
 using Ui;
 using Ui.EnterMain;
 using Ui.ModStory.ModStoryEffect.ModStoryEffectUnit;
@@ -122,31 +123,31 @@ public static partial class GlobalSettings
     public static int OBJECT_MAX = 100000;
     public static float MAX = 999999999;
 }
-public static class GlobalNameHelper
+public static class GlobalDefaultHelper
 {
-    public static string defaultLab="unclassified";
-    public static string GetInternalPrefabName(string name) => Z_Map.GlobalHelper.GetInternalPrefabName(name);
+    public static string defaultLab = "unclassified";
+    public static string GetInternalPrefabName(string name) => MapInfo.GetPrefabName(name);
 
     public static string GetRuntimePrefabName(string name = "") => "runtime$" + name;
     public static string GetRuntimeMapObjectPrefabName(int mapObjectId) => GetRuntimePrefabName("obj$" + mapObjectId);
     public static string GetRuntimeMapItemPrefabName(int mapItemId) => GetRuntimePrefabName("item$" + mapItemId);
-    public static string GetDefaultTexName(string name = "") => "reservedI$" + name;
-    public static string GetExternDefaultTexName(string name = "") => AssetManager.instance.texCtrl.GetName();
+    public static int DefaultTexId;
+    public static int ExternDefaultTexId;
 
     public static string GetDefaultVideoName(string name = "") => "reservedV$" + name;
     public static string GetExternDefaultVideoName(string name = "") => AssetManager.instance.videoCtrl.GetName();
     public static string GetDefaultAudioName(string name = "") => "reservedA$" + name;
     public static string GetExternDefaultAudioName(string name = "") => AssetManager.instance.audioCtrl.GetName();
-    public static bool IsInnerAssetName(string name)
+    public static bool IsInnerAssetName(int id)
     {
-        return !AssetManager.instance.texCtrl.IsAsset(name) && !AssetManager.instance.audioCtrl.IsAsset(name) && !AssetManager.instance.videoCtrl.IsAsset(name);
+        return !StoryTexAssetForm.DataById.ContainsKey(id) && !StoryAudioAssetForm.DataById.ContainsKey(id) && !StoryVideoAssetForm.DataById.ContainsKey(id);
     }
 
-    public static string GetDefaultStoryTexName() => GetDefaultTexName("story");
-    public static string GetDefaultEventTexName() => GetDefaultTexName("event");
-    public static string GetDefaultCharacterTexName() => GetDefaultTexName("character");
-    public static string GetDefaultItemTexName() => GetDefaultTexName("item");
-    public static string GetDefaultModelTexName() => GetDefaultTexName("model");
+    public static int DefaultStoryTexId;
+    public static int DefaultEventTexId;
+    public static int DefaultCharacterTexId;
+    public static int DefaultItemTexId;
+    public static int DefaultModelTexId;
 }
 
 
@@ -165,10 +166,10 @@ public class GameManager : Z_MonoManager<GameManager>
     public StoryForm.Data curStory;
     public SceneForm.Data curScene;
     public ProgressForm.Data curProgress => ProgressForm.DataByUid.ContainsKey(1) ? ProgressForm.DataByUid[1] : null;
-
+    public Dictionary<string, AssetForm.Data> innerAssetDic; 
     public override void Init()
     {
-
+        innerAssetDic = new Dictionary<string, AssetForm.Data>();
         base.Init();
         AudioManager.instance.BgmStreaming(GlobalSettings.BGM_FILE_NAME);
         LanguageManager.instance.SetLanguage(Language.Cn);
@@ -185,27 +186,45 @@ public class GameManager : Z_MonoManager<GameManager>
 
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets
-
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, AssetManager.instance.texCtrl.GetName()));
-
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultTexName()));
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultStoryTexName()));
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(Texture2D.whiteTexture, GlobalNameHelper.GetDefaultEventTexName()));
-
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(TextureHelper.transparentTexture, GlobalNameHelper.GetDefaultCharacterTexName()));
-        saveCtrl.AddGameTex(AssetManager.instance.texCtrl.CreateDataByTex(new Texture2D(1, 1), GlobalNameHelper.GetDefaultModelTexName()));
+        var data = AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture), "");
+        data.id=AssetForm.autoIdCnt + 200000;
+        saveCtrl.AddStoryTex(ref data);
+        GlobalDefaultHelper.DefaultTexId = data.id;
+        GlobalDefaultHelper.DefaultStoryTexId = data.id;
+        GlobalDefaultHelper.DefaultEventTexId = data.id;
+        GlobalDefaultHelper.DefaultCharacterTexId = data.id;
+        GlobalDefaultHelper.DefaultItemTexId = data.id;
+        GlobalDefaultHelper.DefaultModelTexId = data.id;
+        GlobalDefaultHelper.ExternDefaultTexId = data.id;
 
 
 
         var res = AssetManager.instance.LoadAssetsByFolder("Z_Map/", true);
         for (int i = 0; i < res.texs.Count; i++)
         {
-            saveCtrl.AddGameTex(res.texs[i].Item2);
+            var texData = res.texs[i].Item2;
+            texData.id = AssetForm.autoIdCnt+i+100000;
+            saveCtrl.AddGameTex(ref texData);
+            if(texData.name == "MapTexture$grass")
+            {
+                innerAssetDic["defaultTileTexture"] = texData;
+            }
+            if (texData.name == "MapTexture$wall")
+            {
+                innerAssetDic["defaultObjectTexture"] = texData;
+            }
+            
         }
         for (int i = 0; i < res.gos.Count; i++)
         {
+            if (res.gos[i].Item1.StartsWith(MapInfo.GetPrefabName()))
+            {
+                res.gos[i].Item2.id = AssetForm.autoIdCnt + i + 110000;
+                innerAssetDic[res.gos[i].Item1.Split(MapInfo.GetPrefabName())[1]] = res.gos[i].Item2;
+            }
             GameObjectAssetForm.AddData(res.gos[i].Item2);
         }
+        
 
         if (SaveAndLoad.Exist(ItemDefines.SAVE_NAME))
         {
@@ -227,6 +246,7 @@ public class GameManager : Z_MonoManager<GameManager>
         {
             UiManager.instance.ShowUi<UiPlaySceneMenuCtrl>();
         });
+
     }
 
     public void Start()
@@ -268,7 +288,7 @@ public class GameManager : Z_MonoManager<GameManager>
     }
     public static float MapPosToPlayerPos(float v)
     {
-        return (v  - playerPosToMapPosOffset) ;
+        return (v - playerPosToMapPosOffset);
     }
     public static Vector3 PlayerPosToMapPos(Vector3 playerPos)
     {

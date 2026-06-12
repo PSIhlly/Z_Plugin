@@ -107,7 +107,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
 
             view.sta_valid.ChangeState(model.lab == "" ? 0 : 1);
             view.sta_.ChangeState(model.lab == parent.model.lab ? 1 : 0);
-            view.txt_.text = model.lab == "" ? TextManager.instance.GetTxt(GlobalNameHelper.defaultLab):model.lab;
+            view.txt_.text = model.lab == "" ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab):model.lab;
         }
     }
 

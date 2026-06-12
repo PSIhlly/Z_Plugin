@@ -67,7 +67,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,MapModelForm.Data,MapModelForm.Data> changeModelAction;
                 
@@ -79,7 +79,7 @@ namespace Form
                 
         public static Action<Data,Dictionary<string,MapObjectParamForm.Data>,Dictionary<string,MapObjectParamForm.Data>> changeParamdicAction;
                 
-        public static Action<Data,string,string> changeMinimapiconAction;
+        public static Action<Data,int,int> changeMinimapiconAction;
                 
 
 
@@ -158,11 +158,11 @@ namespace Form
                  
                      }
                     
-                    private string  _minimapIcon;
+                    private int  _minimapIcon;
                     /// <summary>
                     ///小地图标识
                     ///</summary>
-                    public string  minimapIcon{
+                    public int  minimapIcon{
                                 get{return _minimapIcon;}
  set{
 
@@ -180,7 +180,7 @@ namespace Form
             {
             }
             
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,string minimapIcon):base(id,name,icon,label)
+            public Data(int id,string name,int icon,MapModelForm.Data model,string label,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -220,7 +220,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},"");
+                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,"",true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -339,7 +339,7 @@ namespace Form
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                 jo.SelectToken("model")==null?defaultData.model:jo.Get<MapModelForm.Data>("model"),
 
@@ -351,7 +351,7 @@ namespace Form
 
                 jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
                     );
 
             return data;
@@ -368,7 +368,7 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<MapModelForm.Data>("model",data.model);
 
@@ -380,7 +380,7 @@ namespace Form
 
             jo.Set<Dictionary<string,MapObjectParamForm.Data>>("paramDic",data.paramDic);
 
-            jo.Set<string>("minimapIcon",data.minimapIcon);
+            jo.Set<int>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -501,7 +501,7 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -568,7 +568,7 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            public static void ChangeMinimapicon(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

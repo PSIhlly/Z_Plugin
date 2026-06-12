@@ -160,7 +160,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.go_skills.SetActive(GameManager.instance.curProgress.enableSkill);
 
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
-            view.img_minimapIcon.sprite = TexAssetForm.DataByName.GetDk(model.data.minimapIcon, GlobalNameHelper.GetDefaultStoryTexName()).GetSprite();
+            view.img_minimapIcon.BindTexData(TexAssetForm.DataById.GetDv(model.data.minimapIcon, TexAssetForm.DataById[GlobalDefaultHelper.DefaultStoryTexId]));
 
         }
     }

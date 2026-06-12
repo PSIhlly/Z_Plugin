@@ -55,7 +55,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         }
         public void Refresh()
         {
-            view.img_map.sprite = TexAssetForm.DataByName.GetDk(GameManager.instance.curProgress.largeMap,GlobalNameHelper.GetDefaultTexName()).GetSprite();
+            view.img_map.BindTexData(TexAssetForm.DataById.GetDv(GameManager.instance.curProgress.largeMap, TexAssetForm.DataById[GlobalDefaultHelper.DefaultTexId]));
 
             RefreshScenes();
             view.model_axis.SetShow(false);

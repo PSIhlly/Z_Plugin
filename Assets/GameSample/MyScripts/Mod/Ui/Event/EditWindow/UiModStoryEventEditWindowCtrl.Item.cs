@@ -6,6 +6,7 @@ using Z_Code.Form;
 using Z_String;
 using Z_Text;
 using Z_Ui.Base;
+using Z_Ui.Notify;
 namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiItemParam
@@ -39,7 +40,9 @@ namespace Ui.ModStoryEventEditWindow
                             string defaultCode = sel.defaultCode;
                             if (!string.IsNullOrEmpty(sel.allowAsVoid))
                                 defaultCode = $"{sel.allowAsVoid}{defaultCode};";
-                            parent.model.cpr.Compile(defaultCode, out var res,out _,out _);
+                            parent.model.cpr.Compile(defaultCode, out var res,out _,out _,out _,out var errors);
+                            if(errors.Count>0)
+                                NotifyManager.instance.AddTip(errors[0].ToString());
                             model.prm.targetNewList.AddRange(res);
                             parent.ApplyEntry();
                         }else if(ProgramDataForm.DataByName.ContainsKey(item.content))
@@ -52,7 +55,9 @@ namespace Ui.ModStoryEventEditWindow
                                 rawCode += $"{(i==0?"":",")}param{i+1}";
                             }
                             rawCode += ");";
-                            parent.model.cpr.Compile(rawCode, out var res,out _,out _);
+                            parent.model.cpr.Compile(rawCode, out var res,out _,out _,out _,out var errors);
+                            if(errors.Count>0)
+                                NotifyManager.instance.AddTip(errors[0].ToString());
                             model.prm.targetNewList.AddRange(res);
                             parent.ApplyEntry();
                         }
@@ -155,9 +160,10 @@ namespace Ui.ModStoryEventEditWindow
                         }
 
                     }
-                    else if (EventProgramDataForm.DataByName.ContainsKey(node.desc.code))
+                    else if (int.TryParse(node.desc.code, out int evtId) && EventProgramDataForm.DataByUid.ContainsKey(evtId))
                     {
-                        res = node.desc.code + "(";
+                        var evtData = EventProgramDataForm.DataByUid[evtId];
+                        res = evtData.name + "(";
 
                         for (int i = 0; i < node.subNodes.Count; i++)
                         {

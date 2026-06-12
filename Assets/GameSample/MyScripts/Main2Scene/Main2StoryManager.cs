@@ -30,7 +30,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", null));
             SceneForm.Clear();
-            var sceneData = new SceneForm.Data(1, "scene", GlobalNameHelper.GetDefaultTexName(),Vector2.zero  ,false,false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(),  false);
+            var sceneData = new SceneForm.Data(1, "scene", GlobalDefaultHelper.DefaultTexId, Vector2.zero, false, false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(), false);
             SceneForm.AddData(sceneData);
             CharacterParamForm.Clear();
             CharacterProductForm.Clear();
@@ -45,26 +45,31 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(),  CameraMode.Overhead, ClipForm.defaultData.Copy(),   0, defaultStyle,false,false,true,true,true,true,true,"",0,(sceneData.uid, Vector3.zero),false,EventState.Normal); 
+            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 1000, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), 0, defaultStyle, false, false, true, true, true, true, true, GlobalDefaultHelper.DefaultTexId, 0, (sceneData.uid, Vector3.zero), false, EventState.Normal);
             ProgressForm.AddData(progress);
             var data = new GameMapData();
-            data.Init();
+
+            var dic = GameManager.instance.innerAssetDic;
+            data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
+            MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, "default", new Dictionary<string, EventTriggerForm.Data>()));
+            MapObjectForm.AddData(new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id, new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true), "default", true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
+
             EventProgramDataForm.Clear();
-            StoryTexAssetForm.AddData(new StoryTexAssetForm.Data(AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture),GlobalNameHelper.GetExternDefaultTexName())));
-            var cpr = new Compiler();
+
+            ModManager.instance.assetCtrl.CreateEvent("mainDialog", "enterGame", "dialog");
+            var dialogEvt = EventProgramDataForm.DataByUid.Values.FirstOrDefault(d => d.name == "mainDialog");
+
+            sceneData.events["onEnterEvent"] = new EventTriggerForm.Data(-1, "onEnterEvent", new List<int>() { dialogEvt.uid }, default);
+
             switch (defaultStyle)
             {
                 case EditorStyle.Avg:
                 case EditorStyle.AvgAdvanced:
-
-                    ModManager.instance.assetCtrl.CreateEvent("mainDialog", "enterGame", "dialog");
-                    var dialogEvt = EventProgramDataForm.DataByName["mainDialog"];
                     dialogEvt.ApplyCode(@"ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");GameOver();");
-
-                    sceneData.events["onEnterEvent"] = new EventTriggerForm.Data(-1, "onEnterEvent", new List<string>() { "mainDialog" }, default);
                     break;
                 case EditorStyle.Rpg:
                 case EditorStyle.RpgAdvanced:
+                    dialogEvt.ApplyCode(@"Pause();ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");");
                     var prmBox = CodeHelper.CreateBoxByNum(100);
                     var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "HpMax", ParamShowType.AlwaysWithPanel);
                     var hpMaxParamData = new CharacterParamForm.Data(-1, "HpMax", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", ParamShowType.AlwaysWithPanel);
@@ -72,6 +77,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                     var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", default);
                     CharacterParamForm.AddData(hpParamData);
                     CharacterParamForm.AddData(speedParamData);
+                    CharacterParamForm.AddData(hpMaxParamData);
                     player.hpParamName = "Hp";
                     player.speedParamName = "Speed";
                     player.paramDic[player.hpParamName] = hpParamData.Copy();
@@ -94,7 +100,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     private void StartLoadStory(int storyId)
     {
         string storyFolder = GetStoryFolderNameById(storyId);
-        StoryTexAssetForm.Clear();
+        StoryTexAssetForm.ClearAuto();
         GameManager.instance.curStory = StoryForm.DataById[storyId];
 
     }
@@ -124,6 +130,12 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         AudioManager.instance.BgmStreaming(GlobalSettings.BGM_FILE_NAME);
     }
+
+    public void DeleteStory(int id)
+    {
+        SaveAndLoad.Delete(GetStoryFolderNameById(id));
+        StoryForm.RemoveData(id);
+    }
     #endregion
 
     #region scene
@@ -133,14 +145,14 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         DynamicGlobalSettings.playing = false;
         ModManager.instance.BeginScene(sceneId);
     }
-    public async void StartLoadScenePlay(int sceneId,Action onMapComplete=null)
+    public async void StartLoadScenePlay(int sceneId, Action onMapComplete = null)
     {
         bool ok = await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId, onMapComplete);
         DynamicGlobalSettings.playing = true;
         PlayManager.instance.BeginScene(sceneId);
     }
 
-    private async Task<bool> StartLoadScene(string storyFolder, int id,Action onMapComplete=null)
+    private async Task<bool> StartLoadScene(string storyFolder, int id, Action onMapComplete = null)
     {
         if (!SaveAndLoad.Exist(storyFolder + "/" + GetSceneFileNameById(id)))
         {
@@ -170,7 +182,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
              });
          }*/
         data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 1, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
-         
+
         MapManager.instance.Begin(data);
         onMapComplete?.Invoke();
 
@@ -182,9 +194,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
             for (int i = 0; i < maskData.texsName.Count; i++)
             {
-                raws[i] = (Texture2D)TexAssetForm.DataByName[maskData.texsName[i]].GetTex();
+                raws[i] = (Texture2D)TexAssetForm.DataById[maskData.texsName[i]].GetTex();
             }
-            GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic6(maskData.name, raws);
+            GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic6(maskData.id, raws);
         }
 
 
@@ -208,7 +220,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameManager.instance.characterCtrl.Reset();
         GameManager.instance.curScene = null;
     }
-    public void ChangeScene(int sceneId,Action oncomplete=null)
+    public void ChangeScene(int sceneId, Action oncomplete = null)
     {
         UnloadScenePlay();
 

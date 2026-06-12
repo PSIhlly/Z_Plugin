@@ -25,8 +25,8 @@ using Z_UnitSystem;
 
 public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<CharacterEvent>
 {
-    private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.imgName);
-    private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.canvasName);
+    private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("img"));
+    private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("canvas"));
     private Dictionary<int, CanvasHolder> canvasDic = new Dictionary<int, CanvasHolder>();
     private int updateFrame;
     private List<string> needShowParamName = new List<string>();
@@ -98,7 +98,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
                     clip = eft[cur];
                     img.render.GetPropertyBlock(propBlock);
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataByName[clip.tex].GetTex());
+                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[clip.tex].GetTex());
 
 
                     propBlock.SetFloat("_Alpha", clip.opacity);
@@ -235,7 +235,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         }, o.GetComponent<CanvasHolder>());
     }
 
-    public void ChatText(int characterUid, string txt, string img, float time)
+    public void ChatText(int characterUid, string txt, int img, float time)
     {
         var productData = CharacterProductForm.DataByUid.GetDv(characterUid, null);
         var unit = _super.sceneCtrl.GetCharacterUnit(characterUid);

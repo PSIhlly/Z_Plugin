@@ -67,9 +67,9 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
-        public static Action<Data,List<string>,List<string>> changeTexsnameAction;
+        public static Action<Data,List<int>,List<int>> changeTexsnameAction;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
@@ -78,11 +78,11 @@ namespace Form
         public partial class Data : MapBaseForm.Data
         {
 
-                    private List<string>  _texsName;
+                    private List<int>  _texsName;
                     /// <summary>
                     ///贴图名称
                     ///</summary>
-                    public List<string>  texsName{
+                    public List<int>  texsName{
                                 get{return _texsName;}
  set{
 
@@ -100,7 +100,7 @@ namespace Form
             {
             }
             
-            public Data(int id,string name,string icon,List<string> texsName,string label):base(id,name,icon,label)
+            public Data(int id,string name,int icon,List<int> texsName,string label):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -122,7 +122,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,texsName==null?new List<string>():new List<string>(texsName),label);
+        return new Data(sameId? id:idChain.GetId(),name,icon,texsName==null?new List<int>():new List<int>(texsName),label);
                 }
             
             public override  void BeforeGet()
@@ -132,7 +132,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",null,"");
+                   private static Data _defaultData=new Data(0,"",0,null,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -147,6 +147,16 @@ namespace Form
                 }
             }
     
+            static Dictionary<string, List<Data>> _DatasByName;
+            public static Dictionary<string, List<Data>> DatasByName
+            {
+                get
+                {
+                    Init();
+                    return _DatasByName;
+                }
+            }
+    
             static Dictionary<string, List<Data>> _DatasByLabel;
             public static Dictionary<string, List<Data>> DatasByLabel
             {
@@ -154,16 +164,6 @@ namespace Form
                 {
                     Init();
                     return _DatasByLabel;
-                }
-            }
-    
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
                 }
             }
     
@@ -184,29 +184,16 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {300001,new Data(300001,"alpha","z_map_a$alpha$0",new List<string>(){"z_map_a$alpha$0","z_map_a$alpha$1","z_map_a$alpha$2","z_map_a$alpha$3","z_map_a$alpha$4","z_map_a$alpha$5",},"")},
-
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DatasByName = new Dictionary<string, List<Data>>() {
     
-                        {"alpha",_DataById[300001]},
-    
-                    
-                    };
-                    foreach(var v in _DataById.Values)
-                    {
-                        _DatasHashSet.Add(v);
-                    }
-    
-                    _DatasByLabel = new Dictionary<string, List<Data>>() {
-    
-                            {"",new List<Data>()},
-        
                 };
 
-                    _DatasByLabel[""].Add(_DataById[300001]);
+                    _DatasByLabel = new Dictionary<string, List<Data>>() {
+    
+                };
 
 
             childInitAction?.Invoke();
@@ -259,9 +246,9 @@ namespace Form
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
-                jo.SelectToken("texsName")==null?defaultData.texsName:jo.Get<List<string>>("texsName"),
+                jo.SelectToken("texsName")==null?defaultData.texsName:jo.Get<List<int>>("texsName"),
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label")
                     );
@@ -280,9 +267,9 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
-            jo.Set<List<string>>("texsName",data.texsName);
+            jo.Set<List<int>>("texsName",data.texsName);
 
             jo.Set<string>("label",data.label);
 
@@ -307,7 +294,9 @@ namespace Form
         DataById[data.id]=data;
         _DatasHashSet.Add(data);
     
-                    DataByName[data.name]=data;
+                    if(!DatasByName.ContainsKey(data.name))
+                        DatasByName[data.name]=new List<Data>();
+                    DatasByName[data.name].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
@@ -330,7 +319,9 @@ MapBaseForm.AddData(data);
                     DataById.Remove(data.id);
                     
     
-                    DataByName.Remove(data.name);
+                    DatasByName[data.name].Remove(data);
+                    if(DatasByName[data.name].Count==0)
+                        DatasByName.Remove(data.name);
     
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
@@ -397,15 +388,19 @@ MapBaseForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DatasByName[oldV].Remove(data);
+                    if(DatasByName[oldV].Count==0)
+                        DatasByName.Remove(oldV);
+                    if(!DatasByName.ContainsKey(newV))
+                        DatasByName[newV]=new List<Data>();
+                    DatasByName[newV].Add(data);
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -415,7 +410,7 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeTexsname(Data superData,List<string> oldV,List<string> newV)
+            public static void ChangeTexsname(Data superData,List<int> oldV,List<int> newV)
             {
                 if(superData is Data data)
                 {

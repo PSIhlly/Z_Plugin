@@ -49,13 +49,13 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,string,string> changeMaintextAction;
                 
-        public static Action<Data,string,string> changeMainpicturenameAction;
+        public static Action<Data,int,int> changeMainpictureAction;
                 
-        public static Action<Data,string,string> changeMainvideonameAction;
+        public static Action<Data,int,int> changeMainvideoAction;
                 
-        public static Action<Data,string,string> changeProfilepicturenameAction;
+        public static Action<Data,int,int> changeProfilepictureAction;
                 
-        public static Action<Data,string,string> changeMainaudionameAction;
+        public static Action<Data,int,int> changeMainaudioAction;
                 
 
 
@@ -116,88 +116,88 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _mainPictureName;
+                    private int  _mainPicture;
                     /// <summary>
                     ///背景图片
                     ///</summary>
-                    public string  mainPictureName{
-                                get{return _mainPictureName;}
+                    public int  mainPicture{
+                                get{return _mainPicture;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeMainpicturename(this,_mainPictureName,value); 
+                       ChangeMainpicture(this,_mainPicture,value); 
                     }
         
-                _mainPictureName = value;
+                _mainPicture = value;
                 }
                  
                      }
                     
-                    private string  _mainVideoName;
+                    private int  _mainVideo;
                     /// <summary>
                     ///背景视频
                     ///</summary>
-                    public string  mainVideoName{
-                                get{return _mainVideoName;}
+                    public int  mainVideo{
+                                get{return _mainVideo;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeMainvideoname(this,_mainVideoName,value); 
+                       ChangeMainvideo(this,_mainVideo,value); 
                     }
         
-                _mainVideoName = value;
+                _mainVideo = value;
                 }
                  
                      }
                     
-                    private string  _profilePictureName;
+                    private int  _profilePicture;
                     /// <summary>
                     ///头像图片
                     ///</summary>
-                    public string  profilePictureName{
-                                get{return _profilePictureName;}
+                    public int  profilePicture{
+                                get{return _profilePicture;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeProfilepicturename(this,_profilePictureName,value); 
+                       ChangeProfilepicture(this,_profilePicture,value); 
                     }
         
-                _profilePictureName = value;
+                _profilePicture = value;
                 }
                  
                      }
                     
-                    private string  _mainAudioName;
+                    private int  _mainAudio;
                     /// <summary>
                     ///音声
                     ///</summary>
-                    public string  mainAudioName{
-                                get{return _mainAudioName;}
+                    public int  mainAudio{
+                                get{return _mainAudio;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeMainaudioname(this,_mainAudioName,value); 
+                       ChangeMainaudio(this,_mainAudio,value); 
                     }
         
-                _mainAudioName = value;
+                _mainAudio = value;
                 }
                  
                      }
                     
-            public Data(int uid,string title,string mainText,string mainPictureName,string mainVideoName,string profilePictureName,string mainAudioName)
+            public Data(int uid,string title,string mainText,int mainPicture,int mainVideo,int profilePicture,int mainAudio)
             {
 
              this.uid = uid;
              this.title = title;
              this.mainText = mainText;
-             this.mainPictureName = mainPictureName;
-             this.mainVideoName = mainVideoName;
-             this.profilePictureName = profilePictureName;
-             this.mainAudioName = mainAudioName;
+             this.mainPicture = mainPicture;
+             this.mainVideo = mainVideo;
+             this.profilePicture = profilePicture;
+             this.mainAudio = mainAudio;
 
             }
             public void Reset(Data data)
@@ -206,15 +206,15 @@ public static readonly int autoUidCnt=100;
              this.uid = data.uid;
              this.title = data.title;
              this.mainText = data.mainText;
-             this.mainPictureName = data.mainPictureName;
-             this.mainVideoName = data.mainVideoName;
-             this.profilePictureName = data.profilePictureName;
-             this.mainAudioName = data.mainAudioName;
+             this.mainPicture = data.mainPicture;
+             this.mainVideo = data.mainVideo;
+             this.profilePicture = data.profilePicture;
+             this.mainAudio = data.mainAudio;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPictureName,mainVideoName,profilePictureName,mainAudioName);
+        return new Data(sameId? uid:uidChain.GetId(),title,mainText,mainPicture,mainVideo,profilePicture,mainAudio);
                 }
             
             public virtual  void BeforeGet()
@@ -224,7 +224,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","","","","");
+                   private static Data _defaultData=new Data(0,"","",0,0,0,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -304,13 +304,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("mainText")==null?defaultData.mainText:jo.Get<string>("mainText"),
 
-                jo.SelectToken("mainPictureName")==null?defaultData.mainPictureName:jo.Get<string>("mainPictureName"),
+                jo.SelectToken("mainPicture")==null?defaultData.mainPicture:jo.Get<int>("mainPicture"),
 
-                jo.SelectToken("mainVideoName")==null?defaultData.mainVideoName:jo.Get<string>("mainVideoName"),
+                jo.SelectToken("mainVideo")==null?defaultData.mainVideo:jo.Get<int>("mainVideo"),
 
-                jo.SelectToken("profilePictureName")==null?defaultData.profilePictureName:jo.Get<string>("profilePictureName"),
+                jo.SelectToken("profilePicture")==null?defaultData.profilePicture:jo.Get<int>("profilePicture"),
 
-                jo.SelectToken("mainAudioName")==null?defaultData.mainAudioName:jo.Get<string>("mainAudioName")
+                jo.SelectToken("mainAudio")==null?defaultData.mainAudio:jo.Get<int>("mainAudio")
                     );
 
             return data;
@@ -329,13 +329,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<string>("mainText",data.mainText);
 
-            jo.Set<string>("mainPictureName",data.mainPictureName);
+            jo.Set<int>("mainPicture",data.mainPicture);
 
-            jo.Set<string>("mainVideoName",data.mainVideoName);
+            jo.Set<int>("mainVideo",data.mainVideo);
 
-            jo.Set<string>("profilePictureName",data.profilePictureName);
+            jo.Set<int>("profilePicture",data.profilePicture);
 
-            jo.Set<string>("mainAudioName",data.mainAudioName);
+            jo.Set<int>("mainAudio",data.mainAudio);
 
             return jo;
         }
@@ -451,42 +451,42 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeMainpicturename(Data superData,string oldV,string newV)
+            public static void ChangeMainpicture(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMainpicturenameAction?.Invoke(data,oldV,newV);
+                changeMainpictureAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeMainvideoname(Data superData,string oldV,string newV)
+            public static void ChangeMainvideo(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMainvideonameAction?.Invoke(data,oldV,newV);
+                changeMainvideoAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeProfilepicturename(Data superData,string oldV,string newV)
+            public static void ChangeProfilepicture(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeProfilepicturenameAction?.Invoke(data,oldV,newV);
+                changeProfilepictureAction?.Invoke(data,oldV,newV);
                 }
                     
             }
             
-            public static void ChangeMainaudioname(Data superData,string oldV,string newV)
+            public static void ChangeMainaudio(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeMainaudionameAction?.Invoke(data,oldV,newV);
+                changeMainaudioAction?.Invoke(data,oldV,newV);
                 }
                     
             }

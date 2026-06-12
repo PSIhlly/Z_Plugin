@@ -92,7 +92,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                string icon = GlobalNameHelper.GetDefaultTexName();
+                var icon = GlobalDefaultHelper.DefaultTexId;
                 switch (parent.model.data.faceType)
                 {
                     case FaceType.Fixed:
@@ -110,7 +110,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                         break;
                 }
 
-                view.img_.sprite = TexAssetForm.DataByName[icon].GetSprite();
+                view.img_.BindTexData(TexAssetForm.DataById[icon]);
             }
         }
     }

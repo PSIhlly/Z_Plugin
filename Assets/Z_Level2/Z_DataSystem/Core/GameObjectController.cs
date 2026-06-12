@@ -25,9 +25,9 @@ namespace Z_DataSystem
             var parts = name.Split(GetMark());
             return parts.Length == 3 && string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[2]);
         }
-        public virtual string GetName(string name)
+        public virtual string GetName(int id=-1)
         {
-            return $"{GetMark()}{name}{GetMark()}";
+            return $"{GetMark()}{id}{GetMark()}";
         }
         public string GetMark() => "$g$";
         public string[] GetSupportedExtensions() => new string[]

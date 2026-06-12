@@ -110,7 +110,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
             view.ipt_cd.Set(model.data.cd.ToString());
-            view.img_icon.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
+            view.img_icon.BindTexData(TexAssetForm.DataById[model.data.icon]);
             view.sta_e.ChangeState(model.data.skillTypes.Contains(SkillType.E) ? 1 : 0);
             view.sta_q.ChangeState(model.data.skillTypes.Contains(SkillType.Q) ? 1 : 0);
             view.sta_lightAttack.ChangeState(model.data.skillTypes.Contains(SkillType.LightAttack) ? 1 : 0);

@@ -86,7 +86,7 @@ namespace Ui.PlayAsset
             model.prm = param;
             model.prm.data.ctrl = this;
             rect.sizeDelta = new Vector2(model.prm.data.size.x, model.prm.data.size.y);
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.prm.data.texName, GlobalNameHelper.GetDefaultEventTexName()).GetSprite();
+            view.img_.BindTexData(TexAssetForm.DataById.GetDv(model.prm.data.tex, TexAssetForm.DataById[GlobalDefaultHelper.DefaultEventTexId]));
 
             Refresh();
         }

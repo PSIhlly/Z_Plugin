@@ -89,7 +89,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,bool,bool> changeEnablemissionAction;
                 
-        public static Action<Data,string,string> changeLargemapAction;
+        public static Action<Data,int,int> changeLargemapAction;
                 
         public static Action<Data,int,int> changeCurmissionidAction;
                 
@@ -464,11 +464,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private string  _largeMap;
+                    private int  _largeMap;
                     /// <summary>
                     ///大地图
                     ///</summary>
-                    public string  largeMap{
+                    public int  largeMap{
                                 get{return _largeMap;}
  set{
 
@@ -554,7 +554,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,CameraMode cameraMode,ClipForm.Data dialogCache,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,string largeMap,int curMissionId,(int,Vector3) targetScene,bool banSceneChange,EventState eventState)
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,CameraMode cameraMode,ClipForm.Data dialogCache,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,int largeMap,int curMissionId,(int,Vector3) targetScene,bool banSceneChange,EventState eventState)
             {
 
              this.uid = uid;
@@ -626,7 +626,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},CameraMode.Overhead,ClipForm.defaultData,0,EditorStyle.Avg,false,false,false,false,false,false,false,"",0,(0,Vector3.zero),false,default);
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},CameraMode.Overhead,ClipForm.defaultData,0,EditorStyle.Avg,false,false,false,false,false,false,false,0,0,(0,Vector3.zero),false,default);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -740,7 +740,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("enableMission")==null?defaultData.enableMission:jo.Get<bool>("enableMission"),
 
-                jo.SelectToken("largeMap")==null?defaultData.largeMap:jo.Get<string>("largeMap"),
+                jo.SelectToken("largeMap")==null?defaultData.largeMap:jo.Get<int>("largeMap"),
 
                 jo.SelectToken("curMissionId")==null?defaultData.curMissionId:jo.Get<int>("curMissionId"),
 
@@ -801,7 +801,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<bool>("enableMission",data.enableMission);
 
-            jo.Set<string>("largeMap",data.largeMap);
+            jo.Set<int>("largeMap",data.largeMap);
 
             jo.Set<int>("curMissionId",data.curMissionId);
 
@@ -1095,7 +1095,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeLargemap(Data superData,string oldV,string newV)
+            public static void ChangeLargemap(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

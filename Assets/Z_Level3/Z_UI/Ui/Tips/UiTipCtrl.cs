@@ -37,10 +37,10 @@ namespace Ui.Notify
                 return true;
             }, uiHolder);
 
-            UiManager.Rebuild(gameObject);
+            UiManager.Rebuild(gameObject,true);
             TimeManager.instance.AddCurLateUpdateAction(() =>
             {
-                UiManager.Rebuild(gameObject);
+                UiManager.Rebuild(gameObject, true);
             }, gameObject);
 
 

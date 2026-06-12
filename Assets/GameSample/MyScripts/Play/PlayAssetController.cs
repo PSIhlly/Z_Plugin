@@ -41,7 +41,7 @@ public interface InternalPlayAssetController
 }
 public interface ExternalPlayAssetController
 {
-    public int Add(string texName, float scale);
+    public int Add(int texId, float scale);
     public void Remove(int id);
     public void SetPos(int id, Vector2 tar, float time);
     public void SetEuler(int id, float tar, float time);
@@ -76,16 +76,16 @@ public class PlayAssetController : Z_Controller<PlayManager>, InternalPlayAssetC
         UiManager.instance.CloseUi<UiPlayAssetCtrl>();
     }
 
-    public int Add(string texName, float scale)
+    public int Add(int texId, float scale)
     {
-        var texData = TexAssetForm.DataByName.GetDv(texName, null);
+        var texData = TexAssetForm.DataById.GetDv(texId, null);
         Vector2 size = Vector2.zero;
         if (texData != null)
         {
             var tex = texData.GetTex();
             size = new Vector2(tex.width * scale, tex.height * scale);
         }
-        var data = new ImageUiItemForm.Data(-1, texName, size, Vector2.one * 0.5f, 0, 0, Vector2.one * 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 999999);
+        var data = new ImageUiItemForm.Data(-1, texId, size, Vector2.one * 0.5f, 0, 0, Vector2.one * 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 999999);
         var id = ImageUiItemForm.AddData(data);
         Z_EventHelper.Invoke(new PlayAssetEvent());
         return id;

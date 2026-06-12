@@ -32,6 +32,7 @@ public class ModManager : Z_MonoManager<ModManager>
     private InternalModSceneController _sceneCtrl;
     public ExternalModSceneController sceneCtrl;
     public ModAssetCtrl assetCtrl;
+    public CheckController checkCtrl;
     public override void Init()
     {
         base.Init();
@@ -40,6 +41,7 @@ public class ModManager : Z_MonoManager<ModManager>
         sceneCtrl = __sceneCtrl;
 
         assetCtrl = new ModAssetCtrl(this);
+        checkCtrl = new CheckController(this);
     }
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {

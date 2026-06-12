@@ -275,11 +275,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 3500788134850385684, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -351,35 +351,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.79062784
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.8924511
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.23026635
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.08428201
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 9.457608
+      value: -0.0020752
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_SizeDelta.y
-      value: -8.849684
+      value: 0.0005188
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -5.5956984
+      value: -0.0009460449
       objectReference: {fileID: 0}
     - target: {fileID: 6179892076302384992, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 3.4480362
+      value: 0.00021362305
       objectReference: {fileID: 0}
     - target: {fileID: 6817592591530964852, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -387,7 +387,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7525050481112364759, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_Pivot.x

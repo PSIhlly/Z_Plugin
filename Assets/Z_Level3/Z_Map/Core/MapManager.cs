@@ -45,13 +45,7 @@ namespace Z_Map
         public static bool pauseNav;
     }
 
-    public static class GlobalHelper
-    {
-        public static string GetInternalPrefabName(string name = "")
-        {
-            return "z_map$" + name;
-        }
-    }
+
     public enum MapEventType
     {
         Create,

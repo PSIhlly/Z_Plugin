@@ -20,15 +20,15 @@ namespace Z_Map
         public Dictionary<(int, int, int), TileUnitForm.Data> maps;
         public Dictionary<(int, int), SortedSet<int>> mapXZ2Y;
 
-        protected string mapName => GlobalHelper.GetInternalPrefabName("map");
-        public static string imgName => GlobalHelper.GetInternalPrefabName("img");
-        public static string canvasName => GlobalHelper.GetInternalPrefabName("canvas");
-        protected string defaultTextureName => "grass";
+        public Dictionary<string,AssetForm.Data> innerPrefabDic = new Dictionary<string, AssetForm.Data>();
+        public static string GetPrefabName(string name="") => "MapPrefab$" + name;
 
-
-
-        public void Init()
+        public void Init(GameObjectAssetForm.Data mapPrefab, GameObjectAssetForm.Data imgPrefab, GameObjectAssetForm.Data canvasPrefab,TexAssetForm.Data defaultTileTexture)
         {
+            innerPrefabDic["map"] = mapPrefab;
+            innerPrefabDic["img"] = imgPrefab;
+            innerPrefabDic["canvas"] = canvasPrefab;
+            innerPrefabDic["defaultTileTexture"] = defaultTileTexture;
             TileUnitForm.Clear();
             ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
@@ -173,7 +173,7 @@ namespace Z_Map
 
         public virtual CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
         {
-            return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false,"");
+            return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
         }
         public virtual void RegisterNewCharacter(CharacterUnitForm.Data data)
         {
@@ -186,7 +186,7 @@ namespace Z_Map
 
         public virtual ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
         {
-            return new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "", false,"");
+            return new ItemUnitForm.Data(-1, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "", false,GlobalDefaultHelper.DefaultTexId);
         }
         public virtual void RegisterNewItem(ItemUnitForm.Data data)
         {
@@ -200,7 +200,7 @@ namespace Z_Map
 
         public virtual ObjectUnitForm.Data GetNewObject(string prefabName = "", object[] prms = null)
         {
-            return new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "", false,"");
+            return new ObjectUnitForm.Data(-1, false, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), "", false, GlobalDefaultHelper.DefaultTexId);
         }
 
 
@@ -233,7 +233,7 @@ namespace Z_Map
 
         public virtual TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
         {
-            return new TileUnitForm.Data(-1, "", new Dictionary<int, string>() { { 0, defaultTextureName } }, mapPos, mapName, Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
+            return new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("map"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
         }
         public virtual void RegisterNewTile(TileUnitForm.Data data)
         {

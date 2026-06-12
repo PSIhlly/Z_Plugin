@@ -20,6 +20,7 @@ namespace Ui.ModSceneMain.ModTool
     {
         public bool show;
         public MapTypeForm.Data curType;
+        public string curLab;
         public MapBaseForm.Data curData
         {
             set
@@ -147,12 +148,14 @@ namespace Ui.ModSceneMain.ModTool
         private Controller aniCon;
         UiScrViewContainer<UiToolItemCtrl> conData;
         UiScrViewContainer<UiToolTypeItemCtrl> conType;
+        UiScrViewContainer<UiLabCtrl> conLab;
 
 
         public override void OnCreate()
         {
             conData = new UiScrViewContainer<UiToolItemCtrl>(this, view.go_toolItem, view.scr_tool);
             conType = new UiScrViewContainer<UiToolTypeItemCtrl>(this, view.go_toolTypeItem, view.scr_toolType);
+            conLab = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
 
             var to = parent.view.go_toolPos.transform.position - view.go_toolContentPos.transform.position;
             var showAct = new Action(uiHolder, new PositionSetEvent(uiHolder.transform, uiHolder.transform.position, uiHolder.transform.position + to, 0.2f));
@@ -266,17 +269,19 @@ namespace Ui.ModSceneMain.ModTool
         public override void OnShow()
         {
             model.curType = MapTypeForm.DataById[1];
+            model.curLab = null;
             model.curData = null;
             Refresh();
 
         }
         public void Refresh()
         {
+            RefreshLabs();
             conType.Clear();
 
             foreach (var data in MapTypeForm.DataById.Values)
             {
-                if (data.id == 3 || data.id == 1)
+                if (data.id == 3)
                     continue;
                 conType.Add(new UiToolTypeItemParam()
                 {
@@ -293,10 +298,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapTextureForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
                     }
                     break;
@@ -304,10 +312,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapMaskForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
                     }
                     break;
@@ -315,10 +326,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapObjectForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
                     }
                     break;
@@ -326,10 +340,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapItemForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
                         
                         
@@ -339,10 +356,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapCharacterForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
 
 
@@ -352,10 +372,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapEraseForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
                     }
                     break;
@@ -364,10 +387,13 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapTerrainForm.DataById.Values)
                         {
-                            conData.Add(new UiToolItemParam()
+                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
                             {
-                                data = data
-                            });
+                                conData.Add(new UiToolItemParam()
+                                {
+                                    data = data
+                                });
+                            }
                         }
                     }
                     break;
@@ -390,9 +416,79 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_layer2.ChangeState(model.layer == 2 ? 1 : 0);
 
         }
+        void RefreshLabs()
+        {
+            conLab.Clear();
+            HashSet<string> labs = new HashSet<string>();
+            switch (model.curType.id)
+            {
+                case 2:
+                    foreach (var data in MapTextureForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+                case 3:
+                    foreach (var data in MapMaskForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+                case 4:
+                    foreach (var data in MapObjectForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+                case 5:
+                    foreach (var data in MapItemForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+                case 6:
+                    foreach (var data in MapCharacterForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+                case 100:
+                    foreach (var data in MapEraseForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+                case 1:
+                default:
+                    foreach (var data in MapTerrainForm.DataById.Values)
+                    {
+                        if (!string.IsNullOrEmpty(data.label))
+                            labs.Add(data.label);
+                    }
+                    break;
+            }
+            conLab.Add(new UiLabParam() { lab = null });
+            foreach (var lab in labs)
+            {
+                conLab.Add(new UiLabParam() { lab = lab });
+            }
+            conLab.Refresh();
+        }
         public void SetCurType(MapTypeForm.Data type)
         {
             model.curType = type;
+            model.curLab = null;
+            Refresh();
+        }
+        public void SetCurLab(string lab)
+        {
+            model.curLab = lab;
             Refresh();
         }
         public void SetCurData(MapBaseForm.Data data)
@@ -433,7 +529,7 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            view.img_.sprite = TexAssetForm.DataByName.GetDk(model.data.icon, GlobalNameHelper.GetExternDefaultTexName()).GetSprite();
+            view.img_.BindTexData(TexAssetForm.DataById.GetDv(model.data.icon, TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]));
 
             view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
 
@@ -466,13 +562,43 @@ namespace Ui.ModSceneMain.ModTool
             model.data = param.data;
             view.sta_exist.ChangeState(1);
             view.txt_.text = TextManager.instance.GetTxt(model.data.NameKey);
-            view.img_.sprite = TexAssetForm.DataByName[model.data.icon].GetSprite();
+            view.img_.BindTexData(TexAssetForm.DataById.GetDk(model.data.icon,GlobalDefaultHelper.DefaultTexId));
 
 
             view.sta_.ChangeState(parent.model.curType == model.data ? 1 : 0);
         }
 
 
+    }
+
+    public partial class UiLabParam
+    {
+        public string lab;
+    }
+    public partial class UiLabModel
+    {
+        public UiLabParam prm;
+    }
+    public partial class UiLabCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.SetCurLab(model.prm.lab);
+            });
+        }
+        public override void OnShow()
+        {
+            model.prm = param;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            view.txt_.text = model.prm.lab;
+            view.sta_.ChangeState(parent.model.curLab == model.prm.lab ? 1 : 0);
+            view.sta_valid.ChangeState(model.prm.lab == null ? 0 : 1);
+        }
     }
 
 }

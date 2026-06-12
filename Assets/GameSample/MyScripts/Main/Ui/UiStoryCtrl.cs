@@ -92,12 +92,12 @@ namespace Ui.Story
                 view.txt_.text = model.data.name;
                 try
                 {
-                    view.img_.sprite = AssetManager.instance.texCtrl.CreateDataByBytes(model.data.icon.ToArray(), "tmp").GetSprite();
+                    view.img_.BindTexData(AssetManager.instance.texCtrl.CreateDataByBytes(model.data.icon.ToArray(), "tmp"));
                 }
                 catch (Exception ex)
                 {
                     Debug.Log(ex);
-                    TexAssetForm.DataByName[GlobalNameHelper.GetExternDefaultTexName()].GetSprite();
+                    TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId].GetSprite();
                 }
             }
         }

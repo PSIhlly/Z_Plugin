@@ -55,7 +55,7 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Dictionary<EquipPartType,(float,float,int,float)>,Dictionary<EquipPartType,(float,float,int,float)>> changeEquiptrsAction;
                 
-        public static Action<Data,Dictionary<BodyPartType,string>,Dictionary<BodyPartType,string>> changeParttexAction;
+        public static Action<Data,Dictionary<BodyPartType,int>,Dictionary<BodyPartType,int>> changeParttexAction;
                 
 
 
@@ -116,11 +116,11 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-                    private Dictionary<BodyPartType,string>  _partTex;
+                    private Dictionary<BodyPartType,int>  _partTex;
                     /// <summary>
-                    ///贴图名称
+                    ///贴图Id
                     ///</summary>
-                    public Dictionary<BodyPartType,string>  partTex{
+                    public Dictionary<BodyPartType,int>  partTex{
                                 get{return _partTex;}
  set{
 
@@ -134,7 +134,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,Dictionary<EquipPartType,ItemStyle> equipStyle,Dictionary<EquipPartType,(float,float,int,float)> equipTrs,Dictionary<BodyPartType,string> partTex)
+            public Data(int uid,Dictionary<EquipPartType,ItemStyle> equipStyle,Dictionary<EquipPartType,(float,float,int,float)> equipTrs,Dictionary<BodyPartType,int> partTex)
             {
 
              this.uid = uid;
@@ -154,7 +154,7 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),equipStyle==null?new Dictionary<EquipPartType,ItemStyle>():new Dictionary<EquipPartType,ItemStyle>(equipStyle),equipTrs==null?new Dictionary<EquipPartType,(float,float,int,float)>():new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),partTex==null?new Dictionary<BodyPartType,string>():new Dictionary<BodyPartType,string>(partTex));
+        return new Data(sameId? uid:uidChain.GetId(),equipStyle==null?new Dictionary<EquipPartType,ItemStyle>():new Dictionary<EquipPartType,ItemStyle>(equipStyle),equipTrs==null?new Dictionary<EquipPartType,(float,float,int,float)>():new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),partTex==null?new Dictionary<BodyPartType,int>():new Dictionary<BodyPartType,int>(partTex));
                 }
             
             public virtual  void BeforeGet()
@@ -164,7 +164,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,new Dictionary<EquipPartType,ItemStyle>(){},new Dictionary<EquipPartType,(float,float,int,float)>(){},new Dictionary<BodyPartType,string>(){});
+                   private static Data _defaultData=new Data(0,new Dictionary<EquipPartType,ItemStyle>(){},new Dictionary<EquipPartType,(float,float,int,float)>(){},new Dictionary<BodyPartType,int>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -244,7 +244,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("equipTrs")==null?defaultData.equipTrs:jo.Get<Dictionary<EquipPartType,(float,float,int,float)>>("equipTrs"),
 
-                jo.SelectToken("partTex")==null?defaultData.partTex:jo.Get<Dictionary<BodyPartType,string>>("partTex")
+                jo.SelectToken("partTex")==null?defaultData.partTex:jo.Get<Dictionary<BodyPartType,int>>("partTex")
                     );
 
             return data;
@@ -263,7 +263,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
             jo.Set<Dictionary<EquipPartType,(float,float,int,float)>>("equipTrs",data.equipTrs);
 
-            jo.Set<Dictionary<BodyPartType,string>>("partTex",data.partTex);
+            jo.Set<Dictionary<BodyPartType,int>>("partTex",data.partTex);
 
             return jo;
         }
@@ -379,7 +379,7 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                     
             }
             
-            public static void ChangeParttex(Data superData,Dictionary<BodyPartType,string> oldV,Dictionary<BodyPartType,string> newV)
+            public static void ChangeParttex(Data superData,Dictionary<BodyPartType,int> oldV,Dictionary<BodyPartType,int> newV)
             {
                 if(superData is Data data)
                 {

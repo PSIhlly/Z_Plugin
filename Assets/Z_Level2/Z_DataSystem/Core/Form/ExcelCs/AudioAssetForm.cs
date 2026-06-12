@@ -156,16 +156,6 @@ namespace Z_DataSystem.Form
                 }
             }
     
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
-                }
-            }
-    
 
         static public void Init()
         {
@@ -186,15 +176,6 @@ namespace Z_DataSystem.Form
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
-                    _DataByName = new Dictionary<string, Data>() {
-    
-                    
-                    };
-                    foreach(var v in _DataById.Values)
-                    {
-                        _DatasHashSet.Add(v);
-                    }
-    
                     _DatasByPath = new Dictionary<string, List<Data>>() {
     
                 };
@@ -306,8 +287,6 @@ namespace Z_DataSystem.Form
         DataById[data.id]=data;
         _DatasHashSet.Add(data);
     
-                    DataByName[data.name]=data;
-    
                     if(!DatasByPath.ContainsKey(data.path))
                         DatasByPath[data.path]=new List<Data>();
                     DatasByPath[data.path].Add(data);
@@ -332,8 +311,6 @@ AssetForm.AddData(data);
                     _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
                     
-    
-                    DataByName.Remove(data.name);
     
                     DatasByPath[data.path].Remove(data);
                     if(DatasByPath[data.path].Count==0)
@@ -404,9 +381,6 @@ AssetForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
- 
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
                     

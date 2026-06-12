@@ -46,7 +46,7 @@ namespace Ui.DialogMain
                 model.prm = param;
                 view.go_bg.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
 
-                var audioData = AudioAssetForm.DataByName.GetDv(model.prm.clip.mainAudioName, null);
+                var audioData = AudioAssetForm.DataById.GetDv(model.prm.clip.mainAudio, null);
                 if (audioData != null)
                 {
                     audioData.Play(view.mp_);

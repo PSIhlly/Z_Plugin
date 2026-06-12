@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Audio;
 using Z_Code.Form;
+using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Ui.Dialog;
 using Z_Ui.Notify;
@@ -27,7 +28,7 @@ namespace Z_Code
             var heapTemp = asyncTask.interpreter.data.heapTemp;
 
                 AudioManager.instance.BgmPause();
-            DialogManager.instance.Begin(null,  null , heapTemp[1].str , heapTemp[0].str, "", "", () =>
+            DialogManager.instance.Begin(null,  null , AssetManager.instance.texCtrl.GetId(heapTemp[1].str) , AssetManager.instance.videoCtrl.GetId(heapTemp[0].str), 0, 0, () =>
             {
                 AudioManager.instance.BgmContinue();
                 asyncTask.Complete();

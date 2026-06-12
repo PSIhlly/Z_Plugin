@@ -90,6 +90,7 @@ namespace Z_Ui.Notify
         public List<string> selectionWords;
         public bool canClose;
         public int id;
+        public bool enableScr;
     }
     public class InputAreaInfo
     {
@@ -204,7 +205,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddPopup(string title, string content, bool canClose, List<string> words, List<Func<bool>> funcs)
+        public void AddPopup(string title, string content, bool canClose, List<string> words=null, List<Func<bool>> funcs=null,bool enableScr=false)
         {
             var info = new PopupInfo()
             {
@@ -213,7 +214,8 @@ namespace Z_Ui.Notify
                 canClose = canClose,
                 selectionWords = words,
                 funcs = funcs,
-                id = popupIdCnt++
+                id = popupIdCnt++,
+                enableScr = enableScr
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
             if (ctrl != null && ctrl.active)

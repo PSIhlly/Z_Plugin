@@ -99,7 +99,7 @@ namespace Ui.PlayMap
                         }
                         else
                         {
-                            view.img_real.sprite = StoryTexAssetForm.DataByName[mapCtrl.curScene.miniMap].GetSprite();
+                            view.img_real.BindTexData(StoryTexAssetForm.DataById[mapCtrl.curScene.miniMap]);
                         }
                         view.rimg_unlock.texture = mapCtrl.unlockTextureMap.GetDv(y);
                         view.rtf_area.sizeDelta = new UnityEngine.Vector2(mapCtrl.cols * mapCtrl.tileSize, mapCtrl.rows * mapCtrl.tileSize);
@@ -120,7 +120,7 @@ namespace Ui.PlayMap
 
                     missionCon.Clear();
                     var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                    if (missionData == null)
+                    if (missionData != null)
                     {
                         missionCon.Add(new UiMissionParam()
                         {
@@ -155,7 +155,7 @@ namespace Ui.PlayMap
             }
             else
             {
-                view.img_largeMap.sprite = StoryTexAssetForm.DataByName.GetDk(GameManager.instance.curProgress.largeMap, GlobalNameHelper.GetDefaultTexName()).GetSprite();
+                view.img_largeMap.BindTexData(StoryTexAssetForm.DataById.GetDv(GameManager.instance.curProgress.largeMap, StoryTexAssetForm.DataById[GlobalDefaultHelper.DefaultTexId]));
                 sceneCon.Clear();
                 var scenes = SceneForm.DataByUid.Values;
                 foreach (var scene in scenes)

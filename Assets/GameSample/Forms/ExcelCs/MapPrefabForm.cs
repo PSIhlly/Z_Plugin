@@ -80,11 +80,11 @@ private set{
                  
                      }
                     
-                    private string  _icon;
+                    private int  _icon;
                     /// <summary>
                     ///图标
                     ///</summary>
-                    public string  icon{
+                    public int  icon{
                                 get{return _icon;}
 private set{
         
@@ -93,7 +93,7 @@ private set{
                  
                      }
                     
-            public Data(int id,string name,string icon)
+            public Data(int id,string name,int icon)
             {
 
              this.id = id;
@@ -121,7 +121,7 @@ private set{
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","");
+                   private static Data _defaultData=new Data(0,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -161,9 +161,9 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"Cube","")},
+                {1,new Data(1,"Cube",0)},
 
-                {2,new Data(2,"Sphere","")},
+                {2,new Data(2,"Sphere",0)},
 
                 };
                 _DatasHashSet=new HashSet<Data>();

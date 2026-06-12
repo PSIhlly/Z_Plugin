@@ -98,7 +98,7 @@ namespace Z_Ui.Base
                 int i = 1;
                 for (; i < parts.Length; i += 2)
                 {
-                    sprites.Add(TexAssetForm.DataByName.GetDv(AssetManager.instance.texCtrl.GetName(parts[i]), null)?.GetSprite());
+                    sprites.Add(TexAssetForm.DataById.GetDk(int.TryParse(parts[i], out int id) ? id : 0, GlobalDefaultHelper.DefaultTexId)?.GetSprite());
                     text += parts[i - 1];
                     text += AssetManager.instance.texCtrl.GetMark();
                 }
@@ -124,6 +124,7 @@ namespace Z_Ui.Base
                         {
                             var go = new GameObject("icon");
                             var img = go.AddComponent<Img>();
+                            img.raycastTarget = false;
                             go.transform.parent = transform;
                             images.Add(img);
                         }

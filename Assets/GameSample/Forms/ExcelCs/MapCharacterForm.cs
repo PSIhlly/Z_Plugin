@@ -38,9 +38,9 @@ namespace Form
 
             MapBaseForm.changeNameAction+=ChangeName;
 
-            MapBaseForm.changeLabelAction+=ChangeLabel;
-
             MapBaseForm.changeIconAction+=ChangeIcon;
+
+            MapBaseForm.changeLabelAction+=ChangeLabel;
 
             Z_Json.extra[typeof(Data)]=((obj)=>{
             if(obj is Data data)
@@ -67,9 +67,9 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeLabelAction;
+        public static Action<Data,int,int> changeIconAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,string,string> changeLabelAction;
                 
         public static Action<Data,int,int> changeCharacteruidAction;
                 
@@ -96,17 +96,17 @@ namespace Form
                  
                      }
                     
-            public Data(MapBaseForm.Data data):base(data.id,data.name,data.label,data.icon)
+            public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.label)
             {
             }
             
-            public Data(int id,string name,string label,string icon,int characterUid):base(id,name,label,icon)
+            public Data(int id,string name,int icon,string label,int characterUid):base(id,name,icon,label)
             {
 
              this.id = id;
              this.name = name;
-             this.label = label;
              this.icon = icon;
+             this.label = label;
              this.characterUid = characterUid;
 
             }
@@ -115,14 +115,14 @@ namespace Form
 
              this.id = data.id;
              this.name = data.name;
-             this.label = data.label;
              this.icon = data.icon;
+             this.label = data.label;
              this.characterUid = data.characterUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,label,icon,characterUid);
+        return new Data(sameId? id:idChain.GetId(),name,icon,label,characterUid);
                 }
             
             public override  void BeforeGet()
@@ -132,7 +132,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",0);
+                   private static Data _defaultData=new Data(0,"",0,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -251,9 +251,9 @@ namespace Form
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
                 jo.SelectToken("characterUid")==null?defaultData.characterUid:jo.Get<int>("characterUid")
                     );
@@ -272,9 +272,9 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("label",data.label);
+            jo.Set<int>("icon",data.icon);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<string>("label",data.label);
 
             jo.Set<int>("characterUid",data.characterUid);
 
@@ -397,6 +397,16 @@ MapBaseForm.RemoveData(id);
                     
             }
             
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
             public static void ChangeLabel(MapBaseForm.Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
@@ -410,16 +420,6 @@ MapBaseForm.RemoveData(id);
                     DatasByLabel[newV].Add(data);
  
                 changeLabelAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeIconAction?.Invoke(data,oldV,newV);
                 }
                     
             }

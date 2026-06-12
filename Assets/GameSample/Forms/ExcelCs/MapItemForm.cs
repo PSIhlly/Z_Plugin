@@ -67,7 +67,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,MapModelForm.Data,MapModelForm.Data> changeModelAction;
                 
@@ -120,7 +120,7 @@ namespace Form
             {
             }
             
-            public Data(int id,string name,string icon,MapModelForm.Data model,string label,int itemUid):base(id,name,icon,label)
+            public Data(int id,string name,int icon,MapModelForm.Data model,string label,int itemUid):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -154,7 +154,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","",MapModelForm.defaultData,"",0);
+                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,"",0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -206,14 +206,14 @@ namespace Form
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {400001,new Data(400001,"wall","z_map_b$floor$0",MapModelForm.defaultData,"",0)},
+                {400001,new Data(400001,"",0,MapModelForm.defaultData,"",0)},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
                     _DataByName = new Dictionary<string, Data>() {
     
-                        {"wall",_DataById[400001]},
+                        {"",_DataById[400001]},
     
                     
                     };
@@ -281,7 +281,7 @@ namespace Form
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                 jo.SelectToken("model")==null?defaultData.model:jo.Get<MapModelForm.Data>("model"),
 
@@ -304,7 +304,7 @@ namespace Form
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<MapModelForm.Data>("model",data.model);
 
@@ -431,7 +431,7 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

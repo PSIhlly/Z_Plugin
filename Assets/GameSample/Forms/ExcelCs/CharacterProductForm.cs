@@ -69,7 +69,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeLabelAction;
                 
-        public static Action<Data,string,string> changeAvatartexnameAction;
+        public static Action<Data,int,int> changeAvatartexAction;
                 
         public static Action<Data,Dictionary<string,CharacterParamForm.Data>,Dictionary<string,CharacterParamForm.Data>> changeParamdicAction;
                 
@@ -91,7 +91,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeDescAction;
                 
-        public static Action<Data,string,string> changeIllustrationAction;
+        public static Action<Data,int,int> changeIllustrationAction;
                 
         public static Action<Data,bool,bool> changeUniqueAction;
                 
@@ -101,27 +101,27 @@ namespace Form
                 
         public static Action<Data,bool,bool> changeEnablenavAction;
                 
-        public static Action<Data,string,string> changeMinimapiconAction;
+        public static Action<Data,int,int> changeMinimapiconAction;
                 
 
 
         public partial class Data : ProductForm.Data
         {
 
-                    private string  _avatarTexName;
+                    private int  _avatarTex;
                     /// <summary>
                     ///头像名称
                     ///</summary>
-                    public string  avatarTexName{
-                                get{return _avatarTexName;}
+                    public int  avatarTex{
+                                get{return _avatarTex;}
  set{
 
                     if(_DataByUid!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeAvatartexname(this,_avatarTexName,value); 
+                       ChangeAvatartex(this,_avatarTex,value); 
                     }
         
-                _avatarTexName = value;
+                _avatarTex = value;
                 }
                  
                      }
@@ -288,11 +288,11 @@ namespace Form
                  
                      }
                     
-                    private string  _illustration;
+                    private int  _illustration;
                     /// <summary>
                     ///立绘
                     ///</summary>
-                    public string  illustration{
+                    public int  illustration{
                                 get{return _illustration;}
  set{
 
@@ -378,11 +378,11 @@ namespace Form
                  
                      }
                     
-                    private string  _minimapIcon;
+                    private int  _minimapIcon;
                     /// <summary>
                     ///小地图标识
                     ///</summary>
-                    public string  minimapIcon{
+                    public int  minimapIcon{
                                 get{return _minimapIcon;}
  set{
 
@@ -400,13 +400,13 @@ namespace Form
             {
             }
             
-            public Data(int uid,string name,string label,string avatarTexName,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,string illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav,string minimapIcon):base(uid,name,label,protoUid)
+            public Data(int uid,string name,string label,int avatarTex,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,int illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav,int minimapIcon):base(uid,name,label,protoUid)
             {
 
              this.uid = uid;
              this.name = name;
              this.label = label;
-             this.avatarTexName = avatarTexName;
+             this.avatarTex = avatarTex;
              this.paramDic = paramDic;
              this.protoUid = protoUid;
              this.animDic = animDic;
@@ -431,7 +431,7 @@ namespace Form
              this.uid = data.uid;
              this.name = data.name;
              this.label = data.label;
-             this.avatarTexName = data.avatarTexName;
+             this.avatarTex = data.avatarTex;
              this.paramDic = data.paramDic;
              this.protoUid = data.protoUid;
              this.animDic = data.animDic;
@@ -452,7 +452,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTexName,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon);
+        return new Data(sameId? uid:uidChain.GetId(),name,label,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon);
                 }
             
             public override  void BeforeGet()
@@ -462,7 +462,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"","",false,new Dictionary<SkillType,int>(){},0f,false,"");
+                   private static Data _defaultData=new Data(0,"","",0,new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"",0,false,new Dictionary<SkillType,int>(){},0f,false,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -611,7 +611,7 @@ namespace Form
 
                 jo.SelectToken("label")==null?defaultData.label:jo.Get<string>("label"),
 
-                jo.SelectToken("avatarTexName")==null?defaultData.avatarTexName:jo.Get<string>("avatarTexName"),
+                jo.SelectToken("avatarTex")==null?defaultData.avatarTex:jo.Get<int>("avatarTex"),
 
                 jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,CharacterParamForm.Data>>("paramDic"),
 
@@ -633,7 +633,7 @@ namespace Form
 
                 jo.SelectToken("desc")==null?defaultData.desc:jo.Get<string>("desc"),
 
-                jo.SelectToken("illustration")==null?defaultData.illustration:jo.Get<string>("illustration"),
+                jo.SelectToken("illustration")==null?defaultData.illustration:jo.Get<int>("illustration"),
 
                 jo.SelectToken("unique")==null?defaultData.unique:jo.Get<bool>("unique"),
 
@@ -643,7 +643,7 @@ namespace Form
 
                 jo.SelectToken("enableNav")==null?defaultData.enableNav:jo.Get<bool>("enableNav"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<string>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
                     );
 
             return data;
@@ -662,7 +662,7 @@ namespace Form
 
             jo.Set<string>("label",data.label);
 
-            jo.Set<string>("avatarTexName",data.avatarTexName);
+            jo.Set<int>("avatarTex",data.avatarTex);
 
             jo.Set<Dictionary<string,CharacterParamForm.Data>>("paramDic",data.paramDic);
 
@@ -684,7 +684,7 @@ namespace Form
 
             jo.Set<string>("desc",data.desc);
 
-            jo.Set<string>("illustration",data.illustration);
+            jo.Set<int>("illustration",data.illustration);
 
             jo.Set<bool>("unique",data.unique);
 
@@ -694,7 +694,7 @@ namespace Form
 
             jo.Set<bool>("enableNav",data.enableNav);
 
-            jo.Set<string>("minimapIcon",data.minimapIcon);
+            jo.Set<int>("minimapIcon",data.minimapIcon);
 
             return jo;
         }
@@ -855,12 +855,12 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeAvatartexname(Data superData,string oldV,string newV)
+            public static void ChangeAvatartex(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeAvatartexnameAction?.Invoke(data,oldV,newV);
+                changeAvatartexAction?.Invoke(data,oldV,newV);
                 }
                     
             }
@@ -982,7 +982,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeIllustration(Data superData,string oldV,string newV)
+            public static void ChangeIllustration(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
@@ -1032,7 +1032,7 @@ ProductForm.RemoveData(uid);
                     
             }
             
-            public static void ChangeMinimapicon(Data superData,string oldV,string newV)
+            public static void ChangeMinimapicon(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

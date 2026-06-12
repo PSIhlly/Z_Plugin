@@ -67,12 +67,12 @@ namespace Ui.ModStory.ModStoryOverview
         {
             try
             {
-                view.img_image.sprite = AssetManager.instance.texCtrl.CreateDataByBytes(GameManager.instance.curStory.icon.ToArray(), "tmp").GetSprite();
+                view.img_image.BindTexData(AssetManager.instance.texCtrl.CreateDataByBytes(GameManager.instance.curStory.icon.ToArray(), "tmp"));
             }
             catch (Exception ex)
             {
                 Debug.Log(ex);
-                TexAssetForm.DataByName[GlobalNameHelper.GetExternDefaultTexName()].GetSprite();
+                TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId].GetSprite();
             }
             view.ipt_introduction.Set(GameManager.instance.curStory.desc);
             view.ipt_name.Set(GameManager.instance.curStory.name);

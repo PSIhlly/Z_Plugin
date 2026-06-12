@@ -515,7 +515,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             var it = ItemProductForm.DataByUid[uid];
             if (it.canEquipe && it.equip == part)
             {
-                items.Add(it.name, StoryTexAssetForm.DataByName.GetDv(it.iconTexName, StoryTexAssetForm.defaultData).GetSprite(), uid);
+                items.Add(it.name, StoryTexAssetForm.DataById.GetDv(it.iconTexName, StoryTexAssetForm.defaultData).GetSprite(), uid);
             }
         }
         NotifyManager.instance.AddChoose(title,
@@ -610,7 +610,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         foreach (var uid in GameManager.instance.curProgress.team)
         {
             var ch = CharacterProductForm.DataByUid[uid];
-            items.Add(ch.name, StoryTexAssetForm.DataByName.GetDv(ch.avatarTexName, StoryTexAssetForm.defaultData).GetSprite(), uid);
+            items.Add(ch.name, StoryTexAssetForm.DataById.GetDv(ch.avatarTex, StoryTexAssetForm.defaultData).GetSprite(), uid);
         }
         NotifyManager.instance.AddChoose(title,
             true, (item) =>

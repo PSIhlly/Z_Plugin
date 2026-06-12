@@ -29,7 +29,8 @@ namespace Z_Code.Form
                 if (compiler == null)
                     compiler = new Compiler();
                 this.code = code;
-                zCode = compiler.Compile(code, out var res, out int count, out string ret);
+                zCode = compiler.Compile(code, out var res, out int count, out string ret, out var _zCodeMap, out List<CompileError> errors);
+                zCodeMap = _zCodeMap;
                 paramCount = count;
                 returnValue = ret;
                 return res;

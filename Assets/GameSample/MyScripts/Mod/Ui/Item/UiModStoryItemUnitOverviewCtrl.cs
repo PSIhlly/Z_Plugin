@@ -75,7 +75,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
         {
             view.ipt_name.Set(model.data.name);
             view.ipt_label.Set(model.data.label);
-            view.img_image.sprite = TexAssetForm.DataByName[model.data.iconTexName].GetSprite();
+            view.img_image.BindTexData(TexAssetForm.DataById[model.data.iconTexName]);
             view.ipt_desc.Set(model.data.desc);
         }
     }

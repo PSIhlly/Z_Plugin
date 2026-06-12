@@ -69,7 +69,7 @@ namespace Form
                 
         public static Action<Data,string,string> changePrefabnameAction;
                 
-        public static Action<Data,string,string> changeIconAction;
+        public static Action<Data,int,int> changeIconAction;
                 
         public static Action<Data,string,string> changeLabelAction;
                 
@@ -113,7 +113,7 @@ private set{
             {
             }
             
-            public Data(int id,string name,string prefabName,string icon,float step,string label):base(id,name,icon,label)
+            public Data(int id,string name,string prefabName,int icon,float step,string label):base(id,name,icon,label)
             {
 
              this.id = id;
@@ -147,7 +147,7 @@ private set{
             }
         }
 
-                   private static Data _defaultData=new Data(0,"","","",0f,"");
+                   private static Data _defaultData=new Data(0,"","",0,0f,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -162,6 +162,16 @@ private set{
                 }
             }
     
+            static Dictionary<string, List<Data>> _DatasByName;
+            public static Dictionary<string, List<Data>> DatasByName
+            {
+                get
+                {
+                    Init();
+                    return _DatasByName;
+                }
+            }
+    
             static Dictionary<string, List<Data>> _DatasByLabel;
             public static Dictionary<string, List<Data>> DatasByLabel
             {
@@ -169,16 +179,6 @@ private set{
                 {
                     Init();
                     return _DatasByLabel;
-                }
-            }
-    
-            static Dictionary<string, Data> _DataByName;
-            public static Dictionary<string, Data> DataByName
-            {
-                get
-                {
-                    Init();
-                    return _DataByName;
                 }
             }
     
@@ -199,47 +199,26 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {100001,new Data(100001,"plain","map","z_map_a$alpha$0",0f,"")},
-
-                {100002,new Data(100002,"3slope","map3Slope","z_map_a$alpha$0",3f,"")},
-
-                {100003,new Data(100003,"4slope","map4Slope","z_map_a$alpha$0",4f,"")},
-
-                {100004,new Data(100004,"5slope","map5Slope","z_map_a$alpha$0",5f,"")},
+                {1,new Data(1,"ground","MapPrefab$map",0,0f,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
-                    _DataByName = new Dictionary<string, Data>() {
+                    _DatasByName = new Dictionary<string, List<Data>>() {
     
-                        {"plain",_DataById[100001]},
-    
-                        {"3slope",_DataById[100002]},
-    
-                        {"4slope",_DataById[100003]},
-    
-                        {"5slope",_DataById[100004]},
-    
-                    
-                    };
-                    foreach(var v in _DataById.Values)
-                    {
-                        _DatasHashSet.Add(v);
-                    }
-    
+                            {"ground",new List<Data>()},
+        
+                };
+
+                    _DatasByName["ground"].Add(_DataById[1]);
+
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
                             {"",new List<Data>()},
         
                 };
 
-                    _DatasByLabel[""].Add(_DataById[100001]);
-
-                    _DatasByLabel[""].Add(_DataById[100002]);
-
-                    _DatasByLabel[""].Add(_DataById[100003]);
-
-                    _DatasByLabel[""].Add(_DataById[100004]);
+                    _DatasByLabel[""].Add(_DataById[1]);
 
 
             childInitAction?.Invoke();
@@ -294,7 +273,7 @@ private set{
 
                 jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
 
-                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<string>("icon"),
+                jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
                     _defaultData.step,
 
@@ -317,7 +296,7 @@ private set{
 
             jo.Set<string>("prefabName",data.prefabName);
 
-            jo.Set<string>("icon",data.icon);
+            jo.Set<int>("icon",data.icon);
 
             jo.Set<string>("label",data.label);
 
@@ -342,7 +321,9 @@ private set{
         DataById[data.id]=data;
         _DatasHashSet.Add(data);
     
-                    DataByName[data.name]=data;
+                    if(!DatasByName.ContainsKey(data.name))
+                        DatasByName[data.name]=new List<Data>();
+                    DatasByName[data.name].Add(data);
     
                     if(!DatasByLabel.ContainsKey(data.label))
                         DatasByLabel[data.label]=new List<Data>();
@@ -365,7 +346,9 @@ MapBaseForm.AddData(data);
                     DataById.Remove(data.id);
                     
     
-                    DataByName.Remove(data.name);
+                    DatasByName[data.name].Remove(data);
+                    if(DatasByName[data.name].Count==0)
+                        DatasByName.Remove(data.name);
     
                     DatasByLabel[data.label].Remove(data);
                     if(DatasByLabel[data.label].Count==0)
@@ -432,8 +415,12 @@ MapBaseForm.RemoveData(id);
                 if(superData is Data data)
                 {
 
-                    DataByName.Remove(oldV);
-                    DataByName[newV]=data;
+                    DatasByName[oldV].Remove(data);
+                    if(DatasByName[oldV].Count==0)
+                        DatasByName.Remove(oldV);
+                    if(!DatasByName.ContainsKey(newV))
+                        DatasByName[newV]=new List<Data>();
+                    DatasByName[newV].Add(data);
  
                 changeNameAction?.Invoke(data,oldV,newV);
                 }
@@ -450,7 +437,7 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeIcon(MapBaseForm.Data superData,string oldV,string newV)
+            public static void ChangeIcon(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

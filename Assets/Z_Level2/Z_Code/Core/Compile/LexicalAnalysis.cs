@@ -13,21 +13,31 @@ namespace Z_Code
 
     public class LexicalNode : Node
     {
-        public LexicalNode(string code)
+        public LexicalNode(string code, int startIndex = -1)
         {
             this.rawCode = code;
+            this.startIndex = startIndex;
         }
         public string rawCode;
+        /// <summary>
+        /// 在原始代码中的起始位置（字符索引）
+        /// </summary>
+        public int startIndex = -1;
     }
     public class Desc
     {
-        public Desc(string code, CodeType type)
+        public Desc(string code, CodeType type, int codeIndex = -1)
         {
             this.type = type;
             this.code = code;
+            this.codeIndex = codeIndex;
         }
         public string code;
         public CodeType type;
+        /// <summary>
+        /// 在原始代码中的起始位置（字符索引）
+        /// </summary>
+        public int codeIndex = -1;
         public string retType
         {
             get
@@ -54,15 +64,94 @@ namespace Z_Code
     {
         public const bool DEBUG = true;
 
-        public List<LexicalNode> Execute(string code)
+        /// <summary>
+        /// 原始代码（用于计算错误位置）
+        /// </summary>
+        private string _originalCode;
+
+        /// <summary>
+        /// 错误列表
+        /// </summary>
+        private List<CompileError> _errors;
+
+        public List<LexicalNode> Execute(string code, List<CompileError> errors = null)
         {
-            var lst = ManageString(code);
-            ManageDesc(lst);
+            _originalCode = code;
+            _errors = errors ?? new List<CompileError>();
+
+            List<LexicalNode> lst = null;
+            try
+            {
+                lst = ManageString(code);
+            }
+            catch (Exception ex)
+            {
+                AddError(0, code.Length - 1, "词法分析", $"字符串解析失败: {ex.Message}", ex);
+                return new List<LexicalNode>();
+            }
+
+            try
+            {
+                ManageDesc(lst);
+            }
+            catch (Exception ex)
+            {
+                AddError(0, code.Length - 1, "词法分析", $"描述解析失败: {ex.Message}", ex);
+            }
+
             if (DEBUG)
             {
                 Z_Log.Log(lst, new[] { "desc.code", "desc.type" });
             }
             return lst;
+        }
+
+        /// <summary>
+        /// 添加错误
+        /// </summary>
+        private void AddError(int startIndex, int endIndex, string stage, string message, Exception ex = null)
+        {
+            var (line, column) = GetLineAndColumn(startIndex);
+            _errors?.Add(new CompileError
+            {
+                StartIndex = startIndex,
+                EndIndex = endIndex,
+                LineNumber = line,
+                ColumnNumber = column,
+                Stage = stage,
+                Message = message,
+                Exception = ex
+            });
+        }
+
+        /// <summary>
+        /// 根据字符索引计算行号和列号
+        /// </summary>
+        private (int line, int column) GetLineAndColumn(int index)
+        {
+            if (string.IsNullOrEmpty(_originalCode) || index < 0)
+            {
+                return (1, 1);
+            }
+
+            int line = 1;
+            int column = 1;
+            int maxIndex = Math.Min(index, _originalCode.Length - 1);
+
+            for (int i = 0; i <= maxIndex; i++)
+            {
+                if (_originalCode[i] == '\n')
+                {
+                    line++;
+                    column = 1;
+                }
+                else
+                {
+                    column++;
+                }
+            }
+
+            return (line, column);
         }
         public List<LexicalNode> ManageString(string code)
         {
@@ -71,73 +160,79 @@ namespace Z_Code
             bool isStringNow = false;
             for (int i = 0, icnt = code.Length; i < icnt; i++)
             {
-
-                if (IsString(code[i]))
+                try
                 {
-                    isStringNow = !isStringNow;
-                    if (!isStringNow)
+                    if (IsString(code[i]))
+                    {
+                        isStringNow = !isStringNow;
+                        if (!isStringNow)
+                        {
+                            sb.Append(code[i]);
+                            End(lst, sb, i + 1);
+                        }
+                        else
+                        {
+                            End(lst, sb, i);
+                            sb.Append(code[i]);
+                        }
+                    }
+                    else if (isStringNow)
                     {
                         sb.Append(code[i]);
-                        End(lst, sb);
                     }
-                    else
+                    else if (IsEmpty(code[i]))
                     {
-                        End(lst, sb);
+                        End(lst, sb, i);
+                    }
+                    else if (IsSplit(code[i]))
+                    {
+                        End(lst, sb, i);
+                        if (code[i] == ';')
+                        {
+                            sb.Append(code[i]);
+                            End(lst, sb, i + 1);
+                        }
+                    }
+                    else if (IsNum(code[i]))
+                    {
+                        if (IsOperator(sb.ToString()))
+                        {
+                            End(lst, sb, i);
+                        }
                         sb.Append(code[i]);
                     }
-                }
-                else if (isStringNow)
-                {
-                    sb.Append(code[i]);
-                }
-                else if (IsEmpty(code[i]))
-                {
-                    End(lst, sb);
-                }
-                else if (IsSplit(code[i]))
-                {
-                    End(lst, sb);
-                    if (code[i] == ';')
+                    else if (IsOperator(code[i]))
                     {
-                        sb.Append(code[i]);
-                        End(lst, sb);
-                    }
-                }
-                else if (IsNum(code[i]))
-                {
-                    if (IsOperator(sb.ToString()))
-                    {
-                        End(lst, sb);
-                    }
-                    sb.Append(code[i]);
-                }
-                else if (IsOperator(code[i]))
-                {
-                    if (IsNum(sb.ToString()))
-                    {
-                        if (!IsNum(sb.ToString() + code[i]))
-                            End(lst, sb);
-                    }
-                    else if (!IsOperator(sb.ToString() + code[i]))
-                    {
-                        End(lst, sb);
-                    }
-                    sb.Append(code[i]);
-                }
-                else
-                {
-                    if (IsNum(sb.ToString()) || IsOperator(sb.ToString()))
-                    {
-                        End(lst, sb);
+                        if (IsNum(sb.ToString()))
+                        {
+                            if (!IsNum(sb.ToString() + code[i]))
+                                End(lst, sb, i);
+                        }
+                        else if (!IsOperator(sb.ToString() + code[i]))
+                        {
+                            End(lst, sb, i);
+                        }
                         sb.Append(code[i]);
                     }
                     else
                     {
-                        sb.Append(code[i]);
+                        if (IsNum(sb.ToString()) || IsOperator(sb.ToString()))
+                        {
+                            End(lst, sb, i);
+                            sb.Append(code[i]);
+                        }
+                        else
+                        {
+                            sb.Append(code[i]);
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    AddError(i, i, "词法分析", $"处理字符 '{code[i]}' 时出错: {ex.Message}", ex);
                 }
             }
-            End(lst, sb);
+            End(lst, sb, code.Length);
 
 
             return lst;
@@ -148,43 +243,49 @@ namespace Z_Code
         {
             for (int i = 0, icnt = nodes.Count; i < icnt; i++)
             {
-                if (IsString(nodes[i]))
+                try
                 {
-                    nodes[i].desc = new Desc(nodes[i].rawCode.Substring(1, nodes[i].rawCode.Length - 2), CodeType.Str);
-                }
-                else if (IsNum(nodes[i].rawCode))
-                {
-                    nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Num);
-                }
-                else
-                {
-                    if (IsSplit(nodes[i].rawCode))
+                    if (IsString(nodes[i]))
                     {
-                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Split);
+                        nodes[i].desc = new Desc(nodes[i].rawCode.Substring(1, nodes[i].rawCode.Length - 2), CodeType.Str, nodes[i].startIndex);
                     }
-                    else if (IsOperator(nodes[i].rawCode))
+                    else if (IsNum(nodes[i].rawCode))
                     {
-                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Operator);
-                    }
-                    else if (IsReserved(nodes[i].rawCode))
-                    {
-                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Reserved);
-                    }
-                    else if (IsCmd(nodes[i].rawCode) || (i + 1 < icnt && nodes[i + 1].rawCode == "("))
-                    {
-                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.FuncName);
+                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Num, nodes[i].startIndex);
                     }
                     else
                     {
-                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.VarName);
+                        if (IsSplit(nodes[i].rawCode))
+                        {
+                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Split, nodes[i].startIndex);
+                        }
+                        else if (IsOperator(nodes[i].rawCode))
+                        {
+                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Operator, nodes[i].startIndex);
+                        }
+                        else if (IsReserved(nodes[i].rawCode))
+                        {
+                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Reserved, nodes[i].startIndex);
+                        }
+                        else if (IsCmd(nodes[i].rawCode) || (i + 1 < icnt && nodes[i + 1].rawCode == "("))
+                        {
+                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.FuncName, nodes[i].startIndex);
+                        }
+                        else
+                        {
+                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.VarName, nodes[i].startIndex);
+                        }
                     }
-
+                }
+                catch (Exception ex)
+                {
+                    AddError(0, _originalCode.Length - 1, "词法分析", $"处理词法节点 '{nodes[i].rawCode}' 时出错: {ex.Message}", ex);
                 }
             }
         }
 
 
-        private bool End(List<LexicalNode> lst, StringBuilder sb)
+        private bool End(List<LexicalNode> lst, StringBuilder sb, int currentIndex = -1)
         {
             if (sb.Length == 0)
             {
@@ -192,7 +293,8 @@ namespace Z_Code
             }
             else
             {
-                lst.Add(new LexicalNode(sb.ToString()));
+                int startIndex = currentIndex >= 0 ? currentIndex - sb.Length : -1;
+                lst.Add(new LexicalNode(sb.ToString(), startIndex));
                 sb.Clear();
                 return true;
             }

@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1 &3061151053050646319
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3028163475063461867}
   - component: {fileID: 2329295387475330599}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: MapPrefab$capture
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

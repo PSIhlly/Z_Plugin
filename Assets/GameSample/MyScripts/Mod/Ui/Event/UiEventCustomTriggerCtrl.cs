@@ -14,6 +14,7 @@ using Z_Code.Form;
 using Z_DesignStyle;
 using Z_Text;
 using Z_Texture;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
  
@@ -59,6 +60,8 @@ namespace Ui.EventCustomTrigger
             }
             con.Add(new UiTriggerParam() { data = null });
             con.Refresh();
+
+            UiManager.Rebuild(gameObject, true);
         }
 
         public void OnEvent(EventModifyEvent evt)

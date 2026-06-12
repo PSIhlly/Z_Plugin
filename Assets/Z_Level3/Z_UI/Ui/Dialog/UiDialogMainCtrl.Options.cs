@@ -58,7 +58,7 @@ namespace Ui.DialogMain
             {
                 view.btn_over.onClick.AddListener(() =>
                 {
-                    if(string.IsNullOrEmpty(model.prm.clip.mainVideoName))
+                    if(model.prm.clip.mainVideo<=0)
                     {
                         Z_EventHelper.Invoke(new ClipPlayEvent()
                         {
@@ -148,7 +148,7 @@ namespace Ui.DialogMain
                 model.prm = param;
                 view.go_func.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
                 view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed > 0 ? 1 : 0);
-                view.btn_skipVideo.gameObject.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainVideoName));
+                view.btn_skipVideo.gameObject.SetActive(model.prm.clip.mainVideo > 0);
             }
         }
     }

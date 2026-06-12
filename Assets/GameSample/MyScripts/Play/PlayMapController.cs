@@ -76,15 +76,15 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
         this.Unregister<TileEvent>();
     }
 
-    private void Manage(MapEventType tp, MapUnit unit, string icon)
+    private void Manage(MapEventType tp, MapUnit unit, int icon)
     {
-        if (!_super.enable|| !unit.belongTile.data.unlock || string.IsNullOrEmpty(icon) || icon == GlobalNameHelper.GetExternDefaultTexName())
+        if (!_super.enable|| !unit.belongTile.data.unlock || icon<=0 || icon == GlobalDefaultHelper.ExternDefaultTexId)
             return;
         switch (tp)
         {
             case MapEventType.Move:
             case MapEventType.Create:
-                dic[unit.data.uid] = (unit.data.pos, StoryTexAssetForm.DataByName.GetDk(icon, GlobalNameHelper.GetExternDefaultTexName()).GetSprite());
+                dic[unit.data.uid] = (unit.data.pos, StoryTexAssetForm.DataById.GetDk(icon, GlobalDefaultHelper.ExternDefaultTexId).GetSprite());
                 break;
             case MapEventType.Hide:
                 dic.Remove(unit.data.uid);
@@ -95,8 +95,8 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
     {
         if (curScene == null)
             return false;
-        var map = StoryTexAssetForm.DataByName.GetDv(curScene.miniMap, null);
-        return map != null && curScene.miniMap != GlobalNameHelper.GetExternDefaultTexName();
+        var map = StoryTexAssetForm.DataById.GetDv(curScene.miniMap, null);
+        return map != null && curScene.miniMap != GlobalDefaultHelper.ExternDefaultTexId;
     }
     public void RegisterNewScene()
     {
@@ -141,12 +141,12 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
                 int col = tileData.mapPos.x - size.Item3;
                 int row = size.Item1 - tileData.mapPos.z;
 
-                if (tileData.texNameDic != null && tileData.texNameDic.TryGetValue(0, out string texName))
+                if (tileData.texDic != null && tileData.texDic.TryGetValue(0, out int texId))
                 {
-                    var data = MapTextureForm.DataByName.GetDv(texName, null);
-                    if (data != null && data.texsName.Count > 0)
+                    var data = MapTextureForm.DataById.GetDv(texId, null);
+                    if (data != null && data.texs.Count > 0)
                     {
-                        var texAsset = TexAssetForm.DataByName.GetDv(data.texsName[0], null);
+                        var texAsset = TexAssetForm.DataById.GetDv(data.texs[0], null);
                         if (texAsset != null)
                         {
 

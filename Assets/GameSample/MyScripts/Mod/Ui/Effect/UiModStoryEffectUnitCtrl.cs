@@ -160,7 +160,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                     id = -1
                 });
                 effectCon.Refresh();
-                view.img_image.sprite = TexAssetForm.DataByName[parent.model.data.clips[model.id][0].tex].GetSprite();
+                view.img_image.BindTexData(TexAssetForm.DataById[parent.model.data.clips[model.id][0].tex]);
             }
         }
 

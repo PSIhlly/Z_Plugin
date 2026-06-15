@@ -65,8 +65,13 @@ namespace Z_Texture
         }
         public static Texture GetTextureByByte(byte[] data)
         {
-            Texture2D texture = new Texture2D(2, 2);
+            // 使用 RGBA32 格式，禁用 mipmap，避免边缘问题
+            Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             texture.LoadImage(data);
+            // 设置点采样模式，避免双线性过滤导致的边缘模糊
+            texture.filterMode = FilterMode.Point;
+            // 设置钳制模式，避免边缘采样时从另一侧取像素
+            texture.wrapMode = TextureWrapMode.Clamp;
             return texture;
         }
         public static Sprite GetSpriteByPath(string path)

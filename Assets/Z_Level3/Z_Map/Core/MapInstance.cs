@@ -33,12 +33,13 @@ namespace Z_Map
             if (vising)
                 return;
             vising = true;
-            foreach (var render in renderers)
+            for (int i = 0; i < renderers.Length; i++)
             {
+                var render = renderers[i];
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
-                propBlock.SetFloat("_Show", 1);
-                degree = 1;
+                propBlock.SetFloat("_Show", i <= displayLayer ? 1 : 0);
+                degree = i <= displayLayer ? 1 : 0;
                 render.SetPropertyBlock(propBlock);
             }
         }
@@ -47,8 +48,11 @@ namespace Z_Map
 
             if (degree == this.degree)
                 return;
-            foreach (var render in renderers)
+            for (int i = 0; i < renderers.Length; i++)
             {
+                if (i > displayLayer)
+                    continue;
+                var render = renderers[i];
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 propBlock.SetFloat("_Show", degree);
@@ -62,8 +66,9 @@ namespace Z_Map
             if (!vising)
                 return;
             vising = false;
-            foreach (var render in renderers)
+            for (int i = 0; i < renderers.Length; i++)
             {
+                var render = renderers[i];
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 propBlock.SetFloat("_Show", 0);

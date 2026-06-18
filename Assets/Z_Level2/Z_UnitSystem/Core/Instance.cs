@@ -21,6 +21,12 @@ namespace Z_UnitSystem
         private BoxCollider[] _boxColliders;
         private CapsuleCollider[] _capsuleColliders;
         public bool vising;
+
+        /// <summary>
+        /// 显示层级上限（0=仅显示第0层Renderer, 1=显示0和1层, int.MaxValue=显示全部）
+        /// </summary>
+        public int displayLayer = int.MaxValue;
+
         public BoxCollider[] boxColliders
         {
             get

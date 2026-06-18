@@ -311,6 +311,12 @@ namespace ModTool
             public Sta sta_mapObject;
             public Btn btn_event;
             public Sta sta_event;
+            public Btn btn_layer0;
+            public Sta sta_layer0;
+            public Btn btn_layer1;
+            public Sta sta_layer1;
+            public Btn btn_layer2;
+            public Sta sta_layer2;
             public Ipt ipt_viewPosSetX;
             public Ipt ipt_viewPosSetZ;
             public Ipt ipt_viewPosSetY;
@@ -325,9 +331,15 @@ namespace ModTool
             sta_mapObject = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             btn_event = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             sta_event = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            ipt_viewPosSetX = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
-            ipt_viewPosSetZ = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
-            ipt_viewPosSetY = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            btn_layer0 = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_layer0 = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_layer1 = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_layer1 = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            btn_layer2 = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_layer2 = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            ipt_viewPosSetX = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
+            ipt_viewPosSetZ = uiHolder.elementTrsLst[15].GetComponent<Ipt>();
+            ipt_viewPosSetY = uiHolder.elementTrsLst[16].GetComponent<Ipt>();
         }
 
     }

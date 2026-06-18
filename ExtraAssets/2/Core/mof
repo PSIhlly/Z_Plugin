@@ -37,5 +37,44 @@
     "events": [],
     "paramDic": [],
     "minimapIcon": 210000
+  },
+  {
+    "id": 17,
+    "name": "星弹",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 120002
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.8|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 33
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false
+    },
+    "label": "",
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000
   }
 ]

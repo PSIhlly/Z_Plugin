@@ -230,7 +230,7 @@ public static readonly int autoIdCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,new List<int>(){1,},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},null,0f,false);
+                   private static Data _defaultData=new Data(0,new List<int>(){120002,},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},null,0f,false);
                    public static Data defaultData=>_defaultData.Copy();
 
 

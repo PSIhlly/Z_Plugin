@@ -25,6 +25,17 @@ namespace Ui.ModSceneMain
                 return ModManager.instance.sceneCtrl.designType;
             }
         }
+        public int tileLayerDisplayMode
+        {
+            set
+            {
+                ModManager.instance.sceneCtrl.tileLayerDisplayMode = value;
+            }
+            get
+            {
+                return ModManager.instance.sceneCtrl.tileLayerDisplayMode;
+            }
+        }
         public string viewX
         {
             set
@@ -106,6 +117,21 @@ namespace Ui.ModSceneMain
                 model.designType = DesignType.Event;
                 Refresh();
             });
+            view.btn_layer0.onClick.AddListener(() =>
+            {
+                model.tileLayerDisplayMode = 0;
+                Refresh();
+            });
+            view.btn_layer1.onClick.AddListener(() =>
+            {
+                model.tileLayerDisplayMode = 1;
+                Refresh();
+            });
+            view.btn_layer2.onClick.AddListener(() =>
+            {
+                model.tileLayerDisplayMode = 2;
+                Refresh();
+            });
             Refresh();
 
         }
@@ -129,6 +155,11 @@ namespace Ui.ModSceneMain
             view.ipt_viewPosSetZ.Set(model.viewZ);
             view.sta_mapObject.ChangeState(model.designType == DesignType.MapObject ? 1 : 0);
             view.sta_event.ChangeState(model.designType == DesignType.Event ? 1 : 0);
+
+            var mode = model.tileLayerDisplayMode;
+            view.sta_layer0.ChangeState(mode == 0 ? 1 : 0);
+            view.sta_layer1.ChangeState(mode == 1 ? 1 : 0);
+            view.sta_layer2.ChangeState(mode >= 2 ? 1 : 0);
         }
     }
 

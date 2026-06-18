@@ -94,7 +94,7 @@ namespace Z_Ui.Base
                 if (DEBUG)
                     Debug.Log("[sv]������" + totRow);
 
-                content.sizeDelta += new Vector2(width - content.rect.width, Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
+                content.sizeDelta += new Vector2(width - content.rect.width, top + Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
 
 
                 content.sizeDelta += Vector2.right * offsetMax * 2.5f;
@@ -109,7 +109,7 @@ namespace Z_Ui.Base
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
 
 
-                content.sizeDelta += new Vector2(Mathf.Max(totColumn, columnCnt) * (cell.rect.width + xSpacing) - content.rect.width, height - content.rect.height);
+                content.sizeDelta += new Vector2(left + Mathf.Max(totColumn, columnCnt) * (cell.rect.width + xSpacing) - content.rect.width, height - content.rect.height);
 
 
                 content.sizeDelta += Vector2.up * offsetMax * 2.5f;

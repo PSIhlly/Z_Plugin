@@ -43,6 +43,8 @@ public interface ExternalModSceneController
 
     public MapBaseForm.Data curData { get; set; }
 
+    public int tileLayerDisplayMode { get; set; }
+
     public void SetCamera(float x, float y, float z);
 
     public void ForceUpdate();
@@ -93,6 +95,18 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public float posY { get => _posY; set => _posY = value; }
     public bool posing { get => _posing; set => _posing = value; }
     public MapBaseForm.Data curData { get => _curData; set => _curData = value; }
+
+    private int _tileLayerDisplayMode = int.MaxValue;
+    public int tileLayerDisplayMode
+    {
+        get => _tileLayerDisplayMode;
+        set
+        {
+            if (_tileLayerDisplayMode == value) return;
+            _tileLayerDisplayMode = value;
+            RefreshTileLayerDisplay();
+        }
+    }
     #endregion
 
 
@@ -101,6 +115,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         downPos = Vector2.zero;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
+        _tileLayerDisplayMode = int.MaxValue;
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 5, 15);
         CameraInstance.instance.tarTrs.position = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
         switch (DynamicGlobalSettings.cameraMode)
@@ -145,28 +160,31 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
         if (waitForActive || !enable)
             return;
-        // set z
-        pos.z = CameraInstance.instance.cam.nearClipPlane;
-        // to world
+        // 通过射线与地平面求交，确保不同相机视角下位置计算正确
         Ray ray = CameraInstance.instance.cam.ScreenPointToRay(pos);
-        Vector3 worldPosition = CameraInstance.instance.cam.ScreenToWorldPoint(pos);
-        /*;
-        Debug.Log(worldPosition + "  " + CameraInstance.instance.cam.transform.up);
-        worldPosition.y = CameraInstance.instance.tarTrs.position.y;
-        var hits = new List<RaycastHit>(Physics.RaycastAll(worldPosition + CameraInstance.instance.cam.transform.up * 100, -CameraInstance.instance.cam.transform.up));
-    */
         var hits = new List<RaycastHit>(Physics.RaycastAll(ray, 100));
         hits.Sort((a, b) =>
         {
             return a.distance.CompareTo(b.distance);
         });
+        Vector3 worldPosition;
         if (hits.Count > 0)
         {
-            worldPosition = new Vector3(hits[0].transform.position.x, CameraInstance.instance.tarTrs.position.y, hits[0].transform.position.z);
+            worldPosition = hits[0].point;
+            worldPosition.y = CameraInstance.instance.tarTrs.position.y;
         }
         else
         {
-            worldPosition.y = CameraInstance.instance.tarTrs.position.y;
+            Plane groundPlane = new Plane(Vector3.up, -CameraInstance.instance.tarTrs.position.y);
+            if (groundPlane.Raycast(ray, out float enter))
+            {
+                worldPosition = ray.GetPoint(enter);
+            }
+            else
+            {
+                worldPosition = ray.GetPoint(10);
+                worldPosition.y = CameraInstance.instance.tarTrs.position.y;
+            }
         }
         var hitPos = mapMgr.utilCtrl.RealPos2MapPosInt(worldPosition);
         //manage
@@ -475,8 +493,30 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         TimeManager.instance.AddNextBigFrameAction(() =>
         {
             waitForActive = false;
+            RefreshTileLayerDisplay();
         }, _super.gameObject);
     }
+
+    /// <summary>
+    /// 刷新所有 Tile 的显示层级
+    /// </summary>
+    private void RefreshTileLayerDisplay()
+    {
+        foreach (var mapData in mapMgr.data.maps.Values)
+        {
+            if (mapData.unit.ins != null)
+            {
+                mapData.unit.ins.displayLayer = _tileLayerDisplayMode;
+                if (mapData.unit.ins.vising)
+                {
+                    // 重新应用 VisOn 以刷新各层 Renderer 显隐
+                    mapData.unit.ins.vising = false;
+                    mapData.unit.ins.VisOn();
+                }
+            }
+        }
+    }
+
     public void Update()
     {
         if (!enable)

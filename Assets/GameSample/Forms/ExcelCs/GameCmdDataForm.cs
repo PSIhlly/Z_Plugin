@@ -378,7 +378,7 @@ namespace Form
 
                 {100047,new Data(100047,"GetCharacterPosition",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"pos",},new List<string>(){"vector",},"character {0} position","GetCharacterPosition(self)","character","transform",EditorStyle.RpgAdvanced,"")},
 
-                {100048,new Data(100048,"NewVector",new List<string>(){"x","y","height",},new List<string>(){"num","num","num",},new List<string>(){"vector",},new List<string>(){"vector",},"vector({0},{1},{2})","NewVector(0,0,0);","basic","const",EditorStyle.RpgAdvanced,"")},
+                {100048,new Data(100048,"NewVector",new List<string>(){"x","y","height",},new List<string>(){"num","num","num",},new List<string>(){"vector",},new List<string>(){"vector",},"vector({0},{1},{2})","NewVector(0,0,0)","basic","const",EditorStyle.RpgAdvanced,"")},
 
                 {100049,new Data(100049,"StopCharacterNavigate",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0} : Navigate stop","StopCharacterNavigate(self)","character","transform",EditorStyle.RpgAdvanced,"")},
 
@@ -489,6 +489,8 @@ namespace Form
                 {100102,new Data(100102,"MoveToScene",new List<string>(){"sceneName","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Move to Scene {0} position: {1}","MoveToScene(\"empty\",NewVector(1,1,0));","basic","process",EditorStyle.AvgAdvanced,"")},
 
                 {100103,new Data(100103,"ShowTeamerSelect",null,null,null,new List<string>(){"void",},"Show Teamer Select","ShowTeamerSelect()","ui","window",EditorStyle.AvgAdvanced,"")},
+
+                {100104,new Data(100104,"GetVectorLength",new List<string>(){"vector",},new List<string>(){"vector",},new List<string>(){"length",},new List<string>(){"num",},"Vector {0}'s Length","GetVectorLength(NewVector(0,0,0))","basic","math",EditorStyle.Rpg,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -700,6 +702,8 @@ namespace Form
                         {"MoveToScene",_DataByUid[100102]},
     
                         {"ShowTeamerSelect",_DataByUid[100103]},
+    
+                        {"GetVectorLength",_DataByUid[100104]},
     
                     
                     };
@@ -968,6 +972,8 @@ namespace Form
 
                     _DatasByCategoryType[("ui","window")].Add(_DataByUid[100103]);
 
+                    _DatasByCategoryType[("basic","math")].Add(_DataByUid[100104]);
+
                     _DatasByCategory = new Dictionary<string, List<Data>>() {
     
                             {"ui",new List<Data>()},
@@ -1193,6 +1199,8 @@ namespace Form
                     _DatasByCategory["basic"].Add(_DataByUid[100102]);
 
                     _DatasByCategory["ui"].Add(_DataByUid[100103]);
+
+                    _DatasByCategory["basic"].Add(_DataByUid[100104]);
 
 
             childInitAction?.Invoke();

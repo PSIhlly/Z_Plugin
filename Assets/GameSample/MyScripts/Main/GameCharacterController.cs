@@ -296,6 +296,12 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 {
                     stateCd[part]--;
                 }
+                else if (GetDir() != dirCur)
+                {
+                    // 方向改变时强制更新动画
+                    ChangeState(tar, part, forceReplay, extraAnimName);
+                    return;
+                }
                 if (stateCd[part] > 0)
                 {
                     return;
@@ -320,11 +326,15 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             {
                 return;
             }
-            if (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name && GetDir() == dirCur)
+            if (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name)
             {
-                return;
+                var newDir = GetDir();
+                if (newDir == dirCur)
+                {
+                    return;
+                }
+                dirCur = newDir;
             }
-            dirCur = GetDir();
             MaterialPropertyBlock propBlock;
             if (anim != null && anim.animClip.Count > 0 && anim.animClip[dirCur].Count > 0)
             {

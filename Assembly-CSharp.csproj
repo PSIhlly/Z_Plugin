@@ -196,6 +196,7 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\Tips\UiTipCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Character\GetCharacterPositionCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\FloatingTextCmd.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Math\GetVectorLengthCmd.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiPlaySceneMenuBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Effect\UiModStoryEffectListCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Character\SetCharacterRotationCmd.cs" />

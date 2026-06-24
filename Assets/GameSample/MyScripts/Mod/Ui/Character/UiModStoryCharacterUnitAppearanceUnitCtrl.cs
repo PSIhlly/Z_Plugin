@@ -359,6 +359,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.btn_new.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.CreateCharacterAnimId(parent.model.ch.uid, parent.model.data.name,parent.model.dir);
+                parent.model.id = parent.model.data.animClip[parent.model.dir].Count - 1;
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>

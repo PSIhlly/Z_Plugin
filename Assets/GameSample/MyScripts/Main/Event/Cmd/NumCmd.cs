@@ -30,6 +30,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new NumCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.error = "Num 功能未实现";
             return true;
         }
     }

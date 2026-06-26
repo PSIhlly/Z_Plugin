@@ -61,3 +61,5 @@ MerryYellow.CodeAssist.Editor.csproj
 /.vscode
 Packages/packages-lock.json
 UserSettings/Layouts/default-2022.dwlt
+Assets/TextMesh Pro/Resources/Fonts & Materials/Alibaba-PuHuiTi-OutLine.asset
+Assets/TextMesh Pro/Resources/Fonts & Materials/Alibaba-PuHuiTi-Light SDF.asset

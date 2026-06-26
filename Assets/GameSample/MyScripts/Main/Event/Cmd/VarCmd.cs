@@ -27,6 +27,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new LocalVarCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.error = "LocalVar 功能未实现";
             return true;
         }
     }

@@ -126,6 +126,7 @@ namespace Z_Code
     {
         public readonly Interpreter interpreter;
         public BoxDataForm.Data[] res;
+        public string error;
         public InterpretAsyncTask(Interpreter interpreter)
         {
             this.interpreter = interpreter;
@@ -144,6 +145,7 @@ namespace Z_Code
         {
             isComplete = false;
             isRuning = true;
+            error = null;
         }
         public void Complete()
         {
@@ -154,6 +156,7 @@ namespace Z_Code
         {
             isComplete = false;
             isRuning = false;
+            error = null;
         }
     }
 
@@ -251,6 +254,10 @@ namespace Z_Code
 
                                 if (asyncTask.IsComplete())
                                 {
+                                    if (!string.IsNullOrEmpty(asyncTask.error))
+                                    {
+                                        AddError(data.p, asyncTask.error);
+                                    }
                                     data.p++;
                                     int removeCount = prmCount + 1;
                                     for (int i = 0; i < removeCount; i++)

@@ -26,6 +26,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SkillCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.error = "Skill 功能未实现";
             return true;
         }
     }

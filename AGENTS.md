@@ -2,7 +2,7 @@
 - Project name: Z_Plugin
 - Unity version: Unity 2022.3.61t4
 - Active game object:
-  - Name: ModStoryEventEditWindow
+  - Name: Ui
   - Tag: Untagged
-  - Layer: UI
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

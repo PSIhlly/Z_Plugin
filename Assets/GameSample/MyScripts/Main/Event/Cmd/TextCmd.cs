@@ -27,6 +27,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new TextCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.error = "Text 功能未实现";
             return true;
         }
     }

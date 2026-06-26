@@ -50,7 +50,8 @@ namespace Z_Code
             }
             catch (Exception e)
             {
-                Debug.LogError(GetName() + " execute fail:" + e);
+                asyncTask.error = GetName() + " 执行失败: " + e.Message;
+                asyncTask.Complete();
             }
         }
     }

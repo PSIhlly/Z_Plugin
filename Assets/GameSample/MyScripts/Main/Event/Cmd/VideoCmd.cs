@@ -27,6 +27,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new VideoCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.error = "Video 功能未实现";
             return true;
         }
     }

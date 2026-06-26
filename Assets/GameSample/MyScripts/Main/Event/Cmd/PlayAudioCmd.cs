@@ -27,7 +27,10 @@ namespace Z_Code
             {
                 AudioManager.instance.Play(data.path);
             }
-            
+            else
+            {
+                asyncTask.error = "PlayAudio 找不到音频资源: " + prm[0].str;
+            }
 
             return true;
         }

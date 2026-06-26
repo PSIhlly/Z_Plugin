@@ -27,7 +27,10 @@ namespace Z_Code
             {
                 AudioManager.instance.Bgm(data.path);
             }
-            
+            else
+            {
+                asyncTask.error = "ChangeBgm 找不到音频资源: " + prm[0].str;
+            }
 
             return true;
         }

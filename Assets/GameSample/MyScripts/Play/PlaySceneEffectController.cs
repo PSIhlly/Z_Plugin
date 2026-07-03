@@ -100,7 +100,6 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     img.render.GetPropertyBlock(propBlock);
                     propBlock.SetTexture("_Tex", TexAssetForm.DataById[clip.tex].GetTex());
 
-
                     propBlock.SetFloat("_Alpha", clip.opacity);
                     img.render.SetPropertyBlock(propBlock);
 
@@ -122,7 +121,6 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     float rate = Mathf.Min(1, progress / eft[cur].time);
                     propBlock.SetFloat("_Alpha", clip.opacity + (clipNxt.opacity - clip.opacity) * rate);
                     img.render.SetPropertyBlock(propBlock);
-
 
                     beforeUpdate?.Invoke(img);
                     img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);

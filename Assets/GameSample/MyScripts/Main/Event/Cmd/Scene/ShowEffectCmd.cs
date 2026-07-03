@@ -29,7 +29,7 @@ namespace Z_Code
         }
         public static void Nxt()
         {
-            DeltaHeight.y = (DeltaHeight.y + 0.019f) % 0.17f;
+            DeltaHeight.y = (DeltaHeight.y + 0.19f) % 0.73f;
         }
     }
 }

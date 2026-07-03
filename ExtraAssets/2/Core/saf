@@ -19,6 +19,28 @@
           ],
           "type": 0
         }
+      },
+      {
+        "k": "onCharacterParamChangeEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterParamChangeEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterParamChangeEvent$$Hp",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterParamChangeEvent$$Hp",
+          "evt": [
+            {
+              "v": 11
+            }
+          ],
+          "type": 0
+        }
       }
     ],
     "triggeredOnceEvts": [],

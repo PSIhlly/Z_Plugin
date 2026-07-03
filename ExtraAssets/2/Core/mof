@@ -56,7 +56,7 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1|0.8|1"
+          "v": "0.7|0.7|0.7"
         }
       ],
       "subUnitTexsName": [
@@ -71,7 +71,235 @@
       "animTimeInterval": 0.0,
       "isObstacle": false
     },
-    "label": "",
+    "label": "子弹",
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterLeaveEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterLeaveEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 9
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000
+  },
+  {
+    "id": 16,
+    "name": "札弹",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 120002
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.7|0.7|0.7"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 46
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false
+    },
+    "label": "子弹",
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 7
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000
+  },
+  {
+    "id": 18,
+    "name": "玉弹",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 120002
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.7|0.7|0.7"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 47
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false
+    },
+    "label": "子弹",
     "collision": false,
     "events": [],
     "paramDic": [],

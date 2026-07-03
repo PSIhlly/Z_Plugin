@@ -1,8 +1,8 @@
 [
   {
     "uid": 1,
-    "name": "New3",
-    "label": "",
+    "name": "灵梦",
+    "label": "自机",
     "avatarTex": 210000,
     "paramDic": [
       {
@@ -2155,7 +2155,16 @@
     "desc": "人类魔法使",
     "illustration": 3,
     "unique": true,
-    "skill": [],
+    "skill": [
+      {
+        "k": 0,
+        "v": 4
+      },
+      {
+        "k": 2,
+        "v": 5
+      }
+    ],
     "recoveryTime": 0.0,
     "enableNav": false,
     "minimapIcon": 210000

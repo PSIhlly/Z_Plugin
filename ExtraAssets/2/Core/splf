@@ -1,1 +1,98 @@
-[]
+[
+  {
+    "uid": 3,
+    "name": "札弹",
+    "label": "通用",
+    "protoUid": 0,
+    "icon": 46,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.4,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 5
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 4,
+    "name": "星弹",
+    "label": "通用",
+    "protoUid": 0,
+    "icon": 33,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 6
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 5,
+    "name": "魔符·星屑幻想",
+    "label": "魔理沙",
+    "protoUid": 0,
+    "icon": 33,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 2
+      }
+    ],
+    "characterUid": 0,
+    "cd": 10.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 13
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  }
+]

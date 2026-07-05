@@ -50,7 +50,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var data = new GameMapData();
 
             var dic = GameManager.instance.innerAssetDic;
-            data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
+            data.Init((GameObjectAssetForm.Data)dic["map"],(GameObjectAssetForm.Data)dic["slop1"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
             MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, "default", new Dictionary<string, EventTriggerForm.Data>()));
             MapObjectForm.AddData(new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id, new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true), "default", true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
 
@@ -71,8 +71,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 case EditorStyle.RpgAdvanced:
                     dialogEvt.ApplyCode(@"Pause();ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");");
                     var prmBox = CodeHelper.CreateBoxByNum(100);
-                    var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "HpMax", ParamShowType.AlwaysWithPanel);
-                    var hpMaxParamData = new CharacterParamForm.Data(-1, "HpMax", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", ParamShowType.AlwaysWithPanel);
+                    var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "HpMax", ParamShowType.AlwaysWithPanelAndScene);
+                    var hpMaxParamData = new CharacterParamForm.Data(-1, "HpMax", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", ParamShowType.AlwaysWithPanelAndScene);
                     prmBox.num = 5;
                     var speedParamData = new CharacterParamForm.Data(-1, "Speed", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", default);
                     CharacterParamForm.AddData(hpParamData);
@@ -181,7 +181,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                  return data;
              });
          }*/
-        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 1, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
+        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 5, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
 
         MapManager.instance.Begin(data);
         onMapComplete?.Invoke();

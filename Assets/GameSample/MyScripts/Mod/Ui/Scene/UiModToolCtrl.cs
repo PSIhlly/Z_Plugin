@@ -298,7 +298,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapTextureForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null ) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -312,7 +312,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapMaskForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null ) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -326,7 +326,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapObjectForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null ) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -340,7 +340,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapItemForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null ) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -356,7 +356,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapCharacterForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null ) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -372,7 +372,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapEraseForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -387,7 +387,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapTerrainForm.DataById.Values)
                         {
-                            if ((model.curLab == null && string.IsNullOrEmpty(data.label)) || data.label == model.curLab)
+                            if ((model.curLab == null ) || data.label == model.curLab)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -595,7 +595,10 @@ namespace Ui.ModSceneMain.ModTool
         }
         public void Refresh()
         {
-            view.txt_.text = model.prm.lab;
+            if (model.prm.lab != null)
+            {
+                view.txt_.text = model.prm.lab;
+            }
             view.sta_.ChangeState(parent.model.curLab == model.prm.lab ? 1 : 0);
             view.sta_valid.ChangeState(model.prm.lab == null ? 0 : 1);
         }

@@ -300,6 +300,12 @@ namespace Z_Math
 
         #region Intersect
         static HashSet<Vector3> exist = new HashSet<Vector3>(10);
+        /// <summary>
+        /// 立方体与立方体SAT碰撞检测
+        /// 使用分离轴定理，检测两个立方体在给定移动方向上的碰撞
+        /// 输出：dis=碰撞距离（可移动距离），avoidDir=避障方向法线
+        /// 检测轴：A的面法线3个 + B的面法线3个，共6个轴
+        /// </summary>
         public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
             avoidDir = Vector3.zero;
@@ -323,9 +329,12 @@ namespace Z_Math
             if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
 
             GetFaceNormals(bCubeEightPoints, out normal1, out normal2, out normal3);
+
             if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
             if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
             if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
+            
+
             if (avoidTime < 0)
                 avoidTime = 0;
             if (touchTime > 1)
@@ -354,7 +363,6 @@ namespace Z_Math
                     touchTime = 1;
             }
 
-
             dis = mag * touchTime;
             avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
@@ -368,6 +376,10 @@ namespace Z_Math
             return true;
         }
 
+        /// <summary>
+        /// 单轴SAT检测：将两个立方体投影到给定轴上，计算碰触时间touchTime和脱出时间avoidTime
+        /// 根据投影区间关系确定避障方向avoidDir（+1/-1，表示沿轴正/负方向避让）
+        /// </summary>
         private static void CheckAxis(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, Vector3 axis,
             ref float touchTime, ref float avoidTime, ref Vector3 avoidDir)
         {
@@ -381,6 +393,11 @@ namespace Z_Math
             avoidDir += (avoid * axis).normalized;
         }
 
+        /// <summary>
+        /// 球体与立方体SAT碰撞检测
+        /// 检测轴：立方体的3个面法线 + 移动方向与立方体3条棱的叉积，共6个轴
+        /// 输出：dis=碰撞距离，avoidDir=避障方向（用球心到立方体最近点方向计算）
+        /// </summary>
         public static IntersectType SphereIntersectCube(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
             avoidDir = Vector3.zero;
@@ -490,6 +507,9 @@ namespace Z_Math
             return true;
         }
 
+        /// <summary>
+        /// 球体单轴SAT检测：将球体（投影为区间[sphereMin,sphereMax]）和立方体投影到给定轴上
+        /// </summary>
         private static void CheckSphereAxis(Vector3 sphereCenter, float sphereRadius, Vector3[] cubeEightPoints,
             Vector3 dir, Vector3 axis, ref float touchTime, ref float avoidTime)
         {
@@ -596,6 +616,12 @@ namespace Z_Math
             forward = (p3 - p0).normalized;
         }
 
+        /// <summary>
+        /// 判断一组向量是否全部位于某个半球内
+        /// 遍历每个向量作为候选法线，检查其余所有向量与它的点积是否>=0（即在同一半球）
+        /// 如果是，输出该半球法线方向hemisphereNormal，用于角色移动层判断是否可以沿避障方向滑行
+        /// 当避障方向在同一半球内时，说明障碍物在同一侧，可以贴墙滑行
+        /// </summary>
         public static bool IsVectorsInHemisphere(List<Vector3> vectors, out Vector3 hemisphereNormal)
         {
             hemisphereNormal = Vector3.zero;
@@ -1067,10 +1093,27 @@ namespace Z_Math
 
         #endregion
         #region 2DUtil
+        /// <summary>
+        /// SAT核心计算：根据两个区间[aMin,aMax]和[bMin,bMax]在轴上的投影关系，计算碰触时间和避障方向
+        /// aMin/aMax: 物体A在轴上的投影区间
+        /// bMin/bMax: 物体B在轴上的投影区间
+        /// dir: 移动方向在轴上的投影值
+        /// touchTime: A触碰B的时间（0~1，相对于移动距离的比例）
+        /// avoidTime: A脱出B的时间
+        /// avoidDir: 避障方向（+1=沿轴正方向避让，-1=沿轴负方向避让）
+        /// 
+        /// 5种区间关系：
+        /// [] {} : A在B左侧，A向右移动才会碰到B
+        /// [{}]  : A完全包含B
+        /// {[}]  : B完全包含A
+        /// [{)}] : A的右半部分与B的左半部分重叠
+        /// {[]}  : A的左半部分与B的右半部分重叠
+        /// {} [] : A在B右侧，A向左移动才会碰到B
+        /// </summary>
         private static bool CalcTouchTimeAndAvoidTime(float aMin, float aMax, float bMin, float bMax, float dir, ref float touchTime, ref float avoidTime, out int avoidDir)
         {
             avoidDir = 0;
-            if (aMax < bMin)// [] {}
+            if (aMax <= bMin)// [] {} 或 恰好相切(aMax==bMin)
             {
                 if (dir > 0)
                 {
@@ -1093,13 +1136,18 @@ namespace Z_Math
                 {
                     avoidDir = -1;
                     touchTime = Mathf.Max(touchTime, 0);
-                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                    if (dir != 0) avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
                 }
-                else
+                else if (dir < 0)
                 {
                     avoidDir = 1;
                     touchTime = Mathf.Max(touchTime, 0);
                     avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
+                }
+                else // dir==0: 已重叠且无此轴移动，已触碰，不修改avoidTime(避免除以零)
+                {
+                    avoidDir = -1;
+                    touchTime = Mathf.Max(touchTime, 0);
                 }
             }
             else if (aMax < bMax && aMin > bMin)//{[]}
@@ -1107,14 +1155,19 @@ namespace Z_Math
                 if (dir > 0)
                 {
                     touchTime = Mathf.Max(touchTime, 0);
-                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                    if (dir != 0) avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
                     avoidDir = (bMax - aMin) > (aMax - bMin) ? -1 : 1;
                 }
-                else
+                else if (dir < 0)
                 {
                     touchTime = Mathf.Max(touchTime, 0);
                     avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
                     avoidDir = (bMax - aMin) > (aMax - bMin) ? 1 : -1;
+                }
+                else // dir==0
+                {
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidDir = (bMax - aMin) > (aMax - bMin) ? -1 : 1;
                 }
             }
             else if (aMax > bMax && aMin < bMin)//[{}]
@@ -1122,14 +1175,19 @@ namespace Z_Math
                 if (dir > 0)
                 {
                     touchTime = Mathf.Max(touchTime, 0);
-                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                    if (dir != 0) avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
                     avoidDir = (bMax - aMin) > (aMax - bMin) ? -1 : 1;
                 }
-                else
+                else if (dir < 0)
                 {
                     touchTime = Mathf.Max(touchTime, 0);
                     avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
                     avoidDir = (bMax - aMin) > (aMax - bMin) ? 1 : -1;
+                }
+                else // dir==0
+                {
+                    touchTime = Mathf.Max(touchTime, 0);
+                    avoidDir = (bMax - aMin) > (aMax - bMin) ? -1 : 1;
                 }
             }
             else if (aMax > bMax && aMin > bMin && aMin < bMax)//{[}]
@@ -1138,16 +1196,21 @@ namespace Z_Math
                 {
                     avoidDir = 1;
                     touchTime = Mathf.Max(touchTime, 0);
-                    avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
+                    if (dir != 0) avoidTime = Mathf.Min(avoidTime, (bMax - aMin) / dir);
                 }
-                else
+                else if (dir < 0)
                 {
                     avoidDir = -1;
                     touchTime = Mathf.Max(touchTime, 0);
                     avoidTime = Mathf.Min(avoidTime, (aMax - bMin) / -dir);
                 }
+                else // dir==0
+                {
+                    avoidDir = 1;
+                    touchTime = Mathf.Max(touchTime, 0);
+                }
             }
-            else if (aMin > bMax)//{}[]
+            else if (aMin >= bMax)//{}[] 或 恰好相切(aMin==bMax)
             {
                 if (dir >= 0)
                 {

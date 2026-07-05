@@ -31,20 +31,19 @@ namespace Z_Map
             for (int i = mapPos.Item1 - area; i <= mapPos.Item1 + area; i++)
                 for (int j = mapPos.Item3 - area; j <= mapPos.Item3 + area; j++)
                 {
-                    if (_super.data.maps.ContainsKey((i, mapPos.Item2, j)))
-                    {
-                        res.Add(_super.data.maps[(i, mapPos.Item2, j)].unit);
-                    }
+                    var tile = GetTile(i, mapPos.Item2, j);
+                    if (tile != null)
+                        res.Add(tile);
                 }
             return res;
         }
         public bool InArea((int, int, int) pos)
         {
-            return _super.data.maps.ContainsKey((pos.Item1, pos.Item2, pos.Item3));
+            return InArea(pos.Item1, pos.Item2, pos.Item3);
         }
         public bool InArea(Vector3Int pos)
         {
-            return _super.data.maps.ContainsKey((pos.x, pos.y, pos.z));
+            return InArea(pos.x, pos.y, pos.z);
         }
         public bool InArea(Vector3 pos)
         {
@@ -52,6 +51,61 @@ namespace Z_Map
             int y = (int)(pos.y / _super.data.mainData.mapUnitSize.y);
             int z = (int)Math.Round(pos.z / _super.data.mainData.mapUnitSize.z);
 
+            return InArea(x, y, z);
+        }
+        /// <summary>
+        /// 判断位置是否在地图区域内：当前y层有tile，或下方有tile（允许角色走到高层边界外再下落）
+        /// </summary>
+        private bool InArea(int x, int y, int z)
+        {
+            if (ContainsTile(x, y, z))
+                return true;
+            //当前y层没有tile时，下方有tile也算在区域内
+            if (_super.data.mapXZ2Y.ContainsKey((x, z)))
+            {
+                foreach (var yLevel in _super.data.mapXZ2Y[(x, z)])
+                {
+                    if (yLevel < y)
+                        return true;
+                }
+            }
+            return false;
+        }
+        /// <summary>
+        /// 获取指定位置的TileUnit，如果当前y层没有tile则自动取下方最近的tile
+        /// </summary>
+        public TileUnit GetTile(int x, int y, int z)
+        {
+            if (_super.data.maps.ContainsKey((x, y, z)))
+                return _super.data.maps[(x, y, z)].unit;
+            //当前y层没有tile时，取下方最近的tile
+            if (_super.data.mapXZ2Y.ContainsKey((x, z)))
+            {
+                int floorY = -1;
+                foreach (var yLevel in _super.data.mapXZ2Y[(x, z)])
+                {
+                    if (yLevel < y && yLevel > floorY)
+                        floorY = yLevel;
+                }
+                if (floorY > -1 && _super.data.maps.ContainsKey((x, floorY, z)))
+                    return _super.data.maps[(x, floorY, z)].unit;
+            }
+            return null;
+        }
+        /// <summary>
+        /// 获取指定位置的地图数据，仅当前y层有tile时返回（不自动往下取）
+        /// </summary>
+        public TileUnitForm.Data GetTileData(int x, int y, int z)
+        {
+            if (_super.data.maps.ContainsKey((x, y, z)))
+                return _super.data.maps[(x, y, z)];
+            return null;
+        }
+        /// <summary>
+        /// 判断指定位置的当前y层是否存在tile（不自动往下取）
+        /// </summary>
+        public bool ContainsTile(int x, int y, int z)
+        {
             return _super.data.maps.ContainsKey((x, y, z));
         }
         public bool IsOnBoundary(Vector3 pos)
@@ -69,7 +123,7 @@ namespace Z_Map
         {
             if (_super.enable)
                 pos = Z_Math.Graph.ElementwiseDivide(pos, _super.data.mainData.mapUnitSize);
-            return new Vector3Int((int)Math.Round(pos.x), (int)(pos.y), (int)Math.Round(pos.z));
+            return new Vector3Int((int)Math.Round(pos.x), (int)Math.Round(pos.y), (int)Math.Round(pos.z));
         }
         public Vector3 RealPos2MapPos(Vector3 pos)
         {
@@ -129,7 +183,7 @@ namespace Z_Map
             }
             else
             {
-                if (_super.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                if (ContainsTile(mapPos.x, mapPos.y, mapPos.z))
                 {
                     floor = 1;
                 }
@@ -176,7 +230,7 @@ namespace Z_Map
                     {
                         if (!vis.Contains(d) && InLimit(d))
                         {
-                            if (_super.data.maps.ContainsKey(d))
+                            if (ContainsTile(d.Item1, d.Item2, d.Item3))
                             {
                                 tar = new Vector3(d.Item1, d.Item2, d.Item3);
                                 finded = true;
@@ -237,6 +291,9 @@ namespace Z_Map
         {
             UnityEngine.Collider[] cs = root.GetComponentsInChildren<Collider>();
             var res = new List<MeshInfo>();
+            //计算root的世界旋转的逆，用于把子物体的世界旋转转换到root局部坐标系
+            Quaternion rootRotInv = Quaternion.Inverse(root.transform.rotation);
+            Quaternion rootRotFinal = Quaternion.Euler(rootEuler);
             foreach (var c in cs)
             {
                 if (type == CollideType.CollideOnly && c.isTrigger)
@@ -244,13 +301,19 @@ namespace Z_Map
                 if (type == CollideType.TriggerOnly && !c.isTrigger)
                     continue;
                 var pos = c.transform.position;
+                //位置变换：把子物体世界位置转换到root局部空间，再用rootEuler旋转到rootPos坐标系
+                Vector3 localPos = rootRotInv * (pos - root.transform.position);
+                Vector3 finalPos = rootPos + rootRotFinal * localPos;
+                //旋转变换：把子物体世界旋转转换到root局部空间，再用rootEuler旋转
+                Quaternion childLocalRot = rootRotInv * c.transform.rotation;
+                Vector3 finalEuler = (rootRotFinal * childLocalRot).eulerAngles;
                 if (c is BoxCollider box)
                 {
-                    res.Add(Mesh.GetMesh(box, pos - root.transform.position + rootPos, rootEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
+                    res.Add(Mesh.GetMesh(box, finalPos, finalEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
                 }
                 else if (c is SphereCollider sp)
                 {
-                    res.Add(Mesh.GetMesh(sp, pos - root.transform.position + rootPos, rootEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
+                    res.Add(Mesh.GetMesh(sp, finalPos, finalEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
                 }
             }
             return res;
@@ -270,9 +333,9 @@ namespace Z_Map
             foreach (var pos in lst)
             {
                 var mapPos = _super.utilCtrl.RealPos2MapPosInt(pos);
-                if (_super.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+                var tile = GetTile(mapPos.x, mapPos.y, mapPos.z);
+                if (tile != null)
                 {
-                    var tile = _super.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit;
                     var unitLst = new List<MapUnit>() { tile };
                     unitLst.AddRange(_super.updateCtrl.objectTileDic.Get(tile));
                     unitLst.AddRange(_super.updateCtrl.characterTileDic.Get(tile));
@@ -310,7 +373,9 @@ namespace Z_Map
                 var mp = RealPos2MapPosInt(p);
                 if (InArea(mp))
                 {
-                    ans.Add(_super.data.maps[(mp.x, mp.y, mp.z)].unit);
+                    var t = GetTile(mp.x, mp.y, mp.z);
+                    if (t != null)
+                        ans.Add(t);
                 }
             }
 

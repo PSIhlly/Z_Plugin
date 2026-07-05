@@ -197,7 +197,7 @@ namespace Z_Map
                     {
                         if (!_super.utilCtrl.InArea((i, j, k)))
                             continue;
-                        var map = _super.data.maps[(i, j, k)];
+                        var map = _super.utilCtrl.GetTileData(i, j, k);
                         map.unit.Show();
                         lst.Add(map);
 
@@ -335,7 +335,7 @@ namespace Z_Map
                     {
                         var dir = d.Item1;
                         float degree = Math.Clamp(d.Item2 - 0.75f, 0, 1);
-                        if (_super.data.maps.ContainsKey((dir.Item1, i, dir.Item2)))
+                        if (_super.utilCtrl.ContainsTile(dir.Item1, i, dir.Item2))
                         {
                             if (!visited.Contains(dir))
                             {
@@ -343,23 +343,27 @@ namespace Z_Map
                                 queue.Enqueue(dir);
                             }
                             while (queue.Count > 0)
-                            {
-                                var cur = queue.Dequeue();
-                                var map = _super.data.maps[(cur.Item1, i, cur.Item2)];
-                                if (d.Item2 <= 0)
                                 {
-                                    SetGroupVision(map.unit, 0);
+                                    var cur = queue.Dequeue();
+                                    var map = _super.utilCtrl.GetTileData(cur.Item1, i, cur.Item2);
+                                    if (!_super.utilCtrl.ContainsTile(cur.Item1, viewCenter.y, cur.Item2))
+                                    {
+                                        // 当前层无tile，高层tile保持可见
+                                    }
+                                    else if (d.Item2 <= 0)
+                                    {
+                                        SetGroupVision(map.unit, 0);
 
-                                }
-                                else
-                                {
-                                    SetGroupVision(map.unit, degree);
+                                    }
+                                    else
+                                    {
+                                        SetGroupVision(map.unit, degree);
 
-                                }
+                                    }
 
                                 for (int x = cur.Item1 - 1; x <= cur.Item1 + 1 && x < dir.Item1 + viewSize.x && x >= dir.Item1 - viewSize.x; x += 2)
                                 {
-                                    if (!visited.Contains((x, cur.Item2)) && _super.data.maps.ContainsKey((x, i, cur.Item2)))
+                                    if (!visited.Contains((x, cur.Item2)) && _super.utilCtrl.ContainsTile(x, i, cur.Item2))
                                     {
                                         visited.Add((x, cur.Item2));
                                         queue.Enqueue((x, cur.Item2));
@@ -367,7 +371,7 @@ namespace Z_Map
                                 }
                                 for (int z = cur.Item2 - 1; z <= cur.Item2 + 1 && z < dir.Item2 + viewSize.z && z >= dir.Item2 - viewSize.z; z += 2)
                                 {
-                                    if (!visited.Contains((cur.Item1, z)) && _super.data.maps.ContainsKey((cur.Item1, i, z)))
+                                    if (!visited.Contains((cur.Item1, z)) && _super.utilCtrl.ContainsTile(cur.Item1, i, z))
                                     {
                                         visited.Add((cur.Item1, z));
                                         queue.Enqueue((cur.Item1, z));
@@ -393,7 +397,14 @@ namespace Z_Map
                     }
                     else
                     {
-                        curMap.unit.VisOff();
+                        if (_super.utilCtrl.ContainsTile(curMap.mapPos.x, viewCenter.y, curMap.mapPos.z))
+                        {
+                            curMap.unit.VisOff();
+                        }
+                        else
+                        {
+                            curMap.unit.VisOn();
+                        }
                     }
                 }
             }
@@ -514,32 +525,47 @@ namespace Z_Map
             }
 
         }
-        public void ApplyMove(Unit unit, Vector3 newPos, Vector3 euler, bool teleport = false)
+        /// <summary>
+        /// 应用移动：更新单位位置、朝向、所属tile，并触发碰撞事件
+        /// teleport=true时不触发碰撞检测（传送）
+        /// </summary>
+        public void ApplyMove(MapUnit unit, Vector3 newPos, Vector3 euler, bool teleport = false)
         {
             var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
             {
+                //InArea已包含下方有tile的判断，此处为完全不在区域内，拉回最近有效位置
                 newPos = _super.utilCtrl.GetClosestInArea(newPos);
                 newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             }
-            if (_super.data.maps.ContainsKey((newMapPos.x, newMapPos.y, newMapPos.z)))
+            // 决定关联哪个tile：防止重力微移导致y截断后误切换到下方tile
+            TileUnit newMap = null;
+            var floatMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
+                // < 0.05f 表示角色接近上方y层
+                if (Math.Abs(floatMapPos.y - newMapPos.y) < 0.05f
+                    && _super.utilCtrl.ContainsTile(newMapPos.x, newMapPos.y, newMapPos.z))
+                {
+                    var tileData = _super.utilCtrl.GetTileData(newMapPos.x, newMapPos.y, newMapPos.z);
+                 if (tileData != null&&tileData.prefabName == MapInfo.GetPrefabName("map"))
+                {
+                    newMap = tileData.unit;
+                             newPos.y= newMap.data.pos.y;
+                 }
+               } 
+
+            // 策略3：以上都不满足，取下方最近的tile
+            if (newMap == null)
             {
-                var newMap = _super.data.maps[(newMapPos.x, newMapPos.y, newMapPos.z)].unit;
-
+                   newMap = _super.utilCtrl.GetTile(newMapPos.x, newMapPos.y, newMapPos.z);
+            }
+            if (newMap != null)
+            {
                 if (unit is CharacterUnit ch)
-                {
                     characterTileDic.Move(ch, newMap);
-                }
                 else if (unit is ObjectUnit obj)
-                {
                     objectTileDic.Move(obj, newMap);
-                }
                 else if (unit is ItemUnit item)
-                {
                     itemTileDic.Move(item, newMap);
-                }
-
-
             }
 
             var oldPos = unit.data.pos;
@@ -617,12 +643,16 @@ namespace Z_Map
             });
 
         }
+        /// <summary>
+        /// 碰撞检测调度（MapUnit级别）：遍历触发者的所有Mesh，对每个Mesh调用下层CheckCollide
+        /// 返回最短碰撞距离disRes和对应的避障方向avoidDir
+        /// </summary>
         public float CheckCollide(MapUnit trigger, MapUnit unit, Vector3 dir, CollideType type, out List<Vector3> avoidDir, Action<Unit, Graph.IntersectType, float> onCast = null)
         {
             avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
             var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
- 
+     
             foreach (var cur in trigger.GetMeshes(type))
             {
                 float dis = CheckCollide(cur, unit,dir, type,out var avoidDirTmp,out var assistTmp);
@@ -644,6 +674,10 @@ namespace Z_Map
             }
             return disRes;
         }
+        /// <summary>
+        /// 碰撞检测调度（MeshInfo级别）：遍历目标Unit的所有Mesh，调用MeshIntersectMesh进行SAT交叉检测
+        /// 返回最短碰撞距离disRes和对应的避障法线方向avoidDir
+        /// </summary>
         public float CheckCollide(MeshInfo trigger, MapUnit unit, Vector3 dir, CollideType type, out List<Vector3> avoidDir, out IntersectAssisant assist, Action<Unit, Graph.IntersectType, float> onCast = null)
         {
             float disRes= (dir).magnitude;
@@ -652,6 +686,7 @@ namespace Z_Map
             foreach (var tar in unit.GetMeshes(type))
             {
                 float dis = 0;
+                //MeshIntersectMesh: 根据Mesh类型(Cube/Sphere)分发SAT碰撞检测
                 var curType = Mesh.MeshIntersectMesh(trigger, tar, dir, out dis, out var avoid);
 
                 assist.Add(curType);
@@ -681,7 +716,7 @@ namespace Z_Map
                     var mapPos = _super.utilCtrl.RealPos2MapPosInt(itemData.pos);
                     if (_super.utilCtrl.InArea(mapPos))
                     {
-                        itemTileDic.Add(itemData.unit, _super.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+                        itemTileDic.Add(itemData.unit, _super.utilCtrl.GetTile(mapPos.x, mapPos.y, mapPos.z));
                     }
                 }
                 else
@@ -713,7 +748,7 @@ namespace Z_Map
                     var mapPos = _super.utilCtrl.RealPos2MapPosInt(characterData.pos);
                     if (_super.utilCtrl.InArea(mapPos))
                     {
-                        characterTileDic.Add(characterData.unit, _super.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+                        characterTileDic.Add(characterData.unit, _super.utilCtrl.GetTile(mapPos.x, mapPos.y, mapPos.z));
                     }
                 }
                 else

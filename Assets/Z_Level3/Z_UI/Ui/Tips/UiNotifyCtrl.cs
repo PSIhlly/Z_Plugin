@@ -264,6 +264,17 @@ namespace Ui.Notify
             }
             Refresh();
         }
+
+        public void ClearAll()
+        {
+            model.tipInfos.Clear();
+            model.popupInfos.Clear();
+            model.chooseInfos.Clear();
+            model.quickChooseInfos.Clear();
+            model.multipleChooseInfos.Clear();
+            model.inputAreaInfos.Clear();
+            Refresh();
+        }
     }
 
 }

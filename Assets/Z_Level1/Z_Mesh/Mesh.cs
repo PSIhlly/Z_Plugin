@@ -45,6 +45,10 @@ namespace Z_Mesh
                 positions = Graph.GetSphereSixPoint(pos, radius, euler, scale)
             };
         }
+        /// <summary>
+        /// Mesh交叉检测入口：根据Mesh类型(Cube/Sphere)组合分发到对应的SAT检测函数
+        /// 返回碰撞类型、碰撞距离dis和避障法线方向avoidDir
+        /// </summary>
         public static IntersectType MeshIntersectMesh(MeshInfo o, MeshInfo tar, Vector3 step, out float dis, out Vector3 avoidDir)
         {
             avoidDir = Vector3.zero;

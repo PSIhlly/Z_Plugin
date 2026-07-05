@@ -163,7 +163,6 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
         _assetCtrl.Begin();
 
-        effectCtrl.Begin();
 
 
         enable = true;
@@ -183,6 +182,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         _sceneCtrl.Begin(id);
         _infoCtrl.Begin();
         mapCtrl.Begin();
+        effectCtrl.Begin();
     }
 
     public void EndScene()

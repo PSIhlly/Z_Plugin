@@ -49,6 +49,11 @@ namespace Z_UnitSystem
 
             if (ins == null || ins.gameObject == null)
             {
+                if(prefab==null)
+                {
+                    Debug.LogError("can't find prefab " + data.prefabName + " in pool");
+                    return; 
+                }
                 var go = InstancePoolManager.instance.CreateInstance(prefab);
                 ins = (Instance)go.GetComponent(GetInsType());
             }

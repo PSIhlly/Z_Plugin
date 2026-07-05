@@ -36,7 +36,7 @@ namespace Z_Map
         public const bool UPDATE_TILE_ALWAYS = false;
         public const bool UPDATE_ALL_CHARACTER = true;
         public const bool UPDATE_ALL_OBJECT = true;
-        public const bool ENABLE_GRAVITY = false;
+        public const bool ENABLE_GRAVITY = true;
     }
     public static class DynamicGlobalSettings
     {
@@ -152,11 +152,12 @@ public class MapManager : Z_MonoManager<MapManager>
     public ObjectUnitForm.Data AddObject(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
-        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+
+        var oData = this.data.AddObject(prefabName, prms);
+        if (oData==null)
         {
             return null;
         }
-        var oData = this.data.AddObject(prefabName, prms);
         oData.name = name;
         oData.pos = realPos;
         foreach (var m in utilCtrl.GetOverlap(oData))
@@ -171,11 +172,12 @@ public class MapManager : Z_MonoManager<MapManager>
     public ItemUnitForm.Data AddItem(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
-        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+
+        var iData = this.data.AddItem(prefabName, prms);
+        if (iData == null)
         {
             return null;
         }
-        var iData = this.data.AddItem(prefabName, prms);
         iData.name = name; ;
         iData.pos = realPos;
         updateCtrl.itemTileDic.Add(iData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
@@ -186,11 +188,12 @@ public class MapManager : Z_MonoManager<MapManager>
     public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, string extra = "")
     {
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
-        if (!this.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
-        {
-            mapPos = utilCtrl.GetClosestInArea(mapPos);
-        }
+
         var cData = this.data.AddCharacter(prefabName, isMine, extra);
+        if (cData == null)
+        {
+            return null;
+        }
         cData.pos = realPos;
         updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
         cData.name = name;

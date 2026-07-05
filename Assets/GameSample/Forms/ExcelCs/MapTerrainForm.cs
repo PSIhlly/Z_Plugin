@@ -199,7 +199,9 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"ground","MapPrefab$map",0,0f,"")},
+                {1000001,new Data(1000001,"ground","MapPrefab$map",0,0f,"")},
+
+                {1000002,new Data(1000002,"slope","MapPrefab$slope1",0,2f,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -208,9 +210,13 @@ private set{
     
                             {"ground",new List<Data>()},
         
+                            {"slope",new List<Data>()},
+        
                 };
 
-                    _DatasByName["ground"].Add(_DataById[1]);
+                    _DatasByName["ground"].Add(_DataById[1000001]);
+
+                    _DatasByName["slope"].Add(_DataById[1000002]);
 
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -218,7 +224,9 @@ private set{
         
                 };
 
-                    _DatasByLabel[""].Add(_DataById[1]);
+                    _DatasByLabel[""].Add(_DataById[1000001]);
+
+                    _DatasByLabel[""].Add(_DataById[1000002]);
 
 
             childInitAction?.Invoke();

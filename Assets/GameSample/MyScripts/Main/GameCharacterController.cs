@@ -286,7 +286,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
             if ((animTar[part] != tarAnimName) && !string.IsNullOrEmpty(animCur[part]))
             {
-                stateCd[part] = 10;
+                stateCd[part] = 2;
             }
 
             animTar[part] = tarAnimName;

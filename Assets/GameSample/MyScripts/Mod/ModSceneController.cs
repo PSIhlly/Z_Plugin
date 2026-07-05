@@ -14,6 +14,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Time;
 using Z_Ui;
+using Z_Ui.Notify;
 using Z_UnitSystem;
 public enum DesignType
 {
@@ -113,6 +114,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public void Begin(int id)
     {
         downPos = Vector2.zero;
+        _cntX = 1;
+        _cntY = 1;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         _tileLayerDisplayMode = int.MaxValue;
@@ -137,6 +140,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public void End()
     {
         enable = false;
+        NotifyManager.instance.ClearAll();
         mapMgr.End();
         UiManager.instance.CloseAll();
         GameManager.instance.RegisterInputDefault();
@@ -168,22 +172,57 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             return a.distance.CompareTo(b.distance);
         });
         Vector3 worldPosition;
-        if (hits.Count > 0)
+        if (curData != null)
         {
-            worldPosition = hits[0].point;
-            worldPosition.y = CameraInstance.instance.tarTrs.position.y;
+            // 放置模式下优先找 TileInstance（地面），避免已放置物体的碰撞体干扰射线检测
+            TileInstance tileHit = null;
+            RaycastHit? tileRayHit = null;
+            foreach (var hit in hits)
+            {
+                tileHit = hit.transform.GetComponentInParent<TileInstance>();
+                if (tileHit != null)
+                {
+                    tileRayHit = hit;
+                    break;
+                }
+            }
+            // if (tileHit != null && tileRayHit != null)
+            // {
+            //     worldPosition = tileRayHit.Value.point;
+            //     worldPosition.y += posY;
+            // }
+            // else
+            {
+                Plane groundPlane = new Plane(Vector3.up, -CameraInstance.instance.tarTrs.position.y);
+                if (groundPlane.Raycast(ray, out float enter))
+                {
+                    worldPosition = ray.GetPoint(enter);
+                }
+                else
+                {
+                    worldPosition = ray.GetPoint(10);
+                }
+            }
         }
         else
         {
-            Plane groundPlane = new Plane(Vector3.up, -CameraInstance.instance.tarTrs.position.y);
-            if (groundPlane.Raycast(ray, out float enter))
+            if (hits.Count > 0)
             {
-                worldPosition = ray.GetPoint(enter);
+                worldPosition = hits[0].point;
+                worldPosition.y = CameraInstance.instance.tarTrs.position.y;
             }
             else
             {
-                worldPosition = ray.GetPoint(10);
-                worldPosition.y = CameraInstance.instance.tarTrs.position.y;
+                Plane groundPlane = new Plane(Vector3.up, -CameraInstance.instance.tarTrs.position.y);
+                if (groundPlane.Raycast(ray, out float enter))
+                {
+                    worldPosition = ray.GetPoint(enter);
+                }
+                else
+                {
+                    worldPosition = ray.GetPoint(10);
+                    worldPosition.y = CameraInstance.instance.tarTrs.position.y;
+                }
             }
         }
         var hitPos = mapMgr.utilCtrl.RealPos2MapPosInt(worldPosition);
@@ -205,10 +244,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     if (mapMgr.utilCtrl.InLimit(newMapPos))
                                     {
                                         mapMgr.AddTile(newMapPos);
-                                    }
-                                    else
-                                    {
-                                        continue;
                                     }
                                 }
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
@@ -241,27 +276,35 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                                 break;
                                         }
 
-                                        if (mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
+                                        if (!mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                         {
-                                            var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
-                                            cur.prefabName = GlobalDefaultHelper.GetInternalPrefabName(terrainData.prefabName);
-                                            switch (Z_Math.Graph.GetFourDirByEuler(angle))
+                                            var newMapPos = new Vector3Int(stepX, mapData.mapPos.y, stepZ);
+                                            if (mapMgr.utilCtrl.InLimit(newMapPos))
                                             {
-                                                case Z_Math.Graph.FourDir.Up:
-                                                    cur.euler = Vector3.zero;
-                                                    break;
-                                                case Z_Math.Graph.FourDir.Right:
-                                                    cur.euler = new Vector3(0, 90, 0);
-                                                    break;
-                                                case Z_Math.Graph.FourDir.Down:
-                                                    cur.euler = new Vector3(0, 180, 0);
-                                                    break;
-                                                case Z_Math.Graph.FourDir.Left:
-                                                    cur.euler = new Vector3(0, 270, 0);
-                                                    break;
+                                                mapMgr.AddTile(newMapPos);
                                             }
-                                            cur.pos = new Vector3(cur.pos.x, cur.mapPos.y * 3f + 3f * (i + 0.5f) / terrainData.step, cur.pos.z);
                                         }
+                                        var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
+                                        cur.prefabName = terrainData.prefabName;
+                                        switch (Z_Math.Graph.GetFourDirByEuler(angle))
+                                        {
+                                            case Z_Math.Graph.FourDir.Up:
+                                                cur.euler = Vector3.zero;
+                                                break;
+                                            case Z_Math.Graph.FourDir.Right:
+                                                cur.euler = new Vector3(0, 90, 0);
+                                                break;
+                                            case Z_Math.Graph.FourDir.Down:
+                                                cur.euler = new Vector3(0, 180, 0);
+                                                break;
+                                            case Z_Math.Graph.FourDir.Left:
+                                                cur.euler = new Vector3(0, 270, 0);
+                                                break;
+                                        }
+                                        cur.pos = new Vector3(cur.pos.x, cur.mapPos.y * MapManager.instance.data.mainData.mapUnitSize.y + MapManager.instance.data.mainData.mapUnitSize.y * (i) / terrainData.step, cur.pos.z);
+
+                                        Debug.Log(cur.pos);
+
                                     }
                                 }
                             }
@@ -310,7 +353,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos,GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(objectData.id), prms);
+                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos, GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(objectData.id), prms);
                                 GameManager.instance.mapCtrl.RegisterObject(newObjectData, objectData);
                                 newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
                             }
@@ -365,7 +408,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                             if (allow)
                             {
                                 object[] prms = null;
-                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalDefaultHelper.GetRuntimePrefabName("character"), false,MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(),(data.uid, -1)));
+                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalDefaultHelper.GetRuntimePrefabName("character"), false, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
                                 newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
                             }
                         });
@@ -431,7 +474,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     }//move
                     else
                     {
-                        Vector2 moveDir = -Time.deltaTime * dir * 4;
+                        var clampedDir = new Vector2(Mathf.Clamp(dir.x, -50f, 50f), Mathf.Clamp(dir.y, -50f, 50f));
+                        Vector2 moveDir = -clampedDir * 0.04f;
                         CameraInstance.instance.tarTrs.position += new Vector3(moveDir.x, 0, moveDir.y);
                         Z_EventHelper.Invoke(new CameraMoveEvent());
                     }
@@ -457,7 +501,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 }//move
                 else
                 {
-                    Vector2 moveDir = -Time.deltaTime * dir * 4;
+                    var clampedDir = new Vector2(Mathf.Clamp(dir.x, -50f, 50f), Mathf.Clamp(dir.y, -50f, 50f));
+                    Vector2 moveDir = -clampedDir * 0.04f;
                     CameraInstance.instance.tarTrs.position += new Vector3(moveDir.x, 0, moveDir.y);
                     Z_EventHelper.Invoke(new CameraMoveEvent());
                 }

@@ -5,6 +5,14 @@ using Z_DesignStyle;
 
 namespace Z_Map.Analysis
 {
+    /// <summary>
+    /// BFS广度优先搜索寻路：基于导航网格的宏观路径规划
+    /// 流程：
+    /// 1. 将起点入队，BFS遍历所有可通行(cantPassParts为空)的NavUnit
+    /// 2. 若终点不可达，取距离终点最近的可达节点
+    /// 3. 回溯路径，视线检测(Check)验证路径上无障碍
+    /// 4. 返回可行的移动方向（去除Y分量）
+    /// </summary>
     public class Bfs: NaviComponent
     {
         NavigationController nc;
@@ -16,6 +24,10 @@ namespace Z_Map.Analysis
         {
             this.nc = nc;
         }
+        /// <summary>
+        /// BFS寻路核心方法：从cur到tar寻找可行路径，返回第一步的移动方向
+        /// maxStep: 最大搜索步数限制
+        /// </summary>
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep)
         {
             pre.Clear();
@@ -160,16 +172,26 @@ namespace Z_Map.Analysis
             return nc.GetNormalWithoutY(tar - cur);
         }
 
+        /// <summary>
+        /// 判断NavUnit是否可通行：未被访问过 且 无障碍方向(cantPassParts为空)
+        /// </summary>
         public bool CanPass(NavUnit tar)
         {
             return !steps.ContainsKey(tar) && tar.cantPassParts.Count == 0;
         }
+        /// <summary>
+        /// 判断从from到tar是否可通行
+        /// </summary>
         public bool CanPass(NavUnit from, NavUnit tar)
         {
             return !steps.ContainsKey(tar)
                 && tar.cantPassParts.Count == 0;
         }
 
+        /// <summary>
+        /// 视线检测：验证指定矩形区域内所有导航格均无障碍且高度差在阈值内
+        /// 用于判断路径上是否可以直线到达（无需绕行）
+        /// </summary>
         public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ)
         {
             for (int i = startX; i <= endX; i++)

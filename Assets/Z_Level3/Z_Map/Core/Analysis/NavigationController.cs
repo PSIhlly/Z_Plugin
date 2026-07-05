@@ -82,9 +82,9 @@ namespace Z_Map.Analysis
                     navUnits[pos] = newUnit;
                     newUnit.cantPassParts = new HashSet<Dir>();
                     newUnit.links = new List<NavUnit>();
-                    newUnit.realPos = _super.data.maps[pos].pos;
+                    newUnit.realPos = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).pos;
                     newUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
-                    newUnit.isNull = _super.data.maps[pos].scale == Vector3.zero;
+                    newUnit.isNull = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).scale == Vector3.zero;
                 }
             }
             curUpdateCount = 0;
@@ -113,12 +113,12 @@ namespace Z_Map.Analysis
                         Vector3Int linkPos = Z_Math.Graph.GetVector3Int(Z_Math.Graph.ElementwisePlus(new Vector3Int(pos.Item1, m + pos.Item2, pos.Item3), tryDir[l]));
                         if (!InArea(linkPos))
                             continue;
-                        var link = _super.data.maps[(linkPos.x, linkPos.y, linkPos.z)];
+                        var link = _super.utilCtrl.GetTileData(linkPos.x, linkPos.y, linkPos.z);
 
                         Vector2 p = new Vector2(tryDir[l].x * 0.5f, tryDir[l].z * 0.5f);
 
                         //can move
-                        if (Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
+                        if (link!=null&&Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
                         {
                             navUnit.links.Add(navUnits[(linkPos.x, linkPos.y, linkPos.z)]);
                         }

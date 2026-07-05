@@ -19,6 +19,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Time;
 using Z_Ui;
+using Z_Ui.Notify;
 using Z_UnitSystem;
 using static UnityEditor.PlayerSettings;
 
@@ -193,6 +194,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         enable = false;
+
+        NotifyManager.instance.ClearAll();
 
         this.Unregister<InputKeyEvent>();
         this.Unregister<InputKeyUpEvent>();

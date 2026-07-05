@@ -102,7 +102,6 @@ namespace Z_Ui.Notify
     }
     public class NotifyManager: NotifyManagerBase<UiNotifyCtrl, UiTipCtrl, UiChooseCtrl, UiQuickChooseCtrl, UiMultipleChooseCtrl, UiPopupCtrl, UiInputAreaCtrl>
     {
-
     }
     public class NotifyManagerBase<Notify, Tip, Choose, QuickChoose, MultiChoose, Popup, Input> : Z_Manager<NotifyManagerBase<Notify, Tip, Choose, QuickChoose, MultiChoose, Popup, Input>>
         where Notify : UiNotifyCtrl
@@ -116,6 +115,14 @@ namespace Z_Ui.Notify
         public static int tipIdCnt;
         public static int chooseIdCnt;
         public static int popupIdCnt;
+        public virtual void ClearAll()
+        {
+            var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
+            if (ctrl != null)
+            {
+                ctrl.ClearAll();
+            }
+        }
         public void AddTip(string content, float time = 2)
         {
             var info = new TipInfo()

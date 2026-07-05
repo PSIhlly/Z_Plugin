@@ -33,9 +33,9 @@ namespace Z_Code
 
             var pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)));
 
-            if (data.unit is CharacterUnit o)
+            if (data.unit is ObjectUnit o)
             {
-                MapManager.instance.updateCtrl.ApplyMove(data.unit, pos, data.euler, true);
+                MapManager.instance.updateCtrl.ApplyMove(o, pos, data.euler, true);
             }
 
             return true;

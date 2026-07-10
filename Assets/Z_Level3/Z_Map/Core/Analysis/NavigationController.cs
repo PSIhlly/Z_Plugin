@@ -23,7 +23,6 @@ namespace Z_Map.Analysis
         public bool isNull;
         public Vector3Int pos;
         public Vector3 realPos;
-        public HashSet<Dir> cantPassParts;
         public List<NavUnit> links;
     }
     public interface NaviComponent
@@ -80,54 +79,17 @@ namespace Z_Map.Analysis
                 {
                     var newUnit = new NavUnit();
                     navUnits[pos] = newUnit;
-                    newUnit.cantPassParts = new HashSet<Dir>();
                     newUnit.links = new List<NavUnit>();
                     newUnit.realPos = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).pos;
                     newUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
                     newUnit.isNull = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).scale == Vector3.zero;
                 }
             }
-            curUpdateCount = 0;
-            for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
-            {
-                times++;
-                if (times >= step)
-                {
-                    times = 0;
-                    yield return null;
-                }
-                if (!_super.enable)
-                {
-                    yield break;
-                }
-                var map = curUpdateTileList[curUpdateCount];
-                if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
-                    continue;
-                (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
-
-                var navUnit = navUnits[pos];
-                navUnit.links.Clear();
-                for (int m = -1; m <= 1; m++)
-                    for (int l = 0; l < 4; l++)
-                    {
-                        Vector3Int linkPos = Z_Math.Graph.GetVector3Int(Z_Math.Graph.ElementwisePlus(new Vector3Int(pos.Item1, m + pos.Item2, pos.Item3), tryDir[l]));
-                        if (!InArea(linkPos))
-                            continue;
-                        var link = _super.utilCtrl.GetTileData(linkPos.x, linkPos.y, linkPos.z);
-
-                        Vector2 p = new Vector2(tryDir[l].x * 0.5f, tryDir[l].z * 0.5f);
-
-                        //can move
-                        if (link!=null&&Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
-                        {
-                            navUnit.links.Add(navUnits[(linkPos.x, linkPos.y, linkPos.z)]);
-                        }
-                    }
-            }
+            //先扫描障碍物，记录blocked位置
             curUpdateObjList.Clear();
             curUpdateObjList.AddRange(ObjectUnitForm.DataByUid.Values);
             curUpdateCount = 0;
-            var hash = new Dictionary<(int, int, int), HashSet<Dir>>();
+            var blocked = new HashSet<(int, int, int)>();
             for (; curUpdateCount < curUpdateObjList.Count; curUpdateCount++)
             {
                 var obs = curUpdateObjList[curUpdateCount];
@@ -162,15 +124,30 @@ namespace Z_Map.Analysis
                             {
                                 if (InArea(mapPos) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(pos.x, pos.z) + offset[i]))
                                 {
-                                    if (!hash.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
-                                        hash[(mapPos.x, mapPos.y, mapPos.z)] = new HashSet<Dir>();
-                                    hash[(mapPos.x, mapPos.y, mapPos.z)].Add((Dir)i);
+                                    //检测是否能达到y+1的tile（参考高度差判断）
+                                    bool canReachY1 = false;
+                                    Vector3Int linkPos = new Vector3Int(mapPos.x + tryDir[i].x, mapPos.y + 1, mapPos.z + tryDir[i].z);
+                                    if (InArea(linkPos))
+                                    {
+                                        var link = _super.utilCtrl.GetTileData(linkPos.x, linkPos.y, linkPos.z);
+                                        var curMap = _super.utilCtrl.GetTileData(mapPos.x, mapPos.y, mapPos.z);
+                                        Vector2 p = new Vector2(tryDir[i].x * 0.5f, tryDir[i].z * 0.5f);
+                                        if (link != null && curMap != null && Math.Abs(link.unit.GetYByPoint(-p) - curMap.unit.GetYByPoint(p)) <= this.step)
+                                        {
+                                            canReachY1 = true;
+                                        }
+                                    }
+                                    if (!canReachY1)
+                                    {
+                                        blocked.Add((mapPos.x, mapPos.y, mapPos.z));
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            //构建links，跳过blocked的tile
             curUpdateCount = 0;
             for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
             {
@@ -180,7 +157,7 @@ namespace Z_Map.Analysis
                     times = 0;
                     yield return null;
                 }
-                if(!_super.enable)
+                if (!_super.enable)
                 {
                     yield break;
                 }
@@ -188,8 +165,31 @@ namespace Z_Map.Analysis
                 if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
                     continue;
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
-                if (hash.ContainsKey(pos))
-                    navUnits[pos].cantPassParts = hash[pos];
+
+                var navUnit = navUnits[pos];
+                navUnit.links.Clear();
+                if (blocked.Contains(pos))
+                    continue;
+                for (int m = -1; m <= 1; m++)
+                    for (int l = 0; l < 4; l++)
+                    {
+                        Vector3Int linkPos = Z_Math.Graph.GetVector3Int(Z_Math.Graph.ElementwisePlus(new Vector3Int(pos.Item1, m + pos.Item2, pos.Item3), tryDir[l]));
+                        if (!InArea(linkPos))
+                            continue;
+                        var link = _super.utilCtrl.GetTileData(linkPos.x, linkPos.y, linkPos.z);
+
+                        Vector2 p = new Vector2(tryDir[l].x * 0.5f, tryDir[l].z * 0.5f);
+
+                        //can move
+                        if (link!=null&&Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
+                        {
+                            var linkNavUnit = navUnits[(linkPos.x, linkPos.y, linkPos.z)];
+                            if (!blocked.Contains((linkPos.x, linkPos.y, linkPos.z)))
+                            {
+                                navUnit.links.Add(linkNavUnit);
+                            }
+                        }
+                    }
             }
         }
 

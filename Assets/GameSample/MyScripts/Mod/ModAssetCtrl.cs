@@ -327,6 +327,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 items.Add(form.name,null,form.id);
             }
         }
+        foreach (var form in MapPrefabForm.DataById.Values)
+        {
+            items.Add(form.name, null, form.id);
+        }
         NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {

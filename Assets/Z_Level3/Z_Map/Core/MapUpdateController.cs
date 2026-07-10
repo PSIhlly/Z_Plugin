@@ -296,120 +296,130 @@ namespace Z_Map
 
 
         }
-        (int, int)[] dir9 = new[] {
-                    (0, 0), (1, 0), (-1, 0),
-                    (0, 1), (0, -1), (1, 1),
-                    (-1,-1),(1, -1),(-1, 1)
-                };
+
+        private HashSet<(int, int)> bfsVisited = new HashSet<(int, int)>();
+        private Queue<(int, int)> bfsQueue = new Queue<(int, int)>();
+        private List<((int, int) pos, float sqrDist)> bfsStartLst = new List<((int, int), float)>();
+        private static Comparison<((int, int) pos, float sqrDist)> bfsDistCompare =
+            (a, b) => a.sqrDist.CompareTo(b.sqrDist);
+
+        /// <summary>
+        /// BFS遍历指定y层的tile，从(centerX,centerZ)开始，对遮挡层有tile的位置设置透明度
+        /// 如果起始位置不存在tile则直接返回
+        /// </summary>
+        private void BfsLayerVision(int layerY, int centerX, int centerZ, float degree)
+        {
+            if (!_super.utilCtrl.ContainsTile(centerX, layerY, centerZ))
+                return;
+
+            var viewSize = _super.data.mainData.viewSize;
+            var start = (centerX, centerZ);
+            if (bfsVisited.Contains(start))
+                return;
+            bfsVisited.Add(start);
+            bfsQueue.Enqueue(start);
+
+            while (bfsQueue.Count > 0)
+            {
+                var cur = bfsQueue.Dequeue();
+                var map = _super.utilCtrl.GetTileData(cur.Item1, layerY, cur.Item2);
+                SetGroupVision(map.unit, degree);
+
+                for (int x = cur.Item1 - 1; x <= cur.Item1 + 1; x += 2)
+                {
+                    if (x < viewCenter.x - viewSize.x || x >= viewCenter.x + viewSize.x) continue;
+                    if (!bfsVisited.Contains((x, cur.Item2)) && _super.utilCtrl.ContainsTile(x, layerY, cur.Item2))
+                    {
+                        bfsVisited.Add((x, cur.Item2));
+                        bfsQueue.Enqueue((x, cur.Item2));
+                    }
+                }
+                for (int z = cur.Item2 - 1; z <= cur.Item2 + 1; z += 2)
+                {
+                    if (z < viewCenter.z - viewSize.z || z >= viewCenter.z + viewSize.z) continue;
+                    if (!bfsVisited.Contains((cur.Item1, z)) && _super.utilCtrl.ContainsTile(cur.Item1, layerY, z))
+                    {
+                        bfsVisited.Add((cur.Item1, z));
+                        bfsQueue.Enqueue((cur.Item1, z));
+                    }
+                }
+            }
+        }
         /// <summary>
         /// Manage vison
         /// </summary>
         private void UpdateVision()
         {
-            if (GlobalSettings.OVERLAY_HIDE)
+            var viewSize = _super.data.mainData.viewSize;
+            var realViewCenter = _super.utilCtrl.RealPos2MapPosInt(curCenterPos);
+            bool overlayHide = GlobalSettings.OVERLAY_HIDE;
+            // 侧视模式：相机角度让前方(z更小方向)的高层会遮挡视线，需要扩展z检测范围
+            bool isSideView = DynamicGlobalSettings.cameraMode == CameraMode.Isometric;
+
+            foreach (var curMap in curTileLst)
             {
-                var viewSize = _super.data.mainData.viewSize;
-                foreach (var curMap in curTileLst)
+                if (curMap.mapPos.y < realViewCenter.y)
+                {
+                    if (_super.utilCtrl.ContainsTile(curMap.mapPos.x, realViewCenter.y, curMap.mapPos.z))
+                        SetGroupVision(curMap.unit, 0);
+                    else
+                        SetGroupVision(curMap.unit, 1);
+                }
+                else
                 {
                     SetGroupVision(curMap.unit, 1);
                 }
-
-                HashSet<(int, int)> visited = new HashSet<(int, int)>();
-                Queue<(int, int)> queue = new Queue<(int, int)>();
-                for (int i = viewCenter.y + 1; i < viewCenter.y + viewSize.y; i++)
-                {
-                    visited.Clear();
-                    queue.Clear();
-
-                    List<((int, int), float)> dis = new List<((int, int), float)>();
-                    for (int dirId = 0; dirId < dir9.Length; dirId++)
-                    {
-                        var dir = dir9[dirId];
-                        dir.Item1 += viewCenter.x;
-                        dir.Item2 += viewCenter.z;
-                        dis.Add((dir, new Vector2(curCenterPos.x - dir.Item1, curCenterPos.z - dir.Item2).magnitude));
-                    }
-                    dis.Sort((a, b) => { return a.Item2.CompareTo(b.Item2); });
-
-                    foreach (var d in dis)
-                    {
-                        var dir = d.Item1;
-                        float degree = Math.Clamp(d.Item2 - 0.75f, 0, 1);
-                        if (_super.utilCtrl.ContainsTile(dir.Item1, i, dir.Item2))
-                        {
-                            if (!visited.Contains(dir))
-                            {
-                                visited.Add(dir);
-                                queue.Enqueue(dir);
-                            }
-                            while (queue.Count > 0)
-                                {
-                                    var cur = queue.Dequeue();
-                                    var map = _super.utilCtrl.GetTileData(cur.Item1, i, cur.Item2);
-                                    if (!_super.utilCtrl.ContainsTile(cur.Item1, viewCenter.y, cur.Item2))
-                                    {
-                                        // 当前层无tile，高层tile保持可见
-                                    }
-                                    else if (d.Item2 <= 0)
-                                    {
-                                        SetGroupVision(map.unit, 0);
-
-                                    }
-                                    else
-                                    {
-                                        SetGroupVision(map.unit, degree);
-
-                                    }
-
-                                for (int x = cur.Item1 - 1; x <= cur.Item1 + 1 && x < dir.Item1 + viewSize.x && x >= dir.Item1 - viewSize.x; x += 2)
-                                {
-                                    if (!visited.Contains((x, cur.Item2)) && _super.utilCtrl.ContainsTile(x, i, cur.Item2))
-                                    {
-                                        visited.Add((x, cur.Item2));
-                                        queue.Enqueue((x, cur.Item2));
-                                    }
-                                }
-                                for (int z = cur.Item2 - 1; z <= cur.Item2 + 1 && z < dir.Item2 + viewSize.z && z >= dir.Item2 - viewSize.z; z += 2)
-                                {
-                                    if (!visited.Contains((cur.Item1, z)) && _super.utilCtrl.ContainsTile(cur.Item1, i, z))
-                                    {
-                                        visited.Add((cur.Item1, z));
-                                        queue.Enqueue((cur.Item1, z));
-                                    }
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
             }
-            else
+
+            // 处理高层tile的遮挡：按距离从近到远，从各起始点BFS相连的高层
+            int range = overlayHide ? 1 : 0;
+            // 侧视模式下，dz范围扩展到-viewSize.y（角色前方z更小的方向），与OVERLAY_HIDE与否都生效
+            int startDz = -range - (isSideView ? viewSize.y : 0);
+
+            for (int i = realViewCenter.y + 1; i < realViewCenter.y + viewSize.y; i++)
             {
-                foreach (var curMap in curTileLst)
+                bfsVisited.Clear();
+                bfsQueue.Clear();
+                bfsStartLst.Clear();
+
+                for (int dx = -range; dx <= range; dx++)
                 {
-                    if (curMap.mapPos.y <= viewCenter.y)
+                    for (int dz = startDz; dz <= range; dz++)
                     {
-                        curMap.unit.VisOn();
-                    }
-                    else
-                    {
-                        if (_super.utilCtrl.ContainsTile(curMap.mapPos.x, viewCenter.y, curMap.mapPos.z))
-                        {
-                            curMap.unit.VisOff();
-                        }
-                        else
-                        {
-                            curMap.unit.VisOn();
-                        }
+                        int checkX = realViewCenter.x + dx;
+                        int checkZ = realViewCenter.z + dz;
+                        float dxN = curCenterPos.x - checkX;
+                        float dzN = curCenterPos.z - checkZ;
+                        bfsStartLst.Add(((checkX, checkZ), dxN * dxN + dzN * dzN));
                     }
                 }
+                bfsStartLst.Sort(bfsDistCompare);
+
+                foreach (var d in bfsStartLst)
+                {
+                    var pos = d.pos;
+                    float sqrDist = d.sqrDist;
+                    float degree = Math.Clamp(Mathf.Sqrt(sqrDist) - 0.75f, 0, 1);
+
+                    // OVERLAY_HIDE额外逻辑：靠近的tile，其相连的高层也消失
+                    bool nearHide = false;
+                    if (overlayHide && sqrDist < 0.25f) // 0.5f^2
+                    {
+                        for (int yOffset = 0; yOffset <= 2; yOffset++)
+                        {
+                            int baseY = realViewCenter.y - yOffset;
+                            if (baseY < 0) continue;
+                            if (_super.utilCtrl.ContainsTile(pos.Item1, baseY, pos.Item2))
+                            {
+                                nearHide = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    BfsLayerVision(i, pos.Item1, pos.Item2, nearHide ? 0 : degree);
+                }
             }
-
-
         }
 
 
@@ -541,8 +551,8 @@ namespace Z_Map
             // 决定关联哪个tile：防止重力微移导致y截断后误切换到下方tile
             TileUnit newMap = null;
             var floatMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
-                // < 0.05f 表示角色接近上方y层
-                if (Math.Abs(floatMapPos.y - newMapPos.y) < 0.05f
+                // snap阈值需按unitSize.y缩放，保持真实空间容差固定为0.1（原unitSize=2时0.05 map空间=0.1真实空间）
+                if (Math.Abs(floatMapPos.y - newMapPos.y) < 0.1f / _super.data.mainData.mapUnitSize.y
                     && _super.utilCtrl.ContainsTile(newMapPos.x, newMapPos.y, newMapPos.z))
                 {
                     var tileData = _super.utilCtrl.GetTileData(newMapPos.x, newMapPos.y, newMapPos.z);

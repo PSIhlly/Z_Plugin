@@ -8,7 +8,7 @@ namespace Z_Map.Analysis
     /// <summary>
     /// BFS广度优先搜索寻路：基于导航网格的宏观路径规划
     /// 流程：
-    /// 1. 将起点入队，BFS遍历所有可通行(cantPassParts为空)的NavUnit
+    /// 1. 将起点入队，BFS遍历links中可通行的NavUnit
     /// 2. 若终点不可达，取距离终点最近的可达节点
     /// 3. 回溯路径，视线检测(Check)验证路径上无障碍
     /// 4. 返回可行的移动方向（去除Y分量）
@@ -173,19 +173,18 @@ namespace Z_Map.Analysis
         }
 
         /// <summary>
-        /// 判断NavUnit是否可通行：未被访问过 且 无障碍方向(cantPassParts为空)
+        /// 判断NavUnit是否可通行：未被访问过
         /// </summary>
         public bool CanPass(NavUnit tar)
         {
-            return !steps.ContainsKey(tar) && tar.cantPassParts.Count == 0;
+            return !steps.ContainsKey(tar);
         }
         /// <summary>
         /// 判断从from到tar是否可通行
         /// </summary>
         public bool CanPass(NavUnit from, NavUnit tar)
         {
-            return !steps.ContainsKey(tar)
-                && tar.cantPassParts.Count == 0;
+            return !steps.ContainsKey(tar);
         }
 
         /// <summary>
@@ -197,7 +196,10 @@ namespace Z_Map.Analysis
             for (int i = startX; i <= endX; i++)
                 for (int k = startZ; k <= endZ; k++)
                 {
-                    if (!nc.navUnits.ContainsKey((i, mapY, k)) ||nc.navUnits[(i, mapY, k)].cantPassParts.Count > 0 || Mathf.Abs(nc.navUnits[(i, mapY, k)].realPos.y - realY) > nc.step)
+                    if (!nc.navUnits.ContainsKey((i, mapY, k)))
+                        return false;
+                    var unit = nc.navUnits[(i, mapY, k)];
+                    if (unit.links.Count == 0 || Mathf.Abs(unit.realPos.y - realY) > nc.step)
                     {
                         return false;
                     }

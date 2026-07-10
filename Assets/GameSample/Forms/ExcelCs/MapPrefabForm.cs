@@ -93,12 +93,26 @@ private set{
                  
                      }
                     
-            public Data(int id,string name,int icon)
+                    private string  _prefabName;
+                    /// <summary>
+                    ///资源名
+                    ///</summary>
+                    public string  prefabName{
+                                get{return _prefabName;}
+private set{
+        
+                _prefabName = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,string name,int icon,string prefabName)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
+             this.prefabName = prefabName;
 
             }
             public void Reset(Data data)
@@ -107,11 +121,12 @@ private set{
              this.id = data.id;
              this.name = data.name;
              this.icon = data.icon;
+             this.prefabName = data.prefabName;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon);
+        return new Data(sameId? id:idChain.GetId(),name,icon,prefabName);
                 }
             
             public virtual  void BeforeGet()
@@ -121,7 +136,7 @@ private set{
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0);
+                   private static Data _defaultData=new Data(0,"",0,"");
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -161,9 +176,11 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"Cube",0)},
+                {1,new Data(1,"Cube",0,"MapPrefab$cube")},
 
-                {2,new Data(2,"Sphere",0)},
+                {2,new Data(2,"Sphere",0,"MapPrefab$sphere")},
+
+                {3,new Data(3,"Slope",0,"MapPrefab$slope")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -173,6 +190,8 @@ idChain=new Z_Chain.Chain (autoIdCnt);
                         {"Cube",_DataById[1]},
     
                         {"Sphere",_DataById[2]},
+    
+                        {"Slope",_DataById[3]},
     
                     
                     };
@@ -226,7 +245,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                     _defaultData.name,
 
-                    _defaultData.icon
+                    _defaultData.icon,
+
+                    _defaultData.prefabName
                     );
 
             return data;

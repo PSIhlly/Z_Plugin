@@ -22,7 +22,7 @@ public class Z_Map_Sample : MonoBehaviour
         }
         var data = new MapInfo();
         var dic = GameManager.instance.innerAssetDic;
-        data.Init((GameObjectAssetForm.Data)dic["map"],(GameObjectAssetForm.Data)dic["slop1"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
+        data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
         MapManager.instance.Begin(data);
     }
     public void Update()

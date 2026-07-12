@@ -126,10 +126,14 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             case CameraMode.Overhead:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, 0);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(90, 0, 0);
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 80;
+                CameraInstance.instance.globalLight.intensity = 1f;
                 break;
             case CameraMode.Isometric:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 50;
+                CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
 
@@ -250,7 +254,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                                 if (terrainData.step == 0)
                                 {
-                                    mapData.prefabName = terrainData.prefabName;
+                                    mapData.prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
                                     mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), mapMgr.data.mainData.mapUnitSize);
 
                                 }
@@ -285,7 +289,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                             }
                                         }
                                         var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
-                                        cur.prefabName = terrainData.prefabName;
+                                        cur.prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
                                         switch (Z_Math.Graph.GetFourDirByEuler(angle))
                                         {
                                             case Z_Math.Graph.FourDir.Up:

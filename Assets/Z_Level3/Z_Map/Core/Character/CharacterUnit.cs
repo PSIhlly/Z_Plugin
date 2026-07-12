@@ -1,15 +1,16 @@
+//#define DEBUG_CHARACTER
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.TextCore.Text;
+using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_UnitSystem.Form;
-
 namespace Z_Map
 {
-
+     
     public partial class CharacterUnit : MapUnit
     {
         public CharacterUnit(CharacterUnitForm.Data data) : base(data)
@@ -61,11 +62,16 @@ namespace Z_Map
                     }
 
                 }
-
-                //gravity: 每帧施加向下的重力移动
-                if(GlobalSettings.ENABLE_GRAVITY)
+                //gravity: 每帧施加向下的重力移动（有地面接触时跳过，避免贴地抖动）
+                if(GlobalSettings.ENABLE_GRAVITY&&!HasGroundContact())
                 {
-                    Move(Vector3.down * Time.deltaTime * 3f);
+#if DEBUG_CHARACTER
+                    Debug.Log($"[move]{Time.frameCount}before gravity:" + (data.pos.ToString("F10") ));
+#endif
+                    Move(Vector3.down * Time.deltaTime * 2f);
+#if DEBUG_CHARACTER
+                    Debug.Log($"[move]{Time.frameCount}after gravity:" + (data.pos.ToString("F10")));
+#endif
                 }
                 //fix: 同步实例位置
                 ins?.UpdatePos();
@@ -161,17 +167,18 @@ namespace Z_Map
                             existUnit.Add(obj);
                             //CheckCollide: 基于SAT的碰撞检测，返回碰撞距离cur和避障方向avoid
                             var cur = manager.updateCtrl.CheckCollide(this, obj, dir, CollideType.CollideOnly, out avoid);
-                            //碰撞距离为0（已嵌入）：累加避障方向
+
+                            //碰撞距离为0（已嵌入）：智能合并避障方向（仅保留同半球兼容方向）
                             if (Mathf.Abs(cur - res) < 0.01f && MathF.Abs(cur) < 0.01f)
                             {
-                                avoidDir.AddRange(avoid);
+                                Z_Math.Graph.MergeAvoidDirRange(avoidDir, avoid);
                             }
                             //更短的碰撞距离：替换为新的最短距离和避障方向
                             else if (cur < res)
                             {
                                 res = cur;
                                 avoidDir.Clear();
-                                avoidDir.AddRange(avoid);
+                                Z_Math.Graph.MergeAvoidDirRange(avoidDir, avoid);
                             }
                         }
                     }
@@ -206,6 +213,7 @@ namespace Z_Map
                             float loss = dir.magnitude - Vector3.Dot(newDir.normalized, dir);
                             //计算滑行方向：从移动方向中减去沿避障法线的分量（含0.1*loss的额外缩减防止贴墙卡住）
                             var slideDir = (dir- (( + Vector3.Dot(newDir.normalized, dir) - 0.1f * loss  ) * newDir.normalized));
+                            
                             dirQue.Enqueue(slideDir);
                         }
                         else
@@ -218,22 +226,6 @@ namespace Z_Map
                         //避障方向不在同一半球，无法滑行
                     }
 
-                    /*foreach (var o in avoidDir)
-                    {
-                        if (existAvoid.Contains(o))
-                            continue;
-                        existAvoid.Add(o);
-                        var dot = Vector3.Dot(curDir, o) - 0.001f;
-                        if (dot >= 0)
-                            continue;
-                        var realO = o * dot;
-                        if ((curDir - realO).sqrMagnitude < 0.0001f)
-                            continue;
-                        *//*               if (dir.x != 0 && dir.z != 0)
-                                           Debug.Log(Time.frameCount + " " + realO.magnitude + " " + curDir.magnitude + " " + (curDir - realO).magnitude + " " + dir.magnitude);
-                     *//*
-                        dirQue.Enqueue(curDir - realO);
-                    }*/
                 }
                 firstTry = false;
                 //按最短碰撞距离截断当前移动方向
@@ -241,11 +233,20 @@ namespace Z_Map
                 //有可移动距离时应用位置更新
                 if (res > 0.01f)
                 {
+#if DEBUG_CHARACTER
+                    Debug.Log($"[move]{Time.frameCount}character applyMove:" + (data.pos + dir).ToString("F10"));
+#endif
                     moved = true;
                     manager.updateCtrl.ApplyMove(this, data.pos + dir, euler);
+#if DEBUG_CHARACTER            
+                    Debug.Log($"[move]{Time.frameCount}character applyRes:" + (data.pos).ToString("F10"));
+#endif
                 }
                 else
                 {
+#if DEBUG_CHARACTER
+                    Debug.Log($"[move]{Time.frameCount}character BLOCKED res={res:F6} avoidDir.Count={avoidDir.Count} dir={dir.ToString("F10")} mag={mag}");
+#endif
                 }
             }
             if(moved)
@@ -265,6 +266,93 @@ namespace Z_Map
                 });
             }
 
+        }
+
+        /// <summary>
+        /// 检测角色球体是否与周围碰撞体存在地面支撑接触
+        /// 遍历belongTile所在九宫格的tile及其object/character碰撞体，对每个碰撞体计算球心到其最近点：
+        /// - 若距离<=半径（接触中），且接触点相对球心高度<0.4半径（接触点位于球体下半区域，即地面支撑）
+        /// 则返回true，表示有地面接触，应跳过重力
+        /// </summary>
+        private bool HasGroundContact()
+        {
+            if (belongTile == null)
+                return false;
+
+            //获取角色球体碰撞mesh的中心与半径
+            Vector3 sphereCenter = data.pos;
+            float radius = 0f;
+            foreach (var m in GetMeshes(CollideType.CollideOnly))
+            {
+                if (m.type == Z_Mesh.MeshType.Sphere)
+                {
+                    sphereCenter = (m.positions[(int)Z_Math.Graph.SphereSixPoint.Right] + m.positions[(int)Z_Math.Graph.SphereSixPoint.Left]) * 0.5f;
+                    radius = (m.positions[(int)Z_Math.Graph.SphereSixPoint.Right] - m.positions[(int)Z_Math.Graph.SphereSixPoint.Left]).magnitude * 0.5f;
+                    break;
+                }
+            }
+            if (radius <= 0f)
+                return false;
+
+            float contactHeightLimit = 0.4f * radius;
+            //接触判定容差：球心到碰撞体最近点距离<=半径+0.02视为接触
+            float touchRadius = radius + 0.02f;
+            float touchRadiusSqr = touchRadius * touchRadius;
+            HashSet<MapUnit> existUnit = new HashSet<MapUnit>();
+
+            foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z), 1f))
+            {
+                //踩在本层tile上时，跳过低于本层的tile
+                if (tile.data.mapPos.y < belongTile.data.mapPos.y)
+                    continue;
+                //距离筛选：只检测1.3范围内的tile
+                if ((tile.data.pos - data.pos).sqrMagnitude > 1.69f)
+                    continue;
+
+                List<MapUnit> casts = new List<MapUnit>();
+                casts.Add(tile);
+                casts.AddRange(manager.updateCtrl.objectTileDic.Get(tile));
+                casts.AddRange(manager.updateCtrl.characterTileDic.Get(tile));
+
+                foreach (var obj in casts)
+                {
+                    if (obj is ObjectUnit objU && !objU.data.isObstacle)
+                        continue;
+                    if (obj == this || existUnit.Contains(obj))
+                        continue;
+                    existUnit.Add(obj);
+
+                    foreach (var mesh in obj.GetMeshes(CollideType.CollideOnly))
+                    {
+                        Vector3 nearest;
+                        if (mesh.type == Z_Mesh.MeshType.Cube)
+                        {
+                            nearest = Z_Math.Graph.GetClosestPointOnCube(sphereCenter, mesh.positions);
+                        }
+                        else //Sphere
+                        {
+                            var c = (mesh.positions[(int)Z_Math.Graph.SphereSixPoint.Right] + mesh.positions[(int)Z_Math.Graph.SphereSixPoint.Left]) * 0.5f;
+                            var dir = sphereCenter - c;
+                            if (dir.sqrMagnitude <= 1e-6f)
+                                nearest = c;
+                            else
+                            {
+                                float r = (mesh.positions[(int)Z_Math.Graph.SphereSixPoint.Right] - mesh.positions[(int)Z_Math.Graph.SphereSixPoint.Left]).magnitude * 0.5f;
+                                nearest = c + dir.normalized * r;
+                            }
+                        }
+
+                        //接触判定：球心到碰撞体最近点距离<=半径+容差
+                        if ((nearest - sphereCenter).sqrMagnitude <= touchRadiusSqr)
+                        {
+                            //接触点相对球心的高度小于0.3半径（位于球体下半区域，地面支撑）
+                            if (nearest.y - sphereCenter.y < contactHeightLimit)
+                                return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public override void Remove()

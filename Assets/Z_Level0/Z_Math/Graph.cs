@@ -1,14 +1,15 @@
+//#define DEBUG_GRAPH
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
+using static Z_Math.Graph;
 
 namespace Z_Math
 {
     public static class Graph
     {
         public static float DELTA = 0.0005f;
-        public static bool dDebug;
 
         private static readonly Vector3[] s_CubeCornerOffsets = new Vector3[]
         {
@@ -308,6 +309,17 @@ namespace Z_Math
         /// </summary>
         public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
+#if DEBUG_GRAPH
+            string tmp = "";
+            foreach (var o in aCubeEightPoints)
+                tmp += o.ToString("F10") + " ";
+            Debug.Log($"[graph]{Time.frameCount}aCubeSize:" + tmp);
+            tmp = "";
+            foreach (var o in bCubeEightPoints)
+                tmp += o.ToString("F10") + " ";
+            Debug.Log($"[graph]{Time.frameCount}bCubeSize:" + tmp);
+            Debug.Log($"[graph]{Time.frameCount}dir:" + dir.ToString("F10"));
+#endif
             avoidDir = Vector3.zero;
 
             float mag = dir.magnitude;
@@ -400,6 +412,7 @@ namespace Z_Math
         /// </summary>
         public static IntersectType SphereIntersectCube(Vector3[] sphereSixPoints, Vector3[] cubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
+
             avoidDir = Vector3.zero;
             bool fromIn = false;
             bool toIn = false;
@@ -407,6 +420,45 @@ namespace Z_Math
             dis = mag;
 
             Vector3 sphereCenter = (sphereSixPoints[(int)SphereSixPoint.Right] + sphereSixPoints[(int)SphereSixPoint.Left]) * 0.5f;
+            float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude * 0.5f;
+
+            // 计算cube的AABB，用于快速排除（AABB是超集，排除安全不漏检）
+            Vector3 cubeMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 cubeMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 p = cubeEightPoints[i];
+                cubeMin = Vector3.Min(cubeMin, p);
+                cubeMax = Vector3.Max(cubeMax, p);
+            }
+            Vector3 closestOnAABB = new Vector3(
+                Mathf.Clamp(sphereCenter.x, cubeMin.x, cubeMax.x),
+                Mathf.Clamp(sphereCenter.y, cubeMin.y, cubeMax.y),
+                Mathf.Clamp(sphereCenter.z, cubeMin.z, cubeMax.z)
+            );
+            // Early-out: 快速排除不可能碰撞的情况
+            if (mag > 0)
+            {
+                float distToCube = (sphereCenter - closestOnAABB).magnitude;
+                if (distToCube > sphereRadius + mag)
+                {
+                    return IntersectType.None;
+                }
+            }
+            // 计算球心到OBB最近点（用于SAT分离轴和avoidDir）
+            // 不能用AABB最近点：斜面等非轴对齐cube的AABB比实际OBB大，会给出错误的分离轴
+            Vector3 closestOnCube = GetClosestPointOnCube(sphereCenter, cubeEightPoints);
+#if DEBUG_GRAPH
+            string tmp = "";
+            foreach (var o in sphereSixPoints)
+                tmp += o.ToString("F10") + " ";
+            Debug.Log($"[graph]{Time.frameCount}aSphereSize:" + tmp);
+            tmp = "";
+            foreach (var o in cubeEightPoints)
+                tmp += o.ToString("F10") + " ";
+            Debug.Log($"[graph]{Time.frameCount}bCubeSize:" + tmp);
+            Debug.Log($"[graph]{Time.frameCount}dir:" + dir.ToString("F10"));
+#endif
             Vector3 disDir = GetPointToCube(sphereCenter, cubeEightPoints, out fromIn);
 
             if (fromIn)
@@ -419,8 +471,6 @@ namespace Z_Math
 
             Vector3 newDisDir = GetPointToCube(sphereCenter + dir, cubeEightPoints, out var newInner);
 
-            float sphereRadius = (sphereSixPoints[(int)SphereSixPoint.Right] - sphereSixPoints[(int)SphereSixPoint.Left]).magnitude * 0.5f;
-
             float touchTime = 0;
             float avoidTime = 1;
             exist.Clear();
@@ -431,44 +481,37 @@ namespace Z_Math
             if (AddAxisCheckSphere(normal1, exist))
             {
                 CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, normal1, ref touchTime, ref avoidTime);
+#if DEBUG_GRAPH
+                Debug.Log($"[graph]{Time.frameCount}check1 :" + normal1 + " touchTime:"+ touchTime.ToString("F10") +" avoidTime:"+ avoidTime.ToString("F10"));
+#endif
             }
             if (AddAxisCheckSphere(normal2, exist))
             {
                 CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, normal2, ref touchTime, ref avoidTime);
+#if DEBUG_GRAPH
+                Debug.Log($"[graph]{Time.frameCount}check2 :" + normal2 + " touchTime:" + touchTime.ToString("F10") + " avoidTime:" + avoidTime.ToString("F10"));
+#endif
             }
             if (AddAxisCheckSphere(normal3, exist))
             {
                 CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, normal3, ref touchTime, ref avoidTime);
+#if DEBUG_GRAPH
+                Debug.Log($"[graph]{Time.frameCount}check3 :" + normal3 + " touchTime:" + touchTime.ToString("F10") + " avoidTime:" + avoidTime.ToString("F10"));
+#endif
             }
 
-            if (dir.sqrMagnitude > 0)
+            // 球心到cube最近点的方向：当球心在cube棱/角附近时，3个面法线不足以检测分离
+            // 这个轴是棱/角情况下的真正分离轴
+            Vector3 toClosest = sphereCenter - closestOnCube;
+            if (toClosest.sqrMagnitude > 0.0001f)
             {
-                Vector3 right, up, forward;
-                GetCubeEdgeDirections(cubeEightPoints, out right, out up, out forward);
-
-                if (right.sqrMagnitude > 0)
+                Vector3 nearestAxis = toClosest.normalized;
+                if (AddAxisCheckSphere(nearestAxis, exist))
                 {
-                    Vector3 crossAxis = Vector3.Cross(dir, right);
-                    if (crossAxis.sqrMagnitude > 0 && AddAxisCheckSphere(crossAxis.normalized, exist))
-                    {
-                        CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, crossAxis.normalized, ref touchTime, ref avoidTime);
-                    }
-                }
-                if (up.sqrMagnitude > 0)
-                {
-                    Vector3 crossAxis = Vector3.Cross(dir, up);
-                    if (crossAxis.sqrMagnitude > 0 && AddAxisCheckSphere(crossAxis.normalized, exist))
-                    {
-                        CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, crossAxis.normalized, ref touchTime, ref avoidTime);
-                    }
-                }
-                if (forward.sqrMagnitude > 0)
-                {
-                    Vector3 crossAxis = Vector3.Cross(dir, forward);
-                    if (crossAxis.sqrMagnitude > 0 && AddAxisCheckSphere(crossAxis.normalized, exist))
-                    {
-                        CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, crossAxis.normalized, ref touchTime, ref avoidTime);
-                    }
+                    CheckSphereAxis(sphereCenter, sphereRadius, cubeEightPoints, dir, nearestAxis, ref touchTime, ref avoidTime);
+#if DEBUG_GRAPH
+                    Debug.Log($"[graph]{Time.frameCount}nearest :" + nearestAxis + " touchTime:" + touchTime.ToString("F10") + " avoidTime:" + avoidTime.ToString("F10"));
+#endif
                 }
             }
 
@@ -494,8 +537,26 @@ namespace Z_Math
             dis = touchTime * mag;
             if (touchTime < 1)
             {
-                avoidDir = GetPointToCube(sphereCenter + dir * touchTime, cubeEightPoints, out _);
+                //使用碰撞点处球心到OBB最近点的方向作为避障方向
+                //比GetPushDirByFace更准确：棱角处GetPushDirByFace选最近面而非碰撞面，
+                //导致avoidDir方向错误（选了贴住的面而非撞上的面），角色无法正确滑行
+                //比AABB最近点更准确：斜面等非轴对齐cube的AABB比OBB大，AABB最近点方向错误
+                Vector3 contactPos = sphereCenter + dir * touchTime;
+                Vector3 closestAtContact = GetClosestPointOnCube(contactPos, cubeEightPoints);
+                Vector3 pushDir = contactPos - closestAtContact;
+                if (pushDir.sqrMagnitude > 0.0001f)
+                {
+                    avoidDir = pushDir.normalized;
+                }
+                else
+                {
+                    //球心恰好在cube表面或内部，回退到面分类法
+                    avoidDir = GetPushDirByFace(contactPos, cubeEightPoints, out _);
+                }
             }
+#if DEBUG_GRAPH
+            Debug.Log($"[graph]{Time.frameCount}final :" +"touchTime:" + touchTime.ToString("F10") + " avoidDir:" + avoidDir.ToString("F10"));
+#endif
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
 
@@ -522,6 +583,7 @@ namespace Z_Math
             float dirProj = Vector3.Dot(dir, axis);
 
             CalcTouchTimeAndAvoidTime(sphereMin, sphereMax, cubeMin, cubeMax, dirProj, ref touchTime, ref avoidTime, out _);
+
         }
 
         public static IntersectType SphereIntersectSphere(Vector3[] aSphereSixPoints, Vector3[] bSphereSixPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
@@ -656,6 +718,44 @@ namespace Z_Math
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// 智能合并避障方向：仅当新方向与已有方向处于同一半球（两两点积>=0）时才添加
+        /// 避免盲目并集：碰到最近面后，其avoid若已能避开其他面，则冲突方向的其他面avoid不再污染滑行计算
+        /// 判定标准：新方向与所有已有方向归一化点积>=0（同侧），否则视为冲突方向丢弃
+        /// </summary>
+        public static void MergeAvoidDir(List<Vector3> avoidDir, Vector3 newAvoid)
+        {
+            if (newAvoid.sqrMagnitude <= 0)
+                return;
+            if (avoidDir.Count == 0)
+            {
+                avoidDir.Add(newAvoid);
+                return;
+            }
+            var normalized = newAvoid.normalized;
+            for (int i = 0; i < avoidDir.Count; i++)
+            {
+                var existing = avoidDir[i];
+                if (existing.sqrMagnitude <= 0)
+                    continue;
+                if (Vector3.Dot(normalized, existing.normalized) < 0)
+                    return;
+            }
+            avoidDir.Add(newAvoid);
+        }
+
+        /// <summary>
+        /// 批量智能合并避障方向：对newAvoids中每个方向调用MergeAvoidDir
+        /// 用于替换原有的avoidDir.AddRange(avoid)盲目并集
+        /// </summary>
+        public static void MergeAvoidDirRange(List<Vector3> avoidDir, List<Vector3> newAvoids)
+        {
+            if (newAvoids == null)
+                return;
+            for (int i = 0; i < newAvoids.Count; i++)
+                MergeAvoidDir(avoidDir, newAvoids[i]);
         }
 
         private static (float min, float max) ProjectCubeOntoAxis(Vector3[] cubeEightPoints, Vector3 axis)
@@ -1040,6 +1140,112 @@ namespace Z_Math
                                    res.x * axis[0].y + res.y * axis[1].y + res.z * axis[2].y,
                                    res.x * axis[0].z + res.y * axis[1].z + res.z * axis[2].z);
 
+        }
+
+        /// <summary>
+        /// 基于面分类的球心到OBB推出方向计算（用于碰撞避障avoidDir）
+        /// 遍历6个面，计算球心到各面平面的有符号距离：
+        /// - 正距离=球心在该面外侧（该面面向球心，可能产生阻碍）
+        /// - 负距离=球心在该面内侧（该面背向球心，不可能产生阻碍，过滤）
+        /// 外部点：在正距离面中选距离最小的（最近接触面），返回 法线×距离
+        /// 内部点：在负距离面中选距离最大（最接近0）的，返回 法线×|距离|
+        /// 相比GetPointToCube的角点近似法，本方法在边缘接触时返回单一面法线而非混合方向，
+        /// 避免角色在斜面顶部边缘被混合法线抬起而无法沿斜面滑行
+        /// </summary>
+        public static Vector3 GetPushDirByFace(Vector3 point, Vector3[] cubeEightPoints, out bool inner)
+        {
+            Vector3 p0 = cubeEightPoints[(int)CubeEightPoint.LeftDownBack];
+            Vector3 p1 = cubeEightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 p2 = cubeEightPoints[(int)CubeEightPoint.LeftUpBack];
+            Vector3 p3 = cubeEightPoints[(int)CubeEightPoint.LeftDownForward];
+            Vector3 p7 = cubeEightPoints[(int)CubeEightPoint.RightUpForward];
+
+            Vector3 right = (p1 - p0).normalized;
+            Vector3 up = (p2 - p0).normalized;
+            Vector3 forward = (p3 - p0).normalized;
+            Vector3 center = (p0 + p7) * 0.5f;
+
+            float halfX = (p1 - p0).magnitude * 0.5f;
+            float halfY = (p2 - p0).magnitude * 0.5f;
+            float halfZ = (p3 - p0).magnitude * 0.5f;
+
+            Vector3 d = point - center;
+            float lx = Vector3.Dot(d, right);
+            float ly = Vector3.Dot(d, up);
+            float lz = Vector3.Dot(d, forward);
+
+            //6个面的有符号距离（正=球心在外侧=面向球心，负=内侧=背向球心）
+            float dxPos = lx - halfX;
+            float dxNeg = -lx - halfX;
+            float dyPos = ly - halfY;
+            float dyNeg = -ly - halfY;
+            float dzPos = lz - halfZ;
+            float dzNeg = -lz - halfZ;
+
+            //判断是否在OBB内部（所有距离都<=容差）
+            inner = dxPos <= DELTA && dxNeg <= DELTA &&
+                    dyPos <= DELTA && dyNeg <= DELTA &&
+                    dzPos <= DELTA && dzNeg <= DELTA;
+
+            if (inner)
+            {
+                //内部点：找最近面（距离最大=最接近0的负值），沿该面法线推出
+                float maxDist = dxPos; Vector3 pushNormal = right; float pushDist = -dxPos;
+                if (dxNeg > maxDist) { maxDist = dxNeg; pushNormal = -right; pushDist = -dxNeg; }
+                if (dyPos > maxDist) { maxDist = dyPos; pushNormal = up; pushDist = -dyPos; }
+                if (dyNeg > maxDist) { maxDist = dyNeg; pushNormal = -up; pushDist = -dyNeg; }
+                if (dzPos > maxDist) { maxDist = dzPos; pushNormal = forward; pushDist = -dzPos; }
+                if (dzNeg > maxDist) { maxDist = dzNeg; pushNormal = -forward; pushDist = -dzNeg; }
+                return pushNormal * pushDist;
+            }
+            else
+            {
+                //外部点：在正距离面中选距离最小的（最近接触面），背向面（负距离）自动过滤
+                float minDist = float.MaxValue;
+                Vector3 pushNormal = Vector3.zero;
+                if (dxPos > DELTA && dxPos < minDist) { minDist = dxPos; pushNormal = right; }
+                if (dxNeg > DELTA && dxNeg < minDist) { minDist = dxNeg; pushNormal = -right; }
+                if (dyPos > DELTA && dyPos < minDist) { minDist = dyPos; pushNormal = up; }
+                if (dyNeg > DELTA && dyNeg < minDist) { minDist = dyNeg; pushNormal = -up; }
+                if (dzPos > DELTA && dzPos < minDist) { minDist = dzPos; pushNormal = forward; }
+                if (dzNeg > DELTA && dzNeg < minDist) { minDist = dzNeg; pushNormal = -forward; }
+                if (pushNormal == Vector3.zero)
+                {
+                    //所有面都在容差内（点在OBB表面），回退到GetPointToCube
+                    return GetPointToCube(point, cubeEightPoints, out _);
+                }
+                return pushNormal * minDist;
+            }
+        }
+
+        /// <summary>
+        /// 计算点point到定向立方体（由8个顶点定义的OBB）的最近点
+        /// 将point转换到立方体局部坐标系（以中心为原点、3条正交边为轴），各分量钳制到半边长范围内，再转回世界坐标
+        /// 用于检测球体与立方体的接触点位置（判断地面支撑）
+        /// </summary>
+        public static Vector3 GetClosestPointOnCube(Vector3 point, Vector3[] cubeEightPoints)
+        {
+            Vector3 p0 = cubeEightPoints[(int)CubeEightPoint.LeftDownBack];
+            Vector3 p1 = cubeEightPoints[(int)CubeEightPoint.RightDownBack];
+            Vector3 p2 = cubeEightPoints[(int)CubeEightPoint.LeftUpBack];
+            Vector3 p3 = cubeEightPoints[(int)CubeEightPoint.LeftDownForward];
+            Vector3 p7 = cubeEightPoints[(int)CubeEightPoint.RightUpForward];
+
+            Vector3 right = (p1 - p0).normalized;
+            Vector3 up = (p2 - p0).normalized;
+            Vector3 forward = (p3 - p0).normalized;
+            Vector3 center = (p0 + p7) * 0.5f;
+
+            float halfX = (p1 - p0).magnitude * 0.5f;
+            float halfY = (p2 - p0).magnitude * 0.5f;
+            float halfZ = (p3 - p0).magnitude * 0.5f;
+
+            Vector3 d = point - center;
+            float lx = Mathf.Clamp(Vector3.Dot(d, right), -halfX, halfX);
+            float ly = Mathf.Clamp(Vector3.Dot(d, up), -halfY, halfY);
+            float lz = Mathf.Clamp(Vector3.Dot(d, forward), -halfZ, halfZ);
+
+            return center + right * lx + up * ly + forward * lz;
         }
 
 

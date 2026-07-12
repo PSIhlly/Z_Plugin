@@ -68,9 +68,9 @@ namespace Ui.PlayDataCharacter
         {
 
             itemCon.Clear();
-            for (int i = 0, icnt = GameManager.instance.curProgress.team.Count; i < icnt; i++)
+            foreach (var uid in GameManager.instance.curProgress.team.OrderBy(u => u))
             {
-                var data = CharacterProductForm.DataByUid[GameManager.instance.curProgress.team[i]];
+                var data = CharacterProductForm.DataByUid[uid];
                 itemCon.Add(new UiGameItemParam()
                 {
                     data = data

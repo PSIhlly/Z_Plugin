@@ -23,16 +23,17 @@ namespace Z_Map
         public Dictionary<string,AssetForm.Data> innerPrefabDic = new Dictionary<string, AssetForm.Data>();
         public static string GetPrefabName(string name="") => "MapPrefab$" + name;
 
-        public void Init(GameObjectAssetForm.Data mapPrefab, GameObjectAssetForm.Data imgPrefab, GameObjectAssetForm.Data canvasPrefab,TexAssetForm.Data defaultTileTexture)
+        public void Init(GameObjectAssetForm.Data mapPrefab, GameObjectAssetForm.Data mapslopePrefab, GameObjectAssetForm.Data imgPrefab, GameObjectAssetForm.Data canvasPrefab,TexAssetForm.Data defaultTileTexture)
         {
             innerPrefabDic["map"] = mapPrefab;
+            innerPrefabDic["mapslope"] = mapslopePrefab;
             innerPrefabDic["img"] = imgPrefab;
             innerPrefabDic["canvas"] = canvasPrefab;
             innerPrefabDic["defaultTileTexture"] = defaultTileTexture;
             TileUnitForm.Clear();
             ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
-            var unitSize = new Vector3(1, 1, 1);
+            var unitSize = new Vector3(1, 1.5f, 1);
             mainData = new MapMainForm.Data(
                 1,
                 unitSize,

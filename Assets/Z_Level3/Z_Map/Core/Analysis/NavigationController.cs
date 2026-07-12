@@ -108,9 +108,13 @@ namespace Z_Map.Analysis
                 if (obs != null && obs.isObstacle)
                 {
 
+                    //prefab根的lossyScale，用于把collider的lossyScale换算成“相对root的局部scale”，
+                    //避免与obs.scale相乘时重复计入prefab根的缩放（prefab根scale非1时会出错）
+                    Vector3 rootLossyScale = obs.unit.prefab.transform.lossyScale;
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
-                        Vector3[] points = Mesh.GetMesh(bc, obs.pos + Vector3.up * obs.scale.y / 2, obs.euler, Graph.ElementwiseMultiply(bc.transform.lossyScale, obs.scale)).positions;
+                        Vector3 finalScale = Graph.ElementwiseMultiply(Graph.ElementwiseDivide(bc.transform.lossyScale, rootLossyScale), obs.scale);
+                        Vector3[] points = Mesh.GetMesh(bc, obs.pos + Vector3.up * obs.scale.y / 2, obs.euler, finalScale).positions;
                         var overlapPoses = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),

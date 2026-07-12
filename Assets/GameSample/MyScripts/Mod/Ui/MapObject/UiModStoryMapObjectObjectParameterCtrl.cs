@@ -38,7 +38,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
 
             argIptCon.Clear();
-            foreach (var data in MapObjectParamForm.DataByName.Values)
+            foreach (var data in MapObjectParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 if (!model.data.paramDic.ContainsKey(data.name))
                 {

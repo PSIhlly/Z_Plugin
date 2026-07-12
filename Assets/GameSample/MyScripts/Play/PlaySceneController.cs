@@ -98,10 +98,14 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             case CameraMode.Overhead:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, 0);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(90, 0, 0);
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 80;
+                CameraInstance.instance.globalLight.intensity = 1f;
                 break;
             case CameraMode.Isometric:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 50;
+                CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
 

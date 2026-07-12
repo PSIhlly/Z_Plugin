@@ -6,6 +6,7 @@ using Z_DesignStyle;
 public class CameraInstance : Z_MonoSingleton<CameraInstance>
 {
     Camera _cam;
+    public Light globalLight;
     Transform _camTrs;
     Transform _tarTrs;
     private Vector3 limitMax;

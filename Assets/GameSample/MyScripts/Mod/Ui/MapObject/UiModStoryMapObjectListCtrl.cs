@@ -139,7 +139,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                 datas= model.datas[model.lab];
             }
 
-            foreach (var data in datas)
+            foreach (var data in datas.OrderBy(d => d.id))
             {
                 itemCon.Add(new UiBigItemParam()
                 {

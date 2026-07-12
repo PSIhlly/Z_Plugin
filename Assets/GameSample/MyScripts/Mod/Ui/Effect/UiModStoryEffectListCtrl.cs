@@ -59,7 +59,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectList
             var datas = string.IsNullOrEmpty(model.lab) ? new List<EffectForm.Data>(EffectForm.DataByUid.Values) :
                 (EffectForm.DatasByLabel.ContainsKey(model.lab) ? EffectForm.DatasByLabel[model.lab] : new List<EffectForm.Data>());
 
-            foreach (var data in datas)
+            foreach (var data in datas.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
                 {

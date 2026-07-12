@@ -117,9 +117,9 @@ namespace Ui.PlayDataBackpack
             labCon.Refresh();
 
             itemCon.Clear();
-            for (int i = 0, icnt = GameManager.instance.curProgress.bag.Count; i < icnt; i++)
+            foreach (var uid in GameManager.instance.curProgress.bag.OrderBy(u => u))
             {
-                var data = ItemProductForm.DataByUid[GameManager.instance.curProgress.bag[i]];
+                var data = ItemProductForm.DataByUid[uid];
                 if (model.lab == null || data.label == model.lab)
                 {
                     itemCon.Add(new UiGameItemParam()

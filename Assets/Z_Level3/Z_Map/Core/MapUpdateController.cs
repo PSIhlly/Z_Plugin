@@ -360,9 +360,7 @@ namespace Z_Map
             {
                 if (curMap.mapPos.y < realViewCenter.y)
                 {
-                    if (_super.utilCtrl.ContainsTile(curMap.mapPos.x, realViewCenter.y, curMap.mapPos.z))
-                        SetGroupVision(curMap.unit, 0);
-                    else
+                    
                         SetGroupVision(curMap.unit, 1);
                 }
                 else
@@ -550,18 +548,24 @@ namespace Z_Map
             }
             // 决定关联哪个tile：防止重力微移导致y截断后误切换到下方tile
             TileUnit newMap = null;
-            var floatMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
+          /*  var floatMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
                 // snap阈值需按unitSize.y缩放，保持真实空间容差固定为0.1（原unitSize=2时0.05 map空间=0.1真实空间）
                 if (Math.Abs(floatMapPos.y - newMapPos.y) < 0.1f / _super.data.mainData.mapUnitSize.y
                     && _super.utilCtrl.ContainsTile(newMapPos.x, newMapPos.y, newMapPos.z))
                 {
                     var tileData = _super.utilCtrl.GetTileData(newMapPos.x, newMapPos.y, newMapPos.z);
                  if (tileData != null&&tileData.prefabName == MapInfo.GetPrefabName("map"))
-                {
-                    newMap = tileData.unit;
-                             newPos.y= newMap.data.pos.y;
-                 }
-               } 
+			                {
+			                    newMap = tileData.unit;
+			                    //仅在非爬升时吸附Y到地面tile高度，避免覆盖斜面滑行的+Y分量
+			                    //重力开启时不吸附Y：球体碰撞体中心相对data.pos有偏移，吸附到tile高度会导致球体悬空，重力无法使球体落地
+			                    float deltaY = newPos.y - unit.data.pos.y;
+			                    if (deltaY <= 0.0001f && !GlobalSettings.ENABLE_GRAVITY)
+			                    {
+			                        newPos.y = newMap.data.pos.y;
+			                    }
+			                 }
+               }*/
 
             // 策略3：以上都不满足，取下方最近的tile
             if (newMap == null)
@@ -669,12 +673,14 @@ namespace Z_Map
                 assist.Merge(assistTmp);
                 if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
                 {
+                    //已嵌入：智能合并避障方向（仅保留同半球兼容方向，避免冲突方向污染滑行）
+                    MergeAvoidDirRange(avoidDir, avoidDirTmp);
                 }
                 else if (dis < disRes)
                 {
                     disRes = dis;
                     avoidDir.Clear();
-                    avoidDir.AddRange(avoidDirTmp);
+                    MergeAvoidDirRange(avoidDir, avoidDirTmp);
                 }
             }
             var res = assist.GetRes();
@@ -702,13 +708,14 @@ namespace Z_Map
                 assist.Add(curType);
                 if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
                 {
-                    avoidDir.Add(avoid);
+                    //已嵌入：智能合并避障方向（仅保留同半球兼容方向，避免冲突方向污染滑行）
+                    MergeAvoidDir(avoidDir, avoid);
                 }
                 else if (dis < disRes)
                 {
                     disRes = dis;
                     avoidDir.Clear();
-                    avoidDir.Add(avoid);
+                    MergeAvoidDir(avoidDir, avoid);
                 }
             }
             return disRes;

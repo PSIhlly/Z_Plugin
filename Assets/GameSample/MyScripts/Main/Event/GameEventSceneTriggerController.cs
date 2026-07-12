@@ -177,6 +177,10 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         {
                             mapUnit.ExecuteEvt("onObjectTouchEvent", heap);
                         }
+                        else if(evt.b is TileUnit)
+                        {
+                            mapUnit.ExecuteEvt("onBoundaryTouchEvent", heap);
+                        }
                        
                         
                         break;

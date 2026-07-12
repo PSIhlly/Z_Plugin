@@ -41,7 +41,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
 
             itemCon.Clear();
-            foreach (var data in model.data.animDic.Values)
+            foreach (var data in model.data.animDic.Values.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
                 {

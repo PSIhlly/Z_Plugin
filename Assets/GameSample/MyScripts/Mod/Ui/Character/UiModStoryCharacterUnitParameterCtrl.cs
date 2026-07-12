@@ -37,7 +37,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         {
 
             argIptCon.Clear();
-            foreach (var data in CharacterParamForm.DataByName.Values)
+            foreach (var data in CharacterParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 if (!model.data.paramDic.ContainsKey(data.name))
                 {

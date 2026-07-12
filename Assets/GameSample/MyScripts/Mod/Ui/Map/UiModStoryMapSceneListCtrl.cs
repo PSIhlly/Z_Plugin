@@ -49,7 +49,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneList
 
           
             itemCon.Clear();
-            foreach (var data in SceneForm.DataByName.Values)
+            foreach (var data in SceneForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
                 {

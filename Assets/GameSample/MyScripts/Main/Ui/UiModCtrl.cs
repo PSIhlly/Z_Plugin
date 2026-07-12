@@ -14,6 +14,7 @@ using Ui.ModStoryEditorStyleWindow;
 using Z_DesignStyle;
 using Z_DataSystem;
 using System;
+using System.Linq;
 
 namespace Ui.Mod
 {
@@ -38,7 +39,7 @@ namespace Ui.Mod
         public void Refresh()
         {
             con.Clear();
-            foreach (var data in StoryForm.DataById.Values)
+            foreach (var data in StoryForm.DataById.Values.OrderBy(d => d.id))
             {
                 con.Add(new UiItemParam()
                 {

@@ -125,7 +125,7 @@ public class GameSaveController : Z_Controller<GameManager>
             {
                 var mapData = new GameMapData();
                 var dic = GameManager.instance.innerAssetDic;
-                mapData.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"],(TexAssetForm.Data) dic["defaultTileTexture"]);
+                mapData.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"],(TexAssetForm.Data) dic["defaultTileTexture"]);
                 GameManager.instance.saveCtrl.SaveSceneMap(path + Main2StoryManager.GetSceneFileNameById(data.uid), mapData);
             }
         }

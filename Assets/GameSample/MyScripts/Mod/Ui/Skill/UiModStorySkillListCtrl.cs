@@ -58,7 +58,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
             var datas = string.IsNullOrEmpty(model.lab) ? new List<SkillProductForm.Data>(SkillProductForm.DataByUid.Values) : 
                 (SkillProductForm.DatasByLabel.ContainsKey(model.lab) ? SkillProductForm.DatasByLabel[model.lab] : new List<SkillProductForm.Data>());
 
-            foreach (var data in datas)
+            foreach (var data in datas.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
                 {

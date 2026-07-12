@@ -29,10 +29,11 @@ namespace Z_Map
             List<TileUnit> res = new List<TileUnit>();
             int area = (int)Math.Max(1, length);
             for (int i = mapPos.Item1 - area; i <= mapPos.Item1 + area; i++)
-                for (int j = mapPos.Item3 - area; j <= mapPos.Item3 + area; j++)
+                for (int k = mapPos.Item2; k <= mapPos.Item2 + 1; k++)
+                    for (int j = mapPos.Item3 - area; j <= mapPos.Item3 + area; j++)
                 {
-                    var tile = GetTile(i, mapPos.Item2, j);
-                    if (tile != null)
+                    var tile = GetTile(i, k, j);
+                    if (tile != null&& !res.Contains(tile))
                         res.Add(tile);
                 }
             return res;
@@ -294,26 +295,34 @@ namespace Z_Map
             //计算root的世界旋转的逆，用于把子物体的世界旋转转换到root局部坐标系
             Quaternion rootRotInv = Quaternion.Inverse(root.transform.rotation);
             Quaternion rootRotFinal = Quaternion.Euler(rootEuler);
+            //prefab根的lossyScale，用于把collider的lossyScale换算成“相对root的局部scale”，
+            //避免与rootScale相乘时重复计入prefab根的缩放
+            Vector3 rootLossyScale = root.transform.lossyScale;
             foreach (var c in cs)
             {
                 if (type == CollideType.CollideOnly && c.isTrigger)
                     continue;
                 if (type == CollideType.TriggerOnly && !c.isTrigger)
                     continue;
-                var pos = c.transform.position;
-                //位置变换：把子物体世界位置转换到root局部空间，再用rootEuler旋转到rootPos坐标系
-                Vector3 localPos = rootRotInv * (pos - root.transform.position);
-                Vector3 finalPos = rootPos + rootRotFinal * localPos;
+                //位置变换：用InverseTransformPoint把子物体世界位置转换到root局部空间（已抵消root的旋转和缩放），
+                //再用rootScale重新缩放、rootRotFinal重新旋转，最后叠加rootPos。
+                //旧实现直接用rootRotInv*(pos-rootPos)得到的是世界单位偏移，未按rootScale重新缩放，
+                //当rootScale!=(1,1,1)且有嵌套collider时位置会偏。
+                Vector3 localPosInRoot = root.transform.InverseTransformPoint(c.transform.position);
+                Vector3 finalPos = rootPos + rootRotFinal * Graph.ElementwiseMultiply(localPosInRoot, rootScale);
                 //旋转变换：把子物体世界旋转转换到root局部空间，再用rootEuler旋转
                 Quaternion childLocalRot = rootRotInv * c.transform.rotation;
                 Vector3 finalEuler = (rootRotFinal * childLocalRot).eulerAngles;
+                //scale变换：collider的lossyScale已包含prefab根的scale，需先除掉根scale再用rootScale重新缩放，
+                //否则prefab根scale非1时会与rootScale重复相乘
+                Vector3 finalScale = Graph.ElementwiseMultiply(Graph.ElementwiseDivide(c.transform.lossyScale, rootLossyScale), rootScale);
                 if (c is BoxCollider box)
                 {
-                    res.Add(Mesh.GetMesh(box, finalPos, finalEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
+                    res.Add(Mesh.GetMesh(box, finalPos, finalEuler, finalScale));
                 }
                 else if (c is SphereCollider sp)
                 {
-                    res.Add(Mesh.GetMesh(sp, finalPos, finalEuler, Graph.ElementwiseMultiply(c.transform.lossyScale, rootScale)));
+                    res.Add(Mesh.GetMesh(sp, finalPos, finalEuler, finalScale));
                 }
             }
             return res;
@@ -381,18 +390,34 @@ namespace Z_Map
 
             return ans;
         }
-        public void SetPerspectiveModel(Transform rootTrs, Transform imgTrs, float deepth)
+        public void SetPerspectiveModel(Transform rootTrs, Transform imgTrs, float deepth, ref Transform stretchWrapper)
         {
             switch (DynamicGlobalSettings.cameraMode)
             {
                 case CameraMode.Overhead:
+                    if (stretchWrapper != null)
+                    {
+                        imgTrs.SetParent(rootTrs);
+                        UnityEngine.Object.Destroy(stretchWrapper.gameObject);
+                        stretchWrapper = null;
+                    }
                     imgTrs.position = rootTrs.position + Vector3.up * rootTrs.localScale.y / 2 + Vector3.down * deepth;
                     imgTrs.localScale = Vector3.one;
                     break;
                 case CameraMode.Isometric:
-                    imgTrs.position = rootTrs.position + new Vector3(0, -1, -1) * deepth;
-                    imgTrs.localScale = new Vector3(rootTrs.localScale.x, rootTrs.localScale.y, rootTrs.localScale.z);
-                    imgTrs.eulerAngles = new Vector3(45, 0, 0);
+                    if (stretchWrapper == null)
+                    {
+                        GameObject wrapperObj = new GameObject("IsoStretchWrapper");
+                        stretchWrapper = wrapperObj.transform;
+                        stretchWrapper.SetParent(rootTrs);
+                    }
+                    stretchWrapper.position = rootTrs.position + new Vector3(0, 0.207f,0)+ new Vector3(0, -1, -1) * deepth;
+                    stretchWrapper.rotation = Quaternion.identity;
+                    stretchWrapper.localScale = new Vector3(rootTrs.localScale.x, rootTrs.localScale.y*1.414f, rootTrs.localScale.z);
+                    imgTrs.SetParent(stretchWrapper);
+                    imgTrs.localPosition = Vector3.zero;
+                    imgTrs.localScale = Vector3.one;
+                    imgTrs.eulerAngles = new Vector3(0, 0, 0);
                     break;
             }
         }

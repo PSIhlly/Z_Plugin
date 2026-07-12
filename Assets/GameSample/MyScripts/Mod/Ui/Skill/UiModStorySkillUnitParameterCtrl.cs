@@ -40,7 +40,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitParameter
         {
 
             argIptCon.Clear();
-            foreach (var data in SkillParamForm.DataByName.Values)
+            foreach (var data in SkillParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 if (!model.data.paramDic.ContainsKey(data.name))
                 {

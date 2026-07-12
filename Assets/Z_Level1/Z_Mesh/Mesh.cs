@@ -21,7 +21,11 @@ namespace Z_Mesh
     {
         public static MeshInfo GetMesh(BoxCollider box, Vector3 pos, Vector3 euler, Vector3 scale)
         {
-            return GetMesh(Graph.ElementwiseMultiply(box.center, scale) + pos, euler, Graph.ElementwiseMultiply(box.size, scale));
+            //box.center是collider局部空间偏移，需按collider世界旋转euler旋转后再叠加到pos上
+            //否则当父物体有旋转且center非零时，center会按世界轴向偏移，导致盒子位置/形态错误
+            Quaternion rot = Quaternion.Euler(euler);
+            Vector3 center = pos + rot * Graph.ElementwiseMultiply(box.center, scale);
+            return GetMesh(center, euler, Graph.ElementwiseMultiply(box.size, scale));
         }
         public static MeshInfo GetMesh(Vector3 pos, Vector3 euler, Vector3 size)
         {
@@ -34,7 +38,10 @@ namespace Z_Mesh
         }
         public static MeshInfo GetMesh(SphereCollider sp, Vector3 pos, Vector3 euler, Vector3 scale)
         {
-            return GetMesh(Graph.ElementwiseMultiply(sp.center, scale) + pos, sp.radius, euler, scale);
+            //sp.center同理，需按collider世界旋转euler旋转后再叠加到pos上
+            Quaternion rot = Quaternion.Euler(euler);
+            Vector3 center = pos + rot * Graph.ElementwiseMultiply(sp.center, scale);
+            return GetMesh(center, sp.radius, euler, scale);
         }
         public static MeshInfo GetMesh(Vector3 pos, float radius, Vector3 euler, Vector3 scale)
         {

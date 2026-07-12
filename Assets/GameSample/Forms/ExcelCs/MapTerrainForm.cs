@@ -67,7 +67,7 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
-        public static Action<Data,string,string> changePrefabnameAction;
+        public static Action<Data,string,string> changeInnerprefabnameAction;
                 
         public static Action<Data,int,int> changeIconAction;
                 
@@ -78,20 +78,20 @@ namespace Form
         public partial class Data : MapBaseForm.Data
         {
 
-                    private string  _prefabName;
+                    private string  _innerPrefabName;
                     /// <summary>
                     ///预制名称
                     ///</summary>
-                    public string  prefabName{
-                                get{return _prefabName;}
+                    public string  innerPrefabName{
+                                get{return _innerPrefabName;}
  set{
 
                     if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangePrefabname(this,_prefabName,value); 
+                       ChangeInnerprefabname(this,_innerPrefabName,value); 
                     }
         
-                _prefabName = value;
+                _innerPrefabName = value;
                 }
                  
                      }
@@ -113,12 +113,12 @@ private set{
             {
             }
             
-            public Data(int id,string name,string prefabName,int icon,float step,string label):base(id,name,icon,label)
+            public Data(int id,string name,string innerPrefabName,int icon,float step,string label):base(id,name,icon,label)
             {
 
              this.id = id;
              this.name = name;
-             this.prefabName = prefabName;
+             this.innerPrefabName = innerPrefabName;
              this.icon = icon;
              this.step = step;
              this.label = label;
@@ -129,7 +129,7 @@ private set{
 
              this.id = data.id;
              this.name = data.name;
-             this.prefabName = data.prefabName;
+             this.innerPrefabName = data.innerPrefabName;
              this.icon = data.icon;
              this.step = data.step;
              this.label = data.label;
@@ -137,7 +137,7 @@ private set{
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,prefabName,icon,step,label);
+        return new Data(sameId? id:idChain.GetId(),name,innerPrefabName,icon,step,label);
                 }
             
             public override  void BeforeGet()
@@ -199,7 +199,9 @@ private set{
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1000001,new Data(1000001,"ground","MapPrefab$map",0,0f,"")},
+                {1000001,new Data(1000001,"ground","map",0,0f,"")},
+
+                {1000002,new Data(1000002,"slope","mapslope",0,1f,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -208,9 +210,13 @@ private set{
     
                             {"ground",new List<Data>()},
         
+                            {"slope",new List<Data>()},
+        
                 };
 
                     _DatasByName["ground"].Add(_DataById[1000001]);
+
+                    _DatasByName["slope"].Add(_DataById[1000002]);
 
                     _DatasByLabel = new Dictionary<string, List<Data>>() {
     
@@ -219,6 +225,8 @@ private set{
                 };
 
                     _DatasByLabel[""].Add(_DataById[1000001]);
+
+                    _DatasByLabel[""].Add(_DataById[1000002]);
 
 
             childInitAction?.Invoke();
@@ -271,7 +279,7 @@ private set{
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
-                jo.SelectToken("prefabName")==null?defaultData.prefabName:jo.Get<string>("prefabName"),
+                jo.SelectToken("innerPrefabName")==null?defaultData.innerPrefabName:jo.Get<string>("innerPrefabName"),
 
                 jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
@@ -294,7 +302,7 @@ private set{
 
             jo.Set<string>("name",data.name);
 
-            jo.Set<string>("prefabName",data.prefabName);
+            jo.Set<string>("innerPrefabName",data.innerPrefabName);
 
             jo.Set<int>("icon",data.icon);
 
@@ -427,12 +435,12 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangePrefabname(Data superData,string oldV,string newV)
+            public static void ChangeInnerprefabname(Data superData,string oldV,string newV)
             {
                 if(superData is Data data)
                 {
 
-                changePrefabnameAction?.Invoke(data,oldV,newV);
+                changeInnerprefabnameAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -93,26 +93,26 @@ private set{
                  
                      }
                     
-                    private string  _prefabName;
+                    private string  _innerPrefabName;
                     /// <summary>
                     ///资源名
                     ///</summary>
-                    public string  prefabName{
-                                get{return _prefabName;}
+                    public string  innerPrefabName{
+                                get{return _innerPrefabName;}
 private set{
         
-                _prefabName = value;
+                _innerPrefabName = value;
                 }
                  
                      }
                     
-            public Data(int id,string name,int icon,string prefabName)
+            public Data(int id,string name,int icon,string innerPrefabName)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
-             this.prefabName = prefabName;
+             this.innerPrefabName = innerPrefabName;
 
             }
             public void Reset(Data data)
@@ -121,12 +121,12 @@ private set{
              this.id = data.id;
              this.name = data.name;
              this.icon = data.icon;
-             this.prefabName = data.prefabName;
+             this.innerPrefabName = data.innerPrefabName;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,prefabName);
+        return new Data(sameId? id:idChain.GetId(),name,icon,innerPrefabName);
                 }
             
             public virtual  void BeforeGet()
@@ -176,11 +176,11 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {1,new Data(1,"Cube",0,"MapPrefab$cube")},
+                {1,new Data(1,"Cube",0,"cube")},
 
-                {2,new Data(2,"Sphere",0,"MapPrefab$sphere")},
+                {2,new Data(2,"Sphere",0,"sphere")},
 
-                {3,new Data(3,"Slope",0,"MapPrefab$slope")},
+                {3,new Data(3,"Slope",0,"slope")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -247,7 +247,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                     _defaultData.icon,
 
-                    _defaultData.prefabName
+                    _defaultData.innerPrefabName
                     );
 
             return data;

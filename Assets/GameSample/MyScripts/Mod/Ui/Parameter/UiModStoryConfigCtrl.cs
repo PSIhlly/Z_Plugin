@@ -147,7 +147,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
         {
 
             teamCon.Clear();
-            foreach (var uid in GameManager.instance.curProgress.team)
+            foreach (var uid in GameManager.instance.curProgress.team.OrderBy(u => u))
             {
                 teamCon.Add(new UiTeamerParam() { uid = uid });
             }
@@ -155,7 +155,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             teamCon.Refresh();
 
             activeTeamCon.Clear();
-            foreach (var uid in GameManager.instance.curProgress.teamActive)
+            foreach (var uid in GameManager.instance.curProgress.teamActive.OrderBy(u => u))
             {
                 activeTeamCon.Add(new UiActiveTeamerParam() { uid = uid });
             }
@@ -163,7 +163,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             activeTeamCon.Refresh();
 
             bagCon.Clear();
-            foreach (var uid in GameManager.instance.curProgress.bag)
+            foreach (var uid in GameManager.instance.curProgress.bag.OrderBy(u => u))
             {
                 bagCon.Add(new UiItemParam() { uid = uid });
             }

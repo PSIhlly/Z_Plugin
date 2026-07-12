@@ -320,16 +320,10 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ChooseModel(string title, Action<EntryItem> act)
     {
         var items = new EntryItem();
-        foreach (var form in GameObjectAssetForm.DataById.Values)
-        {
-            if (!form.name.StartsWith(GlobalDefaultHelper.GetInternalPrefabName("")))
-            {
-                items.Add(form.name,null,form.id);
-            }
-        }
+
         foreach (var form in MapPrefabForm.DataById.Values)
         {
-            items.Add(form.name, null, form.id);
+            items.Add(form.name, null,GameManager.instance.innerAssetDic[form.innerPrefabName].id);
         }
         NotifyManager.instance.AddChoose(title,
             true, (item) =>

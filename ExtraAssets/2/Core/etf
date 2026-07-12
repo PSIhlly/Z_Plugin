@@ -1,53 +1,5 @@
 [
   {
-    "uid": 2,
-    "name": "魔符·星屑幻想",
-    "label": "技能",
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 48,
-              "time": 1.0,
-              "pos": "0|0|0",
-              "rot": 0.0,
-              "scale": "3|3|3",
-              "opacity": 0.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 48,
-              "time": 1.0,
-              "pos": "0|0|0",
-              "rot": 179.0,
-              "scale": "3|3|3",
-              "opacity": 1.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 48,
-              "time": 1.0,
-              "pos": "0|0|0",
-              "rot": 359.0,
-              "scale": "3|3|3",
-              "opacity": 0.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": true
-  },
-  {
     "uid": 1,
     "name": "爆炸1",
     "label": "场景特效",
@@ -194,5 +146,53 @@
       }
     ],
     "ground": false
+  },
+  {
+    "uid": 2,
+    "name": "魔符·星屑幻想",
+    "label": "技能",
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 48,
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "3|3|3",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 48,
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 179.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 48,
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 359.0,
+              "scale": "3|3|3",
+              "opacity": 0.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": true
   }
 ]

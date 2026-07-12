@@ -1,6 +1,6 @@
 Shader "DisFadeCode"
 {
-    // 属性面板（暴露给Inspector）
+    // 锟斤拷锟斤拷锟斤拷澹拷锟铰讹拷锟絀nspector锟斤拷
     Properties
     {
         [NoScaleOffset]_Tex("_Tex", 2D) = "white" {}
@@ -38,7 +38,7 @@ Shader "DisFadeCode"
 
             #pragma vertex vert
             #pragma fragment frag
-            // 必须添加阴影相关的multi_compile，否则阴影函数失效
+            // 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷影锟斤拷氐锟絤ulti_compile锟斤拷锟斤拷锟斤拷锟斤拷影锟斤拷锟斤拷失效
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _SHADOWS_SOFT
@@ -100,18 +100,18 @@ Shader "DisFadeCode"
                     clip(baseColor.a - _Cutoff);
                 #endif
 
-                // 核心：计算阴影坐标（URP工具函数）
+                // 锟斤拷锟侥ｏ拷锟斤拷锟斤拷锟斤拷影锟斤拷锟疥（URP锟斤拷锟竭猴拷锟斤拷锟斤拷
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
 
-                // 1. 获取主光源（包含方向、颜色）
-                Light mainLight = GetMainLight(shadowCoord); // 传入阴影坐标
-                // 2. 采样阴影强度：mainLight.shadowAttenuation就是阴影强度（0~1）
-                // 0=完全阴影，1=无阴影
+                // 1. 锟斤拷取锟斤拷锟斤拷源锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷色锟斤拷
+                Light mainLight = GetMainLight(shadowCoord); // 锟斤拷锟斤拷锟斤拷影锟斤拷锟斤拷
+                // 2. 锟斤拷锟斤拷锟斤拷影强锟饺ｏ拷mainLight.shadowAttenuation锟斤拷锟斤拷锟斤拷影强锟饺ｏ拷0~1锟斤拷
+                // 0=锟斤拷全锟斤拷影锟斤拷1=锟斤拷锟斤拷影
                 half shadowStrength = mainLight.shadowAttenuation;
 
                 half3 normalWS = normalize(input.normalWS);
                 half NdotL = saturate(dot(normalWS, mainLight.direction));
-                // 3. 用阴影强度衰减漫反射（核心：接收阴影的关键）
+                // 3. 锟斤拷锟斤拷影强锟斤拷衰锟斤拷锟斤拷锟斤拷锟戒（锟斤拷锟侥ｏ拷锟斤拷锟斤拷锟斤拷影锟侥关硷拷锟斤拷
                 half3 diffuse = mainLight.color * NdotL * baseColor.rgb * shadowStrength * input.dark;
                 
                 return half4(diffuse.rgb,saturate(_Alpha));
@@ -119,7 +119,7 @@ Shader "DisFadeCode"
             ENDHLSL
         }
 
-        // 阴影投射Pass（不变，保证投射镂空阴影）
+        // 锟斤拷影投锟斤拷Pass锟斤拷锟斤拷锟戒，锟斤拷证投锟斤拷锟轿匡拷锟斤拷影锟斤拷
         Pass
         {
             Name "ShadowCaster"

@@ -61,11 +61,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 
             itemCon.Clear();
             var datas = model.lab == null || !CharacterProductForm.DatasByLabelProtouid.ContainsKey((model.lab, 0)) ?( CharacterProductForm.DatasByProtouid.ContainsKey(0)?CharacterProductForm.DatasByProtouid[0]:new List<CharacterProductForm.Data>() ): CharacterProductForm.DatasByLabelProtouid[(model.lab, 0)];
-            foreach (var data in datas)
+            foreach (var data in datas.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
                 {
-                    data= data
+                    data = data
                 });
             }
             itemCon.Add(new UiBigItemParam()

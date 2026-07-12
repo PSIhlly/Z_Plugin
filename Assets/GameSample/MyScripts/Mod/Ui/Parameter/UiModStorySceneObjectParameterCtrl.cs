@@ -39,7 +39,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStorySceneObjectParameter
         {
 
             argCon.Clear();
-            foreach (var data in MapObjectParamForm.DataByName.Values)
+            foreach (var data in MapObjectParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 argCon.Add(new UiArgParam()
                 {

@@ -175,7 +175,7 @@ namespace Ui.ModAssetSelectWindow
             itemCon.Clear();
             if (model.prm is UiModAssetSelectTexWindowParam)
             {
-                foreach (var data in StoryTexAssetForm.DataById.Values)
+                foreach (var data in StoryTexAssetForm.DataById.Values.OrderBy(d => d.id))
                 {
                     if ((model.curLab == null && string.IsNullOrEmpty(data.lab)) || data.lab == model.curLab)
                     {
@@ -188,7 +188,7 @@ namespace Ui.ModAssetSelectWindow
             }
             else if (model.prm is UiModAssetSelectAudioWindowParam)
             {
-                foreach (var data in AudioAssetForm.DataById.Values)
+                foreach (var data in AudioAssetForm.DataById.Values.OrderBy(d => d.id))
                 {
                     if (model.curLab == null || data.lab == model.curLab)
                     {
@@ -201,7 +201,7 @@ namespace Ui.ModAssetSelectWindow
             }
             else if (model.prm is UiModAssetSelectVideoWindowParam)
             {
-                foreach (var data in VideoAssetForm.DataById.Values)
+                foreach (var data in VideoAssetForm.DataById.Values.OrderBy(d => d.id))
                 {
                     if (model.curLab == null || data.lab == model.curLab)
                     {

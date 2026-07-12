@@ -123,7 +123,7 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
 
             if (model.type != null)
             {
-                foreach (var data in EventProgramDataForm.DatasByCategoryType[(model.cat, model.type)])
+                foreach (var data in EventProgramDataForm.DatasByCategoryType[(model.cat, model.type)].OrderBy(d => d.uid))
                 {
                     itemCon.Add(new UiItemParam()
                     {

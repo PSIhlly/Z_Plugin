@@ -1,6 +1,7 @@
 using Form;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -296,7 +297,7 @@ namespace Ui.ModSceneMain.ModTool
             {
                 case 2:
                     {
-                        foreach (var data in MapTextureForm.DataById.Values)
+                        foreach (var data in MapTextureForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null ) || data.label == model.curLab)
                             {
@@ -310,7 +311,7 @@ namespace Ui.ModSceneMain.ModTool
                     break;
                 case 3:
                     {
-                        foreach (var data in MapMaskForm.DataById.Values)
+                        foreach (var data in MapMaskForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null ) || data.label == model.curLab)
                             {
@@ -324,7 +325,7 @@ namespace Ui.ModSceneMain.ModTool
                     break;
                 case 4:
                     {
-                        foreach (var data in MapObjectForm.DataById.Values)
+                        foreach (var data in MapObjectForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null ) || data.label == model.curLab)
                             {
@@ -338,7 +339,7 @@ namespace Ui.ModSceneMain.ModTool
                     break;
                 case 5:
                     {
-                        foreach (var data in MapItemForm.DataById.Values)
+                        foreach (var data in MapItemForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null ) || data.label == model.curLab)
                             {
@@ -354,7 +355,7 @@ namespace Ui.ModSceneMain.ModTool
                     break;
                 case 6:
                     {
-                        foreach (var data in MapCharacterForm.DataById.Values)
+                        foreach (var data in MapCharacterForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null ) || data.label == model.curLab)
                             {
@@ -370,7 +371,7 @@ namespace Ui.ModSceneMain.ModTool
                     break;
                 case 100:
                     {
-                        foreach (var data in MapEraseForm.DataById.Values)
+                        foreach (var data in MapEraseForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null) || data.label == model.curLab)
                             {
@@ -385,7 +386,7 @@ namespace Ui.ModSceneMain.ModTool
                 case 1:
                 default:
                     {
-                        foreach (var data in MapTerrainForm.DataById.Values)
+                        foreach (var data in MapTerrainForm.DataById.Values.OrderBy(d => d.id))
                         {
                             if ((model.curLab == null ) || data.label == model.curLab)
                             {

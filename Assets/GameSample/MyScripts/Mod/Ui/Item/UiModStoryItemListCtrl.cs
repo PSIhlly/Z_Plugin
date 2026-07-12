@@ -59,7 +59,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemList
                 (ItemProductForm.DatasByProtouid.ContainsKey(0)?(ItemProductForm.DatasByProtouid[0]):new List<ItemProductForm.Data>())
                 : ItemProductForm.DatasByLabelProtouid[(model.lab, 0)];
 
-            foreach (var data in datas)
+            foreach (var data in datas.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
                 {

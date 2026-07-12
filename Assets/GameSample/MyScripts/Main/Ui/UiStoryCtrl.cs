@@ -3,6 +3,7 @@ using Item;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using Ui.EnterMain;
 using Ui.Start;
@@ -47,7 +48,7 @@ namespace Ui.Story
         public void Refresh()
         {
             con.Clear();
-            foreach (var data in model.prm.datas)
+            foreach (var data in model.prm.datas.OrderBy(d => d.id))
             {
                 con.Add(new UiItemParam()
                 {

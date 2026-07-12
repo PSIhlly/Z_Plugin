@@ -58,7 +58,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
             var datas = MissionForm.DatasByLabel.GetDv(model.lab, null);
             if (datas != null)
             {
-                foreach (var data in datas)
+                foreach (var data in datas.OrderBy(d => d.id))
                 {
                     itemCon.Add(new UiBigItemParam()
                     {

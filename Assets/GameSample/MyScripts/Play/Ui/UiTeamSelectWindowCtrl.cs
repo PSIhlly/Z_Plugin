@@ -1,6 +1,7 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Texture;
@@ -56,7 +57,7 @@ namespace Ui.TeamSelectWindow
             activeTeamerCon.Refresh();
 
             teamerCon.Clear();
-            foreach (var uid in GameManager.instance.curProgress.team)
+            foreach (var uid in GameManager.instance.curProgress.team.OrderBy(u => u))
             {
                 teamerCon.Add(new UiTeamerParam() { uid = uid });
             }

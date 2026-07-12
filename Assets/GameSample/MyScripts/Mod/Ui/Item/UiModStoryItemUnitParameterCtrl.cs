@@ -40,7 +40,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
         {
 
             argIptCon.Clear();
-            foreach (var data in ItemParamForm.DataByName.Values)
+            foreach (var data in ItemParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 if(!model.data.paramDic.ContainsKey(data.name))
                 {
@@ -51,7 +51,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitParameter
                     data = model.data.paramDic[data.name]
                 });
             }
-            foreach (var data in CharacterParamForm.DataByName.Values)
+            foreach (var data in CharacterParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 argIptCon.Add(new UiArgIptParam()
                 {

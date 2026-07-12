@@ -38,7 +38,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryItemParameter
         {
 
             argCon.Clear();
-            foreach (var data in ItemParamForm.DataByName.Values)
+            foreach (var data in ItemParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 argCon.Add(new UiArgParam()
                 {

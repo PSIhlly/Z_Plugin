@@ -30,6 +30,7 @@ namespace Z_Map.Analysis
         /// </summary>
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep)
         {
+
             pre.Clear();
             steps.Clear();
             queue.Clear();
@@ -40,7 +41,10 @@ namespace Z_Map.Analysis
             Vector3Int tarPos = nc.RealPos2MapPosInt(tar);
             if (!nc.InArea(tarPos))
                 tarPos = nc.GetClosestInArea(tarPos);
-
+            if (!nc.navUnits.ContainsKey((tarPos.x, tarPos.y, tarPos.z)))
+            {
+                return cur;
+            }
 
 
             if (curPos == tarPos)
@@ -61,10 +65,15 @@ namespace Z_Map.Analysis
 
             queue.Enqueue(first);
             steps[first] = 0;
-
+            int times = 0;
             //Vector3Int[] dirs = new[] { Vector3Int.right, Vector3Int.left, Vector3Int.up, Vector3Int.down, Vector3Int.forward, Vector3Int.back };
             while (queue.Count > 0)
             {
+                if(times>999)
+                {
+                    Debug.LogError("cnm");
+                    break;
+                }
                 var now = queue.Dequeue();
                 int step = steps[now];
                 if (step >= maxStep)

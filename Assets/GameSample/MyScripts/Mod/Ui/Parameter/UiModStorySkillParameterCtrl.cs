@@ -38,7 +38,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStorySkillParameter
         {
 
             argCon.Clear();
-            foreach (var data in SkillParamForm.DataByName.Values)
+            foreach (var data in SkillParamForm.DataByName.Values.OrderBy(d => d.uid))
             {
                 argCon.Add(new UiArgParam()
                 {

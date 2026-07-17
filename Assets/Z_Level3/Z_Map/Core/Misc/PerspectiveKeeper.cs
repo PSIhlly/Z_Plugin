@@ -9,7 +9,6 @@ public class PerspectiveKeeper : MonoBehaviour
 {
     private Vector3 insLastRot;
     private Transform ins;
-    private Transform _stretchWrapper;
     public bool enableFixedYRotation;
     public bool applyYRotationToLocalZ = true;
     public float fixedYRotation;
@@ -36,16 +35,7 @@ public class PerspectiveKeeper : MonoBehaviour
     {
         if (ins == null)
         {
-            Transform parent = transform.parent;
-            if (parent != null && parent.name == "IsoStretchWrapper")
-            {
-                _stretchWrapper = parent;
-                ins = parent.parent;
-            }
-            else
-            {
-                ins = parent;
-            }
+            ins = transform.parent;
             if (ins != null)
             {
                 UpdateModel();
@@ -74,7 +64,7 @@ public class PerspectiveKeeper : MonoBehaviour
     }
     public void UpdateModel()
     {
-        MapManager.instance.utilCtrl.SetPerspectiveModel(ins, transform, _deepth, ref _stretchWrapper);
+        MapManager.instance.utilCtrl.SetPerspectiveModel(ins, transform, _deepth);
     }
 
 }

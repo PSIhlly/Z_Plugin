@@ -390,34 +390,21 @@ namespace Z_Map
 
             return ans;
         }
-        public void SetPerspectiveModel(Transform rootTrs, Transform imgTrs, float deepth, ref Transform stretchWrapper)
+        public void SetPerspectiveModel(Transform rootTrs, Transform imgTrs, float deepth)
         {
             switch (DynamicGlobalSettings.cameraMode)
             {
                 case CameraMode.Overhead:
-                    if (stretchWrapper != null)
-                    {
-                        imgTrs.SetParent(rootTrs);
-                        UnityEngine.Object.Destroy(stretchWrapper.gameObject);
-                        stretchWrapper = null;
-                    }
+                    imgTrs.SetParent(rootTrs);
                     imgTrs.position = rootTrs.position + Vector3.up * rootTrs.localScale.y / 2 + Vector3.down * deepth;
                     imgTrs.localScale = Vector3.one;
                     break;
                 case CameraMode.Isometric:
-                    if (stretchWrapper == null)
-                    {
-                        GameObject wrapperObj = new GameObject("IsoStretchWrapper");
-                        stretchWrapper = wrapperObj.transform;
-                        stretchWrapper.SetParent(rootTrs);
-                    }
-                    stretchWrapper.position = rootTrs.position + new Vector3(0, 0.207f,0)+ new Vector3(0, -1, -1) * deepth;
-                    stretchWrapper.rotation = Quaternion.identity;
-                    stretchWrapper.localScale = new Vector3(rootTrs.localScale.x, rootTrs.localScale.y*1.414f, rootTrs.localScale.z);
-                    imgTrs.SetParent(stretchWrapper);
-                    imgTrs.localPosition = Vector3.zero;
-                    imgTrs.localScale = Vector3.one;
-                    imgTrs.eulerAngles = new Vector3(0, 0, 0);
+                    // 直接由已知信息推算 imgTrs 的变换，无需中间节点。
+                    imgTrs.SetParent(rootTrs);
+                    imgTrs.position = rootTrs.position + new Vector3(0, 0.207f, 0) + new Vector3(0, -1, -1) * deepth;
+                    imgTrs.rotation = Quaternion.identity;
+                    imgTrs.localScale = new Vector3(rootTrs.localScale.x, rootTrs.localScale.y * 1.414f, rootTrs.localScale.z);
                     break;
             }
         }

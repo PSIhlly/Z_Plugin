@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Ui.ModSceneMenu;
 using UnityEngine;
 using Z_Map;
+using Z_Math;
 using Z_ObjectAnimator.Base;
 using Z_ObjectAnimator.Core;
 using Z_Texture;
@@ -149,7 +150,6 @@ namespace Ui.ModSceneMain
         public void Refresh()
         {
             view.ipt_viewPosSetX.Set(model.viewX);
-
             view.ipt_viewPosSetY.Set(model.viewY);
 
             view.ipt_viewPosSetZ.Set(model.viewZ);

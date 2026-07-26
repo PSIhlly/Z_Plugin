@@ -9,6 +9,7 @@ public class PerspectiveKeeper : MonoBehaviour
 {
     private Vector3 insLastRot;
     private Transform ins;
+    public Transform scaleHolder;
     public bool enableFixedYRotation;
     public bool applyYRotationToLocalZ = true;
     public float fixedYRotation;
@@ -35,7 +36,7 @@ public class PerspectiveKeeper : MonoBehaviour
     {
         if (ins == null)
         {
-            ins = transform.parent;
+            ins = transform.parent.parent;
             if (ins != null)
             {
                 UpdateModel();
@@ -49,7 +50,7 @@ public class PerspectiveKeeper : MonoBehaviour
             insLastRot = ins.eulerAngles;
 
 
-            
+
             if (enableFixedYRotation)
             {
                 transform.eulerAngles = transform.eulerAngles.NewSetY(fixedYRotation);
@@ -64,7 +65,20 @@ public class PerspectiveKeeper : MonoBehaviour
     }
     public void UpdateModel()
     {
-        MapManager.instance.utilCtrl.SetPerspectiveModel(ins, transform, _deepth);
+        switch (DynamicGlobalSettings.cameraMode)
+        {
+            case CameraMode.Overhead:
+                scaleHolder.position = ins.position + Vector3.up * ins.localScale.y / 2 + Vector3.down * deepth;
+                scaleHolder.localScale = Vector3.one;
+                transform.eulerAngles = Vector3.right * 90;
+                break;
+            case CameraMode.Isometric:
+                // 直接由已知信息推算 imgTrs 的变换，无需中间节点。
+                scaleHolder.position = ins.position + (new Vector3(0, 0.207f, 0)* ins.localScale.y) + new Vector3(0, -1, -1) * deepth;
+                transform.eulerAngles = Vector3.zero;
+                scaleHolder.localScale = new Vector3(1, 1.414f, 1);
+                break;
+        }
     }
 
 }

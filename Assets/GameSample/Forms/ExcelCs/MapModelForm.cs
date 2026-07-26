@@ -63,6 +63,8 @@ public static readonly int autoIdCnt=100;
                 
         public static Action<Data,bool,bool> changeIsobstacleAction;
                 
+        public static Action<Data,float,float> changeColliderscaleAction;
+                
 
 
         public partial class Data
@@ -194,7 +196,25 @@ public static readonly int autoIdCnt=100;
                  
                      }
                     
-            public Data(int id,List<int> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale,List<List<int>> subUnitTexsName,float animTimeInterval,bool isObstacle)
+                    private float  _colliderScale;
+                    /// <summary>
+                    ///碰撞缩放
+                    ///</summary>
+                    public float  colliderScale{
+                                get{return _colliderScale;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeColliderscale(this,_colliderScale,value); 
+                    }
+        
+                _colliderScale = value;
+                }
+                 
+                     }
+                    
+            public Data(int id,List<int> subPrefabUnitName,List<Vector3> subPrefabUnitPos,List<Vector3> subPrefabUnitScale,List<List<int>> subUnitTexsName,float animTimeInterval,bool isObstacle,float colliderScale)
             {
 
              this.id = id;
@@ -204,6 +224,7 @@ public static readonly int autoIdCnt=100;
              this.subUnitTexsName = subUnitTexsName;
              this.animTimeInterval = animTimeInterval;
              this.isObstacle = isObstacle;
+             this.colliderScale = colliderScale;
 
             }
             public void Reset(Data data)
@@ -216,11 +237,12 @@ public static readonly int autoIdCnt=100;
              this.subUnitTexsName = data.subUnitTexsName;
              this.animTimeInterval = data.animTimeInterval;
              this.isObstacle = data.isObstacle;
+             this.colliderScale = data.colliderScale;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<int>():new List<int>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<List<int>>():new List<List<int>>(subUnitTexsName),animTimeInterval,isObstacle);
+        return new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<int>():new List<int>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<List<int>>():new List<List<int>>(subUnitTexsName),animTimeInterval,isObstacle,colliderScale);
                 }
             
             public virtual  void BeforeGet()
@@ -230,7 +252,7 @@ public static readonly int autoIdCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,new List<int>(){120002,},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},null,0f,false);
+                   private static Data _defaultData=new Data(0,new List<int>(){125049,},new List<Vector3>(){Vector3.zero,},new List<Vector3>(){Vector3.one,},null,0f,false,0f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -316,7 +338,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
                 jo.SelectToken("animTimeInterval")==null?defaultData.animTimeInterval:jo.Get<float>("animTimeInterval"),
 
-                jo.SelectToken("isObstacle")==null?defaultData.isObstacle:jo.Get<bool>("isObstacle")
+                jo.SelectToken("isObstacle")==null?defaultData.isObstacle:jo.Get<bool>("isObstacle"),
+
+                jo.SelectToken("colliderScale")==null?defaultData.colliderScale:jo.Get<float>("colliderScale")
                     );
 
             return data;
@@ -342,6 +366,8 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
             jo.Set<float>("animTimeInterval",data.animTimeInterval);
 
             jo.Set<bool>("isObstacle",data.isObstacle);
+
+            jo.Set<float>("colliderScale",data.colliderScale);
 
             return jo;
         }
@@ -493,6 +519,16 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 {
 
                 changeIsobstacleAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeColliderscale(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeColliderscaleAction?.Invoke(data,oldV,newV);
                 }
                     
             }

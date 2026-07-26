@@ -214,7 +214,7 @@ namespace Z_Math
         }
         public static Vector3 ElementwiseDivide(Vector3 a, Vector3 b)
         {
-            return new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+            return new Vector3(b.x==0?float.MaxValue:a.x / b.x, b.y == 0 ? float.MaxValue : a.y / b.y, b.z == 0 ? float.MaxValue : a.z / b.z);
         }
         public static Vector3Int GetVector3Int(Vector3 a)
         {
@@ -229,7 +229,10 @@ namespace Z_Math
         #endregion
 
         #region 3D
-
+        public static void SetLoosyScale(this Transform tr, Vector3 scale)
+        {
+            tr.localScale = ElementwiseDivide(scale, tr.lossyScale);
+        }
         public static Vector3[] GetCubeEightPoint(Vector3 center, Vector3 size, Vector3 euler)
         {
             Vector3[] ans = new Vector3[8];
@@ -295,8 +298,24 @@ namespace Z_Math
             return point.x * point.x / a2 + point.y * point.y / b2 + point.z * point.z / c2 <= 1e-9;
         }
 
+        public static float CalculateYAtPointInPlane(Vector3 planePoint, Vector3 normal, float x, float z)
+        {
+            // 可选：归一化法线（非必须，但推荐）
+            normal = normal.normalized;
 
+            if (Mathf.Abs(normal.y) < 1e-6f)
+            {
+                Debug.LogError("法线 Y 分量接近 0，平面垂直于 XZ 轴，无法计算唯一 Y 值。");
+                return 0f;
+            }
 
+            float dx = x - planePoint.x;
+            float dz = z - planePoint.z;
+
+            // 由 n·(P - P0) = 0 推导：ny * (y - y0) = - (nx*dx + nz*dz)
+            float y = (Vector3.Dot(normal, planePoint) - (normal.x * dx + normal.z * dz)) / normal.y;
+            return y;
+        }
 
 
         #region Intersect
@@ -345,7 +364,7 @@ namespace Z_Math
             if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
             if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
             if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
-            
+
 
             if (avoidTime < 0)
                 avoidTime = 0;
@@ -610,6 +629,8 @@ namespace Z_Math
 
 
             {
+                //SAT检测轴：两球心连线方向（球-球碰撞的唯一分离轴）
+                //avoidDir不在此时计算，留到touchTime确定后在碰撞点处计算（与SphereIntersectCube对齐）
                 Vector3 diff = aCenter - bCenter;
                 float sqrMag = diff.sqrMagnitude;
                 Vector3 axis = sqrMag > 0 ? diff.normalized : Vector3.up;
@@ -625,9 +646,7 @@ namespace Z_Math
                     float bMax = bCenterProj + bRadius;
 
                     float dirProj = Vector3.Dot(dir, axis);
-                    CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid);
-
-                    avoidDir += (avoid * axis).normalized;
+                    CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out _);
                 }
 
             }
@@ -649,7 +668,18 @@ namespace Z_Math
             }
 
             dis = touchTime * mag;
-
+            if (touchTime < 1)
+            {
+                //使用碰撞点处两球心连线方向作为避障方向（与SphereIntersectCube对齐）
+                //不能用起始位置的中心连线：斜切擦碰时起始连线方向与接触时刻连线方向差异大，
+                //avoidDir指向错误会导致切向滑行方向错误，角色无法沿球面滑行
+                Vector3 contactPos = aCenter + dir * touchTime;
+                Vector3 pushDir = contactPos - bCenter;
+                if (pushDir.sqrMagnitude > 0.0001f)
+                {
+                    avoidDir = pushDir.normalized;
+                }
+            }
             avoidDir = avoidDir.normalized;
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }

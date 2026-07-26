@@ -36,14 +36,12 @@ namespace Z_Map.Analysis
             queue.Clear();
             path.Clear();
             Vector3Int curPos = nc.RealPos2MapPosInt(cur);
-            if (!nc.InArea(curPos))
-                curPos = nc.GetClosestInArea(curPos);
+                curPos = nc.GetClosestExistInArea(curPos);
             Vector3Int tarPos = nc.RealPos2MapPosInt(tar);
-            if (!nc.InArea(tarPos))
-                tarPos = nc.GetClosestInArea(tarPos);
+                tarPos = nc.GetClosestExistInArea(tarPos);
             if (!nc.navUnits.ContainsKey((tarPos.x, tarPos.y, tarPos.z)))
             {
-                return cur;
+                return Vector3.zero;
             }
 
 

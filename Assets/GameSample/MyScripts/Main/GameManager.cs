@@ -28,6 +28,7 @@ using Z_Input;
 using Z_Language;
 using Z_Map;
 using Z_Map.Form;
+using Z_Math;
 using Z_Texture;
 using Z_Ui;
 using Z_Ui.Dialog;
@@ -203,7 +204,7 @@ public class GameManager : Z_MonoManager<GameManager>
         for (int i = 0; i < res.texs.Count; i++)
         {
             var texData = res.texs[i].Item2;
-            texData.id = AssetForm.autoIdCnt+i+100000;
+            texData.id = AssetForm.autoIdCnt+ Algorithm.GetHash(texData.name,9973) + 100000;
             saveCtrl.AddGameTex(ref texData);
             if(texData.name == "MapTexture$grass")
             {
@@ -219,7 +220,7 @@ public class GameManager : Z_MonoManager<GameManager>
         {
             if (res.gos[i].Item1.StartsWith(MapInfo.GetPrefabName()))
             {
-                res.gos[i].Item2.id = AssetForm.autoIdCnt + i + 110000;
+                res.gos[i].Item2.id = AssetForm.autoIdCnt + Algorithm.GetHash(res.gos[i].Item1, 9973) + 110000;
                 innerAssetDic[res.gos[i].Item1.Split(MapInfo.GetPrefabName())[1]] = res.gos[i].Item2;
             }
             GameObjectAssetForm.AddData(res.gos[i].Item2);

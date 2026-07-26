@@ -4254,6 +4254,7 @@ namespace ModStoryMapObjectObjectAppearance
             public Ipt ipt_name;
             public Ipt ipt_label;
             public Ipt ipt_interval;
+            public Ipt ipt_colliderScale;
             public Sta sta_show;
             public ScrView scr_items;
             public Btn btn_deleteUnit;
@@ -4278,23 +4279,24 @@ namespace ModStoryMapObjectObjectAppearance
             ipt_name = uiHolder.elementTrsLst[1].GetComponent<Ipt>();
             ipt_label = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
             ipt_interval = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            sta_show = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            scr_items = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
-            btn_deleteUnit = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            ipt_width = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
-            ipt_length = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
-            ipt_height = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
-            ipt_posHeight = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            btn_reset = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            btn_model = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            btn_image = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            rimg_image = uiHolder.elementTrsLst[14].GetComponent<RImg>();
-            rtf_image = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
-            rtf_axis = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
-            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[18].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
-            txt_model = uiHolder.elementTrsLst[20].GetComponent<Txt>();
+            ipt_colliderScale = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            sta_show = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            scr_items = uiHolder.elementTrsLst[6].GetComponent<ScrView>();
+            btn_deleteUnit = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            ipt_width = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
+            ipt_length = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            ipt_height = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_posHeight = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            btn_reset = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            btn_model = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            btn_image = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            rimg_image = uiHolder.elementTrsLst[15].GetComponent<RImg>();
+            rtf_image = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
+            rtf_axis = uiHolder.elementTrsLst[17].GetComponent<RectTransform>();
+            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[19].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[20].GetComponent<UiHolder>().ctrl;
+            txt_model = uiHolder.elementTrsLst[21].GetComponent<Txt>();
         }
 
     }

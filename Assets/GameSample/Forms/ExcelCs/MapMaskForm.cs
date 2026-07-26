@@ -319,13 +319,21 @@ MapBaseForm.AddData(data);
                     DataById.Remove(data.id);
                     
     
-                    DatasByName[data.name].Remove(data);
-                    if(DatasByName[data.name].Count==0)
-                        DatasByName.Remove(data.name);
+                    if(DatasByName.ContainsKey(data.name))
+                    {
+                        DatasByName[data.name].Remove(data);
+                        if(DatasByName[data.name].Count==0)
+                            DatasByName.Remove(data.name);
+                    }
+                    
     
-                    DatasByLabel[data.label].Remove(data);
-                    if(DatasByLabel[data.label].Count==0)
-                        DatasByLabel.Remove(data.label);
+                    if(DatasByLabel.ContainsKey(data.label))
+                    {
+                        DatasByLabel[data.label].Remove(data);
+                        if(DatasByLabel[data.label].Count==0)
+                            DatasByLabel.Remove(data.label);
+                    }
+                    
     
 MapBaseForm.RemoveData(id);
             idChain.PushId(data.id);

@@ -8,6 +8,7 @@ Shader "DisFadeCode"
         _UseCloseHide("_UseCloseHide", Float) = 0
         _Show("_Show", Float) = 0
         _Alpha("_Alpha", Float) = 0
+        _LightSensitivity("Light Sensitivity", Range(0.1, 10)) = 1
         _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
     }
 
@@ -56,6 +57,7 @@ Shader "DisFadeCode"
                 float _Cutoff;
                 float _Alpha;
                 float _Show;
+                float _LightSensitivity;
             CBUFFER_END
 
             struct Attributes
@@ -111,8 +113,10 @@ Shader "DisFadeCode"
 
                 half3 normalWS = normalize(input.normalWS);
                 half NdotL = saturate(dot(normalWS, mainLight.direction));
-                // 3. ����Ӱǿ��˥�������䣨���ģ�������Ӱ�Ĺؼ���
-                half3 diffuse = mainLight.color * NdotL * baseColor.rgb * shadowStrength * input.dark;
+                // 光敏感性：_LightSensitivity越大，弱光下整体越亮
+                half lightAmount = pow(NdotL, 1.0 / _LightSensitivity);
+                // 3. 计算阴影强度衰减后的漫反射（降低模型被遮挡时的亮度）
+                half3 diffuse = mainLight.color * lightAmount * baseColor.rgb * shadowStrength * input.dark;
                 
                 return half4(diffuse.rgb,saturate(_Alpha));
             }

@@ -370,9 +370,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
     
                     DataByName.Remove(data.name);
     
-                    DatasByLabel[data.label].Remove(data);
-                    if(DatasByLabel[data.label].Count==0)
-                        DatasByLabel.Remove(data.label);
+                    if(DatasByLabel.ContainsKey(data.label))
+                    {
+                        DatasByLabel[data.label].Remove(data);
+                        if(DatasByLabel[data.label].Count==0)
+                            DatasByLabel.Remove(data.label);
+                    }
+                    
     
 
             uidChain.PushId(data.uid);

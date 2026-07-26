@@ -393,17 +393,29 @@ ProgramDataForm.AddData(data);
                     DataByUid.Remove(data.uid);
                     
     
-                    DatasByName[data.name].Remove(data);
-                    if(DatasByName[data.name].Count==0)
-                        DatasByName.Remove(data.name);
+                    if(DatasByName.ContainsKey(data.name))
+                    {
+                        DatasByName[data.name].Remove(data);
+                        if(DatasByName[data.name].Count==0)
+                            DatasByName.Remove(data.name);
+                    }
+                    
     
-                    DatasByCategoryType[(data.category,data.type)].Remove(data);
-                    if(DatasByCategoryType[(data.category,data.type)].Count==0)
-                        DatasByCategoryType.Remove((data.category,data.type));
+                    if(DatasByCategoryType.ContainsKey((data.category,data.type)))
+                    {
+                        DatasByCategoryType[(data.category,data.type)].Remove(data);
+                        if(DatasByCategoryType[(data.category,data.type)].Count==0)
+                            DatasByCategoryType.Remove((data.category,data.type));
+                    }
+                    
     
-                    DatasByCategory[data.category].Remove(data);
-                    if(DatasByCategory[data.category].Count==0)
-                        DatasByCategory.Remove(data.category);
+                    if(DatasByCategory.ContainsKey(data.category))
+                    {
+                        DatasByCategory[data.category].Remove(data);
+                        if(DatasByCategory[data.category].Count==0)
+                            DatasByCategory.Remove(data.category);
+                    }
+                    
     
 ProgramDataForm.RemoveData(uid);
             uidChain.PushId(data.uid);

@@ -64,6 +64,14 @@ public class GameUtilController : Z_Controller<GameManager>
             lst0.Add(lst != null && lst.Count > 0 ? lst[0] : GlobalDefaultHelper.DefaultTexId);
         }
         var res = CombineNewGoByPrefabs(name, model.subPrefabUnitName, lst0, model.subPrefabUnitPos, model.subPrefabUnitScale, showShadow);
+        foreach (var col in res.GetComponentsInChildren<BoxCollider>())
+        {
+            col.transform.localScale = new Vector3(model.colliderScale, 1, model.colliderScale);
+        }
+        foreach (var col in res.GetComponentsInChildren<SphereCollider>())
+        {
+            col.transform.localScale = new Vector3(model.colliderScale, model.colliderScale, model.colliderScale);
+        }
         if (forGame)
         {
             if (isItem)
@@ -87,11 +95,11 @@ public class GameUtilController : Z_Controller<GameManager>
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             var render = go.GetComponentInChildren<Renderer>();
             render.GetPropertyBlock(propBlock);
-            if (texRealId[i] != null && !TexAssetForm.DataById.ContainsKey(texRealId[i]))
+            if (texRealId[i] != 0 && !TexAssetForm.DataById.ContainsKey(texRealId[i]))
             {
                 Debug.LogError(name + " miss tex " + texRealId[i]);
             }
-            if (texRealId[i] == null || texRealId[i] == emptyTexId || !TexAssetForm.DataById.ContainsKey(texRealId[i]))
+            if (texRealId[i] == 0 || texRealId[i] == emptyTexId || !TexAssetForm.DataById.ContainsKey(texRealId[i]))
             {
                 propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])

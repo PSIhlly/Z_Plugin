@@ -119,7 +119,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
         _tileLayerDisplayMode = int.MaxValue;
-        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 5, 15);
+        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 4, 6);
         CameraInstance.instance.tarTrs.position = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
         switch (DynamicGlobalSettings.cameraMode)
         {
@@ -132,7 +132,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             case CameraMode.Isometric:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
-                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 50;
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 70;
                 CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
@@ -170,7 +170,16 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             return;
         // 通过射线与地平面求交，确保不同相机视角下位置计算正确
         Ray ray = CameraInstance.instance.cam.ScreenPointToRay(pos);
-        var hits = new List<RaycastHit>(Physics.RaycastAll(ray, 100));
+        // 只检测trigger的collider，避免非trigger的物理碰撞体干扰射线检测
+        var allHits = Physics.RaycastAll(ray, 100, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
+        var hits = new List<RaycastHit>(allHits.Length);
+        foreach (var hit in allHits)
+        {
+            if (hit.collider != null && hit.collider.isTrigger)
+            {
+                hits.Add(hit);
+            }
+        }
         hits.Sort((a, b) =>
         {
             return a.distance.CompareTo(b.distance);

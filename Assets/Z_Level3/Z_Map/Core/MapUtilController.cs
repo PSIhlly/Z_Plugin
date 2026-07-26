@@ -146,12 +146,12 @@ namespace Z_Map
                 return pos;
         }
 
-        public Vector3Int GetClosestInArea(Vector3Int pos)
+        public Vector3Int GetClosestExistInArea(Vector3Int pos)
         {
             Vector3 newPos = pos;
             if (_super.enable)
             {
-                newPos = SearchClosedValid(MapPos2RealPos(pos));
+                newPos = SearchClosedExist(MapPos2RealPos(pos));
             }
             return RealPos2MapPosInt(newPos);
         }
@@ -159,13 +159,15 @@ namespace Z_Map
         {
             var newPos = pos;
             if (_super.enable)
-                newPos = SearchClosedValid(pos);
+                newPos = SearchClosedExist(pos);
             return newPos;
         }
-        private Vector3 SearchClosedValid(Vector3 pos)
+        private Vector3 SearchClosedExist(Vector3 pos)
         {
 
             Vector3Int mapPos = RealPos2MapPosInt(pos);
+            if (ContainsTile(mapPos.x, mapPos.y, mapPos.z))
+                return pos;
             //groundFirst
             int floor = -1;
             if (GlobalSettings.ENABLE_GRAVITY)
@@ -192,7 +194,7 @@ namespace Z_Map
 
             if (floor > -1)
             {
-                return new Vector3(pos.x, pos.y, pos.z);
+                return new Vector3(pos.x,  floor* _super.data.mainData.mapUnitSize.y, pos.z);
             }
 
 
@@ -370,7 +372,7 @@ namespace Z_Map
         public List<TileUnit> GetOverlap(ObjectUnitForm.Data oData)
         {
             var all = new List<List<Vector3Int>>();
-            foreach (var c in oData.unit.GetMeshes(CollideType.CollideOnly))
+            foreach (var c in oData.unit.GetMeshes(CollideType.All))
             {
                 all.Add(Graph.GetRoughOverlapIntPos(c.positions));
             }
@@ -389,24 +391,6 @@ namespace Z_Map
             }
 
             return ans;
-        }
-        public void SetPerspectiveModel(Transform rootTrs, Transform imgTrs, float deepth)
-        {
-            switch (DynamicGlobalSettings.cameraMode)
-            {
-                case CameraMode.Overhead:
-                    imgTrs.SetParent(rootTrs);
-                    imgTrs.position = rootTrs.position + Vector3.up * rootTrs.localScale.y / 2 + Vector3.down * deepth;
-                    imgTrs.localScale = Vector3.one;
-                    break;
-                case CameraMode.Isometric:
-                    // 直接由已知信息推算 imgTrs 的变换，无需中间节点。
-                    imgTrs.SetParent(rootTrs);
-                    imgTrs.position = rootTrs.position + new Vector3(0, 0.207f, 0) + new Vector3(0, -1, -1) * deepth;
-                    imgTrs.rotation = Quaternion.identity;
-                    imgTrs.localScale = new Vector3(rootTrs.localScale.x, rootTrs.localScale.y * 1.414f, rootTrs.localScale.z);
-                    break;
-            }
         }
     }
 }

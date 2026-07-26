@@ -1,3 +1,4 @@
+//#define DEBUG
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Z_Map.Analysis
         public Vector3Int pos;
         public Vector3 realPos;
         public List<NavUnit> links;
+        public float[] dirMaxY;
     }
     public interface NaviComponent
     {
@@ -38,7 +40,7 @@ namespace Z_Map.Analysis
         public float step;
         public void Build()
         {
-            step = _super.data.mainData.mapUnitSize.y * 1 / 10;
+            step = _super.data.mainData.mapUnitSize.y * 1 / 3;
             navUnits = new Dictionary<(int, int, int), NavUnit>(_super.data.maps.Count);
             UpdateMap(int.MaxValue);
             bfs = new Bfs(this);
@@ -83,6 +85,10 @@ namespace Z_Map.Analysis
                     newUnit.realPos = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).pos;
                     newUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
                     newUnit.isNull = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).scale == Vector3.zero;
+                    var realPos = MapPos2RealPos(new Vector3Int(pos.Item1, pos.Item2, pos.Item2));
+
+
+                    newUnit.dirMaxY = new float[4] { map.unit.GetYByPoint(offset[0]), map.unit.GetYByPoint(offset[1]), map.unit.GetYByPoint(offset[2]), map.unit.GetYByPoint(offset[3]) };
                 }
             }
             //先扫描障碍物，记录blocked位置
@@ -113,8 +119,10 @@ namespace Z_Map.Analysis
                     Vector3 rootLossyScale = obs.unit.prefab.transform.lossyScale;
                     foreach (var bc in obs.unit.prefab.GetComponentsInChildren<BoxCollider>())
                     {
-                        Vector3 finalScale = Graph.ElementwiseMultiply(Graph.ElementwiseDivide(bc.transform.lossyScale, rootLossyScale), obs.scale);
-                        Vector3[] points = Mesh.GetMesh(bc, obs.pos + Vector3.up * obs.scale.y / 2, obs.euler, finalScale).positions;
+                        Vector3 finalScale = Z_Math.Graph.ElementwiseMultiply(Z_Math.Graph.ElementwiseDivide(bc.transform.lossyScale, rootLossyScale), obs.scale);
+                        var mesh = Mesh.GetMesh(bc, obs.pos + Vector3.up * obs.scale.y / 2, obs.euler, finalScale);
+                        Vector3[] points = mesh.positions;
+                        var maxY = mesh.GetMaxY();
                         var overlapPoses = Z_Math.Graph.GetRoughOverlapIntPos(points);
                         //simple
                         var quad = new Vector2[] { new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownForward].z),
@@ -123,34 +131,57 @@ namespace Z_Map.Analysis
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].z) };
                         foreach (var pos in overlapPoses)
                         {
-                            var mapPos = RealPos2MapPosInt(pos);
-                            for (int i = 0, icnt = offset.Length; i < icnt; i++)
+                            if (!navUnits.TryGetValue((pos.x, pos.y, pos.z), out var unit))
                             {
-                                if (InArea(mapPos) && Z_Math.Graph.IsPointInQuad(quad, new Vector2(pos.x, pos.z) + offset[i]))
+                                continue;
+                            }
+                            for (int dir = 0; dir < offset.Length; dir++)
+                            {
+                                var dir2D = new Vector2(unit.pos.x + offset[dir].x, unit.pos.z + offset[dir].y);
+                                if (Graph.IsPointInQuad(quad, dir2D))
                                 {
-                                    //检测是否能达到y+1的tile（参考高度差判断）
-                                    bool canReachY1 = false;
-                                    Vector3Int linkPos = new Vector3Int(mapPos.x + tryDir[i].x, mapPos.y + 1, mapPos.z + tryDir[i].z);
-                                    if (InArea(linkPos))
-                                    {
-                                        var link = _super.utilCtrl.GetTileData(linkPos.x, linkPos.y, linkPos.z);
-                                        var curMap = _super.utilCtrl.GetTileData(mapPos.x, mapPos.y, mapPos.z);
-                                        Vector2 p = new Vector2(tryDir[i].x * 0.5f, tryDir[i].z * 0.5f);
-                                        if (link != null && curMap != null && Math.Abs(link.unit.GetYByPoint(-p) - curMap.unit.GetYByPoint(p)) <= this.step)
-                                        {
-                                            canReachY1 = true;
-                                        }
-                                    }
-                                    if (!canReachY1)
-                                    {
-                                        blocked.Add((mapPos.x, mapPos.y, mapPos.z));
-                                    }
+                                    unit.dirMaxY[dir] = Mathf.Max(maxY, unit.dirMaxY[dir]);
                                 }
                             }
                         }
                     }
                 }
             }
+
+            /*         curUpdateCount = 0;
+                     for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
+                     {
+                         times++;
+                         if (times >= step)
+                         {
+                             times = 0;
+                             yield return null;
+                         }
+                         if (!_super.enable)
+                         {
+                             yield break;
+                         }
+                         var map = curUpdateTileList[curUpdateCount];
+                         if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
+                             continue;
+                         (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
+                         if (navUnits.TryGetValue(pos, out var unit))
+                         {
+                             float max = float.MinValue;
+                             float min = float.MaxValue;
+                             for (int dir = 0; dir < offset.Length; dir++)
+                             {
+                                 max = Mathf.Max(unit.dirMaxY[dir], max);
+                                 min = Mathf.Max(unit.dirMaxY[dir], min);
+                             }
+                             if (max - min > this.step)
+                             {
+                                 blocked.Add(pos);
+                             }
+                         }
+
+
+                     }*/
             //构建links，跳过blocked的tile
             curUpdateCount = 0;
             for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
@@ -178,21 +209,22 @@ namespace Z_Map.Analysis
                     for (int l = 0; l < 4; l++)
                     {
                         Vector3Int linkPos = Z_Math.Graph.GetVector3Int(Z_Math.Graph.ElementwisePlus(new Vector3Int(pos.Item1, m + pos.Item2, pos.Item3), tryDir[l]));
-                        if (!InArea(linkPos))
+
+                        if (!InArea(linkPos) || blocked.Contains((linkPos.x, linkPos.y, linkPos.z)))
                             continue;
                         var link = _super.utilCtrl.GetTileData(linkPos.x, linkPos.y, linkPos.z);
 
-                        Vector2 p = new Vector2(tryDir[l].x * 0.5f, tryDir[l].z * 0.5f);
 
                         //can move
-                        if (link!=null&&Math.Abs(link.unit.GetYByPoint(-p) - map.unit.GetYByPoint(p)) <= step)
+                        if (link != null)
                         {
+
                             var linkNavUnit = navUnits[(linkPos.x, linkPos.y, linkPos.z)];
-                            if (!blocked.Contains((linkPos.x, linkPos.y, linkPos.z)))
-                            {
+
+                            if (linkNavUnit.dirMaxY[l ^ 1] - navUnit.dirMaxY[l] < this.step)
                                 navUnit.links.Add(linkNavUnit);
-                            }
                         }
+
                     }
             }
         }
@@ -215,9 +247,9 @@ namespace Z_Map.Analysis
         {
             return _super.utilCtrl.RealPos2MapPosInt(pos);
         }
-        public Vector3Int GetClosestInArea(Vector3Int pos)
+        public Vector3Int GetClosestExistInArea(Vector3Int pos)
         {
-            return _super.utilCtrl.GetClosestInArea(pos);
+            return _super.utilCtrl.GetClosestExistInArea(pos);
         }
         public bool InArea(Vector3Int pos)
         {

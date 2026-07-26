@@ -46,18 +46,27 @@ namespace Z_Map
 
         public float GetYByPoint(Vector2 selfPos)
         {
-            float length = 0;
             if (data.scale == Vector3.zero)
                 return -999;//直接坠落
-            if (data.euler.x != 0)
+            var collider=prefab.GetComponentInChildren<BoxCollider>();
+            if(collider != null)
             {
-                length = selfPos.y * (float)Math.Tan(-data.euler.x * 3.14f / 180);
+                var euler = collider.transform.eulerAngles;
+                euler.y += +data.euler.y;
+                Vector3 normal = Quaternion.Euler(euler) * Vector3.back;
+                if (Mathf.Abs(normal.y) < 1e-6f)
+                    return data.pos.y;//平面接近竖直，y 不确定，退化返回 tile 中心高度
+
+                //必经过点 (0, 1/tan(euler.x)/2, 0)
+                //euler.x 接近 0 时 tan→0，1/tan 趋于无穷会产生 Infinity/NaN，需提前拦截
+                float tan = Mathf.Tan(collider.transform.eulerAngles.x * Mathf.PI / 180f);
+                if (Mathf.Abs(tan) < 1e-6f)
+                    return data.pos.y;
+
+                Vector3 planePoint = new Vector3(0, 1f / tan / 2f, 0);
+                return data.pos.y + Z_Math.Graph.CalculateYAtPointInPlane(planePoint, normal, selfPos.x, selfPos.y);
             }
-            else
-            {
-                length = selfPos.x * (float)Math.Tan(-data.euler.z * 3.14f / 180);
-            }
-            return data.pos.y + length;
+            return data.pos.y;
         }
 
 

@@ -108,6 +108,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data.model.animTimeInterval = StringHelper.ToFloat(s, 0, true);
                 Refresh();
             };
+            view.ipt_colliderScale.onFinishInput += (s) =>
+            {
+                model.data.model.colliderScale = StringHelper.ToFloat(s, 1, true);
+                Refresh();
+            };
         }
         public override void OnShow()
         {
@@ -151,6 +156,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 view.ipt_width.Set(model.data.model.subPrefabUnitScale[0].x.ToString("0.##"));
             }
             view.ipt_interval.Set(model.data.model.animTimeInterval.ToString("0.##"));
+            view.ipt_colliderScale.Set(model.data.model.colliderScale.ToString("0.##"));
 
             itemCon.Clear();
             var texs = model.data.model.subUnitTexsName[0];

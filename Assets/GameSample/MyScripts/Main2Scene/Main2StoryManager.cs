@@ -52,7 +52,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var dic = GameManager.instance.innerAssetDic;
             data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
             MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, "default", new Dictionary<string, EventTriggerForm.Data>()));
-            MapObjectForm.AddData(new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id, new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true), "default", true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
+            MapObjectForm.AddData(new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id, new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true, 1), "default", true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
 
             EventProgramDataForm.Clear();
 
@@ -142,6 +142,19 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     public async void StartLoadSceneUgc(int sceneId)
     {
         bool ok = await StartLoadScene(ModManager.instance.GetStoryCoreFolder(), sceneId);
+        //ugc模式不搞碰撞缩放
+        foreach (var form in MapObjectForm.DataById.Values)
+        {
+            var name = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.id);
+            var prefab = InstancePoolManager.instance.GetPrefab(name);
+            if (prefab != null)
+            {
+                foreach (var col in prefab.GetComponentsInChildren<Collider>())
+                {
+                    col.transform.localScale = Vector3.one;
+                }
+            }
+        }
         DynamicGlobalSettings.playing = false;
         ModManager.instance.BeginScene(sceneId);
     }

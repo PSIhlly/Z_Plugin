@@ -358,9 +358,13 @@ MapBaseForm.AddData(data);
     
                     DataByName.Remove(data.name);
     
-                    DatasByLabel[data.label].Remove(data);
-                    if(DatasByLabel[data.label].Count==0)
-                        DatasByLabel.Remove(data.label);
+                    if(DatasByLabel.ContainsKey(data.label))
+                    {
+                        DatasByLabel[data.label].Remove(data);
+                        if(DatasByLabel[data.label].Count==0)
+                            DatasByLabel.Remove(data.label);
+                    }
+                    
     
 MapBaseForm.RemoveData(id);
             idChain.PushId(data.id);

@@ -233,8 +233,25 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.BindTexData(TexAssetForm.DataById[model.data.icon]);
+                int texId = GetFirstAnimTexId(model.data);
+                if (texId != 0 && TexAssetForm.DataById.ContainsKey(texId))
+                    view.img_.BindTexData(TexAssetForm.DataById[texId]);
             }
+        }
+        /// <summary>
+        /// 获取data动画帧的第一张贴图id，替代icon字段
+        /// </summary>
+        private int GetFirstAnimTexId(MapBaseForm.Data data)
+        {
+            if (data is MapTextureForm.Data texData && texData.texs != null && texData.texs.Count > 0)
+                return texData.texs[0];
+            if (data is MapMaskForm.Data maskData && maskData.texsName != null && maskData.texsName.Count > 0)
+                return maskData.texsName[0];
+            if (data is MapObjectForm.Data objData && objData.model != null
+                && objData.model.subUnitTexsName != null && objData.model.subUnitTexsName.Count > 0
+                && objData.model.subUnitTexsName[0] != null && objData.model.subUnitTexsName[0].Count > 0)
+                return objData.model.subUnitTexsName[0][0];
+            return 0;
         }
     }
 

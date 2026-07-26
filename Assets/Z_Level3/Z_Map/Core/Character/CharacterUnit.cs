@@ -27,6 +27,10 @@ namespace Z_Map
 
         public float pathDis;
 
+        //nav脱困计时：记录nav最近一次实际位移时间，超过2秒未位移时触发右侧脱困位移。负值表示未初始化。
+        private float lastNavMoveTime = -1f;
+        private float avoidPos = -1f;
+
         public override Type GetInsType()
         {
             return typeof(CharacterInstance);
@@ -55,12 +59,46 @@ namespace Z_Map
                 //nav: 通过BFS导航获取移动方向，乘以速度和距离的较小值作为本帧移动量
                 if (data.navEnabled && !DynamicGlobalSettings.pauseNav)
                 {
-                    if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
+                    //首次激活nav时初始化计时器，避免立即触发脱困位移
+                    if (lastNavMoveTime < 0f)
+                        lastNavMoveTime = Time.time;
+                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis);
+                    bool movedThisFrame = false;
+                    if(avoidPos<=0)
                     {
-                        Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis);
+                        if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
+                    {
+                        Vector3 posBefore = data.pos;
                         Move(dir * Mathf.Min(Time.deltaTime * data.speed, (data.destination - data.pos).magnitude));
+                    //检测本次nav是否实际产生了位移（Move仅在res>0.01时应用位置，故阈值取1e-6足够区分）
+                       if ((data.pos - posBefore).sqrMagnitude > 1e-6f)
+                            movedThisFrame = true;
+                    }                
                     }
 
+                    if (movedThisFrame)
+                    {
+                        lastNavMoveTime = Time.time;
+                    }
+                    //idle脱困：nav开启但超过0.3秒未发生位移时，朝当前朝向右侧移动一步尝试脱困
+                    else if (Time.time - lastNavMoveTime > 0.3f)
+                    {
+                        lastNavMoveTime=1f;
+                        avoidPos=1f;
+                    }
+                    if(avoidPos>0)
+                    {
+                        Vector3 right = Quaternion.Euler(0,90,0)*dir.normalized;
+                        Move(right * Time.deltaTime * data.speed);
+                        lastNavMoveTime = Time.time;
+                        avoidPos-=Time.deltaTime * data.speed;
+                    }
+                }
+                else
+                {
+                    //nav关闭时重置计时器，下次激活时重新计时
+                    lastNavMoveTime = -1f;
+                    avoidPos=-1f;
                 }
                 //gravity: 每帧施加向下的重力移动（有地面接触时跳过，避免贴地抖动）
                 if(GlobalSettings.ENABLE_GRAVITY&&!HasGroundContact())

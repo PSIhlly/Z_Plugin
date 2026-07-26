@@ -53,6 +53,9 @@ namespace Z_Map
                 lastPos = data.pos;
                 _zMeshes[CollideType.CollideOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.CollideOnly);
                 _zMeshes[CollideType.TriggerOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.TriggerOnly);
+                _zMeshes[CollideType.All] = new List<MeshInfo>();
+                _zMeshes[CollideType.All].AddRange(_zMeshes[CollideType.CollideOnly]);
+                _zMeshes[CollideType.All].AddRange(_zMeshes[CollideType.TriggerOnly]);
             }
             return _zMeshes[type];
         }

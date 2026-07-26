@@ -317,13 +317,21 @@ AudioAssetForm.AddData(data);
                     DataById.Remove(data.id);
                     
     
-                    DatasByPath[data.path].Remove(data);
-                    if(DatasByPath[data.path].Count==0)
-                        DatasByPath.Remove(data.path);
+                    if(DatasByPath.ContainsKey(data.path))
+                    {
+                        DatasByPath[data.path].Remove(data);
+                        if(DatasByPath[data.path].Count==0)
+                            DatasByPath.Remove(data.path);
+                    }
+                    
     
-                    DatasByLab[data.lab].Remove(data);
-                    if(DatasByLab[data.lab].Count==0)
-                        DatasByLab.Remove(data.lab);
+                    if(DatasByLab.ContainsKey(data.lab))
+                    {
+                        DatasByLab[data.lab].Remove(data);
+                        if(DatasByLab[data.lab].Count==0)
+                            DatasByLab.Remove(data.lab);
+                    }
+                    
     
 AudioAssetForm.RemoveData(id);
             idChain.PushId(data.id);

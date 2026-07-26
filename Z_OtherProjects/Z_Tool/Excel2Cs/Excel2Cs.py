@@ -397,9 +397,13 @@ def dic_index_handle():
                     DatasBy{name}[{prm}].Add(data);
     '''         
             formInfo.remove_str+=f'''
-                    DatasBy{name}[{prm}].Remove(data);
-                    if(DatasBy{name}[{prm}].Count==0)
-                        DatasBy{name}.Remove({prm});
+                    if(DatasBy{name}.ContainsKey({prm}))
+                    {{
+                        DatasBy{name}[{prm}].Remove(data);
+                        if(DatasBy{name}[{prm}].Count==0)
+                            DatasBy{name}.Remove({prm});
+                    }}
+                    
     '''
 
                 #登记list

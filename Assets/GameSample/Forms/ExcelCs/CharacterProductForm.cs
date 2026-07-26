@@ -750,17 +750,29 @@ ProductForm.AddData(data);
     
                     DataByNameProtouid.Remove((data.name,data.protoUid));
     
-                    DatasByLabelProtouid[(data.label,data.protoUid)].Remove(data);
-                    if(DatasByLabelProtouid[(data.label,data.protoUid)].Count==0)
-                        DatasByLabelProtouid.Remove((data.label,data.protoUid));
+                    if(DatasByLabelProtouid.ContainsKey((data.label,data.protoUid)))
+                    {
+                        DatasByLabelProtouid[(data.label,data.protoUid)].Remove(data);
+                        if(DatasByLabelProtouid[(data.label,data.protoUid)].Count==0)
+                            DatasByLabelProtouid.Remove((data.label,data.protoUid));
+                    }
+                    
     
-                    DatasByLabel[data.label].Remove(data);
-                    if(DatasByLabel[data.label].Count==0)
-                        DatasByLabel.Remove(data.label);
+                    if(DatasByLabel.ContainsKey(data.label))
+                    {
+                        DatasByLabel[data.label].Remove(data);
+                        if(DatasByLabel[data.label].Count==0)
+                            DatasByLabel.Remove(data.label);
+                    }
+                    
     
-                    DatasByProtouid[data.protoUid].Remove(data);
-                    if(DatasByProtouid[data.protoUid].Count==0)
-                        DatasByProtouid.Remove(data.protoUid);
+                    if(DatasByProtouid.ContainsKey(data.protoUid))
+                    {
+                        DatasByProtouid[data.protoUid].Remove(data);
+                        if(DatasByProtouid[data.protoUid].Count==0)
+                            DatasByProtouid.Remove(data.protoUid);
+                    }
+                    
     
 ProductForm.RemoveData(uid);
             uidChain.PushId(data.uid);

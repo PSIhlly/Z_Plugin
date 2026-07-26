@@ -104,7 +104,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             case CameraMode.Isometric:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
-                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 50;
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 70;
                 CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
@@ -258,7 +258,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         {
             return;
         }
-        SetPlayerRotation(new Vector3(pos.x - InputManager.instance.screenSize.x / 2, 0, pos.y - InputManager.instance.screenSize.y / 2));
+        SetPlayerRotation(new Vector3(pos.x - InputManager.instance.screenSize.x / 2, 0, (pos.y - InputManager.instance.screenSize.y / 2)*(Z_Map.DynamicGlobalSettings.cameraMode == CameraMode.Isometric?1.414f:1) ));
     }
 
     public void ForceUpdate()

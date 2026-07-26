@@ -530,7 +530,12 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            view.img_.BindTexData(TexAssetForm.DataById.GetDv(model.data.icon, TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]));
+            int iconId = model.data.icon;
+            if (model.data is MapObjectForm.Data objData && objData.model != null
+                && objData.model.subUnitTexsName != null && objData.model.subUnitTexsName.Count > 0
+                && objData.model.subUnitTexsName[0] != null && objData.model.subUnitTexsName[0].Count > 0)
+                iconId = objData.model.subUnitTexsName[0][0];
+            view.img_.BindTexData(TexAssetForm.DataById.GetDv(iconId, TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]));
 
             view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
 

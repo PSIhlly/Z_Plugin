@@ -15,7 +15,15 @@ namespace Z_Mesh
         public MeshType type;
         public Vector3[] positions;
         public Vector3 center;
-
+        public float GetMaxY()
+        {
+            float maxY = positions[0].y;
+            foreach(var pos in  positions)
+            {
+                maxY = Mathf.Max(pos.y, maxY);
+            }
+            return maxY;
+        }
     }
     public static class Mesh
     {

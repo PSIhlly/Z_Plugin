@@ -35,10 +35,10 @@ public class DisplayCameraAreaManager : Z_MonoManager<DisplayCameraAreaManager>
     public void Add(GameObject go,Vector3 relaPos)
     {
        go.transform.position = pos+ relaPos;
-       foreach(var per in go.GetComponentsInChildren<PerspectiveKeeper>())
+/*       foreach(var per in go.GetComponentsInChildren<PerspectiveKeeper>())
         {
             per.UpdateModel();
-        }
+        }*/
        shows.Add(go);
     }
 

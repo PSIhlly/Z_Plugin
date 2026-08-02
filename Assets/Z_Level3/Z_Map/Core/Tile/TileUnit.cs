@@ -22,7 +22,6 @@ namespace Z_Map
             set { base.ins = value; }
             get { return (TileInstance)base.ins; }
         }
-
         public override Type GetInsType()
         {
             return typeof(TileInstance);
@@ -30,6 +29,10 @@ namespace Z_Map
 
         public override void Show()
         {
+            if (isShowing)
+            {
+                return;
+            }
             base.Show();
             if(DynamicGlobalSettings.playing)
                 data.unlock = true;

@@ -114,7 +114,7 @@ namespace Z_Map
         }
         public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap)
         {
-            var trigger= GetEvt(name);
+            var trigger = GetEvt(name);
             if (trigger != null)
             {
                 GameManager.instance.evtCtrl.TriggerEventExecute(trigger, data.uid, defaultHeap);
@@ -177,12 +177,12 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         {
                             mapUnit.ExecuteEvt("onObjectTouchEvent", heap);
                         }
-                        else if(evt.b is TileUnit)
+                        else if (evt.b is TileUnit)
                         {
                             mapUnit.ExecuteEvt("onBoundaryTouchEvent", heap);
                         }
-                       
-                        
+
+
                         break;
                     case CollideEventType.TriggerExit:
                         if (evt.b is CharacterUnit chU2)
@@ -268,33 +268,37 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     }
     public void OnEvent(ObjectEvent evt)
     {
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
+        if (evt.unit is MapUnit mapUnit)
         {
-            if (evt.unit is MapUnit mapUnit)
+
+
+            switch (evt.type)
             {
+                case MapEventType.Create:
+                    {
+                        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
+                         {
 
+                             var heap = new Dictionary<string, BoxDataForm.Data>();
+                             heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
 
-                switch (evt.type)
-                {
-                    case MapEventType.Create:
-                        {
-                            var heap = new Dictionary<string, BoxDataForm.Data>();
-                            heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
-
-                            mapUnit.ExecuteEvt("onShowEvent", heap);
-                        }
+                             mapUnit.ExecuteEvt("onShowEvent", heap);
+                         };
                         break;
-                    case MapEventType.BoundaryTouch:
+                    }
+                case MapEventType.BoundaryTouch:
+                    {
+                        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
                         {
+
                             var heap = new Dictionary<string, BoxDataForm.Data>();
                             heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
                             mapUnit.ExecuteEvt("onBoundaryTouchEvent", heap);
-                        }
-
+                        };
                         break;
-                }
+                    }
             }
-        };
+        }
     }
 
     public void OnEvent(StoryLifeEvent evt)

@@ -316,7 +316,6 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                         }
                                         cur.pos = new Vector3(cur.pos.x, cur.mapPos.y * MapManager.instance.data.mainData.mapUnitSize.y + MapManager.instance.data.mainData.mapUnitSize.y * (i) / terrainData.step, cur.pos.z);
 
-                                        Debug.Log(cur.pos);
 
                                     }
                                 }
@@ -333,7 +332,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     continue;
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
                                 mapData.texDic[layer] = textureData.id;
-
+                                mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
                             }
                     }
                     else if (curData is MapMaskForm.Data maskData)
@@ -346,6 +345,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
                                 mapData.texDic[GlobalSettings.TERRAIN_LAYER_MAX + layer] = maskData.id;
+                                mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
                             }
                     }
                     else if (curData is MapObjectForm.Data objectData)
@@ -543,7 +543,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public void ForceUpdate()
     {
 
-        mapMgr.updateCtrl.ResetInfo();
+        mapMgr.updateCtrl.ResetView();
         if (waitForActive)
             return;
 

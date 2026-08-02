@@ -28,14 +28,22 @@ namespace Z_Map
 
     public static class GlobalSettings
     {
+        public enum UpdateType
+        {
+            None,
+            ShowOnly,
+            All,
+            Marked
+        }
         public const int TEX_ANIM_MAX = 10;
         public const int ITEM_UNIT_MAX = 10;
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
         public const bool OVERLAY_HIDE = false;
-        public const bool UPDATE_TILE_ALWAYS = false;
-        public const bool UPDATE_ALL_CHARACTER = true;
-        public const bool UPDATE_ALL_OBJECT = true;
+        public const UpdateType UPDATE_TILE_TYPE = UpdateType.None;
+        public const UpdateType UPDATE_CHARACTER_TYPE = UpdateType.All;
+        public const UpdateType UPDATE_OBJECT_TYPE = UpdateType.None;
+
         public const bool ENABLE_GRAVITY = true;
     }
     public static class DynamicGlobalSettings
@@ -147,6 +155,7 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         var tData = data.AddTile(mapPos, prms);
         tData.unit.Create();
+        updateCtrl.UpdateSingleOne(tData.unit);
         return tData;
     }
     public ObjectUnitForm.Data AddObject(string name, Vector3 realPos, string prefabName, object[] prms = null)
@@ -154,7 +163,7 @@ public class MapManager : Z_MonoManager<MapManager>
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
 
         var oData = this.data.AddObject(prefabName, prms);
-        if (oData==null)
+        if (oData == null)
         {
             return null;
         }
@@ -195,7 +204,8 @@ public class MapManager : Z_MonoManager<MapManager>
             return null;
         }
         cData.pos = realPos;
-        updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+        var tilePos = utilCtrl.GetClosestExistInArea(mapPos);
+        updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(tilePos.x, tilePos.y, tilePos.z)].unit);
         cData.name = name;
         cData.unit.Create();
         updateCtrl.UpdateSingleOne(cData.unit);

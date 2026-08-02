@@ -37,7 +37,12 @@ namespace Z_Map
         }
         public override void Show()
         {
+            if (isShowing)
+            {
+                return;
+            }
             base.Show();
+
             Z_EventHelper.Invoke(new CharacterEvent()
             {
                 type = MapEventType.Show,
@@ -54,7 +59,7 @@ namespace Z_Map
                 MapManager.instance.updateCtrl.UpdateSingleOne(this);
             }
 
-            if (data.updateType == UpdateType.Always || isShowing || GlobalSettings.UPDATE_ALL_CHARACTER)
+            if (data.updateType == UpdateType.Always || isShowing)
             {
                 //nav: 通过BFS导航获取移动方向，乘以速度和距离的较小值作为本帧移动量
                 if (data.navEnabled && !DynamicGlobalSettings.pauseNav)

@@ -78,7 +78,7 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
 
     private void Manage(MapEventType tp, MapUnit unit, int icon)
     {
-        if (!_super.enable|| !unit.belongTile.data.unlock || icon<=0 || icon == GlobalDefaultHelper.ExternDefaultTexId)
+        if (!_super.enable || unit.belongTile == null || !unit.belongTile.data.unlock || icon <= 0 || icon == GlobalDefaultHelper.ExternDefaultTexId)
             return;
         switch (tp)
         {
@@ -101,7 +101,7 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
     public void RegisterNewScene()
     {
 
-        if (!_super.enable||maps == null || maps.Count == 0)
+        if (!_super.enable || maps == null || maps.Count == 0)
             return;
 
         size.Item4 = int.MinValue;
@@ -154,9 +154,9 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
                         }
                         if (tileData.unlock)
                         {
-                            for(int i=0;i< tileSize; i++)
+                            for (int i = 0; i < tileSize; i++)
                             {
-                                for(int j=0;j< tileSize; j++)
+                                for (int j = 0; j < tileSize; j++)
                                 {
                                     unlock.SetPixel(col * tileSize + i, row * tileSize + j, Color.black);
                                 }
@@ -167,7 +167,7 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
                 }
             }
             Texture2D minimapTex = TextureTransform.FlipTexture(TextureCombine.FillTexture2DsToTexture2D(tileTextures, cols, rows, 1, (Vector2Int.one * tileSize)), false, true);
-            unlock= TextureTransform.FlipTexture(unlock, false, true);
+            unlock = TextureTransform.FlipTexture(unlock, false, true);
             minimapTex.wrapMode = TextureWrapMode.Clamp;
             unlock.wrapMode = TextureWrapMode.Clamp;
             Sprite minimapSprite = TextureHelper.GetSpriteByTexture(minimapTex);
@@ -188,13 +188,13 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
             for (int i = 0; i < tileSize; i++)
             {
                 for (int j = 0; j < tileSize; j++)
-                {   
+                {
                     unlock.SetPixel(col * tileSize + i, unlock.height - (row * tileSize + j) - 1, Color.black);
                 }
             }
             unlock.Apply();
             unlockTiles.Add(data.uid);
-           
+
         }
     }
 

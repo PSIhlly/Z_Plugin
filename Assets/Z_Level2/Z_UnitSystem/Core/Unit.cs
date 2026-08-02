@@ -115,6 +115,7 @@ namespace Z_UnitSystem
         }
         public virtual bool VisDegree(float degree)
         {
+            return false;
             if (ins == null || ins.gameObject == null)
                 return false;
             ins.VisDegree(degree);

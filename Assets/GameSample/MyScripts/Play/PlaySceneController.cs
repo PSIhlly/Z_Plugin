@@ -264,7 +264,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     public void ForceUpdate()
     {
 
-        MapManager.instance.updateCtrl.ResetInfo();
+        MapManager.instance.updateCtrl.ResetView();
         if (waitForActive)
             return;
 

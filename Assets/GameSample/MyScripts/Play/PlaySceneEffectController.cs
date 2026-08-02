@@ -268,7 +268,6 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 if (evt.unit.isVising)
                 {
                     BindCanvas(evt.unit.data);
-
                 }
                 break;
         }

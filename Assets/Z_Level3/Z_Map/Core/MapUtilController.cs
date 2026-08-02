@@ -20,7 +20,6 @@ namespace Z_Map
     }
     public class MapUtilController : Z_Controller<MapManager>
     {
-        Vector3[] tryDir = new Vector3[] { Vector3.forward * 0.1f, Vector3.back * 0.1f, Vector3.left * 0.1f, Vector3.right * 0.1f };
         public MapUtilController(MapManager super) : base(super)
         {
         }
@@ -51,6 +50,10 @@ namespace Z_Map
             int x = (int)Math.Round(pos.x / _super.data.mainData.mapUnitSize.x);
             int y = (int)(pos.y / _super.data.mainData.mapUnitSize.y);
             int z = (int)Math.Round(pos.z / _super.data.mainData.mapUnitSize.z);
+
+            //边缘0.2检测：距当前tile任一水平边缘0.2以内，且该方向相邻tile不存在（含下方）时，视为不在区域内
+            if (IsNearBoundaryEdge(pos, x, y, z))
+                return false;
 
             return InArea(x, y, z);
         }
@@ -109,15 +112,39 @@ namespace Z_Map
         {
             return _super.data.maps.ContainsKey((x, y, z));
         }
+        /// <summary>
+        /// 检查pos是否在地图边缘0.2以内：距当前tile任一水平边缘0.2以内，且该方向相邻tile不存在（含下方tile）。
+        /// 边缘定义：这一方向上相接的tile不存在，且这个tile的下方也不存在tile（即!InArea(相邻)）。
+        /// InArea(Vector3)与IsOnBoundary共用此判定，保证两者阈值一致，避免offset叠加放大边界范围。
+        /// </summary>
+        private bool IsNearBoundaryEdge(Vector3 pos, int x, int y, int z)
+        {
+            var size = _super.data.mainData.mapUnitSize;
+            //pos在当前tile内的相对坐标（-0.5 ~ 0.5）
+            float relX = pos.x / size.x - x;
+            float relZ = pos.z / size.z - z;
+            //距右边缘（+X方向）：（0.5 - relX）为map空间距离，乘size转真实空间距离
+            if ((0.5f - relX) * size.x < 0.2f && !InArea(x + 1, y, z))
+                return true;
+            //距左边缘（-X方向）
+            if ((relX + 0.5f) * size.x < 0.2f && !InArea(x - 1, y, z))
+                return true;
+            //距前边缘（+Z方向）
+            if ((0.5f - relZ) * size.z < 0.2f && !InArea(x, y, z + 1))
+                return true;
+            //距后边缘（-Z方向）
+            if ((relZ + 0.5f) * size.z < 0.2f && !InArea(x, y, z - 1))
+                return true;
+            return false;
+        }
         public bool IsOnBoundary(Vector3 pos)
         {
-            if (_super.enable)
-                for (int i = 0; i < tryDir.Length; i++)
-                {
-                    if (!InArea(pos + tryDir[i]))
-                        return true;
-                }
-            return false;
+            if (!_super.enable)
+                return false;
+            int x = (int)Math.Round(pos.x / _super.data.mainData.mapUnitSize.x);
+            int y = (int)(pos.y / _super.data.mainData.mapUnitSize.y);
+            int z = (int)Math.Round(pos.z / _super.data.mainData.mapUnitSize.z);
+            return IsNearBoundaryEdge(pos, x, y, z);
         }
 
         public Vector3Int RealPos2MapPosInt(Vector3 pos)
@@ -221,8 +248,10 @@ namespace Z_Map
                 var vis = new HashSet<(int, int, int)>();
                 queue.Enqueue((mapPos.x, mapPos.y, mapPos.z));
                 vis.Add((mapPos.x, mapPos.y, mapPos.z));
-                while (queue.Count > 0)
+                int deepth = 100;
+                while (queue.Count > 0&& deepth>0)
                 {
+                    deepth++;
                     var cur = queue.Dequeue();
                     var dirs = new (int, int, int)[]{
                             (cur.Item1+1,cur.Item2,cur.Item3), (cur.Item1 - 1, cur.Item2, cur.Item3),

@@ -56,9 +56,9 @@ namespace Z_Map
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
                 propBlock.SetFloat("_Show", degree);
-                this.degree = degree;
                 render.SetPropertyBlock(propBlock);
             }
+            this.degree = degree;
 
         }
         public override void VisOff()

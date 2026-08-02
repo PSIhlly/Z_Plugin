@@ -174,7 +174,7 @@ namespace Z_Map
 
         public virtual CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
         {
-            return new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
+            return new CharacterUnitForm.Data(-1, false, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
         }
         public virtual void RegisterNewCharacter(CharacterUnitForm.Data data)
         {

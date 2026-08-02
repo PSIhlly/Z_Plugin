@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using UnityEngine;
 using Z_Debug;
 using Z_DesignStyle;
@@ -29,7 +28,6 @@ namespace Z_Map
         public DoubleDictionary<ObjectUnit, TileUnit> objectTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
         public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
-
         public List<TileUnitForm.Data> curTileLst
         {
             get;
@@ -140,47 +138,65 @@ namespace Z_Map
 
             foreach (var newMap in newMapLst)
             {
-                foreach (var ch in characterTileDic.Get(newMap.unit))
+                UpdateRelatedUnit(newMap.unit);
+
+            }
+            foreach (var delMap in delMapLst)
+            {
+                UpdateRelatedUnit(delMap.unit);
+
+            }
+
+            curTileLst = nowTmp;
+            lastView = curView;
+        }
+        private void UpdateRelatedUnit(TileUnit tile)
+        {
+            bool show = tile.isShowing;
+            foreach (var ch in characterTileDic.Get(tile))
+            {
+                if (show)
                 {
                     ch.Show();
                     if (!curCharacterLst.Contains(ch.data))
                         curCharacterLst.Add(ch.data);
                 }
-                foreach (var ch in itemTileDic.Get(newMap.unit))
-                {
-                    ch.Show();
-                    if (!curItemLst.Contains(ch.data))
-                        curItemLst.Add(ch.data);
-                }
-
-                foreach (var ch in objectTileDic.Get(newMap.unit))
-                {
-                    ch.Show();
-                    if (!curObjectLst.Contains(ch.data))
-                        curObjectLst.Add(ch.data);
-                }
-            }
-            foreach (var delMap in delMapLst)
-            {
-                foreach (var ch in itemTileDic.Get(delMap.unit))
-                {
-                    ch.Hide();
-                    curItemLst.Remove(ch.data);
-                }
-                foreach (var ch in characterTileDic.Get(delMap.unit))
+                else
                 {
                     ch.Hide();
                     curCharacterLst.Remove(ch.data);
                 }
-                foreach (var ch in objectTileDic.Get(delMap.unit))
+            }
+            foreach (var item in itemTileDic.Get(tile))
+            {
+                if (show)
                 {
-                    ch.Hide();
-                    curObjectLst.Remove(ch.data);
+                    item.Show();
+                    if (!curItemLst.Contains(item.data))
+                        curItemLst.Add(item.data);
+                }
+                else
+                {
+                    item.Hide();
+                    curItemLst.Remove(item.data);
                 }
             }
 
-            curTileLst = nowTmp;
-            lastView = curView;
+            foreach (var obj in objectTileDic.Get(tile))
+            {
+                if (show)
+                {
+                    obj.Show();
+                    if (!curObjectLst.Contains(obj.data))
+                        curObjectLst.Add(obj.data);
+                }
+                else
+                {
+                    obj.Hide();
+                    curObjectLst.Remove(obj.data);
+                }
+            }
+
         }
         private void ShowAndAddLst(List<TileUnitForm.Data> lst, int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
         {
@@ -209,8 +225,14 @@ namespace Z_Map
         }
         public void UpdateSingleOne(MapUnit unit)
         {
-
-            if (unit is CharacterUnit ch)
+            if (unit is TileUnit tl)
+            {
+                tl.Hide();
+                curTileLst.Add(tl.data);
+                tl.Show();
+                UpdateRelatedUnit(tl);
+            }
+            else if (unit is CharacterUnit ch)
             {
                 foreach (var tile in characterTileDic.Get(ch))
                 {
@@ -253,47 +275,65 @@ namespace Z_Map
         {
             //return;
             //update
-            if (GlobalSettings.UPDATE_TILE_ALWAYS)
+            switch (GlobalSettings.UPDATE_TILE_TYPE)
             {
-                foreach (var map in curTileLst)
-                {
-                    map.unit.UpdateInfo();
-                }
+                case GlobalSettings.UpdateType.ShowOnly:
+                    foreach (var tile in curTileLst)
+                    {
+                        tile.unit.UpdateInfo();
+                    }
+                    break;
+                case GlobalSettings.UpdateType.All:
+
+                    foreach (var tile in TileUnitForm.DataByUid.Values)
+                    {
+                        tile.unit.UpdateInfo();
+                    }
+                    break;
+                case GlobalSettings.UpdateType.None:
+                default:
+                    break;
             }
-            if (GlobalSettings.UPDATE_ALL_OBJECT)
+            switch (GlobalSettings.UPDATE_OBJECT_TYPE)
             {
-                foreach (var oData in ObjectUnitForm.DataByUid.Values)
-                {
-                    oData.unit.UpdateInfo();
-                }
-            }
-            else
-            {
-                foreach (var map in curObjectLst)
-                {
-                    map.unit.UpdateInfo();
-                }
-            }
-            foreach (var map in curItemLst)
-            {
-                map.unit.UpdateInfo();
+                case GlobalSettings.UpdateType.ShowOnly:
+                    foreach (var obj in curObjectLst)
+                    {
+                        obj.unit.UpdateInfo();
+                    }
+                    break;
+                case GlobalSettings.UpdateType.All:
+
+                    var lst = objectTileDic.GetDicT1().Keys.ToList();
+                    foreach (var oUnit in lst)
+                    {
+                        oUnit.UpdateInfo();
+                    }
+                    break;
+                case GlobalSettings.UpdateType.None:
+                default:
+                    break;
             }
 
-            if (GlobalSettings.UPDATE_ALL_CHARACTER)
+            switch (GlobalSettings.UPDATE_CHARACTER_TYPE)
             {
-                foreach (var cData in CharacterUnitForm.DataByUid.Values)
-                {
-                    cData.unit.UpdateInfo();
-                }
+                case GlobalSettings.UpdateType.ShowOnly:
+                    foreach (var obj in curCharacterLst)
+                    {
+                        obj.unit.UpdateInfo();
+                    }
+                    break;
+                case GlobalSettings.UpdateType.All:
+                    var lst = characterTileDic.GetDicT1().Keys.ToList();
+                    foreach (var cUnit in lst)
+                    {
+                        cUnit.UpdateInfo();
+                    }
+                    break;
+                case GlobalSettings.UpdateType.None:
+                default:
+                    break;
             }
-            else
-            {
-                foreach (var map in curCharacterLst)
-                {
-                    map.unit.UpdateInfo();
-                }
-            }
-
 
         }
 
@@ -360,8 +400,8 @@ namespace Z_Map
             {
                 if (curMap.mapPos.y < realViewCenter.y)
                 {
-                    
-                        SetGroupVision(curMap.unit, 1);
+
+                    SetGroupVision(curMap.unit, 1);
                 }
                 else
                 {
@@ -425,14 +465,8 @@ namespace Z_Map
         {
             return _super.navigationCtrl.GetNextDir(cur, tar, maxStep);
         }
-        public void ResetInfo()
+        public void ResetView()
         {
-            lastView = (0, 0, 0, 0, 0, 0);
-            foreach (var map in curTileLst)
-            {
-                map.unit.Hide();
-            }
-            curTileLst.Clear();
             UpdateInfo(true);
         }
         public void UpdateInfo(bool forceFresh = false)
@@ -481,7 +515,7 @@ namespace Z_Map
                 unit.VisDegree(1f);
                 foreach (var curObj in objectTileDic.Get(unit))
                 {
-                    
+
                     if (curObj.belongTile == unit)
                     {
                         curObj.VisOn();
@@ -548,29 +582,29 @@ namespace Z_Map
             }
             // 决定关联哪个tile：防止重力微移导致y截断后误切换到下方tile
             TileUnit newMap = null;
-          /*  var floatMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
-                // snap阈值需按unitSize.y缩放，保持真实空间容差固定为0.1（原unitSize=2时0.05 map空间=0.1真实空间）
-                if (Math.Abs(floatMapPos.y - newMapPos.y) < 0.1f / _super.data.mainData.mapUnitSize.y
-                    && _super.utilCtrl.ContainsTile(newMapPos.x, newMapPos.y, newMapPos.z))
-                {
-                    var tileData = _super.utilCtrl.GetTileData(newMapPos.x, newMapPos.y, newMapPos.z);
-                 if (tileData != null&&tileData.prefabName == MapInfo.GetPrefabName("map"))
-			                {
-			                    newMap = tileData.unit;
-			                    //仅在非爬升时吸附Y到地面tile高度，避免覆盖斜面滑行的+Y分量
-			                    //重力开启时不吸附Y：球体碰撞体中心相对data.pos有偏移，吸附到tile高度会导致球体悬空，重力无法使球体落地
-			                    float deltaY = newPos.y - unit.data.pos.y;
-			                    if (deltaY <= 0.0001f && !GlobalSettings.ENABLE_GRAVITY)
-			                    {
-			                        newPos.y = newMap.data.pos.y;
-			                    }
-			                 }
-               }*/
+            /*  var floatMapPos = _super.utilCtrl.RealPos2MapPos(newPos);
+                  // snap阈值需按unitSize.y缩放，保持真实空间容差固定为0.1（原unitSize=2时0.05 map空间=0.1真实空间）
+                  if (Math.Abs(floatMapPos.y - newMapPos.y) < 0.1f / _super.data.mainData.mapUnitSize.y
+                      && _super.utilCtrl.ContainsTile(newMapPos.x, newMapPos.y, newMapPos.z))
+                  {
+                      var tileData = _super.utilCtrl.GetTileData(newMapPos.x, newMapPos.y, newMapPos.z);
+                   if (tileData != null&&tileData.prefabName == MapInfo.GetPrefabName("map"))
+                              {
+                                  newMap = tileData.unit;
+                                  //仅在非爬升时吸附Y到地面tile高度，避免覆盖斜面滑行的+Y分量
+                                  //重力开启时不吸附Y：球体碰撞体中心相对data.pos有偏移，吸附到tile高度会导致球体悬空，重力无法使球体落地
+                                  float deltaY = newPos.y - unit.data.pos.y;
+                                  if (deltaY <= 0.0001f && !GlobalSettings.ENABLE_GRAVITY)
+                                  {
+                                      newPos.y = newMap.data.pos.y;
+                                  }
+                               }
+                 }*/
 
             // 策略3：以上都不满足，取下方最近的tile
             if (newMap == null)
             {
-                   newMap = _super.utilCtrl.GetTile(newMapPos.x, newMapPos.y, newMapPos.z);
+                newMap = _super.utilCtrl.GetTile(newMapPos.x, newMapPos.y, newMapPos.z);
             }
             if (newMap != null)
             {
@@ -666,10 +700,10 @@ namespace Z_Map
             avoidDir = new List<Vector3>();
             var disRes = (dir).magnitude;
             var assist = new Graph.IntersectAssisant(trigger.data.collidingUnitUid.Contains(unit.data.uid));
-     
+
             foreach (var cur in trigger.GetMeshes(type))
             {
-                float dis = CheckCollide(cur, unit,dir, type,out var avoidDirTmp,out var assistTmp);
+                float dis = CheckCollide(cur, unit, dir, type, out var avoidDirTmp, out var assistTmp);
                 assist.Merge(assistTmp);
                 if (MathF.Abs(dis) <= 0.01f && MathF.Abs(disRes) <= 0.01f)
                 {
@@ -696,7 +730,7 @@ namespace Z_Map
         /// </summary>
         public float CheckCollide(MeshInfo trigger, MapUnit unit, Vector3 dir, CollideType type, out List<Vector3> avoidDir, out IntersectAssisant assist, Action<Unit, Graph.IntersectType, float> onCast = null)
         {
-            float disRes= (dir).magnitude;
+            float disRes = (dir).magnitude;
             avoidDir = new List<Vector3>();
             assist = new Graph.IntersectAssisant(false);
             foreach (var tar in unit.GetMeshes(type))

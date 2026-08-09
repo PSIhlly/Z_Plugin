@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1001 &5770327398125457453
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -92,6 +92,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Loading Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 8857016060710973673, guid: 9684a91e5734922438a98f1e4fcfbe8a, type: 3}
+      propertyPath: preloadConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 425ee19dfd144314dabd355900a16158, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

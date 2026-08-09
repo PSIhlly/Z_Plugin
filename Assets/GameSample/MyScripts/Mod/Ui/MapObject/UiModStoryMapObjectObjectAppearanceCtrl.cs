@@ -74,7 +74,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             };
             view.ipt_label.onFinishInput += (s) =>
             {
-                model.data.label = s;
+                model.data.labId = LabForm.GetOrCreateDisplayName(s, nameof(MapObjectForm), model.data.labId);
                 Refresh();
             };
             view.ipt_posHeight.onFinishInput += (s) =>
@@ -130,7 +130,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
 
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(model.data.label);
+            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
 
             DisplayCameraAreaManager.instance.Clear();
 

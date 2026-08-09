@@ -41,7 +41,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
             });
             view.ipt_label.onFinishInput += (s) =>
             {
-                model.data.label = s;
+                model.data.labId = LabForm.GetOrCreateDisplayName(s, nameof(MapMaskForm), model.data.labId);
             };
             view.ipt_name.onFinishInput += (s) =>
             {
@@ -70,6 +70,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
         public void Refresh()
         {
             view.sta_show.ChangeState(model.id >= 0 ? 1 : 0);
+            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
 
             con.Clear();
             for (int i = 0; i < model.data.texsName.Count; i++)

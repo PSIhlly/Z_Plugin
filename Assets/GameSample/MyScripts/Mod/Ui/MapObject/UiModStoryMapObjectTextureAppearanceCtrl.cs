@@ -40,7 +40,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             });
             view.ipt_label.onFinishInput += (s) =>
             {
-                model.data.label = s;
+                model.data.labId = LabForm.GetOrCreateDisplayName(s, nameof(MapTextureForm), model.data.labId);
                 Refresh();
             };
             view.ipt_name.onFinishInput += (s) =>
@@ -53,6 +53,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                 model.data.animTimeInterval = StringHelper.ToFloat(s, 0, true);
                 Refresh();
             };
+            view.btn_isWangTile.onClick.AddListener(() =>
+            {
+                model.data.isWangTile = !model.data.isWangTile;
+                Refresh();
+            });
             view.btn_deleteTex.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTexId(model.data.id, model.id);
@@ -104,8 +109,9 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                 view.img_image.BindTexData(TexAssetForm.DataById[model.data.texs[model.id]]);
             }
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(model.data.label);
+            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
             view.ipt_interval.Set(model.data.animTimeInterval.ToString("0.##"));
+            view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
         }
     }
 

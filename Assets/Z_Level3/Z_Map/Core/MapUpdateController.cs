@@ -28,12 +28,12 @@ namespace Z_Map
         public DoubleDictionary<ObjectUnit, TileUnit> objectTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
         public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
-        public List<TileUnitForm.Data> curTileLst
+        public HashSet<TileUnitForm.Data> curTileLst
         {
             get;
             private set;
         }
-        = new List<TileUnitForm.Data>();
+        = new HashSet<TileUnitForm.Data>();
         public List<TileUnitForm.Data> newMapLst
         {
             get;
@@ -73,7 +73,7 @@ namespace Z_Map
         private void FreshMap()
         {
 
-            List<TileUnitForm.Data> nowTmp = new List<TileUnitForm.Data>();
+            HashSet<TileUnitForm.Data> nowTmp = new HashSet<TileUnitForm.Data>();
             var viewSize = _super.data.mainData.viewSize;
             var curView = (viewCenter.x - viewSize.x, viewCenter.x + viewSize.x, viewCenter.y - viewSize.y, viewCenter.y + viewSize.y, viewCenter.z - viewSize.z, viewCenter.z + viewSize.z);
             (int, int, int, int, int, int) commonView = (Mathf.Max(curView.Item1, lastView.Item1), Mathf.Min(curView.Item2, lastView.Item2),
@@ -198,7 +198,7 @@ namespace Z_Map
             }
 
         }
-        private void ShowAndAddLst(List<TileUnitForm.Data> lst, int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
+        private void ShowAndAddLst(HashSet<TileUnitForm.Data> lst, int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
         {
             for (int i = minX; i < maxX; i++)
             {
@@ -227,10 +227,22 @@ namespace Z_Map
         {
             if (unit is TileUnit tl)
             {
-                tl.Hide();
-                curTileLst.Add(tl.data);
-                tl.Show();
-                UpdateRelatedUnit(tl);
+                for(int i=tl.data.mapPos.x-1;i<= tl.data.mapPos.x +1;i++)
+                for(int j=tl.data.mapPos.z-1;j<= tl.data.mapPos.z +1;j++)
+                    {
+                        var cur = _super.data.maps.GetDv((i, tl.data.mapPos.y, j), null);
+                        if(cur!=null)
+                        {
+                            cur.unit.Hide();
+                            if(!curTileLst.Contains(cur))
+                            {
+                                curTileLst.Add(cur);
+                            }
+                            cur.unit.Show();
+                            UpdateRelatedUnit(cur.unit);
+                        }
+                    }
+                      
             }
             else if (unit is CharacterUnit ch)
             {

@@ -1,0 +1,352 @@
+[
+  {
+    "id": 10001,
+    "lv1Lab": "basic",
+    "lv2Lab": "audio",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10002,
+    "lv1Lab": "basic",
+    "lv2Lab": "const",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10003,
+    "lv1Lab": "basic",
+    "lv2Lab": "list",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10004,
+    "lv1Lab": "basic",
+    "lv2Lab": "math",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10005,
+    "lv1Lab": "basic",
+    "lv2Lab": "process",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10006,
+    "lv1Lab": "basic",
+    "lv2Lab": "variable",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10007,
+    "lv1Lab": "character",
+    "lv2Lab": "anim",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10008,
+    "lv1Lab": "character",
+    "lv2Lab": "detect",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10009,
+    "lv1Lab": "character",
+    "lv2Lab": "parameter",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10010,
+    "lv1Lab": "character",
+    "lv2Lab": "skill",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10011,
+    "lv1Lab": "character",
+    "lv2Lab": "system",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10012,
+    "lv1Lab": "character",
+    "lv2Lab": "transform",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10013,
+    "lv1Lab": "effect",
+    "lv2Lab": "system",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10014,
+    "lv1Lab": "item",
+    "lv2Lab": "backpack",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10015,
+    "lv1Lab": "mission",
+    "lv2Lab": "system",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10016,
+    "lv1Lab": "sceneObject",
+    "lv2Lab": "detect",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10017,
+    "lv1Lab": "sceneObject",
+    "lv2Lab": "parameter",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10018,
+    "lv1Lab": "sceneObject",
+    "lv2Lab": "system",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10019,
+    "lv1Lab": "sceneObject",
+    "lv2Lab": "transform",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10020,
+    "lv1Lab": "skill",
+    "lv2Lab": "parameter",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10021,
+    "lv1Lab": "skill",
+    "lv2Lab": "system",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10022,
+    "lv1Lab": "ui",
+    "lv2Lab": "dialog",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10023,
+    "lv1Lab": "ui",
+    "lv2Lab": "image",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10024,
+    "lv1Lab": "ui",
+    "lv2Lab": "notice",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 10025,
+    "lv1Lab": "ui",
+    "lv2Lab": "window",
+    "lv3Lab": "",
+    "belong": "GameCmdDataForm"
+  },
+  {
+    "id": 1,
+    "lv1Lab": "default",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapTextureForm"
+  },
+  {
+    "id": 2,
+    "lv1Lab": "草1",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapTextureForm"
+  },
+  {
+    "id": 3,
+    "lv1Lab": "水1",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapTextureForm"
+  },
+  {
+    "id": 4,
+    "lv1Lab": "default",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapObjectForm"
+  },
+  {
+    "id": 5,
+    "lv1Lab": "景物",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapObjectForm"
+  },
+  {
+    "id": 6,
+    "lv1Lab": "子弹",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapObjectForm"
+  },
+  {
+    "id": 7,
+    "lv1Lab": "自机",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "CharacterProductForm"
+  },
+  {
+    "id": 8,
+    "lv1Lab": "小怪",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "CharacterProductForm"
+  },
+  {
+    "id": 9,
+    "lv1Lab": "魔理沙",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "SkillProductForm"
+  },
+  {
+    "id": 10,
+    "lv1Lab": "通用",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "SkillProductForm"
+  },
+  {
+    "id": 11,
+    "lv1Lab": "场景特效",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "EffectForm"
+  },
+  {
+    "id": 12,
+    "lv1Lab": "技能",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "EffectForm"
+  },
+  {
+    "id": 13,
+    "lv1Lab": "流程",
+    "lv2Lab": "机制",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 14,
+    "lv1Lab": "人物",
+    "lv2Lab": "通用",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 15,
+    "lv1Lab": "通用",
+    "lv2Lab": "子弹",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 16,
+    "lv1Lab": "通用",
+    "lv2Lab": "Ui",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 17,
+    "lv1Lab": "enterGame",
+    "lv2Lab": "dialog",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 18,
+    "lv1Lab": "特效",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 19,
+    "lv1Lab": "草",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 20,
+    "lv1Lab": "背景",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 21,
+    "lv1Lab": "npc",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "CharacterProductForm"
+  },
+  {
+    "id": 22,
+    "lv1Lab": "魔理沙",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 23,
+    "lv1Lab": "自机",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapCharacterForm"
+  },
+  {
+    "id": 24,
+    "lv1Lab": "小怪",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapCharacterForm"
+  },
+  {
+    "id": 25,
+    "lv1Lab": "npc",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapCharacterForm"
+  }
+]

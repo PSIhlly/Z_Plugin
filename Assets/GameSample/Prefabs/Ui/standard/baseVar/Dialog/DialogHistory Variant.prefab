@@ -198,6 +198,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: -1.7810669
       objectReference: {fileID: 0}
+    - target: {fileID: 2643101337488122539, guid: 784167321fce0ef4c9fb185ef34cdf91, type: 3}
+      propertyPath: preloadConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 425ee19dfd144314dabd355900a16158, type: 2}
     - target: {fileID: 3643882976030210267, guid: 784167321fce0ef4c9fb185ef34cdf91, type: 3}
       propertyPath: m_Name
       value: DialogHistory Variant

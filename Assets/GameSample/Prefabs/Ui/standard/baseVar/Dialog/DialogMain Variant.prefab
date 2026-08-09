@@ -340,6 +340,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4055602769719995540, guid: 003469a4284ab6a47b3cb067f3fddf9d, type: 3}
+      propertyPath: preloadConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 425ee19dfd144314dabd355900a16158, type: 2}
     - target: {fileID: 4354411144364362408, guid: 003469a4284ab6a47b3cb067f3fddf9d, type: 3}
       propertyPath: m_fontSize
       value: 50

@@ -49,7 +49,9 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
             };
             view.ipt_label.onFinishInput = (s) =>
             {
-                model.data.label = s;
+                model.data.labId = string.IsNullOrWhiteSpace(s)
+                    ? 0
+                    : LabForm.GetOrCreateDisplayName(s, nameof(EffectForm), model.data.labId);
                 Refresh();
             };
             view.btn_ground.onClick.AddListener(() =>
@@ -76,7 +78,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
         {
             view.sta_ground.ChangeState(model.data.ground ? 1 : 0);
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(model.data.label);
+            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
 
             clipsCon.Clear();
             for (int i = 0; i < parent.model.data.clips.Count; i++)

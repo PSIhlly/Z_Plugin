@@ -19,7 +19,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
     }
     public partial class UiModStoryMissionListModel
     {
-        public string lab;
+        public int? labId;
     }
     public partial class UiModStoryMissionListCtrl
     {
@@ -35,37 +35,57 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
         }
         public override void OnShow()
         {
-
+            model.labId = HasUnclassified() ? LabForm.NoneId : (int?)null;
             Refresh();
+        }
+        bool HasUnclassified()
+        {
+            return MissionForm.DatasByLabid.ContainsKey(LabForm.NoneId);
         }
         public void Refresh()
         {
 
+            var hasUnclassified = HasUnclassified();
+            if (model.labId == LabForm.NoneId && !hasUnclassified)
+                model.labId = null;
             labCon.Clear();
             labCon.Add(new UiLabParam()
             {
-                lab = ""
+                state = UiLabRenderHelper.AllState
             });
-            foreach (var lab in MissionForm.DatasByLabel.Keys)
+            if (hasUnclassified)
             {
                 labCon.Add(new UiLabParam()
                 {
-                    lab = lab
+                    labId = LabForm.NoneId,
+                    state = UiLabRenderHelper.UnclassifiedState
                 });
             }
+            foreach (var labId in UiLabRenderHelper.GetLabIds(nameof(MissionForm)))
+            {
+                labCon.Add(new UiLabParam()
+                {
+                    labId = labId,
+                    state = UiLabRenderHelper.LabState
+                });
+            }
+            labCon.Add(new UiLabParam()
+            {
+                state = UiLabRenderHelper.NewState
+            });
             labCon.Refresh();
             itemCon.Clear();
-            var datas = MissionForm.DatasByLabel.GetDv(model.lab, null);
-            if (datas != null)
+            var datas = model.labId == null
+                ? new List<MissionForm.Data>(MissionForm.DataById.Values)
+                : (MissionForm.DatasByLabid.ContainsKey(model.labId.Value)
+                    ? MissionForm.DatasByLabid[model.labId.Value]
+                    : new List<MissionForm.Data>());
+            foreach (var data in datas.OrderBy(d => d.id))
             {
-                foreach (var data in datas.OrderBy(d => d.id))
+                itemCon.Add(new UiBigItemParam()
                 {
-                    itemCon.Add(new UiBigItemParam()
-                    {
-                        data = data
-                    });
-                }
-                
+                    data = data
+                });
             }
             itemCon.Add(new UiBigItemParam()
             {
@@ -78,11 +98,13 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
 
     public partial class UiLabParam
     {
-        public string lab;
+        public int? labId;
+        public int state;
     }
     public partial class UiLabModel
     {
-        public string lab;
+        public int? labId;
+        public int state;
     }
     public partial class UiLabCtrl
     {
@@ -92,22 +114,33 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
 
             view.btn_.onClick.AddListener(() =>
             {
-                parent.model.lab = model.lab;
+                if (model.state == UiLabRenderHelper.NewState)
+                {
+                    UiLabRenderHelper.Create(nameof(MissionForm), labId =>
+                    {
+                        parent.model.labId = labId;
+                        parent.Refresh();
+                    });
+                    return;
+                }
+
+                parent.model.labId = model.labId;
                 parent.Refresh();
             });
 
         }
         public override void OnShow()
         {
-            model.lab = param.lab;
+            model.labId = param.labId;
+            model.state = param.state;
             Refresh();
         }
         public void Refresh()
         {
-
-            view.sta_valid.ChangeState(model.lab == "" ? 0 : 1);
-            view.sta_.ChangeState(model.lab == parent.model.lab ? 1 : 0);
-            view.txt_.text = model.lab == "" ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab):model.lab;
+            var isNew = model.state == UiLabRenderHelper.NewState;
+            view.sta_state.ChangeState(model.state);
+            view.sta_.ChangeState(!isNew && model.labId == parent.model.labId ? 1 : 0);
+            view.txt_.text = UiLabRenderHelper.GetText(model.labId, isNew);
         }
     }
 
@@ -128,7 +161,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionList
 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateMission(parent.model.lab);
+                ModManager.instance.assetCtrl.CreateMission(parent.model.labId ?? 0);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>

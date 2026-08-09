@@ -2,184 +2,30 @@
   {
     "id": 1,
     "name": "grass",
-    "icon": 110000,
+    "icon": 111706,
     "animTimeInterval": 0.0,
     "texs": [
       {
-        "v": 110000
+        "v": 111706
       }
     ],
-    "label": "default",
-    "events": []
+    "labId": 1,
+    "events": [],
+    "isWangTile": false
   },
   {
     "id": 2,
     "name": "草1-0",
-    "icon": 13,
+    "icon": 59,
     "animTimeInterval": 1.0,
     "texs": [
       {
-        "v": 13
+        "v": 59
       }
     ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 9,
-    "name": "草1-1",
-    "icon": 12,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 12
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 10,
-    "name": "草1-2",
-    "icon": 23,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 23
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 11,
-    "name": "草1-3",
-    "icon": 14,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 14
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 3,
-    "name": "草1-4",
-    "icon": 15,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 15
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 4,
-    "name": "草1-5",
-    "icon": 16,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 16
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 5,
-    "name": "草1-6",
-    "icon": 17,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 17
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 6,
-    "name": "草1-7",
-    "icon": 18,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 18
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 7,
-    "name": "草1-8",
-    "icon": 19,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 19
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 8,
-    "name": "草1-9",
-    "icon": 20,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 20
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 12,
-    "name": "草1-10",
-    "icon": 21,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 21
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 13,
-    "name": "草1-11",
-    "icon": 22,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 22
-      }
-    ],
-    "label": "草1",
-    "events": []
-  },
-  {
-    "id": 14,
-    "name": "草1-12",
-    "icon": 24,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 24
-      }
-    ],
-    "label": "草1",
-    "events": []
+    "labId": 2,
+    "events": [],
+    "isWangTile": true
   },
   {
     "id": 15,
@@ -197,7 +43,8 @@
         "v": 27
       }
     ],
-    "label": "水1",
-    "events": []
+    "labId": 3,
+    "events": [],
+    "isWangTile": false
   }
 ]

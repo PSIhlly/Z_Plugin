@@ -19,7 +19,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
     }
     public partial class UiModStoryCharacterListModel
     {
-        public string lab;
+        public int? labId;
         public CharacterProductForm.Data data;
     }
     public partial class UiModStoryCharacterListCtrl
@@ -36,31 +36,52 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
         }
         public override void OnShow()
         {
-
+            model.labId = HasUnclassified() ? LabForm.NoneId : (int?)null;
             Refresh();
+        }
+        bool HasUnclassified()
+        {
+            return CharacterProductForm.DatasByLabidProtouid.ContainsKey((LabForm.NoneId, 0));
         }
         public void Refresh()
         {
 
+            var hasUnclassified = HasUnclassified();
+            if (model.labId == LabForm.NoneId && !hasUnclassified)
+                model.labId = null;
             labCon.Clear();
             labCon.Add(new UiLabParam()
             {
-                lab = null
+                state = UiLabRenderHelper.AllState
             });
-            foreach (var lab in CharacterProductForm.DatasByLabel.Keys)
+            if (hasUnclassified)
             {
-                if(lab!="")
+                labCon.Add(new UiLabParam()
                 {
-                    labCon.Add(new UiLabParam()
-                    {
-                        lab = lab
-                    });
-                }
+                    labId = LabForm.NoneId,
+                    state = UiLabRenderHelper.UnclassifiedState
+                });
             }
+            foreach (var labId in UiLabRenderHelper.GetLabIds(nameof(CharacterProductForm)))
+            {
+                labCon.Add(new UiLabParam()
+                {
+                    labId = labId,
+                    state = UiLabRenderHelper.LabState
+                });
+            }
+            labCon.Add(new UiLabParam()
+            {
+                state = UiLabRenderHelper.NewState
+            });
             labCon.Refresh();
 
             itemCon.Clear();
-            var datas = model.lab == null || !CharacterProductForm.DatasByLabelProtouid.ContainsKey((model.lab, 0)) ?( CharacterProductForm.DatasByProtouid.ContainsKey(0)?CharacterProductForm.DatasByProtouid[0]:new List<CharacterProductForm.Data>() ): CharacterProductForm.DatasByLabelProtouid[(model.lab, 0)];
+            var datas = model.labId == null
+                ? (CharacterProductForm.DatasByProtouid.ContainsKey(0) ? CharacterProductForm.DatasByProtouid[0] : new List<CharacterProductForm.Data>())
+                : (CharacterProductForm.DatasByLabidProtouid.ContainsKey((model.labId.Value, 0))
+                    ? CharacterProductForm.DatasByLabidProtouid[(model.labId.Value, 0)]
+                    : new List<CharacterProductForm.Data>());
             foreach (var data in datas.OrderBy(d => d.uid))
             {
                 itemCon.Add(new UiBigItemParam()
@@ -81,11 +102,13 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 
     public partial class UiLabParam
     {
-        public string lab;
+        public int? labId;
+        public int state;
     }
     public partial class UiLabModel
     {
-        public string lab;
+        public int? labId;
+        public int state;
     }
     public partial class UiLabCtrl
     {
@@ -95,25 +118,33 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 
             view.btn_.onClick.AddListener(() =>
             {
-                parent.model.lab = model.lab;
+                if (model.state == UiLabRenderHelper.NewState)
+                {
+                    UiLabRenderHelper.Create(nameof(CharacterProductForm), labId =>
+                    {
+                        parent.model.labId = labId;
+                        parent.Refresh();
+                    });
+                    return;
+                }
+
+                parent.model.labId = model.labId;
                 parent.Refresh();
             });
 
         }
         public override void OnShow()
         {
-            model.lab = param.lab;
+            model.labId = param.labId;
+            model.state = param.state;
             Refresh();
         }
         public void Refresh()
         {
-
-            view.sta_valid.ChangeState(model.lab==null?0:1);
-            view.sta_.ChangeState(parent.model.lab == model.lab ? 1 : 0);
-            if (model.lab != null)
-            {
-                view.txt_.text = model.lab;
-            }
+            var isNew = model.state == UiLabRenderHelper.NewState;
+            view.sta_state.ChangeState(model.state);
+            view.sta_.ChangeState(!isNew && parent.model.labId == model.labId ? 1 : 0);
+            view.txt_.text = UiLabRenderHelper.GetText(model.labId, isNew);
         }
     }
 
@@ -134,7 +165,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateCharacter();
+                ModManager.instance.assetCtrl.CreateCharacter(parent.model.labId ?? 0);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>

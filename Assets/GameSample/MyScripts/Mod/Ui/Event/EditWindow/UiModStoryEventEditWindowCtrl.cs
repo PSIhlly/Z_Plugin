@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using Z_Code;
 using Z_Code.Form;
 using Z_CodeVisual;
+using Z_DataSystem.Form;
 using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
@@ -57,12 +58,12 @@ namespace Ui.ModStoryEventEditWindow
             };
             view.ipt_category.onFinishInput += (v) =>
             {
-                model.data.category = v;
+                SetLab(v, null);
                 Refresh();
             };
             view.ipt_type.onFinishInput += (v) =>
             {
-                model.data.type = v;
+                SetLab(null, v);
                 Refresh();
             };
             view.btn_switchMod.onClick.AddListener(() =>
@@ -262,8 +263,9 @@ namespace Ui.ModStoryEventEditWindow
             view.txt_title.text = model.data.name;
 
             view.ipt_name.Set(model.data.name);
-            view.ipt_category.Set(model.data.category);
-            view.ipt_type.Set(model.data.type);
+            LabForm.TryGetData(model.data.labId, out var lab);
+            view.ipt_category.Set(lab?.lv1Lab ?? string.Empty);
+            view.ipt_type.Set(lab?.lv2Lab ?? string.Empty);
 
 
             RefreshUnitDetail();
@@ -273,6 +275,17 @@ namespace Ui.ModStoryEventEditWindow
                 UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
             },gameObject);
         }
+
+        private void SetLab(string category, string type)
+        {
+            LabForm.TryGetData(model.data.labId, out var current);
+            model.data.labId = LabForm.GetOrCreate(
+                category ?? current?.lv1Lab ?? string.Empty,
+                type ?? current?.lv2Lab ?? string.Empty,
+                current?.lv3Lab ?? string.Empty,
+                nameof(EventProgramDataForm));
+        }
+
         public void RefreshUnit()
         {
             unitCon.Clear();

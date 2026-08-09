@@ -66,7 +66,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     #endregion
     #region mission
-    public void CreateMission(string name)
+    public void CreateMission(int labId = 0, string name = null)
     {
         if (MissionForm.DataByName.Keys.Count > GlobalSettings.CHARACTER_PARAM_MAX)
             return;
@@ -76,6 +76,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             name = StringHelper.GetUniqueName(MissionForm.DataByName.Keys);
         }
 
+        MissionForm.AddData(new MissionForm.Data(-1, name, labId, "", false, false, false, false, 0, Vector3.zero, 0));
     }
     public void DeleteMission(string name)
     {
@@ -244,13 +245,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     #region texture
 
-    public void CreateTex(string lab = "", string name = null)
+    public void CreateTex(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(MapTextureForm.DatasByName.Keys);
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, 1, new List<int>() { GlobalDefaultHelper.DefaultTexId }, lab, new Dictionary<string, EventTriggerForm.Data>()));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, 1, new List<int>() { GlobalDefaultHelper.DefaultTexId }, labId, new Dictionary<string, EventTriggerForm.Data>(), false,new Dictionary<int, int>()));
     }
     public void ImportTex(int texId, int id = -1)
     {
@@ -283,13 +284,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     #endregion
     #region mask
-    public void CreateMask(string lab = "", string name = null)
+    public void CreateMask(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(MapMaskForm.DatasByName.Keys);
         }
-        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, new List<int>() { GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId }, lab));
+        MapMaskForm.AddData(new MapMaskForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, new List<int>() { GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId }, labId));
     }
     public void ImportMask(int maskId, int id)
     {
@@ -337,7 +338,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
     }
 
-    public void CreateObject(string lab = "", string name = null)
+    public void CreateObject(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -350,7 +351,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var modelData = MapModelForm.defaultData.Copy();
         modelData.subUnitTexsName = new List<List<int>>() { new List<int>() };
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, lab, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId));
+        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, labId, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId));
     }
     public void DeleteObjectUnitTex(string name, int texId)
     {
@@ -551,7 +552,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
 
 
-    public void CreateCharacter(string name = null)
+    public void CreateCharacter(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -573,7 +574,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, "", GlobalDefaultHelper.DefaultCharacterTexId, paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalDefaultHelper.DefaultCharacterTexId, false, new Dictionary<SkillType, int>(), 0, false, GlobalDefaultHelper.DefaultTexId));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, labId, GlobalDefaultHelper.DefaultCharacterTexId, paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalDefaultHelper.DefaultCharacterTexId, false, new Dictionary<SkillType, int>(), 0, false, GlobalDefaultHelper.DefaultTexId));
     }
     public void DeleteCharacter(int uid)
     {
@@ -670,13 +671,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         EffectForm.DataByUid[effectUid].clips[id1].RemoveAt(id2);
     }
-    public void CreateEffect(string lab = "", string name = null)
+    public void CreateEffect(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(EffectForm.DataByName.Keys);
         }
-        EffectForm.AddData(new EffectForm.Data(-1, name, lab, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalDefaultHelper.DefaultTexId) } }, false));
+        EffectForm.AddData(new EffectForm.Data(-1, name, labId, new List<List<EffectClipForm.Data>>() { new List<EffectClipForm.Data>() { CreateEffectClip(GlobalDefaultHelper.DefaultTexId) } }, false));
     }
     public void DeleteEffect(int effectUid)
     {
@@ -713,7 +714,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     #endregion
     #region skill
-    public void CreateSkill(string lab = "", string name = null)
+    public void CreateSkill(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -724,7 +725,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        SkillProductForm.AddData(new SkillProductForm.Data(-1, name, "", 0, GlobalDefaultHelper.DefaultTexId, paramDic, new List<SkillType>(), 0, 1, 0, new Dictionary<string, EventTriggerForm.Data>(), 0));
+        SkillProductForm.AddData(new SkillProductForm.Data(-1, name, labId, 0, GlobalDefaultHelper.DefaultTexId, paramDic, new List<SkillType>(), 0, 1, 0, new Dictionary<string, EventTriggerForm.Data>(), 0));
     }
     public void DeleteSkill(int uid)
     {
@@ -884,18 +885,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }, items, defaultItem);
     }
 
-    public void CreateEvent(string name = "", string category = "", string type = "")
+    public void CreateEvent(int labId = 0, string name = "")
     {
         if (string.IsNullOrEmpty(name))
         {
             name = StringHelper.GetUniqueName(EventProgramDataForm.DatasByName.Keys);
         }
-        if (category == null)
-            category = "";
-        if (type == null)
-            type = "";
-
-        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "", new List<string>(), new List<int>(), 0, "void", category, type));
+        EventProgramDataForm.AddData(new EventProgramDataForm.Data(-1, name, "", new List<string>(), new List<int>(), 0, "void", labId));
     }
     public void DeleteEvent(string name)
     {
@@ -951,7 +947,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
 
 
-    public void CreateItem(string name = null)
+    public void CreateItem(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -969,7 +965,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             styleTex[style] = GlobalDefaultHelper.DefaultTexId;
         }
-        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, "", GlobalDefaultHelper.DefaultTexId, dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true, new Dictionary<string, CharacterParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
+        ItemProductForm.AddData(new ItemProductForm.Data(-1, name, labId, GlobalDefaultHelper.DefaultTexId, dic, 0, model, "", 1, 99, default, styleTex, 0, false, new Dictionary<string, EventTriggerForm.Data>(), true, new Dictionary<string, CharacterParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
     }
     public void DeleteItem(int itemUid)
     {

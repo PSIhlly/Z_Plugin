@@ -133,13 +133,13 @@ namespace Z_DataSystem
                 Texture2D[] textures = Resources.LoadAll<Texture2D>(path);
                 foreach (var tex in textures)
                 {
-                    res.texs.Add((tex.name, new TexAssetForm.Data(int.TryParse(tex.name, out var id) ? id : -1, tex.name, "", null, "", tex, "")));
+                    res.texs.Add((tex.name, new TexAssetForm.Data(int.TryParse(tex.name, out var id) ? id : -1, tex.name, "", null, "", tex, 0)));
                 }
 
                 GameObject[] gos = Resources.LoadAll<GameObject>(path);
                 foreach (var go in gos)
                 {
-                    res.gos.Add((go.name, new GameObjectAssetForm.Data(int.TryParse(go.name, out var id) ? id : -1, go.name, "", null, "", go, "")));
+                    res.gos.Add((go.name, new GameObjectAssetForm.Data(int.TryParse(go.name, out var id) ? id : -1, go.name, "", null, "", go, 0)));
                 }
 
             }
@@ -153,7 +153,7 @@ namespace Z_DataSystem
                     string extension = Path.GetExtension(file).ToLower();
                     if (Array.Exists(texCtrl.GetSupportedExtensions(), ext => ext == extension))
                     {
-                        res.texs.Add((Path.GetFileNameWithoutExtension(file), new TexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(file), Path.GetFullPath(file), null, null, null, "")));
+                        res.texs.Add((Path.GetFileNameWithoutExtension(file), new TexAssetForm.Data(-1, Path.GetFileNameWithoutExtension(file), Path.GetFullPath(file), null, null, null, 0)));
                     }
                 }
             }

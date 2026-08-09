@@ -1,12 +1,15 @@
+using System;
 using NUnit.Framework.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_String;
+using Z_Ui;
 using Z_Ui.Base;
 
 namespace Z_Ui_Editor
@@ -201,6 +204,7 @@ using Z_Texture;
         UiHolder uiHolder => (UiHolder)target;
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
 
             //绘制输入框
             var newName = EditorGUILayout.TextField("Name: ", uiHolder.uiName);
@@ -224,6 +228,11 @@ using Z_Texture;
                     EditorUtility.SetDirty(uiHolder);
                 }
                 // 绘制按钮
+                if (uiHolder.uiType == UiType.Panel)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("preloadConfig"), new GUIContent("Preload Config"));
+                    serializedObject.ApplyModifiedProperties();
+                }
                 if (GUILayout.Button("Generate"))
                 {
                     GenerateFile();
@@ -235,7 +244,9 @@ using Z_Texture;
 
 
             // 如果需要，绘制默认的 Inspector
-            DrawDefaultInspector();
+            serializedObject.Update();
+            DrawPropertiesExcluding(serializedObject, "preloadConfig");
+            serializedObject.ApplyModifiedProperties();
         }
         //中间参数
         string declareContent = "";
@@ -439,12 +450,106 @@ using Z_Texture;
 
         public void GenerateFile()
         {
+            if (uiHolder.uiType != UiType.Panel)
+            {
+                var generatedPath = WriteGeneratedFile();
+                Debug.Log(generatedPath + $" Generate Success! {uiHolder.uiType} holders are generated as embedded UI and are not added to the preload registry.");
+                return;
+            }
+
+            var preloadConfig = uiHolder.PreloadConfig;
+            if (preloadConfig == null || !EditorUtility.IsPersistent(preloadConfig))
+            {
+                Debug.LogError($"{uiHolder.name} requires a persistent {nameof(UiPreloadConfig)} reference in the Inspector before Generate.");
+                return;
+            }
+
+            if (!TryGetPersistentUi(out var persistentUi))
+            {
+                Debug.LogError($"{uiHolder.name} must be the root of a Prefab asset or instance with a valid Panel UiHolder before Generate. Pure scene objects cannot be registered in {AssetDatabase.GetAssetPath(preloadConfig)}.");
+                return;
+            }
+
+            if (uiHolder.gameObject != persistentUi)
+            {
+                var persistentHolder = persistentUi.GetComponent<UiHolder>();
+                var sourceEditor = (UiHolderEditor)CreateEditor(persistentHolder);
+                try
+                {
+                    Debug.LogWarning($"Generate uses the saved Prefab source '{AssetDatabase.GetAssetPath(persistentUi)}'. Apply or save relevant instance changes first; scene-only overrides are ignored.");
+                    sourceEditor.GeneratePanelFile(persistentUi, preloadConfig);
+                }
+                finally
+                {
+                    DestroyImmediate(sourceEditor);
+                }
+                return;
+            }
+
+            GeneratePanelFile(persistentUi, preloadConfig);
+        }
+
+        private void GeneratePanelFile(GameObject persistentUi, UiPreloadConfig preloadConfig)
+        {
+            var fullPath = WriteGeneratedFile();
+            var registryChanged = RegisterPreloadUi(preloadConfig, persistentUi);
+            AssetDatabase.SaveAssets();
+            var registrationResult = registryChanged ? "Registered" : "Already registered";
+            Debug.Log(fullPath + $" Generate Success! {registrationResult}: {persistentUi.name} in {AssetDatabase.GetAssetPath(preloadConfig)}.");
+        }
+
+        private string WriteGeneratedFile()
+        {
             var fullPath = Application.dataPath + uiHolder.path + "/Ui" + uiHolder.uiName + "Base.cs";
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
             if (File.Exists(fullPath))
                 File.Delete(fullPath);
             uiHolder.parent = null;
             File.WriteAllText(fullPath, GetCode());
-            Debug.Log(fullPath + " Generate Success!");
+            return fullPath;
+        }
+
+        private bool TryGetPersistentUi(out GameObject persistentUi)
+        {
+            var sourceUi = uiHolder.gameObject;
+            persistentUi = EditorUtility.IsPersistent(sourceUi) ? sourceUi : null;
+
+            if (persistentUi == null)
+            {
+                var prefabStage = PrefabStageUtility.GetPrefabStage(sourceUi);
+                if (prefabStage != null)
+                {
+                    persistentUi = PrefabUtility.GetCorrespondingObjectFromSourceAtPath(sourceUi, prefabStage.assetPath);
+                    if (persistentUi == null && sourceUi == prefabStage.prefabContentsRoot)
+                        persistentUi = AssetDatabase.LoadAssetAtPath<GameObject>(prefabStage.assetPath);
+                }
+                else
+                {
+                    persistentUi = PrefabUtility.GetCorrespondingObjectFromSource(sourceUi);
+                }
+            }
+
+            if (persistentUi == null || !EditorUtility.IsPersistent(persistentUi))
+                return false;
+
+            var assetPath = AssetDatabase.GetAssetPath(persistentUi);
+            var persistentHolder = persistentUi.GetComponent<UiHolder>();
+            return persistentUi.transform.parent == null &&
+                   assetPath.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase) &&
+                   persistentHolder != null &&
+                   persistentHolder.uiType == UiType.Panel &&
+                   !string.IsNullOrWhiteSpace(persistentHolder.uiName);
+        }
+
+        private static bool RegisterPreloadUi(UiPreloadConfig preloadConfig, GameObject persistentUi)
+        {
+            Undo.RecordObject(preloadConfig, "Register UI preload prefab");
+            var changed = preloadConfig.Register(persistentUi);
+            if (!changed)
+                return false;
+
+            EditorUtility.SetDirty(preloadConfig);
+            return true;
         }
 
         string GetCode(string parentClass = "")

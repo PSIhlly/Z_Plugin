@@ -137,16 +137,16 @@ namespace Z_DataSystem
         }
         public VideoAssetForm.Data CreateDataByClip(VideoClip clip, string name)
         {
-            return new VideoAssetForm.Data(-1, name, "", null, "", clip,"");
+            return new VideoAssetForm.Data(-1, name, "", null, "", clip, 0);
         }
         public VideoAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new VideoAssetForm.Data(-1, name, "", data, "", null, "");
+            return new VideoAssetForm.Data(-1, name, "", data, "", null, 0);
         }
         public VideoAssetForm.Data CreateDataByPath(string path, string name)
         {
             path = SaveAndLoad.GetRealPath(path);
-            return new VideoAssetForm.Data(-1, name, path, null, "", null, "");
+            return new VideoAssetForm.Data(-1, name, path, null, "", null, 0);
         }
 
     }

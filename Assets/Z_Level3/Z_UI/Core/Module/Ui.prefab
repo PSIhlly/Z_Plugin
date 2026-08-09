@@ -1,15 +1,16 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1 &444835085791409009
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 4715854543931010755}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: DialogText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,7 +30,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7796189548773297529}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -42,10 +42,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 6555100527949425976}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: Custom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -65,7 +66,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7796189548773297529}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -78,10 +78,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 7743041180549883958}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: Notice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +102,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7796189548773297529}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -114,13 +114,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 4119210609889203409}
   - component: {fileID: 877633541867376930}
   - component: {fileID: 1961489765059953382}
   - component: {fileID: 7449214356629848370}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: CanvasPre
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +141,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2392566362434357709}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -164,6 +164,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -215,10 +216,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 4564107992340509111}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: Window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +240,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7796189548773297529}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -251,10 +252,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 7516176885060526726}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: Basic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -274,7 +276,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7796189548773297529}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -287,10 +288,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 210923796763550832}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: DialogBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -310,7 +312,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7796189548773297529}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -323,13 +324,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 7796189548773297529}
   - component: {fileID: 7607734477032847354}
   - component: {fileID: 7516752815331705770}
   - component: {fileID: 7480269883418529271}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: CanvasReal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -355,7 +357,6 @@ RectTransform:
   - {fileID: 4715854543931010755}
   - {fileID: 7743041180549883958}
   m_Father: {fileID: 2392566362434357709}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -379,6 +380,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -430,11 +432,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 2392566362434357709}
   - component: {fileID: 7618889313271683759}
   m_Layer: 0
+  m_HasEditorInfo: 1
   m_Name: Ui
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -448,6 +451,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9063028078783727144}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.105548844, y: 1.5272616, z: -9.543921}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -456,7 +460,6 @@ Transform:
   - {fileID: 4119210609889203409}
   - {fileID: 7796189548773297529}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7618889313271683759
 MonoBehaviour:
@@ -470,11 +473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2acaa9f566e70f24488074a6a6cfdb9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  preloadUis:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   layerRootLst:
   - {fileID: 5151625613510100389}
   - {fileID: 4810508011541791132}

@@ -122,16 +122,16 @@ namespace Z_DataSystem
         }
         public AudioAssetForm.Data CreateDataByClip(AudioClip clip, string name)
         {
-            return new AudioAssetForm.Data(-1, name, "", null, "", clip,"");
+            return new AudioAssetForm.Data(-1, name, "", null, "", clip, 0);
         }
         public AudioAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new AudioAssetForm.Data(-1, name, "", data, "", null, "");
+            return new AudioAssetForm.Data(-1, name, "", data, "", null, 0);
         }
         public AudioAssetForm.Data CreateDataByPath(string path, string name)
         {
             path = SaveAndLoad.GetRealPath(path);
-            return new AudioAssetForm.Data(-1, name, path, null, "", null, "");
+            return new AudioAssetForm.Data(-1, name, path, null, "", null, 0);
         }
 
     }

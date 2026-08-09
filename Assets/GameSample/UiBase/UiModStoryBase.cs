@@ -943,7 +943,7 @@ namespace ModStoryCharacterList
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -951,7 +951,7 @@ namespace ModStoryCharacterList
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -2163,7 +2163,7 @@ namespace ModStorySkillList
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -2171,7 +2171,7 @@ namespace ModStorySkillList
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -2675,7 +2675,7 @@ namespace ModStoryItemList
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -2683,7 +2683,7 @@ namespace ModStoryItemList
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -3573,7 +3573,7 @@ namespace ModStoryMapObjectList
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -3581,7 +3581,7 @@ namespace ModStoryMapObjectList
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -3822,6 +3822,8 @@ namespace ModStoryMapObjectTextureAppearance
             public Ipt ipt_name;
             public Ipt ipt_label;
             public Ipt ipt_interval;
+            public Btn btn_isWangTile;
+            public Sta sta_isWangTile;
             public Btn btn_new;
             public Btn btn_deleteTex;
             public GameObject go_item;
@@ -3837,12 +3839,14 @@ namespace ModStoryMapObjectTextureAppearance
             ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
             ipt_label = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             ipt_interval = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            btn_new = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_deleteTex = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            go_item = uiHolder.elementTrsLst[8].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            btn_image = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            img_image = uiHolder.elementTrsLst[11].GetComponent<Img>();
+            btn_isWangTile = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            sta_isWangTile = uiHolder.elementTrsLst[7].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_deleteTex = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            go_item = uiHolder.elementTrsLst[10].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            btn_image = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[13].GetComponent<Img>();
         }
 
     }
@@ -4711,7 +4715,7 @@ namespace ModStoryEffectList
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -4719,7 +4723,7 @@ namespace ModStoryEffectList
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -5159,7 +5163,7 @@ namespace ModStoryMissionList
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -5167,7 +5171,7 @@ namespace ModStoryMissionList
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -5473,7 +5477,7 @@ namespace ModStoryEventCustom
             public GameObject go_category;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiCategoryView(UiHolder uiHolder):base(uiHolder)
         {
@@ -5481,7 +5485,7 @@ namespace ModStoryEventCustom
             go_category = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -5527,7 +5531,7 @@ namespace ModStoryEventCustom
             public GameObject go_type;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiTypeView(UiHolder uiHolder):base(uiHolder)
         {
@@ -5535,7 +5539,7 @@ namespace ModStoryEventCustom
             go_type = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -5581,7 +5585,7 @@ namespace ModStoryEventCustom
             public GameObject go_item;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiItemView(UiHolder uiHolder):base(uiHolder)
         {
@@ -5589,7 +5593,7 @@ namespace ModStoryEventCustom
             go_item = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 

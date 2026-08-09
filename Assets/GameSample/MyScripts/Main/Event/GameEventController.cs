@@ -386,8 +386,9 @@ public class GameEventController : Z_Controller<GameManager>
         {
             if (!IsCorrect(retType, data.returnValue))
                 continue;
-            var cat = data.category == "" ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : data.category;
-            var type = data.type == "" ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : data.type;
+            LabForm.TryGetData(data.labId, out var lab);
+            var cat = string.IsNullOrEmpty(lab?.lv1Lab) ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : lab.lv1Lab;
+            var type = string.IsNullOrEmpty(lab?.lv2Lab) ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : lab.lv2Lab;
             if (!res.subs.ContainsKey(cat))
             {
                 res.Add(cat);
@@ -432,12 +433,13 @@ public class GameEventController : Z_Controller<GameManager>
                     continue;
                 }
             }
-            string category = TextManager.instance.GetTxt(data.category);
+            LabForm.TryGetData(data.labId, out var lab);
+            string category = TextManager.instance.GetTxt(lab?.lv1Lab ?? string.Empty);
             if (!res.subs.ContainsKey(category))
             {
                 res.Add(category);
             }
-            string type = TextManager.instance.GetTxt(data.type);
+            string type = TextManager.instance.GetTxt(lab?.lv2Lab ?? string.Empty);
             if (!res.subs[category].subs.ContainsKey(type))
             {
                 res.subs[category].Add(type);

@@ -236,16 +236,16 @@ namespace Z_DataSystem
         }
         public TexAssetForm.Data CreateDataByTex(Texture2D tex, string name)
         {
-            return new TexAssetForm.Data(-1, name, "", null, "", tex, "");
+            return new TexAssetForm.Data(-1, name, "", null, "", tex, 0);
         }
         public TexAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new TexAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null, "");
+            return new TexAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null, 0);
         }
         public TexAssetForm.Data CreateDataByPath(string path, string name)
         {
             path = SaveAndLoad.GetRealPath(path);
-            return new TexAssetForm.Data(-1, name, path, null, "", null, "");
+            return new TexAssetForm.Data(-1, name, path, null, "", null, 0);
         }
         public TexAssetForm.Data CreateDataByTex(Texture tex, string name)
         {

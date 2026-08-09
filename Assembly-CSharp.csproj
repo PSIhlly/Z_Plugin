@@ -218,6 +218,7 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Form\ExcelCs\ClipForm.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Misc\ImageHolder.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Frame\UiView.cs" />
+    <Compile Include="Assets\Z_Level3\Z_UI\Core\UiPreloadConfig.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Map\UiModStoryMapSceneUnitCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\PlayInfoController.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\MapObject\UiModStoryMapObjectTextureCtrl.cs" />
@@ -242,6 +243,7 @@
     <Compile Include="Assets\GameSample\MyScripts\Main\GameUtilController.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Character\GetCharacterRightVectorCmd.cs" />
     <Compile Include="Assets\Samples\Universal RP\13.1.9\URP Package Samples\SharedAssets\Scripts\FirstPersonController.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\TileHelper.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiPlayDataBackpackBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Skill\SetSkillParameterCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Parameter\UiModStorySceneObjectParameterCtrl.cs" />
@@ -441,6 +443,7 @@
     <Compile Include="Assets\GameSample\UiBase\UiModStoryEditorStyleWindowBase.cs" />
     <Compile Include="Assets\GameSample\Forms\ExcelCs\MapTextureForm.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\VideoCmd.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiLabRenderHelper.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiModStoryItemBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\GameCharacterController.cs" />
     <Compile Include="Assets\GameSample\Forms\ExcelCs\GameCmdDataForm.cs" />

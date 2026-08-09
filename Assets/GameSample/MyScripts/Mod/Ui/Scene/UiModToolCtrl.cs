@@ -21,7 +21,7 @@ namespace Ui.ModSceneMain.ModTool
     {
         public bool show;
         public MapTypeForm.Data curType;
-        public string curLab;
+        public int? curLabId;
         public MapBaseForm.Data curData
         {
             set
@@ -270,7 +270,7 @@ namespace Ui.ModSceneMain.ModTool
         public override void OnShow()
         {
             model.curType = MapTypeForm.DataById[1];
-            model.curLab = null;
+            model.curLabId = HasCurrentUnclassified() ? LabForm.NoneId : (int?)null;
             model.curData = null;
             Refresh();
 
@@ -299,7 +299,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapTextureForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null ) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -313,7 +313,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapMaskForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null ) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -327,7 +327,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapObjectForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null ) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -341,7 +341,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapItemForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null ) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -357,7 +357,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapCharacterForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null ) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -373,7 +373,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapEraseForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -388,7 +388,7 @@ namespace Ui.ModSceneMain.ModTool
                     {
                         foreach (var data in MapTerrainForm.DataById.Values.OrderBy(d => d.id))
                         {
-                            if ((model.curLab == null ) || data.label == model.curLab)
+                            if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                             {
                                 conData.Add(new UiToolItemParam()
                                 {
@@ -420,76 +420,71 @@ namespace Ui.ModSceneMain.ModTool
         void RefreshLabs()
         {
             conLab.Clear();
-            HashSet<string> labs = new HashSet<string>();
+            var belong = GetCurrentLabBelong();
+            var hasUnclassified = HasCurrentUnclassified();
+            if (model.curLabId == LabForm.NoneId && !hasUnclassified)
+                model.curLabId = null;
+            conLab.Add(new UiLabParam() { labId = null });
+            if (hasUnclassified)
+                conLab.Add(new UiLabParam() { labId = LabForm.NoneId });
+            foreach (var labId in UiLabRenderHelper.GetLabIds(belong))
+            {
+                conLab.Add(new UiLabParam() { labId = labId });
+            }
+            conLab.Add(new UiLabParam() { isNew = true });
+            conLab.Refresh();
+        }
+        public string GetCurrentLabBelong()
+        {
             switch (model.curType.id)
             {
                 case 2:
-                    foreach (var data in MapTextureForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapTextureForm);
                 case 3:
-                    foreach (var data in MapMaskForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapMaskForm);
                 case 4:
-                    foreach (var data in MapObjectForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapObjectForm);
                 case 5:
-                    foreach (var data in MapItemForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapItemForm);
                 case 6:
-                    foreach (var data in MapCharacterForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapCharacterForm);
                 case 100:
-                    foreach (var data in MapEraseForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapEraseForm);
                 case 1:
                 default:
-                    foreach (var data in MapTerrainForm.DataById.Values)
-                    {
-                        if (!string.IsNullOrEmpty(data.label))
-                            labs.Add(data.label);
-                    }
-                    break;
+                    return nameof(MapTerrainForm);
             }
-            conLab.Add(new UiLabParam() { lab = null });
-            foreach (var lab in labs)
+        }
+        bool HasCurrentUnclassified()
+        {
+            switch (model.curType.id)
             {
-                conLab.Add(new UiLabParam() { lab = lab });
+                case 2:
+                    return MapTextureForm.DatasByLabid.ContainsKey(LabForm.NoneId);
+                case 3:
+                    return MapMaskForm.DatasByLabid.ContainsKey(LabForm.NoneId);
+                case 4:
+                    return MapObjectForm.DatasByLabid.ContainsKey(LabForm.NoneId);
+                case 5:
+                    return MapItemForm.DatasByLabid.ContainsKey(LabForm.NoneId);
+                case 6:
+                    return MapCharacterForm.DatasByLabid.ContainsKey(LabForm.NoneId);
+                case 100:
+                    return MapEraseForm.DatasByLabid.ContainsKey(LabForm.NoneId);
+                case 1:
+                default:
+                    return MapTerrainForm.DatasByLabid.ContainsKey(LabForm.NoneId);
             }
-            conLab.Refresh();
         }
         public void SetCurType(MapTypeForm.Data type)
         {
             model.curType = type;
-            model.curLab = null;
+            model.curLabId = null;
             Refresh();
         }
-        public void SetCurLab(string lab)
+        public void SetCurLab(int? labId)
         {
-            model.curLab = lab;
+            model.curLabId = labId;
             Refresh();
         }
         public void SetCurData(MapBaseForm.Data data)
@@ -579,7 +574,8 @@ namespace Ui.ModSceneMain.ModTool
 
     public partial class UiLabParam
     {
-        public string lab;
+        public int? labId;
+        public bool isNew;
     }
     public partial class UiLabModel
     {
@@ -591,7 +587,14 @@ namespace Ui.ModSceneMain.ModTool
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SetCurLab(model.prm.lab);
+                if (model.prm.isNew)
+                {
+                    UiLabRenderHelper.Create(parent.GetCurrentLabBelong(), labId => parent.SetCurLab(labId));
+                }
+                else
+                {
+                    parent.SetCurLab(model.prm.labId);
+                }
             });
         }
         public override void OnShow()
@@ -601,12 +604,9 @@ namespace Ui.ModSceneMain.ModTool
         }
         public void Refresh()
         {
-            if (model.prm.lab != null)
-            {
-                view.txt_.text = model.prm.lab;
-            }
-            view.sta_.ChangeState(parent.model.curLab == model.prm.lab ? 1 : 0);
-            view.sta_valid.ChangeState(model.prm.lab == null ? 0 : 1);
+            view.txt_.text = UiLabRenderHelper.GetText(model.prm.labId, model.prm.isNew);
+            view.sta_.ChangeState(!model.prm.isNew && parent.model.curLabId == model.prm.labId ? 1 : 0);
+            view.sta_state.ChangeState(UiLabRenderHelper.GetState(model.prm.labId, model.prm.isNew));
         }
     }
 

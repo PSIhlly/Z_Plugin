@@ -28,6 +28,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         string storyFolder = GetStoryFolderNameById(storyId);
         if (!SaveAndLoad.Exist(GetStoryCoreFolder(storyFolder)))
         {
+            GameManager.instance.saveCtrl.ResetStory();
             StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", null));
             SceneForm.Clear();
             var sceneData = new SceneForm.Data(1, "scene", GlobalDefaultHelper.DefaultTexId, Vector2.zero, false, false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(), false);
@@ -41,7 +42,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             SkillParamForm.Clear();
             SkillProductForm.Clear();
 
-            ModManager.instance.assetCtrl.CreateCharacter("Player");
+            ModManager.instance.assetCtrl.CreateCharacter(0, "Player");
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
@@ -51,12 +52,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
             var dic = GameManager.instance.innerAssetDic;
             data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
-            MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, "default", new Dictionary<string, EventTriggerForm.Data>()));
-            MapObjectForm.AddData(new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id, new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true, 1), "default", true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(), GlobalDefaultHelper.DefaultTexId));
+            var defaultTextureLabId = LabForm.GetOrCreate("default", nameof(MapTextureForm));
+            var defaultObjectLabId = LabForm.GetOrCreate("default", nameof(MapObjectForm));
+            MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, defaultTextureLabId, new Dictionary<string, EventTriggerForm.Data>(),false,new Dictionary<int,int>()));
+            MapObjectForm.AddData(new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id, new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true, 1), defaultObjectLabId, true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),GlobalDefaultHelper.DefaultTexId));
 
             EventProgramDataForm.Clear();
 
-            ModManager.instance.assetCtrl.CreateEvent("mainDialog", "enterGame", "dialog");
+            var dialogLabId = LabForm.GetOrCreate("enterGame", "dialog", "", nameof(EventProgramDataForm));
+            ModManager.instance.assetCtrl.CreateEvent(dialogLabId, "mainDialog");
             var dialogEvt = EventProgramDataForm.DataByUid.Values.FirstOrDefault(d => d.name == "mainDialog");
 
             sceneData.events["onEnterEvent"] = new EventTriggerForm.Data(-1, "onEnterEvent", new List<int>() { dialogEvt.uid }, default);
@@ -96,6 +100,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     {
         StartLoadStory(storyId);
         PlayManager.instance.BeginStory(storyId, boxPlay);
+
     }
     private void StartLoadStory(int storyId)
     {
@@ -114,6 +119,79 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         PlayManager.instance.EndStory();
         UnloadStory();
     }
+
+    private readonly List<int> wangTileGameTexIds = new List<int>();
+
+    private void CreateWangTileTextures()
+    {
+        DestroyWangTileTextures();
+
+        foreach (MapTextureForm.Data mapTexture in MapTextureForm.DataById.Values)
+        {
+            mapTexture.WangTileDic = new Dictionary<int, int>();
+            if (!mapTexture.isWangTile || mapTexture.texs == null || mapTexture.texs.Count == 0)
+                continue;
+
+            TexAssetForm.Data sourceData = TexAssetForm.DataById.GetDv(mapTexture.texs[0], null);
+            if (!(sourceData?.GetTex() is Texture2D sourceTexture))
+            {
+                Debug.LogError($"WangTile '{mapTexture.name}' has no Texture2D source.");
+                continue;
+            }
+
+            try
+            {
+                Dictionary<int, Sprite> spritesByMask = TileHelper.GetAutoTileSprites(sourceTexture);
+                Dictionary<Sprite, int> texIdBySprite = new Dictionary<Sprite, int>();
+
+                foreach (KeyValuePair<int, Sprite> pair in spritesByMask)
+                {
+                    if (!texIdBySprite.TryGetValue(pair.Value, out int texId))
+                    {
+                        TexAssetForm.Data generatedData = new TexAssetForm.Data(
+                            -1,
+                            $"WangTile_{mapTexture.id}_{texIdBySprite.Count}",
+                            string.Empty,
+                            null,
+                            string.Empty,
+                            pair.Value.texture,
+                            LabForm.NoneId);
+                        GameManager.instance.saveCtrl.AddGameTex(ref generatedData);
+                        texId = generatedData.id;
+                        texIdBySprite.Add(pair.Value, texId);
+                        wangTileGameTexIds.Add(texId);
+                    }
+
+                    mapTexture.WangTileDic[pair.Key] = texId;
+                }
+
+                foreach (Sprite sprite in texIdBySprite.Keys)
+                    Destroy(sprite);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Failed to create WangTile '{mapTexture.name}': {exception.Message}");
+                mapTexture.WangTileDic.Clear();
+            }
+        }
+    }
+
+    private void DestroyWangTileTextures()
+    {
+        foreach (int texId in wangTileGameTexIds)
+        {
+            if (!GameTexAssetForm.DataById.TryGetValue(texId, out GameTexAssetForm.Data data))
+                continue;
+
+            if (data.asset is Texture texture)
+                Destroy(texture);
+            GameTexAssetForm.RemoveData(texId);
+        }
+        wangTileGameTexIds.Clear();
+
+        foreach (MapTextureForm.Data mapTexture in MapTextureForm.DataById.Values)
+            mapTexture.WangTileDic?.Clear();
+    }
     public void UnloadStory()
     {
         //clean auto content
@@ -125,6 +203,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 MapBaseForm.RemoveData(id);
             }
         }
+        GameManager.instance.saveCtrl.ResetStory();
         ProgressForm.Clear();
         GameManager.instance.curStory = null;
 
@@ -162,6 +241,12 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     {
         bool ok = await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId, onMapComplete);
         DynamicGlobalSettings.playing = true;
+
+
+        foreach (var textureData in MapTextureForm.DataById.Values)
+        {
+
+        }
         PlayManager.instance.BeginScene(sceneId);
     }
 
@@ -175,6 +260,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         GameManager.instance.saveCtrl.ResetPrefabPool();
 
+        CreateWangTileTextures();
         LoadingManager.instance.AddLoadItem("scene");
         MapInfo data;
 
@@ -201,18 +287,6 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
 
 
-        foreach (var maskData in MapMaskForm.DataById.Values)
-        {
-            var raws = new Texture2D[6];
-
-            for (int i = 0; i < maskData.texsName.Count; i++)
-            {
-                raws[i] = (Texture2D)TexAssetForm.DataById[maskData.texsName[i]].GetTex();
-            }
-            GameManager.instance.mapCtrl.CreateAlphaVariantsByBasic6(maskData.id, raws);
-        }
-
-
         return true;
     }
     public void UnloadSceneUgc()
@@ -232,6 +306,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameManager.instance.mapCtrl.Reset();
         GameManager.instance.characterCtrl.Reset();
         GameManager.instance.curScene = null;
+        DestroyWangTileTextures();
     }
     public void ChangeScene(int sceneId, Action oncomplete = null)
     {

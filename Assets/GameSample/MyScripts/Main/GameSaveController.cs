@@ -37,6 +37,8 @@ public class GameSaveController : Z_Controller<GameManager>
     public string imageAssetFormFileName => "iaff";
     public string audioAssetFormFileName => "aaff";
     public string videoAssetFormFileName => "vaff";
+    public string labFormFileName => "lf";
+    public string missionFormFileName => "msf";
 
     public string assetFolder => "ast/";
     public GameSaveController(GameManager super) : base(super)
@@ -86,12 +88,14 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         string path = Main2StoryManager.GetStorySaveFolder(id);
 
+        SaveLab(path);
         SaveMaterial(path);
         SaveObject(path);
         SaveCharacter(path);
         SaveSkill(path);
         SaveItem(path);
         SaveEffect(path);
+        SaveMission(path);
         SaveEvent(path, null);
         SaveConfig(path);
         SaveScene(path);
@@ -109,12 +113,14 @@ public class GameSaveController : Z_Controller<GameManager>
 
         string path = Main2StoryManager.GetStoryCoreFolder(id);
 
+        SaveLab(path);
         SaveMaterial(path);
         SaveObject(path);
         SaveCharacter(path);
         SaveSkill(path);
         SaveItem(path);
         SaveEffect(path);
+        SaveMission(path);
         SaveEvent(path);
         SaveConfig(path);
         SaveScene(path);
@@ -138,6 +144,11 @@ public class GameSaveController : Z_Controller<GameManager>
         var storyCoreFolder = Main2StoryManager.GetStoryCoreFolder(id);
         SaveAndLoad.Save(storyCoreFolder + "/" + storyFormFileName, StoryForm.GetJoByData(StoryForm.DataById[id]).ToString());
 
+    }
+
+    public void SaveLab(string storyFolder)
+    {
+        SaveAndLoad.Save(storyFolder + "/" + labFormFileName, LabForm.GetJaByDatas().ToString());
     }
 
     public void SaveMaterial(string storyCoreFolder)
@@ -179,6 +190,11 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + effectFormFileName, EffectForm.GetJaByDatas().ToString());
 
+    }
+
+    public void SaveMission(string storyCoreFolder)
+    {
+        SaveAndLoad.Save(storyCoreFolder + "/" + missionFormFileName, MissionForm.GetJaByDatas().ToString());
     }
 
     public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
@@ -300,6 +316,7 @@ public class GameSaveController : Z_Controller<GameManager>
         ResetStory();
         var folder = Main2StoryManager.GetStoryCoreFolder(id);
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
+        LoadLab(folder);
         LoadScene(folder);
         LoadMaterial(folder);
         LoadObject(folder);
@@ -308,6 +325,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
         LoadItem(folder);
         LoadEffect(folder);
+        LoadMission(folder);
 
         LoadEvent(folder);
         LoadProgress(folder);
@@ -326,11 +344,13 @@ public class GameSaveController : Z_Controller<GameManager>
 
         LoadItem(null);
         LoadEffect(null);
+        LoadMission(null);
 
         LoadEvent(null);
         LoadProgress(null);
         LoadUiItem(null);
         LoadAsset(null);
+        LoadLab(null);
     }
     public void LoadSaveStory(int id)
     {
@@ -338,6 +358,7 @@ public class GameSaveController : Z_Controller<GameManager>
         var folder = Main2StoryManager.GetStorySaveFolder(id);
 
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
+        LoadLab(folder);
         LoadScene(folder);
         LoadMaterial(folder);
         LoadObject(folder);
@@ -346,6 +367,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
         LoadItem(folder);
         LoadEffect(folder);
+        LoadMission(folder);
 
         LoadEvent(folder);
         LoadProgress(folder);
@@ -377,12 +399,94 @@ public class GameSaveController : Z_Controller<GameManager>
             }
         }
     }
+
+    public void LoadLab(string folder)
+    {
+        LabForm.ClearAuto();
+        if (folder == null)
+            return;
+
+        var pathForm = folder + labFormFileName;
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            foreach (var form in LabForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            {
+                LabForm.AddData(form);
+            }
+        }
+    }
+
+    private static void MigrateFlatLabIds(JArray forms, string belong, params string[] legacyKeys)
+    {
+        foreach (JObject form in forms)
+        {
+            if (TryNormalizeCurrentLabId(form, belong))
+                continue;
+
+            form["labId"] = LabForm.NoneId;
+            foreach (var legacyKey in legacyKeys)
+            {
+                if (!form.TryGetValue(legacyKey, out var legacy) || legacy.Type == JTokenType.Null)
+                    continue;
+
+                if (legacy.Type == JTokenType.Integer)
+                    form["labId"] = LabForm.GetOrCreateForBelong(legacy.Value<int>(), belong);
+                else
+                    form["labId"] = LabForm.GetOrCreate(legacy.Value<string>(), belong);
+                break;
+            }
+
+        }
+    }
+
+    private static void MigrateHierarchicalLabIds(JArray forms, string belong, string lv1Key, string lv2Key)
+    {
+        foreach (JObject form in forms)
+        {
+            if (TryNormalizeCurrentLabId(form, belong))
+                continue;
+
+            var hasLv1 = form.TryGetValue(lv1Key, out var lv1Token) && lv1Token.Type != JTokenType.Null;
+            var hasLv2 = form.TryGetValue(lv2Key, out var lv2Token) && lv2Token.Type != JTokenType.Null;
+            if (!hasLv1 && !hasLv2)
+            {
+                form["labId"] = LabForm.NoneId;
+                continue;
+            }
+
+            form["labId"] = LabForm.GetOrCreate(
+                hasLv1 ? lv1Token.Value<string>() : string.Empty,
+                hasLv2 ? lv2Token.Value<string>() : string.Empty,
+                string.Empty,
+                belong);
+        }
+    }
+
+    private static bool TryNormalizeCurrentLabId(JObject form, string belong)
+    {
+        if (!form.TryGetValue("labId", out var current) || current.Type != JTokenType.Integer)
+            return false;
+
+        var labId = current.Value<int>();
+        if (labId == LabForm.NoneId)
+            return true;
+        if (!LabForm.TryGetData(labId, out _))
+            return false;
+
+        form["labId"] = LabForm.GetOrCreateForBelong(labId, belong);
+        return true;
+    }
+
     public void LoadMaterial(string folder)
     {
+        MapTextureForm.ClearAuto();
+        MapMaskForm.ClearAuto();
         var pathForm = folder + mapTextureFormFileName;
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in MapTextureForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(MapTextureForm), "label");
+            foreach (var form in MapTextureForm.GetDatasByJa(forms))
             {
                 MapTextureForm.AddData(form);
             }
@@ -393,7 +497,9 @@ public class GameSaveController : Z_Controller<GameManager>
         pathForm = folder + mapMaskFormFileName;
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in MapMaskForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(MapMaskForm), "label");
+            foreach (var form in MapMaskForm.GetDatasByJa(forms))
             {
                 MapMaskForm.AddData(form);
             }
@@ -406,8 +512,9 @@ public class GameSaveController : Z_Controller<GameManager>
         MapObjectForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-
-            foreach (var form in MapObjectForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(MapObjectForm), "label");
+            foreach (var form in MapObjectForm.GetDatasByJa(forms))
             {
                 MapObjectForm.AddData(form);
             }
@@ -431,7 +538,9 @@ public class GameSaveController : Z_Controller<GameManager>
         CharacterProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in CharacterProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(CharacterProductForm), "label");
+            foreach (var form in CharacterProductForm.GetDatasByJa(forms))
             {
                 CharacterProductForm.AddData(form);
             }
@@ -474,7 +583,9 @@ public class GameSaveController : Z_Controller<GameManager>
         SkillProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in SkillProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(SkillProductForm), "label");
+            foreach (var form in SkillProductForm.GetDatasByJa(forms))
             {
                 SkillProductForm.AddData(form);
             }
@@ -498,7 +609,9 @@ public class GameSaveController : Z_Controller<GameManager>
         ItemProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in ItemProductForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(ItemProductForm), "label");
+            foreach (var form in ItemProductForm.GetDatasByJa(forms))
             {
                 ItemProductForm.AddData(form);
             }
@@ -513,9 +626,29 @@ public class GameSaveController : Z_Controller<GameManager>
         EffectForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in EffectForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(EffectForm), "label");
+            foreach (var form in EffectForm.GetDatasByJa(forms))
             {
                 EffectForm.AddData(form);
+            }
+        }
+    }
+
+    public void LoadMission(string folder)
+    {
+        MissionForm.ClearAuto();
+        if (folder == null)
+            return;
+
+        var pathForm = folder + missionFormFileName;
+        if (SaveAndLoad.Exist(pathForm))
+        {
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateFlatLabIds(forms, nameof(MissionForm), "label", "lab");
+            foreach (var form in MissionForm.GetDatasByJa(forms))
+            {
+                MissionForm.AddData(form);
             }
         }
     }
@@ -525,9 +658,13 @@ public class GameSaveController : Z_Controller<GameManager>
         var path = "";
         path = folder + imageAssetFormFileName;
         StoryTexAssetForm.ClearAuto();
+        StoryAudioAssetForm.ClearAuto();
+        StoryVideoAssetForm.ClearAuto();
         if (SaveAndLoad.Exist(path))
         {
-            foreach (var form in StoryTexAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(path));
+            MigrateFlatLabIds(forms, nameof(StoryTexAssetForm), "lab");
+            foreach (var form in StoryTexAssetForm.GetDatasByJa(forms))
             {
                 if (form != null)
                 {
@@ -539,7 +676,9 @@ public class GameSaveController : Z_Controller<GameManager>
         path = folder + audioAssetFormFileName;
         if (SaveAndLoad.Exist(path))
         {
-            foreach (var form in StoryAudioAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(path));
+            MigrateFlatLabIds(forms, nameof(StoryAudioAssetForm), "lab");
+            foreach (var form in StoryAudioAssetForm.GetDatasByJa(forms))
             {
                 StoryAudioAssetForm.AddData(form);
                 form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.audioCtrl.GetName(form.id));
@@ -548,7 +687,9 @@ public class GameSaveController : Z_Controller<GameManager>
         path = folder + videoAssetFormFileName;
         if (SaveAndLoad.Exist(path))
         {
-            foreach (var form in StoryVideoAssetForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(path));
+            MigrateFlatLabIds(forms, nameof(StoryVideoAssetForm), "lab");
+            foreach (var form in StoryVideoAssetForm.GetDatasByJa(forms))
             {
                 StoryVideoAssetForm.AddData(form);
                 form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.videoCtrl.GetName(form.id));
@@ -564,7 +705,9 @@ public class GameSaveController : Z_Controller<GameManager>
         EventProgramDataForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in EventProgramDataForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateHierarchicalLabIds(forms, nameof(EventProgramDataForm), "category", "type");
+            foreach (var form in EventProgramDataForm.GetDatasByJa(forms))
             {
                 EventProgramDataForm.AddData(form);
             }
@@ -634,8 +777,7 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = StoryTexAssetForm.DataById[data.id];
             StoryTexAssetForm.RemoveData(oldData.id);
         }
-        if (data.lab == null)
-            data.lab = "";
+        data.labId = LabForm.GetOrCreateForBelong(data.labId, nameof(StoryTexAssetForm));
         StoryTexAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -653,8 +795,7 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = GameTexAssetForm.DataById[data.id];
             GameTexAssetForm.RemoveData(oldData.id);
         }
-        if (data.lab == null)
-            data.lab = "";
+        data.labId = LabForm.GetOrCreateForBelong(data.labId, nameof(GameTexAssetForm));
         GameTexAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -672,8 +813,7 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = StoryAudioAssetForm.DataById[data.id];
             StoryAudioAssetForm.RemoveData(oldData.id);
         }
-        if (data.lab == null)
-            data.lab = "";
+        data.labId = LabForm.GetOrCreateForBelong(data.labId, nameof(StoryAudioAssetForm));
         StoryAudioAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -690,8 +830,7 @@ public class GameSaveController : Z_Controller<GameManager>
             var oldData = StoryVideoAssetForm.DataById[data.id];
             StoryVideoAssetForm.RemoveData(oldData.id);
         }
-        if (data.lab == null)
-            data.lab = "";
+        data.labId = LabForm.GetOrCreateForBelong(data.labId, nameof(StoryVideoAssetForm));
         StoryVideoAssetForm.AddData(data);
 
         Z_EventHelper.Invoke(new AssetEvent()
@@ -767,7 +906,8 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var itemData in ItemProductForm.DatasByProtouid[0])
             {
-                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, itemData.label, itemData.uid));
+                var labId = LabForm.GetOrCreateForBelong(itemData.labId, nameof(MapItemForm));
+                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, labId, itemData.uid));
             }
         }
 
@@ -777,7 +917,8 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var characterData in CharacterProductForm.DatasByProtouid[0])
             {
-                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.avatarTex, characterData.label, characterData.uid));
+                var labId = LabForm.GetOrCreateForBelong(characterData.labId, nameof(MapCharacterForm));
+                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.avatarTex, labId, characterData.uid));
             }
         }
 

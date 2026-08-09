@@ -32,7 +32,7 @@ namespace ModTool
             public GameObject go_lab;
             public Btn btn_;
             public Sta sta_;
-            public Sta sta_valid;
+            public Sta sta_state;
             public Txt txt_;
         public UiLabView(UiHolder uiHolder):base(uiHolder)
         {
@@ -40,7 +40,7 @@ namespace ModTool
             go_lab = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_valid = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 

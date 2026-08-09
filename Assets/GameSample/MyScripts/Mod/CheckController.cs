@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Z_DesignStyle;
 using Z_Code;
+using Z_DataSystem.Form;
 
 /// <summary>
 /// 检查 Form 表之间的外键引用完整性
@@ -35,6 +36,7 @@ public class CheckController : Z_Controller<ModManager>
         {
             CheckForeignKey(mapping, sb);
         }
+        CheckLabReferences(sb);
 
         // 2. 检查代码编译
         sb.AppendLine("【二、代码编译检查】");
@@ -68,7 +70,8 @@ public class CheckController : Z_Controller<ModManager>
                 if (errors.Count > 0)
                 {
                     errorCount++;
-                    sb.AppendLine($"【程序: {data.name} (uid={data.uid}, category={data.category}, type={data.type})】");
+                    LabForm.TryGetData(data.labId, out var lab);
+                    sb.AppendLine($"【程序: {data.name} (uid={data.uid}, category={lab?.lv1Lab}, type={lab?.lv2Lab})】");
                     sb.AppendLine($"  代码: {data.code}");
                     sb.AppendLine($"  编译错误 ({errors.Count}个):");
                     foreach (var error in errors)
@@ -171,6 +174,96 @@ public class CheckController : Z_Controller<ModManager>
         list.Add(new ForeignKeyMapping { SourceFormName = "ImageUiItemForm", FieldName = "tex", TargetFormName = "TexAssetForm", TargetIndexName = "DataById", FieldType = typeof(int), SourceDisplayName = "弹出图片", FieldDisplayName = "图片", TargetDisplayName = "图片", SourceDisplayFieldName = "name" });
 
         return list;
+    }
+
+    private static readonly string[] LabReferenceFormNames =
+    {
+        "AssetForm",
+        "TexAssetForm",
+        "AudioAssetForm",
+        "VideoAssetForm",
+        "GameObjectAssetForm",
+        "StoryTexAssetForm",
+        "StoryAudioAssetForm",
+        "StoryVideoAssetForm",
+        "GameTexAssetForm",
+        "ProductForm",
+        "CharacterProductForm",
+        "ItemProductForm",
+        "SkillProductForm",
+        "MapBaseForm",
+        "MapTextureForm",
+        "MapMaskForm",
+        "MapObjectForm",
+        "MapItemForm",
+        "MapCharacterForm",
+        "MapTerrainForm",
+        "MapEraseForm",
+        "EffectForm",
+        "MissionForm",
+        "EventProgramDataForm",
+        "GameCmdDataForm"
+    };
+
+    private static void CheckLabReferences(StringBuilder sb)
+    {
+        var issues = new List<string>();
+        var checkedCount = 0;
+        foreach (var formName in LabReferenceFormNames)
+        {
+            var formType = GetFormType(formName);
+            var dataType = formType?.GetNestedType("Data", BindingFlags.Public);
+            var dataDictionary = formType == null ? null : GetFormDataDictionary(formType);
+            var labIdProperty = dataType?.GetProperty(
+                "labId",
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            if (formType == null || dataType == null || dataDictionary == null || labIdProperty == null)
+            {
+                issues.Add($"{formName} 无法取得 labId 或数据索引");
+                continue;
+            }
+
+            var displayProperty = dataType.GetProperty("name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
+                ?? dataType.GetProperty("uid", BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
+                ?? dataType.GetProperty("id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            foreach (DictionaryEntry entry in dataDictionary)
+            {
+                var data = entry.Value;
+                // 父 Form 的索引也包含派生 Data；派生项由其具体 Form 单独校验。
+                if (data == null || data.GetType() != dataType)
+                    continue;
+
+                checkedCount++;
+                var labId = (int)labIdProperty.GetValue(data);
+                if (labId == LabForm.NoneId)
+                    continue;
+
+                var displayValue = displayProperty?.GetValue(data)?.ToString() ?? entry.Key.ToString();
+                if (!LabForm.TryGetData(labId, out var lab))
+                {
+                    issues.Add($"{formName}[{displayValue}].labId={labId} 在 LabForm 中不存在");
+                }
+                else if (lab.belong != formName)
+                {
+                    issues.Add($"{formName}[{displayValue}].labId={labId} 的 belong 为 {lab.belong}，应为 {formName}");
+                }
+            }
+        }
+
+        sb.AppendLine("【标签引用 → LabForm】");
+        if (issues.Count == 0)
+        {
+            sb.AppendLine($"  全部 {checkedCount} 条标签引用检查通过");
+        }
+        else
+        {
+            sb.AppendLine($"  无效引用 ({issues.Count}个):");
+            foreach (var issue in issues.Take(50))
+                sb.AppendLine($"    - {issue}");
+            if (issues.Count > 50)
+                sb.AppendLine($"    ... 还有 {issues.Count - 50} 个");
+        }
+        sb.AppendLine();
     }
 
     /// <summary>

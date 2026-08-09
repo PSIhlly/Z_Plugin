@@ -45,7 +45,9 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
             };
             view.ipt_label.onFinishInput+=(s)=>
             {
-                model.data.label = s;
+                model.data.labId = string.IsNullOrWhiteSpace(s)
+                    ? 0
+                    : LabForm.GetOrCreateDisplayName(s, nameof(ItemProductForm), model.data.labId);
             };
             view.btn_image.onClick.AddListener(() =>
             {
@@ -74,7 +76,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitOverview
         public void Refresh()
         {
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(model.data.label);
+            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
             view.img_image.BindTexData(TexAssetForm.DataById[model.data.iconTexName]);
             view.ipt_desc.Set(model.data.desc);
         }

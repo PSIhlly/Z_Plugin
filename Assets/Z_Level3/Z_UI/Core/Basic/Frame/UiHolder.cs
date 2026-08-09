@@ -29,6 +29,11 @@ namespace Z_Ui.Base
     {
 
         public static string defaultPath = "\\GameSample\\UiBase";
+        [SerializeField]
+        private UiPreloadConfig preloadConfig;
+
+        public UiPreloadConfig PreloadConfig => preloadConfig;
+
         [HideInInspector]
         public string uiName;
         [HideInInspector]

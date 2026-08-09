@@ -2,7 +2,7 @@
   {
     "uid": 5,
     "name": "魔符·星屑幻想",
-    "label": "魔理沙",
+    "labId": 9,
     "protoUid": 0,
     "icon": 33,
     "paramDic": [],
@@ -34,7 +34,7 @@
   {
     "uid": 4,
     "name": "星弹",
-    "label": "通用",
+    "labId": 10,
     "protoUid": 0,
     "icon": 33,
     "paramDic": [],
@@ -66,7 +66,7 @@
   {
     "uid": 3,
     "name": "札弹",
-    "label": "通用",
+    "labId": 10,
     "protoUid": 0,
     "icon": 46,
     "paramDic": [],
@@ -98,7 +98,7 @@
   {
     "uid": 17,
     "name": "触击",
-    "label": "通用",
+    "labId": 10,
     "protoUid": 0,
     "icon": 210000,
     "paramDic": [],

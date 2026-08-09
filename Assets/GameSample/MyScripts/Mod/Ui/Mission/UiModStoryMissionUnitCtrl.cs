@@ -9,6 +9,7 @@ using Z_Texture;
 using Z_String;
 using Z_Text;
 using Z_Math;
+using Z_DataSystem.Form;
 
 namespace Ui.ModStory.ModStoryMission.ModStoryMissionUnit
 {
@@ -50,7 +51,9 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionUnit
             };
             view.ipt_lab.onFinishInput += (s) =>
             {
-                model.data.label = s;
+                model.data.labId = string.IsNullOrWhiteSpace(s)
+                    ? 0
+                    : LabForm.GetOrCreateDisplayName(s, nameof(MissionForm), model.data.labId);
                 Refresh();
             };
             view.ipt_desc.onFinishInput += (s) =>
@@ -98,7 +101,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionUnit
             if (model.data != null)
             {
                 view.ipt_name.Set(model.data.name);
-                view.ipt_lab.Set(model.data.label);
+                view.ipt_lab.Set(LabForm.GetDisplayName(model.data.labId));
                 view.ipt_desc.Set(model.data.desc);
                 view.sta_show.ChangeState(model.data.show ? 1 : 0);
 

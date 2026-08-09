@@ -248,6 +248,10 @@ PrefabInstance:
       propertyPath: uiName
       value: Notify
       objectReference: {fileID: 0}
+    - target: {fileID: 1614467867034934810, guid: fed789db9e891cd4bb07ea99b1f032d9, type: 3}
+      propertyPath: preloadConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 425ee19dfd144314dabd355900a16158, type: 2}
     - target: {fileID: 1614467867034934814, guid: fed789db9e891cd4bb07ea99b1f032d9, type: 3}
       propertyPath: m_Name
       value: Notify Variant

@@ -15,13 +15,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
     public partial class UiModStoryMapObjectListParam
     {
         public int type;
-        public string lab;
+        public int? labId;
     }
     public partial class UiModStoryMapObjectListModel
     {
-        public Dictionary<string, List<MapBaseForm.Data>> datas;
-        public Action<string> createAct;
-        public string lab;
+        public Dictionary<int, List<MapBaseForm.Data>> datas;
+        public Action<int> createAct;
+        public int? labId;
     }
     public partial class UiModStoryMapObjectListCtrl
     {
@@ -30,7 +30,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         UiScrViewContainer<UiBigItemCtrl> itemCon;
         public override void OnCreate()
         {
-            model.datas = new Dictionary<string, List<MapBaseForm.Data>>();
+            model.datas = new Dictionary<int, List<MapBaseForm.Data>>();
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
             itemCon = new UiScrViewContainer<UiBigItemCtrl>(this, view.go_bigItem, view.scr_bigItems);
             view.btn_back.onClick.AddListener(() =>
@@ -40,9 +40,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         }
         public override void OnShow()
         {
-            model.lab = null;
             Update();
+            model.labId = HasUnclassified() ? LabForm.NoneId : (int?)null;
             Refresh();
+        }
+        bool HasUnclassified()
+        {
+            return model.datas.ContainsKey(LabForm.NoneId);
         }
         public void Update()
         {
@@ -50,57 +54,57 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             switch (param.type)
             {
                 case 1:
-                    foreach (var pair in MapTextureForm.DatasByLabel)
+                    foreach (var pair in MapTextureForm.DatasByLabid)
                     {
-                        model.datas[pair.Key] = new List<MapBaseForm.Data>();
+                        if (!model.datas.TryGetValue(pair.Key, out var datas))
+                        {
+                            datas = new List<MapBaseForm.Data>();
+                            model.datas[pair.Key] = datas;
+                        }
                         foreach (var data in pair.Value)
                         {
-                            model.datas[pair.Key].Add(data);
+                            datas.Add(data);
                         }
                     }
-                    model.createAct = (lab) =>
+                    model.createAct = (labId) =>
                     {
-                        if (lab == null)
-                        {
-                            lab = "";
-                        }
-                        ModManager.instance.assetCtrl.CreateTex(lab);
+                        ModManager.instance.assetCtrl.CreateTex(labId);
                     };
                     break;
                 case 2:
-                    foreach (var pair in MapMaskForm.DatasByLabel)
+                    foreach (var pair in MapMaskForm.DatasByLabid)
                     {
-                        model.datas[pair.Key] = new List<MapBaseForm.Data>();
+                        if (!model.datas.TryGetValue(pair.Key, out var datas))
+                        {
+                            datas = new List<MapBaseForm.Data>();
+                            model.datas[pair.Key] = datas;
+                        }
                         foreach (var data in pair.Value)
                         {
-                            model.datas[pair.Key].Add(data);
+                            datas.Add(data);
                         }
                     }
-                    model.createAct = (lab) =>
+                    model.createAct = (labId) =>
                     {
-                        if (lab == null)
-                        {
-                            lab = "";
-                        }
-                        ModManager.instance.assetCtrl.CreateMask(lab);
+                        ModManager.instance.assetCtrl.CreateMask(labId);
                     };
                     break;
                 case 3:
-                    foreach (var pair in MapObjectForm.DatasByLabel)
+                    foreach (var pair in MapObjectForm.DatasByLabid)
                     {
-                        model.datas[pair.Key] = new List<MapBaseForm.Data>();
+                        if (!model.datas.TryGetValue(pair.Key, out var datas))
+                        {
+                            datas = new List<MapBaseForm.Data>();
+                            model.datas[pair.Key] = datas;
+                        }
                         foreach (var data in pair.Value)
                         {
-                            model.datas[pair.Key].Add(data);
+                            datas.Add(data);
                         }
                     }
-                    model.createAct = (lab) =>
+                    model.createAct = (labId) =>
                     {
-                        if (lab == null)
-                        {
-                            lab = "";
-                        }
-                        ModManager.instance.assetCtrl.CreateObject(lab);
+                        ModManager.instance.assetCtrl.CreateObject(labId);
                     };
                     break;
 
@@ -109,24 +113,37 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         public void Refresh()
         {
 
+            var hasUnclassified = HasUnclassified();
+            if (model.labId == LabForm.NoneId && !hasUnclassified)
+                model.labId = null;
             labCon.Clear();
             labCon.Add(new UiLabParam()
             {
-                lab = null
+                labId = null
             });
-            foreach (var lab in model.datas.Keys)
+            if (hasUnclassified)
             {
-                if (lab != "")
-                    labCon.Add(new UiLabParam()
-                    {
-                        lab = lab
-                    });
+                labCon.Add(new UiLabParam()
+                {
+                    labId = LabForm.NoneId
+                });
             }
+            foreach (var labId in UiLabRenderHelper.GetLabIds(GetLabBelong()))
+            {
+                labCon.Add(new UiLabParam()
+                {
+                    labId = labId
+                });
+            }
+            labCon.Add(new UiLabParam()
+            {
+                isNew = true
+            });
             labCon.Refresh();
             itemCon.Clear();
 
             List<MapBaseForm.Data> datas = null;
-            if (model.lab == null)
+            if (!model.labId.HasValue)
             {
                 datas=new List<MapBaseForm.Data>();
                 foreach(var v in model.datas.Values)
@@ -136,7 +153,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             }
             else
             {
-                datas= model.datas[model.lab];
+                if (!model.datas.TryGetValue(model.labId.Value, out datas))
+                {
+                    datas = new List<MapBaseForm.Data>();
+                }
             }
 
             foreach (var data in datas.OrderBy(d => d.id))
@@ -155,15 +175,32 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
 
 
         }
+
+        public string GetLabBelong()
+        {
+            switch (param.type)
+            {
+                case 1:
+                    return nameof(MapTextureForm);
+                case 2:
+                    return nameof(MapMaskForm);
+                case 3:
+                    return nameof(MapObjectForm);
+                default:
+                    return string.Empty;
+            }
+        }
     }
 
     public partial class UiLabParam
     {
-        public string lab;
+        public int? labId;
+        public bool isNew;
     }
     public partial class UiLabModel
     {
-        public string lab;
+        public int? labId;
+        public bool isNew;
     }
     public partial class UiLabCtrl
     {
@@ -173,25 +210,34 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
 
             view.btn_.onClick.AddListener(() =>
             {
-                parent.model.lab = model.lab;
-                parent.Refresh();
+                if (model.isNew)
+                {
+                    UiLabRenderHelper.Create(parent.GetLabBelong(), labId =>
+                    {
+                        parent.model.labId = labId;
+                        parent.Refresh();
+                    });
+                }
+                else
+                {
+                    parent.model.labId = model.labId;
+                    parent.Refresh();
+                }
             });
 
         }
         public override void OnShow()
         {
-            model.lab = param.lab;
+            model.labId = param.labId;
+            model.isNew = param.isNew;
             Refresh();
         }
         public void Refresh()
         {
 
-            view.sta_valid.ChangeState(model.lab == null ? 0 : 1);
-            view.sta_.ChangeState(model.lab == parent.model.lab ? 1 : 0);
-            if (model.lab != null)
-            {
-                view.txt_.text = model.lab;
-            }
+            view.sta_state.ChangeState(UiLabRenderHelper.GetState(model.labId, model.isNew));
+            view.sta_.ChangeState(!model.isNew && model.labId == parent.model.labId ? 1 : 0);
+            view.txt_.text = UiLabRenderHelper.GetText(model.labId, model.isNew);
         }
     }
 
@@ -212,7 +258,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
 
             view.btn_new.onClick.AddListener(() =>
             {
-                parent.model.createAct?.Invoke(parent.model.lab);
+                parent.model.createAct?.Invoke(parent.model.labId ?? LabForm.NoneId);
                 parent.Update();
                 parent.Refresh();
             });

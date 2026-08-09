@@ -33,8 +33,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "流程",
-    "type": "机制"
+    "labId": 13
   },
   {
     "uid": 15,
@@ -334,8 +333,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "人物",
-    "type": "通用"
+    "labId": 14
   },
   {
     "uid": 14,
@@ -1049,8 +1047,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "人物",
-    "type": "通用"
+    "labId": 14
   },
   {
     "uid": 13,
@@ -1728,8 +1725,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "人物",
-    "type": "通用"
+    "labId": 14
   },
   {
     "uid": 18,
@@ -2311,8 +2307,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "通用",
-    "type": "子弹"
+    "labId": 15
   },
   {
     "uid": 11,
@@ -2612,8 +2607,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "流程",
-    "type": "机制"
+    "labId": 13
   },
   {
     "uid": 10,
@@ -2943,8 +2937,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "通用",
-    "type": "子弹"
+    "labId": 15
   },
   {
     "uid": 9,
@@ -3370,8 +3363,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "通用",
-    "type": "子弹"
+    "labId": 15
   },
   {
     "uid": 8,
@@ -3863,8 +3855,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "通用",
-    "type": "子弹"
+    "labId": 15
   },
   {
     "uid": 7,
@@ -5028,8 +5019,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "通用",
-    "type": "子弹"
+    "labId": 15
   },
   {
     "uid": 6,
@@ -5665,8 +5655,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "人物",
-    "type": "通用"
+    "labId": 14
   },
   {
     "uid": 5,
@@ -6236,8 +6225,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "人物",
-    "type": "通用"
+    "labId": 14
   },
   {
     "uid": 4,
@@ -6609,8 +6597,7 @@
     ],
     "paramCount": 1,
     "returnValue": "void",
-    "category": "通用",
-    "type": "Ui"
+    "labId": 16
   },
   {
     "uid": 2,
@@ -6742,8 +6729,7 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "通用",
-    "type": "子弹"
+    "labId": 15
   },
   {
     "uid": 3,
@@ -7295,7 +7281,6 @@
     ],
     "paramCount": 0,
     "returnValue": "void",
-    "category": "enterGame",
-    "type": "dialog"
+    "labId": 17
   }
 ]

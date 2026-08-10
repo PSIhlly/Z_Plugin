@@ -21,15 +21,26 @@ public static readonly int autoIdCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
 
-        public static Z_Chain.Chain idChain ;;
+        public static Z_Chain.Chain idChain ;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
-        public static Action<Data,string> childRemoveAction;
-        public static Action<Data,string> childAddAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
 
 
@@ -51,7 +62,7 @@ private set{
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚≥∆
+                    ///ÂêçÁß∞
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -64,7 +75,7 @@ private set{
                     
                     private int  _avatar_imgId;
                     /// <summary>
-                    ///Õ∑œÒÕº∆¨Id
+                    ///Â§¥ÂÉèÂõæÁâáId
                     ///</summary>
                     public int  avatar_imgId{
                                 get{return _avatar_imgId;}
@@ -83,12 +94,31 @@ private set{
              this.avatar_imgId = avatar_imgId;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.avatar_imgId = data.avatar_imgId;
+            }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),name,avatar_imgId);
+                }
             
+            public virtual  void BeforeGet()
+            {
+                
+                NpcFormForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   public static Data defaultData=new Data(0,"",0);
+                   private static Data _defaultData=new Data(0,"",0);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -142,7 +172,26 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 {4,new Data(4,"chicken",100004)},
 
-                }
+                };
+                _DatasHashSet=new HashSet<Data>();
+                
+                    _DataByAvatar_imgid = new Dictionary<int, Data>() {
+    
+                        {100001,_DataById[1]},
+    
+                        {100002,_DataById[2]},
+    
+                        {100003,_DataById[3]},
+    
+                        {100004,_DataById[4]},
+    
+                    
+                    };
+                    foreach(var v in _DataById.Values)
+                    {
+                        _DatasHashSet.Add(v);
+                    }
+    
                     _DatasByName = new Dictionary<string, List<Data>>() {
     
                             {"human",new List<Data>()},
@@ -155,25 +204,13 @@ idChain=new Z_Chain.Chain (autoIdCnt);
         
                 };
 
-                    _DataByAvatar_imgid = new Dictionary<int, Data>() {
-    
-                        {100001,_DataById[1]},
-    
-                        {100002,_DataById[2]},
-    
-                        {100003,_DataById[3]},
-    
-                        {100004,_DataById[4]},
-    
-                    };
-    
-                    _DatasByAvatar_imgid[100001].Add(_DataById[1]);
+                    _DatasByName["human"].Add(_DataById[1]);
 
-                    _DatasByAvatar_imgid[100002].Add(_DataById[2]);
+                    _DatasByName["pig"].Add(_DataById[2]);
 
-                    _DatasByAvatar_imgid[100003].Add(_DataById[3]);
+                    _DatasByName["dog"].Add(_DataById[3]);
 
-                    _DatasByAvatar_imgid[100004].Add(_DataById[4]);
+                    _DatasByName["chicken"].Add(_DataById[4]);
 
 
             childInitAction?.Invoke();
@@ -216,11 +253,11 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                    defaultData.name,
+                    _defaultData.name,
 
-                    defaultData.avatar_imgId
+                    _defaultData.avatar_imgId
                     );
 
             return data;
@@ -229,6 +266,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

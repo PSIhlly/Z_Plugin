@@ -431,7 +431,6 @@ namespace Ui.ModSceneMain.ModTool
             {
                 conLab.Add(new UiLabParam() { labId = labId });
             }
-            conLab.Add(new UiLabParam() { isNew = true });
             conLab.Refresh();
         }
         public string GetCurrentLabBelong()

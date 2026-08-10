@@ -47,13 +47,14 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
                 Refresh();
 
             };
-            view.ipt_label.onFinishInput+=(s)=>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = string.IsNullOrWhiteSpace(s)
-                    ? 0
-                    : LabForm.GetOrCreateDisplayName(s, nameof(CharacterProductForm), model.data.labId);
-                Refresh();
-            };
+                UiLabRenderHelper.Choose(nameof(CharacterProductForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.btn_illustration.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportCharacterIllustration(model.data.uid);
@@ -79,7 +80,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         public void Refresh()
         {
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
+            view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
             view.img_image.BindTexData(TexAssetForm.DataById.GetDv(model.data.avatarTex, TexAssetForm.DataById[GlobalDefaultHelper.DefaultCharacterTexId]));
             view.img_illustration.BindTexData(TexAssetForm.DataById.GetDv(model.data.illustration, TexAssetForm.DataById[GlobalDefaultHelper.DefaultCharacterTexId]));
             view.ipt_desc.Set(model.data.desc);

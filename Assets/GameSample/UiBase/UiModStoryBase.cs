@@ -1128,23 +1128,25 @@ namespace ModStoryCharacterUnitOverview
 
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
             public Btn btn_image;
             public Img img_image;
             public Btn btn_illustration;
             public Img img_illustration;
             public Ipt ipt_desc;
+            public Txt txt_label;
         public UiModStoryCharacterUnitOverviewView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[1].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_image = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             img_image = uiHolder.elementTrsLst[4].GetComponent<Img>();
             btn_illustration = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             img_illustration = uiHolder.elementTrsLst[6].GetComponent<Img>();
             ipt_desc = uiHolder.elementTrsLst[7].GetComponent<Ipt>();
+            txt_label = uiHolder.elementTrsLst[8].GetComponent<Txt>();
         }
 
     }
@@ -2349,7 +2351,7 @@ namespace ModStorySkillUnitOverview
             public Btn btn_delete;
             public UiEventChooseCtrl model_EventChoose;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
             public Ipt ipt_cd;
             public Btn btn_icon;
             public Img img_icon;
@@ -2362,6 +2364,7 @@ namespace ModStorySkillUnitOverview
             public Sta sta_e;
             public Btn btn_q;
             public Sta sta_q;
+            public Txt txt_label;
             public Txt txt_triggerCondition;
         public UiModStorySkillUnitOverviewView(UiHolder uiHolder):base(uiHolder)
         {
@@ -2369,7 +2372,7 @@ namespace ModStorySkillUnitOverview
             btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             model_EventChoose = (UiEventChooseCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
             ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_cd = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             btn_icon = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             img_icon = uiHolder.elementTrsLst[6].GetComponent<Img>();
@@ -2382,7 +2385,8 @@ namespace ModStorySkillUnitOverview
             sta_e = uiHolder.elementTrsLst[13].GetComponent<Sta>();
             btn_q = uiHolder.elementTrsLst[14].GetComponent<Btn>();
             sta_q = uiHolder.elementTrsLst[15].GetComponent<Sta>();
-            txt_triggerCondition = uiHolder.elementTrsLst[16].GetComponent<Txt>();
+            txt_label = uiHolder.elementTrsLst[16].GetComponent<Txt>();
+            txt_triggerCondition = uiHolder.elementTrsLst[17].GetComponent<Txt>();
         }
 
     }
@@ -2860,19 +2864,21 @@ namespace ModStoryItemUnitOverview
 
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
             public Btn btn_image;
             public Img img_image;
             public Ipt ipt_desc;
+            public Txt txt_label;
         public UiModStoryItemUnitOverviewView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[1].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_image = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             img_image = uiHolder.elementTrsLst[4].GetComponent<Img>();
             ipt_desc = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            txt_label = uiHolder.elementTrsLst[6].GetComponent<Txt>();
         }
 
     }
@@ -3820,10 +3826,11 @@ namespace ModStoryMapObjectTextureAppearance
             public ScrView scr_items;
             public Sta sta_show;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
             public Ipt ipt_interval;
             public Btn btn_isWangTile;
             public Sta sta_isWangTile;
+            public Txt txt_label;
             public Btn btn_new;
             public Btn btn_deleteTex;
             public GameObject go_item;
@@ -3837,16 +3844,17 @@ namespace ModStoryMapObjectTextureAppearance
             scr_items = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
             sta_show = uiHolder.elementTrsLst[2].GetComponent<Sta>();
             ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             ipt_interval = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             btn_isWangTile = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             sta_isWangTile = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_deleteTex = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            go_item = uiHolder.elementTrsLst[10].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            btn_image = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            img_image = uiHolder.elementTrsLst[13].GetComponent<Img>();
+            txt_label = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            btn_new = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            btn_deleteTex = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            go_item = uiHolder.elementTrsLst[11].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            btn_image = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[14].GetComponent<Img>();
         }
 
     }
@@ -4110,7 +4118,8 @@ namespace ModStoryMapObjectMask
             public ScrView scr_items;
             public Sta sta_show;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
+            public Txt txt_label;
             public GameObject go_mask0;
             public GameObject go_mask1;
             public GameObject go_mask2;
@@ -4129,17 +4138,18 @@ namespace ModStoryMapObjectMask
             scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             sta_show = uiHolder.elementTrsLst[3].GetComponent<Sta>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            go_mask0 = uiHolder.elementTrsLst[6].gameObject;
-            go_mask1 = uiHolder.elementTrsLst[7].gameObject;
-            go_mask2 = uiHolder.elementTrsLst[8].gameObject;
-            go_mask3 = uiHolder.elementTrsLst[9].gameObject;
-            go_mask4 = uiHolder.elementTrsLst[10].gameObject;
-            go_mask5 = uiHolder.elementTrsLst[11].gameObject;
-            go_item = uiHolder.elementTrsLst[12].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
-            btn_image = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            img_image = uiHolder.elementTrsLst[15].GetComponent<Img>();
+            btn_label = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            txt_label = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            go_mask0 = uiHolder.elementTrsLst[7].gameObject;
+            go_mask1 = uiHolder.elementTrsLst[8].gameObject;
+            go_mask2 = uiHolder.elementTrsLst[9].gameObject;
+            go_mask3 = uiHolder.elementTrsLst[10].gameObject;
+            go_mask4 = uiHolder.elementTrsLst[11].gameObject;
+            go_mask5 = uiHolder.elementTrsLst[12].gameObject;
+            go_item = uiHolder.elementTrsLst[13].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            btn_image = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[16].GetComponent<Img>();
         }
 
     }
@@ -4256,11 +4266,12 @@ namespace ModStoryMapObjectObjectAppearance
 
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
             public Ipt ipt_interval;
             public Ipt ipt_colliderScale;
             public Sta sta_show;
             public ScrView scr_items;
+            public Txt txt_label;
             public Btn btn_deleteUnit;
             public Ipt ipt_width;
             public Ipt ipt_length;
@@ -4281,26 +4292,27 @@ namespace ModStoryMapObjectObjectAppearance
 
             btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[1].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             ipt_interval = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
             ipt_colliderScale = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             sta_show = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             scr_items = uiHolder.elementTrsLst[6].GetComponent<ScrView>();
-            btn_deleteUnit = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            ipt_width = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
-            ipt_length = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
-            ipt_height = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            ipt_posHeight = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
-            btn_reset = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            btn_model = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            btn_image = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            rimg_image = uiHolder.elementTrsLst[15].GetComponent<RImg>();
-            rtf_image = uiHolder.elementTrsLst[16].GetComponent<RectTransform>();
-            rtf_axis = uiHolder.elementTrsLst[17].GetComponent<RectTransform>();
-            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[18].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[19].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[20].GetComponent<UiHolder>().ctrl;
-            txt_model = uiHolder.elementTrsLst[21].GetComponent<Txt>();
+            txt_label = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            btn_deleteUnit = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            ipt_width = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            ipt_length = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_height = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            ipt_posHeight = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
+            btn_reset = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            btn_model = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_image = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            rimg_image = uiHolder.elementTrsLst[16].GetComponent<RImg>();
+            rtf_image = uiHolder.elementTrsLst[17].GetComponent<RectTransform>();
+            rtf_axis = uiHolder.elementTrsLst[18].GetComponent<RectTransform>();
+            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[20].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
+            txt_model = uiHolder.elementTrsLst[22].GetComponent<Txt>();
         }
 
     }
@@ -5035,9 +5047,10 @@ namespace ModStoryEffectUnit
             public GameObject go_clips;
             public UiClipsCtrl sub_clips;
             public Ipt ipt_name;
-            public Ipt ipt_label;
+            public Btn btn_label;
             public Btn btn_ground;
             public Sta sta_ground;
+            public Txt txt_label;
         public UiModStoryEffectUnitView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -5047,9 +5060,10 @@ namespace ModStoryEffectUnit
             go_clips = uiHolder.elementTrsLst[3].gameObject;
             sub_clips = (UiClipsCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             ipt_name = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            ipt_label = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             btn_ground = uiHolder.elementTrsLst[7].GetComponent<Btn>();
             sta_ground = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            txt_label = uiHolder.elementTrsLst[9].GetComponent<Txt>();
         }
 
     }
@@ -5342,11 +5356,12 @@ namespace ModStoryMissionUnit
             public Btn btn_back;
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_lab;
+            public Btn btn_label;
             public Btn btn_show;
             public Sta sta_show;
             public Ipt ipt_desc;
             public Btn btn_guideScene;
+            public Txt txt_label;
             public Txt txt_guideScene;
             public Ipt ipt_guidePosSetX;
             public Ipt ipt_guidePosSetZ;
@@ -5357,15 +5372,16 @@ namespace ModStoryMissionUnit
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
-            ipt_lab = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             btn_show = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             sta_show = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             ipt_desc = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
             btn_guideScene = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            txt_guideScene = uiHolder.elementTrsLst[8].GetComponent<Txt>();
-            ipt_guidePosSetX = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
-            ipt_guidePosSetZ = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            ipt_guidePosSetY = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            txt_label = uiHolder.elementTrsLst[8].GetComponent<Txt>();
+            txt_guideScene = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            ipt_guidePosSetX = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
+            ipt_guidePosSetZ = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            ipt_guidePosSetY = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
         }
 
     }

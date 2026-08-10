@@ -80,5 +80,34 @@ namespace Ui
                 return true;
             });
         }
+
+        public static void Choose(string belong, Action<int> onSelected)
+        {
+            if (string.IsNullOrWhiteSpace(belong))
+                return;
+
+            var items = new EntryItem();
+            var unclassifiedText = TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab);
+            items.Add(unclassifiedText, null, LabForm.NoneId);
+
+            var displayNames = new HashSet<string>(StringComparer.Ordinal) { unclassifiedText };
+            foreach (var labId in GetLabIds(belong))
+            {
+                var displayName = LabForm.GetDisplayName(labId);
+                if (string.IsNullOrWhiteSpace(displayName) || !displayNames.Add(displayName))
+                    continue;
+                items.Add(displayName, null, labId);
+            }
+
+            NotifyManager.instance.AddChoose(
+                TextManager.instance.GetTxt("label"),
+                true,
+                item =>
+                {
+                    onSelected?.Invoke(item.id);
+                    return true;
+                },
+                items);
+        }
     }
 }

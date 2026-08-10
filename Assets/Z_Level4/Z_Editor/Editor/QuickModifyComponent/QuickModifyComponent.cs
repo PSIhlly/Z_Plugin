@@ -12,7 +12,7 @@ namespace DP.Editor
     /// - Tools 菜单：打开窗口。
     /// - 右键 GameObject：「复制组件信息」「粘贴组件信息」。
     /// - 快捷键 Shift+C：打开窗口并复制选中对象；Shift+V：粘贴到选中对象；
-    ///   Shift+Z：撤回；Shift+Y：重做；Shift+Q：切换「场景点选UI」模式（可在窗口里开关）。
+    ///   Shift+Z：撤回；Shift+Y：重做；按住 Shift：临时启用「场景点选UI」模式（可在窗口里开关）。
     /// 复制内容：Image 的 sprite；Transform 的 position（世界坐标）/ rotation / scale，
     /// 若为 RectTransform 额外复制 rect 相关布局（anchoredPosition / sizeDelta / anchors / pivot）；
     /// TextPro（TMP_Text）的 内容 / fontAsset / materialPreset / fontSize / vertexColor。
@@ -74,57 +74,30 @@ namespace DP.Editor
             set => EditorPrefs.SetBool(PREF_HOTKEY, value);
         }
 
-        /// <summary>场景点选 UI 模式：点击场景选中命中点最前面的 Image/TextPro 对象。</summary>
-        static bool PickMode
+        /// <summary>是否启用场景快捷选中功能。</summary>
+        static bool QuickSelectEnabled
         {
             get => EditorPrefs.GetBool(PREF_PICKMODE, false);
             set => EditorPrefs.SetBool(PREF_PICKMODE, value);
         }
 
-        // 进入点选模式前各 SceneView 的 gizmos 开关状态，退出时还原
-        static readonly Dictionary<SceneView, bool> savedGizmos = new Dictionary<SceneView, bool>();
+        // 当前是否处于「Shift 按住」激活态
+        static bool quickSelectActive;
         // 进入点选模式前的变换工具，退出时还原
         static Tool savedTool = Tool.Move;
 
-        /// <summary>统一切换点选模式：进入时隐藏所有 SceneView 的 gizmos 并强制 RectTool，退出时还原。</summary>
-        static void SetPickMode(bool on)
+        static void ActivateQuickSelect()
         {
-            if (on == PickMode)
-            {
-                return;
-            }
-            if (on)
-            {
-                savedGizmos.Clear();
-                foreach (SceneView sv in SceneView.sceneViews)
-                {
-                    if (sv == null)
-                    {
-                        continue;
-                    }
-                    savedGizmos[sv] = sv.drawGizmos;
-                    sv.drawGizmos = false;
-                }
-                savedTool = Tools.current;
-                Tools.current = Tool.Rect;
-            }
-            else
-            {
-                foreach (var kv in savedGizmos)
-                {
-                    if (kv.Key != null)
-                    {
-                        kv.Key.drawGizmos = kv.Value;
-                    }
-                }
-                savedGizmos.Clear();
-                Tools.current = savedTool;
-            }
-            PickMode = on;
-            if (HasOpenInstances<QuickModifyComponent>())
-            {
-                GetWindow<QuickModifyComponent>().Repaint();
-            }
+            savedTool = Tools.current;
+            Tools.current = Tool.Rect;
+            quickSelectActive = true;
+            SceneView.RepaintAll();
+        }
+
+        static void DeactivateQuickSelect()
+        {
+            Tools.current = savedTool;
+            quickSelectActive = false;
             SceneView.RepaintAll();
         }
 
@@ -195,37 +168,51 @@ namespace DP.Editor
                     Undo.PerformRedo();
                     e.Use();
                 }
-                // Shift+Q：切换「场景点选 UI」模式
-                else if (e.keyCode == KeyCode.Q)
-                {
-                    SetPickMode(!PickMode);
-                    e.Use();
-                }
             }
         }
 
-        // ---------------- 场景点选 UI（Shift+Q 开关）----------------
+        // ---------------- 场景快捷选中（按住 Shift 激活）----------------
         static void OnSceneGui(SceneView sv)
         {
-            if (!PickMode)
+            if (!QuickSelectEnabled)
+            {
+                if (quickSelectActive)
+                {
+                    DeactivateQuickSelect();
+                }
+                return;
+            }
+
+            var e = Event.current;
+            bool active = e.shift && !e.alt && !e.control && !e.command;
+            if (active && !quickSelectActive)
+            {
+                ActivateQuickSelect();
+            }
+            else if (!active && quickSelectActive)
+            {
+                DeactivateQuickSelect();
+            }
+
+            if (!quickSelectActive)
             {
                 return;
             }
 
             // 在场景视图角落提示当前处于点选模式
             Handles.BeginGUI();
-            var rect = new Rect(8, 8, 220, 20);
             var old = GUI.color;
             GUI.color = new Color(0.3f, 1f, 0.4f, 1f);
-            GUI.Label(rect, "点选UI模式 (Shift+Q 关闭)", EditorStyles.boldLabel);
+            GUI.Label(new Rect(8, 8, 260, 20), "快捷选中模式（松开 Shift 退出）", EditorStyles.boldLabel);
             GUI.color = old;
             Handles.EndGUI();
 
-            var e = Event.current;
-            // 抢占默认控件，使左键点击不触发常规拾取
-            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+            // 仅在鼠标不位于 RectTool 手柄上时接管点击，保留 Shift 等比缩放等原生操作。
+            int ctrlId = GUIUtility.GetControlID(FocusType.Passive);
+            HandleUtility.AddDefaultControl(ctrlId);
+            bool overHandle = HandleUtility.nearestControl != ctrlId;
 
-            if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
+            if (!overHandle && e.type == EventType.MouseDown && e.button == 0)
             {
                 // GUI 坐标 → 屏幕像素坐标（SceneView 相机像素坐标系）
                 Vector2 screenPoint = HandleUtility.GUIPointToScreenPixelCoordinate(e.mousePosition);
@@ -307,6 +294,7 @@ namespace DP.Editor
                     {
                         continue; // 非 Image/RawImage/TextPro，不参与、不记录
                     }
+
                     string name = GetPath(g.transform);
                     if (!g.isActiveAndEnabled || !g.gameObject.activeInHierarchy)
                     {
@@ -833,11 +821,16 @@ namespace DP.Editor
                 HotkeyEnabled = newHk;
             }
 
-            bool pm = PickMode;
-            bool newPm = EditorGUILayout.ToggleLeft("场景点选UI模式 (Shift+Q)", pm);
+            bool pm = QuickSelectEnabled;
+            bool newPm = EditorGUILayout.ToggleLeft("启用快捷选中（按住 Shift 生效）", pm);
             if (newPm != pm)
             {
-                SetPickMode(newPm);
+                QuickSelectEnabled = newPm;
+                if (!newPm && quickSelectActive)
+                {
+                    DeactivateQuickSelect();
+                }
+                SceneView.RepaintAll();
             }
 
             EditorGUILayout.Space();

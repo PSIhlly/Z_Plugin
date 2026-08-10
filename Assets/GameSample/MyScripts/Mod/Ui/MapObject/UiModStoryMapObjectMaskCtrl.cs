@@ -39,10 +39,14 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
                 ModManager.instance.assetCtrl.DeleteMask(model.data.id);
                 parent.SelType(2);
             });
-            view.ipt_label.onFinishInput += (s) =>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = LabForm.GetOrCreateDisplayName(s, nameof(MapMaskForm), model.data.labId);
-            };
+                UiLabRenderHelper.Choose(nameof(MapMaskForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.ipt_name.onFinishInput += (s) =>
             {
                 model.data.name = s;
@@ -70,7 +74,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask
         public void Refresh()
         {
             view.sta_show.ChangeState(model.id >= 0 ? 1 : 0);
-            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
+            view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
 
             con.Clear();
             for (int i = 0; i < model.data.texsName.Count; i++)

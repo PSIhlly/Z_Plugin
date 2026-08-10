@@ -38,11 +38,14 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                 ModManager.instance.assetCtrl.DeleteTex(model.data.id);
                 parent.parent.SelType(1);
             });
-            view.ipt_label.onFinishInput += (s) =>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = LabForm.GetOrCreateDisplayName(s, nameof(MapTextureForm), model.data.labId);
-                Refresh();
-            };
+                UiLabRenderHelper.Choose(nameof(MapTextureForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.ipt_name.onFinishInput += (s) =>
             {
                 model.data.name = s;
@@ -109,7 +112,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                 view.img_image.BindTexData(TexAssetForm.DataById[model.data.texs[model.id]]);
             }
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
+            view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
             view.ipt_interval.Set(model.data.animTimeInterval.ToString("0.##"));
             view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
         }

@@ -21,15 +21,26 @@ public static readonly int autoIdCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
 
-        public static Z_Chain.Chain idChain ;;
+        public static Z_Chain.Chain idChain ;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
-        public static Action<Data,string> childRemoveAction;
-        public static Action<Data,string> childAddAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
 
 
@@ -51,7 +62,7 @@ private set{
                     
                     private string  _path;
                     /// <summary>
-                    ///ͷ��Ŀ¼
+                    ///头像目录
                     ///</summary>
                     public string  path{
                                 get{return _path;}
@@ -69,12 +80,30 @@ private set{
              this.path = path;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.path = data.path;
+            }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),path);
+                }
             
+            public virtual  void BeforeGet()
+            {
+                
+                ImgFormForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   public static Data defaultData=new Data(0,"");
+                   private static Data _defaultData=new Data(0,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -112,19 +141,9 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 {200002,new Data(200002,"\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg2")},
 
-                }
-                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc1"].Add(_DataById[100001]);
-
-                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc2"].Add(_DataById[100002]);
-
-                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc3"].Add(_DataById[100003]);
-
-                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\npc4"].Add(_DataById[100004]);
-
-                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg1"].Add(_DataById[200001]);
-
-                    _DatasByPath["\\Z_Level2\\Z_UI\\Sample\\Imgs\\bg2"].Add(_DataById[200002]);
-
+                };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -166,9 +185,9 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                    defaultData.path
+                    _defaultData.path
                     );
 
             return data;
@@ -177,6 +196,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

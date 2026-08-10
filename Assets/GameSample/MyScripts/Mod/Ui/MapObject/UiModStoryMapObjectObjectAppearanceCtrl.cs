@@ -72,11 +72,14 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data.name = s;
                 Refresh();
             };
-            view.ipt_label.onFinishInput += (s) =>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = LabForm.GetOrCreateDisplayName(s, nameof(MapObjectForm), model.data.labId);
-                Refresh();
-            };
+                UiLabRenderHelper.Choose(nameof(MapObjectForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.ipt_posHeight.onFinishInput += (s) =>
             {
                 model.data.model.subPrefabUnitPos[0] = model.data.model.subPrefabUnitPos[0].NewSetY(StringHelper.ToFloat(s, 0, false));
@@ -130,7 +133,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
 
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
+            view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
 
             DisplayCameraAreaManager.instance.Clear();
 

@@ -49,12 +49,14 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
                 if (StringHelper.IsUniqueName(lst, s))
                     model.data.name = s;
             };
-            view.ipt_label.onFinishInput += (s) =>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = string.IsNullOrWhiteSpace(s)
-                    ? 0
-                    : LabForm.GetOrCreateDisplayName(s, nameof(SkillProductForm), model.data.labId);
-            };
+                UiLabRenderHelper.Choose(nameof(SkillProductForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.btn_icon.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportSkillIcon(model.data.uid);
@@ -110,7 +112,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
         public void Refresh()
         {
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
+            view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
             view.ipt_cd.Set(model.data.cd.ToString());
             view.img_icon.BindTexData(TexAssetForm.DataById[model.data.icon]);
             view.sta_e.ChangeState(model.data.skillTypes.Contains(SkillType.E) ? 1 : 0);

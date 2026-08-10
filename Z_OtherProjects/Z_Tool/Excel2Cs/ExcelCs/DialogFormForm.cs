@@ -21,15 +21,26 @@ public static readonly int autoIdCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
 
-        public static Z_Chain.Chain idChain ;;
+        public static Z_Chain.Chain idChain ;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
-        public static Action<Data,string> childRemoveAction;
-        public static Action<Data,string> childAddAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
 
 
@@ -51,7 +62,7 @@ private set{
                     
                     private int  _groupId;
                     /// <summary>
-                    ///组号
+                    ///缁勫彿
                     ///</summary>
                     public int  groupId{
                                 get{return _groupId;}
@@ -64,7 +75,7 @@ private set{
                     
                     private int  _speaker_npcId;
                     /// <summary>
-                    ///说话者Id
+                    ///璇磋瘽鑰匢d
                     ///</summary>
                     public int  speaker_npcId{
                                 get{return _speaker_npcId;}
@@ -77,7 +88,7 @@ private set{
                     
                     private int  _background_imgId;
                     /// <summary>
-                    ///对话背景图片Id
+                    ///瀵硅瘽鑳屾櫙鍥剧墖Id
                     ///</summary>
                     public int  background_imgId{
                                 get{return _background_imgId;}
@@ -90,7 +101,7 @@ private set{
                     
                     private string  _text;
                     /// <summary>
-                    ///对话文本
+                    ///瀵硅瘽鏂囨湰
                     ///</summary>
                     public string  text{
                                 get{return _text;}
@@ -111,12 +122,33 @@ private set{
              this.text = text;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.groupId = data.groupId;
+             this.speaker_npcId = data.speaker_npcId;
+             this.background_imgId = data.background_imgId;
+             this.text = data.text;
+            }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),groupId,speaker_npcId,background_imgId,text);
+                }
             
+            public virtual  void BeforeGet()
+            {
+                
+                DialogFormForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   public static Data defaultData=new Data(0,0,0,0,"");
+                   private static Data _defaultData=new Data(0,0,0,0,"");
+                   public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -144,7 +176,7 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 {1,new Data(1,1,1,200001,"hello")},
 
-                {2,new Data(2,1,1,200002,"你好")},
+                {2,new Data(2,1,1,200002,"浣犲ソ")},
 
                 {3,new Data(3,1,2,200002,"world")},
 
@@ -152,17 +184,9 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 {5,new Data(5,2,1,200001,"fine")},
 
-                }
-                    _DatasByText["hello"].Add(_DataById[1]);
-
-                    _DatasByText["你好"].Add(_DataById[2]);
-
-                    _DatasByText["world"].Add(_DataById[3]);
-
-                    _DatasByText["ok"].Add(_DataById[4]);
-
-                    _DatasByText["fine"].Add(_DataById[5]);
-
+                };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -204,15 +228,15 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                    defaultData.groupId,
+                    _defaultData.groupId,
 
-                    defaultData.speaker_npcId,
+                    _defaultData.speaker_npcId,
 
-                    defaultData.background_imgId,
+                    _defaultData.background_imgId,
 
-                    defaultData.text
+                    _defaultData.text
                     );
 
             return data;
@@ -221,6 +245,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 

@@ -21,15 +21,26 @@ public static readonly int autoIdCnt=100;
 
 
 
+            Z_Json.extra[typeof(Data)]=((obj)=>{
+            if(obj is Data data)
+                return GetJoByData(data);
+            return null;
+            },(jo)=>{
+            return GetDataByJo(jo);
+            });
         }
         
         private static bool inited;
 
-        public static Z_Chain.Chain idChain ;;
+        public static Z_Chain.Chain idChain ;
 
+        public static Action<Data> addAction;
+        public static Action<Data> removeAction;
         public static Action childInitAction;
-        public static Action<Data,string> childRemoveAction;
-        public static Action<Data,string> childAddAction;
+        public static Action<Data> childRemoveAction;
+        public static Action<Data> childAddAction;
+        
+        public static Action<Data> beforeGetAction;
 
         public static Action<Data,int,int> changeCountAction;
                 
@@ -53,7 +64,7 @@ private set{
                     
                     private string  _name;
                     /// <summary>
-                    ///√˚◊÷
+                    ///ÂêçÂ≠ó
                     ///</summary>
                     public string  name{
                                 get{return _name;}
@@ -66,7 +77,7 @@ private set{
                     
                     private string  _icon;
                     /// <summary>
-                    ///Õº±Í
+                    ///ÂõæÊ†á
                     ///</summary>
                     public string  icon{
                                 get{return _icon;}
@@ -79,11 +90,16 @@ private set{
                     
                     private int  _count;
                     /// <summary>
-                    ///”µ”– ˝
+                    ///Êã•ÊúâÊï∞
                     ///</summary>
                     public int  count{
                                 get{return _count;}
  set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeCount(this,_count,value); 
+                    }
         
                 _count = value;
                 }
@@ -99,12 +115,32 @@ private set{
              this.count = count;
 
             }
+            public void Reset(Data data)
+            {
+
+             this.id = data.id;
+             this.name = data.name;
+             this.icon = data.icon;
+             this.count = data.count;
+            }
+
+                public Data Copy(bool sameId = true)
+                {
+        return new Data(sameId? id:idChain.GetId(),name,icon,count);
+                }
             
+            public virtual  void BeforeGet()
+            {
+                
+                ItemFormForm.beforeGetAction?.Invoke(this);
+            }
         }
 
-                   public static Data defaultData=new Data(0,"","",0);
+                   private static Data _defaultData=new Data(0,"","",0);
+                   public static Data defaultData=>_defaultData.Copy();
 
 
+            static HashSet<Data> _DatasHashSet;
             static Dictionary<int, Data> _DataById;
             public static Dictionary<int, Data> DataById
             {
@@ -134,11 +170,9 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 {2,new Data(2,"Soul power","\\GameSample\\Imgs\\Item\\Soul Power.png",0)},
 
-                }
-                    _DatasByCount[500].Add(_DataById[1]);
-
-                    _DatasByCount[0].Add(_DataById[2]);
-
+                };
+                _DatasHashSet=new HashSet<Data>();
+                
 
             childInitAction?.Invoke();
             
@@ -180,13 +214,13 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
             Data data=new Data(
 
-                jo.Get<int>("id"),
+                jo.SelectToken("id")==null?defaultData.id:jo.Get<int>("id"),
 
-                    defaultData.name,
+                    _defaultData.name,
 
-                    defaultData.icon,
+                    _defaultData.icon,
 
-                jo.Get<int>("count")
+                jo.SelectToken("count")==null?defaultData.count:jo.Get<int>("count")
                     );
 
             return data;
@@ -195,6 +229,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         public static JObject GetJoByData(Data data)
         {
             Init();
+            data.BeforeGet();
 
             JObject jo=new JObject();
 
@@ -208,7 +243,7 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
 
 
 
-            public void ChangeCount(Data superData,int oldV,int newV)
+            public static void ChangeCount(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {

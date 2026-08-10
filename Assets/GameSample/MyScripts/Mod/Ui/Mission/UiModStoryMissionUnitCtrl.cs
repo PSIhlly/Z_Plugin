@@ -49,13 +49,14 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionUnit
                 }
                 Refresh();
             };
-            view.ipt_lab.onFinishInput += (s) =>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = string.IsNullOrWhiteSpace(s)
-                    ? 0
-                    : LabForm.GetOrCreateDisplayName(s, nameof(MissionForm), model.data.labId);
-                Refresh();
-            };
+                UiLabRenderHelper.Choose(nameof(MissionForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.ipt_desc.onFinishInput += (s) =>
             {
                 model.data.desc = s;
@@ -101,7 +102,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionUnit
             if (model.data != null)
             {
                 view.ipt_name.Set(model.data.name);
-                view.ipt_lab.Set(LabForm.GetDisplayName(model.data.labId));
+                view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
                 view.ipt_desc.Set(model.data.desc);
                 view.sta_show.ChangeState(model.data.show ? 1 : 0);
 

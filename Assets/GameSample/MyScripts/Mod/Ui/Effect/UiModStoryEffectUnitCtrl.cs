@@ -47,13 +47,14 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                     model.data.name = s;
                 Refresh();
             };
-            view.ipt_label.onFinishInput = (s) =>
+            view.btn_label.onClick.AddListener(() =>
             {
-                model.data.labId = string.IsNullOrWhiteSpace(s)
-                    ? 0
-                    : LabForm.GetOrCreateDisplayName(s, nameof(EffectForm), model.data.labId);
-                Refresh();
-            };
+                UiLabRenderHelper.Choose(nameof(EffectForm), labId =>
+                {
+                    model.data.labId = labId;
+                    Refresh();
+                });
+            });
             view.btn_ground.onClick.AddListener(() =>
             {
                 model.data.ground = !model.data.ground;
@@ -78,7 +79,7 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
         {
             view.sta_ground.ChangeState(model.data.ground ? 1 : 0);
             view.ipt_name.Set(model.data.name);
-            view.ipt_label.Set(LabForm.GetDisplayName(model.data.labId));
+            view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
 
             clipsCon.Clear();
             for (int i = 0; i < parent.model.data.clips.Count; i++)

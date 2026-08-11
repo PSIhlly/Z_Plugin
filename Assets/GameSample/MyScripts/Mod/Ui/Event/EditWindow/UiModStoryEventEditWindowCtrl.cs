@@ -119,9 +119,8 @@ namespace Ui.ModStoryEventEditWindow
                         {
                             if (tp == "void" && !string.IsNullOrEmpty(data.allowAsVoid))
                                 code = $"{data.allowAsVoid}{code};";
-                            model.cpr.Compile(code, out var res, out _, out _,out _,out var errors);
-                            if (errors.Count > 0)
-                                NotifyManager.instance.AddTip(errors[0].ToString());
+                            if (!TryCompileSyntax(code, out var res))
+                                return;
                             ReplaceNode(model.selUnit, res[0]);
                             ApplyEntry();
                         }, model.selUnit);
@@ -136,9 +135,8 @@ namespace Ui.ModStoryEventEditWindow
                             rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
                         }
                         rawCode += ");";
-                        model.cpr.Compile(rawCode, out var res, out _, out _,out _,out var errors);
-                        if (errors.Count > 0)
-                            NotifyManager.instance.AddTip(errors[0].ToString());    
+                        if (!TryCompileSyntax(rawCode, out var res))
+                            return;
                         ReplaceNode(model.selUnit, res[0]);
                     }
 
@@ -186,9 +184,8 @@ namespace Ui.ModStoryEventEditWindow
                         }
 
 
-                        model.cpr.Compile(defaultCode, out var res, out _, out _,out _,out var errors);
-                        if (errors.Count > 0)
-                            NotifyManager.instance.AddTip(errors[0].ToString());
+                        if (!TryCompileSyntax(defaultCode, out var res))
+                            return;
                         var parentLst=FindParentList(model.curEntry, model.selItem);
                         int id = parentLst.IndexOf(model.selItem);
                         foreach (var r in res)
@@ -205,15 +202,53 @@ namespace Ui.ModStoryEventEditWindow
         }
         public void ApplyEntry()
         {
-            model.data.ApplyCode(model.dcpr.Decompile(model.curEntry), model.cpr);
-            view.ipt_code.Set(model.data.code);
-            Refresh();
+            var code = model.dcpr.Decompile(model.curEntry);
+            if (model.data.TryApplyCode(code, out _, out var errors, model.cpr))
+            {
+                view.ipt_code.Set(model.data.code);
+                Refresh();
+            }
+            else
+            {
+                ShowCompileErrors(errors);
+            }
         }
         public void ApplyCode()
         {
-            model.curEntry = model.data.ApplyCode(view.ipt_code.text, model.cpr);
+            if (model.data.TryApplyCode(view.ipt_code.text, out var syntaxNodes,
+                    out var errors, model.cpr))
+            {
+                model.curEntry = syntaxNodes;
+                Refresh();
+            }
+            else
+            {
+                ShowCompileErrors(errors);
+            }
+        }
 
-            Refresh();
+        internal bool TryCompileSyntax(string code, out List<SyntaxNode> syntaxNodes)
+        {
+            if (model.cpr.TryCompile(code, out _, out syntaxNodes, out _, out _, out _, out var errors))
+                return true;
+
+            syntaxNodes = new List<SyntaxNode>();
+            ShowCompileErrors(errors);
+            return false;
+        }
+
+        private static void ShowCompileErrors(List<CompileError> errors)
+        {
+            if (errors == null || errors.Count == 0)
+            {
+                NotifyManager.instance.AddTip("编译失败");
+                return;
+            }
+
+            var message = errors[0].ToString();
+            if (errors.Count > 1)
+                message += $"\n……另有 {errors.Count - 1} 个错误";
+            NotifyManager.instance.AddTip(message);
         }
         public override void OnShow()
         {
@@ -221,7 +256,9 @@ namespace Ui.ModStoryEventEditWindow
             model.data = param.data;
             model.onClose = param.onClose;
 
-            model.curEntry = model.data.ApplyCode(model.data.code, model.cpr);
+            if (!TryCompileSyntax(model.data.code, out var initialEntries))
+                initialEntries = new List<SyntaxNode>();
+            model.curEntry = initialEntries;
             view.ipt_code.Set(model.data.code);
 
             model.selItem = null;

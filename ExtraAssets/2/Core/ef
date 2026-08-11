@@ -11,7 +11,7 @@
         "v": "0"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "GameOver"
@@ -38,7 +38,7 @@
   {
     "uid": 15,
     "name": "敌人死亡",
-    "code": "FloatingText(delta,GetCharacterPosition(self));\nif(GetCharacterParameter(self,\"Hp\")<=0)\n{\nif(self==GetCurrentCharacter())\n{\n战败();\n} \nelse \n{\nDestroyCharacter(self);\n}\n;\n} \n;\n",
+    "code": "FloatingText(delta,GetCharacterPosition(self));\nif(GetCharacterParameter(self,\"Hp\")<=0)\n{\nif(self==GetCurrentCharacter())\n{\n战败();\n}\nelse\n{\nDestroyCharacter(self);\n}\n}\n",
     "zCode": [
       {
         "v": "14"
@@ -71,7 +71,7 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "FloatingText"
@@ -113,7 +113,7 @@
         "v": "15"
       },
       {
-        "v": "48"
+        "v": "46"
       },
       {
         "v": "0"
@@ -149,7 +149,7 @@
         "v": "0"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "战败"
@@ -173,16 +173,10 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyCharacter"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "48"
       }
     ],
     "zCodeMap": [
@@ -307,28 +301,22 @@
         "v": 90
       },
       {
-        "v": 158
+        "v": 156
       },
       {
-        "v": 158
+        "v": 156
       },
       {
-        "v": 141
+        "v": 139
       },
       {
-        "v": 141
+        "v": 139
       },
       {
-        "v": 141
+        "v": 139
       },
       {
-        "v": 141
-      },
-      {
-        "v": 48
-      },
-      {
-        "v": 48
+        "v": 139
       }
     ],
     "paramCount": 0,
@@ -338,7 +326,7 @@
   {
     "uid": 14,
     "name": "敌人索敌",
-    "code": "lst=GetCharactersInArea(GetCharacterPosition(self),10);\nlen=Len(lst);\nfor(i=0;i<len;i=i+1)\n{\nif(GetCharacterParameter(lst[i],\"Team\")!=GetCharacterParameter(self,\"Team\"))\n{\nSetCharacterNavigate(self,GetCharacterPosition(lst[i]));\nSetCharacterRotation(self,GetLookAtRotation(GetCharacterPosition(self),GetCharacterPosition(lst[i])),0);\ni=9999; \n;\n} \n;\n }\n ;\n",
+    "code": "lst=GetCharactersInArea(GetCharacterPosition(self),10);\nlen=Len(lst);\nfor(i=0;i<len;i=i+1)\n{\nif(GetCharacterParameter(lst[i],\"Team\")!=GetCharacterParameter(self,\"Team\"))\n{\nSetCharacterNavigate(self,GetCharacterPosition(lst[i]));\nSetCharacterRotation(self,GetLookAtRotation(GetCharacterPosition(self),GetCharacterPosition(lst[i])),0);\ni=9999;\n}\n }\n",
     "zCode": [
       {
         "v": "14"
@@ -446,7 +434,7 @@
         "v": "15"
       },
       {
-        "v": "117"
+        "v": "115"
       },
       {
         "v": "14"
@@ -512,7 +500,7 @@
         "v": "15"
       },
       {
-        "v": "107"
+        "v": "105"
       },
       {
         "v": "14"
@@ -554,7 +542,7 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetCharacterNavigate"
@@ -635,7 +623,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetCharacterRotation"
@@ -654,12 +642,6 @@
       },
       {
         "v": "9"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "107"
       },
       {
         "v": "0"
@@ -1009,12 +991,6 @@
         "v": 335
       },
       {
-        "v": 93
-      },
-      {
-        "v": 93
-      },
-      {
         "v": 88
       },
       {
@@ -1052,7 +1028,7 @@
   {
     "uid": 13,
     "name": "魔符·星屑幻想",
-    "code": "ShowEffectByCharacter(\"$ef$2$ef$\",self,1);\nfor(i=1;i<=2;i=i+1)\n{\nWait(0.2);\npos=GetCharacterPosition(self);\nfor(j=0;j<360;j=j+30)\n{\nnewObject=GenerateObject(\"星弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetObjectRotation(newObject,j,0);\nSetSceneObjectParameter(newObject,\"移动方向\",GetObjectForwardVector(newObject));\n }\n ;\n }\n ;\n",
+    "code": "ShowEffectByCharacter(\"$ef$2$ef$\",self,1);\nfor(i=1;i<=2;i=i+1)\n{\nWait(0.2);\npos=GetCharacterPosition(self);\nfor(j=0;j<360;j=j+30)\n{\nnewObject=GenerateObject(\"星弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetObjectRotation(newObject,j,0);\nSetSceneObjectParameter(newObject,\"移动方向\",GetObjectForwardVector(newObject));\n }\n }\n",
     "zCode": [
       {
         "v": "1"
@@ -1079,7 +1055,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowEffectByCharacter"
@@ -1250,7 +1226,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetSceneObjectParameter"
@@ -1280,7 +1256,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetObjectRotation"
@@ -1322,7 +1298,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetSceneObjectParameter"
@@ -1730,7 +1706,7 @@
   {
     "uid": 18,
     "name": "碰撞打人",
-    "code": "chs=GetCharactersInArea(GetCharacterPosition(self),3);\nlen=Len(chs);\nfor(tar=0;tar<len;tar=tar+1)\n{\nif(GetCharacterParameter(chs[tar],\"Team\")!=GetCharacterParameter(self,\"Team\"))\n{\nSetCharacterParameter(chs[tar],\"Hp\",GetCharacterParameter(chs[tar],\"Hp\")-1);\n} \n;\n }\n ;\n",
+    "code": "chs=GetCharactersInArea(GetCharacterPosition(self),3);\nlen=Len(chs);\nfor(tar=0;tar<len;tar=tar+1)\n{\nif(GetCharacterParameter(chs[tar],\"Team\")!=GetCharacterParameter(self,\"Team\"))\n{\nSetCharacterParameter(chs[tar],\"Hp\",GetCharacterParameter(chs[tar],\"Hp\")-1);\n}\n }\n",
     "zCode": [
       {
         "v": "14"
@@ -1838,7 +1814,7 @@
         "v": "15"
       },
       {
-        "v": "95"
+        "v": "93"
       },
       {
         "v": "14"
@@ -1904,7 +1880,7 @@
         "v": "15"
       },
       {
-        "v": "85"
+        "v": "83"
       },
       {
         "v": "14"
@@ -1976,16 +1952,10 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetCharacterParameter"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "85"
       },
       {
         "v": "0"
@@ -2269,12 +2239,6 @@
         "v": 181
       },
       {
-        "v": 100
-      },
-      {
-        "v": 100
-      },
-      {
         "v": 95
       },
       {
@@ -2312,7 +2276,7 @@
   {
     "uid": 11,
     "name": "受伤",
-    "code": "FloatingText(delta,GetCharacterPosition(self));\nif(GetCharacterParameter(self,\"Hp\")<=0)\n{\nif(self==GetCurrentCharacter())\n{\n战败();\n} \nelse \n{\nDestroyCharacter(self);\n}\n;\n} \n;\n",
+    "code": "FloatingText(delta,GetCharacterPosition(self));\nif(GetCharacterParameter(self,\"Hp\")<=0)\n{\nif(self==GetCurrentCharacter())\n{\n战败();\n}\nelse\n{\nDestroyCharacter(self);\n}\n}\n",
     "zCode": [
       {
         "v": "14"
@@ -2345,7 +2309,7 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "FloatingText"
@@ -2387,7 +2351,7 @@
         "v": "15"
       },
       {
-        "v": "48"
+        "v": "46"
       },
       {
         "v": "0"
@@ -2423,7 +2387,7 @@
         "v": "0"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "战败"
@@ -2447,16 +2411,10 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyCharacter"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "48"
       }
     ],
     "zCodeMap": [
@@ -2581,28 +2539,22 @@
         "v": 90
       },
       {
-        "v": 158
+        "v": 156
       },
       {
-        "v": 158
+        "v": 156
       },
       {
-        "v": 141
+        "v": 139
       },
       {
-        "v": 141
+        "v": 139
       },
       {
-        "v": 141
+        "v": 139
       },
       {
-        "v": 141
-      },
-      {
-        "v": 48
-      },
-      {
-        "v": 48
+        "v": 139
       }
     ],
     "paramCount": 0,
@@ -2612,7 +2564,7 @@
   {
     "uid": 10,
     "name": "子弹碰撞销毁",
-    "code": "if(IsObjectEnableCollision(target))\n{\nShowEffect(\"$ef$1$ef$\",GetObjectPosition(self),0);\nif(GetSceneObjectParameter(target,\"可破坏\")==1)\n{\nDestroyObject(target);\n} \n;\nDestroyObject(self);\n} \n;\n\r;\n",
+    "code": "if(IsObjectEnableCollision(target))\n{\nShowEffect(\"$ef$1$ef$\",GetObjectPosition(self),0);\nif(GetSceneObjectParameter(target,\"可破坏\")==1)\n{\nDestroyObject(target);\n}\nDestroyObject(self);\n}\n\n",
     "zCode": [
       {
         "v": "14"
@@ -2636,7 +2588,7 @@
         "v": "15"
       },
       {
-        "v": "51"
+        "v": "47"
       },
       {
         "v": "1"
@@ -2675,7 +2627,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowEffect"
@@ -2717,7 +2669,7 @@
         "v": "15"
       },
       {
-        "v": "43"
+        "v": "41"
       },
       {
         "v": "14"
@@ -2732,16 +2684,10 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyObject"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "43"
       },
       {
         "v": "14"
@@ -2756,22 +2702,10 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyObject"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "51"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
       }
     ],
     "zCodeMap": [
@@ -2899,40 +2833,22 @@
         "v": 136
       },
       {
-        "v": 89
+        "v": 175
       },
       {
-        "v": 89
+        "v": 175
       },
       {
-        "v": 178
+        "v": 161
       },
       {
-        "v": 178
+        "v": 161
       },
       {
-        "v": 164
+        "v": 161
       },
       {
-        "v": 164
-      },
-      {
-        "v": 164
-      },
-      {
-        "v": 164
-      },
-      {
-        "v": 0
-      },
-      {
-        "v": 0
-      },
-      {
-        "v": 190
-      },
-      {
-        "v": 190
+        "v": 161
       }
     ],
     "paramCount": 0,
@@ -3128,7 +3044,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "MoveObjectRelative"
@@ -3146,7 +3062,7 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyObject"
@@ -3368,7 +3284,7 @@
   {
     "uid": 8,
     "name": "子弹打人",
-    "code": "if(GetSceneObjectParameter(self,\"所属人物\")!=target)\n{\n\r;\nCharacterStun(target,0.1);\n\r;\nSetCharacterParameter(target,\"Hp\",GetCharacterParameter(target,\"Hp\")-1);\n\r;\nShowEffect(\"$ef$1$ef$\",GetCharacterPosition(target),0);\n\r;\nPlayAudio(\"$a$55$a$\");\n\r;\nDestroyObject(self);\n} \n;\n\r;\n",
+    "code": "if(GetSceneObjectParameter(self,\"所属人物\")!=target)\n{\n\nCharacterStun(target,0.1);\n\nSetCharacterParameter(target,\"Hp\",GetCharacterParameter(target,\"Hp\")-1);\n\nShowEffect(\"$ef$1$ef$\",GetCharacterPosition(target),0);\n\nPlayAudio(\"$a$55$a$\");\n\nDestroyObject(self);\n}\n\n",
     "zCode": [
       {
         "v": "14"
@@ -3407,13 +3323,7 @@
         "v": "15"
       },
       {
-        "v": "78"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
+        "v": "66"
       },
       {
         "v": "14"
@@ -3434,16 +3344,10 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "CharacterStun"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
       },
       {
         "v": "14"
@@ -3497,16 +3401,10 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetCharacterParameter"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
       },
       {
         "v": "1"
@@ -3545,16 +3443,10 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowEffect"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
       },
       {
         "v": "1"
@@ -3569,16 +3461,10 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "PlayAudio"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
       },
       {
         "v": "14"
@@ -3593,22 +3479,10 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyObject"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "78"
-      },
-      {
-        "v": "14"
-      },
-      {
-        "v": "\r"
       }
     ],
     "zCodeMap": [
@@ -3652,205 +3526,163 @@
         "v": 0
       },
       {
-        "v": 51
+        "v": 66
       },
       {
-        "v": 51
+        "v": 66
       },
       {
-        "v": 68
+        "v": 73
       },
       {
-        "v": 68
+        "v": 73
       },
       {
-        "v": 75
+        "v": 52
       },
       {
-        "v": 75
+        "v": 52
       },
       {
-        "v": 54
+        "v": 52
       },
       {
-        "v": 54
+        "v": 52
       },
       {
-        "v": 54
+        "v": 102
       },
       {
-        "v": 54
+        "v": 102
       },
       {
-        "v": 81
+        "v": 109
       },
       {
-        "v": 81
+        "v": 109
       },
       {
-        "v": 106
+        "v": 149
       },
       {
-        "v": 106
+        "v": 149
       },
       {
-        "v": 113
+        "v": 136
       },
       {
-        "v": 113
+        "v": 136
       },
       {
-        "v": 153
+        "v": 143
       },
       {
-        "v": 153
+        "v": 143
       },
       {
-        "v": 140
+        "v": 114
       },
       {
-        "v": 140
+        "v": 114
       },
       {
-        "v": 147
+        "v": 114
       },
       {
-        "v": 147
+        "v": 114
       },
       {
-        "v": 118
+        "v": 148
       },
       {
-        "v": 118
+        "v": 80
       },
       {
-        "v": 118
+        "v": 80
       },
       {
-        "v": 118
+        "v": 80
       },
       {
-        "v": 152
+        "v": 80
       },
       {
-        "v": 84
+        "v": 165
       },
       {
-        "v": 84
+        "v": 165
       },
       {
-        "v": 84
+        "v": 198
       },
       {
-        "v": 84
+        "v": 198
       },
       {
-        "v": 157
+        "v": 177
       },
       {
-        "v": 157
+        "v": 177
       },
       {
-        "v": 171
+        "v": 177
       },
       {
-        "v": 171
+        "v": 177
       },
       {
-        "v": 204
+        "v": 206
       },
       {
-        "v": 204
+        "v": 206
       },
       {
-        "v": 183
+        "v": 154
       },
       {
-        "v": 183
+        "v": 154
       },
       {
-        "v": 183
+        "v": 154
       },
       {
-        "v": 183
+        "v": 154
       },
       {
-        "v": 212
+        "v": 221
       },
       {
-        "v": 212
+        "v": 221
       },
       {
-        "v": 160
+        "v": 211
       },
       {
-        "v": 160
+        "v": 211
       },
       {
-        "v": 160
+        "v": 211
       },
       {
-        "v": 160
+        "v": 211
       },
       {
-        "v": 216
+        "v": 249
       },
       {
-        "v": 216
+        "v": 249
       },
       {
-        "v": 229
+        "v": 235
       },
       {
-        "v": 229
+        "v": 235
       },
       {
-        "v": 219
+        "v": 235
       },
       {
-        "v": 219
-      },
-      {
-        "v": 219
-      },
-      {
-        "v": 219
-      },
-      {
-        "v": 242
-      },
-      {
-        "v": 242
-      },
-      {
-        "v": 259
-      },
-      {
-        "v": 259
-      },
-      {
-        "v": 245
-      },
-      {
-        "v": 245
-      },
-      {
-        "v": 245
-      },
-      {
-        "v": 245
-      },
-      {
-        "v": 0
-      },
-      {
-        "v": 0
-      },
-      {
-        "v": 271
-      },
-      {
-        "v": 271
+        "v": 235
       }
     ],
     "paramCount": 0,
@@ -3860,7 +3692,7 @@
   {
     "uid": 7,
     "name": "子弹追踪",
-    "code": "dir=GetSceneObjectParameter(self,\"移动方向\");\ndir=GetNormalizedVector(dir);\nMoveObjectRelative(self,dir,0.3);\nfor(a=0;a<19;a=a+1)\n{\nchs=GetCharactersInArea(GetObjectPosition(self),3);\nlen=Len(chs);\nfor(tar=0;tar<len;tar=tar+1)\n{\nif(chs[tar]!=GetSceneObjectParameter(self,\"所属人物\"))\n{\ndir=GetCharacterPosition(chs[tar])-GetObjectPosition(self);\nSetObjectRotation(self,GetLookAtRotation(GetObjectPosition(self),GetCharacterPosition(chs[tar])),0.1);\ntar=len;\n} \n;\n }\n ;\ndir=GetNormalizedVector(dir);\nMoveObjectRelative(self,dir,0.3);\n }\n ;\nDestroyObject(self);\n",
+    "code": "dir=GetSceneObjectParameter(self,\"移动方向\");\ndir=GetNormalizedVector(dir);\nMoveObjectRelative(self,dir,0.3);\nfor(a=0;a<19;a=a+1)\n{\nchs=GetCharactersInArea(GetObjectPosition(self),3);\nlen=Len(chs);\nfor(tar=0;tar<len;tar=tar+1)\n{\nif(chs[tar]!=GetSceneObjectParameter(self,\"所属人物\"))\n{\ndir=GetCharacterPosition(chs[tar])-GetObjectPosition(self);\nSetObjectRotation(self,GetLookAtRotation(GetObjectPosition(self),GetCharacterPosition(chs[tar])),0.1);\ntar=len;\n}\n }\ndir=GetNormalizedVector(dir);\nMoveObjectRelative(self,dir,0.3);\n }\nDestroyObject(self);\n",
     "zCode": [
       {
         "v": "14"
@@ -3947,7 +3779,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "MoveObjectRelative"
@@ -3986,7 +3818,7 @@
         "v": "15"
       },
       {
-        "v": "186"
+        "v": "184"
       },
       {
         "v": "14"
@@ -4094,7 +3926,7 @@
         "v": "15"
       },
       {
-        "v": "157"
+        "v": "155"
       },
       {
         "v": "14"
@@ -4142,7 +3974,7 @@
         "v": "15"
       },
       {
-        "v": "147"
+        "v": "145"
       },
       {
         "v": "14"
@@ -4277,7 +4109,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetObjectRotation"
@@ -4296,12 +4128,6 @@
       },
       {
         "v": "9"
-      },
-      {
-        "v": "16"
-      },
-      {
-        "v": "147"
       },
       {
         "v": "0"
@@ -4385,7 +4211,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "MoveObjectRelative"
@@ -4433,7 +4259,7 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyObject"
@@ -4876,12 +4702,6 @@
         "v": 444
       },
       {
-        "v": 225
-      },
-      {
-        "v": 225
-      },
-      {
         "v": 220
       },
       {
@@ -4912,61 +4732,61 @@
         "v": 194
       },
       {
+        "v": 479
+      },
+      {
+        "v": 479
+      },
+      {
+        "v": 459
+      },
+      {
+        "v": 459
+      },
+      {
+        "v": 459
+      },
+      {
+        "v": 459
+      },
+      {
+        "v": 455
+      },
+      {
+        "v": 455
+      },
+      {
+        "v": 458
+      },
+      {
+        "v": 504
+      },
+      {
+        "v": 504
+      },
+      {
+        "v": 509
+      },
+      {
+        "v": 509
+      },
+      {
+        "v": 513
+      },
+      {
+        "v": 513
+      },
+      {
+        "v": 485
+      },
+      {
         "v": 485
       },
       {
         "v": 485
       },
       {
-        "v": 465
-      },
-      {
-        "v": 465
-      },
-      {
-        "v": 465
-      },
-      {
-        "v": 465
-      },
-      {
-        "v": 461
-      },
-      {
-        "v": 461
-      },
-      {
-        "v": 464
-      },
-      {
-        "v": 510
-      },
-      {
-        "v": 510
-      },
-      {
-        "v": 515
-      },
-      {
-        "v": 515
-      },
-      {
-        "v": 519
-      },
-      {
-        "v": 519
-      },
-      {
-        "v": 491
-      },
-      {
-        "v": 491
-      },
-      {
-        "v": 491
-      },
-      {
-        "v": 491
+        "v": 485
       },
       {
         "v": 123
@@ -4999,22 +4819,22 @@
         "v": 106
       },
       {
-        "v": 545
+        "v": 536
       },
       {
-        "v": 545
+        "v": 536
       },
       {
-        "v": 531
+        "v": 522
       },
       {
-        "v": 531
+        "v": 522
       },
       {
-        "v": 531
+        "v": 522
       },
       {
-        "v": 531
+        "v": 522
       }
     ],
     "paramCount": 0,
@@ -5024,7 +4844,7 @@
   {
     "uid": 6,
     "name": "星弹攻击",
-    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPosition(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw+NewVector(0,0,0.1);\nnewObject=GenerateObject(\"星弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n ;\n",
+    "code": "CharacterPlayAnim(self,\"攻击\");\nposRaw=GetCharacterPosition(self);\nfor(i=-0.5;i<=0;i=i+1)\n{\npos=posRaw+NewVector(0,0,0.1);\nnewObject=GenerateObject(\"星弹\",pos);\nSetSceneObjectParameter(newObject,\"所属人物\",self);\nSetSceneObjectParameter(newObject,\"移动方向\",GetCharacterForwardVector(self));\nSetObjectRotation(newObject,GetCharacterRotation(self),0);\n }\n",
     "zCode": [
       {
         "v": "14"
@@ -5045,7 +4865,7 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "CharacterPlayAnim"
@@ -5081,7 +4901,10 @@
         "v": "0"
       },
       {
-        "v": "-0.5"
+        "v": "0.5"
+      },
+      {
+        "v": "5"
       },
       {
         "v": "14"
@@ -5111,7 +4934,7 @@
         "v": "15"
       },
       {
-        "v": "104"
+        "v": "105"
       },
       {
         "v": "0"
@@ -5219,7 +5042,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetSceneObjectParameter"
@@ -5261,7 +5084,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetSceneObjectParameter"
@@ -5303,7 +5126,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetObjectRotation"
@@ -5336,7 +5159,7 @@
         "v": "16"
       },
       {
-        "v": "22"
+        "v": "23"
       }
     ],
     "zCodeMap": [
@@ -5396,6 +5219,9 @@
       },
       {
         "v": 72
+      },
+      {
+        "v": 71
       },
       {
         "v": 69
@@ -5660,7 +5486,7 @@
   {
     "uid": 5,
     "name": "札弹攻击",
-    "code": "CharacterPlayAnim (self,\"攻击\");\nposRaw=GetCharacterPosition (self);\nfor (i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject (\"札弹\",pos);\nSetSceneObjectParameter (newObject,\"所属人物\",self);\nSetSceneObjectParameter (newObject,\"移动方向\",GetCharacterForwardVector (self));\nSetObjectRotation (newObject,GetCharacterRotation (self),0);\n}\n;",
+    "code": "CharacterPlayAnim (self,\"攻击\");\nposRaw=GetCharacterPosition (self);\nfor (i=-0.5;i<=0;i=i+1)\n{\npos=posRaw;\nnewObject=GenerateObject (\"札弹\",pos);\nSetSceneObjectParameter (newObject,\"所属人物\",self);\nSetSceneObjectParameter (newObject,\"移动方向\",GetCharacterForwardVector (self));\nSetObjectRotation (newObject,GetCharacterRotation (self),0);\n}",
     "zCode": [
       {
         "v": "14"
@@ -5681,7 +5507,7 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "CharacterPlayAnim"
@@ -5717,7 +5543,10 @@
         "v": "0"
       },
       {
-        "v": "-0.5"
+        "v": "0.5"
+      },
+      {
+        "v": "5"
       },
       {
         "v": "14"
@@ -5747,7 +5576,7 @@
         "v": "15"
       },
       {
-        "v": "93"
+        "v": "94"
       },
       {
         "v": "14"
@@ -5822,7 +5651,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetSceneObjectParameter"
@@ -5864,7 +5693,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetSceneObjectParameter"
@@ -5906,7 +5735,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetObjectRotation"
@@ -5939,7 +5768,7 @@
         "v": "16"
       },
       {
-        "v": "22"
+        "v": "23"
       }
     ],
     "zCodeMap": [
@@ -5999,6 +5828,9 @@
       },
       {
         "v": 75
+      },
+      {
+        "v": 74
       },
       {
         "v": 72
@@ -6230,7 +6062,7 @@
   {
     "uid": 4,
     "name": "弹图",
-    "code": "Pause ();\nimage=ShowImage (param1,0.3,3);\nSetImagePosition (image,-2,0.5,0);\nSetImagePosition (image,0.5,0.5,0.5);\nWait (1);\nSetImagePosition (image,2,0.5,0.5);\nContinue ();",
+    "code": "GamePause ();\nimage=ShowImage (param1,0.3,3);\nSetImagePosition (image,-2,0.5,0);\nSetImagePosition (image,0.5,0.5,0.5);\nWait (1);\nSetImagePosition (image,2,0.5,0.5);\nGameContinue ();",
     "zCode": [
       {
         "v": "0"
@@ -6239,10 +6071,10 @@
         "v": "0"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
-        "v": "Pause"
+        "v": "GamePause"
       },
       {
         "v": "14"
@@ -6293,7 +6125,10 @@
         "v": "0"
       },
       {
-        "v": "-2"
+        "v": "2"
+      },
+      {
+        "v": "5"
       },
       {
         "v": "0"
@@ -6314,7 +6149,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetImagePosition"
@@ -6350,7 +6185,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetImagePosition"
@@ -6395,7 +6230,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "SetImagePosition"
@@ -6407,10 +6242,10 @@
         "v": "0"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
-        "v": "Continue"
+        "v": "GameContinue"
       }
     ],
     "zCodeMap": [
@@ -6427,16 +6262,10 @@
         "v": 0
       },
       {
-        "v": 27
+        "v": 31
       },
       {
-        "v": 27
-      },
-      {
-        "v": 34
-      },
-      {
-        "v": 34
+        "v": 31
       },
       {
         "v": 38
@@ -6445,43 +6274,46 @@
         "v": 38
       },
       {
-        "v": 16
+        "v": 42
       },
       {
-        "v": 16
+        "v": 42
       },
       {
-        "v": 16
+        "v": 20
       },
       {
-        "v": 16
+        "v": 20
       },
       {
-        "v": 10
+        "v": 20
       },
       {
-        "v": 10
+        "v": 20
       },
       {
-        "v": 15
+        "v": 14
       },
       {
-        "v": 60
+        "v": 14
       },
       {
-        "v": 60
+        "v": 19
       },
       {
-        "v": 67
+        "v": 64
       },
       {
-        "v": 67
+        "v": 64
       },
       {
-        "v": 69
+        "v": 71
       },
       {
-        "v": 69
+        "v": 71
+      },
+      {
+        "v": 70
       },
       {
         "v": 73
@@ -6490,28 +6322,28 @@
         "v": 73
       },
       {
-        "v": 42
+        "v": 77
       },
       {
-        "v": 42
+        "v": 77
       },
       {
-        "v": 42
+        "v": 46
       },
       {
-        "v": 42
+        "v": 46
       },
       {
-        "v": 95
+        "v": 46
       },
       {
-        "v": 95
+        "v": 46
       },
       {
-        "v": 101
+        "v": 99
       },
       {
-        "v": 101
+        "v": 99
       },
       {
         "v": 105
@@ -6526,43 +6358,43 @@
         "v": 109
       },
       {
-        "v": 77
+        "v": 113
       },
       {
-        "v": 77
+        "v": 113
       },
       {
-        "v": 77
+        "v": 81
       },
       {
-        "v": 77
+        "v": 81
       },
       {
-        "v": 121
+        "v": 81
       },
       {
-        "v": 121
+        "v": 81
       },
       {
-        "v": 115
+        "v": 125
       },
       {
-        "v": 143
+        "v": 125
       },
       {
-        "v": 143
+        "v": 119
       },
       {
-        "v": 149
+        "v": 147
       },
       {
-        "v": 149
+        "v": 147
       },
       {
-        "v": 151
+        "v": 153
       },
       {
-        "v": 151
+        "v": 153
       },
       {
         "v": 155
@@ -6571,28 +6403,34 @@
         "v": 155
       },
       {
-        "v": 125
+        "v": 159
       },
       {
-        "v": 125
+        "v": 159
       },
       {
-        "v": 125
+        "v": 129
       },
       {
-        "v": 125
+        "v": 129
       },
       {
-        "v": 161
+        "v": 129
       },
       {
-        "v": 161
+        "v": 129
       },
       {
-        "v": 161
+        "v": 165
       },
       {
-        "v": 161
+        "v": 165
+      },
+      {
+        "v": 165
+      },
+      {
+        "v": 165
       }
     ],
     "paramCount": 1,
@@ -6641,7 +6479,7 @@
         "v": "3"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowEffect"
@@ -6659,7 +6497,7 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "DestroyObject"
@@ -6734,7 +6572,7 @@
   {
     "uid": 3,
     "name": "mainDialog",
-    "code": "Pause();\nShowVideo(\"$v$8$v$\",\"$i$9$i$\");\nChangeBgm(\"$a$10$a$\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"琪露诺\",\"露米娅，我藏好了，快来找我\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"露米娅\",\"为什么琪露诺最近都能藏得这么好，每次都找不到\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"琪露诺\",\"灵梦姐姐说，我只要躲在阳光下，你怕刺眼，自己就会把眼睛遮住了\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"露米娅\",\"诶，怎么这样\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"\",\"(几分钟后)\");\nShowDialog(\"$i$$i$\",\"$i$2$i$\",\"魔理沙\",\"阿拉\");\n",
+    "code": "GamePause();\nShowVideo(\"$v$8$v$\",\"$i$9$i$\");\nChangeBgm(\"$a$10$a$\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"琪露诺\",\"露米娅，我藏好了，快来找我\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"露米娅\",\"为什么琪露诺最近都能藏得这么好，每次都找不到\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"琪露诺\",\"灵梦姐姐说，我只要躲在阳光下，你怕刺眼，自己就会把眼睛遮住了\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"露米娅\",\"诶，怎么这样\");\nShowDialog(\"$i$11$i$\",\"$i$$i$\",\"\",\"(几分钟后)\");\nShowDialog(\"$i$$i$\",\"$i$2$i$\",\"魔理沙\",\"阿拉\");\n",
     "zCode": [
       {
         "v": "0"
@@ -6743,10 +6581,10 @@
         "v": "0"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
-        "v": "Pause"
+        "v": "GamePause"
       },
       {
         "v": "1"
@@ -6767,7 +6605,7 @@
         "v": "2"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowVideo"
@@ -6785,7 +6623,7 @@
         "v": "1"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ChangeBgm"
@@ -6821,7 +6659,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowDialog"
@@ -6857,7 +6695,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowDialog"
@@ -6893,7 +6731,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowDialog"
@@ -6929,7 +6767,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowDialog"
@@ -6965,7 +6803,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowDialog"
@@ -7001,7 +6839,7 @@
         "v": "4"
       },
       {
-        "v": "2"
+        "v": "25"
       },
       {
         "v": "ShowDialog"
@@ -7021,262 +6859,262 @@
         "v": 0
       },
       {
-        "v": 19
+        "v": 23
       },
       {
-        "v": 19
+        "v": 23
       },
       {
-        "v": 29
+        "v": 33
       },
       {
-        "v": 29
+        "v": 33
       },
       {
-        "v": 9
+        "v": 13
       },
       {
-        "v": 9
+        "v": 13
       },
       {
-        "v": 9
+        "v": 13
       },
       {
-        "v": 9
+        "v": 13
       },
       {
-        "v": 51
+        "v": 55
       },
       {
-        "v": 51
+        "v": 55
       },
       {
-        "v": 41
+        "v": 45
       },
       {
-        "v": 41
+        "v": 45
       },
       {
-        "v": 41
+        "v": 45
       },
       {
-        "v": 41
+        "v": 45
       },
       {
-        "v": 75
+        "v": 79
       },
       {
-        "v": 75
+        "v": 79
       },
       {
-        "v": 86
+        "v": 90
       },
       {
-        "v": 86
+        "v": 90
       },
       {
-        "v": 95
+        "v": 99
       },
       {
-        "v": 95
+        "v": 99
       },
       {
-        "v": 101
+        "v": 105
       },
       {
-        "v": 101
+        "v": 105
       },
       {
-        "v": 64
+        "v": 68
       },
       {
-        "v": 64
+        "v": 68
       },
       {
-        "v": 64
+        "v": 68
       },
       {
-        "v": 64
+        "v": 68
       },
       {
-        "v": 130
+        "v": 134
       },
       {
-        "v": 130
+        "v": 134
       },
       {
-        "v": 141
+        "v": 145
       },
       {
-        "v": 141
+        "v": 145
       },
       {
-        "v": 150
+        "v": 154
       },
       {
-        "v": 150
+        "v": 154
       },
       {
-        "v": 156
+        "v": 160
       },
       {
-        "v": 156
+        "v": 160
       },
       {
-        "v": 119
+        "v": 123
       },
       {
-        "v": 119
+        "v": 123
       },
       {
-        "v": 119
+        "v": 123
       },
       {
-        "v": 119
+        "v": 123
       },
       {
-        "v": 194
+        "v": 198
       },
       {
-        "v": 194
+        "v": 198
       },
       {
-        "v": 205
+        "v": 209
       },
       {
-        "v": 205
+        "v": 209
       },
       {
-        "v": 214
+        "v": 218
       },
       {
-        "v": 214
+        "v": 218
       },
       {
-        "v": 220
+        "v": 224
       },
       {
-        "v": 220
+        "v": 224
       },
       {
-        "v": 183
+        "v": 187
       },
       {
-        "v": 183
+        "v": 187
       },
       {
-        "v": 183
+        "v": 187
       },
       {
-        "v": 183
+        "v": 187
       },
       {
-        "v": 266
+        "v": 270
       },
       {
-        "v": 266
+        "v": 270
       },
       {
-        "v": 277
+        "v": 281
       },
       {
-        "v": 277
+        "v": 281
       },
       {
-        "v": 286
+        "v": 290
       },
       {
-        "v": 286
+        "v": 290
       },
       {
-        "v": 292
+        "v": 296
       },
       {
-        "v": 292
+        "v": 296
       },
       {
-        "v": 255
+        "v": 259
       },
       {
-        "v": 255
+        "v": 259
       },
       {
-        "v": 255
+        "v": 259
       },
       {
-        "v": 255
+        "v": 259
       },
       {
-        "v": 314
+        "v": 318
       },
       {
-        "v": 314
+        "v": 318
       },
       {
-        "v": 325
+        "v": 329
       },
       {
-        "v": 325
+        "v": 329
       },
       {
-        "v": 334
+        "v": 338
       },
       {
-        "v": 334
+        "v": 338
       },
       {
-        "v": 337
+        "v": 341
       },
       {
-        "v": 337
+        "v": 341
       },
       {
-        "v": 303
+        "v": 307
       },
       {
-        "v": 303
+        "v": 307
       },
       {
-        "v": 303
+        "v": 307
       },
       {
-        "v": 303
+        "v": 307
       },
       {
-        "v": 359
+        "v": 363
       },
       {
-        "v": 359
+        "v": 363
       },
       {
-        "v": 368
+        "v": 372
       },
       {
-        "v": 368
+        "v": 372
       },
       {
-        "v": 378
+        "v": 382
       },
       {
-        "v": 378
+        "v": 382
       },
       {
-        "v": 384
+        "v": 388
       },
       {
-        "v": 384
+        "v": 388
       },
       {
-        "v": 348
+        "v": 352
       },
       {
-        "v": 348
+        "v": 352
       },
       {
-        "v": 348
+        "v": 352
       },
       {
-        "v": 348
+        "v": 352
       }
     ],
     "paramCount": 0,

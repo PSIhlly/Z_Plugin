@@ -84,9 +84,12 @@ namespace Z_Code
         {
             "if",
             "for",
+            "while",
             "else",
             "Wait",
-            "Return"
+            "Return",
+            "break",
+            "continue"
         };
         public static HashSet<string> operators = new HashSet<string>()
         {
@@ -110,7 +113,9 @@ namespace Z_Code
             ">",
             "<",
             ">=",
-            "<="
+            "<=",
+            "&&",
+            "||"
         };
     }
     public class Compiler
@@ -137,6 +142,7 @@ namespace Z_Code
         /// <returns>编译后的指令列表</returns>
         public List<string> Compile(string code, out List<SyntaxNode> syntaxs, out int paramCount, out string ret, out List<int> zCodeMap, out List<CompileError> errors)
         {
+            code = code ?? string.Empty;
             errors = new List<CompileError>();
             _originalCode = code;
             syntaxs = new List<SyntaxNode>();
@@ -154,6 +160,7 @@ namespace Z_Code
             catch (Exception ex)
             {
                 errors.Add(CreateError(0, code.Length - 1, "词法分析", $"词法分析失败: {ex.Message}", ex));
+                NormalizeErrorLocations(errors);
                 return zl;
             }
 
@@ -166,6 +173,7 @@ namespace Z_Code
             {
                 var errorPos = FindErrorPosition(lexicals);
                 errors.Add(CreateError(errorPos.start, errorPos.end, "语法分析", $"语法分析失败: {ex.Message}", ex));
+                NormalizeErrorLocations(errors);
                 return zl;
             }
 
@@ -178,13 +186,14 @@ namespace Z_Code
             {
                 var errorPos = FindErrorPosition(syntaxs);
                 errors.Add(CreateError(errorPos.start, errorPos.end, "代码生成", $"代码生成失败: {ex.Message}", ex));
+                NormalizeErrorLocations(errors);
                 return zl;
             }
 
             // 提取参数数量和返回类型
             try
             {
-                var retRes = "void";
+                var returnTypes = new HashSet<string>();
                 var paramCountRes = 0;
                 foreach (var node in syntaxs)
                 {
@@ -195,18 +204,15 @@ namespace Z_Code
 
                             if (o.desc.type == CodeType.VarName)
                             {
-                                var splits = o.desc.code.Split("param");
-                                if (splits.Length == 2 && string.IsNullOrEmpty(splits[0]) && int.TryParse(splits[1], out int id))
+                                if (o.desc.code.StartsWith("param", StringComparison.Ordinal) &&
+                                    int.TryParse(o.desc.code.Substring("param".Length), out int id) && id > 0)
                                 {
                                     paramCountRes = Math.Max(id, paramCountRes);
                                 }
                             }
-                            else if (o.desc.type == CodeType.Reserved && node.desc.code == "Return")
+                            else if (o.desc.type == CodeType.Reserved && o.desc.code == "Return")
                             {
-                                if (o.subNodes.Count > 0)
-                                {
-                                    retRes = o.subNodes[0].desc.code;
-                                }
+                                returnTypes.Add(o.subNodes.Count == 0 ? "void" : InferType(o.subNodes[0]));
                             }
 
                         }, node);
@@ -216,7 +222,7 @@ namespace Z_Code
                         errors.Add(CreateError(0, _originalCode.Length - 1, "参数提取", $"提取参数信息失败: {innerEx.Message}", innerEx));
                     }
                 }
-                ret = retRes;
+                ret = MergeReturnTypes(returnTypes);
                 paramCount = paramCountRes;
             }
             catch (Exception ex)
@@ -228,7 +234,108 @@ namespace Z_Code
             {
                 Z_Log.Log(zl);
             }
+            NormalizeErrorLocations(errors);
             return zl;
+        }
+
+        /// <summary>
+        /// Compiles without mutating any ProgramData. Failed compilations return no executable zCode.
+        /// The syntax tree and diagnostics are retained so callers can present useful editor feedback.
+        /// </summary>
+        public bool TryCompile(string code, out List<string> zCode, out List<SyntaxNode> syntaxs,
+            out int paramCount, out string ret, out List<int> zCodeMap, out List<CompileError> errors)
+        {
+            zCode = Compile(code, out syntaxs, out paramCount, out ret, out zCodeMap, out errors);
+            if (errors.Count == 0)
+            {
+                return true;
+            }
+
+            zCode = new List<string>();
+            zCodeMap = new List<int>();
+            return false;
+        }
+
+        private string InferType(SyntaxNode node)
+        {
+            if (node == null || node.desc == null)
+            {
+                return "var";
+            }
+
+            switch (node.desc.type)
+            {
+                case CodeType.Num:
+                    return "num";
+                case CodeType.Str:
+                    return "string";
+                case CodeType.VarName:
+                    return "var";
+                case CodeType.FuncName:
+                    return node.desc.retType;
+                case CodeType.Operator:
+                    switch (node.desc.code)
+                    {
+                        case "==":
+                        case "!=":
+                        case ">":
+                        case "<":
+                        case ">=":
+                        case "<=":
+                        case "&&":
+                        case "||":
+                        case "!":
+                            return "num";
+                        case ".":
+                        case "[":
+                            return "var";
+                        case "=":
+                            return node.subNodes.Count > 0 ? InferType(node.subNodes[0]) : "var";
+                        case "+":
+                            if (node.subNodes.Count == 1)
+                            {
+                                return InferType(node.subNodes[0]);
+                            }
+                            if (node.subNodes.Count > 1)
+                            {
+                                var rightType = InferType(node.subNodes[0]);
+                                var leftType = InferType(node.subNodes[1]);
+                                if (rightType == "string" || leftType == "string")
+                                {
+                                    return "string";
+                                }
+                                return rightType == "num" && leftType == "num" ? "num" : "var";
+                            }
+                            return "var";
+                        case "-":
+                            if (node.subNodes.Count == 1)
+                            {
+                                return "num";
+                            }
+                            goto case "*";
+                        case "*":
+                        case "/":
+                        case "%":
+                            return node.subNodes.Count > 1 &&
+                                   InferType(node.subNodes[0]) == "num" &&
+                                   InferType(node.subNodes[1]) == "num"
+                                ? "num"
+                                : "var";
+                    }
+                    break;
+            }
+
+            return "var";
+        }
+
+        private static string MergeReturnTypes(HashSet<string> returnTypes)
+        {
+            if (returnTypes == null || returnTypes.Count == 0)
+            {
+                return "void";
+            }
+
+            return returnTypes.Count == 1 ? returnTypes.First() : "var";
         }
 
         /// <summary>
@@ -261,9 +368,9 @@ namespace Z_Code
 
             int line = 1;
             int column = 1;
-            int maxIndex = Math.Min(index, _originalCode.Length - 1);
+            int maxIndex = Math.Min(index, _originalCode.Length);
 
-            for (int i = 0; i <= maxIndex; i++)
+            for (int i = 0; i < maxIndex; i++)
             {
                 if (_originalCode[i] == '\n')
                 {
@@ -277,6 +384,20 @@ namespace Z_Code
             }
 
             return (line, column);
+        }
+
+        private void NormalizeErrorLocations(List<CompileError> errors)
+        {
+            if (errors == null)
+            {
+                return;
+            }
+            foreach (var error in errors)
+            {
+                var (line, column) = GetLineAndColumn(Math.Max(0, error.StartIndex));
+                error.LineNumber = line;
+                error.ColumnNumber = column;
+            }
         }
 
         /// <summary>
@@ -306,10 +427,31 @@ namespace Z_Code
 
         public void DfsNode(Action<SyntaxNode> manage, SyntaxNode node)
         {
-            manage(node);
-            foreach (var sub in node.subNodes)
+            if (manage == null)
             {
-                DfsNode(manage, sub);
+                throw new ArgumentNullException(nameof(manage));
+            }
+            if (node == null)
+            {
+                return;
+            }
+
+            var pending = new Stack<SyntaxNode>();
+            var visited = new HashSet<SyntaxNode>();
+            pending.Push(node);
+            while (pending.Count > 0)
+            {
+                var current = pending.Pop();
+                if (current == null || !visited.Add(current))
+                {
+                    continue;
+                }
+
+                manage(current);
+                for (int i = current.subNodes.Count - 1; i >= 0; i--)
+                {
+                    pending.Push(current.subNodes[i]);
+                }
             }
 
         }

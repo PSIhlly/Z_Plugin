@@ -40,9 +40,8 @@ namespace Ui.ModStoryEventEditWindow
                             string defaultCode = sel.defaultCode;
                             if (!string.IsNullOrEmpty(sel.allowAsVoid))
                                 defaultCode = $"{sel.allowAsVoid}{defaultCode};";
-                            parent.model.cpr.Compile(defaultCode, out var res,out _,out _,out _,out var errors);
-                            if(errors.Count>0)
-                                NotifyManager.instance.AddTip(errors[0].ToString());
+                            if (!parent.TryCompileSyntax(defaultCode, out var res))
+                                return;
                             model.prm.targetNewList.AddRange(res);
                             parent.ApplyEntry();
                         }else if(ProgramDataForm.DataByName.ContainsKey(item.content))
@@ -55,9 +54,8 @@ namespace Ui.ModStoryEventEditWindow
                                 rawCode += $"{(i==0?"":",")}param{i+1}";
                             }
                             rawCode += ");";
-                            parent.model.cpr.Compile(rawCode, out var res,out _,out _,out _,out var errors);
-                            if(errors.Count>0)
-                                NotifyManager.instance.AddTip(errors[0].ToString());
+                            if (!parent.TryCompileSyntax(rawCode, out var res))
+                                return;
                             model.prm.targetNewList.AddRange(res);
                             parent.ApplyEntry();
                         }

@@ -1,29 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using Z_Code.Form;
 using Z_Debug;
 
 namespace Z_Code
 {
-
     public class LexicalNode : Node
     {
         public LexicalNode(string code, int startIndex = -1)
         {
-            this.rawCode = code;
+            rawCode = code;
             this.startIndex = startIndex;
         }
+
         public string rawCode;
-        /// <summary>
-        /// 在原始代码中的起始位置（字符索引）
-        /// </summary>
         public int startIndex = -1;
     }
+
     public class Desc
     {
         public Desc(string code, CodeType type, int codeIndex = -1)
@@ -32,12 +28,11 @@ namespace Z_Code
             this.code = code;
             this.codeIndex = codeIndex;
         }
+
         public string code;
         public CodeType type;
-        /// <summary>
-        /// 在原始代码中的起始位置（字符索引）
-        /// </summary>
         public int codeIndex = -1;
+
         public string retType
         {
             get
@@ -48,67 +43,329 @@ namespace Z_Code
                         return "num";
                     case CodeType.VarName:
                         return "var";
-                    case CodeType.FuncName:
-                    case CodeType.Operator:
-                        return CmdDataForm.DataByName[code].retTypes[0];
                     case CodeType.Str:
                         return "string";
+                    case CodeType.FuncName:
+                    case CodeType.Operator:
+                        if (CmdDataForm.DataByName.TryGetValue(code, out var directForm))
+                        {
+                            return GetFirstReturnType(directForm);
+                        }
+                        if (BaseData.cmdDic.TryGetValue(code, out var aliasCmd) &&
+                            CmdDataForm.DataByName.TryGetValue(aliasCmd.GetName(), out var canonicalForm))
+                        {
+                            return GetFirstReturnType(canonicalForm);
+                        }
+                        if (ProgramDataForm.DataByName.TryGetValue(code, out var program))
+                        {
+                            return string.IsNullOrEmpty(program.returnValue) ? "var" : program.returnValue;
+                        }
+                        switch (code)
+                        {
+                            case "%":
+                            case "!":
+                            case "&&":
+                            case "||":
+                                return "num";
+                            default:
+                                return "var";
+                        }
                     default:
                         return "null";
                 }
             }
+        }
 
+        private static string GetFirstReturnType(CmdDataForm.Data form)
+        {
+            if (form?.retTypes == null || form.retTypes.Count == 0 || string.IsNullOrEmpty(form.retTypes[0]))
+            {
+                return "void";
+            }
+            return form.retTypes[0];
         }
     }
+
     public class LexicalAnalysis
     {
-        public const bool DEBUG = true;
+        public static bool DEBUG = false;
 
-        /// <summary>
-        /// 原始代码（用于计算错误位置）
-        /// </summary>
+        private static readonly string[] CompoundOperators =
+        {
+            "==", "!=", ">=", "<=", "&&", "||"
+        };
+
         private string _originalCode;
-
-        /// <summary>
-        /// 错误列表
-        /// </summary>
         private List<CompileError> _errors;
 
         public List<LexicalNode> Execute(string code, List<CompileError> errors = null)
         {
+            code = code ?? string.Empty;
             _originalCode = code;
             _errors = errors ?? new List<CompileError>();
 
-            List<LexicalNode> lst = null;
+            List<LexicalNode> nodes;
             try
             {
-                lst = ManageString(code);
+                nodes = ManageString(code);
             }
             catch (Exception ex)
             {
-                AddError(0, code.Length - 1, "词法分析", $"字符串解析失败: {ex.Message}", ex);
+                AddError(0, Math.Max(0, code.Length - 1), "词法分析", $"拆分 Token 失败: {ex.Message}", ex);
                 return new List<LexicalNode>();
             }
 
             try
             {
-                ManageDesc(lst);
+                ManageDesc(nodes);
             }
             catch (Exception ex)
             {
-                AddError(0, code.Length - 1, "词法分析", $"描述解析失败: {ex.Message}", ex);
+                AddError(0, Math.Max(0, code.Length - 1), "词法分析", $"Token 分类失败: {ex.Message}", ex);
             }
 
-            if (DEBUG)
+            if (DEBUG || Compiler.DEBUG)
             {
-                Z_Log.Log(lst, new[] { "desc.code", "desc.type" });
+                Z_Log.Log(nodes, new[] { "desc.code", "desc.type" });
             }
-            return lst;
+            return nodes;
         }
 
-        /// <summary>
-        /// 添加错误
-        /// </summary>
+        public List<LexicalNode> ManageString(string code)
+        {
+            var nodes = new List<LexicalNode>();
+            if (string.IsNullOrEmpty(code))
+            {
+                return nodes;
+            }
+
+            int index = 0;
+            while (index < code.Length)
+            {
+                char current = code[index];
+                if (IsEmpty(current))
+                {
+                    index++;
+                    continue;
+                }
+
+                if (IsString(current))
+                {
+                    int start = index;
+                    char quote = current;
+                    index++;
+                    bool closed = false;
+                    while (index < code.Length)
+                    {
+                        if (code[index] == '\\')
+                        {
+                            index += Math.Min(2, code.Length - index);
+                            continue;
+                        }
+                        if (code[index] == quote)
+                        {
+                            index++;
+                            closed = true;
+                            break;
+                        }
+                        index++;
+                    }
+
+                    nodes.Add(new LexicalNode(code.Substring(start, index - start), start));
+                    if (!closed)
+                    {
+                        AddError(start, Math.Max(start, code.Length - 1), "词法分析", "字符串缺少结束引号");
+                    }
+                    continue;
+                }
+
+                if (IsSplit(current))
+                {
+                    nodes.Add(new LexicalNode(current.ToString(), index));
+                    index++;
+                    continue;
+                }
+
+                if (TryReadOperator(code, index, out var op))
+                {
+                    nodes.Add(new LexicalNode(op, index));
+                    index += op.Length;
+                    continue;
+                }
+
+                int tokenStart = index;
+                if (IsNum(current))
+                {
+                    bool hasDot = false;
+                    while (index < code.Length)
+                    {
+                        if (IsNum(code[index]))
+                        {
+                            index++;
+                            continue;
+                        }
+                        if (!hasDot && code[index] == '.')
+                        {
+                            hasDot = true;
+                            index++;
+                            continue;
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    while (index < code.Length &&
+                           !IsEmpty(code[index]) &&
+                           !IsString(code[index]) &&
+                           !IsSplit(code[index]) &&
+                           !TryReadOperator(code, index, out _))
+                    {
+                        index++;
+                    }
+                }
+
+                if (index == tokenStart)
+                {
+                    AddError(index, index, "词法分析", $"无法识别字符 '{code[index]}'");
+                    index++;
+                    continue;
+                }
+                nodes.Add(new LexicalNode(code.Substring(tokenStart, index - tokenStart), tokenStart));
+            }
+
+            return nodes;
+        }
+
+        public void ManageDesc(List<LexicalNode> nodes)
+        {
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                try
+                {
+                    if (IsString(node))
+                    {
+                        node.desc = new Desc(DecodeString(node), CodeType.Str, node.startIndex);
+                    }
+                    else if (IsNum(node.rawCode))
+                    {
+                        node.desc = new Desc(node.rawCode, CodeType.Num, node.startIndex);
+                    }
+                    else if (IsSplit(node.rawCode))
+                    {
+                        node.desc = new Desc(node.rawCode, CodeType.Split, node.startIndex);
+                    }
+                    else if (IsOperator(node.rawCode))
+                    {
+                        node.desc = new Desc(node.rawCode, CodeType.Operator, node.startIndex);
+                    }
+                    else if (IsReserved(node.rawCode))
+                    {
+                        node.desc = new Desc(node.rawCode, CodeType.Reserved, node.startIndex);
+                    }
+                    else if (IsCmd(node.rawCode) || (i + 1 < nodes.Count && nodes[i + 1].rawCode == "("))
+                    {
+                        node.desc = new Desc(node.rawCode, CodeType.FuncName, node.startIndex);
+                    }
+                    else
+                    {
+                        node.desc = new Desc(node.rawCode, CodeType.VarName, node.startIndex);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddError(node.startIndex, node.startIndex + Math.Max(0, node.rawCode.Length - 1),
+                        "词法分析", $"Token '{node.rawCode}' 分类失败: {ex.Message}", ex);
+                    node.desc = new Desc(node.rawCode, CodeType.VarName, node.startIndex);
+                }
+            }
+        }
+
+        private string DecodeString(LexicalNode node)
+        {
+            string raw = node.rawCode;
+            if (raw.Length < 2 || raw[raw.Length - 1] != raw[0])
+            {
+                return raw.Length > 1 ? raw.Substring(1) : string.Empty;
+            }
+
+            var result = new StringBuilder();
+            for (int i = 1; i < raw.Length - 1; i++)
+            {
+                char ch = raw[i];
+                if (ch != '\\')
+                {
+                    result.Append(ch);
+                    continue;
+                }
+
+                if (++i >= raw.Length - 1)
+                {
+                    AddError(node.startIndex + i - 1, node.startIndex + i - 1,
+                        "词法分析", "字符串末尾存在不完整转义");
+                    break;
+                }
+
+                switch (raw[i])
+                {
+                    case '\\': result.Append('\\'); break;
+                    case '"': result.Append('"'); break;
+                    case '\'': result.Append('\''); break;
+                    case 'n': result.Append('\n'); break;
+                    case 'r': result.Append('\r'); break;
+                    case 't': result.Append('\t'); break;
+                    case '0': result.Append('\0'); break;
+                    case 'b': result.Append('\b'); break;
+                    case 'f': result.Append('\f'); break;
+                    case 'u':
+                        if (i + 4 < raw.Length - 1 &&
+                            int.TryParse(raw.Substring(i + 1, 4), NumberStyles.HexNumber,
+                                CultureInfo.InvariantCulture, out int unicode))
+                        {
+                            result.Append((char)unicode);
+                            i += 4;
+                        }
+                        else
+                        {
+                            AddError(node.startIndex + i - 1, node.startIndex + i,
+                                "词法分析", "无效的 Unicode 转义");
+                            result.Append('u');
+                        }
+                        break;
+                    default:
+                        AddError(node.startIndex + i - 1, node.startIndex + i,
+                            "词法分析", $"不支持的转义 \\{raw[i]}");
+                        result.Append(raw[i]);
+                        break;
+                }
+            }
+            return result.ToString();
+        }
+
+        private static bool TryReadOperator(string code, int index, out string op)
+        {
+            foreach (var candidate in CompoundOperators)
+            {
+                if (index + candidate.Length <= code.Length &&
+                    string.CompareOrdinal(code, index, candidate, 0, candidate.Length) == 0)
+                {
+                    op = candidate;
+                    return true;
+                }
+            }
+
+            string single = code[index].ToString();
+            if (BaseData.operators.Contains(single))
+            {
+                op = single;
+                return true;
+            }
+
+            op = null;
+            return false;
+        }
+
         private void AddError(int startIndex, int endIndex, string stage, string message, Exception ex = null)
         {
             var (line, column) = GetLineAndColumn(startIndex);
@@ -124,9 +381,6 @@ namespace Z_Code
             });
         }
 
-        /// <summary>
-        /// 根据字符索引计算行号和列号
-        /// </summary>
         private (int line, int column) GetLineAndColumn(int index)
         {
             if (string.IsNullOrEmpty(_originalCode) || index < 0)
@@ -136,9 +390,8 @@ namespace Z_Code
 
             int line = 1;
             int column = 1;
-            int maxIndex = Math.Min(index, _originalCode.Length - 1);
-
-            for (int i = 0; i <= maxIndex; i++)
+            int maxIndex = Math.Min(index, _originalCode.Length);
+            for (int i = 0; i < maxIndex; i++)
             {
                 if (_originalCode[i] == '\n')
                 {
@@ -150,223 +403,63 @@ namespace Z_Code
                     column++;
                 }
             }
-
             return (line, column);
         }
-        public List<LexicalNode> ManageString(string code)
-        {
-            StringBuilder sb = new StringBuilder();
-            List<LexicalNode> lst = new List<LexicalNode>();
-            bool isStringNow = false;
-            for (int i = 0, icnt = code.Length; i < icnt; i++)
-            {
-                try
-                {
-                    if (IsString(code[i]))
-                    {
-                        isStringNow = !isStringNow;
-                        if (!isStringNow)
-                        {
-                            sb.Append(code[i]);
-                            End(lst, sb, i + 1);
-                        }
-                        else
-                        {
-                            End(lst, sb, i);
-                            sb.Append(code[i]);
-                        }
-                    }
-                    else if (isStringNow)
-                    {
-                        sb.Append(code[i]);
-                    }
-                    else if (IsEmpty(code[i]))
-                    {
-                        End(lst, sb, i);
-                    }
-                    else if (IsSplit(code[i]))
-                    {
-                        End(lst, sb, i);
-                        if (code[i] == ';')
-                        {
-                            sb.Append(code[i]);
-                            End(lst, sb, i + 1);
-                        }
-                    }
-                    else if (IsNum(code[i]))
-                    {
-                        if (IsOperator(sb.ToString()))
-                        {
-                            End(lst, sb, i);
-                        }
-                        sb.Append(code[i]);
-                    }
-                    else if (IsOperator(code[i]))
-                    {
-                        if (IsNum(sb.ToString()))
-                        {
-                            if (!IsNum(sb.ToString() + code[i]))
-                                End(lst, sb, i);
-                        }
-                        else if (!IsOperator(sb.ToString() + code[i]))
-                        {
-                            End(lst, sb, i);
-                        }
-                        sb.Append(code[i]);
-                    }
-                    else
-                    {
-                        if (IsNum(sb.ToString()) || IsOperator(sb.ToString()))
-                        {
-                            End(lst, sb, i);
-                            sb.Append(code[i]);
-                        }
-                        else
-                        {
-                            sb.Append(code[i]);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    AddError(i, i, "词法分析", $"处理字符 '{code[i]}' 时出错: {ex.Message}", ex);
-                }
-            }
-            End(lst, sb, code.Length);
 
-
-            return lst;
-
-
-        }
-        public void ManageDesc(List<LexicalNode> nodes)
-        {
-            for (int i = 0, icnt = nodes.Count; i < icnt; i++)
-            {
-                try
-                {
-                    if (IsString(nodes[i]))
-                    {
-                        nodes[i].desc = new Desc(nodes[i].rawCode.Substring(1, nodes[i].rawCode.Length - 2), CodeType.Str, nodes[i].startIndex);
-                    }
-                    else if (IsNum(nodes[i].rawCode))
-                    {
-                        nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Num, nodes[i].startIndex);
-                    }
-                    else
-                    {
-                        if (IsSplit(nodes[i].rawCode))
-                        {
-                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Split, nodes[i].startIndex);
-                        }
-                        else if (IsOperator(nodes[i].rawCode))
-                        {
-                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Operator, nodes[i].startIndex);
-                        }
-                        else if (IsReserved(nodes[i].rawCode))
-                        {
-                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.Reserved, nodes[i].startIndex);
-                        }
-                        else if (IsCmd(nodes[i].rawCode) || (i + 1 < icnt && nodes[i + 1].rawCode == "("))
-                        {
-                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.FuncName, nodes[i].startIndex);
-                        }
-                        else
-                        {
-                            nodes[i].desc = new Desc(nodes[i].rawCode, CodeType.VarName, nodes[i].startIndex);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    AddError(0, _originalCode.Length - 1, "词法分析", $"处理词法节点 '{nodes[i].rawCode}' 时出错: {ex.Message}", ex);
-                }
-            }
-        }
-
-
-        private bool End(List<LexicalNode> lst, StringBuilder sb, int currentIndex = -1)
-        {
-            if (sb.Length == 0)
-            {
-                return false;
-            }
-            else
-            {
-                int startIndex = currentIndex >= 0 ? currentIndex - sb.Length : -1;
-                lst.Add(new LexicalNode(sb.ToString(), startIndex));
-                sb.Clear();
-                return true;
-            }
-
-        }
-
-        #region str
         public static bool IsNum(char ch)
         {
             return ch >= '0' && ch <= '9';
         }
+
         public static bool IsEmpty(char ch)
         {
-            switch (ch)
-            {
-                case ' ':
-                case '\n':
-                case '\0':
-                    return true;
-                default:
-                    return false;
-            }
+            return ch == '\0' || char.IsWhiteSpace(ch);
         }
+
         public static bool IsSplit(char ch)
         {
-            switch (ch)
-            {
-                case ';':
-                    return true;
-                default:
-                    return false;
-            }
+            return ch == ';';
         }
+
         public static bool IsSplit(string str)
         {
-            switch (str)
-            {
-                case ";":
-                    return true;
-                default:
-                    return false;
-            }
+            return str == ";";
         }
+
         public static bool IsNum(string str)
         {
-            if (str.StartsWith('.'))
+            if (string.IsNullOrEmpty(str) || str[0] == '.')
+            {
                 return false;
+            }
+
             bool hasDot = false;
             foreach (var ch in str)
             {
-                if (!IsNum(ch))
+                if (IsNum(ch))
                 {
-                    if (hasDot)
-                        return false;
-                    if (ch == '.')
-                    {
-                        hasDot = true;
-                        continue;
-                    }
-                    return false;
+                    continue;
                 }
+                if (!hasDot && ch == '.')
+                {
+                    hasDot = true;
+                    continue;
+                }
+                return false;
             }
             return true;
         }
+
         public static bool IsOperator(char ch)
         {
-            return BaseData.operators.Contains(ch.ToString());
+            return BaseData.operators.Any(op => op.Length > 0 && op[0] == ch);
         }
+
         public static bool IsOperator(string str)
         {
             return BaseData.operators.Contains(str);
         }
+
         public static bool IsFirstOperator(string str)
         {
             switch (str)
@@ -375,6 +468,7 @@ namespace Z_Code
                 case "-":
                 case "*":
                 case "/":
+                case "%":
                 case "=":
                 case "!":
                 case ">":
@@ -384,10 +478,12 @@ namespace Z_Code
                     return false;
             }
         }
+
         public static bool IsReserved(string str)
         {
             return BaseData.reserved.Contains(str);
         }
+
         public static bool IsCmd(string str)
         {
             return BaseData.cmdDic.ContainsKey(str);
@@ -395,21 +491,12 @@ namespace Z_Code
 
         public static bool IsString(char ch)
         {
-            switch (ch)
-            {
-                case '\"':
-                case '\'': return true;
-                default:
-                    return false;
-            }
+            return ch == '"' || ch == '\'';
         }
-        #endregion
 
-        #region lexi
         public static bool IsString(LexicalNode node)
         {
-            return node.rawCode.StartsWith("\"") || node.rawCode.StartsWith("\'");
+            return node != null && !string.IsNullOrEmpty(node.rawCode) && IsString(node.rawCode[0]);
         }
-        #endregion
     }
 }

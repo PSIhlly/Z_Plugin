@@ -1,4 +1,3 @@
-using Codice.CM.Common;
 using System;
 using System.Collections.Generic;
 using Z_Code;
@@ -24,16 +23,30 @@ namespace Z_Code.Form
     {
         public partial class Data
         {
-            public List<SyntaxNode> ApplyCode(string code, Compiler compiler = null)
+            public bool TryApplyCode(string code, out List<SyntaxNode> syntaxNodes,
+                out List<CompileError> errors, Compiler compiler = null)
             {
                 if (compiler == null)
                     compiler = new Compiler();
+
+                if (!compiler.TryCompile(code, out var compiledCode, out syntaxNodes,
+                        out int count, out string ret, out var compiledCodeMap, out errors))
+                {
+                    return false;
+                }
+
                 this.code = code;
-                zCode = compiler.Compile(code, out var res, out int count, out string ret, out var _zCodeMap, out List<CompileError> errors);
-                zCodeMap = _zCodeMap;
+                zCode = compiledCode;
+                zCodeMap = compiledCodeMap;
                 paramCount = count;
                 returnValue = ret;
-                return res;
+                return true;
+            }
+
+            public List<SyntaxNode> ApplyCode(string code, Compiler compiler = null)
+            {
+                TryApplyCode(code, out var syntaxNodes, out _, compiler);
+                return syntaxNodes;
             }
         }
     }

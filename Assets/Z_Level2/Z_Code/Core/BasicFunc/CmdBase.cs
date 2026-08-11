@@ -15,6 +15,19 @@ namespace Z_Code
         {
             BaseData.cmdDic[cmd.GetName()] = cmd;
         }
+        protected static void RegisterAlias(string alias, CmdBase cmd)
+        {
+            if (string.IsNullOrWhiteSpace(alias))
+            {
+                throw new ArgumentException("命令别名不能为空", nameof(alias));
+            }
+            if (cmd == null)
+            {
+                throw new ArgumentNullException(nameof(cmd));
+            }
+
+            BaseData.cmdDic[alias] = cmd;
+        }
         public virtual void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
             act?.Invoke(CmdDataForm.DataByName[GetName()].defaultCode);
@@ -29,21 +42,33 @@ namespace Z_Code
             try
             {
                 asyncTask.Run();
-                for (int i=0; i<prm.Length;i++)
+                if (prm == null)
                 {
+                    throw new ArgumentNullException(nameof(prm));
+                }
+                if (heap == null)
+                {
+                    throw new ArgumentNullException(nameof(heap));
+                }
+
+                for (int i = 0; i < prm.Length; i++)
+                {
+                    if (prm[i] == null)
+                    {
+                        throw new InvalidOperationException($"第 {i + 1} 个命令参数为空");
+                    }
                     if (!string.IsNullOrEmpty(prm[i].valName))
                     {
-                        prm[i] = heap[prm[i].valName];
+                        if (!heap.TryGetValue(prm[i].valName, out var value) || value == null)
+                        {
+                            throw new KeyNotFoundException($"找不到命令参数变量 {prm[i].valName}");
+                        }
+                        prm[i] = value;
                     }
-                    if(i<prm.Length/2)
-                    {
-                        var tmp = prm[i];
-                        prm[i] = prm[prm.Length - i - 1];
-                        prm[prm.Length - i - 1] = tmp;
-                    }
-
                 }
-                if(ExecuteInternal(prm,asyncTask))
+
+                Array.Reverse(prm);
+                if (ExecuteInternal(prm, asyncTask))
                 {
                     asyncTask.Complete();
                 }

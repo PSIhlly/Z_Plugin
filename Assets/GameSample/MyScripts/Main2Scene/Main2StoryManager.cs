@@ -73,7 +73,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                     break;
                 case EditorStyle.Rpg:
                 case EditorStyle.RpgAdvanced:
-                    dialogEvt.ApplyCode(@"Pause();ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");");
+                    dialogEvt.ApplyCode(@"GamePause();ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""hello"");ShowDialog(""$i$$i$"",""$i$$i$"",""player"",""you can edit it in event panel"");");
                     var prmBox = CodeHelper.CreateBoxByNum(100);
                     var hpParamData = new CharacterParamForm.Data(-1, "Hp", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "HpMax", ParamShowType.AlwaysWithPanelAndScene);
                     var hpMaxParamData = new CharacterParamForm.Data(-1, "HpMax", 0, "", BoxDataForm.GetJoByData(prmBox).ToString(), "", ParamShowType.AlwaysWithPanelAndScene);

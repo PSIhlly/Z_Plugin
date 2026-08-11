@@ -1,6 +1,7 @@
-//#define INTERPRETER_DEBUG 
+//#define INTERPRETER_DEBUG
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Debug;
@@ -32,11 +33,58 @@ namespace Z_Code
         Less,
         NotGreater,
         NotLess,
-        Ret
+        Ret,
+        Mod,
+        Not,
+        CallDiscard,
+        Discard
     }
+
+    internal sealed class InterpretBudget
+    {
+        private const int MaxSubProgramDepth = 64;
+        private int subProgramDepth;
+
+        public InterpretBudget(int instructionCount)
+        {
+            RemainingInstructions = Math.Max(0, instructionCount);
+        }
+
+        public int RemainingInstructions { get; private set; }
+
+        public bool TryConsumeInstruction()
+        {
+            if (RemainingInstructions <= 0)
+            {
+                return false;
+            }
+
+            RemainingInstructions--;
+            return true;
+        }
+
+        public bool TryEnterSubProgram()
+        {
+            if (subProgramDepth >= MaxSubProgramDepth)
+            {
+                return false;
+            }
+
+            subProgramDepth++;
+            return true;
+        }
+
+        public void ExitSubProgram()
+        {
+            if (subProgramDepth > 0)
+            {
+                subProgramDepth--;
+            }
+        }
+    }
+
     namespace Form
     {
-
         public static partial class InterpretDataForm
         {
             public class RetInfo
@@ -45,126 +93,162 @@ namespace Z_Code
                 public BoxDataForm.Data ret = CodeHelper.CreateBox();
                 public List<InterpretError> errors = new List<InterpretError>();
             }
+
             public partial class Data
-        {
-            public int debugId;
-            protected Interpreter _interpreter;
-            public virtual RetInfo Interpret()
             {
-                if (_interpreter == null)
+                public int debugId;
+                protected Interpreter _interpreter;
+
+                public virtual RetInfo Interpret()
                 {
-                    _interpreter = new Interpreter(this);
+                    return Interpret(new InterpretBudget(Interpreter.MaxInstructionsPerExecution));
                 }
-                return _interpreter.Interpret();
+
+                internal RetInfo Interpret(InterpretBudget budget)
+                {
+                    if (_interpreter == null)
+                    {
+                        _interpreter = new Interpreter(this);
+                    }
+
+                    return _interpreter.Interpret(budget);
+                }
+
+                public void Reset()
+                {
+                    _interpreter?.Reset();
+                    p = 0;
+                    stack?.Clear();
+                    top = -1;
+                    heap?.Clear();
+                    heapTemp?.Clear();
+                    subInterpret = null;
+                }
             }
-            public void Reset()
+
+            /// <summary>
+            /// 解释器运行时错误
+            /// </summary>
+            public class InterpretError
             {
-                _interpreter.Reset();
-                p = 0;
-                stack.Clear();
-                top = -1;
-                heap.Clear();
-            }
-        }
+                /// <summary>
+                /// 当前指令地址（PC）
+                /// </summary>
+                public int Pc;
 
-        /// <summary>
-        /// 解释器运行时错误
-        /// </summary>
-        public class InterpretError
-        {
-            /// <summary>
-            /// 当前指令地址（PC）
-            /// </summary>
-            public int Pc;
+                /// <summary>
+                /// 当前操作码
+                /// </summary>
+                public Op OpCode;
 
-            /// <summary>
-            /// 当前操作码
-            /// </summary>
-            public Op OpCode;
+                /// <summary>
+                /// 错误描述
+                /// </summary>
+                public string Message;
 
-            /// <summary>
-            /// 错误描述
-            /// </summary>
-            public string Message;
+                /// <summary>
+                /// 原始异常
+                /// </summary>
+                public Exception Exception;
 
-            /// <summary>
-            /// 原始异常
-            /// </summary>
-            public Exception Exception;
+                /// <summary>
+                /// 原始代码中的行号（从1开始）
+                /// </summary>
+                public int LineNumber;
 
-            /// <summary>
-            /// 原始代码中的行号（从1开始）
-            /// </summary>
-            public int LineNumber;
+                /// <summary>
+                /// 原始代码中的列号（从1开始）
+                /// </summary>
+                public int ColumnNumber;
 
-            /// <summary>
-            /// 原始代码中的列号（从1开始）
-            /// </summary>
-            public int ColumnNumber;
+                /// <summary>
+                /// 原始代码中对应行的内容
+                /// </summary>
+                public string SourceLine;
 
-            /// <summary>
-            /// 原始代码中对应行的内容
-            /// </summary>
-            public string SourceLine;
+                /// <summary>
+                /// 程序名称
+                /// </summary>
+                public string ProgramName;
 
-            /// <summary>
-            /// 程序名称
-            /// </summary>
-            public string ProgramName;
-
-            public override string ToString()
-            {
-                var programInfo = !string.IsNullOrEmpty(ProgramName) ? $"[{ProgramName}] " : "";
-                var location = LineNumber > 0 ? $"行{LineNumber}列{ColumnNumber}" : $"PC={Pc}";
-                var sourceInfo = !string.IsNullOrEmpty(SourceLine) ? $"\n  源代码: {SourceLine}" : "";
-                return $"{programInfo}{location}, Op={OpCode}: {Message}{sourceInfo}";
+                public override string ToString()
+                {
+                    var programInfo = !string.IsNullOrEmpty(ProgramName) ? $"[{ProgramName}] " : "";
+                    var location = LineNumber > 0 ? $"行{LineNumber}列{ColumnNumber}" : $"PC={Pc}";
+                    var sourceInfo = !string.IsNullOrEmpty(SourceLine) ? $"\n  源代码: {SourceLine}" : "";
+                    return $"{programInfo}{location}, Op={OpCode}: {Message}{sourceInfo}";
+                }
             }
         }
     }
-}
+
     public class InterpretAsyncTask
     {
         public readonly Interpreter interpreter;
         public BoxDataForm.Data[] res;
         public string error;
+
         public InterpretAsyncTask(Interpreter interpreter)
         {
             this.interpreter = interpreter;
         }
+
         private bool isRuning;
         private bool isComplete;
+
         public bool IsRuning()
         {
             return isRuning;
         }
+
         public bool IsComplete()
         {
             return isComplete;
         }
+
         public void Run()
         {
             isComplete = false;
             isRuning = true;
             error = null;
+            res = null;
         }
+
         public void Complete()
         {
             isComplete = true;
             isRuning = false;
         }
+
         public void Reset()
         {
             isComplete = false;
             isRuning = false;
             error = null;
+            res = null;
         }
     }
 
     public class Interpreter
     {
+        /// <summary>
+        /// 单次顶层 Interpret 调用（包含同步子程序）最多执行的操作码数量。
+        /// 耗尽后保留 PC/栈状态并在下一帧续跑，不视为运行时错误。
+        /// </summary>
+        public const int MaxInstructionsPerExecution = 4096;
+
         public InterpretDataForm.Data data;
-        Op? opCode;
-        InterpretAsyncTask asyncTask;
+        private Op? opCode;
+        private readonly InterpretAsyncTask asyncTask;
+
+        private List<string> cachedZCode;
+        private int cachedZCodeCount = -1;
+        private Op[] opcodeCache;
+        private bool[] opcodeCacheValid;
+        private float[] numberCache;
+        private bool[] numberCacheValid;
+        private int[] integerCache;
+        private bool[] integerCacheValid;
 
         /// <summary>
         /// 解释执行过程中收集的错误信息
@@ -176,318 +260,899 @@ namespace Z_Code
             data = interpret;
             asyncTask = new InterpretAsyncTask(this);
         }
-        List<Op> ops;
+
         public RetInfo Interpret()
         {
+            return Interpret(new InterpretBudget(MaxInstructionsPerExecution));
+        }
+
+        internal RetInfo Interpret(InterpretBudget budget)
+        {
             errors.Clear();
-            var zCode = data.program.zCode;
-            int cnt = zCode.Count;
-            Dictionary<string, BoxDataForm.Data> heap = data.heap;
-            List<BoxDataForm.Data> stack = data.stack;
-            BoxDataForm.Data box = null;
-            BoxDataForm.Data box2 = null;
-            BoxDataForm.Data realBox = null;
-#if INTERPRETER_DEBUG
+            opCode = null;
+
+            if (!TryPrepare(out var zCode))
             {
-                Z_Log.Log(data.debugId+"[Start]" + data.program.code);
+                return MakeRetInfo(true);
             }
+
+            budget ??= new InterpretBudget(MaxInstructionsPerExecution);
+            int count = zCode.Count;
+
+#if INTERPRETER_DEBUG
+            Z_Log.Log(data.debugId + "[Start]" + data.program.code);
 #endif
-            for (; data.p < cnt; data.p++, opCode = null)
+
+            while (data.p < count)
             {
-                try
+                if (!budget.TryConsumeInstruction())
                 {
-                    if (opCode == null)
-                        opCode = (Op)(int.Parse(zCode[data.p]));
+                    return MakeRetInfo(false);
                 }
-                catch (Exception ex)
+
+                int instructionPc = data.p;
+                if (!TryReadOpcode(zCode, instructionPc, out var parsedOp, out var parseError))
                 {
-                    AddError(data.p, "解析操作码失败", ex);
+                    AddError(instructionPc, parseError);
                     return MakeRetInfo(true);
                 }
-#if INTERPRETER_DEBUG
-                Z_Log.Log(data.p + ":" + (Op)opCode);
 
+                opCode = parsedOp;
+
+#if INTERPRETER_DEBUG
+                Z_Log.Log(data.p + ":" + parsedOp);
                 Z_Log.Log("{Current Stacks:}");
-                for (int i=0;i<stack.Count;i++)
+                for (int i = 0; i < data.stack.Count; i++)
                 {
-                    Z_Log.Log("{"+i+" val:"+ stack[i].valName+" num:"+ stack[i].num+" str:"+ stack[i].str+" dic:"+ stack[i].dic.Count+ "}");
+                    Z_Log.Log("{" + i + " val:" + data.stack[i].valName + " num:" + data.stack[i].num + " str:" + data.stack[i].str + " dic:" + data.stack[i].dic.Count + "}");
                 }
 #endif
 
                 try
                 {
-                switch (opCode)
-                {
-                    case Op.PushNum:
-                        data.p++;
-                        Push(CodeHelper.CreateBoxByNum(float.Parse(zCode[data.p])));
-                        break;
-                    case Op.PushStr:
-                        data.p++;
-                        Push(CodeHelper.CreateBoxByStr(zCode[data.p]));
-                        break;
-                    case Op.Get:
-                        data.p++;
-                        Push(CodeHelper.CreateBoxByVal(zCode[data.p]));
-                        break;
-                    case Op.Call:
-                        string funcName = zCode[data.p + 1];
-#if INTERPRETER_DEBUG
-                        Z_Log.Log(" invoke" + funcName);
-#endif
-                        try
+                    switch (parsedOp)
+                    {
+                        case Op.PushNum:
                         {
-                            if (BaseData.cmdDic.TryGetValue(funcName, out var cmdTemplate))
+                            int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
+                            if (!TryReadNumber(zCode, operandIndex, out var number, out parseError))
                             {
-                                var cmd = cmdTemplate.GetNew();
-                                var form = cmd.GetForm();
-                                int prmCount = (int)GetNum(stack[data.top]);
-                                var prm = new BoxDataForm.Data[prmCount];
-                                for (int i = 0; i < prmCount; i++)
-                                {
-                                    prm[i] = GetBox(stack[data.top - i - 1]);
-                                }
-                                if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
-                                {
-                                    cmd.Execute(prm, heap, asyncTask);
-                                }
-
-                                if (asyncTask.IsComplete())
-                                {
-                                    if (!string.IsNullOrEmpty(asyncTask.error))
-                                    {
-                                        AddError(data.p, asyncTask.error);
-                                    }
-                                    data.p++;
-                                    int removeCount = prmCount + 1;
-                                    for (int i = 0; i < removeCount; i++)
-                                    {
-                                        Pop();
-                                    }
-                                    var retNames = form.retNames;
-                                    int retCount = retNames == null ? 0 : retNames.Count;
-                                    for (int i = 0; i < retCount; i++)
-                                    {
-                                        Push(asyncTask.res[i]);
-                                    }
-                                    asyncTask.Reset();
-                                }
-                                else
-                                {
-                                    return MakeRetInfo(false);
-                                }
-
+                                throw new FormatException(parseError);
                             }
-                            else if (ProgramDataForm.DataByName.TryGetValue(funcName, out var func))
+
+                            Push(CodeHelper.CreateBoxByNum(number));
+                            data.p += 2;
+                            break;
+                        }
+                        case Op.PushStr:
+                        {
+                            int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
+                            Push(CodeHelper.CreateBoxByStr(zCode[operandIndex]));
+                            data.p += 2;
+                            break;
+                        }
+                        case Op.Get:
+                        {
+                            int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
+                            Push(CodeHelper.CreateBoxByVal(zCode[operandIndex]));
+                            data.p += 2;
+                            break;
+                        }
+                        case Op.Call:
+                        case Op.CallDiscard:
+                        {
+                            int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
+                            var callResult = ExecuteCall(zCode[operandIndex], budget, instructionPc,
+                                parsedOp == Op.CallDiscard);
+                            if (callResult != null)
                             {
-                                int prmCount = (int)GetNum(stack[data.top]);
-                                var prm = new BoxDataForm.Data[prmCount];
-                                var newHeap = new Dictionary<string, BoxDataForm.Data>();
-                                for (int i = 0; i < prmCount; i++)
-                                {
-                                    newHeap[$"param{i + 1}"] = GetBox(stack[data.top - i - 1]).DeepCopy();
-                                }
-                                if (data.subInterpret == null)
-                                {
-                                    data.subInterpret = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(), newHeap, func, 0, -1, 0, null, new List<BoxDataForm.Data>(), data.rootUid == 0 ? data.uid : data.rootUid);
-                                }
-                                var ret = data.subInterpret.Interpret();
+                                return callResult;
+                            }
 
-                                if (ret.complete)
-                                {
-                                    data.heapTemp.Clear();
-                                    data.p++;
-                                    var subHeap = data.subInterpret.heap;
-                                    for (int i = 0; i < prmCount; i++)
-                                    {
-                                        GetBox(stack[data.top - i - 1]).Reset(subHeap[$"param{i + 1}"]);
-                                    }
-                                    int removeCount = prmCount + 1;
-                                    for (int i = 0; i < removeCount; i++)
-                                    {
-                                        Pop();
-                                    }
-                                    Push(ret.ret);
-
-                                    asyncTask.Reset();
-                                    data.subInterpret = null;
-                                }
-                                else
-                                {
-                                    return MakeRetInfo(false);
-                                }
+                            break;
+                        }
+                        case Op.Equal:
+                        {
+                            var left = GetBox(Pop());
+                            var right = GetBox(Pop());
+                            if (left.str == null && right.str == null)
+                            {
+                                Push(CodeHelper.CreateBoxByNum(GetNum(left) == GetNum(right) ? 1 : 0));
                             }
                             else
                             {
-                                throw new Exception("can't find");
+                                Push(CodeHelper.CreateBoxByNum(GetStr(left) == GetStr(right) ? 1 : 0));
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            AddError(data.p, $"{funcName} 调用失败: {e.Message}", e);
-                        }
 
-                        break;
-                    case Op.Equal:
-                        box = GetBox(Pop());
-                        box2 = GetBox(Pop());
-                        if (box.str == null && box2.str == null)
-                        {
-                            Push(CodeHelper.CreateBoxByNum(GetNum(box) == GetNum(box2) ? 1 : 0));
+                            data.p++;
+                            break;
                         }
-                        else
+                        case Op.Greater:
                         {
-                            Push(CodeHelper.CreateBoxByNum(GetStr(box) == GetStr(box2) ? 1 : 0));
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            Push(CodeHelper.CreateBoxByNum(left > right ? 1 : 0));
+                            data.p++;
+                            break;
                         }
-
-                        break;
-                    case Op.Greater:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) > GetNum(Pop()) ? 1 : 0));
-                        break;
-                    case Op.Less:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) < GetNum(Pop()) ? 1 : 0));
-                        break;
-                    case Op.NotGreater:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) <= GetNum(Pop()) ? 1 : 0));
-                        break;
-                    case Op.NotLess:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) >= GetNum(Pop()) ? 1 : 0));
-                        break;
-                    case Op.NotEqual:
-                        box = GetBox(Pop());
-                        box2 = GetBox(Pop());
-                        if (box.str == null && box2.str == null)
+                        case Op.Less:
                         {
-                            Push(CodeHelper.CreateBoxByNum(GetNum(box) != GetNum(box2) ? 1 : 0));
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            Push(CodeHelper.CreateBoxByNum(left < right ? 1 : 0));
+                            data.p++;
+                            break;
                         }
-                        else
+                        case Op.NotGreater:
                         {
-                            Push(CodeHelper.CreateBoxByNum(GetStr(box) != GetStr(box2) ? 1 : 0));
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            Push(CodeHelper.CreateBoxByNum(left <= right ? 1 : 0));
+                            data.p++;
+                            break;
                         }
-                        break;
-                    case Op.Take:
-                        box = Pop();
-                        var key = GetStr(Pop());
-                        box = CodeHelper.CreateBoxByVal(box.valName);
-                        box.str = key;
-                        Push(box);
-                        break;
-                    case Op.Assign:
-                        box = Pop();
-                        realBox = GetBox(box);
-                        if (box.str != null)
+                        case Op.NotLess:
                         {
-                            heap[box.valName].dic[box.str] = GetBox(Pop()).DeepCopy();
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            Push(CodeHelper.CreateBoxByNum(left >= right ? 1 : 0));
+                            data.p++;
+                            break;
                         }
-                        else
+                        case Op.NotEqual:
                         {
-                            heap[box.valName] = GetBox(Pop()).DeepCopy();
-                        }
-                        break;
-                    case Op.Plus:
-                        box = GetBox(Pop());
-                        box2 = GetBox(Pop());
-                        if (box.dic.Count > 0 && box2.dic.Count > 0)
-                        {
-                            var ret = CodeHelper.CreateBox();
-                            foreach (var pair in box.dic)
+                            var left = GetBox(Pop());
+                            var right = GetBox(Pop());
+                            if (left.str == null && right.str == null)
                             {
-                                if (box2.dic.TryGetValue(pair.Key, out var val2))
-                                {
-                                    ret.dic[pair.Key] = ValuePlus(pair.Value, val2);
-                                }
+                                Push(CodeHelper.CreateBoxByNum(GetNum(left) != GetNum(right) ? 1 : 0));
                             }
-                            Push(ret);
-                        }
-                        else
-                        {
-                            Push(ValuePlus(box, box2));
-                        }
-                        break;
-                    case Op.Positive:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop())));
-                        break;
-                    case Op.Minus:
-                        box = GetBox(Pop());
-                        box2 = GetBox(Pop());
-                        if (box.dic.Count > 0 && box2.dic.Count > 0)
-                        {
-                            var ret = CodeHelper.CreateBox();
-                            foreach (var pair in box.dic)
+                            else
                             {
-                                if (box2.dic.TryGetValue(pair.Key, out var val2))
-                                {
-                                    ret.dic[pair.Key] = ValueMinus(pair.Value, val2);
-                                }
+                                Push(CodeHelper.CreateBoxByNum(GetStr(left) != GetStr(right) ? 1 : 0));
                             }
-                            Push(ret);
-                        }
-                        else
-                        {
-                            Push(ValueMinus(box, box2));
-                        }
-                        break;
-                    case Op.Negative:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * -1f));
-                        break;
-                    case Op.Mul:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) * GetNum(Pop())));
-                        break;
-                    case Op.Div:
-                        Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) / GetNum(Pop())));
-                        break;
-                    case Op.Jump:
-                        data.p++;
-                        data.p = int.Parse(zCode[data.p]) - 1;
-                        break;
-                    case Op.IfFalseJump:
-                        data.p++;
-                        if (GetNum(Pop()) == 0)
-                        {
-                            data.p = int.Parse(zCode[data.p]) - 1;
-                        }
-                        break;
-                    case Op.Sub:
-                        box = Pop();
-                        string paramName = Pop().valName;
-                        box = CodeHelper.CreateBoxByVal(box.valName);
-                        box.str = paramName;
-                        Push(box);
-                        break;
-                    case Op.Wait:
-                        box = Pop();
-                        if (box.valName != null && box.num == 0)
-                        {
-                            box.num = GetBox(box).num;
-                        }
-                        box.num -= Time.deltaTime;
-                        if (box.num > 0)
-                        {
-                            Push(box);
-                            return MakeRetInfo(false);
-                        }
-                        break;
-                    case Op.Ret:
-                        box = Pop();
-                        realBox = GetBox(box);
 
-                        return MakeRetInfo(true, realBox);
-                    default:
-                        Z_Log.Log($"op:{opCode} not found");
-                        break;
+                            data.p++;
+                            break;
+                        }
+                        case Op.Take:
+                        {
+                            var owner = Pop();
+                            string key = GetStr(Pop());
+                            var reference = CodeHelper.CreateBoxByVal(owner.valName);
+                            reference.str = key;
+                            Push(reference);
+                            data.p++;
+                            break;
+                        }
+                        case Op.Assign:
+                        {
+                            var target = Pop();
+                            if (string.IsNullOrEmpty(target.valName))
+                            {
+                                throw new InvalidOperationException("赋值目标不是变量或成员");
+                            }
 
-                }
+                            var value = GetBox(Pop()).DeepCopy();
+                            if (target.str != null)
+                            {
+                                GetBox(target);
+                                data.heap[target.valName].dic[target.str] = value;
+                            }
+                            else
+                            {
+                                data.heap[target.valName] = value;
+                            }
+
+                            data.p++;
+                            break;
+                        }
+                        case Op.Plus:
+                        {
+                            var left = GetBox(Pop());
+                            var right = GetBox(Pop());
+                            if (HasDictionary(left) && HasDictionary(right))
+                            {
+                                var result = CodeHelper.CreateBox();
+                                foreach (var pair in left.dic)
+                                {
+                                    if (right.dic.TryGetValue(pair.Key, out var rightValue))
+                                    {
+                                        result.dic[pair.Key] = ValuePlus(pair.Value, rightValue);
+                                    }
+                                }
+
+                                Push(result);
+                            }
+                            else
+                            {
+                                Push(ValuePlus(left, right));
+                            }
+
+                            data.p++;
+                            break;
+                        }
+                        case Op.Positive:
+                            Push(CodeHelper.CreateBoxByNum(GetNum(Pop())));
+                            data.p++;
+                            break;
+                        case Op.Minus:
+                        {
+                            var left = GetBox(Pop());
+                            var right = GetBox(Pop());
+                            if (HasDictionary(left) && HasDictionary(right))
+                            {
+                                var result = CodeHelper.CreateBox();
+                                foreach (var pair in left.dic)
+                                {
+                                    if (right.dic.TryGetValue(pair.Key, out var rightValue))
+                                    {
+                                        result.dic[pair.Key] = ValueMinus(pair.Value, rightValue);
+                                    }
+                                }
+
+                                Push(result);
+                            }
+                            else
+                            {
+                                Push(ValueMinus(left, right));
+                            }
+
+                            data.p++;
+                            break;
+                        }
+                        case Op.Negative:
+                            Push(CodeHelper.CreateBoxByNum(-GetNum(Pop())));
+                            data.p++;
+                            break;
+                        case Op.Mul:
+                        {
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            Push(CodeHelper.CreateBoxByNum(left * right));
+                            data.p++;
+                            break;
+                        }
+                        case Op.Div:
+                        {
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            if (right == 0f)
+                            {
+                                throw new DivideByZeroException("除数不能为 0");
+                            }
+
+                            Push(CodeHelper.CreateBoxByNum(left / right));
+                            data.p++;
+                            break;
+                        }
+                        case Op.Mod:
+                        {
+                            float left = GetNum(Pop());
+                            float right = GetNum(Pop());
+                            if (right == 0f)
+                            {
+                                throw new DivideByZeroException("取模除数不能为 0");
+                            }
+
+                            Push(CodeHelper.CreateBoxByNum(left % right));
+                            data.p++;
+                            break;
+                        }
+                        case Op.Not:
+                            Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) == 0f ? 1 : 0));
+                            data.p++;
+                            break;
+                        case Op.Discard:
+                            Pop();
+                            data.p++;
+                            break;
+                        case Op.Jump:
+                        {
+                            int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
+                            data.p = ReadJumpTarget(zCode, operandIndex);
+                            break;
+                        }
+                        case Op.IfFalseJump:
+                        {
+                            int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
+                            int target = ReadJumpTarget(zCode, operandIndex);
+                            data.p = GetNum(Pop()) == 0f ? target : data.p + 2;
+                            break;
+                        }
+                        case Op.Sub:
+                        {
+                            var owner = Pop();
+                            var member = Pop();
+                            if (string.IsNullOrEmpty(owner.valName) || string.IsNullOrEmpty(member.valName))
+                            {
+                                throw new InvalidOperationException("成员访问必须使用变量名");
+                            }
+
+                            var reference = CodeHelper.CreateBoxByVal(owner.valName);
+                            reference.str = member.valName;
+                            Push(reference);
+                            data.p++;
+                            break;
+                        }
+                        case Op.Wait:
+                        {
+                            var waitValue = Pop();
+                            if (waitValue.valName != null && waitValue.num == 0f)
+                            {
+                                waitValue.num = GetBox(waitValue).num;
+                            }
+
+                            waitValue.num -= Time.deltaTime;
+                            if (waitValue.num > 0f)
+                            {
+                                Push(waitValue);
+                                return MakeRetInfo(false);
+                            }
+
+                            data.p++;
+                            break;
+                        }
+                        case Op.Ret:
+                        {
+                            var result = GetBox(Pop());
+                            data.p++;
+                            return MakeRetInfo(true, result);
+                        }
+                        default:
+                            throw new InvalidOperationException($"不支持的操作码: {parsedOp}");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    AddError(data.p, $"执行 {opCode} 指令失败: {ex.Message}", ex);
+                    AddError(instructionPc, $"执行 {parsedOp} 指令失败: {ex.Message}", ex);
+                    return MakeRetInfo(true);
                 }
-
-
+                finally
+                {
+                    opCode = null;
+                }
             }
 
-
             return MakeRetInfo(true);
+        }
+
+        private RetInfo ExecuteCall(string funcName, InterpretBudget budget, int instructionPc,
+            bool discardReturn)
+        {
+#if INTERPRETER_DEBUG
+            Z_Log.Log(" invoke" + funcName);
+#endif
+            if (string.IsNullOrEmpty(funcName))
+            {
+                throw new InvalidOperationException("函数名为空");
+            }
+
+            int parameterCount = GetParameterCount();
+            if (BaseData.cmdDic.TryGetValue(funcName, out var cmdTemplate))
+            {
+                var cmd = cmdTemplate.GetNew();
+                var form = cmd.GetForm();
+                int expectedParameterCount = form.prmNames == null ? 0 : form.prmNames.Count;
+                if (parameterCount != expectedParameterCount)
+                {
+                    throw new InvalidOperationException($"命令 {funcName} 需要 {expectedParameterCount} 个参数，实际为 {parameterCount} 个");
+                }
+
+                var parameters = new BoxDataForm.Data[parameterCount];
+                for (int i = 0; i < parameterCount; i++)
+                {
+                    parameters[i] = GetBox(data.stack[data.top - i - 1]);
+                }
+
+                if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
+                {
+                    cmd.Execute(parameters, data.heap, asyncTask);
+                }
+
+                if (!asyncTask.IsComplete())
+                {
+                    return MakeRetInfo(false);
+                }
+
+                if (!string.IsNullOrEmpty(asyncTask.error))
+                {
+                    string commandError = asyncTask.error;
+                    asyncTask.Reset();
+                    AddError(instructionPc, commandError);
+                    return MakeRetInfo(true);
+                }
+
+                var returnNames = form.retNames;
+                int returnCount = returnNames == null ? 0 : returnNames.Count;
+                if (returnCount > 0 && (asyncTask.res == null || asyncTask.res.Length < returnCount))
+                {
+                    string resultError = $"命令 {funcName} 声明 {returnCount} 个返回值，但实际未返回足够结果";
+                    asyncTask.Reset();
+                    AddError(instructionPc, resultError);
+                    return MakeRetInfo(true);
+                }
+
+                for (int i = 0; i < returnCount; i++)
+                {
+                    if (asyncTask.res[i] == null)
+                    {
+                        string resultError = $"命令 {funcName} 的第 {i + 1} 个返回值为空";
+                        asyncTask.Reset();
+                        AddError(instructionPc, resultError);
+                        return MakeRetInfo(true);
+                    }
+                }
+
+                PopMany(parameterCount + 1);
+                if (!discardReturn)
+                {
+                    for (int i = 0; i < returnCount; i++)
+                    {
+                        Push(asyncTask.res[i]);
+                    }
+                }
+
+                asyncTask.Reset();
+                data.p += 2;
+                return null;
+            }
+
+            if (!ProgramDataForm.DataByName.TryGetValue(funcName, out var func))
+            {
+                throw new InvalidOperationException($"找不到函数或命令 {funcName}");
+            }
+
+            if (parameterCount != func.paramCount)
+            {
+                throw new InvalidOperationException($"程序 {funcName} 需要 {func.paramCount} 个参数，实际为 {parameterCount} 个");
+            }
+
+            int argumentStart = data.top - parameterCount;
+            if (data.subInterpret == null)
+            {
+                var subHeap = new Dictionary<string, BoxDataForm.Data>();
+                for (int i = 0; i < parameterCount; i++)
+                {
+                    subHeap[$"param{i + 1}"] = GetBox(data.stack[argumentStart + i]).DeepCopy();
+                }
+
+                data.subInterpret = new InterpretDataForm.Data(
+                    -1,
+                    new List<BoxDataForm.Data>(),
+                    subHeap,
+                    func,
+                    0,
+                    -1,
+                    0,
+                    null,
+                    new List<BoxDataForm.Data>(),
+                    data.rootUid == 0 ? data.uid : data.rootUid);
+            }
+
+            if (!budget.TryEnterSubProgram())
+            {
+                AddError(instructionPc, $"程序调用层级超过限制: {funcName}");
+                return MakeRetInfo(true);
+            }
+
+            RetInfo subResult;
+            try
+            {
+                subResult = data.subInterpret.Interpret(budget);
+            }
+            finally
+            {
+                budget.ExitSubProgram();
+            }
+
+            if (subResult.errors != null && subResult.errors.Count > 0)
+            {
+                errors.AddRange(subResult.errors);
+                data.subInterpret = null;
+                return MakeRetInfo(true);
+            }
+
+            if (!subResult.complete)
+            {
+                return MakeRetInfo(false);
+            }
+
+            data.heapTemp?.Clear();
+            var completedSubHeap = data.subInterpret.heap;
+            for (int i = 0; i < parameterCount; i++)
+            {
+                string parameterName = $"param{i + 1}";
+                if (!completedSubHeap.TryGetValue(parameterName, out var parameterValue) || parameterValue == null)
+                {
+                    throw new InvalidOperationException($"程序 {funcName} 完成后缺少参数 {parameterName}");
+                }
+
+                GetBox(data.stack[argumentStart + i]).Reset(parameterValue);
+            }
+
+            PopMany(parameterCount + 1);
+            if (!discardReturn)
+            {
+                Push(subResult.ret ?? CodeHelper.CreateBox());
+            }
+            data.subInterpret = null;
+            data.p += 2;
+            return null;
+        }
+
+        private bool TryPrepare(out List<string> zCode)
+        {
+            zCode = null;
+            if (data == null)
+            {
+                AddError(0, "解释器数据为空");
+                return false;
+            }
+
+            if (data.program == null)
+            {
+                AddError(data.p, "程序数据为空");
+                return false;
+            }
+
+            zCode = data.program.zCode;
+            if (zCode == null)
+            {
+                AddError(data.p, "程序 zCode 为空");
+                return false;
+            }
+
+            if (data.stack == null)
+            {
+                AddError(data.p, "运行栈为空");
+                return false;
+            }
+
+            if (data.heap == null)
+            {
+                AddError(data.p, "运行堆为空");
+                return false;
+            }
+
+            if (data.p < 0 || data.p > zCode.Count)
+            {
+                AddError(data.p, $"程序计数器越界: {data.p}/{zCode.Count}");
+                return false;
+            }
+
+            if (data.top != data.stack.Count - 1)
+            {
+                AddError(data.p, $"栈顶索引不一致: top={data.top}, Count={data.stack.Count}");
+                return false;
+            }
+
+            EnsureParseCache(zCode);
+            return true;
+        }
+
+        private void EnsureParseCache(List<string> zCode)
+        {
+            if (ReferenceEquals(cachedZCode, zCode) && cachedZCodeCount == zCode.Count)
+            {
+                return;
+            }
+
+            cachedZCode = zCode;
+            cachedZCodeCount = zCode.Count;
+            opcodeCache = new Op[zCode.Count];
+            opcodeCacheValid = new bool[zCode.Count];
+            numberCache = new float[zCode.Count];
+            numberCacheValid = new bool[zCode.Count];
+            integerCache = new int[zCode.Count];
+            integerCacheValid = new bool[zCode.Count];
+        }
+
+        private bool TryReadOpcode(List<string> zCode, int index, out Op value, out string error)
+        {
+            value = default;
+            error = null;
+            if (index < 0 || index >= zCode.Count)
+            {
+                error = $"操作码位置越界: {index}/{zCode.Count}";
+                return false;
+            }
+
+            if (opcodeCacheValid[index])
+            {
+                value = opcodeCache[index];
+                return true;
+            }
+
+            if (!int.TryParse(zCode[index], NumberStyles.Integer, CultureInfo.InvariantCulture, out int rawValue))
+            {
+                error = $"无法解析操作码 '{zCode[index]}'";
+                return false;
+            }
+
+            if (!Enum.IsDefined(typeof(Op), rawValue))
+            {
+                error = $"未知操作码 {rawValue}";
+                return false;
+            }
+
+            value = (Op)rawValue;
+            opcodeCache[index] = value;
+            opcodeCacheValid[index] = true;
+            return true;
+        }
+
+        private bool TryReadNumber(List<string> zCode, int index, out float value, out string error)
+        {
+            value = default;
+            error = null;
+            if (index < 0 || index >= zCode.Count)
+            {
+                error = $"数值位置越界: {index}/{zCode.Count}";
+                return false;
+            }
+
+            if (numberCacheValid[index])
+            {
+                value = numberCache[index];
+                return true;
+            }
+
+            if (!float.TryParse(zCode[index], NumberStyles.Float, CultureInfo.InvariantCulture, out value) ||
+                float.IsNaN(value) || float.IsInfinity(value))
+            {
+                error = $"无法解析有限数值 '{zCode[index]}'";
+                return false;
+            }
+
+            numberCache[index] = value;
+            numberCacheValid[index] = true;
+            return true;
+        }
+
+        private bool TryReadInteger(List<string> zCode, int index, out int value, out string error)
+        {
+            value = default;
+            error = null;
+            if (index < 0 || index >= zCode.Count)
+            {
+                error = $"整数位置越界: {index}/{zCode.Count}";
+                return false;
+            }
+
+            if (integerCacheValid[index])
+            {
+                value = integerCache[index];
+                return true;
+            }
+
+            if (!int.TryParse(zCode[index], NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+            {
+                error = $"无法解析整数 '{zCode[index]}'";
+                return false;
+            }
+
+            integerCache[index] = value;
+            integerCacheValid[index] = true;
+            return true;
+        }
+
+        private int GetOperandIndex(List<string> zCode, int instructionPc, Op instruction)
+        {
+            int operandIndex = instructionPc + 1;
+            if (operandIndex >= zCode.Count)
+            {
+                throw new InvalidOperationException($"{instruction} 指令缺少操作数");
+            }
+
+            return operandIndex;
+        }
+
+        private int ReadJumpTarget(List<string> zCode, int index)
+        {
+            if (!TryReadInteger(zCode, index, out int target, out var error))
+            {
+                throw new FormatException(error);
+            }
+
+            if (target < 0 || target > zCode.Count)
+            {
+                throw new InvalidOperationException($"跳转目标越界: {target}/{zCode.Count}");
+            }
+
+            return target;
+        }
+
+        private int GetParameterCount()
+        {
+            RequireStack(1);
+            float rawCount = GetNum(data.stack[data.top]);
+            if (float.IsNaN(rawCount) || float.IsInfinity(rawCount) || rawCount < 0f ||
+                rawCount > int.MaxValue || rawCount != Math.Truncate(rawCount))
+            {
+                throw new InvalidOperationException($"无效的参数数量: {rawCount}");
+            }
+
+            int parameterCount = (int)rawCount;
+            if (parameterCount > data.top)
+            {
+                throw new InvalidOperationException($"参数栈不足: 需要 {parameterCount} 个，实际仅 {data.top} 个");
+            }
+
+            return parameterCount;
+        }
+
+        private void RequireStack(int count)
+        {
+            ValidateStackState();
+            if (count < 0 || data.stack.Count < count)
+            {
+                throw new InvalidOperationException($"运行栈不足: 需要 {count} 个值，当前为 {data.stack.Count} 个");
+            }
+        }
+
+        private void ValidateStackState()
+        {
+            if (data.stack == null)
+            {
+                throw new InvalidOperationException("运行栈为空");
+            }
+
+            if (data.top != data.stack.Count - 1)
+            {
+                throw new InvalidOperationException($"栈顶索引不一致: top={data.top}, Count={data.stack.Count}");
+            }
+        }
+
+        private BoxDataForm.Data Pop()
+        {
+            RequireStack(1);
+            int index = data.top;
+            var result = data.stack[index];
+            if (result == null)
+            {
+                throw new InvalidOperationException($"栈位置 {index} 的值为空");
+            }
+
+            data.stack.RemoveAt(index);
+            data.top--;
+            return result;
+        }
+
+        private void PopMany(int count)
+        {
+            RequireStack(count);
+            if (count == 0)
+            {
+                return;
+            }
+
+            data.stack.RemoveRange(data.stack.Count - count, count);
+            data.top -= count;
+        }
+
+        private void Push(BoxDataForm.Data box)
+        {
+            if (box == null)
+            {
+                throw new InvalidOperationException("不能向运行栈压入空值");
+            }
+
+            ValidateStackState();
+            data.stack.Add(box);
+            data.top++;
+        }
+
+        private BoxDataForm.Data GetBox(BoxDataForm.Data box)
+        {
+            if (box == null)
+            {
+                throw new InvalidOperationException("Box 为空");
+            }
+
+            string valueName = box.valName;
+            if (string.IsNullOrEmpty(valueName))
+            {
+                EnsureDictionary(box);
+                return box;
+            }
+
+            if (!data.heap.TryGetValue(valueName, out var heapBox) || heapBox == null)
+            {
+                heapBox = CodeHelper.CreateBox();
+                data.heap[valueName] = heapBox;
+            }
+
+            EnsureDictionary(heapBox);
+            if (box.str == null)
+            {
+#if INTERPRETER_DEBUG
+                Debug.Log(valueName + " means " + CodeHelper.GetBoxContent(heapBox));
+#endif
+                return heapBox;
+            }
+
+            if (!heapBox.dic.TryGetValue(box.str, out var dictionaryBox) || dictionaryBox == null)
+            {
+                dictionaryBox = CodeHelper.CreateBox();
+                heapBox.dic[box.str] = dictionaryBox;
+            }
+
+            EnsureDictionary(dictionaryBox);
+            return dictionaryBox;
+        }
+
+        private float GetNum(BoxDataForm.Data box)
+        {
+            return GetBox(box).num;
+        }
+
+        private string GetStr(BoxDataForm.Data box)
+        {
+            box = GetBox(box);
+            return box.str ?? box.num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public void Reset()
+        {
+            asyncTask.Reset();
+            errors.Clear();
+            opCode = null;
+            cachedZCode = null;
+            cachedZCodeCount = -1;
+            opcodeCache = null;
+            opcodeCacheValid = null;
+            numberCache = null;
+            numberCacheValid = null;
+            integerCache = null;
+            integerCacheValid = null;
+        }
+
+        private BoxDataForm.Data ValuePlus(BoxDataForm.Data left, BoxDataForm.Data right)
+        {
+            left = GetBox(left);
+            right = GetBox(right);
+            if (left.str == null && right.str == null)
+            {
+                return CodeHelper.CreateBoxByNum(left.num + right.num);
+            }
+
+            if (left.str != null && right.str == null)
+            {
+                return CodeHelper.CreateBoxByStr(left.str + right.num.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (left.str == null)
+            {
+                return CodeHelper.CreateBoxByStr(left.num.ToString(CultureInfo.InvariantCulture) + right.str);
+            }
+
+            return CodeHelper.CreateBoxByStr(left.str + right.str);
+        }
+
+        private BoxDataForm.Data ValueMinus(BoxDataForm.Data left, BoxDataForm.Data right)
+        {
+            left = GetBox(left);
+            right = GetBox(right);
+            if (left.str == null && right.str == null)
+            {
+                return CodeHelper.CreateBoxByNum(left.num - right.num);
+            }
+
+            throw new InvalidOperationException("字符串不支持减法");
+        }
+
+        private static bool HasDictionary(BoxDataForm.Data box)
+        {
+            return box?.dic != null && box.dic.Count > 0;
+        }
+
+        private static void EnsureDictionary(BoxDataForm.Data box)
+        {
+            if (box.dic == null)
+            {
+                box.dic = new Dictionary<string, BoxDataForm.Data>();
+            }
         }
 
         /// <summary>
@@ -498,10 +1163,11 @@ namespace Z_Code
             int lineNumber = 0;
             int columnNumber = 0;
             string sourceLine = null;
+            var program = data?.program;
 
             // 尝试从 zCodeMap 获取原始代码位置
-            var zCodeMap = data.program.zCodeMap;
-            var sourceCode = data.program.code;
+            var zCodeMap = program?.zCodeMap;
+            var sourceCode = program?.code;
             if (zCodeMap != null && pc >= 0 && pc < zCodeMap.Count && !string.IsNullOrEmpty(sourceCode))
             {
                 int codeIndex = zCodeMap[pc];
@@ -514,20 +1180,17 @@ namespace Z_Code
             errors.Add(new InterpretError
             {
                 Pc = pc,
-                OpCode = opCode ?? 0,
+                OpCode = opCode ?? default,
                 Message = message,
                 Exception = ex,
                 LineNumber = lineNumber,
                 ColumnNumber = columnNumber,
                 SourceLine = sourceLine,
-                ProgramName = data.program?.name
+                ProgramName = program?.name
             });
         }
 
-        /// <summary>
-        /// 根据字符索引获取行号、列号和行内容
-        /// </summary>
-        private (int line, int column, string lineContent) GetLineInfo(string code, int index)
+        private static (int line, int column, string lineContent) GetLineInfo(string code, int index)
         {
             if (string.IsNullOrEmpty(code) || index < 0 || index >= code.Length)
             {
@@ -537,8 +1200,7 @@ namespace Z_Code
             int line = 1;
             int column = 1;
             int lineStart = 0;
-
-            for (int i = 0; i <= index; i++)
+            for (int i = 0; i < index; i++)
             {
                 if (code[i] == '\n')
                 {
@@ -552,123 +1214,22 @@ namespace Z_Code
                 }
             }
 
-            // 获取该行的内容
             int lineEnd = code.IndexOf('\n', lineStart);
-            string lineContent = lineEnd >= 0 
-                ? code.Substring(lineStart, lineEnd - lineStart) 
+            string lineContent = lineEnd >= 0
+                ? code.Substring(lineStart, lineEnd - lineStart)
                 : code.Substring(lineStart);
-
             return (line, column, lineContent);
         }
 
-        /// <summary>
-        /// 将错误信息填充到 RetInfo 中
-        /// </summary>
         private RetInfo MakeRetInfo(bool complete, BoxDataForm.Data ret = null)
         {
             var info = new RetInfo
             {
                 complete = complete,
-                ret = ret ?? CodeHelper.CreateBox(),
+                ret = ret ?? CodeHelper.CreateBox()
             };
             info.errors.AddRange(errors);
             return info;
         }
-
-        private BoxDataForm.Data Pop()
-        {
-            int idx = data.top;
-            var res = data.stack[idx];
-            data.stack.RemoveAt(idx);
-            data.top--;
-            return res;
-        }
-        private void Push(BoxDataForm.Data box)
-        {
-            data.stack.Add(box);
-            data.top++;
-        }
-        private BoxDataForm.Data GetBox(BoxDataForm.Data box)
-        {
-            string valName = box.valName;
-            if (!string.IsNullOrEmpty(valName))
-            {
-                var heap = data.heap;
-                if (!heap.TryGetValue(valName, out var heapBox))
-                {
-                    heapBox = CodeHelper.CreateBox();
-                    heap[valName] = heapBox;
-                }
-                string boxStr = box.str;
-                if (boxStr != null)
-                {
-                    if (!heapBox.dic.TryGetValue(boxStr, out var dicBox))
-                    {
-                        dicBox = CodeHelper.CreateBox();
-                        heapBox.dic[boxStr] = dicBox;
-                    }
-                    return dicBox;
-                }
-                else
-                {
-#if INTERPRETER_DEBUG
-                    Debug.Log(valName + " means " + CodeHelper.GetBoxContent(heapBox));
-#endif
-                    return heapBox;
-                }
-            }
-            return box;
-        }
-        private float GetNum(BoxDataForm.Data box)
-        {
-            box = GetBox(box);
-            return box.num;
-        }
-        private string GetStr(BoxDataForm.Data box)
-        {
-            box = GetBox(box);
-            if (box.str == null)
-            {
-                return box.num.ToString();
-            }
-            return box.str;
-        }
-        public void Reset()
-        {
-            asyncTask.Reset();
-        }
-        private BoxDataForm.Data ValuePlus(BoxDataForm.Data box1, BoxDataForm.Data box2)
-        {
-            if (box1.str == null && box2.str == null)
-            {
-                return CodeHelper.CreateBoxByNum(GetNum(box1) + GetNum(box2));
-            }
-            else if (box1.str != null && box2.str == null)
-            {
-                return CodeHelper.CreateBoxByStr(GetStr(box1) + GetNum(box2));
-            }
-            else if (box1.str == null && box2.str != null)
-            {
-                return CodeHelper.CreateBoxByStr(GetNum(box1) + GetStr(box2));
-            }
-            else
-            {
-                return CodeHelper.CreateBoxByStr(GetStr(box1) + GetStr(box2));
-            }
-        }
-        private BoxDataForm.Data ValueMinus(BoxDataForm.Data box1, BoxDataForm.Data box2)
-        {
-            if (box1.str == null && box2.str == null)
-            {
-                return CodeHelper.CreateBoxByNum(GetNum(box1) - GetNum(box2));
-            }
-            else
-            {
-                return CodeHelper.CreateBoxByStr("error");
-            }
-        }
-
     }
-
-
 }

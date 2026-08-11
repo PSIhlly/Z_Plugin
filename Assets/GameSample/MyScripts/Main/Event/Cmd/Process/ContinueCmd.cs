@@ -13,7 +13,9 @@ namespace Z_Code
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new ContinueCmd());
+            var cmd = new ContinueCmd();
+            Register(cmd);
+            RegisterAlias("GameContinue", cmd);
         }
         public override string GetName() => "Continue";
         public override CmdBase GetNew() => new ContinueCmd();

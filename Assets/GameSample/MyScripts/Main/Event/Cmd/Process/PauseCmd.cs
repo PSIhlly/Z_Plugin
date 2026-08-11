@@ -13,7 +13,9 @@ namespace Z_Code
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new PauseCmd());
+            var cmd = new PauseCmd();
+            Register(cmd);
+            RegisterAlias("GamePause", cmd);
         }
         public override string GetName() => "Pause";
         public override CmdBase GetNew() => new PauseCmd();

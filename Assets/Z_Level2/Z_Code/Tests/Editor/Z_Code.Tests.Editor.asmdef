@@ -1,0 +1,21 @@
+{
+    "name": "Z_Code.Tests.Editor",
+    "rootNamespace": "Z_Code.Tests",
+    "references": [
+        "GUID:3e814c233598432439399d21051dc18e"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

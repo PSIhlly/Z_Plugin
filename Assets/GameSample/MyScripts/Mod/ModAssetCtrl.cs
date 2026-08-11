@@ -12,11 +12,11 @@ using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
+using Z_Map.Form;
 using Z_String;
 using Z_Text;
 using Z_Ui;
 using Z_Ui.Notify;
-using static UnityEditor.Progress;
 using static UnityEngine.Rendering.DebugUI.MessageBox;
 namespace Form
 {
@@ -1072,6 +1072,125 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         });
 
+    }
+    #endregion
+
+    #region scene placement
+    public TileUnitForm.Data AddTile(int x, int y, int height)
+    {
+        Vector3 mapPos = GameManager.PlayerPosToMapPos(new Vector3(x, height, y));
+        return AddTile(Vector3Int.RoundToInt(mapPos));
+    }
+
+    public TileUnitForm.Data AddTile(Vector3Int mapPos)
+    {
+        var mapManager = MapManager.instance;
+        if (mapManager.data == null
+            || !mapManager.utilCtrl.InLimit(mapPos)
+            || mapManager.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
+        {
+            return null;
+        }
+
+        return mapManager.AddTile(mapPos);
+    }
+
+    public ObjectUnitForm.Data AddObject(MapObjectForm.Data data, Vector3 position, float angle = 0)
+    {
+        if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
+            return null;
+
+        var mapManager = MapManager.instance;
+        foreach (ObjectUnit current in mapManager.updateCtrl.objectTileDic.Get(tile.unit))
+        {
+            if (current.data.name == data.name
+                && (current.data.pos - position).sqrMagnitude < 0.001f
+                && Mathf.Abs(current.data.euler.y - angle) < 1f)
+            {
+                return null;
+            }
+        }
+
+        ObjectUnitForm.Data result = mapManager.AddObject(
+            data.name,
+            position,
+            GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(data.id),
+            null);
+        if (result == null)
+            return null;
+
+        GameManager.instance.mapCtrl.RegisterObject(result, data);
+        result.euler = new Vector3(result.euler.x, angle, result.euler.z);
+        return result;
+    }
+
+    public ItemUnitForm.Data AddItem(ItemProductForm.Data data, Vector3 position, float angle = 0)
+    {
+        if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
+            return null;
+
+        var mapManager = MapManager.instance;
+        foreach (ItemUnit current in mapManager.updateCtrl.itemTileDic.Get(tile.unit))
+        {
+            if (current.data.name == data.name
+                && (current.data.pos - position).sqrMagnitude < 0.001f
+                && Mathf.Abs(current.data.euler.y - angle) < 1f)
+            {
+                return null;
+            }
+        }
+
+        ItemUnitForm.Data result = mapManager.AddItem(
+            data.name,
+            position,
+            GlobalDefaultHelper.GetRuntimeMapItemPrefabName(data.uid),
+            null);
+        if (result == null)
+            return null;
+
+        result.unit.productInfo = (data.uid, -1);
+        result.euler = new Vector3(result.euler.x, angle, result.euler.z);
+        return result;
+    }
+
+    public CharacterUnitForm.Data AddCharacter(CharacterProductForm.Data data, Vector3 position, float angle = 0)
+    {
+        if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
+            return null;
+
+        var mapManager = MapManager.instance;
+        foreach (CharacterUnit current in mapManager.updateCtrl.characterTileDic.Get(tile.unit))
+        {
+            if (current.data.name == data.name
+                && (current.data.pos - position).sqrMagnitude < 0.001f
+                && Mathf.Abs(current.data.euler.y - angle) < 1f)
+            {
+                return null;
+            }
+        }
+
+        CharacterUnitForm.Data result = mapManager.AddCharacter(
+            data.name,
+            position,
+            GlobalDefaultHelper.GetRuntimePrefabName("character"),
+            false,
+            MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
+        if (result == null)
+            return null;
+
+        result.euler = new Vector3(result.euler.x, angle, result.euler.z);
+        return result;
+    }
+
+    private static bool TryGetPlacementTile(Vector3 position, out TileUnitForm.Data tile)
+    {
+        tile = null;
+        var mapManager = MapManager.instance;
+        if (mapManager.data == null)
+            return false;
+
+        Vector3Int mapPos = mapManager.utilCtrl.RealPos2MapPosInt(position);
+        return mapManager.data.maps.TryGetValue((mapPos.x, mapPos.y, mapPos.z), out tile);
     }
     #endregion
 

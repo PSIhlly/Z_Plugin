@@ -254,11 +254,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                 {
                                     var newMapPos = new Vector3Int(x, hitPos.y, z);
-                                    if (mapMgr.utilCtrl.InLimit(newMapPos))
-                                    {
-                                        mapMgr.AddTile(newMapPos);
-                                    }
+                                    _super.assetCtrl.AddTile(newMapPos);
                                 }
+                                if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
+                                    continue;
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
 
                                 if (terrainData.step == 0)
@@ -292,11 +291,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                         if (!mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                         {
                                             var newMapPos = new Vector3Int(stepX, mapData.mapPos.y, stepZ);
-                                            if (mapMgr.utilCtrl.InLimit(newMapPos))
-                                            {
-                                                mapMgr.AddTile(newMapPos);
-                                            }
+                                            _super.assetCtrl.AddTile(newMapPos);
                                         }
+                                        if (!mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
+                                            continue;
                                         var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
                                         cur.prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
                                         switch (Z_Math.Graph.GetFourDirByEuler(angle))
@@ -350,27 +348,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     }
                     else if (curData is MapObjectForm.Data objectData)
                     {
-                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            bool allow = true;
-                            //放置去重
-                            foreach (var cur in mapMgr.updateCtrl.objectTileDic.Get(mapData.unit))
-                            {
-                                var curData = cur.data;
-                                if (curData.name == objectData.name && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
-                                {
-                                    allow = false;
-                                    break;
-                                }
-                            }
-                            if (allow)
-                            {
-                                object[] prms = null;
-                                var newObjectData = mapMgr.AddObject(objectData.name, finalPos, GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(objectData.id), prms);
-                                GameManager.instance.mapCtrl.RegisterObject(newObjectData, objectData);
-                                newObjectData.euler = new Vector3(newObjectData.euler.x, angle, newObjectData.euler.z);
-                            }
-
+                            _super.assetCtrl.AddObject(objectData, finalPos, angle);
                         });
 
                     }
@@ -378,52 +358,18 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     {
                         var data = ItemProductForm.DataByUid[itemData.itemUid];
 
-                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            bool allow = true;
-
-                            //放置去重
-                            foreach (var cur in mapMgr.updateCtrl.itemTileDic.Get(mapData.unit))
-                            {
-                                var curData = cur.data;
-                                if (curData.name == data.name && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
-                                {
-                                    allow = false;
-                                    break;
-                                }
-                            }
-                            if (allow)
-                            {
-                                object[] prms = null;
-                                var newItemData = mapMgr.AddItem(data.name, finalPos, GlobalDefaultHelper.GetRuntimeMapItemPrefabName(data.uid), prms);
-                                newItemData.unit.productInfo = (data.uid, -1);
-                                newItemData.euler = new Vector3(newItemData.euler.x, angle, newItemData.euler.z);
-                            }
+                            _super.assetCtrl.AddItem(data, finalPos, angle);
                         });
                     }
                     else if (curData is MapCharacterForm.Data characterData)
                     {
                         var data = CharacterProductForm.DataByUid[characterData.characterUid];
 
-                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
+                        ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            bool allow = true;
-                            //放置去重
-                            foreach (var cur in mapMgr.updateCtrl.characterTileDic.Get(mapData.unit))
-                            {
-                                var curData = cur.data;
-                                if (curData.name == data.name && (curData.pos - finalPos).sqrMagnitude < 0.001f && Mathf.Abs(curData.euler.y - angle) < 1f)
-                                {
-                                    allow = false;
-                                    break;
-                                }
-                            }
-                            if (allow)
-                            {
-                                object[] prms = null;
-                                var newCharacerData = mapMgr.AddCharacter(data.name, finalPos, GlobalDefaultHelper.GetRuntimePrefabName("character"), false, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
-                                newCharacerData.euler = new Vector3(newCharacerData.euler.x, angle, newCharacerData.euler.z);
-                            }
+                            _super.assetCtrl.AddCharacter(data, finalPos, angle);
                         });
                     }
                     else if (curData is MapEraseForm.Data eraseData)

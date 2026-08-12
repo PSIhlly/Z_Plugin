@@ -1,6 +1,7 @@
 using Form;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Ui.ModSceneMenu;
 using UnityEngine;
 using Z_Map;
@@ -10,6 +11,7 @@ using Z_ObjectAnimator.Core;
 using Z_Texture;
 using Z_Ui;
 using Z_Ui.Base;
+using Z_Ui.Notify;
 
 namespace Ui.ModSceneMain
 {
@@ -86,6 +88,20 @@ namespace Ui.ModSceneMain
             view.btn_menu.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModSceneMenuCtrl>();
+            });
+            view.btn_modCmd.onClick.AddListener(() =>
+            {
+                NotifyManager.instance.AddInputArea("ModCmd", true, command =>
+                {
+                    if (string.IsNullOrWhiteSpace(command))
+                        return false;
+
+                    bool success = ModCmd.TryExecute(command.Trim(), ModCmdScope.Scene, out string result);
+                    NotifyManager.instance.AddTip(result);
+                    if (success)
+                        Refresh();
+                    return success;
+                });
             });
             view.btn_view.onClick.AddListener(() =>
             {

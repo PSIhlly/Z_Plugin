@@ -1,0 +1,4 @@
+interface:
+  display_name: "Z Plugin Project Guide"
+  short_description: "Navigate Z_Plugin architecture, data, UI, and validation"
+  default_prompt: "Use $z-plugin-project-guide to implement and verify a change in the Z_Plugin Unity project."

@@ -46,6 +46,20 @@ namespace Ui.ModStory
                 GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
                 NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
             });
+            view.btn_modCmd.onClick.AddListener(() =>
+            {
+                NotifyManager.instance.AddInputArea("ModCmd", true, command =>
+                {
+                    if (string.IsNullOrWhiteSpace(command))
+                        return false;
+
+                    bool success = ModCmd.TryExecute(command.Trim(), ModCmdScope.Story, out string result);
+                    NotifyManager.instance.AddTip(result);
+                    if (success)
+                        Refresh();
+                    return success;
+                });
+            });
             view.btn_delete.onClick.AddListener(() =>
             {
                 NotifyManager.instance.AddPopup(TextManager.instance.GetTxt("delete"), TextManager.instance.GetTxt("delete confirm"), true,

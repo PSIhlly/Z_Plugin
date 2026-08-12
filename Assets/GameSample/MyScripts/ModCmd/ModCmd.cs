@@ -12,6 +12,12 @@ using Z_DataSystem.Form;
 using Z_Map;
 using Z_Map.Form;
 
+public enum ModCmdScope
+{
+    Story,
+    Scene
+}
+
 public class ModCmd : MonoBehaviour
 {
     private enum Operation
@@ -60,8 +66,31 @@ public class ModCmd : MonoBehaviour
 
     public bool TryExecute(string command, out string result)
     {
+        return TryExecuteInternal(command, null, out result);
+    }
+
+    public static bool TryExecute(string command, ModCmdScope scope, out string result)
+    {
+        return TryExecuteInternal(command, scope, out result);
+    }
+
+    private static bool TryExecuteInternal(string command, ModCmdScope? scope, out string result)
+    {
         try
         {
+            bool sceneCommand = IsSceneCommand(command);
+            if (scope == ModCmdScope.Story && sceneCommand)
+            {
+                result = "Scene commands can only be executed from ModScene.";
+                return false;
+            }
+
+            if (scope == ModCmdScope.Scene && !sceneCommand && !string.IsNullOrWhiteSpace(command))
+            {
+                result = "Story data commands can only be executed from ModStory. ModScene only accepts SceneAddTile, SceneAddItem, SceneAddObject, and SceneAddCharacter.";
+                return false;
+            }
+
             if (TryExecuteSceneCommand(command, out bool isSceneCommand, out result))
                 return true;
             if (isSceneCommand)
@@ -102,6 +131,28 @@ public class ModCmd : MonoBehaviour
         }
     }
 
+    private static bool IsSceneCommand(string command)
+    {
+        if (string.IsNullOrWhiteSpace(command))
+            return false;
+
+        int index = 0;
+        SkipWhiteSpace(command, ref index);
+        int commandStart = index;
+        while (index < command.Length && !char.IsWhiteSpace(command[index]))
+            index++;
+        string commandName = command.Substring(commandStart, index - commandStart);
+        return IsSceneCommandName(commandName);
+    }
+
+    private static bool IsSceneCommandName(string commandName)
+    {
+        return commandName.Equals("SceneAddTile", StringComparison.OrdinalIgnoreCase)
+               || commandName.Equals("SceneAddItem", StringComparison.OrdinalIgnoreCase)
+               || commandName.Equals("SceneAddObject", StringComparison.OrdinalIgnoreCase)
+               || commandName.Equals("SceneAddCharacter", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static bool TryExecuteSceneCommand(string command, out bool isSceneCommand, out string result)
     {
         isSceneCommand = false;
@@ -120,7 +171,7 @@ public class ModCmd : MonoBehaviour
         bool isAddItem = commandName.Equals("SceneAddItem", StringComparison.OrdinalIgnoreCase);
         bool isAddObject = commandName.Equals("SceneAddObject", StringComparison.OrdinalIgnoreCase);
         bool isAddCharacter = commandName.Equals("SceneAddCharacter", StringComparison.OrdinalIgnoreCase);
-        isSceneCommand = isAddTile || isAddItem || isAddObject || isAddCharacter;
+        isSceneCommand = IsSceneCommandName(commandName);
         if (!isSceneCommand)
             return false;
 

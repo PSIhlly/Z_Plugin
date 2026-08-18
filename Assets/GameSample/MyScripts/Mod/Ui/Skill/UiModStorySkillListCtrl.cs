@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
+using Z_DesignStyle;
 using Z_DataSystem.Form;
 using Z_Text;
 
@@ -184,7 +185,9 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.BindTexData(TexAssetForm.DataById[model.data.icon]);
+                var tex = TexAssetForm.DataById.GetDv(model.data.icon, null)
+                    ?? TexAssetForm.DataById.GetDv(GlobalDefaultHelper.DefaultTexId, null);
+                view.img_.BindTexData(tex);
             }
         }
     }

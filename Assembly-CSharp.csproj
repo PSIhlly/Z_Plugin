@@ -81,6 +81,7 @@
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Process\SaveCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\MapObject\UiModStoryMapObjectObjectAppearanceCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\SetSceneObjectParameterCmd.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\ModCmd\ModCmdStory.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Math\EqualCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\TextCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Skill\UiModSkillCtrl.cs" />
@@ -401,6 +402,7 @@
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\ShowEffectCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\Ui\PlayAsset\UiPlayAssetCtrl.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiTeamSelectWindowBase.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\ModCmd\ModCmdScene.cs" />
     <Compile Include="Assets\GameSample\Forms\ExcelCs\MapObjectForm.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\SelfObjectCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Item\LostItemCmd.cs" />

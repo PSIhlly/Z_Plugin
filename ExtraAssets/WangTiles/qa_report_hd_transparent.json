@@ -1,0 +1,1540 @@
+{
+  "format": "standard 4x6 Wang/AutoTile sheet",
+  "sheet_size": [
+    384,
+    576
+  ],
+  "tile_size": [
+    96,
+    96
+  ],
+  "color_mode": "RGBA",
+  "background": "transparent",
+  "materials": {
+    "river": "River water",
+    "sea": "Sea water",
+    "lava": "Lava",
+    "mud": "Mud",
+    "road": "Road",
+    "cement": "Cement",
+    "ice": "Ice",
+    "sand": "Sand",
+    "grass": "Grass",
+    "rock": "Rock ground"
+  },
+  "effect_contract": {
+    "inset_01..03": "three detailed recessed / bordered variants",
+    "raised": "convex terrain with bevel highlight and cast shadow",
+    "feather": "soft blurred alpha transition",
+    "noise": "granular eroded alpha transition"
+  },
+  "edge_contract": {
+    "texture_aware_contour": true,
+    "transparent_rgb_bleed": true,
+    "compatible_rgba_edges_are_exact": true
+  },
+  "validation": {
+    "wang_river_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74218,
+      "partially_transparent_pixels": 5299,
+      "opaque_pixels": 141667,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "River water",
+      "effect": "inset_01",
+      "sha256": "4849669bac97fb04985c2fc896d8bad05bfdc12197c86dffbe7bccc0959c90a6"
+    },
+    "wang_river_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74014,
+      "partially_transparent_pixels": 5445,
+      "opaque_pixels": 141725,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "River water",
+      "effect": "inset_02",
+      "sha256": "28a2475d564a816c574057d7ead452d0588b6b3bff91bec3ee2d961669f5d4fa"
+    },
+    "wang_river_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74391,
+      "partially_transparent_pixels": 5312,
+      "opaque_pixels": 141481,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "River water",
+      "effect": "inset_03",
+      "sha256": "018a9a0b115ca678a727a2a7c59f3c68727d4c7048f55b2c9efd2676c6e431cd"
+    },
+    "wang_river_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 69156,
+      "partially_transparent_pixels": 10525,
+      "opaque_pixels": 141503,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "River water",
+      "effect": "raised",
+      "sha256": "ad86758ef8a467aa595dada4645413b41a42d486c429f0288d17046482376491"
+    },
+    "wang_river_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 62089,
+      "partially_transparent_pixels": 30091,
+      "opaque_pixels": 129004,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "River water",
+      "effect": "feather",
+      "sha256": "59298a17cf01193e77116f6c308f5b3941ff9222b616835ca333c3c7251c3bc9"
+    },
+    "wang_river_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 69105,
+      "partially_transparent_pixels": 16790,
+      "opaque_pixels": 135289,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "River water",
+      "effect": "noise",
+      "sha256": "caadb92ad3c7eb6d3928abc7e5bc3743aca15348cd131a0a9141a3035d0f1630"
+    },
+    "wang_sea_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74265,
+      "partially_transparent_pixels": 5395,
+      "opaque_pixels": 141524,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sea water",
+      "effect": "inset_01",
+      "sha256": "4e9d836b6c73e87be505cb5bc47566ad8e2491958ebb2a18bde73b4daecbc823"
+    },
+    "wang_sea_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74013,
+      "partially_transparent_pixels": 5614,
+      "opaque_pixels": 141557,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sea water",
+      "effect": "inset_02",
+      "sha256": "298a4a250d776dc9419302f8d796d8656039497ecdcdd5afeb1076c9bf4a75db"
+    },
+    "wang_sea_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74175,
+      "partially_transparent_pixels": 5304,
+      "opaque_pixels": 141705,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sea water",
+      "effect": "inset_03",
+      "sha256": "a1e0fab905462805bcde6cd2c875035de7b014a0f6be071d21d3a40d5102d08f"
+    },
+    "wang_sea_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 69253,
+      "partially_transparent_pixels": 10361,
+      "opaque_pixels": 141570,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sea water",
+      "effect": "raised",
+      "sha256": "377801cb6049c058d04c2cd95197786787d5e96ca1220a304bb040b1791a81b1"
+    },
+    "wang_sea_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 61904,
+      "partially_transparent_pixels": 30380,
+      "opaque_pixels": 128900,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sea water",
+      "effect": "feather",
+      "sha256": "d3c4ae100aac39ea654871faddebd114381341e038f5c0ce323ce95b82d434fd"
+    },
+    "wang_sea_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 69852,
+      "partially_transparent_pixels": 16033,
+      "opaque_pixels": 135299,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sea water",
+      "effect": "noise",
+      "sha256": "0676558b4e4faa9c958f1303b2f49a15e95a480b10ab881963f3a23862f1ed12"
+    },
+    "wang_lava_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73909,
+      "partially_transparent_pixels": 5537,
+      "opaque_pixels": 141738,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Lava",
+      "effect": "inset_01",
+      "sha256": "37a8e1201e665e4306c7be4c5c91fdb3f10ac10520a1caff19b9a77260a3454d"
+    },
+    "wang_lava_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73999,
+      "partially_transparent_pixels": 5316,
+      "opaque_pixels": 141869,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Lava",
+      "effect": "inset_02",
+      "sha256": "2d26c1fc271b625b3f30f74a460ce87133ee5e1e581f07d50819618a7b951117"
+    },
+    "wang_lava_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73962,
+      "partially_transparent_pixels": 5466,
+      "opaque_pixels": 141756,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Lava",
+      "effect": "inset_03",
+      "sha256": "84ae8e223c84e4b0682429d813259960cad4223cc32b757b648b8edd9bb540c9"
+    },
+    "wang_lava_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68908,
+      "partially_transparent_pixels": 10502,
+      "opaque_pixels": 141774,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Lava",
+      "effect": "raised",
+      "sha256": "364d59f7286760ed9f6b1ed46c80b215b7499421d13fed1d9a26f56859ef5140"
+    },
+    "wang_lava_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 61529,
+      "partially_transparent_pixels": 30908,
+      "opaque_pixels": 128747,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Lava",
+      "effect": "feather",
+      "sha256": "01a3cac5991d1dfa213b80e65b652bb98154eb29bd36d8ba941a4265e18a0140"
+    },
+    "wang_lava_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68536,
+      "partially_transparent_pixels": 16555,
+      "opaque_pixels": 136093,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Lava",
+      "effect": "noise",
+      "sha256": "28ddc305e77caeb577adf76e8479fed872c5112a911a9510ae3339f53ca2fbbd"
+    },
+    "wang_mud_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73905,
+      "partially_transparent_pixels": 5419,
+      "opaque_pixels": 141860,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Mud",
+      "effect": "inset_01",
+      "sha256": "231880405016b06753040c6b3e1ce23dfa6265b677b611b60ff0e63ec9ee8de7"
+    },
+    "wang_mud_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73857,
+      "partially_transparent_pixels": 5574,
+      "opaque_pixels": 141753,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Mud",
+      "effect": "inset_02",
+      "sha256": "62d0c1610177f165f25bf7214d0a814ca749d943c5ed6e1bb789dc83e9df8955"
+    },
+    "wang_mud_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73900,
+      "partially_transparent_pixels": 5452,
+      "opaque_pixels": 141832,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Mud",
+      "effect": "inset_03",
+      "sha256": "c230660226a506787b29a25ac353e61ab0e3a8ac36318f486a83b8c558c70a6e"
+    },
+    "wang_mud_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68951,
+      "partially_transparent_pixels": 10294,
+      "opaque_pixels": 141939,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Mud",
+      "effect": "raised",
+      "sha256": "9371786a59aa11ad9e4bf4c4affed7c55fa0dffc4c68a099fe81472957cada47"
+    },
+    "wang_mud_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 60864,
+      "partially_transparent_pixels": 31123,
+      "opaque_pixels": 129197,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Mud",
+      "effect": "feather",
+      "sha256": "90dd869477447172a21609227cd5bfa2e5dd2049650cfa1677d3103e79d32820"
+    },
+    "wang_mud_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68621,
+      "partially_transparent_pixels": 17409,
+      "opaque_pixels": 135154,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Mud",
+      "effect": "noise",
+      "sha256": "bfaf0eb5127e91922d6edad8e3ce4a963038c75f6f606cb46d923b4df4332808"
+    },
+    "wang_road_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73986,
+      "partially_transparent_pixels": 5470,
+      "opaque_pixels": 141728,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Road",
+      "effect": "inset_01",
+      "sha256": "cc591cfd6c78597cb7e635f66639fd8b224dcdc39342eb930e8e4122c85577d3"
+    },
+    "wang_road_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73949,
+      "partially_transparent_pixels": 5538,
+      "opaque_pixels": 141697,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Road",
+      "effect": "inset_02",
+      "sha256": "de71b943014f9fb670fd31107e51c1d697deb901f3d1936e5495ed8def330dc3"
+    },
+    "wang_road_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73954,
+      "partially_transparent_pixels": 5403,
+      "opaque_pixels": 141827,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Road",
+      "effect": "inset_03",
+      "sha256": "1e3e35ce40a16a3358b7ce632183f983825423d16be26381debe2a868647e171"
+    },
+    "wang_road_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 69045,
+      "partially_transparent_pixels": 10423,
+      "opaque_pixels": 141716,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Road",
+      "effect": "raised",
+      "sha256": "efba46d23888ef789fde8b5e15f5f3de5be060dab150d22313c1c82b894ff234"
+    },
+    "wang_road_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 60455,
+      "partially_transparent_pixels": 32533,
+      "opaque_pixels": 128196,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Road",
+      "effect": "feather",
+      "sha256": "41544e322b7f37c629b47730787a13be91598f76df179a9dba01b3b0fa1d6d38"
+    },
+    "wang_road_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 67503,
+      "partially_transparent_pixels": 18377,
+      "opaque_pixels": 135304,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Road",
+      "effect": "noise",
+      "sha256": "79bb3ace4e0901dd23a57ae9ae813b0d4f39f09b62e71ec4ef99131d8ed51628"
+    },
+    "wang_cement_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73701,
+      "partially_transparent_pixels": 5432,
+      "opaque_pixels": 142051,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Cement",
+      "effect": "inset_01",
+      "sha256": "8f1604a8777afcf88a98be1445e2178809279f626da784b566c2dea19f4f3a4a"
+    },
+    "wang_cement_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73531,
+      "partially_transparent_pixels": 5736,
+      "opaque_pixels": 141917,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Cement",
+      "effect": "inset_02",
+      "sha256": "043cb4d9552eb13e8d773a5cc1e9fbcc8930fac83b38576654a6478eea18074e"
+    },
+    "wang_cement_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73711,
+      "partially_transparent_pixels": 5463,
+      "opaque_pixels": 142010,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Cement",
+      "effect": "inset_03",
+      "sha256": "754c577b4e57599102c4f8818b1ec2bbe47d5cb1c50446719ebff9a9d3170de6"
+    },
+    "wang_cement_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68663,
+      "partially_transparent_pixels": 10692,
+      "opaque_pixels": 141829,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Cement",
+      "effect": "raised",
+      "sha256": "e7ef3046756d501403c0cee8025504323e9e3c41c739cd4d0233ac74ff5ac9d4"
+    },
+    "wang_cement_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 60592,
+      "partially_transparent_pixels": 31490,
+      "opaque_pixels": 129102,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Cement",
+      "effect": "feather",
+      "sha256": "ce0b55df00030f3582650e46bde1bec42f9f67b6030d559d1b85e8179f395208"
+    },
+    "wang_cement_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68229,
+      "partially_transparent_pixels": 17446,
+      "opaque_pixels": 135509,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Cement",
+      "effect": "noise",
+      "sha256": "e5e9d78ab271a3544a6613df21b716baa508e85516d2cb3a259b44143cd45a18"
+    },
+    "wang_ice_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73915,
+      "partially_transparent_pixels": 5532,
+      "opaque_pixels": 141737,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Ice",
+      "effect": "inset_01",
+      "sha256": "508a00963f73203632dae260e765e852aa1ba29ed040569c9f6872e627b5e191"
+    },
+    "wang_ice_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74086,
+      "partially_transparent_pixels": 5425,
+      "opaque_pixels": 141673,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Ice",
+      "effect": "inset_02",
+      "sha256": "6728180fb639727f6b4ce3f3b99f337f97ba3aafb7aa446b5935501fcfb26221"
+    },
+    "wang_ice_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74011,
+      "partially_transparent_pixels": 5181,
+      "opaque_pixels": 141992,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Ice",
+      "effect": "inset_03",
+      "sha256": "503976fb400a22e9ebd19fe91379672c48c50b070055ef04a9e7b0c06aef9ef2"
+    },
+    "wang_ice_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68907,
+      "partially_transparent_pixels": 10588,
+      "opaque_pixels": 141689,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Ice",
+      "effect": "raised",
+      "sha256": "9c17c13ca05c1f67bbf993c7ad55314d26656f1ac3d36f73c194dacdee575fb3"
+    },
+    "wang_ice_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 61715,
+      "partially_transparent_pixels": 30348,
+      "opaque_pixels": 129121,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Ice",
+      "effect": "feather",
+      "sha256": "69e1fbaa009c12f8bb1622a0dea9d8c52b023f2b98fe34eeabc15e182a156b26"
+    },
+    "wang_ice_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 69538,
+      "partially_transparent_pixels": 15929,
+      "opaque_pixels": 135717,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Ice",
+      "effect": "noise",
+      "sha256": "6d713c5c1fd939f2056fa3997717094ccd415f83b1ec94cae8957a1b1ed80daf"
+    },
+    "wang_sand_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73842,
+      "partially_transparent_pixels": 5335,
+      "opaque_pixels": 142007,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sand",
+      "effect": "inset_01",
+      "sha256": "90c068af1aff5a2d8f2e9476f2961fb2aacefabe416a893ac7c9251f7d70191a"
+    },
+    "wang_sand_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73641,
+      "partially_transparent_pixels": 5471,
+      "opaque_pixels": 142072,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sand",
+      "effect": "inset_02",
+      "sha256": "0a2cb23ece7d187c78e9f88fd1bafc03b32153be85e47ebb7d72ffc61f52622e"
+    },
+    "wang_sand_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73847,
+      "partially_transparent_pixels": 5481,
+      "opaque_pixels": 141856,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sand",
+      "effect": "inset_03",
+      "sha256": "c783b639513441a3a118528a1f017c612710d356db82bf00944773a490d822b2"
+    },
+    "wang_sand_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68684,
+      "partially_transparent_pixels": 10626,
+      "opaque_pixels": 141874,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sand",
+      "effect": "raised",
+      "sha256": "311d7cb651a46af299178043f593c5a20712f367f678f0596f5ed5737fce07bd"
+    },
+    "wang_sand_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 61192,
+      "partially_transparent_pixels": 30816,
+      "opaque_pixels": 129176,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sand",
+      "effect": "feather",
+      "sha256": "e02e8517f3c0b14181dafea04ecc5d4d1eb124cc7d3b841382e147b66ed880d0"
+    },
+    "wang_sand_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68684,
+      "partially_transparent_pixels": 16538,
+      "opaque_pixels": 135962,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Sand",
+      "effect": "noise",
+      "sha256": "d35ac6d0e60547ec4db83ec6d64ad978371001444c37b317d63f3b01943f697d"
+    },
+    "wang_grass_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 74005,
+      "partially_transparent_pixels": 5478,
+      "opaque_pixels": 141701,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Grass",
+      "effect": "inset_01",
+      "sha256": "066b0492b4741d97582b8266f631ad4e936d34d9916564141dbe6a8a797d2ee2"
+    },
+    "wang_grass_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73936,
+      "partially_transparent_pixels": 5604,
+      "opaque_pixels": 141644,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Grass",
+      "effect": "inset_02",
+      "sha256": "02ac1af085b82fb7b0d70e022d699c271a15b3fa8b05e63e4a2ac3667cc750c2"
+    },
+    "wang_grass_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73957,
+      "partially_transparent_pixels": 5600,
+      "opaque_pixels": 141627,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Grass",
+      "effect": "inset_03",
+      "sha256": "57594b8ba7370ccabd5b7bce4edc62f6c41c9265dbbd2e4f12ba75cd3c425797"
+    },
+    "wang_grass_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68877,
+      "partially_transparent_pixels": 10700,
+      "opaque_pixels": 141607,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Grass",
+      "effect": "raised",
+      "sha256": "64201c7993eca13365e38e6b7b31f0536c1a1b8743044b1025a2a08166d1d9d9"
+    },
+    "wang_grass_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 61288,
+      "partially_transparent_pixels": 31277,
+      "opaque_pixels": 128619,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Grass",
+      "effect": "feather",
+      "sha256": "358e2ffdfa952351ad66270dd29cd2b7550d507461a0f09ac74f671de7ff9926"
+    },
+    "wang_grass_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 67977,
+      "partially_transparent_pixels": 17175,
+      "opaque_pixels": 136032,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Grass",
+      "effect": "noise",
+      "sha256": "01f2c39e03690848230847e95d2900af47128597a44cfcc2dbf95d05cffeefa5"
+    },
+    "wang_rock_inset_01.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73686,
+      "partially_transparent_pixels": 5377,
+      "opaque_pixels": 142121,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Rock ground",
+      "effect": "inset_01",
+      "sha256": "476c0c0f4d46de8ef510f9d9b5ad5945e3d0c9831d1fa1155e1c1c32a912964b"
+    },
+    "wang_rock_inset_02.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73386,
+      "partially_transparent_pixels": 5689,
+      "opaque_pixels": 142109,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Rock ground",
+      "effect": "inset_02",
+      "sha256": "34a43543d4bf85c2a59e8cfc07c81c2f28da1a0e371f1a42fbaa7e367033b793"
+    },
+    "wang_rock_inset_03.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 73582,
+      "partially_transparent_pixels": 5536,
+      "opaque_pixels": 142066,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Rock ground",
+      "effect": "inset_03",
+      "sha256": "3458a8fb958923dd7870de6aac3e3b93bb40a4b757ccc8283bef8426cbc2e1b1"
+    },
+    "wang_rock_raised.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 68501,
+      "partially_transparent_pixels": 10491,
+      "opaque_pixels": 142192,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Rock ground",
+      "effect": "raised",
+      "sha256": "162668d92a19a85365b87fa61affd6335ece5ff7b8e308da8392972ffd5f28be"
+    },
+    "wang_rock_feather.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 60826,
+      "partially_transparent_pixels": 31065,
+      "opaque_pixels": 129293,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Rock ground",
+      "effect": "feather",
+      "sha256": "b26162283695002499db4c75e55509a8d348e3e0d582db64754ca23575250c0d"
+    },
+    "wang_rock_noise.png": {
+      "mode": "RGBA",
+      "sheet_size": [
+        384,
+        576
+      ],
+      "grid": [
+        4,
+        6
+      ],
+      "tile_size": [
+        96,
+        96
+      ],
+      "transparent_pixels": 67838,
+      "partially_transparent_pixels": 16990,
+      "opaque_pixels": 136356,
+      "horizontal_compatible_pairs": 109,
+      "vertical_compatible_pairs": 106,
+      "compatible_rgba_seam_mismatches": 0,
+      "topology_matches_reference": true,
+      "material": "Rock ground",
+      "effect": "noise",
+      "sha256": "3afe46ef194038a8c07dbcfa0909cda09be94d744c81a1fe9c68e44360e75ab8"
+    }
+  },
+  "sheet_count": 60,
+  "unique_sha256_count": 60
+}

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Z_Ui.Base;
 using Z_Texture;
 using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Text;
 using UnityEngine;
 
@@ -185,7 +186,10 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             if (model.data != null)
             {
                 view.txt_.text = model.data.name;
-                view.img_.BindTexData(TexAssetForm.DataById[model.data.avatarTex]);
+                var tex = TexAssetForm.DataById.GetDv(model.data.avatarTex, null)
+                    ?? TexAssetForm.DataById.GetDv(GlobalDefaultHelper.DefaultCharacterTexId, null)
+                    ?? TexAssetForm.DataById.GetDv(GlobalDefaultHelper.DefaultTexId, null);
+                view.img_.BindTexData(tex);
             }
         }
     }

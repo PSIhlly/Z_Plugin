@@ -164,3 +164,7 @@ When adding a command:
 - Confirm no duplicated callbacks or stale listener reactions.
 - For command changes, execute both success and failure/async paths.
 - For lifecycle changes, verify scene-configured Managers retain their Inspector references.
+
+Story ModCmd form mutations use explicit AddStoryX, DelStoryX, CopyStoryX, and SetStoryX names (for example AddStoryCharacter); bare AddCharacter-style names are invalid. Scene mutations remain SceneAdd*.
+
+ModCmd implementation files: ModCmd.cs is the facade/shared parser; ModCmdStory.cs contains Form mutations; ModCmdScene.cs contains SceneAdd mutations. Keep them in the same Assembly-CSharp boundary.

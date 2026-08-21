@@ -175,162 +175,15 @@
     "belong": "GameCmdDataForm"
   },
   {
-    "id": 1,
-    "lv1Lab": "default",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "MapTextureForm"
-  },
-  {
-    "id": 2,
-    "lv1Lab": "草1",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "MapTextureForm"
-  },
-  {
-    "id": 3,
-    "lv1Lab": "水1",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "MapTextureForm"
-  },
-  {
-    "id": 4,
-    "lv1Lab": "default",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "MapObjectForm"
-  },
-  {
-    "id": 5,
-    "lv1Lab": "景物",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "MapObjectForm"
-  },
-  {
-    "id": 6,
-    "lv1Lab": "子弹",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "MapObjectForm"
-  },
-  {
-    "id": 7,
-    "lv1Lab": "自机",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "CharacterProductForm"
-  },
-  {
-    "id": 8,
-    "lv1Lab": "小怪",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "CharacterProductForm"
-  },
-  {
-    "id": 9,
-    "lv1Lab": "魔理沙",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "SkillProductForm"
-  },
-  {
-    "id": 10,
-    "lv1Lab": "通用",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "SkillProductForm"
-  },
-  {
-    "id": 11,
-    "lv1Lab": "场景特效",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "EffectForm"
-  },
-  {
-    "id": 12,
-    "lv1Lab": "技能",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "EffectForm"
-  },
-  {
-    "id": 13,
-    "lv1Lab": "流程",
-    "lv2Lab": "机制",
-    "lv3Lab": "",
-    "belong": "EventProgramDataForm"
-  },
-  {
-    "id": 14,
-    "lv1Lab": "人物",
-    "lv2Lab": "通用",
-    "lv3Lab": "",
-    "belong": "EventProgramDataForm"
-  },
-  {
-    "id": 15,
-    "lv1Lab": "通用",
-    "lv2Lab": "子弹",
-    "lv3Lab": "",
-    "belong": "EventProgramDataForm"
-  },
-  {
-    "id": 16,
-    "lv1Lab": "通用",
-    "lv2Lab": "Ui",
-    "lv3Lab": "",
-    "belong": "EventProgramDataForm"
-  },
-  {
-    "id": 17,
-    "lv1Lab": "enterGame",
-    "lv2Lab": "dialog",
-    "lv3Lab": "",
-    "belong": "EventProgramDataForm"
-  },
-  {
-    "id": 18,
-    "lv1Lab": "特效",
+    "id": 26,
+    "lv1Lab": "博丽灵梦",
     "lv2Lab": "",
     "lv3Lab": "",
     "belong": "StoryTexAssetForm"
   },
   {
-    "id": 19,
-    "lv1Lab": "草",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "StoryTexAssetForm"
-  },
-  {
-    "id": 20,
-    "lv1Lab": "背景",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "StoryTexAssetForm"
-  },
-  {
-    "id": 21,
+    "id": 25,
     "lv1Lab": "npc",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "CharacterProductForm"
-  },
-  {
-    "id": 22,
-    "lv1Lab": "魔理沙",
-    "lv2Lab": "",
-    "lv3Lab": "",
-    "belong": "StoryTexAssetForm"
-  },
-  {
-    "id": 23,
-    "lv1Lab": "自机",
     "lv2Lab": "",
     "lv3Lab": "",
     "belong": "MapCharacterForm"
@@ -343,10 +196,164 @@
     "belong": "MapCharacterForm"
   },
   {
-    "id": 25,
-    "lv1Lab": "npc",
+    "id": 23,
+    "lv1Lab": "自机",
     "lv2Lab": "",
     "lv3Lab": "",
     "belong": "MapCharacterForm"
+  },
+  {
+    "id": 22,
+    "lv1Lab": "魔理沙",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 21,
+    "lv1Lab": "npc",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "CharacterProductForm"
+  },
+  {
+    "id": 20,
+    "lv1Lab": "背景",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 18,
+    "lv1Lab": "特效",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
+    "id": 17,
+    "lv1Lab": "enterGame",
+    "lv2Lab": "dialog",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 16,
+    "lv1Lab": "通用",
+    "lv2Lab": "Ui",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 15,
+    "lv1Lab": "通用",
+    "lv2Lab": "子弹",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 14,
+    "lv1Lab": "人物",
+    "lv2Lab": "通用",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 13,
+    "lv1Lab": "流程",
+    "lv2Lab": "机制",
+    "lv3Lab": "",
+    "belong": "EventProgramDataForm"
+  },
+  {
+    "id": 12,
+    "lv1Lab": "技能",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "EffectForm"
+  },
+  {
+    "id": 11,
+    "lv1Lab": "场景特效",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "EffectForm"
+  },
+  {
+    "id": 10,
+    "lv1Lab": "通用",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "SkillProductForm"
+  },
+  {
+    "id": 9,
+    "lv1Lab": "魔理沙",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "SkillProductForm"
+  },
+  {
+    "id": 8,
+    "lv1Lab": "小怪",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "CharacterProductForm"
+  },
+  {
+    "id": 7,
+    "lv1Lab": "自机",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "CharacterProductForm"
+  },
+  {
+    "id": 6,
+    "lv1Lab": "子弹",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapObjectForm"
+  },
+  {
+    "id": 5,
+    "lv1Lab": "景物",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapObjectForm"
+  },
+  {
+    "id": 4,
+    "lv1Lab": "default",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapObjectForm"
+  },
+  {
+    "id": 3,
+    "lv1Lab": "水1",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapTextureForm"
+  },
+  {
+    "id": 2,
+    "lv1Lab": "草1",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapTextureForm"
+  },
+  {
+    "id": 1,
+    "lv1Lab": "default",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "MapTextureForm"
+  },
+  {
+    "id": 27,
+    "lv1Lab": "地面",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
   }
 ]

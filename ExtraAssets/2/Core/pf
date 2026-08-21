@@ -9,11 +9,17 @@
     "team": [
       {
         "v": 2
+      },
+      {
+        "v": 1
       }
     ],
     "teamActive": [
       {
         "v": 2
+      },
+      {
+        "v": 1
       }
     ],
     "uiStyleImageName": [],

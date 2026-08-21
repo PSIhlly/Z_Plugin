@@ -135,6 +135,7 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public void Refresh()
         {
+            GameManager.instance.saveCtrl.RepairMissingCharacterTextureReferences();
             view.ipt_name.Set(model.data.name);
             view.ipt_scale.Set(model.data.scale.ToString());
             view.ipt_interval.Set(model.data.animTimeInterval.ToString());
@@ -257,8 +258,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         private void RefreshView()
         {
+            var partTex = model.data.animClip[model.dir][model.id].partTex;
+            var upperPartTextureId = partTex != null && partTex.TryGetValue(BodyPartType.UpperPart, out var textureId)
+                ? textureId
+                : GlobalDefaultHelper.DefaultTexId;
             List<int> texNameLst = new List<int>() {
-                model.data.animClip[model.dir][model.id].partTex[BodyPartType.UpperPart],
+                upperPartTextureId,
                 -1,
                 GlobalDefaultHelper.DefaultTexId
                 };
@@ -380,7 +385,12 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             if (model.prm.id != -1)
             {
                 view.txt_.text = "";
-                view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.animClip[parent.model.dir][model.prm.id].partTex[BodyPartType.UpperPart]]);
+                var partTex = parent.model.data.animClip[parent.model.dir][model.prm.id].partTex;
+                var textureId = GlobalDefaultHelper.DefaultTexId;
+                var hasTextureId = partTex != null && partTex.TryGetValue(BodyPartType.UpperPart, out textureId);
+                if (!hasTextureId || !TexAssetForm.DataById.TryGetValue(textureId, out var textureData))
+                    TexAssetForm.DataById.TryGetValue(GlobalDefaultHelper.DefaultTexId, out textureData);
+                view.img_.BindTexData(textureData);
             }
 
         }

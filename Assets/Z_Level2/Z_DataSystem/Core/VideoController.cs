@@ -83,22 +83,9 @@ namespace Z_DataSystem
             }
             public override void OnImportComplete(byte[] data, string name)
             {
-                if (data != null)
-                {
-                    
-                    var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
-                    if(!Directory.Exists(AssetManager.cachePath))
-                    {
-                        Directory.CreateDirectory(AssetManager.cachePath);
-                    }
-                    File.WriteAllBytes(AssetManager.cachePath + nm, data);
-                    var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, name);
+                var form = ctrl.CreateSelectedData(data, name);
+                if (form != null)
                     callback?.Invoke(form);
-                    Z_EventHelper.Invoke(new AssetEvent()
-                    {
-                        importAssetName = name
-                    });
-                }
             }
         }
         public List<string> GetVideoAssetsByFolder(string path, bool isRes)
@@ -134,6 +121,41 @@ namespace Z_DataSystem
             SelectVideoTask task = new SelectVideoTask();
             task.callback = callback;
             task.Run(this);
+        }
+        public void SelectMultiple(Action<IReadOnlyList<VideoAssetForm.Data>> callback = null)
+        {
+            AssetFilePicker.GetVideos(paths =>
+            {
+                var forms = new List<VideoAssetForm.Data>();
+                if (paths != null)
+                {
+                    foreach (var path in paths)
+                    {
+                        if (string.IsNullOrEmpty(path))
+                            continue;
+                        var form = CreateSelectedData(File.ReadAllBytes(path), Path.GetFileNameWithoutExtension(path));
+                        if (form != null)
+                            forms.Add(form);
+                    }
+                }
+                callback?.Invoke(forms);
+            });
+        }
+        private VideoAssetForm.Data CreateSelectedData(byte[] data, string name)
+        {
+            if (data == null)
+                return null;
+
+            var nm = GetMark() + BytesSerialize.GetHash(data) + GetMark();
+            if (!Directory.Exists(AssetManager.cachePath))
+                Directory.CreateDirectory(AssetManager.cachePath);
+            File.WriteAllBytes(AssetManager.cachePath + nm, data);
+            var form = CreateDataByPath(AssetManager.cachePath + nm, name);
+            Z_EventHelper.Invoke(new AssetEvent()
+            {
+                importAssetName = name
+            });
+            return form;
         }
         public VideoAssetForm.Data CreateDataByClip(VideoClip clip, string name)
         {

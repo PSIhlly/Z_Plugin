@@ -125,6 +125,10 @@ Rules:
 - Render Model → View in a dedicated `Refresh()` method; avoid hidden writes while rendering.
 - Check `active` before refreshing a hidden UI from a global event.
 - Use `UiManager.ShowUi<T>`, `CloseUi<T>`, and existing containers instead of manually instantiating UI prefabs.
+- `NotifyManager.AddTip` wraps Tip text at 30 characters per line while preserving explicit line breaks; Popup and input-area text are not wrapped by this rule.
+- `UiModAssetSelectWindow` exposes `ipt_labelName` and `btn_lableDelete` for the active Label filter; renaming reuses matching labels and deletion moves affected assets to unclassified before removing the Label record.
+- `UiModAssetSelectWindow`'s `btn_replace` opens the single-asset picker for the selected item, updates the existing asset in place (keeping its ID), and clears texture runtime caches before refreshing.
+- `UiModAssetSelectWindowCtrl.OnShow` keeps the last Label filter when reopening within the same asset scope; if that label is no longer visible, fall back to unclassified when available, otherwise All.
 
 ## Global event bus
 
@@ -140,7 +144,7 @@ Rules:
 
 Core command infrastructure is under `Assets/Z_Level2/Z_Code/Core`; product commands are under `Assets/GameSample/MyScripts/Main/Event/Cmd`.
 
-`ModCmd` UI entry points use explicit execution scopes: ModStory accepts Form/story-data operations, while ModScene accepts only `SceneAdd*` operations. Enforce the scope inside `ModCmd` before parsing or mutating data; UI-only filtering is insufficient.
+`ModCmd` UI entry points use explicit execution scopes: ModStory accepts Form/story-data operations, while ModScene accepts only `*Scene*` operations. Enforce the scope inside `ModCmd` before parsing or mutating data; UI-only filtering is insufficient.
 
 When adding a command:
 
@@ -165,6 +169,6 @@ When adding a command:
 - For command changes, execute both success and failure/async paths.
 - For lifecycle changes, verify scene-configured Managers retain their Inspector references.
 
-Story ModCmd form mutations use explicit AddStoryX, DelStoryX, CopyStoryX, and SetStoryX names (for example AddStoryCharacter); bare AddCharacter-style names are invalid. Scene mutations remain SceneAdd*.
+Story ModCmd form mutations use explicit `*Story*` names: AddStoryX, DelStoryX, CopyStoryX, and SetStoryX (for example AddStoryCharacter). Scene mutations use `*Scene*` names such as AddSceneTile, AddSceneItem, AddSceneObject, and AddSceneCharacter.
 
-ModCmd implementation files: ModCmd.cs is the facade/shared parser; ModCmdStory.cs contains Form mutations; ModCmdScene.cs contains SceneAdd mutations. Keep them in the same Assembly-CSharp boundary.
+ModCmd implementation files: ModCmd.cs is the facade/shared parser; ModCmdStory.cs contains Form mutations; ModCmdScene.cs contains AddScene mutations. Keep them in the same Assembly-CSharp boundary.

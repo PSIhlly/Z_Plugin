@@ -30,10 +30,10 @@ public partial class ModCmd
 
     private static bool IsSceneCommandName(string commandName)
     {
-        return commandName.Equals("SceneAddTile", StringComparison.OrdinalIgnoreCase)
-               || commandName.Equals("SceneAddItem", StringComparison.OrdinalIgnoreCase)
-               || commandName.Equals("SceneAddObject", StringComparison.OrdinalIgnoreCase)
-               || commandName.Equals("SceneAddCharacter", StringComparison.OrdinalIgnoreCase);
+        return commandName.Equals("AddSceneTile", StringComparison.OrdinalIgnoreCase)
+               || commandName.Equals("AddSceneItem", StringComparison.OrdinalIgnoreCase)
+               || commandName.Equals("AddSceneObject", StringComparison.OrdinalIgnoreCase)
+               || commandName.Equals("AddSceneCharacter", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool TryExecuteSceneCommand(string command, out bool isSceneCommand, out string result)
@@ -50,10 +50,10 @@ public partial class ModCmd
             index++;
         string commandName = command.Substring(commandStart, index - commandStart);
 
-        bool isAddTile = commandName.Equals("SceneAddTile", StringComparison.OrdinalIgnoreCase);
-        bool isAddItem = commandName.Equals("SceneAddItem", StringComparison.OrdinalIgnoreCase);
-        bool isAddObject = commandName.Equals("SceneAddObject", StringComparison.OrdinalIgnoreCase);
-        bool isAddCharacter = commandName.Equals("SceneAddCharacter", StringComparison.OrdinalIgnoreCase);
+        bool isAddTile = commandName.Equals("AddSceneTile", StringComparison.OrdinalIgnoreCase);
+        bool isAddItem = commandName.Equals("AddSceneItem", StringComparison.OrdinalIgnoreCase);
+        bool isAddObject = commandName.Equals("AddSceneObject", StringComparison.OrdinalIgnoreCase);
+        bool isAddCharacter = commandName.Equals("AddSceneCharacter", StringComparison.OrdinalIgnoreCase);
         isSceneCommand = IsSceneCommandName(commandName);
         if (!isSceneCommand)
             return false;
@@ -64,7 +64,7 @@ public partial class ModCmd
         ModManager modManager = ModManager.instance;
         if (modManager.assetCtrl == null || modManager.sceneCtrl == null || MapManager.instance.data == null)
         {
-            result = "A Mod scene must be active before executing a SceneAdd command.";
+            result = "A Mod scene must be active before executing an AddScene command.";
             return false;
         }
 
@@ -75,7 +75,7 @@ public partial class ModCmd
                 || !int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int y)
                 || !int.TryParse(arguments[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int height))
             {
-                result = "Usage: SceneAddTile {x} {y} {height}";
+                result = "Usage: AddSceneTile {x} {y} {height}";
                 return false;
             }
 

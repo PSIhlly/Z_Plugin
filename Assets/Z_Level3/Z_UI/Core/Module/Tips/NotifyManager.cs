@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Ui;
 using Ui.Notify;
 using UnityEngine;
@@ -112,6 +113,8 @@ namespace Z_Ui.Notify
         where Popup : UiPopupCtrl
         where Input : UiInputAreaCtrl
     {
+        private const int TipLineCharLimit = 30;
+
         public static int tipIdCnt;
         public static int chooseIdCnt;
         public static int popupIdCnt;
@@ -127,7 +130,7 @@ namespace Z_Ui.Notify
         {
             var info = new TipInfo()
             {
-                content = content,
+                content = WrapTipContent(content),
                 time = Time.time + time,
                 id = tipIdCnt++
             };
@@ -144,6 +147,36 @@ namespace Z_Ui.Notify
                 });
             }
         }
+
+        private static string WrapTipContent(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return content;
+
+            var builder = new StringBuilder(content.Length + content.Length / TipLineCharLimit);
+            var lineCharCount = 0;
+            foreach (var character in content)
+            {
+                if (character == '\r' || character == '\n')
+                {
+                    builder.Append(character);
+                    lineCharCount = 0;
+                    continue;
+                }
+
+                if (lineCharCount >= TipLineCharLimit)
+                {
+                    builder.Append('\n');
+                    lineCharCount = 0;
+                }
+
+                builder.Append(character);
+                lineCharCount++;
+            }
+
+            return builder.ToString();
+        }
+
         public void AddChoose(string title, bool canClose, Func<EntryItem, bool> func, EntryItem items)
         {
             var info = new ChooseInfo()

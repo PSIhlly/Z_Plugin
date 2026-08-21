@@ -60,7 +60,7 @@ public partial class ModCmd : MonoBehaviour
 
             if (scope == ModCmdScope.Scene && !sceneCommand && !string.IsNullOrWhiteSpace(command))
             {
-                result = "Story data commands can only be executed from ModStory. ModScene only accepts SceneAddTile, SceneAddItem, SceneAddObject, and SceneAddCharacter.";
+                result = "Story data commands can only be executed from ModStory. ModScene only accepts AddSceneTile, AddSceneItem, AddSceneObject, and AddSceneCharacter.";
                 return false;
             }
 

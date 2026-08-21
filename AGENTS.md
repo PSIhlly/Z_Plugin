@@ -2,9 +2,9 @@
 - Project name: Z_Plugin
 - Unity version: Unity 2022.3.61t4
 - Active game object:
-  - Name: img
+  - Name: btn_replace
   - Tag: Untagged
-  - Layer: Default
+  - Layer: UI
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
 
 ## Codex project knowledge

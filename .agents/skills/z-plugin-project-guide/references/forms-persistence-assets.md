@@ -179,6 +179,8 @@ AssetForm
 - Story asset manifests are `iaff`, `aaff`, and `vaff`; entity bytes/files live under `Core/ast/`.
 - Many `bytes/path/asset` fields are `unsave`; rebind loaded data to the absolute `ast/` path.
 - Import through `GameSaveController.AddStoryTex/AddStoryAudio/AddStoryVideo` so data is converted to the concrete Story subtype, IDs and Lab ownership are normalized, and asset events are emitted.
+- Batch media selection goes through `TexController/AudioController/VideoController.SelectMultiple`. Windows Editor uses `AssetFilePicker`'s native multi-file dialog; supported Player platforms delegate to NativeGallery. Import every returned item through the matching `GameSaveController.AddStory*` method rather than registering the batch directly.
+- After a story's asset manifests load, repair missing character-animation `partTex` references through `GameSaveController.RepairMissingCharacterTextureReferences`. It creates one transparent Story texture per missing legacy ID and rewrites every affected `CharacterProductForm` entry so the repair persists on the next save.
 - Do not register base `TexAssetForm.Data` directly as Story data or reuse a base Form's Lab ID under a Story subtype.
 - Built-in map assets load through `Resources.LoadAll("Z_Map/")`; preserve their reserved names.
 

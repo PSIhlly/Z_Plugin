@@ -166,6 +166,28 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         animCurCache.Clear();
     }
 
+    Texture GetDefaultTexture()
+    {
+        if (TexAssetForm.DataById.TryGetValue(GlobalDefaultHelper.DefaultTexId, out var data))
+        {
+            var texture = data.GetTex();
+            if (texture != null)
+                return texture;
+        }
+        return Texture2D.whiteTexture;
+    }
+
+    Texture GetTextureOrDefault(int texId)
+    {
+        if (TexAssetForm.DataById.TryGetValue(texId, out var data))
+        {
+            var texture = data.GetTex();
+            if (texture != null)
+                return texture;
+        }
+        return GetDefaultTexture();
+    }
+
 
     public void ShowFinalMat(MapInstance ins, int rendererId, List<int> animTexs, float interval, bool isMask = false)
     {
@@ -180,7 +202,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
         renderer.GetPropertyBlock(propBlock);
 
-        if (animTexs != null && animTexs.Count > 0)
+        var hasConfiguredTextures = animTexs != null && animTexs.Count > 0;
+        if (animTexs != null)
+            animTexs.RemoveAll(texId => !TexAssetForm.DataById.ContainsKey(texId));
+        var validAnimTexs = animTexs == null ? null : new List<int>(animTexs);
+
+        if (validAnimTexs != null && validAnimTexs.Count > 0)
         {
 
             if (isMask)
@@ -197,13 +224,17 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                         var pos = ((int)(x + mapPos.x), (int)(mapPos.y), (int)(z + mapPos.z));
                         if (MapManager.instance.data.maps.ContainsKey(pos)
                             && MapManager.instance.data.maps[pos].texDic.ContainsKey(rendererId)
-                            && MapManager.instance.data.maps[pos].texDic[rendererId] == animTexs[0])
+                            && MapManager.instance.data.maps[pos].texDic[rendererId] == validAnimTexs[0])
                         {
                             linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
                         }
                     }
                 }
-                propBlock.SetTexture("_AlphaTex", alphaTextureDic[(animTexs[0], linkDesc)]);
+                if (alphaTextureDic.TryGetValue((validAnimTexs[0], linkDesc), out var alphaTexture)
+                    && alphaTexture != null)
+                    propBlock.SetTexture("_AlphaTex", alphaTexture);
+                else
+                    propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
 
             }
             else
@@ -220,30 +251,38 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
             if (interval > 0)
             {
-                float all = interval * animTexs.Count;
+                float all = interval * validAnimTexs.Count;
 
                 int cur = (int)((Time.time % all) / interval);
                 float timeProgress = (Time.time % interval);
 
                 renderer.GetPropertyBlock(propBlock);
                 animCurCache[data][rendererId] = cur;
-                propBlock.SetTexture("_Tex", TexAssetForm.DataById[animTexs[cur]].GetTex());
+                propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
                 int tempId = rendererId;
                 ins.animTimer[rendererId] = TimeManager.instance.StartTimer(timeProgress, interval, () =>
                 {
                     MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                     ins.renderers[tempId].GetPropertyBlock(propBlock);
-                    cur = (cur + 1) % animTexs.Count;
+                    cur = (cur + 1) % validAnimTexs.Count;
                     animCurCache[data][tempId] = cur;
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[animTexs[cur]].GetTex());
+                    propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
                     ins.renderers[tempId].SetPropertyBlock(propBlock);
                     return false;
                 }, ins);
             }
             else
             {
-                propBlock.SetTexture("_Tex", TexAssetForm.DataById[animTexs[0]].GetTex());
+                propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[0]));
             }
+        }
+        else if (hasConfiguredTextures)
+        {
+            renderer.enabled = true;
+            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
+            propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
+            if (!isMask)
+                propBlock.SetTexture("_Tex", GetDefaultTexture());
         }
         else if(!isMask)
         {

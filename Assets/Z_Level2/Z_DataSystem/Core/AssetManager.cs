@@ -64,6 +64,139 @@ namespace Z_DataSystem
         public abstract bool IsAsset(string name);
     }
 
+    public static class AssetFilePicker
+    {
+        public static void GetImages(Action<string[]> callback)
+        {
+#if UNITY_EDITOR_WIN
+            callback?.Invoke(GetFiles(
+                "Select image files",
+                "Image files\0*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp\0All files\0*.*\0\0"));
+#else
+            NativeGallery.GetImagesFromGallery(paths => callback?.Invoke(paths));
+#endif
+        }
+
+        public static void GetAudios(Action<string[]> callback)
+        {
+#if UNITY_EDITOR_WIN
+            callback?.Invoke(GetFiles(
+                "Select audio files",
+                "Audio files\0*.mp3;*.aac;*.flac\0All files\0*.*\0\0"));
+#else
+            NativeGallery.GetAudiosFromGallery(paths => callback?.Invoke(paths));
+#endif
+        }
+
+        public static void GetVideos(Action<string[]> callback)
+        {
+#if UNITY_EDITOR_WIN
+            callback?.Invoke(GetFiles(
+                "Select video files",
+                "Video files\0*.mp4;*.mov;*.wav;*.avi\0All files\0*.*\0\0"));
+#else
+            NativeGallery.GetVideosFromGallery(paths => callback?.Invoke(paths));
+#endif
+        }
+
+#if UNITY_EDITOR_WIN
+        private const int MaxPathBuffer = 65536;
+        private const int OfnAllowMultiSelect = 0x00000200;
+        private const int OfnPathMustExist = 0x00000800;
+        private const int OfnFileMustExist = 0x00001000;
+        private const int OfnExplorer = 0x00080000;
+        private const int OfnNoChangeDir = 0x00000008;
+
+        [System.Runtime.InteropServices.StructLayout(
+            System.Runtime.InteropServices.LayoutKind.Sequential,
+            CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private sealed class OpenFileName
+        {
+            public int structSize;
+            public IntPtr dlgOwner;
+            public IntPtr instance;
+            public string filter;
+            public string customFilter;
+            public int maxCustFilter;
+            public int filterIndex;
+            public IntPtr file;
+            public int maxFile;
+            public IntPtr fileTitle;
+            public int maxFileTitle;
+            public string initialDir;
+            public string title;
+            public int flags;
+            public short fileOffset;
+            public short fileExtension;
+            public string defExt;
+            public IntPtr custData;
+            public IntPtr hook;
+            public string templateName;
+            public IntPtr reservedPtr;
+            public int reservedInt;
+            public int flagsEx;
+        }
+
+        [System.Runtime.InteropServices.DllImport(
+            "comdlg32.dll",
+            CharSet = System.Runtime.InteropServices.CharSet.Unicode,
+            EntryPoint = "GetOpenFileNameW",
+            SetLastError = true)]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool GetOpenFileName(
+            [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out] OpenFileName openFileName);
+
+        private static string[] GetFiles(string title, string filter)
+        {
+            var buffer = System.Runtime.InteropServices.Marshal.AllocHGlobal(MaxPathBuffer * sizeof(char));
+            try
+            {
+                System.Runtime.InteropServices.Marshal.Copy(new byte[MaxPathBuffer * sizeof(char)], 0, buffer, MaxPathBuffer * sizeof(char));
+                var openFileName = new OpenFileName
+                {
+                    structSize = System.Runtime.InteropServices.Marshal.SizeOf(typeof(OpenFileName)),
+                    dlgOwner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle,
+                    filter = filter,
+                    filterIndex = 1,
+                    file = buffer,
+                    maxFile = MaxPathBuffer,
+                    title = title,
+                    flags = OfnExplorer | OfnAllowMultiSelect | OfnPathMustExist | OfnFileMustExist | OfnNoChangeDir
+                };
+                if (!GetOpenFileName(openFileName))
+                    return Array.Empty<string>();
+
+                var chars = new char[MaxPathBuffer];
+                System.Runtime.InteropServices.Marshal.Copy(buffer, chars, 0, chars.Length);
+                var parts = new List<string>();
+                var start = 0;
+                for (var i = 0; i < chars.Length; i++)
+                {
+                    if (chars[i] != '\0')
+                        continue;
+                    if (i == start)
+                        break;
+                    parts.Add(new string(chars, start, i - start));
+                    start = i + 1;
+                }
+
+                if (parts.Count <= 1)
+                    return parts.ToArray();
+
+                var directory = parts[0];
+                var paths = new string[parts.Count - 1];
+                for (var i = 1; i < parts.Count; i++)
+                    paths[i - 1] = Path.Combine(directory, parts[i]);
+                return paths;
+            }
+            finally
+            {
+                System.Runtime.InteropServices.Marshal.FreeHGlobal(buffer);
+            }
+        }
+#endif
+    }
+
     public abstract class SelectTask<T> where T : IAssetController
     {
         protected T ctrl;

@@ -38,7 +38,7 @@ namespace Ui.Notify
             }, uiHolder);
 
             UiManager.Rebuild(gameObject,true);
-            TimeManager.instance.AddCurLateUpdateAction(() =>
+            TimeManager.instance.AddNextBigFrameAction(() =>
             {
                 UiManager.Rebuild(gameObject, true);
             }, gameObject);

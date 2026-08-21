@@ -33,6 +33,7 @@ namespace Ui.ModAssetSelectWindow
         public UiModAssetSelectWindowParam prm;
         public AssetForm.Data sel;
         public int? curLabId;
+        public bool labTabInitialized;
     }
     public partial class UiModAssetSelectWindowCtrl : IZ_Listener<AssetEvent>
     {
@@ -51,6 +52,7 @@ namespace Ui.ModAssetSelectWindow
                     Refresh();
                 }
             });
+            view.btn_replace.onClick.AddListener(Replace);
 
             view.btn_bg.onClick.AddListener(() =>
             {
@@ -93,6 +95,8 @@ namespace Ui.ModAssetSelectWindow
                     Refresh();
                 }
             };
+            view.ipt_labelName.onFinishInput += RenameCurrentLab;
+            view.btn_labelDelete.onClick.AddListener(DeleteCurrentLab);
 
             itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
@@ -100,11 +104,44 @@ namespace Ui.ModAssetSelectWindow
         }
         public override void OnShow()
         {
+            var previousPrm = model.prm;
+            var preserveLabTab = model.labTabInitialized &&
+                                  GetLabScope(previousPrm) == GetLabScope(param);
             model.prm = param;
-            model.curLabId = HasVisibleUnclassified() ? LabForm.NoneId : (int?)null;
+            if (!preserveLabTab)
+            {
+                model.curLabId = HasVisibleUnclassified() ? LabForm.NoneId : (int?)null;
+                model.labTabInitialized = true;
+            }
+            else
+            {
+                model.curLabId = NormalizeLabSelection(model.curLabId);
+            }
 
             model.sel = null;
             Refresh();
+        }
+
+        string GetLabScope(UiModAssetSelectWindowParam prm)
+        {
+            if (prm is UiModAssetSelectTexWindowParam)
+                return nameof(StoryTexAssetForm);
+            if (prm is UiModAssetSelectAudioWindowParam)
+                return nameof(StoryAudioAssetForm);
+            if (prm is UiModAssetSelectVideoWindowParam)
+                return nameof(StoryVideoAssetForm);
+            return string.Empty;
+        }
+
+        int? NormalizeLabSelection(int? labId)
+        {
+            if (!labId.HasValue)
+                return null;
+            if (labId.Value == LabForm.NoneId)
+                return HasVisibleUnclassified() ? LabForm.NoneId : (int?)null;
+            return GetVisibleLabIds().Contains(labId.Value)
+                ? labId
+                : (HasVisibleUnclassified() ? LabForm.NoneId : (int?)null);
         }
         public void Refresh()
         {
@@ -113,7 +150,88 @@ namespace Ui.ModAssetSelectWindow
             view.sta_selected.ChangeState(model.sel != null ? 1 : 0);
             view.sta_setLabel.ChangeState(0);
             view.ipt_name.Set(model.sel!=null ? model.sel.name : "");
+            var canEditLab = TryGetCurrentLab(out _);
+            view.ipt_labelName.gameObject.SetActive(canEditLab);
+            view.btn_labelDelete.gameObject.SetActive(canEditLab);
+            view.ipt_labelName.Set(canEditLab ? LabForm.GetDisplayName(model.curLabId.Value) : "");
         }
+
+        bool TryGetCurrentLab(out LabForm.Data lab)
+        {
+            lab = null;
+            return model.curLabId.HasValue &&
+                   model.curLabId.Value != LabForm.NoneId &&
+                   LabForm.TryGetData(model.curLabId.Value, out lab);
+        }
+
+        IEnumerable<AssetForm.Data> GetCurrentAssetDatas()
+        {
+            if (model.prm is UiModAssetSelectTexWindowParam)
+                return TexAssetForm.DataById.Values;
+            if (model.prm is UiModAssetSelectAudioWindowParam)
+                return AudioAssetForm.DataById.Values;
+            if (model.prm is UiModAssetSelectVideoWindowParam)
+                return VideoAssetForm.DataById.Values;
+            return Enumerable.Empty<AssetForm.Data>();
+        }
+
+        public void RenameCurrentLab(string value)
+        {
+            if (!TryGetCurrentLab(out var currentLab))
+            {
+                Refresh();
+                return;
+            }
+
+            var displayName = value?.Trim();
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                Refresh();
+                return;
+            }
+
+            var oldLabId = currentLab.id;
+            var newLabId = LabForm.GetOrCreateDisplayName(displayName, currentLab.belong, oldLabId);
+            if (newLabId == LabForm.NoneId)
+            {
+                Refresh();
+                return;
+            }
+
+            if (newLabId != oldLabId)
+            {
+                foreach (var data in GetCurrentAssetDatas())
+                {
+                    if (data.labId == oldLabId)
+                        data.labId = newLabId;
+                }
+
+                if (!GetCurrentAssetDatas().Any(data => data.labId == oldLabId))
+                    LabForm.RemoveData(oldLabId);
+                model.curLabId = newLabId;
+            }
+
+            Refresh();
+        }
+
+        public void DeleteCurrentLab()
+        {
+            if (!TryGetCurrentLab(out var currentLab))
+                return;
+
+            var labId = currentLab.id;
+            foreach (var data in GetCurrentAssetDatas())
+            {
+                if (data.labId == labId)
+                    data.labId = LabForm.NoneId;
+            }
+
+            LabForm.RemoveData(labId);
+            model.curLabId = HasVisibleUnclassified() ? LabForm.NoneId : (int?)null;
+            model.sel = null;
+            Refresh();
+        }
+
         void RefreshLabs()
         {
             labCon.Clear();
@@ -214,67 +332,99 @@ namespace Ui.ModAssetSelectWindow
         public void SetCurLab(int? labId)
         {
             model.curLabId = labId;
+            model.labTabInitialized = true;
             model.sel = null;
             RefreshItems();
         }
         public void Replace()
         {
+            if (model.sel == null)
+                return;
+
             if (model.prm is UiModAssetSelectTexWindowParam texPrm)
             {
                 AssetManager.instance.texCtrl.Select(texPrm.sizeLimit, (data) =>
                 {
-                    model.sel.bytes = data.bytes;
-                    Refresh();
+                    ApplyReplacement(data);
                 });
             }
             else if (model.prm is UiModAssetSelectAudioWindowParam audioPrm)
             {
                 AssetManager.instance.audioCtrl.Select((data) =>
                 {
-                    model.sel.bytes = data.bytes;
-                    Refresh();
+                    ApplyReplacement(data);
                 });
             }
             else if (model.prm is UiModAssetSelectVideoWindowParam videoPrm)
             {
                 AssetManager.instance.videoCtrl.Select((data) =>
                 {
-                    model.sel.bytes = data.bytes;
-                    Refresh();
+                    ApplyReplacement(data);
                 });
             }
+        }
+
+        void ApplyReplacement(AssetForm.Data source)
+        {
+            if (model.sel == null || source == null)
+                return;
+
+            if (model.sel is TexAssetForm.Data texData)
+                texData.ClearRuntimeCache();
+
+            model.sel.path = source.path;
+            model.sel.bytes = source.bytes;
+            model.sel.hash = source.hash;
+            model.sel.asset = source.asset;
+            Refresh();
         }
         public void Import(int labId)
         {
             if (model.prm is UiModAssetSelectTexWindowParam texPrm)
             {
-                AssetManager.instance.texCtrl.Select(texPrm.sizeLimit, (data) =>
+                AssetManager.instance.texCtrl.SelectMultiple(texPrm.sizeLimit, datas =>
                 {
+                    if (datas.Count == 0)
+                        return;
                     var storyLabId = LabForm.GetOrCreateForBelong(labId, nameof(StoryTexAssetForm));
-                    data.labId = storyLabId;
-                    GameManager.instance.saveCtrl.AddStoryTex(ref data);
+                    for (var i = 0; i < datas.Count; i++)
+                    {
+                        var data = datas[i];
+                        data.labId = storyLabId;
+                        GameManager.instance.saveCtrl.AddStoryTex(ref data);
+                    }
                     SetCurLab(storyLabId == LabForm.NoneId ? (int?)null : storyLabId);
                     Refresh();
                 });
             }
             else if (model.prm is UiModAssetSelectAudioWindowParam audioPrm)
             {
-                AssetManager.instance.audioCtrl.Select((data) =>
+                AssetManager.instance.audioCtrl.SelectMultiple(datas =>
                 {
+                    if (datas.Count == 0)
+                        return;
                     var storyLabId = LabForm.GetOrCreateForBelong(labId, nameof(StoryAudioAssetForm));
-                    data.labId = storyLabId;
-                    GameManager.instance.saveCtrl.AddStoryAudio(data);
+                    foreach (var data in datas)
+                    {
+                        data.labId = storyLabId;
+                        GameManager.instance.saveCtrl.AddStoryAudio(data);
+                    }
                     SetCurLab(storyLabId == LabForm.NoneId ? (int?)null : storyLabId);
                     Refresh();
                 });
             }
             else if (model.prm is UiModAssetSelectVideoWindowParam videoPrm)
             {
-                AssetManager.instance.videoCtrl.Select((data) =>
+                AssetManager.instance.videoCtrl.SelectMultiple(datas =>
                 {
+                    if (datas.Count == 0)
+                        return;
                     var storyLabId = LabForm.GetOrCreateForBelong(labId, nameof(StoryVideoAssetForm));
-                    data.labId = storyLabId;
-                    GameManager.instance.saveCtrl.AddStoryVideo(data);
+                    foreach (var data in datas)
+                    {
+                        data.labId = storyLabId;
+                        GameManager.instance.saveCtrl.AddStoryVideo(data);
+                    }
                     SetCurLab(storyLabId == LabForm.NoneId ? (int?)null : storyLabId);
                     Refresh();
                 });

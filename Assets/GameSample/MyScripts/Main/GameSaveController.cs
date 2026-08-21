@@ -333,6 +333,7 @@ public class GameSaveController : Z_Controller<GameManager>
         DeleteCache(id);
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
         LoadAsset(assetFolder);
+        RepairMissingCharacterTextureReferences();
     }
     public void ResetStory()
     {
@@ -381,6 +382,7 @@ public class GameSaveController : Z_Controller<GameManager>
         //
         LoadUiItem(folder);
         LoadAsset(assetFolder);
+        RepairMissingCharacterTextureReferences();
 
     }
 
@@ -769,9 +771,75 @@ public class GameSaveController : Z_Controller<GameManager>
     #region util
 
 
-    public void AddStoryTex(ref TexAssetForm.Data rawData)
+    public void RepairMissingCharacterTextureReferences()
     {
-        StoryTexAssetForm.Data data = new StoryTexAssetForm.Data(rawData);
+        const int missingPartTextureId = int.MinValue;
+        var missingReferences = new List<(Dictionary<BodyPartType, int> partTex, BodyPartType part, int missingId)>();
+
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            if (character.animDic == null)
+                continue;
+
+            foreach (var anim in character.animDic.Values)
+            {
+                if (anim?.animClip == null)
+                    continue;
+
+                foreach (var clips in anim.animClip.Values)
+                {
+                    if (clips == null)
+                        continue;
+
+                    foreach (var clip in clips)
+                    {
+                        if (clip == null)
+                            continue;
+                        if (clip.partTex == null)
+                            clip.partTex = new Dictionary<BodyPartType, int>();
+
+                        foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
+                        {
+                            var hasTextureId = clip.partTex.TryGetValue(part, out var textureId);
+                            if (!hasTextureId || !TexAssetForm.DataById.ContainsKey(textureId))
+                            {
+                                missingReferences.Add((
+                                    clip.partTex,
+                                    part,
+                                    hasTextureId ? textureId : missingPartTextureId));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (missingReferences.Count == 0)
+            return;
+
+        var replacements = new Dictionary<int, int>();
+        var emptyTextureBytes = TextureHelper.GetTextureByte(TextureHelper.transparentTexture);
+        foreach (var missingReference in missingReferences)
+        {
+            if (!replacements.TryGetValue(missingReference.missingId, out var replacementId))
+            {
+                var missingName = missingReference.missingId == missingPartTextureId
+                    ? "missing_texture"
+                    : $"missing_texture_{missingReference.missingId}";
+                var rawData = AssetManager.instance.texCtrl.CreateDataByBytes(emptyTextureBytes, missingName);
+                rawData.labId = LabForm.NoneId;
+                var replacement = AddStoryTexInternal(rawData);
+                replacementId = replacement.id;
+                replacements[missingReference.missingId] = replacementId;
+            }
+
+            missingReference.partTex[missingReference.part] = replacementId;
+        }
+    }
+
+    private StoryTexAssetForm.Data AddStoryTexInternal(TexAssetForm.Data rawData)
+    {
+        var data = new StoryTexAssetForm.Data(rawData);
         if (StoryTexAssetForm.DataById.ContainsKey(data.id))
         {
             var oldData = StoryTexAssetForm.DataById[data.id];
@@ -779,12 +847,18 @@ public class GameSaveController : Z_Controller<GameManager>
         }
         data.labId = LabForm.GetOrCreateForBelong(data.labId, nameof(StoryTexAssetForm));
         StoryTexAssetForm.AddData(data);
+        return data;
+    }
+
+    public void AddStoryTex(ref TexAssetForm.Data rawData)
+    {
+        var data = AddStoryTexInternal(rawData);
+        rawData = data;
 
         Z_EventHelper.Invoke(new AssetEvent()
         {
             importAssetName = data.name
         });
-        rawData = data;
 
     }
     public void AddGameTex(ref TexAssetForm.Data rawData)

@@ -24,6 +24,8 @@ namespace Z_Ui
         public Dictionary<string, UiCtrl> uiCtrlName2UiCtrl = new Dictionary<string, UiCtrl>();
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
         public Dictionary<string, List<UiHolder>> uiCtrlName2Uis = new Dictionary<string, List<UiHolder>>();
+
+        private static List<RectTransform> rectTemp = new List<RectTransform>();
         protected override void Awake()
         {
             base.Awake();
@@ -160,22 +162,22 @@ namespace Z_Ui
         }
         public static void Rebuild(GameObject go, bool recursion = false)
         {
-            var rts = new List<RectTransform>() { go.GetComponent<RectTransform>() };
-
-
-            if (recursion)
+            var rt = go.GetComponent<RectTransform>();
+            if (!rt||go && go.activeInHierarchy)
             {
-                rts.Clear();
-                rts.AddRange(go.GetComponentsInChildren<RectTransform>());
-            }
-
-
-          
-                foreach (var rt in rts)
+                if (recursion)
+                {
+                    go.GetComponentsInChildren(false, rectTemp);
+                    for (int i = rectTemp.Count - 1; i >= 0; i--)
+                    {
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(rectTemp[i]);
+                    }
+                }
+                else
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
                 }
-
+            }
         }
 
     }

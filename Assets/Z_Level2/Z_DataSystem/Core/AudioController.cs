@@ -73,17 +73,9 @@ namespace Z_DataSystem
             }
             public override void OnImportComplete(byte[] data,string name)
             {
-                if (data != null)
-                {
-                    var nm = ctrl.GetMark() + BytesSerialize.GetHash(data) + ctrl.GetMark();
-                    File.WriteAllBytes(AssetManager.cachePath + nm, data);
-                    var form = ctrl.CreateDataByPath(AssetManager.cachePath + nm, name);
+                var form = ctrl.CreateSelectedData(data, name);
+                if (form != null)
                     callback?.Invoke(form);
-                    Z_EventHelper.Invoke(new AssetEvent()
-                    {
-                        importAssetName = nm
-                    });
-                }
             }
         }
         public List<string> GetAudioAssetsByFolder(string path, bool isRes)
@@ -119,6 +111,41 @@ namespace Z_DataSystem
             SelectAudioTask task = new SelectAudioTask();
             task.callback = callback;
             task.Run(this);
+        }
+        public void SelectMultiple(Action<IReadOnlyList<AudioAssetForm.Data>> callback = null)
+        {
+            AssetFilePicker.GetAudios(paths =>
+            {
+                var forms = new List<AudioAssetForm.Data>();
+                if (paths != null)
+                {
+                    foreach (var path in paths)
+                    {
+                        if (string.IsNullOrEmpty(path))
+                            continue;
+                        var form = CreateSelectedData(File.ReadAllBytes(path), Path.GetFileNameWithoutExtension(path));
+                        if (form != null)
+                            forms.Add(form);
+                    }
+                }
+                callback?.Invoke(forms);
+            });
+        }
+        private AudioAssetForm.Data CreateSelectedData(byte[] data, string name)
+        {
+            if (data == null)
+                return null;
+
+            var nm = GetMark() + BytesSerialize.GetHash(data) + GetMark();
+            if (!Directory.Exists(AssetManager.cachePath))
+                Directory.CreateDirectory(AssetManager.cachePath);
+            File.WriteAllBytes(AssetManager.cachePath + nm, data);
+            var form = CreateDataByPath(AssetManager.cachePath + nm, name);
+            Z_EventHelper.Invoke(new AssetEvent()
+            {
+                importAssetName = nm
+            });
+            return form;
         }
         public AudioAssetForm.Data CreateDataByClip(AudioClip clip, string name)
         {

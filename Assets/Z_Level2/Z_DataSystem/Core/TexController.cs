@@ -27,6 +27,14 @@ namespace Z_DataSystem.Form
             Z_MultiTask<Texture> texTask = new Z_MultiTask<Texture>();
             Z_MultiTask<Sprite> spriteTask = new Z_MultiTask<Sprite>();
 
+            public void ClearRuntimeCache()
+            {
+                asset = null;
+                _sprite = null;
+                _gifFrames = null;
+                _gifSprites = null;
+            }
+
             public bool isGif
             {
                 get
@@ -180,19 +188,9 @@ namespace Z_DataSystem
             }
             public override void OnImportComplete(byte[] data,string name)
             {
-                if (data != null)
-                {
-                    var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
-                    if (forceSize != Vector2Int.zero)
-                        tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
-                    var newBytes = data;
-                    var form = ctrl.CreateDataByBytes(newBytes, name);
+                var form = ctrl.CreateSelectedData(data, name, forceSize);
+                if (form != null)
                     callback?.Invoke(form);
-                    Z_EventHelper.Invoke(new AssetEvent()
-                    {
-                        importAssetName = name
-                    });
-                }
             }
         }
         public List<string> GetTexAssetsByFolder(string path, bool isRes)
@@ -229,6 +227,40 @@ namespace Z_DataSystem
             task.callback = callback;
             task.forceSize = forceSize;
             task.Run(this);
+        }
+        public void SelectMultiple(Vector2Int forceSize = default, Action<IReadOnlyList<TexAssetForm.Data>> callback = null)
+        {
+            AssetFilePicker.GetImages(paths =>
+            {
+                var forms = new List<TexAssetForm.Data>();
+                if (paths != null)
+                {
+                    foreach (var path in paths)
+                    {
+                        if (string.IsNullOrEmpty(path))
+                            continue;
+                        var form = CreateSelectedData(File.ReadAllBytes(path), Path.GetFileNameWithoutExtension(path), forceSize);
+                        if (form != null)
+                            forms.Add(form);
+                    }
+                }
+                callback?.Invoke(forms);
+            });
+        }
+        private TexAssetForm.Data CreateSelectedData(byte[] data, string name, Vector2Int forceSize)
+        {
+            if (data == null)
+                return null;
+
+            var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
+            if (forceSize != Vector2Int.zero)
+                tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
+            var form = CreateDataByBytes(data, name);
+            Z_EventHelper.Invoke(new AssetEvent()
+            {
+                importAssetName = name
+            });
+            return form;
         }
         public TexAssetForm.Data CreateDataByTex(Texture2D tex, string name, Vector2Int forceSize)
         {

@@ -65,6 +65,7 @@ Preserve identifiers used as parsing and lookup protocols:
 - `MapTexture$...` for named built-in textures.
 - `runtime$...` for runtime prefab names.
 - Hashed/high-range built-in asset IDs initialized by `GameManager`.
+- `GameMapController.ShowFinalMat` removes missing texture IDs from animation lists and uses `GlobalDefaultHelper.DefaultTexId` (or white texture as the final fallback) instead of indexing a missing asset.
 
 Do not rename these resources as a cosmetic cleanup.
 

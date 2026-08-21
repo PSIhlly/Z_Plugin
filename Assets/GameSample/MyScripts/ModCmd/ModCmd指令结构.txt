@@ -1,0 +1,106 @@
+ModCmd 指令结构说明
+====================
+
+一、总体命名规则
+
+Story 指令：XXXStoryXXX
+Scene 指令：XXXSceneXXX
+
+指令名称不区分大小写；参数之间使用空白分隔。参数含有空格时必须使用双引号。
+
+例如：
+  AddStoryCharacter "角色名称"
+  CopyStoryCharacter "角色名称"
+  AddSceneCharacter "角色名称"
+
+
+二、Story 指令
+
+Story 指令用于修改 ModStory 中的故事数据表。固定结构如下：
+
+  AddStory<FormName> "数据名称"
+  DelStory<FormName> "数据名称"
+  CopyStory<FormName> "数据名称"
+  SetStory<FormName> "数据名称" {"字段名":字段值}
+
+其中：
+  Add   新增数据。
+  Del   删除数据。
+  Copy  复制数据，并自动生成名称：原名称 Copy；重名时追加 2、3……。
+  Set   修改已有数据；后面的 JSON 只覆盖指定字段，未指定字段保持不变。
+  FormName 是故事 Form 的名称，例如 Character、Item、Mission 等。
+
+常用示例：
+  AddStoryCharacter "新角色"
+  DelStoryCharacter "新角色"
+  CopyStoryCharacter "新角色"
+  SetStoryCharacter "新角色" {"name":"改名后的角色"}
+
+Story 指令只能在 ModStory 界面执行。在 ModScene 输入会被拒绝。
+
+
+三、Scene 指令
+
+Scene 指令用于在当前 ModScene 中添加场景内容。当前支持：
+
+  AddSceneTile x y height
+  AddSceneItem "道具名称"
+  AddSceneObject "对象名称"
+  AddSceneCharacter "角色名称"
+
+说明：
+  AddSceneTile      在指定地图坐标添加地块。
+  AddSceneItem      在当前摄像机目标位置添加道具实例。
+  AddSceneObject    在当前摄像机目标位置添加对象实例。
+  AddSceneCharacter 在当前摄像机目标位置添加角色实例。
+
+常用示例：
+  AddSceneTile 3 5 0
+  AddSceneItem "Potion"
+  AddSceneObject "Tree"
+  AddSceneCharacter "Hero"
+
+Scene 指令只能在 ModScene 界面执行。在 ModStory 输入会被拒绝。
+
+
+四、参数和名称规则
+
+1. 不含空格的名称可以不加引号，例如：
+   AddSceneCharacter Hero
+
+2. 含空格的名称必须加双引号，例如：
+   AddSceneCharacter "Red Hero"
+
+3. 双引号参数支持以下转义：
+   \"  双引号
+   \\  反斜杠
+   \n  换行
+   \r  回车
+   \t  制表符
+
+4. Story 数据名称按精确名称查找；Character、Item 等 Form 名称不区分大小写。
+
+5. Scene 中的 Item 和 Character 查找的是 protoUid=0 的产品数据；Object 使用 MapObject 名称查找。
+
+6. SetStory 的 JSON 必须是一个 JSON 对象。例如：
+   SetStoryCharacter "Hero" {"avatarTex":12,"name":"Hero 2"}
+
+
+五、执行范围和返回结果
+
+ModStory UI 调用：
+  允许 AddStory、DelStory、CopyStory、SetStory。
+
+ModScene UI 调用：
+  只允许 AddSceneTile、AddSceneItem、AddSceneObject、AddSceneCharacter。
+
+执行成功时会返回成功提示；执行失败时会返回原因，例如名称不存在、参数数量错误、JSON 无效或当前没有活动的 ModScene。
+
+
+六、源码对应关系
+
+  ModCmd.cs       统一入口、执行范围判断、通用参数读取。
+  ModCmdStory.cs  Story Form 指令解析和数据增删改复制。
+  ModCmdScene.cs  Scene 添加指令解析和场景实例创建。
+
+旧格式 SceneAddTile、SceneAddItem、SceneAddObject、SceneAddCharacter 不属于当前命令格式；请使用 AddSceneTile、AddSceneItem、AddSceneObject、AddSceneCharacter。

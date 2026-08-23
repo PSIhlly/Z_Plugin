@@ -1,31 +1,11 @@
 [
   {
-    "id": 15,
-    "name": "水1",
-    "icon": 25,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 25
-      },
-      {
-        "v": 26
-      },
-      {
-        "v": 27
-      }
-    ],
-    "labId": 3,
-    "events": [],
-    "isWangTile": false
-  },
-  {
-    "id": 2,
-    "name": "草1-0",
+    "id": 3,
+    "name": "水2",
     "icon": 85,
     "animTimeInterval": 1.0,
     "texs": [],
-    "labId": 2,
+    "labId": 3,
     "events": [],
     "isWangTile": true
   },
@@ -44,13 +24,33 @@
     "isWangTile": false
   },
   {
-    "id": 3,
-    "name": "水2",
+    "id": 2,
+    "name": "草1-0",
     "icon": 85,
     "animTimeInterval": 1.0,
     "texs": [],
-    "labId": 3,
+    "labId": 2,
     "events": [],
     "isWangTile": true
+  },
+  {
+    "id": 15,
+    "name": "水1",
+    "icon": 25,
+    "animTimeInterval": 1.0,
+    "texs": [
+      {
+        "v": 25
+      },
+      {
+        "v": 26
+      },
+      {
+        "v": 27
+      }
+    ],
+    "labId": 3,
+    "events": [],
+    "isWangTile": false
   }
 ]

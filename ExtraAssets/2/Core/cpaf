@@ -1,10 +1,19 @@
 [
   {
-    "uid": 4,
-    "name": "Speed",
+    "uid": 3,
+    "name": "Hp",
     "valueType": 0,
     "min": "",
-    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 100.0,\r\n  \"dic\": []\r\n}",
+    "max": "HpMax",
+    "showType": 3
+  },
+  {
+    "uid": 2,
+    "name": "Team",
+    "valueType": 0,
+    "min": "",
+    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
     "max": "",
     "showType": 5
   },
@@ -18,21 +27,12 @@
     "showType": 0
   },
   {
-    "uid": 2,
-    "name": "Team",
+    "uid": 4,
+    "name": "Speed",
     "valueType": 0,
     "min": "",
-    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
     "max": "",
     "showType": 5
-  },
-  {
-    "uid": 3,
-    "name": "Hp",
-    "valueType": 0,
-    "min": "",
-    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 100.0,\r\n  \"dic\": []\r\n}",
-    "max": "HpMax",
-    "showType": 3
   }
 ]

@@ -574,7 +574,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, labId, GlobalDefaultHelper.DefaultCharacterTexId, paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalDefaultHelper.DefaultCharacterTexId, false, new Dictionary<SkillType, int>(), 0, false, GlobalDefaultHelper.DefaultTexId));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, labId, GlobalDefaultHelper.DefaultCharacterTexId, paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalDefaultHelper.DefaultCharacterTexId, false, new Dictionary<SkillType, int>(), 0, false, GlobalDefaultHelper.DefaultTexId, 1));
     }
     public void DeleteCharacter(int uid)
     {
@@ -1174,7 +1174,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             position,
             GlobalDefaultHelper.GetRuntimePrefabName("character"),
             false,
-            MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
+            MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)),
+            GameMapData.GetCharacterProductSize(data));
         if (result == null)
             return null;
 

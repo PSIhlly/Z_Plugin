@@ -194,7 +194,7 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.UpdateSingleOne(iData.unit);
         return iData;
     }
-    public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, string extra = "")
+    public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, string extra = "", int size = 1)
     {
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
 
@@ -204,8 +204,10 @@ public class MapManager : Z_MonoManager<MapManager>
             return null;
         }
         cData.pos = realPos;
+        cData.scale = Vector3.one * Mathf.Max(1, size);
         var tilePos = utilCtrl.GetClosestExistInArea(mapPos);
         updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(tilePos.x, tilePos.y, tilePos.z)].unit);
+        updateCtrl.RefreshCharacterOverlap(cData.unit);
         cData.name = name;
         cData.unit.Create();
         updateCtrl.UpdateSingleOne(cData.unit);
@@ -216,6 +218,7 @@ public class MapManager : Z_MonoManager<MapManager>
         data.RemoveTile(form);
 
         updateCtrl.characterTileDic.Del(form.unit);
+        updateCtrl.characterOverlapTileDic.Del(form.unit);
         updateCtrl.itemTileDic.Del(form.unit);
         updateCtrl.objectTileDic.Del(form.unit);
         updateCtrl.curTileLst.Remove(form);
@@ -224,6 +227,7 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         data.RemoveCharacter(form);
         updateCtrl.characterTileDic.Del(form.unit);
+        updateCtrl.characterOverlapTileDic.Del(form.unit);
         updateCtrl.curCharacterLst.Remove(form);
 
     }

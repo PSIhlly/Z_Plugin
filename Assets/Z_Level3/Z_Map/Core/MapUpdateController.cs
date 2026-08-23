@@ -27,6 +27,7 @@ namespace Z_Map
 
         public DoubleDictionary<ObjectUnit, TileUnit> objectTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
         public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
+        public DoubleDictionary<CharacterUnit, TileUnit> characterOverlapTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
         public HashSet<TileUnitForm.Data> curTileLst
         {
@@ -473,9 +474,28 @@ namespace Z_Map
         }
 
 
-        public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999)
+        public void RefreshCharacterOverlap(CharacterUnit unit)
         {
-            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep);
+            if (unit == null)
+                return;
+
+            TileUnit owner = characterTileDic.GetFirst(unit);
+            characterOverlapTileDic.Del(unit);
+            if (owner == null)
+                return;
+
+            foreach (var tile in _super.utilCtrl.GetCharacterCollisionTiles(unit, Vector3.zero, CollideType.All))
+            {
+                if (!characterOverlapTileDic.Contains(unit, tile))
+                    characterOverlapTileDic.Add(unit, tile);
+            }
+
+            if (characterOverlapTileDic.Get(unit).Count == 0)
+                characterOverlapTileDic.Add(unit, owner);
+        }
+        public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999, float agentRadius = 0f)
+        {
+            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius);
         }
         public void ResetView()
         {
@@ -585,6 +605,11 @@ namespace Z_Map
         /// </summary>
         public void ApplyMove(MapUnit unit, Vector3 newPos, Vector3 euler, bool teleport = false)
         {
+            var movingCharacter = unit as CharacterUnit;
+            var oldPos = unit.data.pos;
+            var oldCharacterOverlap = movingCharacter == null
+                ? null
+                : new List<TileUnit>(characterOverlapTileDic.Get(movingCharacter));
             var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
             {
@@ -600,7 +625,7 @@ namespace Z_Map
                       && _super.utilCtrl.ContainsTile(newMapPos.x, newMapPos.y, newMapPos.z))
                   {
                       var tileData = _super.utilCtrl.GetTileData(newMapPos.x, newMapPos.y, newMapPos.z);
-                   if (tileData != null&&tileData.prefabName == MapInfo.GetPrefabName("map"))
+                   if (tileData != null&&tileData.prefabName == MapInfo.GetPrefabName("mapground"))
                               {
                                   newMap = tileData.unit;
                                   //仅在非爬升时吸附Y到地面tile高度，避免覆盖斜面滑行的+Y分量
@@ -618,17 +643,21 @@ namespace Z_Map
             {
                 newMap = _super.utilCtrl.GetTile(newMapPos.x, newMapPos.y, newMapPos.z);
             }
+            if (!teleport && oldPos != newPos)
+            {
+                // 碰撞算法从当前Mesh位置沿dir扫掠，因此必须在写入newPos之前检测旧位置到新位置。
+                CheckCollideEvent(unit, newPos - oldPos, oldCharacterOverlap);
+            }
             if (newMap != null)
             {
-                if (unit is CharacterUnit ch)
-                    characterTileDic.Move(ch, newMap);
+                if (movingCharacter != null)
+                    characterTileDic.Move(movingCharacter, newMap);
                 else if (unit is ObjectUnit obj)
                     objectTileDic.Move(obj, newMap);
                 else if (unit is ItemUnit item)
                     itemTileDic.Move(item, newMap);
             }
 
-            var oldPos = unit.data.pos;
             if (unit.ins != null)
             {
                 unit.ins.transform.position = newPos;
@@ -637,44 +666,46 @@ namespace Z_Map
             }
             unit.data.pos = newPos;
             unit.data.euler = euler;
-            if (oldPos != newPos)
-            {
-                MapManager.instance.updateCtrl.CheckCollideEvent(unit, teleport ? newPos - oldPos : Vector3.zero);
-            }
-
-
+            if (movingCharacter != null)
+                RefreshCharacterOverlap(movingCharacter);
         }
-        public void CheckCollideEvent(Unit unit, Vector3 dir)
+        public void CheckCollideEvent(Unit unit, Vector3 dir, IEnumerable<TileUnit> extraTiles = null)
         {
-            TileUnit cur = null;
+            var candidateTiles = new HashSet<TileUnit>();
             if (unit is CharacterUnit ch)
             {
-                cur = characterTileDic.Get(ch)[0];
+                if (extraTiles != null)
+                    candidateTiles.UnionWith(extraTiles);
+                candidateTiles.UnionWith(characterOverlapTileDic.Get(ch));
+                candidateTiles.UnionWith(_super.utilCtrl.GetCharacterCollisionTiles(ch, dir, CollideType.All));
             }
-            else if (unit is ObjectUnit obj)
+            else
             {
-                cur = objectTileDic.Get(obj)[0];
-            }
-            else if (unit is ItemUnit it)
-            {
-                cur = itemTileDic.Get(it)[0];
-            }
-            HashSet<int> exist = new HashSet<int>() { unit.data.uid };
+                TileUnit cur = null;
+                if (unit is ObjectUnit obj)
+                    cur = objectTileDic.GetFirst(obj);
+                else if (unit is ItemUnit item)
+                    cur = itemTileDic.GetFirst(item);
 
-            foreach (var tile in _super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z), dir.magnitude))
+                if (cur != null)
+                    candidateTiles.UnionWith(_super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z), dir.magnitude));
+            }
+
+            HashSet<int> exist = new HashSet<int>() { unit.data.uid };
+            foreach (var tile in candidateTiles)
             {
                 var lst = new List<Unit>(objectTileDic.Get(tile));
                 lst.AddRange(itemTileDic.Get(tile));
-                lst.AddRange(characterTileDic.Get(tile));
+                lst.AddRange(characterOverlapTileDic.Get(tile));
 
                 foreach (var tar in lst)
                 {
                     if (exist.Contains(tar.data.uid))
                         continue;
                     exist.Add(tar.data.uid);
-                    CheckCollide((MapUnit)unit, (MapUnit)tar, dir, CollideType.TriggerOnly, out _, (tar, res, dis) =>
+                    CheckCollide((MapUnit)unit, (MapUnit)tar, dir, CollideType.TriggerOnly, out _, (target, res, dis) =>
                     {
-                        ManageTriggerEvent(unit, tar, res);
+                        ManageTriggerEvent(unit, target, res);
                     });
                 }
             }
@@ -812,6 +843,7 @@ namespace Z_Map
                     if (_super.utilCtrl.InArea(mapPos))
                     {
                         characterTileDic.Add(characterData.unit, _super.utilCtrl.GetTile(mapPos.x, mapPos.y, mapPos.z));
+                        RefreshCharacterOverlap(characterData.unit);
                     }
                 }
                 else
@@ -844,6 +876,7 @@ namespace Z_Map
             lastCenterPos = Vector3.one * -9999999;
             objectTileDic.Clear();
             characterTileDic.Clear();
+            characterOverlapTileDic.Clear();
             itemTileDic.Clear();
         }
         public void DebugShow()

@@ -39,18 +39,25 @@ namespace Z_Map
             }
 
         }
+        private string lastPrefabName;
         private Vector3 lastPos;
+        private Vector3 lastEuler;
+        private Vector3 lastScale;
 
         public Dictionary<CollideType,List<MeshInfo>> _zMeshes;
         public List<MeshInfo> GetMeshes(CollideType type)
         {
-            if (_zMeshes == null)
+            if (_zMeshes == null
+                || lastPrefabName != data.prefabName
+                || lastPos != data.pos
+                || lastEuler != data.euler
+                || lastScale != data.scale)
             {
-                _zMeshes = new Dictionary<CollideType, List<MeshInfo>>();
-            }
-            if(lastPos != data.pos)
-            {
+                lastPrefabName = data.prefabName;
                 lastPos = data.pos;
+                lastEuler = data.euler;
+                lastScale = data.scale;
+                _zMeshes = new Dictionary<CollideType, List<MeshInfo>>();
                 _zMeshes[CollideType.CollideOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.CollideOnly);
                 _zMeshes[CollideType.TriggerOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.TriggerOnly);
                 _zMeshes[CollideType.All] = new List<MeshInfo>();

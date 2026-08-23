@@ -104,6 +104,8 @@ namespace Form
                 
         public static Action<Data,int,int> changeMinimapiconAction;
                 
+        public static Action<Data,int,int> changeSizeAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -397,11 +399,29 @@ namespace Form
                  
                      }
                     
+                    private int  _size;
+                    /// <summary>
+                    ///瑙掕壊妯″瀷缂╂斁鍊嶆暟
+                    ///</summary>
+                    public int  size{
+                                get{return _size;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeSize(this,_size,value); 
+                    }
+        
+                _size = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.labId,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,int labId,int avatarTex,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,int illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav,int minimapIcon):base(uid,name,labId,protoUid)
+            public Data(int uid,string name,int labId,int avatarTex,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,int illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav,int minimapIcon,int size):base(uid,name,labId,protoUid)
             {
 
              this.uid = uid;
@@ -424,6 +444,7 @@ namespace Form
              this.recoveryTime = recoveryTime;
              this.enableNav = enableNav;
              this.minimapIcon = minimapIcon;
+             this.size = size;
 
             }
             public void Reset(Data data)
@@ -449,11 +470,12 @@ namespace Form
              this.recoveryTime = data.recoveryTime;
              this.enableNav = data.enableNav;
              this.minimapIcon = data.minimapIcon;
+             this.size = data.size;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon);
+        return new Data(sameId? uid:uidChain.GetId(),name,labId,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon,size);
                 }
             
             public override  void BeforeGet()
@@ -463,7 +485,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,0,new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"",0,false,new Dictionary<SkillType,int>(){},0f,false,0);
+                   private static Data _defaultData=new Data(0,"",0,0,new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"",0,false,new Dictionary<SkillType,int>(){},0f,false,0,1);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -644,7 +666,9 @@ namespace Form
 
                 jo.SelectToken("enableNav")==null?defaultData.enableNav:jo.Get<bool>("enableNav"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon"),
+
+                jo.SelectToken("size")==null?defaultData.size:jo.Get<int>("size")
                     );
 
             return data;
@@ -696,6 +720,8 @@ namespace Form
             jo.Set<bool>("enableNav",data.enableNav);
 
             jo.Set<int>("minimapIcon",data.minimapIcon);
+
+            jo.Set<int>("size",data.size);
 
             return jo;
         }
@@ -1051,6 +1077,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeMinimapiconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeSize(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeSizeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

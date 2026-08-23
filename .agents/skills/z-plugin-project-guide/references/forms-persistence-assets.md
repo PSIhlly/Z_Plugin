@@ -113,12 +113,13 @@ Generated JSON contains the primary key plus fields marked `write` and not marke
 Compatibility behavior:
 
 - Adding a field uses the key-0 default value for an old save.
+- `CharacterProductForm.size` is a positive integer uniform model/collider scale. Keep its key-0 default at `1`; normalize it after load and before save, and never trust a scene-level `CharacterUnitForm.scale` over the owning Product.
 - Renaming, deleting, or changing a field type is not migrated. The old key is silently ignored.
 - Perform migration in this order: parse raw `JArray/JObject` → rewrite legacy keys/values → call generated deserialization → `AddData()`.
 - Load referenced tables first. Reset dependents before their referenced roots.
 - Verify two consecutive story loads because Forms are process-global registries, not fields owned by one Story object.
 
-Story folders are relative to `Application.persistentDataPath`:
+Story folders are relative to `Application.persistentDataPath`. On Windows, Unity uses `%USERPROFILE%\AppData\LocalLow\<CompanyName>\<ProductName>`; this project currently resolves to `C:\Users\<user>\AppData\LocalLow\HlZy\Z_Plugin`. Treat that as the standard local save root for diagnostics and manual migrations, but keep runtime code based on `Application.persistentDataPath` rather than a hard-coded user path:
 
 ```text
 <story-id>/Core/    authored story data and assets

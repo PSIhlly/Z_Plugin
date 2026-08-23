@@ -9,18 +9,57 @@ using Z_Map.Form;
 public class GameMapData : MapInfo
 {
 
+    public static int GetCharacterProductSize(CharacterProductForm.Data productData)
+    {
+        if (productData == null)
+            return 1;
+
+        int size = Mathf.Max(1, productData.size);
+        if (productData.size != size)
+            productData.size = size;
+        return size;
+    }
+
+    public static bool ApplyCharacterProductSize(CharacterUnitForm.Data unitData, CharacterProductForm.Data productData = null)
+    {
+        if (unitData == null)
+            return false;
+
+        if (productData == null)
+            CharacterProductForm.DataByUid.TryGetValue(unitData.unit.productInfo.Item1, out productData);
+
+        return ApplyCharacterProductSize(unitData, GetCharacterProductSize(productData));
+    }
+
+    public static bool ApplyCharacterProductSize(CharacterUnitForm.Data unitData, int size)
+    {
+        if (unitData == null)
+            return false;
+
+        Vector3 scale = Vector3.one * Mathf.Max(1, size);
+        bool changed = unitData.scale != scale;
+        unitData.scale = scale;
+        if (unitData.unit.ins != null)
+            unitData.unit.ins.transform.localScale = scale;
+        return changed;
+    }
+
     public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
     {
         var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;
+        ApplyCharacterProductSize(form);
         return form;
     }
 
     public override List<CharacterUnitForm.Data> GetCharacterDatasByJa(string ja)
     {
-        return CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
+        var result = CharacterUnitForm.GetDatasByJa(JArray.Parse(mainData.characterJa));
+        foreach (var data in result)
+            ApplyCharacterProductSize(data);
+        return result;
 
     }
     public override ItemUnitForm.Data GetNewItem(string prefabName = "", object[] prms = null)
@@ -41,7 +80,7 @@ public class GameMapData : MapInfo
 
     public override TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
     {
-        var form = new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("map"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
+        var form = new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("mapground"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;

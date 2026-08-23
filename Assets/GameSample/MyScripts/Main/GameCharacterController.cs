@@ -146,8 +146,22 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
     public GameCharacterController(GameManager super) : base(super)
     {
         Z_EventHelper.Register(this);
+        CharacterProductForm.changeSizeAction += OnCharacterSizeChanged;
     }
     public Dictionary<CharacterUnitForm.Data, AnimController> animControllerDic = new Dictionary<CharacterUnitForm.Data, AnimController>();
+
+    private void OnCharacterSizeChanged(CharacterProductForm.Data productData, int oldValue, int newValue)
+    {
+        int validSize = Mathf.Max(1, newValue);
+
+        foreach (var unitData in CharacterUnitForm.DataByUid.Values)
+        {
+            if (unitData.unit.productInfo.Item1 != productData.uid)
+                continue;
+            if (GameMapData.ApplyCharacterProductSize(unitData, validSize))
+                MapManager.instance.updateCtrl.RefreshCharacterOverlap(unitData.unit);
+        }
+    }
 
     public class AnimController
     {
@@ -499,6 +513,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         switch (evt.type)
         {
             case MapEventType.Show:
+                if (GameMapData.ApplyCharacterProductSize(evt.unit.data))
+                    MapManager.instance.updateCtrl.RefreshCharacterOverlap(evt.unit);
                 RegisterAnim(evt.unit.data);
                 LoadModel(evt.unit.ins);
                 break;
@@ -507,6 +523,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 var productData = CharacterProductForm.DataByUid.GetDv(evt.unit.productInfo.Item1, null);
                 if (productData != null)
                 {
+                    if (GameMapData.ApplyCharacterProductSize(evt.unit.data, productData))
+                        MapManager.instance.updateCtrl.RefreshCharacterOverlap(evt.unit);
                     evt.unit.data.navEnabled = productData.enableNav && _super.curProgress.seconds > productData.recoveryTime;
                 }
                 CheckAnim(evt.unit.ins);

@@ -51,7 +51,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var data = new GameMapData();
 
             var dic = GameManager.instance.innerAssetDic;
-            data.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
+            data.Init((GameObjectAssetForm.Data)dic["mapground"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["mapfloor"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
             var defaultTextureLabId = LabForm.GetOrCreate("default", nameof(MapTextureForm));
             var defaultObjectLabId = LabForm.GetOrCreate("default", nameof(MapObjectForm));
             MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, defaultTextureLabId, new Dictionary<string, EventTriggerForm.Data>(),false,new Dictionary<int,int>()));

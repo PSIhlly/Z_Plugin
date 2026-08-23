@@ -22,6 +22,16 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     {
         public override void OnCreate()
         {
+            view.ipt_size.contentType = TMPro.TMP_InputField.ContentType.IntegerNumber;
+            view.ipt_size.onFinishInput += value =>
+            {
+                int oldSize = Math.Max(1, model.data.size);
+                if (int.TryParse(value, out int size))
+                    model.data.size = Math.Max(1, size);
+                else
+                    model.data.size = oldSize;
+                view.ipt_size.Set(model.data.size.ToString(), false);
+            };
 
             view.btn_faceType.onClick.AddListener(() =>
             {
@@ -122,6 +132,9 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public void Refresh()
         {
+            if (model.data.size < 1)
+                model.data.size = 1;
+            view.ipt_size.Set(model.data.size.ToString());
             view.txt_moveSpeedParameter.text = model.data.speedParamName;
 
             view.txt_faceType.oriText = model.data.faceType.ToString();

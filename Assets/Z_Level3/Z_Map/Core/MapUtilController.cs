@@ -378,7 +378,7 @@ namespace Z_Map
                 {
                     var unitLst = new List<MapUnit>() { tile };
                     unitLst.AddRange(_super.updateCtrl.objectTileDic.Get(tile));
-                    unitLst.AddRange(_super.updateCtrl.characterTileDic.Get(tile));
+                    unitLst.AddRange(_super.updateCtrl.characterOverlapTileDic.Get(tile));
                     foreach (var u in unitLst)
                     {
                         if (exist.Contains(u.data.uid))
@@ -397,6 +397,65 @@ namespace Z_Map
                 Debug.DrawLine(from, to, Color.green);
             }
             return res;
+        }
+        public List<TileUnit> GetCharacterCollisionTiles(CharacterUnit unit, Vector3 displacement, CollideType type)
+        {
+            var result = new HashSet<TileUnit>();
+            bool hasPoint = false;
+            Vector3 min = Vector3.zero;
+            Vector3 max = Vector3.zero;
+
+            foreach (var mesh in unit.GetMeshes(type))
+            {
+                if (mesh.positions == null)
+                    continue;
+                foreach (var point in mesh.positions)
+                {
+                    Vector3 movedPoint = point + displacement;
+                    if (!hasPoint)
+                    {
+                        min = Vector3.Min(point, movedPoint);
+                        max = Vector3.Max(point, movedPoint);
+                        hasPoint = true;
+                    }
+                    else
+                    {
+                        min = Vector3.Min(min, Vector3.Min(point, movedPoint));
+                        max = Vector3.Max(max, Vector3.Max(point, movedPoint));
+                    }
+                }
+            }
+
+            if (!hasPoint)
+            {
+                min = Vector3.Min(unit.data.pos, unit.data.pos + displacement);
+                max = Vector3.Max(unit.data.pos, unit.data.pos + displacement);
+            }
+
+            Vector3 cellSize = _super.enable ? _super.data.mainData.mapUnitSize : Vector3.one;
+            cellSize.x = Mathf.Max(0.0001f, Mathf.Abs(cellSize.x));
+            cellSize.y = Mathf.Max(0.0001f, Mathf.Abs(cellSize.y));
+            cellSize.z = Mathf.Max(0.0001f, Mathf.Abs(cellSize.z));
+
+            int minX = Mathf.FloorToInt(min.x / cellSize.x - 0.5f);
+            int maxX = Mathf.CeilToInt(max.x / cellSize.x + 0.5f);
+            int minZ = Mathf.FloorToInt(min.z / cellSize.z - 0.5f);
+            int maxZ = Mathf.CeilToInt(max.z / cellSize.z + 0.5f);
+            int anchorY = unit.belongTile != null
+                ? unit.belongTile.data.mapPos.y
+                : RealPos2MapPosInt(unit.data.pos).y;
+            int maxY = Mathf.Max(anchorY + 1, Mathf.CeilToInt(max.y / cellSize.y + 0.5f));
+
+            for (int x = minX; x <= maxX; x++)
+            for (int y = anchorY; y <= maxY; y++)
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                var tile = GetTile(x, y, z);
+                if (tile != null)
+                    result.Add(tile);
+            }
+
+            return new List<TileUnit>(result);
         }
         public List<TileUnit> GetOverlap(ObjectUnitForm.Data oData)
         {

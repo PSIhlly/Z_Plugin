@@ -137,6 +137,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 Debug.Log(Time.frameCount + ":" + newCharacter.uid + " replaced " + ch.uid);
                 data.name = newCharacter.name;
                 data.unit.productInfo = (newCharacter.uid, -1);
+                if (GameMapData.ApplyCharacterProductSize(data, newCharacter))
+                    MapManager.instance.updateCtrl.RefreshCharacterOverlap(data.unit);
                 _characterDic[newCharacter] = data;
                 if (data.minimapIcon<=0)
                 {
@@ -147,6 +149,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             {
                 data.name = ch.name;
                 data.unit.productInfo = (ch.uid, -1);
+                if (GameMapData.ApplyCharacterProductSize(data, ch))
+                    MapManager.instance.updateCtrl.RefreshCharacterOverlap(data.unit);
                 _characterDic[ch] = data;
             }
         }
@@ -352,8 +356,10 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         if (unitData == null)
         {
-            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalDefaultHelper.GetRuntimePrefabName("character"), true, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)));
+            unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalDefaultHelper.GetRuntimePrefabName("character"), true, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)), GameMapData.GetCharacterProductSize(data));
         }
+        if (GameMapData.ApplyCharacterProductSize(unitData, data))
+            MapManager.instance.updateCtrl.RefreshCharacterOverlap(unitData.unit);
         _characterDic[data] = unitData;
         return unitData;
     }

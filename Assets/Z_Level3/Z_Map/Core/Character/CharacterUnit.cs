@@ -30,6 +30,7 @@ namespace Z_Map
         //nav脱困计时：记录nav最近一次实际位移时间，超过2秒未位移时触发右侧脱困位移。负值表示未初始化。
         private float lastNavMoveTime = -1f;
         private float avoidPos = -1f;
+        private float autoFacingMoveDistance;
 
         public override Type GetInsType()
         {
@@ -67,7 +68,7 @@ namespace Z_Map
                     //首次激活nav时初始化计时器，避免立即触发脱困位移
                     if (lastNavMoveTime < 0f)
                         lastNavMoveTime = Time.time;
-                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis);
+                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis, GetNavigationRadius());
                     bool movedThisFrame = false;
                     if(avoidPos<=0)
                     {
@@ -124,6 +125,7 @@ namespace Z_Map
                 data.euler = (Vector3)forceEuler;
                 if (ins != null)
                     ins.transform.eulerAngles = (Vector3)forceEuler;
+                autoFacingMoveDistance = 0f;
                 forceEuler = null;
             }
 
@@ -138,13 +140,44 @@ namespace Z_Map
         /// 流程：
         /// 1. 将初始移动方向入队
         /// 2. 循环处理队列中的每个移动方向：
-        ///    a. 遍历九宫格内tile和上面的ObjectUnit(isObstacle)/CharacterUnit
+        ///    a. 按角色碰撞体扫掠AABB遍历覆盖tile及其ObjectUnit(isObstacle)/CharacterUnit
         ///    b. 用SAT碰撞检测(CheckCollide)获取最短碰撞距离res和避障方向avoidDir
         ///    c. 若有避障方向且在同一半球内，计算滑行方向入队
         ///    d. 按最短碰撞距离截断移动并应用位置
         /// </summary>
+        private float GetNavigationRadius()
+        {
+            bool hasPoint = false;
+            float minX = 0f;
+            float maxX = 0f;
+            float minZ = 0f;
+            float maxZ = 0f;
+            foreach (var mesh in GetMeshes(CollideType.CollideOnly))
+            {
+                if (mesh.positions == null)
+                    continue;
+                foreach (var point in mesh.positions)
+                {
+                    if (!hasPoint)
+                    {
+                        minX = maxX = point.x;
+                        minZ = maxZ = point.z;
+                        hasPoint = true;
+                    }
+                    else
+                    {
+                        minX = Mathf.Min(minX, point.x);
+                        maxX = Mathf.Max(maxX, point.x);
+                        minZ = Mathf.Min(minZ, point.z);
+                        maxZ = Mathf.Max(maxZ, point.z);
+                    }
+                }
+            }
+            return hasPoint ? Mathf.Max(maxX - minX, maxZ - minZ) * 0.5f : 0f;
+        }
         public void Move(Vector3 dir)
         {
+            Vector3 moveStartPos = data.pos;
             /*
             var floor = manager.updateCtrl.g(this, belongTile, dir, CollideType.CollideOnly,out _);
 
@@ -171,6 +204,11 @@ namespace Z_Map
                 times++;
                 dir = dirQue.Dequeue();
                 var mag = dir.magnitude;
+                if (mag <= 0.000001f)
+                {
+                    firstTry = false;
+                    continue;
+                }
                 //避障方向列表：收集本轮所有碰撞产生的避障法线方向
                 var avoidDir = new List<Vector3>();
                 //res: 当前可移动的最短距离（碰撞距离），初始为完整移动距离
@@ -180,23 +218,19 @@ namespace Z_Map
                 if (dir != Vector3.zero)
                 {
                     existUnit.Clear();
-                    //遍历角色所属tile周围的九宫格tile
-                    foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z), mag))
+                    //按角色当前碰撞体到目标位置的扫掠AABB枚举候选tile
+                    foreach (var tile in manager.utilCtrl.GetCharacterCollisionTiles(this, dir, CollideType.CollideOnly))
                     {
                         //踩在本层tile上时，跳过低于本层的tile，避免下层碰撞mesh干扰导致抖动
-                        if (tile.data.mapPos.y < belongTile.data.mapPos.y)
+                        if (belongTile != null && tile.data.mapPos.y < belongTile.data.mapPos.y)
                             continue;
-                        //距离筛选：只检测1.3范围内的tile
-                        if ((tile.data.pos - data.pos).sqrMagnitude > 1.69f)
-                            continue;
-
                         List<Vector3> avoid;
 
                         //收集待检测的碰撞体：tile自身 + tile上的ObjectUnit + tile上的CharacterUnit
                         List<MapUnit> casts = new List<MapUnit>();
                         casts.Add(tile);
                         casts.AddRange(manager.updateCtrl.objectTileDic.Get(tile));
-                        casts.AddRange(manager.updateCtrl.characterTileDic.Get(tile));
+                        casts.AddRange(manager.updateCtrl.characterOverlapTileDic.Get(tile));
 
                         foreach (var obj in casts)
                         {
@@ -225,12 +259,6 @@ namespace Z_Map
                             }
                         }
                     }
-
-                    //更新朝向：根据移动方向在XZ平面的投影计算朝向
-                    var faceDir = dir;
-                    faceDir.y = 0;
-                    if (faceDir != Vector3.zero && !data.isMine)
-                        euler = Quaternion.LookRotation(faceDir).eulerAngles;
 
                 }
                 //避障滑行逻辑：当存在避障方向时尝试贴墙滑行
@@ -294,6 +322,7 @@ namespace Z_Map
             }
             if(moved)
             {
+                UpdateAutoFacing(data.pos - moveStartPos);
                 if (manager.utilCtrl.IsOnBoundary(data.pos))
                 {
                     Z_EventHelper.Invoke(new CharacterEvent()
@@ -311,9 +340,29 @@ namespace Z_Map
 
         }
 
+        private void UpdateAutoFacing(Vector3 moveDelta)
+        {
+            if (data.isMine)
+                return;
+
+            moveDelta.y = 0f;
+            float moveDistance = moveDelta.magnitude;
+            if (moveDistance <= 0.0001f)
+                return;
+
+            autoFacingMoveDistance += moveDistance;
+            if (autoFacingMoveDistance <= Mathf.Abs(data.speed) / 3f)
+                return;
+
+            data.euler = Quaternion.LookRotation(moveDelta).eulerAngles;
+            if (ins != null)
+                ins.transform.eulerAngles = data.euler;
+            autoFacingMoveDistance = 0f;
+        }
+
         /// <summary>
         /// 检测角色球体是否与周围碰撞体存在地面支撑接触
-        /// 遍历belongTile所在九宫格的tile及其object/character碰撞体，对每个碰撞体计算球心到其最近点：
+        /// 遍历角色碰撞体实际覆盖的tile及其object/character碰撞体，对每个碰撞体计算球心到其最近点：
         /// - 若距离<=半径（接触中），且接触点相对球心高度<0.4半径（接触点位于球体下半区域，即地面支撑）
         /// 则返回true，表示有地面接触，应跳过重力
         /// </summary>
@@ -343,19 +392,15 @@ namespace Z_Map
             float touchRadiusSqr = touchRadius * touchRadius;
             HashSet<MapUnit> existUnit = new HashSet<MapUnit>();
 
-            foreach (var tile in manager.utilCtrl.GetNineTile((belongTile.data.mapPos.x, belongTile.data.mapPos.y, belongTile.data.mapPos.z), 1f))
+            foreach (var tile in manager.utilCtrl.GetCharacterCollisionTiles(this, Vector3.zero, CollideType.CollideOnly))
             {
                 //踩在本层tile上时，跳过低于本层的tile
-                if (tile.data.mapPos.y < belongTile.data.mapPos.y)
+                if (belongTile != null && tile.data.mapPos.y < belongTile.data.mapPos.y)
                     continue;
-                //距离筛选：只检测1.3范围内的tile
-                if ((tile.data.pos - data.pos).sqrMagnitude > 1.69f)
-                    continue;
-
                 List<MapUnit> casts = new List<MapUnit>();
                 casts.Add(tile);
                 casts.AddRange(manager.updateCtrl.objectTileDic.Get(tile));
-                casts.AddRange(manager.updateCtrl.characterTileDic.Get(tile));
+                casts.AddRange(manager.updateCtrl.characterOverlapTileDic.Get(tile));
 
                 foreach (var obj in casts)
                 {

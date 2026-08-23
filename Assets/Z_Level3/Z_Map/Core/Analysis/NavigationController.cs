@@ -29,7 +29,7 @@ namespace Z_Map.Analysis
     }
     public interface NaviComponent
     {
-        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep);
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius);
     }
     public class NavigationController : Z_Controller<MapManager>
     {
@@ -79,23 +79,53 @@ namespace Z_Map.Analysis
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
                 if (!navUnits.ContainsKey(pos))
                 {
-                    var newUnit = new NavUnit();
-                    navUnits[pos] = newUnit;
-                    newUnit.links = new List<NavUnit>();
-                    newUnit.realPos = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).pos;
-                    newUnit.pos = new Vector3Int(pos.Item1, pos.Item2, pos.Item3);
-                    newUnit.isNull = _super.utilCtrl.GetTileData(pos.Item1, pos.Item2, pos.Item3).scale == Vector3.zero;
-                    var realPos = MapPos2RealPos(new Vector3Int(pos.Item1, pos.Item2, pos.Item2));
-
-
-                    newUnit.dirMaxY = new float[4] { map.unit.GetYByPoint(offset[0]), map.unit.GetYByPoint(offset[1]), map.unit.GetYByPoint(offset[2]), map.unit.GetYByPoint(offset[3]) };
+                    navUnits[pos] = new NavUnit
+                    {
+                        links = new List<NavUnit>()
+                    };
                 }
+
+                var navUnit = navUnits[pos];
+                navUnit.realPos = map.pos;
+                navUnit.pos = map.mapPos;
+                navUnit.isNull = map.scale == Vector3.zero;
+                navUnit.dirMaxY = new float[4]
+                {
+                    map.unit.GetYByPoint(offset[0]),
+                    map.unit.GetYByPoint(offset[1]),
+                    map.unit.GetYByPoint(offset[2]),
+                    map.unit.GetYByPoint(offset[3])
+                };
             }
             //先扫描障碍物，记录blocked位置
             curUpdateObjList.Clear();
             curUpdateObjList.AddRange(ObjectUnitForm.DataByUid.Values);
             curUpdateCount = 0;
             var blocked = new HashSet<(int, int, int)>();
+
+            // mapground 是实心地块。它的 Collider 可能向下覆盖一个或多个逻辑层；
+            // 顶面仍可行走，但被实体体积占据的下层导航单元必须标记为阻挡。
+            for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
+            {
+                times++;
+                if (times >= step)
+                {
+                    times = 0;
+                    yield return null;
+                }
+                if (!_super.enable)
+                {
+                    yield break;
+                }
+
+                var map = curUpdateTileList[curUpdateCount];
+                if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
+                    continue;
+
+                MarkMapGroundCoveredNavUnits(map, blocked);
+            }
+
+            curUpdateCount = 0;
             for (; curUpdateCount < curUpdateObjList.Count; curUpdateCount++)
             {
                 var obs = curUpdateObjList[curUpdateCount];
@@ -129,15 +159,18 @@ namespace Z_Map.Analysis
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.RightDownForward].x, points[(int)Z_Math.Graph.CubeEightPoint.RightDownForward].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.RightDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.RightDownBack].z),
                             new Vector2(points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].x, points[(int)Z_Math.Graph.CubeEightPoint.LeftDownBack].z) };
-                        foreach (var pos in overlapPoses)
+                        foreach (var worldPos in overlapPoses)
                         {
-                            if (!navUnits.TryGetValue((pos.x, pos.y, pos.z), out var unit))
+                            Vector3Int mapPos = _super.utilCtrl.RealPos2MapPosInt(worldPos);
+                            if (!navUnits.TryGetValue((mapPos.x, mapPos.y, mapPos.z), out var unit))
                             {
                                 continue;
                             }
                             for (int dir = 0; dir < offset.Length; dir++)
                             {
-                                var dir2D = new Vector2(unit.pos.x + offset[dir].x, unit.pos.z + offset[dir].y);
+                                var dir2D = new Vector2(
+                                    unit.realPos.x + offset[dir].x * _super.data.mainData.mapUnitSize.x,
+                                    unit.realPos.z + offset[dir].y * _super.data.mainData.mapUnitSize.z);
                                 if (Graph.IsPointInQuad(quad, dir2D))
                                 {
                                     unit.dirMaxY[dir] = Mathf.Max(maxY, unit.dirMaxY[dir]);
@@ -229,6 +262,55 @@ namespace Z_Map.Analysis
             }
         }
 
+        private void MarkMapGroundCoveredNavUnits(TileUnitForm.Data map, HashSet<(int, int, int)> blocked)
+        {
+            if (map.scale == Vector3.zero || map.prefabName != MapInfo.GetPrefabName("mapground"))
+                return;
+
+            Vector3 cellSize = _super.data.mainData.mapUnitSize;
+            const float overlapEpsilon = 0.0001f;
+            Vector3 halfCell = new Vector3(cellSize.x * 0.5f, 0f, cellSize.z * 0.5f);
+
+            foreach (var mesh in map.unit.GetMeshes(CollideType.CollideOnly))
+            {
+                if (mesh.positions == null || mesh.positions.Length == 0)
+                    continue;
+
+                Vector3 min = mesh.positions[0];
+                Vector3 max = mesh.positions[0];
+                for (int i = 1; i < mesh.positions.Length; i++)
+                {
+                    min = Vector3.Min(min, mesh.positions[i]);
+                    max = Vector3.Max(max, mesh.positions[i]);
+                }
+
+                int radiusX = Mathf.CeilToInt((max.x - min.x) / cellSize.x) + 1;
+                int radiusY = Mathf.CeilToInt((max.y - min.y) / cellSize.y) + 1;
+                int radiusZ = Mathf.CeilToInt((max.z - min.z) / cellSize.z) + 1;
+
+                for (int x = map.mapPos.x - radiusX; x <= map.mapPos.x + radiusX; x++)
+                for (int y = map.mapPos.y - radiusY; y <= map.mapPos.y + radiusY; y++)
+                for (int z = map.mapPos.z - radiusZ; z <= map.mapPos.z + radiusZ; z++)
+                {
+                    var key = (x, y, z);
+                    if (key == (map.mapPos.x, map.mapPos.y, map.mapPos.z) ||
+                        !navUnits.TryGetValue(key, out var navUnit))
+                    {
+                        continue;
+                    }
+
+                    Vector3 cellMin = navUnit.realPos - halfCell;
+                    Vector3 cellMax = navUnit.realPos + halfCell + Vector3.up * cellSize.y;
+
+                    bool overlapX = cellMax.x > min.x + overlapEpsilon && cellMin.x < max.x - overlapEpsilon;
+                    bool overlapY = cellMax.y > min.y + overlapEpsilon && cellMin.y < max.y - overlapEpsilon;
+                    bool overlapZ = cellMax.z > min.z + overlapEpsilon && cellMin.z < max.z - overlapEpsilon;
+                    if (overlapX && overlapY && overlapZ)
+                        blocked.Add(key);
+                }
+            }
+        }
+
 
 
 
@@ -237,9 +319,41 @@ namespace Z_Map.Analysis
             tar.y = 0;
             return tar.normalized;
         }
-        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep)
+        private readonly Dictionary<(int, int), List<Vector2Int>> clearanceOffsetCache =
+            new Dictionary<(int, int), List<Vector2Int>>();
+
+        public IReadOnlyList<Vector2Int> GetClearanceOffsets(float agentRadius)
         {
-            var res = bfs.GetNextDir(cur, tar, maxStep);
+            Vector3 cellSize = _super.data.mainData.mapUnitSize;
+            float cellX = Mathf.Max(0.0001f, Mathf.Abs(cellSize.x));
+            float cellZ = Mathf.Max(0.0001f, Mathf.Abs(cellSize.z));
+            int radiusX = agentRadius <= cellX * 0.5f + 0.0001f
+                ? 0
+                : Mathf.CeilToInt((agentRadius - cellX * 0.5f) / cellX);
+            int radiusZ = agentRadius <= cellZ * 0.5f + 0.0001f
+                ? 0
+                : Mathf.CeilToInt((agentRadius - cellZ * 0.5f) / cellZ);
+            var key = (radiusX, radiusZ);
+            if (!clearanceOffsetCache.TryGetValue(key, out var offsets))
+            {
+                offsets = new List<Vector2Int>();
+                for (int x = -radiusX; x <= radiusX; x++)
+                for (int z = -radiusZ; z <= radiusZ; z++)
+                    offsets.Add(new Vector2Int(x, z));
+                clearanceOffsetCache[key] = offsets;
+            }
+            return offsets;
+        }
+
+        public bool TryGetOffsetUnit(NavUnit center, Vector2Int offset, out NavUnit unit)
+        {
+            return navUnits.TryGetValue(
+                (center.pos.x + offset.x, center.pos.y, center.pos.z + offset.y),
+                out unit);
+        }
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius)
+        {
+            var res = bfs.GetNextDir(cur, tar, maxStep, agentRadius);
             res.y = 0;
             return res;
         }

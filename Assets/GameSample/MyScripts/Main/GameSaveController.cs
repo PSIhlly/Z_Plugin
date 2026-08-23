@@ -131,7 +131,7 @@ public class GameSaveController : Z_Controller<GameManager>
             {
                 var mapData = new GameMapData();
                 var dic = GameManager.instance.innerAssetDic;
-                mapData.Init((GameObjectAssetForm.Data)dic["map"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"],(TexAssetForm.Data) dic["defaultTileTexture"]);
+                mapData.Init((GameObjectAssetForm.Data)dic["mapground"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["mapfloor"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"],(TexAssetForm.Data) dic["defaultTileTexture"]);
                 GameManager.instance.saveCtrl.SaveSceneMap(path + Main2StoryManager.GetSceneFileNameById(data.uid), mapData);
             }
         }
@@ -172,6 +172,11 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + characterParamFormFileName, CharacterParamForm.GetJaByDatas().ToString());
 
+        foreach (var data in CharacterProductForm.DataByUid.Values)
+        {
+            if (data.size < 1)
+                data.size = 1;
+        }
         SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas().ToString());
 
     }
@@ -550,6 +555,8 @@ public class GameSaveController : Z_Controller<GameManager>
 
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
+            if (data.size < 1)
+                data.size = 1;
             var icon = data.avatarTex;
 
             foreach (var anim in data.animDic.Values)

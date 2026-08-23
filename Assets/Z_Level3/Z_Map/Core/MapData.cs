@@ -23,10 +23,11 @@ namespace Z_Map
         public Dictionary<string,AssetForm.Data> innerPrefabDic = new Dictionary<string, AssetForm.Data>();
         public static string GetPrefabName(string name="") => "MapPrefab$" + name;
 
-        public void Init(GameObjectAssetForm.Data mapPrefab, GameObjectAssetForm.Data mapslopePrefab, GameObjectAssetForm.Data imgPrefab, GameObjectAssetForm.Data canvasPrefab,TexAssetForm.Data defaultTileTexture)
+        public void Init(GameObjectAssetForm.Data mapgroundPrefab, GameObjectAssetForm.Data mapslopePrefab, GameObjectAssetForm.Data mapfloorPrefab, GameObjectAssetForm.Data imgPrefab, GameObjectAssetForm.Data canvasPrefab,TexAssetForm.Data defaultTileTexture)
         {
-            innerPrefabDic["map"] = mapPrefab;
+            innerPrefabDic["mapground"] = mapgroundPrefab;
             innerPrefabDic["mapslope"] = mapslopePrefab;
+            innerPrefabDic["mapfloor"] = mapfloorPrefab;
             innerPrefabDic["img"] = imgPrefab;
             innerPrefabDic["canvas"] = canvasPrefab;
             innerPrefabDic["defaultTileTexture"] = defaultTileTexture;
@@ -234,7 +235,7 @@ namespace Z_Map
 
         public virtual TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
         {
-            return new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("map"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
+            return new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("mapground"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false);
         }
         public virtual void RegisterNewTile(TileUnitForm.Data data)
         {

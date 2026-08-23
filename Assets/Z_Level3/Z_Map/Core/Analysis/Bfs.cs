@@ -28,13 +28,21 @@ namespace Z_Map.Analysis
         /// BFS寻路核心方法：从cur到tar寻找可行路径，返回第一步的移动方向
         /// maxStep: 最大搜索步数限制
         /// </summary>
-        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep)
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius)
         {
 
             pre.Clear();
             steps.Clear();
             queue.Clear();
             path.Clear();
+            var clearanceOffsets = nc.GetClearanceOffsets(agentRadius);
+            int smoothingRadiusX = 1;
+            int smoothingRadiusZ = 1;
+            foreach (var offset in clearanceOffsets)
+            {
+                smoothingRadiusX = Mathf.Max(smoothingRadiusX, Mathf.Abs(offset.x));
+                smoothingRadiusZ = Mathf.Max(smoothingRadiusZ, Mathf.Abs(offset.y));
+            }
             Vector3Int curPos = nc.RealPos2MapPosInt(cur);
                 curPos = nc.GetClosestExistInArea(curPos);
             Vector3Int tarPos = nc.RealPos2MapPosInt(tar);
@@ -47,7 +55,7 @@ namespace Z_Map.Analysis
 
             if (curPos == tarPos)
             {
-                nc.GetNormalWithoutY(tar - cur);
+                return nc.GetNormalWithoutY(tar - cur);
             }
             var first = nc.navUnits[(curPos.x, curPos.y, curPos.z)];
             //落地
@@ -83,7 +91,7 @@ namespace Z_Map.Analysis
                 }
                 foreach (var nxt in now.links)
                 {
-                    if (CanPass(now, nxt))
+                    if (CanPass(now, nxt, clearanceOffsets))
                     {
                         steps[nxt] = step + 1;
                         queue.Enqueue(nxt);
@@ -160,7 +168,7 @@ namespace Z_Map.Analysis
                     }
                     
                     //换层 先断
-                    if (!Check(checkLeft-1, checkRight+1, nxt.y, y, checkBack-1, checkForward+1))
+                    if (!Check(checkLeft - smoothingRadiusX, checkRight + smoothingRadiusX, nxt.y, y, checkBack - smoothingRadiusZ, checkForward + smoothingRadiusZ))
                     {
                         //那就只走第一步
                         if (i == path.Count - 2)
@@ -189,9 +197,21 @@ namespace Z_Map.Analysis
         /// <summary>
         /// 判断从from到tar是否可通行
         /// </summary>
-        public bool CanPass(NavUnit from, NavUnit tar)
+        public bool CanPass(NavUnit from, NavUnit tar, IReadOnlyList<Vector2Int> clearanceOffsets)
         {
-            return !steps.ContainsKey(tar);
+            if (steps.ContainsKey(tar))
+                return false;
+
+            foreach (var offset in clearanceOffsets)
+            {
+                if (!nc.TryGetOffsetUnit(from, offset, out var fromUnit) ||
+                    !nc.TryGetOffsetUnit(tar, offset, out var toUnit) ||
+                    !fromUnit.links.Contains(toUnit))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

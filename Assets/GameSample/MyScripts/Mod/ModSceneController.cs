@@ -264,6 +264,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 {
                                     mapData.prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
                                     mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), mapMgr.data.mainData.mapUnitSize);
+                                    mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
 
                                 }
                                 else
@@ -313,6 +314,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                                 break;
                                         }
                                         cur.pos = new Vector3(cur.pos.x, cur.mapPos.y * MapManager.instance.data.mainData.mapUnitSize.y + MapManager.instance.data.mainData.mapUnitSize.y * (i) / terrainData.step, cur.pos.z);
+                                        mapMgr.updateCtrl.UpdateSingleOne(cur.unit);
 
 
                                     }

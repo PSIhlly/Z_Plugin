@@ -1900,6 +1900,7 @@ namespace ModStoryCharacterUnitConfig
             public Btn btn_faceType;
             public Btn btn_unique;
             public Sta sta_unique;
+            public Ipt ipt_size;
             public Btn btn_lightAttack;
             public Btn btn_heavyAttack;
             public Btn btn_e;
@@ -1937,22 +1938,23 @@ namespace ModStoryCharacterUnitConfig
             btn_faceType = uiHolder.elementTrsLst[15].GetComponent<Btn>();
             btn_unique = uiHolder.elementTrsLst[16].GetComponent<Btn>();
             sta_unique = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            btn_lightAttack = uiHolder.elementTrsLst[18].GetComponent<Btn>();
-            btn_heavyAttack = uiHolder.elementTrsLst[19].GetComponent<Btn>();
-            btn_e = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            btn_q = uiHolder.elementTrsLst[21].GetComponent<Btn>();
-            btn_passive1 = uiHolder.elementTrsLst[22].GetComponent<Btn>();
-            btn_passive2 = uiHolder.elementTrsLst[23].GetComponent<Btn>();
-            btn_minimapIcon = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            img_minimapIcon = uiHolder.elementTrsLst[25].GetComponent<Img>();
-            txt_moveSpeedParameter = uiHolder.elementTrsLst[26].GetComponent<Txt>();
-            txt_faceType = uiHolder.elementTrsLst[27].GetComponent<Txt>();
-            txt_lightAttack = uiHolder.elementTrsLst[28].GetComponent<Txt>();
-            txt_heavyAttack = uiHolder.elementTrsLst[29].GetComponent<Txt>();
-            txt_e = uiHolder.elementTrsLst[30].GetComponent<Txt>();
-            txt_q = uiHolder.elementTrsLst[31].GetComponent<Txt>();
-            txt_passive1 = uiHolder.elementTrsLst[32].GetComponent<Txt>();
-            txt_passive2 = uiHolder.elementTrsLst[33].GetComponent<Txt>();
+            ipt_size = uiHolder.elementTrsLst[18].GetComponent<Ipt>();
+            btn_lightAttack = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            btn_heavyAttack = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            btn_e = uiHolder.elementTrsLst[21].GetComponent<Btn>();
+            btn_q = uiHolder.elementTrsLst[22].GetComponent<Btn>();
+            btn_passive1 = uiHolder.elementTrsLst[23].GetComponent<Btn>();
+            btn_passive2 = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            btn_minimapIcon = uiHolder.elementTrsLst[25].GetComponent<Btn>();
+            img_minimapIcon = uiHolder.elementTrsLst[26].GetComponent<Img>();
+            txt_moveSpeedParameter = uiHolder.elementTrsLst[27].GetComponent<Txt>();
+            txt_faceType = uiHolder.elementTrsLst[28].GetComponent<Txt>();
+            txt_lightAttack = uiHolder.elementTrsLst[29].GetComponent<Txt>();
+            txt_heavyAttack = uiHolder.elementTrsLst[30].GetComponent<Txt>();
+            txt_e = uiHolder.elementTrsLst[31].GetComponent<Txt>();
+            txt_q = uiHolder.elementTrsLst[32].GetComponent<Txt>();
+            txt_passive1 = uiHolder.elementTrsLst[33].GetComponent<Txt>();
+            txt_passive2 = uiHolder.elementTrsLst[34].GetComponent<Txt>();
         }
 
     }

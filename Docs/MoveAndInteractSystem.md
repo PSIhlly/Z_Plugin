@@ -146,9 +146,9 @@ Move(dir):
     avoidDir = []                  // 本轮收集的避障法线
 
     ── 碰撞检测阶段 ──
-    foreach tile in GetNineTile(belongTile, mag):  // 九宫格
+    foreach tile in GetCharacterCollisionTiles(this, dir, CollideOnly):  // 当前到目标位置的 Collider swept AABB
       if tile.y < belongTile.y: continue           // 跳过下层 tile
-      if dist > 1.3: continue                      // 距离筛选
+      // 不按 tile 锚点距离筛选；实际 Collider 可能跨逻辑层
 
       casts = [tile] + tile.objects + tile.characters
       foreach obj in casts:
@@ -182,13 +182,18 @@ Move(dir):
       moved = true
 
   if moved:
+    累计本次实际水平位移
+    if !isMine && 累计距离 > abs(speed) / 3:
+      朝向 = LookRotation(本次实际水平移动方向)
+      清空累计距离
     触发 BoundaryTouch / Move 事件
 ```
 
 **关键设计**：
 - **移动队列**：初始方向被墙阻挡后，计算滑行方向重新入队，支持多次重试
 - **首次尝试标记**：`firstTry=true` 时即使 `res=0` 也计算避障；后续迭代要求 `res>0.001` 才滑行，防止无限循环
-- **九宫格遍历**：只检测 `belongTile` 周围 3×3×3 的 tile，且跳过低于当前层的 tile
+- **邻域遍历**：只检测 `GetNineTile` 返回的有界邻域，且跳过低于当前层的 tile。候选不能再按 Tile 锚点的三维距离排除，跨层 Collider 由 Mesh 的 AABB/SAT 判定实际是否接触
+- **自动朝向**：非玩家角色累计实际水平位移；只有严格超过 `abs(speed) / 3` 才朝本次实际移动方向转向并清零累计值。碰撞未移动、纯 Y 位移和短距离移动均保持旧朝向
 
 ### 3.3 碰撞检测调度
 
@@ -427,19 +432,24 @@ if (GlobalSettings.ENABLE_GRAVITY && !HasGroundContact())
 
 ```
 ApplyMove(unit, newPos, euler, teleport=false):
-1. newPos → mapPos (整数坐标)
-2. if !InArea(mapPos): newPos = GetClosestInArea(newPos)  // 拉回区域
-3. 关联 tile:
-   - newMap = GetTile(mapPos.x, mapPos.y, mapPos.z)  // 下方最近 tile
-4. 更新 DoubleDictionary (unit ↔ tile)
-5. ins.transform.position = newPos
-6. data.pos = newPos, data.euler = euler
-7. if oldPos != newPos:
-     CheckCollideEvent(unit, teleport ? Vector3.zero : newPos - oldPos)
-     // teleport=true 时不传移动方向，避免触发穿越检测
+1. 记录 oldPos 与角色旧 overlap Tile
+2. newPos → mapPos；越界时用 GetClosestInArea 拉回
+3. newMap = GetTile(mapPos.x, mapPos.y, mapPos.z)  // 下方最近 tile
+4. if !teleport && oldPos != newPos:
+     CheckCollideEvent(unit, newPos - oldPos, oldOverlap)
+     // 此时 Mesh 仍位于 oldPos，检测段正好是 oldPos → newPos
+5. 更新 owner DoubleDictionary (unit ↔ tile)
+6. 写入 ins.transform 与 data.pos/euler
+7. 重建角色 overlap 索引
 ```
 
 **tile 关联策略**：当前实现取 `GetTile(x, y, z)` 返回的下方最近 tile。角色 Y 轴吸附逻辑（deltaY ≤ 0.0001f 时吸附到 tile 高度）目前被注释掉，依赖重力系统维持地面接触。
+
+角色使用两个不同语义的索引：
+- `characterTileDic`：只保存中心/支撑 owner Tile，供 `belongTile`、可见性、迷雾和编辑器放置使用。
+- `characterOverlapTileDic`：保存实际 `All` Collider AABB 覆盖的 broad-phase Tile，供移动碰撞、接地、Trigger、CaptureCast 和 Object 推动使用。
+
+`ApplyMove` 在旧坐标上完成旧位置到新位置的 Trigger 扫掠，再移动 owner、写入新的 `data.pos/euler` 并重建 overlap 索引；传送不执行移动 Trigger 扫掠。size 或 Product 变化也必须重建 overlap，但没有 owner 的非当前地图角色不得加入索引。
 
 ---
 
@@ -465,8 +475,8 @@ ApplyMove(unit, newPos, euler):
        CheckCollideEvent(unit, newPos - oldPos)
 
 CheckCollideEvent(unit, dir):
-  1. 获取 unit 当前 tile
-  2. 遍历九宫格内的所有 Object/Item/Character
+  1. 合并角色移动前后的 Collider 覆盖格
+  2. 遍历覆盖范围内的所有 Object/Item/Character（Character 查 overlap 索引）
   3. 对每个目标 tar:
        CheckCollide(unit, tar, dir, TriggerOnly, onCast)
        └─ onCast = (tar, res, dis) => ManageTriggerEvent(unit, tar, res)
@@ -483,7 +493,7 @@ ManageTriggerEvent(a, b, type):
 **关键**：
 - Trigger 检测使用 `TriggerOnly` 类型的 Mesh
 - 事件延迟到 `LateUpdate` 执行，避免移动过程中状态不一致
-- `teleport=true` 时传 `Vector3.zero` 作为 dir，Cross 检测不生效（传送不算穿越）
+- `teleport=true` 时跳过整段移动 Trigger 扫掠（传送不产生 Enter/Exit/Cross）
 
 ### 4.3 OnEnter / OnExit / Cross
 
@@ -532,14 +542,15 @@ ObjectUnit.Move(dir):
 
 ### 工程约定（来自 project_memory）
 
-1. **九宫格遍历**：Move 系统只检测 `belongTile` 周围 3×3×3 范围，跳过低于当前层的 tile
-2. **距离筛选**：只检测 1.3 范围内的 tile（`sqrMagnitude > 1.69` 跳过）
+1. **有界邻域遍历**：Move 系统只检测 `GetNineTile` 返回的附近 Tile，并跳过低于当前层的 Tile
+2. **跨层 Collider**：不能用 Tile 锚点距离过滤碰撞候选；例如上层 `mapground` 的 Collider 会向下覆盖下一逻辑层，必须进入实际 Mesh 检测
 3. **避障方向合并**：必须用 `MergeAvoidDir/MergeAvoidDirRange`，禁止 `AddRange` 盲目并集
 4. **碰撞避障方向计算**：使用碰撞点处球心到 OBB 最近点的方向，不使用 `GetPushDirByFace`（棱角处错误）
 5. **OBB 最近点**：用 `GetClosestPointOnCube`，不能用 AABB 最近点（斜面等非轴对齐 cube 会出错）
 6. **角色 Y 轴吸附**：仅当 `deltaY ≤ 0.0001f`（非爬升状态）时吸附到 tile 高度，保留 slideDir 的 +Y 爬升分量
 7. **重力施加条件**：`HasGroundContact()` 返回 false 时才施加重力，接触点高度阈值 0.4 倍半径
 8. **相机 Isometric 模式**：角度固定 45 度，不使用动态计算
+9. **人物自动朝向**：非玩家人物按实际水平位移累计，累计距离严格超过 `abs(speed) / 3` 时才更新到最近一次实际移动方向；`forceEuler` 会清空累计距离
 
 ### 性能优化
 
@@ -588,7 +599,29 @@ ObjectUnit.Move(dir):
 
 **修复**：用 `MergeAvoidDir/MergeAvoidDirRange` 替代 `AddRange`，只合并同半球兼容的方向。最近碰撞面的 avoid 优先加入，冲突方向的远端 avoid 被丢弃。
 
+### 6.6 跨层 Tile Collider 被锚点距离过滤（已修复）
+
+**现象**：`mapground` 的 Collider 向下覆盖下一层，但人物移动和接地检测仍可穿过。
+
+**根因**：候选 Tile 在进入 Mesh 检测前使用 `sqrMagnitude > 1.69` 过滤；相邻逻辑层的锚点高度差为 1.5，平方已是 2.25，实际重叠的 Collider 被提前排除。
+
+**修复**：保留有界邻域和下层跳过规则，移除 Tile 锚点距离过滤，由 Mesh AABB/SAT 决定是否接触。
+
+### 6.7 mapground 下层未进入寻路阻挡集（已修复）
+
+**现象**：导航仍会规划经过 `mapground` 实体占据的下一层。
+
+**根因**：`NavigationController` 的 `blocked` 集合没有根据 Tile Collider 填充。
+
+**修复**：构建导航时读取 `mapground` 的 `CollideOnly` 网格，按实际包围范围标记被占据的下层导航单元，同时排除其自身单元以保留顶面可行走。
+
 ---
+
+### 6.8 CharacterProduct size 与大体型角色（已接入）
+
+`CharacterProductForm.size` 为正整数，统一映射到 `CharacterUnitForm.scale`。根模型、实体 Collider 与 Trigger 会一起缩放。旧存档缺字段时使用默认值 `1`；加载、保存和 UI 输入都会把非正值归一为 `1`。
+
+大体型角色不能使用固定九宫格 broad phase：移动与接地按实际 Collider swept AABB 枚举 Tile，其他单位通过 `characterOverlapTileDic` 查到跨格角色。寻路查询把实际水平碰撞半径换算成 footprint，并要求 footprint 内每个偏移格都能完成同一条导航边，防止中心点路径穿过过窄通道。
 
 ## 附录：关键文件索引
 

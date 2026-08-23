@@ -73,7 +73,7 @@ namespace Z_Map
             {
                 foreach (var tile in manager.utilCtrl.GetOverlap(data))
                 {
-                    foreach (var ch in manager.updateCtrl.characterTileDic.Get(tile))
+                    foreach (var ch in manager.updateCtrl.characterOverlapTileDic.Get(tile))
                     {
                         if (exist.Contains(ch.data.uid))
                             continue;

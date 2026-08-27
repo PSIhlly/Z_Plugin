@@ -129,6 +129,7 @@ Rules:
 - `UiModAssetSelectWindow` exposes `ipt_labelName` and `btn_lableDelete` for the active Label filter; renaming reuses matching labels and deletion moves affected assets to unclassified before removing the Label record.
 - `UiModAssetSelectWindow`'s `btn_replace` opens the single-asset picker for the selected item, updates the existing asset in place (keeping its ID), and clears texture runtime caches before refreshing.
 - `UiModAssetSelectWindowCtrl.OnShow` keeps the last Label filter when reopening within the same asset scope; if that label is no longer visible, fall back to unclassified when available, otherwise All.
+- `UiPlayMap` uses `PlayMapController.heightMap` and `unlockTextureMap`, which are generated for every Tile height when the scene begins. Area-map height controls traverse only sorted heights that contain Tiles, display player-facing height coordinates, and show marks and the active mission only when their Tile/target height matches the browsed height.
 
 ## Global event bus
 

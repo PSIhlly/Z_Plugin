@@ -31,7 +31,7 @@ Move 系统和 Interact 系统共享同一套碰撞检测基础设施，区别�
 | 系统 | 目的 | 使用的 CollideType | 核心入口 |
 |------|------|-------------------|----------|
 | **Move** | 角色移动、碰撞截断、贴墙滑行 | `CollideOnly` | `CharacterUnit.Move()` |
-| **Interact** | 触发器事件（进入/离开区域） | `TriggerOnly` | `MapUpdateController.CheckCollideEvent()` |
+| **Interact** | 单位 Trigger 事件，以及单位接触地面 Tile 的事件 | Unit 使用 `TriggerOnly`；Tile 接触使用 `CollideOnly` | `MapUpdateController.CheckCollideEvent()` |
 
 两者底层都调用 `CheckCollide` → `MeshIntersectMesh` → `Graph.SphereIntersectCube / CubeIntersectCube / SphereIntersectSphere`。
 
@@ -433,14 +433,15 @@ if (GlobalSettings.ENABLE_GRAVITY && !HasGroundContact())
 ```
 ApplyMove(unit, newPos, euler, teleport=false):
 1. 记录 oldPos 与角色旧 overlap Tile
-2. newPos → mapPos；越界时用 GetClosestInArea 拉回
-3. newMap = GetTile(mapPos.x, mapPos.y, mapPos.z)  // 下方最近 tile
-4. if !teleport && oldPos != newPos:
+2. 非传送角色按 `size * 0.2` 将 newPos 钳制在地图水平外边界以内
+3. newPos → mapPos；越界时用 GetClosestInArea 拉回
+4. newMap = GetTile(mapPos.x, mapPos.y, mapPos.z)  // 下方最近 tile
+5. if !teleport && oldPos != newPos:
      CheckCollideEvent(unit, newPos - oldPos, oldOverlap)
      // 此时 Mesh 仍位于 oldPos，检测段正好是 oldPos → newPos
-5. 更新 owner DoubleDictionary (unit ↔ tile)
-6. 写入 ins.transform 与 data.pos/euler
-7. 重建角色 overlap 索引
+6. 更新 owner DoubleDictionary (unit ↔ tile)
+7. 写入 ins.transform 与 data.pos/euler
+8. 重建角色 overlap 索引
 ```
 
 **tile 关联策略**：当前实现取 `GetTile(x, y, z)` 返回的下方最近 tile。角色 Y 轴吸附逻辑（deltaY ≤ 0.0001f 时吸附到 tile 高度）目前被注释掉，依赖重力系统维持地面接触。
@@ -450,6 +451,8 @@ ApplyMove(unit, newPos, euler, teleport=false):
 - `characterOverlapTileDic`：保存实际 `All` Collider AABB 覆盖的 broad-phase Tile，供移动碰撞、接地、Trigger、CaptureCast 和 Object 推动使用。
 
 `ApplyMove` 在旧坐标上完成旧位置到新位置的 Trigger 扫掠，再移动 owner、写入新的 `data.pos/euler` 并重建 overlap 索引；传送不执行移动 Trigger 扫掠。size 或 Product 变化也必须重建 overlap，但没有 owner 的非当前地图角色不得加入索引。
+
+角色的地图边缘可行走范围随体型缩小：`CharacterProductForm.size` 映射到统一的 `CharacterUnitForm.scale` 后，非传送移动会在 `ApplyMove` 写入位置前沿连续可行走 Tile 查找真实水平外边界，并按 `max(1, scale.x) * 0.2` 钳制角色中心。size 为 `1` 时保持原来的 `0.2`；同一距离也用于角色 `BoundaryTouch`。Object 移动不使用固定内缩距离，仅当请求的目标中心真正触到或越过地图区域时触发 Object `BoundaryTouch`；通用 `InArea(Vector3)` 仍默认使用 `0.2`。
 
 ---
 
@@ -476,8 +479,9 @@ ApplyMove(unit, newPos, euler):
 
 CheckCollideEvent(unit, dir):
   1. 合并角色移动前后的 Collider 覆盖格
-  2. 遍历覆盖范围内的所有 Object/Item/Character（Character 查 overlap 索引）
-  3. 对每个目标 tar:
+  2. 对每个候选 Tile 使用 CollideOnly 检测实体接触，并交给 ManageTriggerEvent
+  3. 遍历覆盖范围内的所有 Object/Item/Character（Character 查 overlap 索引）
+  4. 对每个目标 tar:
        CheckCollide(unit, tar, dir, TriggerOnly, onCast)
        └─ onCast = (tar, res, dis) => ManageTriggerEvent(unit, tar, res)
 
@@ -513,6 +517,8 @@ OnExit(unit):
 
 **状态管理**：`collidingUnitUid` 记录当前正在碰撞的 Unit UID，防止重复触发。`IntersectAssisant` 的 `oldIn` 参数即来自此集合。
 
+移动单位与 Tile 的实体 Collider 首次接触时也沿用这套状态链路，但几何筛选使用 `CollideOnly`。`CollideEvent` 的移动单位一侧在 `TriggerEnter` 时执行 `onTileTouchEvent`，heap 中 `self` 是移动单位、`target` 是接触到的 Tile；离开 Tile 只清理接触状态，不额外执行事件。该事件与地图外边缘触发的 `onBoundaryTouchEvent` 相互独立，传送移动仍不扫描。
+
 ### 4.4 ObjectUnit 的 interact
 
 [ObjectUnit.cs:61-107](file:///d:/Works/Game/Z_Plugin/Assets/Z_Level3/Z_Map/Core/Object/ObjectUnit.cs#L61-L107)
@@ -521,6 +527,9 @@ ObjectUnit 也有 `Move` 方法，用于物体移动时推开角色：
 
 ```
 ObjectUnit.Move(dir):
+  targetPos = pos + dir
+  touchBoundary = !InArea(targetPos, 0)  // 只检查真实地图边缘，不使用固定0.2内缩
+
   if isObstacle:
     foreach tile in GetOverlap(data):
       foreach ch in tile.characters:
@@ -528,13 +537,18 @@ ObjectUnit.Move(dir):
         if dis < mag:
           push[ch] = -dir * 1.1 / mag * (dis - mag)  // 反向推力
 
-  ApplyMove(this, pos + dir, euler)
+  ApplyMove(this, targetPos, euler)
 
   foreach (ch, pushDir) in push:
     ch.Move(pushDir)  // 推开角色
+
+  if touchBoundary:
+    Invoke(BoundaryTouch)
+  else:
+    Invoke(Move)
 ```
 
-**特点**：ObjectUnit 移动时不做滑行，而是直接应用移动并推开挡路的角色。
+**特点**：ObjectUnit 移动时不做滑行，而是直接应用移动并推开挡路的角色。Object 的边界事件基于移动前计算出的请求目标中心，因此即使 `ApplyMove` 将越界位置拉回地图内，仍会触发一次 `BoundaryTouch`；仅处于边缘内侧的 `0.2` 范围不会触发。
 
 ---
 

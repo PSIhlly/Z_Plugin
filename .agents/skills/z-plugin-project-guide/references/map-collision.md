@@ -52,12 +52,14 @@ Preserve the semantic split:
 
 - Maintain `Unit.collidingUnitUid` so Enter/Exit is not emitted repeatedly.
 - Defer managed trigger events as the current `MapUpdateController` expects; do not mutate map collections while collision enumeration is active.
+- During non-teleport movement, test each moving MapUnit against candidate Tile `CollideOnly` meshes and route contact state through the same deferred `Unit.OnEnter` / `Unit.OnExit` pipeline. On Enter, the moving unit executes `onTileTouchEvent`; this is distinct from map-edge `onBoundaryTouchEvent`.
 - Treat teleport movement separately: `ApplyMove(..., teleport: true)` skips movement Trigger sweep entirely.
 - Move and pool entities through Map/Unit ownership. Do not permanently instantiate parallel objects outside `InstancePoolManager`.
 - Update tile association through the existing `ApplyMove` flow so spatial lookups, data position, GameObject transform, and triggers remain synchronized.
 - Keep `characterTileDic` as the single owner/support association used by `belongTile`, visibility, fog, and editor placement. Keep broad-phase character coverage in `characterOverlapTileDic`; only register characters that already have an owner, refresh after add/load/move/rotation/scale changes, and clear on remove/end.
 - Derive character broad-phase candidates from the actual `CollideOnly`/`All` Mesh swept AABB. Movement, grounding, trigger scans, CaptureCast, and object pushing must query the overlap index rather than assuming the owner Tile contains the whole character.
 - `CharacterProductForm.size` drives `CharacterUnitForm.scale = Vector3.one * max(1, size)`, so model, physical Collider, Trigger, overlap index, and navigation clearance scale together.
+- Before applying non-teleport character movement, clamp the target center inside the map's horizontal outer boundary by `max(1, CharacterUnitForm.scale.x) * 0.2`, matching `CharacterProductForm.size * 0.2`. Search across contiguous walkable Tiles when the inset spans multiple cells. Use the same distance for character `BoundaryTouch`. Object movement does not use a fixed inset: emit Object `BoundaryTouch` only when the requested target center actually touches or leaves the map area. General `InArea(Vector3)` checks retain the base `0.2` inset unless the caller explicitly supplies another distance.
 - Navigation remains a shared center graph, but each character query supplies its actual horizontal Collider radius. Validate every footprint offset transition and expand path smoothing by the same clearance; size `1` must preserve the base graph behavior.
 
 ## Map resource contracts
@@ -74,6 +76,7 @@ Preserve identifiers used as parsing and lookup protocols:
 - Treat `mapground` as solid volume for navigation: mark other navigation cells whose walkable cell volume overlaps its `CollideOnly` mesh as blocked, while keeping the owning `mapground` cell walkable on top. Do not apply this solid-volume rule to `mapfloor` implicitly.
 - After ModScene changes a terrain tile's prefab or transform, call `MapUpdateController.UpdateSingleOne` in the same placement operation so the pooled instance refreshes immediately. Collision mesh caching must also invalidate on prefab, position, rotation, or scale changes.
 - `GameMapController.ShowFinalMat` removes missing texture IDs from animation lists and uses `GlobalDefaultHelper.DefaultTexId` (or white texture as the final fallback) instead of indexing a missing asset.
+- Effects rendered with `MapPrefab$img` stay horizontal (`X=90°`) in Overhead mode and whenever `EffectForm.ground` is enabled. In Isometric side view, non-ground effects use a vertical plane (`X=0°`) and multiply local Y scale by `sqrt(2)` (about `1.414`) to compensate its projected height; per-effect rotation continues on local Z.
 
 Do not rename these resources as a cosmetic cleanup.
 

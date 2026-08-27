@@ -25,6 +25,7 @@ using Z_UnitSystem;
 
 public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<CharacterEvent>
 {
+    private const float IsometricVerticalEffectHeightScale = 1.41421356f;
     private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("img"));
     private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("canvas"));
     private Dictionary<int, CanvasHolder> canvasDic = new Dictionary<int, CanvasHolder>();
@@ -63,11 +64,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         foreach (var eft in clips)
         {
             var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
+            bool isIsometricVerticalEffect = GameManager.instance.curProgress.cameraMode == CameraMode.Isometric && !data.ground;
 
-            if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground)
-                img.trs.eulerAngles = Vector3.right * 90;
+            if (isIsometricVerticalEffect)
+                img.trs.eulerAngles = Vector3.zero;
             else
-                img.trs.eulerAngles = Vector3.right * 45;
+                img.trs.eulerAngles = Vector3.right * 90;
 
             TimeManager.instance.CancelTimer(img.animTimer);
             int cur = -1;
@@ -80,7 +82,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
             img.trs.position = pos;
             img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-rot);
-            img.trs.localScale = Vector3.one;
+            img.trs.localScale = GetEffectScale(Vector3.one, isIsometricVerticalEffect);
             img.animTimer = TimeManager.instance.StartTimerImmediate(0, 0.0001f, () =>
             {
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
@@ -111,7 +113,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                         img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
                     else
                         img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-(img.oriRot + clip.rot));
-                    img.trs.localScale = clip.scale;
+                    img.trs.localScale = GetEffectScale(clip.scale, isIsometricVerticalEffect);
 
                 }
                 else if (clip.transition && eft.Count > cur + 1)
@@ -129,7 +131,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     else
                         img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate)));
 
-                    img.trs.localScale = Vector3.Lerp(clip.scale, clipNxt.scale, rate);
+                    img.trs.localScale = GetEffectScale(Vector3.Lerp(clip.scale, clipNxt.scale, rate), isIsometricVerticalEffect);
 
                 }
 
@@ -138,6 +140,15 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         }
 
     }
+
+    private static Vector3 GetEffectScale(Vector3 scale, bool isIsometricVerticalEffect)
+    {
+        if (isIsometricVerticalEffect)
+            scale.y *= IsometricVerticalEffectHeightScale;
+
+        return scale;
+    }
+
     public void Update()
     {
         if (updateFrame < Time.frameCount)

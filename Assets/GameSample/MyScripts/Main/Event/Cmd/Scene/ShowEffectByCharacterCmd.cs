@@ -24,7 +24,7 @@ namespace Z_Code
         {
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(prm[1].str, GlobalEventHelper.CHARACTER));
             bool ignoreRot = prm[2].num == 1;
-            var delta = ShowEffectCmd.DeltaHeight;
+            var delta = ShowEffectCmd.Delta;
             if (data != null)
             {
                 PlayManager.instance.effectCtrl.CreatEffect(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.EFFECT), data.pos + delta, ignoreRot ? 0 : data.euler.y, (img) =>

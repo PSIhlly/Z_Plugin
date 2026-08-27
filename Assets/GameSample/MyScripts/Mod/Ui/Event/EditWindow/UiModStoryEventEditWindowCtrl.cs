@@ -119,9 +119,9 @@ namespace Ui.ModStoryEventEditWindow
                         {
                             if (tp == "void" && !string.IsNullOrEmpty(data.allowAsVoid))
                                 code = $"{data.allowAsVoid}{code};";
-                            if (!TryCompileSyntax(code, out var res))
+                            if (!TryCompileUnitSyntax(code, out var unit))
                                 return;
-                            ReplaceNode(model.selUnit, res[0]);
+                            ReplaceNode(model.selUnit, unit);
                             ApplyEntry();
                         }, model.selUnit);
                     }
@@ -235,6 +235,29 @@ namespace Ui.ModStoryEventEditWindow
             syntaxNodes = new List<SyntaxNode>();
             ShowCompileErrors(errors);
             return false;
+        }
+
+        private bool TryCompileUnitSyntax(string code, out SyntaxNode syntaxNode)
+        {
+            var statement = (code ?? string.Empty).TrimEnd();
+            if (!statement.EndsWith(";", StringComparison.Ordinal))
+                statement += ";";
+
+            if (!TryCompileSyntax(statement, out var syntaxNodes))
+            {
+                syntaxNode = null;
+                return false;
+            }
+
+            if (syntaxNodes.Count != 1)
+            {
+                syntaxNode = null;
+                NotifyManager.instance.AddTip("Cmd 参数必须是单个表达式");
+                return false;
+            }
+
+            syntaxNode = syntaxNodes[0];
+            return true;
         }
 
         private static void ShowCompileErrors(List<CompileError> errors)

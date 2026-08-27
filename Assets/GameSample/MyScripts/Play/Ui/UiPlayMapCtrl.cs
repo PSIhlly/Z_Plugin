@@ -38,6 +38,9 @@ namespace Ui.PlayMap
     {
         public PlayMapController mapCtrl;
         private float lastRefreshTime;
+        private bool forceAreaContentRefresh;
+        private int displayedSceneUid;
+        private int displayedHeight = int.MinValue;
         UiContainer<UiMarkCtrl> markCon;
         UiContainer<UiSceneCtrl> sceneCon;
         UiContainer<UiMissionCtrl> missionCon;
@@ -54,8 +57,11 @@ namespace Ui.PlayMap
             view.btn_area.onClick.AddListener(() =>
             {
                 model.isArea = true;
+                forceAreaContentRefresh = true;
                 Refresh();
             });
+            view.btn_up.onClick.AddListener(() => ChangeHeight(1));
+            view.btn_down.onClick.AddListener(() => ChangeHeight(-1));
             view.btn_bg.onClick.AddListener(() => {
                 Close();
             });
@@ -66,6 +72,10 @@ namespace Ui.PlayMap
             mapCtrl = PlayManager.instance.mapCtrl;
             model.cur = 0;
             model.y = 0;
+            lastRefreshTime = 0;
+            forceAreaContentRefresh = true;
+            displayedSceneUid = 0;
+            displayedHeight = int.MinValue;
         }
         public override void OnDisable()
         {
@@ -84,43 +94,30 @@ namespace Ui.PlayMap
             }
             if (model.isArea)
             {
-                int y = PlayManager.instance.sceneCtrl.playerM.unit.belongTile.data.mapPos.y;
+                int playerHeight = PlayManager.instance.sceneCtrl.playerM.unit.belongTile.data.mapPos.y;
                 bool hasMinimap = PlayManager.instance.mapCtrl.HasMinimap();
                 if (mapCtrl.curScene != null)
                 {
                     if (model.cur != mapCtrl.curScene.uid)
                     {
                         model.cur = mapCtrl.curScene.uid;
-
-                        if (!hasMinimap)
-                        {
-                            model.y = y;
-                            view.img_real.sprite = mapCtrl.heightMap.GetDv(y);
-                        }
-                        else
-                        {
-                            view.img_real.BindTexData(StoryTexAssetForm.DataById[mapCtrl.curScene.miniMap]);
-                        }
-                        view.rimg_unlock.texture = mapCtrl.unlockTextureMap.GetDv(y);
+                        model.y = GetClosestHeight(playerHeight);
                         view.rtf_area.sizeDelta = new UnityEngine.Vector2(mapCtrl.cols * mapCtrl.tileSize, mapCtrl.rows * mapCtrl.tileSize);
+                        forceAreaContentRefresh = true;
                     }
 
-                    if (!hasMinimap && model.y != y)
-                    {
-                        model.y = y;
-                        view.img_real.sprite = mapCtrl.heightMap.GetDv(y);
-                        view.rimg_unlock.texture = mapCtrl.unlockTextureMap.GetDv(y);
-                    }
+                    EnsureCurrentHeight(playerHeight);
+                    RefreshHeightView(hasMinimap);
                 }
-                var pos = PlayManager.instance.sceneCtrl.GetPlayerPos();
-                
-                if (lastRefreshTime < GameManager.instance.curProgress.seconds)
+
+                if (forceAreaContentRefresh || lastRefreshTime < GameManager.instance.curProgress.seconds)
                 {
                     lastRefreshTime = GameManager.instance.curProgress.seconds + 0.3f;
+                    forceAreaContentRefresh = false;
 
                     missionCon.Clear();
                     var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                    if (missionData != null)
+                    if (missionData != null && GetPositionHeight(missionData.targetPos) == model.y)
                     {
                         missionCon.Add(new UiMissionParam()
                         {
@@ -137,24 +134,22 @@ namespace Ui.PlayMap
                     foreach (var mark in marks)
                     {
                         var data = UnitForm.DataByUid.GetDv(mark.Key, null);
-                        if(data!=null)
+                        if (data != null && data.unit is MapUnit unit && GetUnitHeight(unit, mark.Value.Item1) == model.y)
                         {
                             markCon.Add(new UiMarkParam()
                             {
                                 pos = mark.Value.Item1,
                                 icon = mark.Value.Item2,
-                                unit = (MapUnit)data.unit
-                        });
+                                unit = unit
+                            });
                         }
-                        
                     }
                     markCon.Refresh();
-
-                  
                 }
             }
             else
             {
+                SetHeightControlsVisible(false, false, false);
                 view.img_largeMap.BindTexData(StoryTexAssetForm.DataById.GetDv(GameManager.instance.curProgress.largeMap, StoryTexAssetForm.DataById[GlobalDefaultHelper.DefaultTexId]));
                 sceneCon.Clear();
                 var scenes = SceneForm.DataByUid.Values;
@@ -171,6 +166,95 @@ namespace Ui.PlayMap
                 sceneCon.Refresh();
             }
             view.btn_world.gameObject.SetActive(GameManager.instance.curProgress.enableLargeMap);
+        }
+
+        private List<int> GetHeights()
+        {
+            return mapCtrl.heightMap.Keys.OrderBy(height => height).ToList();
+        }
+
+        private int GetClosestHeight(int targetHeight)
+        {
+            var heights = GetHeights();
+            if (heights.Count == 0)
+                return targetHeight;
+
+            int closest = heights[0];
+            int closestDistance = Math.Abs(closest - targetHeight);
+            for (int i = 1; i < heights.Count; i++)
+            {
+                int distance = Math.Abs(heights[i] - targetHeight);
+                if (distance < closestDistance)
+                {
+                    closest = heights[i];
+                    closestDistance = distance;
+                }
+            }
+            return closest;
+        }
+
+        private void EnsureCurrentHeight(int fallbackHeight)
+        {
+            if (!mapCtrl.heightMap.ContainsKey(model.y))
+                model.y = GetClosestHeight(fallbackHeight);
+        }
+
+        private void ChangeHeight(int direction)
+        {
+            if (!model.isArea || mapCtrl == null)
+                return;
+
+            var heights = GetHeights();
+            int index = heights.IndexOf(model.y);
+            if (index < 0)
+                return;
+
+            int nextIndex = index + direction;
+            if (nextIndex < 0 || nextIndex >= heights.Count)
+                return;
+
+            model.y = heights[nextIndex];
+            forceAreaContentRefresh = true;
+            Refresh();
+        }
+
+        private void RefreshHeightView(bool hasMinimap)
+        {
+            var heights = GetHeights();
+            int index = heights.IndexOf(model.y);
+            bool hasHeight = index >= 0;
+            SetHeightControlsVisible(hasHeight, hasHeight && index < heights.Count - 1, hasHeight && index > 0);
+            if (!hasHeight)
+                return;
+
+            view.txt_curHeight.text = GameManager.MapPosToPlayerPos(model.y).ToString("0.##");
+            if (displayedSceneUid == model.cur && displayedHeight == model.y)
+                return;
+
+            if (hasMinimap)
+                view.img_real.BindTexData(StoryTexAssetForm.DataById[mapCtrl.curScene.miniMap]);
+            else
+                view.img_real.sprite = mapCtrl.heightMap.GetDv(model.y);
+            view.rimg_unlock.texture = mapCtrl.unlockTextureMap.GetDv(model.y);
+            displayedSceneUid = model.cur;
+            displayedHeight = model.y;
+        }
+
+        private void SetHeightControlsVisible(bool showText, bool showUp, bool showDown)
+        {
+            view.txt_curHeight.gameObject.SetActive(showText);
+            view.btn_up.gameObject.SetActive(showUp);
+            view.btn_down.gameObject.SetActive(showDown);
+        }
+
+        private static int GetPositionHeight(Vector3 position)
+        {
+            return MapManager.instance.utilCtrl.RealPos2MapPosInt(position).y;
+        }
+
+        private static int GetUnitHeight(MapUnit unit, Vector3 position)
+        {
+            return unit.belongTile != null ? unit.belongTile.data.mapPos.y : GetPositionHeight(position);
         }
 
     }

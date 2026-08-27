@@ -150,18 +150,18 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 {
                     heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch.productInfo.Item1.ToString()));
                 }
-                else if (evt.a is ObjectUnit o)
+                else if (evt.a is MapUnit sceneObject)
                 {
-                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, o.data.uid.ToString()));
+                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, sceneObject.data.uid.ToString()));
                 }
 
                 if (evt.b is CharacterUnit ch2)
                 {
                     heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch2.productInfo.Item1.ToString()));
                 }
-                else if (evt.b is ObjectUnit o2)
+                else if (evt.b is MapUnit targetSceneObject)
                 {
-                    heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, o2.data.uid.ToString()));
+                    heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, targetSceneObject.data.uid.ToString()));
                 }
 
                 switch (evt.type)
@@ -179,7 +179,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         }
                         else if (evt.b is TileUnit)
                         {
-                            mapUnit.ExecuteEvt("onBoundaryTouchEvent", heap);
+                            mapUnit.ExecuteEvt("onTileTouchEvent", heap);
                         }
 
 

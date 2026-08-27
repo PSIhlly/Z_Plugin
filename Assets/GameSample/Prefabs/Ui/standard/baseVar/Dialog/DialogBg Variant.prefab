@@ -92,6 +92,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3870053065856857496, guid: ad242dca918fdb44189ee708226ec994, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3870053065856857496, guid: ad242dca918fdb44189ee708226ec994, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3870053065856857496, guid: ad242dca918fdb44189ee708226ec994, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6816808451089095718, guid: ad242dca918fdb44189ee708226ec994, type: 3}
       propertyPath: m_Name
       value: DialogBg Variant

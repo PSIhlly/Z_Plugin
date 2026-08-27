@@ -65,6 +65,9 @@ namespace Z_Map
         public void Move(Vector3 dir)
         {
             var mag = dir.magnitude;
+            var targetPos = data.pos + dir;
+            // Object不使用角色/通用位置的0.2边缘内缩；仅当目标中心真正触到或越过地图区域时触发BoundaryTouch。
+            bool touchBoundary = manager.enable && !manager.utilCtrl.InArea(targetPos, 0f);
             var avoidDir = new List<Vector3>();
             HashSet<int> exist = new HashSet<int>() { data.uid };
             float res = mag;
@@ -88,12 +91,12 @@ namespace Z_Map
                     }
                 }
             }
-            manager.updateCtrl.ApplyMove(this, data.pos + dir, data.euler);
+            manager.updateCtrl.ApplyMove(this, targetPos, data.euler);
             foreach (var pair in push)
             {
                 pair.Key.Move(pair.Value);
             }
-            if (manager.utilCtrl.IsOnBoundary(data.pos))
+            if (touchBoundary)
             {
                 Z_EventHelper.Invoke(new ObjectEvent()
                 {

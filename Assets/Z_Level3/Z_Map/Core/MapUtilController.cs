@@ -47,12 +47,20 @@ namespace Z_Map
         }
         public bool InArea(Vector3 pos)
         {
+            return InArea(pos, 0.2f);
+        }
+        /// <summary>
+        /// 判断真实位置是否位于地图区域内。boundaryDistance为水平外边界内缩距离；
+        /// 传0时按单位中心是否真正触到或越过地图边缘判断，不保留固定边距。
+        /// </summary>
+        public bool InArea(Vector3 pos, float boundaryDistance)
+        {
             int x = (int)Math.Round(pos.x / _super.data.mainData.mapUnitSize.x);
             int y = (int)(pos.y / _super.data.mainData.mapUnitSize.y);
             int z = (int)Math.Round(pos.z / _super.data.mainData.mapUnitSize.z);
 
-            //边缘0.2检测：距当前tile任一水平边缘0.2以内，且该方向相邻tile不存在（含下方）时，视为不在区域内
-            if (IsNearBoundaryEdge(pos, x, y, z))
+            // 距水平外边界指定距离以内时视为不在区域；Object移动传0，不使用固定内缩距离。
+            if (IsNearBoundaryEdge(pos, x, y, z, boundaryDistance))
                 return false;
 
             return InArea(x, y, z);
@@ -113,38 +121,122 @@ namespace Z_Map
             return _super.data.maps.ContainsKey((x, y, z));
         }
         /// <summary>
-        /// 检查pos是否在地图边缘0.2以内：距当前tile任一水平边缘0.2以内，且该方向相邻tile不存在（含下方tile）。
-        /// 边缘定义：这一方向上相接的tile不存在，且这个tile的下方也不存在tile（即!InArea(相邻)）。
-        /// InArea(Vector3)与IsOnBoundary共用此判定，保证两者阈值一致，避免offset叠加放大边界范围。
+        /// 检查pos是否在指定地图边缘距离以内。会沿水平连续可行走tile查找真实外边界，
+        /// 因此boundaryDistance大于单格尺寸时仍能正确判定。
+        /// InArea(Vector3)使用基础距离0.2；InArea(Vector3,float)和IsOnBoundary可由调用方指定距离。
         /// </summary>
-        private bool IsNearBoundaryEdge(Vector3 pos, int x, int y, int z)
+        private bool IsNearBoundaryEdge(Vector3 pos, int x, int y, int z, float boundaryDistance)
         {
-            var size = _super.data.mainData.mapUnitSize;
-            //pos在当前tile内的相对坐标（-0.5 ~ 0.5）
-            float relX = pos.x / size.x - x;
-            float relZ = pos.z / size.z - z;
-            //距右边缘（+X方向）：（0.5 - relX）为map空间距离，乘size转真实空间距离
-            if ((0.5f - relX) * size.x < 0.2f && !InArea(x + 1, y, z))
+            boundaryDistance = Mathf.Max(0f, boundaryDistance);
+            var size = GetSafeMapUnitSize();
+            const float tolerance = 0.0001f;
+            int xSteps = Mathf.CeilToInt(boundaryDistance / size.x) + 1;
+            int zSteps = Mathf.CeilToInt(boundaryDistance / size.z) + 1;
+
+            if (TryGetHorizontalBoundary(x, y, z, 1, 0, xSteps, size, out float right)
+                && right - pos.x <= boundaryDistance + tolerance)
                 return true;
-            //距左边缘（-X方向）
-            if ((relX + 0.5f) * size.x < 0.2f && !InArea(x - 1, y, z))
+            if (TryGetHorizontalBoundary(x, y, z, -1, 0, xSteps, size, out float left)
+                && pos.x - left <= boundaryDistance + tolerance)
                 return true;
-            //距前边缘（+Z方向）
-            if ((0.5f - relZ) * size.z < 0.2f && !InArea(x, y, z + 1))
+            if (TryGetHorizontalBoundary(x, y, z, 0, 1, zSteps, size, out float forward)
+                && forward - pos.z <= boundaryDistance + tolerance)
                 return true;
-            //距后边缘（-Z方向）
-            if ((relZ + 0.5f) * size.z < 0.2f && !InArea(x, y, z - 1))
+            if (TryGetHorizontalBoundary(x, y, z, 0, -1, zSteps, size, out float back)
+                && pos.z - back <= boundaryDistance + tolerance)
                 return true;
             return false;
         }
-        public bool IsOnBoundary(Vector3 pos)
+
+        /// <summary>
+        /// 将非传送角色的目标位置限制在地图水平外边界以内。
+        /// fromPos用于目标位置已经跨入空白格时定位角色原本所属的连续地图区域。
+        /// </summary>
+        public Vector3 ClampMoveToAreaBoundary(Vector3 fromPos, Vector3 targetPos, float boundaryDistance)
+        {
+            if (!_super.enable || boundaryDistance <= 0f)
+                return targetPos;
+
+            Vector3Int reference = RealPos2MapPosInt(targetPos);
+            if (!InArea(reference))
+            {
+                reference = RealPos2MapPosInt(fromPos);
+                if (!InArea(reference))
+                    return targetPos;
+            }
+
+            var size = GetSafeMapUnitSize();
+            int xSteps = Mathf.CeilToInt((Mathf.Abs(targetPos.x - fromPos.x) + boundaryDistance) / size.x) + 1;
+            int zSteps = Mathf.CeilToInt((Mathf.Abs(targetPos.z - fromPos.z) + boundaryDistance) / size.z) + 1;
+
+            float minX = float.NegativeInfinity;
+            float maxX = float.PositiveInfinity;
+            if (TryGetHorizontalBoundary(reference.x, reference.y, reference.z, -1, 0, xSteps, size, out float left))
+                minX = left + boundaryDistance;
+            if (TryGetHorizontalBoundary(reference.x, reference.y, reference.z, 1, 0, xSteps, size, out float right))
+                maxX = right - boundaryDistance;
+            targetPos.x = ClampToBoundaryRange(targetPos.x, minX, maxX);
+
+            float minZ = float.NegativeInfinity;
+            float maxZ = float.PositiveInfinity;
+            if (TryGetHorizontalBoundary(reference.x, reference.y, reference.z, 0, -1, zSteps, size, out float back))
+                minZ = back + boundaryDistance;
+            if (TryGetHorizontalBoundary(reference.x, reference.y, reference.z, 0, 1, zSteps, size, out float forward))
+                maxZ = forward - boundaryDistance;
+            targetPos.z = ClampToBoundaryRange(targetPos.z, minZ, maxZ);
+
+            return targetPos;
+        }
+
+        private Vector3 GetSafeMapUnitSize()
+        {
+            var size = _super.data.mainData.mapUnitSize;
+            size.x = Mathf.Max(0.0001f, Mathf.Abs(size.x));
+            size.y = Mathf.Max(0.0001f, Mathf.Abs(size.y));
+            size.z = Mathf.Max(0.0001f, Mathf.Abs(size.z));
+            return size;
+        }
+
+        private bool TryGetHorizontalBoundary(int x, int y, int z, int stepX, int stepZ, int maxSteps, Vector3 size, out float boundary)
+        {
+            for (int step = 1; step <= maxSteps; step++)
+            {
+                int nextX = x + stepX * step;
+                int nextZ = z + stepZ * step;
+                if (InArea(nextX, y, nextZ))
+                    continue;
+
+                if (stepX > 0)
+                    boundary = (nextX - 0.5f) * size.x;
+                else if (stepX < 0)
+                    boundary = (nextX + 0.5f) * size.x;
+                else if (stepZ > 0)
+                    boundary = (nextZ - 0.5f) * size.z;
+                else
+                    boundary = (nextZ + 0.5f) * size.z;
+                return true;
+            }
+
+            boundary = 0f;
+            return false;
+        }
+
+        private static float ClampToBoundaryRange(float value, float min, float max)
+        {
+            // 当地图在这一轴上的宽度小于两倍缩进时不存在正常区间，固定在区域中点。
+            if (min > max)
+                return (min + max) * 0.5f;
+            return Mathf.Clamp(value, min, max);
+        }
+
+        public bool IsOnBoundary(Vector3 pos, float boundaryDistance = 0.2f)
         {
             if (!_super.enable)
                 return false;
             int x = (int)Math.Round(pos.x / _super.data.mainData.mapUnitSize.x);
             int y = (int)(pos.y / _super.data.mainData.mapUnitSize.y);
             int z = (int)Math.Round(pos.z / _super.data.mainData.mapUnitSize.z);
-            return IsNearBoundaryEdge(pos, x, y, z);
+            return IsNearBoundaryEdge(pos, x, y, z, boundaryDistance);
         }
 
         public Vector3Int RealPos2MapPosInt(Vector3 pos)

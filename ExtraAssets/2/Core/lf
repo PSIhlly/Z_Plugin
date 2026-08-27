@@ -175,6 +175,13 @@
     "belong": "GameCmdDataForm"
   },
   {
+    "id": 19,
+    "lv1Lab": "琪露诺",
+    "lv2Lab": "",
+    "lv3Lab": "",
+    "belong": "StoryTexAssetForm"
+  },
+  {
     "id": 27,
     "lv1Lab": "地面",
     "lv2Lab": "",

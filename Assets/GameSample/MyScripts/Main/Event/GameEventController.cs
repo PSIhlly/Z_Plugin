@@ -176,6 +176,7 @@ public static partial class GlobalEventHelper
             case "onCharacterLeaveEvent":
             case "onObjectTouchEvent":
             case "onObjectLeaveEvent":
+            case "onTileTouchEvent":
             case "onShowEvent":
             case "onBoundaryTouchEvent":
             case "onPerSecondEvent":

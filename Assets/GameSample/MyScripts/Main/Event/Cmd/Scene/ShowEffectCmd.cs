@@ -13,7 +13,7 @@ namespace Z_Code
 {
     public class ShowEffectCmd : CmdBase
     {
-        public static Vector3 DeltaHeight = Vector3.up* 0.019f;
+        public static Vector3 Delta = (Vector3.up+Vector3.back)* 0.0011f;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
@@ -23,13 +23,13 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowEffectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            PlayManager.instance.effectCtrl.CreatEffect(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.EFFECT), MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)) + DeltaHeight), prm[2].num);
+            PlayManager.instance.effectCtrl.CreatEffect(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.EFFECT), MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)) + Delta), prm[2].num);
             Nxt();
             return true;
         }
         public static void Nxt()
         {
-            DeltaHeight.y = (DeltaHeight.y + 0.19f) % 0.73f;
+            Delta.y = (Delta.y + 0.0011f) % 0.73f;
         }
     }
 }

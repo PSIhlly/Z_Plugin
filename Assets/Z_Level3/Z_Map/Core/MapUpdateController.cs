@@ -610,6 +610,10 @@ namespace Z_Map
             var oldCharacterOverlap = movingCharacter == null
                 ? null
                 : new List<TileUnit>(characterOverlapTileDic.Get(movingCharacter));
+            if (movingCharacter != null && !teleport)
+            {
+                newPos = _super.utilCtrl.ClampMoveToAreaBoundary(oldPos, newPos, movingCharacter.mapBoundaryDistance);
+            }
             var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
             {
@@ -694,6 +698,12 @@ namespace Z_Map
             HashSet<int> exist = new HashSet<int>() { unit.data.uid };
             foreach (var tile in candidateTiles)
             {
+                // TileTouch表示移动单位的实体Collider与地面Tile接触，沿用Unit.OnEnter/OnExit的状态链路。
+                CheckCollide((MapUnit)unit, tile, dir, CollideType.CollideOnly, out _, (target, res, dis) =>
+                {
+                    ManageTriggerEvent(unit, target, res);
+                });
+
                 var lst = new List<Unit>(objectTileDic.Get(tile));
                 lst.AddRange(itemTileDic.Get(tile));
                 lst.AddRange(characterOverlapTileDic.Get(tile));

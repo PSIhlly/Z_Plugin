@@ -57,6 +57,8 @@ Assembly-CSharp-Editor
   └─ Z_Level4/Z_Editor/Editor
 ```
 
+`QuickModifyComponent` is self-contained in `Assembly-CSharp-Editor`; its optional single-size adjustment is enabled from the window and uses Space-drag on the selected `RectTransform`, with Unity Undo support. It must not depend on an external `GameCore` editor namespace.
+
 Important core dependencies:
 
 ```text

@@ -25,6 +25,8 @@ namespace Z_Map
         }
         public Vector3? forceEuler;
 
+        public float mapBoundaryDistance => Mathf.Max(1f, data.scale.x) * 0.2f;
+
         public float pathDis;
 
         //nav脱困计时：记录nav最近一次实际位移时间，超过2秒未位移时触发右侧脱困位移。负值表示未初始化。
@@ -323,7 +325,7 @@ namespace Z_Map
             if(moved)
             {
                 UpdateAutoFacing(data.pos - moveStartPos);
-                if (manager.utilCtrl.IsOnBoundary(data.pos))
+                if (manager.utilCtrl.IsOnBoundary(data.pos, mapBoundaryDistance))
                 {
                     Z_EventHelper.Invoke(new CharacterEvent()
                     {

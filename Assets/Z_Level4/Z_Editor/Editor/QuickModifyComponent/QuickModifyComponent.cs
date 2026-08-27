@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ namespace DP.Editor
     /// - Tools 菜单：打开窗口。
     /// - 右键 GameObject：「复制组件信息」「粘贴组件信息」。
     /// - 快捷键 Shift+C：打开窗口并复制选中对象；Shift+V：粘贴到选中对象；
-    ///   Shift+Z：撤回；Shift+Y：重做；按住 Shift：临时启用「场景点选UI」模式（可在窗口里开关）。
+    ///   Shift+Z：撤回；Shift+Y：重做；按住 Shift 临时启用「场景点选UI」，按住空格启用「单体尺寸调节」。
     /// 复制内容：Image 的 sprite；Transform 的 position（世界坐标）/ rotation / scale，
     /// 若为 RectTransform 额外复制 rect 相关布局（anchoredPosition / sizeDelta / anchors / pivot）；
     /// TextPro（TMP_Text）的 内容 / fontAsset / materialPreset / fontSize / vertexColor。
@@ -66,7 +67,11 @@ namespace DP.Editor
 
         const string PREF_HOTKEY = "QuickModifyComponent.HotkeyEnabled";
         const string PREF_PICKMODE = "QuickModifyComponent.PickMode";
+        const string PREF_SINGLESIZE = "QuickModifyComponent.SingleSizeAdjust";
         const string UNDO_NAME = "粘贴组件信息";
+        const string UNDO_NAME_SINGLESIZE = "单体尺寸调节";
+        const float SIZE_ADJUST_POS_EPSILON_SQR = 0.000001f;
+        const float SIZE_ADJUST_SIZE_EPSILON = 0.0001f;
 
         static bool HotkeyEnabled
         {
@@ -79,6 +84,13 @@ namespace DP.Editor
         {
             get => EditorPrefs.GetBool(PREF_PICKMODE, false);
             set => EditorPrefs.SetBool(PREF_PICKMODE, value);
+        }
+
+        /// <summary>是否启用单体尺寸调节功能（按住空格生效）。</summary>
+        static bool SingleSizeAdjustEnabled
+        {
+            get => EditorPrefs.GetBool(PREF_SINGLESIZE, true);
+            set => EditorPrefs.SetBool(PREF_SINGLESIZE, value);
         }
 
         // 当前是否处于「Shift 按住」激活态
@@ -101,6 +113,267 @@ namespace DP.Editor
             SceneView.RepaintAll();
         }
 
+        // ---------------- 单体尺寸调节（按住空格激活）----------------
+        // 当前是否处于「空格按住」激活态
+        static bool singleSizeActive;
+        // 一次拖拽手势的快照：父物体 + 直属子物体的世界位置/尺寸
+        static SizeAdjustGesture sizeAdjustGesture;
+
+        class SizeAdjustGesture
+        {
+            public readonly RectTransform parent;
+            public readonly Vector3[] parentWorldCorners = new Vector3[4];
+            public readonly List<SizeAdjustChild> children;
+            public bool parentChanged;
+            public bool undoRecorded;
+
+            public SizeAdjustGesture(RectTransform parent, List<SizeAdjustChild> children)
+            {
+                this.parent = parent;
+                this.children = children;
+                parent.GetWorldCorners(parentWorldCorners);
+            }
+        }
+
+        class SizeAdjustChild
+        {
+            public readonly RectTransform rect;
+            public readonly Vector3 worldPosition;
+            public readonly float worldWidth;
+            public readonly float worldHeight;
+
+            public SizeAdjustChild(RectTransform rect)
+            {
+                this.rect = rect;
+                worldPosition = rect.position;
+                GetRectWorldSize(rect, out worldWidth, out worldHeight);
+            }
+        }
+
+        static void HandleSingleSizeAdjust(SceneView sv)
+        {
+            if (!SingleSizeAdjustEnabled)
+            {
+                if (singleSizeActive || sizeAdjustGesture != null)
+                {
+                    EndSizeAdjustGesture();
+                    singleSizeActive = false;
+                }
+                return;
+            }
+
+            var e = Event.current;
+            if (e.keyCode == KeyCode.Space && e.rawType == EventType.KeyDown)
+            {
+                if (!singleSizeActive)
+                {
+                    singleSizeActive = true;
+                    SceneView.RepaintAll();
+                }
+            }
+            else if (e.keyCode == KeyCode.Space && e.rawType == EventType.KeyUp)
+            {
+                EndSizeAdjustGesture();
+                singleSizeActive = false;
+                SceneView.RepaintAll();
+                return;
+            }
+
+            if (!singleSizeActive)
+            {
+                return;
+            }
+
+            // 场景视图角落提示
+            Handles.BeginGUI();
+            var oldColor = GUI.color;
+            GUI.color = new Color(0.35f, 0.8f, 1f, 1f);
+            GUI.Label(new Rect(8, 28, 340, 20), "单体尺寸调节（松开空格退出）", EditorStyles.boldLabel);
+            GUI.color = oldColor;
+            Handles.EndGUI();
+
+            // rawType 在 RectTool 消费事件后仍保留原始鼠标类型
+            if (e.rawType == EventType.MouseDown && e.button == 0)
+            {
+                BeginSizeAdjustGesture();
+            }
+
+            ProcessSizeAdjustGesture();
+
+            if (e.rawType == EventType.MouseUp && e.button == 0)
+            {
+                EndSizeAdjustGesture();
+            }
+        }
+
+        /// <summary>空格按下期间选中父 UI 后拖拽 Rect 手柄：直属子物体的世界位置/尺寸保持不变，仅父物体锚点参考变化。</summary>
+        static void BeginSizeAdjustGesture()
+        {
+            EndSizeAdjustGesture();
+
+            var parent = Selection.activeTransform as RectTransform;
+            if (parent == null)
+            {
+                return;
+            }
+
+            var children = new List<SizeAdjustChild>();
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                var child = parent.GetChild(i) as RectTransform;
+                if (child != null)
+                {
+                    children.Add(new SizeAdjustChild(child));
+                }
+            }
+
+            if (children.Count > 0)
+            {
+                sizeAdjustGesture = new SizeAdjustGesture(parent, children);
+            }
+        }
+
+        static void ProcessSizeAdjustGesture()
+        {
+            if (sizeAdjustGesture == null)
+            {
+                return;
+            }
+
+            if (sizeAdjustGesture.parent == null || Selection.activeTransform != sizeAdjustGesture.parent)
+            {
+                sizeAdjustGesture = null;
+                return;
+            }
+
+            if (!sizeAdjustGesture.parentChanged && HasSizeAdjustParentChanged(sizeAdjustGesture))
+            {
+                sizeAdjustGesture.parentChanged = true;
+            }
+
+            if (!sizeAdjustGesture.parentChanged || !AnySizeAdjustChildChanged(sizeAdjustGesture.children))
+            {
+                return;
+            }
+
+            if (!sizeAdjustGesture.undoRecorded)
+            {
+                var undoObjects = new List<Object>();
+                foreach (var snapshot in sizeAdjustGesture.children)
+                {
+                    if (snapshot.rect != null && snapshot.rect.parent == sizeAdjustGesture.parent)
+                    {
+                        undoObjects.Add(snapshot.rect);
+                    }
+                }
+
+                if (undoObjects.Count > 0)
+                {
+                    Undo.RecordObjects(undoObjects.ToArray(), UNDO_NAME_SINGLESIZE);
+                    Undo.SetCurrentGroupName(UNDO_NAME_SINGLESIZE);
+                }
+                sizeAdjustGesture.undoRecorded = true;
+            }
+
+            foreach (var snapshot in sizeAdjustGesture.children)
+            {
+                RestoreSizeAdjustChild(snapshot, sizeAdjustGesture.parent);
+            }
+
+            if (!EditorApplication.isPlaying && sizeAdjustGesture.parent.gameObject.scene.IsValid())
+            {
+                EditorSceneManager.MarkSceneDirty(sizeAdjustGesture.parent.gameObject.scene);
+            }
+        }
+
+        static void EndSizeAdjustGesture()
+        {
+            if (sizeAdjustGesture == null)
+            {
+                return;
+            }
+
+            ProcessSizeAdjustGesture();
+            sizeAdjustGesture = null;
+        }
+
+        static bool HasSizeAdjustParentChanged(SizeAdjustGesture gesture)
+        {
+            var corners = new Vector3[4];
+            gesture.parent.GetWorldCorners(corners);
+            for (int i = 0; i < corners.Length; i++)
+            {
+                if ((corners[i] - gesture.parentWorldCorners[i]).sqrMagnitude > SIZE_ADJUST_POS_EPSILON_SQR)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static bool AnySizeAdjustChildChanged(List<SizeAdjustChild> children)
+        {
+            foreach (var snapshot in children)
+            {
+                RectTransform child = snapshot.rect;
+                if (child == null)
+                {
+                    continue;
+                }
+
+                if ((child.position - snapshot.worldPosition).sqrMagnitude > SIZE_ADJUST_POS_EPSILON_SQR)
+                {
+                    return true;
+                }
+
+                GetRectWorldSize(child, out float width, out float height);
+                if (Mathf.Abs(width - snapshot.worldWidth) > SIZE_ADJUST_SIZE_EPSILON ||
+                    Mathf.Abs(height - snapshot.worldHeight) > SIZE_ADJUST_SIZE_EPSILON)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static void RestoreSizeAdjustChild(SizeAdjustChild snapshot, RectTransform expectedParent)
+        {
+            RectTransform child = snapshot.rect;
+            if (child == null || child.parent != expectedParent)
+            {
+                return;
+            }
+
+            float worldUnitsPerLocalX = child.TransformVector(Vector3.right).magnitude;
+            float worldUnitsPerLocalY = child.TransformVector(Vector3.up).magnitude;
+            if (worldUnitsPerLocalX > Mathf.Epsilon && worldUnitsPerLocalY > Mathf.Epsilon)
+            {
+                Vector2 desiredLocalSize = new Vector2(
+                    snapshot.worldWidth / worldUnitsPerLocalX,
+                    snapshot.worldHeight / worldUnitsPerLocalY);
+                Vector2 parentSize = expectedParent.rect.size;
+                Vector2 anchorStretch = new Vector2(
+                    (child.anchorMax.x - child.anchorMin.x) * parentSize.x,
+                    (child.anchorMax.y - child.anchorMin.y) * parentSize.y);
+
+                // 锚点数值不动，只用 sizeDelta 抵消锚点拉伸带来的尺寸变化
+                child.sizeDelta = desiredLocalSize - anchorStretch;
+            }
+
+            // position 是 pivot 的世界坐标，恢复它即可抵消锚点参考位置移动带来的位移
+            child.position = snapshot.worldPosition;
+            EditorUtility.SetDirty(child);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(child);
+        }
+
+        static void GetRectWorldSize(RectTransform rect, out float width, out float height)
+        {
+            var corners = new Vector3[4];
+            rect.GetWorldCorners(corners);
+            width = Vector3.Distance(corners[0], corners[3]);
+            height = Vector3.Distance(corners[0], corners[1]);
+        }
+
         // ---------------- 全局快捷键（可开关）----------------
         static QuickModifyComponent()
         {
@@ -117,6 +390,41 @@ namespace DP.Editor
 
             SceneView.duringSceneGui -= OnSceneGui;
             SceneView.duringSceneGui += OnSceneGui;
+
+            // 单体尺寸调节：update 补偿 RectTool 先行写入，selection/undo 变化时结束手势
+            EditorApplication.update -= OnSizeAdjustUpdate;
+            EditorApplication.update += OnSizeAdjustUpdate;
+            Selection.selectionChanged -= OnSizeAdjustSelectionChanged;
+            Selection.selectionChanged += OnSizeAdjustSelectionChanged;
+            Undo.undoRedoPerformed -= OnSizeAdjustUndoRedo;
+            Undo.undoRedoPerformed += OnSizeAdjustUndoRedo;
+        }
+
+        /// <summary>空格没有 Event.shift 这类持续状态；SceneView 失焦时主动复位，避免漏收 KeyUp 后卡住。</summary>
+        static void OnSizeAdjustUpdate()
+        {
+            if (singleSizeActive && !(EditorWindow.focusedWindow is SceneView))
+            {
+                EndSizeAdjustGesture();
+                singleSizeActive = false;
+                SceneView.RepaintAll();
+                return;
+            }
+
+            // SceneView 回调可能先于内置 RectTool 写入；update 再补偿一次
+            ProcessSizeAdjustGesture();
+        }
+
+        static void OnSizeAdjustSelectionChanged()
+        {
+            EndSizeAdjustGesture();
+        }
+
+        static void OnSizeAdjustUndoRedo()
+        {
+            // Undo/Redo 正在恢复父子数据，不能在回调中再次补偿
+            sizeAdjustGesture = null;
+            singleSizeActive = false;
         }
 
         static void OnGlobalKey()
@@ -174,6 +482,9 @@ namespace DP.Editor
         // ---------------- 场景快捷选中（按住 Shift 激活）----------------
         static void OnSceneGui(SceneView sv)
         {
+            // 单体尺寸调节与快捷选中共用 SceneView 回调，各自独立判断激活态
+            HandleSingleSizeAdjust(sv);
+
             if (!QuickSelectEnabled)
             {
                 if (quickSelectActive)
@@ -294,7 +605,6 @@ namespace DP.Editor
                     {
                         continue; // 非 Image/RawImage/TextPro，不参与、不记录
                     }
-
                     string name = GetPath(g.transform);
                     if (!g.isActiveAndEnabled || !g.gameObject.activeInHierarchy)
                     {
@@ -829,6 +1139,19 @@ namespace DP.Editor
                 if (!newPm && quickSelectActive)
                 {
                     DeactivateQuickSelect();
+                }
+                SceneView.RepaintAll();
+            }
+
+            bool ss = SingleSizeAdjustEnabled;
+            bool newSs = EditorGUILayout.ToggleLeft("启用单体尺寸调节（空格）", ss);
+            if (newSs != ss)
+            {
+                SingleSizeAdjustEnabled = newSs;
+                if (!newSs)
+                {
+                    EndSizeAdjustGesture();
+                    singleSizeActive = false;
                 }
                 SceneView.RepaintAll();
             }

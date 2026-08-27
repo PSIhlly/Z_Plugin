@@ -71,7 +71,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.0
+      "colliderScale": 0.3
     },
     "labId": 5,
     "collision": true,
@@ -111,7 +111,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.0
+      "colliderScale": 0.3
     },
     "labId": 5,
     "collision": true,
@@ -151,11 +151,25 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.0
+      "colliderScale": 0.2
     },
     "labId": 6,
     "collision": false,
-    "events": [],
+    "events": [
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
     "paramDic": [],
     "minimapIcon": 210000
   },
@@ -191,7 +205,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.0
+      "colliderScale": 0.2
     },
     "labId": 6,
     "collision": false,
@@ -260,6 +274,19 @@
           ],
           "type": 0
         }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
       }
     ],
     "paramDic": [],
@@ -297,7 +324,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.0
+      "colliderScale": 0.2
     },
     "labId": 6,
     "collision": false,
@@ -380,6 +407,19 @@
           "evt": [
             {
               "v": 9
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
             }
           ],
           "type": 0

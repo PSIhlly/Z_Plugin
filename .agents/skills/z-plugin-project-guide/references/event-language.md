@@ -16,7 +16,9 @@
 - Generate LF-only source with spaces; use GamePause and GameContinue in new code.
 - Prefer Compiler.TryCompile and ProgramDataForm.Data.TryApplyCode. Never persist partial output after errors.
 - Function arguments bind in source order; expression statements must leave the stack balanced.
+- Event-editor Cmd parameter replacement compiles one expression as a temporary terminated statement. Add the missing trailing semicolon only in that single-node editor path; complete stored event programs continue to require explicit statement terminators.
 - Recompile each complete ef record from source after code-generation changes. Keep zCode and zCodeMap counts equal.
+- `onTileTouchEvent` is a unit-owned scene trigger fired when a moving MapUnit enters a Tile physical Collider. Its heap exposes the moving unit as `self` and the Tile as `target`, both using the existing scene-object handle format; map-edge contact remains `onBoundaryTouchEvent`.
 
 ## Limits and validation
 

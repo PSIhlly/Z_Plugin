@@ -220,9 +220,9 @@ namespace ModTool
             public Ipt ipt_posSetY;
             public Btn btn_align;
             public Sta sta_align;
-            public Btn btn_resetCount;
             public Ipt ipt_cntSetX;
             public Ipt ipt_cntSetY;
+            public Btn btn_resetCount;
             public GameObject go_toolTypeItem;
             public UiToolTypeItemCtrl sub_toolTypeItem;
         public UiModToolView(UiHolder uiHolder):base(uiHolder)
@@ -252,9 +252,9 @@ namespace ModTool
             ipt_posSetY = uiHolder.elementTrsLst[21].GetComponent<Ipt>();
             btn_align = uiHolder.elementTrsLst[22].GetComponent<Btn>();
             sta_align = uiHolder.elementTrsLst[23].GetComponent<Sta>();
-            btn_resetCount = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            ipt_cntSetX = uiHolder.elementTrsLst[25].GetComponent<Ipt>();
-            ipt_cntSetY = uiHolder.elementTrsLst[26].GetComponent<Ipt>();
+            ipt_cntSetX = uiHolder.elementTrsLst[24].GetComponent<Ipt>();
+            ipt_cntSetY = uiHolder.elementTrsLst[25].GetComponent<Ipt>();
+            btn_resetCount = uiHolder.elementTrsLst[26].GetComponent<Btn>();
             go_toolTypeItem = uiHolder.elementTrsLst[27].gameObject;
             sub_toolTypeItem = (UiToolTypeItemCtrl) uiHolder.elementTrsLst[28].GetComponent<UiHolder>().ctrl;
         }

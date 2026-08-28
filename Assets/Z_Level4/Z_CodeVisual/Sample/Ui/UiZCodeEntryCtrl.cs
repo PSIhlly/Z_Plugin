@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using UnityEngine.UI;
 using Z_Code;
 using Z_Code.Form;
-using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 namespace Ui.ZCodeEntry
 {
@@ -77,12 +76,7 @@ namespace Ui.ZCodeEntry
             });
             unitCon.Refresh();
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unitRoot);
-            TimeManager.instance.StartTimer(0.5f, 0, () =>
-            {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(view.rtf_unitRoot);
-                return true;
-            }, uiHolder);
+            UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
 
         }
 

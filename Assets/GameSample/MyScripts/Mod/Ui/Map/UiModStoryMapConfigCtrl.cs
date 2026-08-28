@@ -30,7 +30,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapConfig
         {
             view.btn_initScene.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseScene(TextManager.instance.GetTxt("ChooseScene"), (data) =>
+                ModManager.instance.assetCtrl.ChooseScene(TextManager.instance.GetTxt("Choose scene"), (data) =>
                 {
                     GameManager.instance.curProgress.targetScene = (data.uid, GameManager.instance.curProgress.targetScene.Item2);
                     Refresh();

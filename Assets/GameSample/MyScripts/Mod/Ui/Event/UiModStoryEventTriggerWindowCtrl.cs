@@ -12,7 +12,6 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Text;
 using Z_Texture;
-using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -94,10 +93,6 @@ namespace Ui.ModStoryEventTriggerWindow
             evtCon.Add(new UiEventParam() { uid = -1 });
             evtCon.Refresh();
             UiManager.Rebuild(gameObject, true);
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(gameObject, true);
-            }, gameObject);
         }
 
         public void OnEvent(EventModifyEvent evt)
@@ -152,7 +147,7 @@ namespace Ui.ModStoryEventTriggerWindow
         {
             view.btn_add.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
+                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name.Split("$")[0]), (res) =>
                 {
                     parent.model.prm.trigger.evt.Add(res.id);
                     Z_EventHelper.Invoke(new EventModifyEvent());
@@ -165,7 +160,7 @@ namespace Ui.ModStoryEventTriggerWindow
             });
             view.btn_edit.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name), (res) =>
+                ModManager.instance.assetCtrl.ChooseEvent(SceneEventType.All, CmdTypeDataForm.defaultData.name, TextManager.instance.GetTxt(parent.model.prm.trigger.name.Split("$")[0]), (res) =>
                 {
                     int pos=parent.model.prm.trigger.evt.IndexOf(model.prm.uid);
                     parent.model.prm.trigger.evt[pos] = res.id;

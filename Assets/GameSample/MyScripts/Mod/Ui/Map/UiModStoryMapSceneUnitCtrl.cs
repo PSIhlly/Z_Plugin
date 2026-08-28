@@ -105,7 +105,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
                      {
                          var oldkey=trigger.name;
                          var any=new EntryItem(){ content = TextManager.instance.GetTxt("Any")};
-                         ModManager.instance.assetCtrl.ChooseCharacter("Choose character", (data) =>
+                         ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose character"), (data) =>
                          {
                              dic.Remove(oldkey);
                              var splits = trigger.name.Split("$");
@@ -155,7 +155,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
                      {
                          var oldkey=trigger.name;
                          var any=new EntryItem(){ content = TextManager.instance.GetTxt("Any")};
-                         ModManager.instance.assetCtrl.ChooseItem("Choose item", (data) =>
+                         ModManager.instance.assetCtrl.ChooseItem(TextManager.instance.GetTxt("Choose item"), (data) =>
                          {
                              dic.Remove(oldkey);
                              var splits = trigger.name.Split("$");
@@ -183,7 +183,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
                      {
                          var oldkey=trigger.name;
                          var any=new EntryItem(){ content = TextManager.instance.GetTxt("Any")};
-                         ModManager.instance.assetCtrl.ChooseItem("Choose item", (data) =>
+                         ModManager.instance.assetCtrl.ChooseItem(TextManager.instance.GetTxt("Choose item"), (data) =>
                          {
                              dic.Remove(oldkey);
                              var splits = trigger.name.Split("$");

@@ -161,7 +161,7 @@ namespace Form
 
                 {1000004,new Data(1000004,"object","Object","物体")},
 
-                {1000005,new Data(1000005,"item","item","道具")},
+                {1000005,new Data(1000005,"item","Item","道具")},
 
                 {1000006,new Data(1000006,"erase","Erase","清除")},
 
@@ -177,13 +177,11 @@ namespace Form
 
                 {1000012,new Data(1000012,"Choose main character","Choose main character","选择主角")},
 
-                {1000013,new Data(1000013,"Choose Hp param","Choose Hp param","选择血量参数")},
+                {1000013,new Data(1000013,"Choose Hp param","Choose HP parameter","选择生命值参数")},
 
-                {1000014,new Data(1000014,"Choose Speed param","Choose Speed param","选择移速参数")},
+                {1000014,new Data(1000014,"Choose Speed param","Choose speed parameter","选择移动速度参数")},
 
-                {1000015,new Data(1000015,"Choose anim","Choose anim","选择动画")},
-
-                {1000016,new Data(1000016,"input value","Input value","输入值")},
+                {1000015,new Data(1000015,"Choose anim","Choose animation","选择动画")},
 
                 {1000017,new Data(1000017,"icon","Icon","图标")},
 
@@ -193,9 +191,7 @@ namespace Form
 
                 {1000020,new Data(1000020,"parameter","Parameter","参数")},
 
-                {1000021,new Data(1000021,"character","Character","人物")},
-
-                {1000022,new Data(1000022,"mapObject","Map object","地图元素")},
+                {1000022,new Data(1000022,"mapObject","Map object","场景物体")},
 
                 {1000023,new Data(1000023,"globalParameter","Global parameter","全局参数")},
 
@@ -203,61 +199,59 @@ namespace Form
 
                 {1000025,new Data(1000025,"itemParameter","Item parameter","道具参数")},
 
-                {1000026,new Data(1000026,"config","Config","设定")},
+                {1000026,new Data(1000026,"config","Configuration","设定")},
 
                 {1000027,new Data(1000027,"event","Event","事件")},
 
                 {1000028,new Data(1000028,"scene","Scene","场景")},
 
-                {1000029,new Data(1000029,"name","Name","名称")},
-
                 {1000030,new Data(1000030,"introduction","Introduction","介绍")},
 
                 {1000031,new Data(1000031,"mainCharacter","Main character","主角")},
 
-                {1000032,new Data(1000032,"appearance","Appearance ","外观")},
+                {1000032,new Data(1000032,"appearance","Appearance","外观")},
 
-                {1000033,new Data(1000033,"dialog","dialog","对话")},
+                {1000033,new Data(1000033,"dialog","Dialog","对话")},
 
-                {1000034,new Data(1000034,"tips","tips","提示")},
+                {1000034,new Data(1000034,"tips","Tips","提示")},
 
-                {1000035,new Data(1000035,"empty","empty","空")},
+                {1000035,new Data(1000035,"empty","Empty","空")},
 
-                {1000036,new Data(1000036,"if","if","如果")},
+                {1000036,new Data(1000036,"if","If","如果")},
 
-                {1000037,new Data(1000037,"then","then","满足执行")},
+                {1000037,new Data(1000037,"then","Then","满足时执行")},
 
-                {1000038,new Data(1000038,"else","else","不满足执行")},
+                {1000038,new Data(1000038,"else","Else","不满足时执行")},
 
-                {1000039,new Data(1000039,"content","content","内容")},
+                {1000039,new Data(1000039,"content","Content","内容")},
 
-                {1000040,new Data(1000040,"conditionJudge","condition judge","条件")},
+                {1000040,new Data(1000040,"conditionJudge","Condition","条件")},
 
-                {1000041,new Data(1000041,"execute","execute","执行内容")},
+                {1000041,new Data(1000041,"execute","Execution","执行内容")},
 
-                {1000042,new Data(1000042,"text","text","文本")},
+                {1000042,new Data(1000042,"text","Text","文本")},
 
-                {1000043,new Data(1000043,"num","num","数值")},
+                {1000043,new Data(1000043,"num","Number","数值")},
 
-                {1000044,new Data(1000044,"dialogClip","dialog clip","对话片段")},
+                {1000044,new Data(1000044,"dialogClip","Dialog clip","对话片段")},
 
-                {1000045,new Data(1000045,"value","value","值")},
+                {1000045,new Data(1000045,"value","Value","值")},
 
-                {1000046,new Data(1000046,"logic","logic","逻辑")},
+                {1000046,new Data(1000046,"logic","Logic","逻辑")},
 
-                {1000047,new Data(1000047,"window","window","窗体")},
+                {1000047,new Data(1000047,"window","Window","窗口")},
 
                 {1000048,new Data(1000048,"min","Min","最小")},
 
                 {1000049,new Data(1000049,"max","Max","最大")},
 
-                {1000050,new Data(1000050,"hpParameter","Hp parameter","血量参数")},
+                {1000050,new Data(1000050,"hpParameter","HP parameter","生命值参数")},
 
-                {1000051,new Data(1000051,"moveSpeedParameter","Move speed parameter","移速参数")},
+                {1000051,new Data(1000051,"moveSpeedParameter","Move speed parameter","移动速度参数")},
 
-                {1000052,new Data(1000052,"idleAnim","Idle anim","待机动画")},
+                {1000052,new Data(1000052,"idleAnim","Idle animation","待机动画")},
 
-                {1000053,new Data(1000053,"moveAnim","Move anim","移动动画")},
+                {1000053,new Data(1000053,"moveAnim","Move animation","移动动画")},
 
                 {1000054,new Data(1000054,"interval(s)","Interval(s)","间隔(秒)")},
 
@@ -285,13 +279,13 @@ namespace Form
 
                 {1000066,new Data(1000066,"onUseEvent","On use event","使用事件")},
 
-                {1000067,new Data(1000067,"price(coins)","Price(Coins)","价格(货币数)")},
+                {1000067,new Data(1000067,"price(coins)","Price (coins)","价格（金币）")},
 
-                {1000068,new Data(1000068,"canEquip","Can equipped","可装备")},
+                {1000068,new Data(1000068,"canEquip","Can equip","可装备")},
 
                 {1000069,new Data(1000069,"onEquipEvent","On equip event","装备事件")},
 
-                {1000070,new Data(1000070,"onDisequipEvent","On disequip event","卸下事件")},
+                {1000070,new Data(1000070,"onDisequipEvent","On unequip event","卸下事件")},
 
                 {1000071,new Data(1000071,"part_1","Part","部位")},
 
@@ -299,11 +293,11 @@ namespace Form
 
                 {1000073,new Data(1000073,"Sphere","Sphere","球")},
 
-                {1000074,new Data(1000074,"verticalView","vertical view","俯视图")},
+                {1000074,new Data(1000074,"verticalView","Top view","俯视图")},
 
-                {1000075,new Data(1000075,"leftView","leftView","左视图")},
+                {1000075,new Data(1000075,"leftView","Left view","左视图")},
 
-                {1000076,new Data(1000076,"frontView","frontView","前视图")},
+                {1000076,new Data(1000076,"frontView","Front view","前视图")},
 
                 {1000077,new Data(1000077,"condition","Condition","条件")},
 
@@ -317,7 +311,7 @@ namespace Form
 
                 {1000082,new Data(1000082,"onObjectLeaveEvent","On object leave event","物体离开事件")},
 
-                {1000083,new Data(1000083,"onShowEvent","OnShow","出现事件")},
+                {1000083,new Data(1000083,"onShowEvent","On show event","出现事件")},
 
                 {1000084,new Data(1000084,"customEvent","Custom event","自定义事件")},
 
@@ -329,11 +323,9 @@ namespace Form
 
                 {1000088,new Data(1000088,"edit","Edit","编辑")},
 
-                {1000089,new Data(1000089,"onBeginEvent","On begin event","开幕事件")},
+                {1000089,new Data(1000089,"onBeginEvent","On begin event","开场事件")},
 
                 {1000090,new Data(1000090,"skillEvent","Skill event","技能事件")},
-
-                {1000091,new Data(1000091,"map","Map","地图")},
 
                 {1000092,new Data(1000092,"setPos","Set position","设置位置")},
 
@@ -350,18 +342,6 @@ namespace Form
                 {1000098,new Data(1000098,"chooseModel","Choose model","选择模型")},
 
                 {1000099,new Data(1000099,"chooseEquipPart","Choose equip part","选择装备部位")},
-
-                {1000100,new Data(1000100,"","","无")},
-
-                {1000101,new Data(1000101,"LeftHand","Left hand","左手")},
-
-                {1000102,new Data(1000102,"RightHand","Right hand","右手")},
-
-                {1000103,new Data(1000103,"Head","Head","头")},
-
-                {1000104,new Data(1000104,"Body","Body","身体")},
-
-                {1000105,new Data(1000105,"label","Label","标签")},
 
                 {1000106,new Data(1000106,"Choose show equipped item style","Choose show equipped item style","选择装备的道具外观样式")},
 
@@ -441,17 +421,17 @@ namespace Form
 
                 {1000144,new Data(1000144,"trigger","Trigger","触发")},
 
-                {1000145,new Data(1000145,"NoLimit","no limit","不限制")},
+                {1000145,new Data(1000145,"NoLimit","No limit","不限制")},
 
-                {1000146,new Data(1000146,"Once","once","一次性")},
+                {1000146,new Data(1000146,"Once","Once","一次")},
 
-                {1000147,new Data(1000147,"OnceDuring","once during triggering","期间一次")},
+                {1000147,new Data(1000147,"OnceDuring","Once per trigger","每次触发期间一次")},
 
-                {1000148,new Data(1000148,"unique","unique","唯一的")},
+                {1000148,new Data(1000148,"unique","Unique","唯一")},
 
                 {1000149,new Data(1000149,"Choose trigger condition","Choose trigger condition","选择触发条件")},
 
-                {1000150,new Data(1000150,"insert","insert","插入")},
+                {1000150,new Data(1000150,"insert","Insert","插入")},
 
                 {1000151,new Data(1000151,"basic","Basic","基础")},
 
@@ -489,7 +469,7 @@ namespace Form
 
                 {1000168,new Data(1000168,"ShowImage","Show image","显示图片")},
 
-                {1000169,new Data(1000169,"imageAdvanced","Image(Advanced)","图片(高级)")},
+                {1000169,new Data(1000169,"imageAdvanced","Image (advanced)","图片（高级）")},
 
                 {1000170,new Data(1000170,"CreateImage","Create image","创建图片")},
 
@@ -549,25 +529,25 @@ namespace Form
 
                 {1000198,new Data(1000198,"NotEqual","Not equal","不等于")},
 
-                {1000199,new Data(1000199,"idle","idle anim","闲置动画")},
+                {1000199,new Data(1000199,"idle","Idle animation","待机动画")},
 
-                {1000200,new Data(1000200,"idle0","idle anim with up","朝上闲置动画")},
+                {1000200,new Data(1000200,"idle0","Up idle animation","向上待机动画")},
 
-                {1000201,new Data(1000201,"idle1","idle anim with down","朝下闲置动画")},
+                {1000201,new Data(1000201,"idle1","Down idle animation","向下待机动画")},
 
-                {1000202,new Data(1000202,"idle2","idle anim with left","朝左闲置动画")},
+                {1000202,new Data(1000202,"idle2","Left idle animation","向左待机动画")},
 
-                {1000203,new Data(1000203,"idle3","idle anim with right","朝右闲置动画")},
+                {1000203,new Data(1000203,"idle3","Right idle animation","向右待机动画")},
 
-                {1000204,new Data(1000204,"move","move anim","移动动画")},
+                {1000204,new Data(1000204,"move","Move animation","移动动画")},
 
-                {1000205,new Data(1000205,"move0","move anim with up","朝上移动动画")},
+                {1000205,new Data(1000205,"move0","Up move animation","向上移动动画")},
 
-                {1000206,new Data(1000206,"move1","move anim with down","朝下移动动画")},
+                {1000206,new Data(1000206,"move1","Down move animation","向下移动动画")},
 
-                {1000207,new Data(1000207,"move2","move anim with left","朝左移动动画")},
+                {1000207,new Data(1000207,"move2","Left move animation","向左移动动画")},
 
-                {1000208,new Data(1000208,"move3","move anim with right","朝右移动动画")},
+                {1000208,new Data(1000208,"move3","Right move animation","向右移动动画")},
 
                 {1000209,new Data(1000209,"Choose faceType","Choose face type","选择朝向类型")},
 
@@ -581,9 +561,9 @@ namespace Form
 
                 {1000214,new Data(1000214,"Image","Image","图片")},
 
-                {1000215,new Data(1000215,"onPerSecondEvent","on per second event","每秒事件")},
+                {1000215,new Data(1000215,"onPerSecondEvent","On per-second event","每秒事件")},
 
-                {1000216,new Data(1000216,"Specific param and  character  change event","Specific param and  character  change event","特定玩家和属性 改变的事件")},
+                {1000216,new Data(1000216,"Specific param and  character  change event","Specific character parameter change event","特定角色参数变化事件")},
 
                 {1000217,new Data(1000217,"Gain specific item event","Gain specific item event","获得指定道具的事件")},
 
@@ -593,7 +573,7 @@ namespace Form
 
                 {1000220,new Data(1000220,"onLostItemEvent","On lost item event","失去道具事件")},
 
-                {1000221,new Data(1000221,"onCharacterParamChangeEvent","On character param change event","玩家属性变化事件")},
+                {1000221,new Data(1000221,"onCharacterParamChangeEvent","On character parameter change event","角色参数变化事件")},
 
                 {1000222,new Data(1000222,"Choose character","Choose character","选择人物")},
 
@@ -619,7 +599,7 @@ namespace Form
 
                 {1000233,new Data(1000233,"GetTriggerCharacterID","Get trigger character ID","获取触发人物ID")},
 
-                {1000234,new Data(1000234,"SetCharacterParameter","Set character's Parameter","设置人物参数")},
+                {1000234,new Data(1000234,"SetCharacterParameter","Set character parameter","设置角色参数")},
 
                 {1000235,new Data(1000235,"GetCurrentCharacterID","Get current character ID","获取当前操作人物ID")},
 
@@ -641,21 +621,19 @@ namespace Form
 
                 {1000244,new Data(1000244,"select editor style","Select editor style","选择编辑器模式")},
 
-                {1000245,new Data(1000245,"extern","Extern","外部的")},
+                {1000245,new Data(1000245,"extern","External","外部")},
 
                 {1000246,new Data(1000246,"internal","Internal","内部的")},
 
                 {1000247,new Data(1000247,"test","Test","测试")},
 
-                {1000248,new Data(1000248,"cantSaveWhenTest","can't save when test","测试时不能保存")},
+                {1000249,new Data(1000249,"sceneObjectParameter","Scene object parameter","场景物体参数")},
 
-                {1000249,new Data(1000249,"sceneObjectParameter","Scene object parameter","景物参数")},
-
-                {1000250,new Data(1000250,"Choose Skill","Choose Skill","选择技能")},
+                {1000250,new Data(1000250,"Choose Skill","Choose skill","选择技能")},
 
                 {1000251,new Data(1000251,"collision","Collision","碰撞")},
 
-                {1000252,new Data(1000252,"isConsume","Consume","是消耗品")},
+                {1000252,new Data(1000252,"isConsume","Consumable","消耗品")},
 
                 {1000253,new Data(1000253,"priority","Priority","优先级")},
 
@@ -666,6 +644,216 @@ namespace Form
                 {1000256,new Data(1000256,"Left","Left","左")},
 
                 {1000257,new Data(1000257,"Right","Right","右")},
+
+                {1000258,new Data(1000258,"check","Check","检查")},
+
+                {1000259,new Data(1000259,"Choose active character","Choose active character","选择出战角色")},
+
+                {1000260,new Data(1000260,"choose value max parameter","Choose maximum-value parameter","选择最大值参数")},
+
+                {1000261,new Data(1000261,"choose value min parameter","Choose minimum-value parameter","选择最小值参数")},
+
+                {1000262,new Data(1000262,"Choose scene","Choose scene","选择场景")},
+
+                {1000263,new Data(1000263,"delete confirm","Confirm deletion?","确定删除吗？")},
+
+                {1000264,new Data(1000264,"input local variable name","Enter local variable name","输入局部变量名")},
+
+                {1000265,new Data(1000265,"1","1","1")},
+
+                {1000266,new Data(1000266,"2","2","2")},
+
+                {1000267,new Data(1000267,"3","3","3")},
+
+                {1000268,new Data(1000268,"12","12","12")},
+
+                {1000269,new Data(1000269,"initial active team","Initial active team","初始出战队伍")},
+
+                {1000270,new Data(1000270,"initial items","Initial items","初始道具")},
+
+                {1000271,new Data(1000271,"initial team","Initial team","初始队伍")},
+
+                {1000272,new Data(1000272,"mission","Mission","任务")},
+
+                {1000273,new Data(1000273,"outPut","Output","输出")},
+
+                {1000274,new Data(1000274,"setLabel","Set label","设置标签")},
+
+                {1000275,new Data(1000275,"skillParameter","Skill parameter","技能参数")},
+
+                {1000276,new Data(1000276,"X","X","X")},
+
+                {1000277,new Data(1000277,"anim","Animation","动画")},
+
+                {1000278,new Data(1000278,"audio","Audio","音频")},
+
+                {1000279,new Data(1000279,"detect","Detection","检测")},
+
+                {1000280,new Data(1000280,"list","List","列表")},
+
+                {1000281,new Data(1000281,"sceneObject","Scene object","场景物体")},
+
+                {1000282,new Data(1000282,"transform","Transform","变换")},
+
+                {1000283,new Data(1000283,"invoke","Invoke","触发")},
+
+                {1000284,new Data(1000284,"onBoundaryTouchEvent","On boundary touch event","边界接触事件")},
+
+                {1000285,new Data(1000285,"onClickMinimapEvent","On minimap click event","小地图点击事件")},
+
+                {1000286,new Data(1000286,"onEnterEvent","On enter event","进入事件")},
+
+                {1000287,new Data(1000287,"onInteractEvent","On interact event","交互事件")},
+
+                {1000288,new Data(1000288,"onLeaveEvent","On leave event","离开事件")},
+
+                {1000289,new Data(1000289,"onLeaveSceneEvent","On leave scene event","离开场景事件")},
+
+                {1000290,new Data(1000290,"onTileTouchEvent","On tile touch event","地块接触事件")},
+
+                {1000291,new Data(1000291,"AlwaysWithPanelAndScene","Always in panel and scene","面板和场景中始终显示")},
+
+                {1000292,new Data(1000292,"AlwaysWithPanelAndSceneWithoutPlayer","Always in panel and scene except player","面板和场景中始终显示（玩家除外）")},
+
+                {1000293,new Data(1000293,"AddMission","Add mission","添加任务")},
+
+                {1000294,new Data(1000294,"Audio","Audio","音频")},
+
+                {1000295,new Data(1000295,"ChangeBgm","Change BGM","更换背景音乐")},
+
+                {1000296,new Data(1000296,"CharacterChat","Character chat","角色发言")},
+
+                {1000297,new Data(1000297,"CharacterPlayAnim","Play character animation","播放角色动画")},
+
+                {1000298,new Data(1000298,"CharacterStun","Stun character","使角色眩晕")},
+
+                {1000299,new Data(1000299,"DestroyCharacter","Destroy character","销毁角色")},
+
+                {1000300,new Data(1000300,"DoneMission","Complete mission","完成任务")},
+
+                {1000301,new Data(1000301,"Effect","Effect","特效")},
+
+                {1000302,new Data(1000302,"FloatingText","Floating text","浮动文字")},
+
+                {1000303,new Data(1000303,"GetCharacterForwardVector","Get character forward vector","获取角色前向向量")},
+
+                {1000304,new Data(1000304,"GetCharacterParameter","Get character parameter","获取角色参数")},
+
+                {1000305,new Data(1000305,"GetCharacterPosition","Get character position","获取角色位置")},
+
+                {1000306,new Data(1000306,"GetCharacterRightVector","Get character right vector","获取角色右向向量")},
+
+                {1000307,new Data(1000307,"GetCharacterRotation","Get character rotation","获取角色旋转角")},
+
+                {1000308,new Data(1000308,"GetCharactersInArea","Get characters in area","获取区域内角色")},
+
+                {1000309,new Data(1000309,"GetCurrentCharacter","Get current character","获取当前角色")},
+
+                {1000310,new Data(1000310,"GetLength","Get length","获取长度")},
+
+                {1000311,new Data(1000311,"GetLookAtRotation","Get look-at rotation","获取朝向目标的旋转角")},
+
+                {1000312,new Data(1000312,"GetNormalizedVector","Normalize vector","获取归一化向量")},
+
+                {1000313,new Data(1000313,"GetObjectForwardVector","Get object forward vector","获取物体前向向量")},
+
+                {1000314,new Data(1000314,"GetObjectPosition","Get object position","获取物体位置")},
+
+                {1000315,new Data(1000315,"GetObjectRightVector","Get object right vector","获取物体右向向量")},
+
+                {1000316,new Data(1000316,"GetObjectRotation","Get object rotation","获取物体旋转角")},
+
+                {1000317,new Data(1000317,"GetSceneObjectParameter","Get scene object parameter","获取场景物体参数")},
+
+                {1000318,new Data(1000318,"GetSkillParameter","Get skill parameter","获取技能参数")},
+
+                {1000319,new Data(1000319,"GetVarKeys","Get variable keys","获取变量键")},
+
+                {1000320,new Data(1000320,"GetVarValues","Get variable values","获取变量值")},
+
+                {1000321,new Data(1000321,"GetVectorByRotation","Get vector from rotation","根据旋转角获取向量")},
+
+                {1000322,new Data(1000322,"GetVectorLength","Get vector length","获取向量长度")},
+
+                {1000323,new Data(1000323,"HasMissionDone","Is mission complete","任务是否完成")},
+
+                {1000324,new Data(1000324,"IsCharacterActive","Is character active","角色是否激活")},
+
+                {1000325,new Data(1000325,"IsMissionAdded","Is mission added","任务是否已添加")},
+
+                {1000326,new Data(1000326,"IsObjectActive","Is object active","物体是否激活")},
+
+                {1000327,new Data(1000327,"IsObjectEnableCollision","Is object collision enabled","物体是否启用碰撞")},
+
+                {1000328,new Data(1000328,"IsUnobstructed","Is path unobstructed","路径是否无阻挡")},
+
+                {1000329,new Data(1000329,"MakeChoice","Make choice","进行选择")},
+
+                {1000330,new Data(1000330,"MoveCharacter","Move character","移动角色")},
+
+                {1000331,new Data(1000331,"MoveCharacterRelative","Move character by offset","相对移动角色")},
+
+                {1000332,new Data(1000332,"MoveObjectRelative","Move object by offset","相对移动物体")},
+
+                {1000333,new Data(1000333,"MoveToScene","Move to scene","移动到场景")},
+
+                {1000334,new Data(1000334,"NewVector","New vector","新建向量")},
+
+                {1000335,new Data(1000335,"ParameterDelta","Parameter delta","参数变化量")},
+
+                {1000336,new Data(1000336,"PlayAudio","Play audio","播放音频")},
+
+                {1000337,new Data(1000337,"Return","Return","返回")},
+
+                {1000338,new Data(1000338,"SelfCharacter","Self character","自身角色")},
+
+                {1000339,new Data(1000339,"SelfSceneObject","Self scene object","自身场景物体")},
+
+                {1000340,new Data(1000340,"SetCharacterNavigate","Navigate character","角色寻路")},
+
+                {1000341,new Data(1000341,"SetCharacterNavigateRelative","Navigate character by offset","角色相对寻路")},
+
+                {1000342,new Data(1000342,"SetCharacterPosition","Set character position","设置角色位置")},
+
+                {1000343,new Data(1000343,"SetCharacterPositionRelative","Set character position by offset","设置角色相对位置")},
+
+                {1000344,new Data(1000344,"SetCharacterRotation","Set character rotation","设置角色旋转角")},
+
+                {1000345,new Data(1000345,"SetImagePosition","Set image position","设置图片位置")},
+
+                {1000346,new Data(1000346,"SetObjectPosition","Set object position","设置物体位置")},
+
+                {1000347,new Data(1000347,"SetObjectRotation","Set object rotation","设置物体旋转角")},
+
+                {1000348,new Data(1000348,"SetSceneObjectParameter","Set scene object parameter","设置场景物体参数")},
+
+                {1000349,new Data(1000349,"SetSkillParameter","Set skill parameter","设置技能参数")},
+
+                {1000350,new Data(1000350,"ShowDialogWithChoice","Show dialog with choices","显示带选项的对话")},
+
+                {1000351,new Data(1000351,"ShowDialogWithIllustration","Show dialog with illustration","显示带立绘的对话")},
+
+                {1000352,new Data(1000352,"ShowEffectByCharacter","Show effect on character","在角色上显示特效")},
+
+                {1000353,new Data(1000353,"ShowImagePermanently","Show image permanently","持续显示图片")},
+
+                {1000354,new Data(1000354,"ShowTeamerSelect","Show team member selection","显示队员选择")},
+
+                {1000355,new Data(1000355,"ShowVideo","Play video","播放视频")},
+
+                {1000356,new Data(1000356,"Skill","Skill","技能")},
+
+                {1000357,new Data(1000357,"StopCharacterNavigate","Stop character navigation","停止角色寻路")},
+
+                {1000358,new Data(1000358,"TargetSkill","Target skill","目标技能")},
+
+                {1000359,new Data(1000359,"TriggerTargetCharacter","Trigger target character","触发目标角色")},
+
+                {1000360,new Data(1000360,"TriggerTargetSceneObject","Trigger target scene object","触发目标场景物体")},
+
+                {1000361,new Data(1000361,"UseSkill","Use skill","使用技能")},
+
+                {1000362,new Data(1000362,"Video","Video","视频")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -702,8 +890,6 @@ namespace Form
     
                         {"Choose anim",_DataById[1000015]},
     
-                        {"input value",_DataById[1000016]},
-    
                         {"icon",_DataById[1000017]},
     
                         {"avatar",_DataById[1000018]},
@@ -711,8 +897,6 @@ namespace Form
                         {"overview",_DataById[1000019]},
     
                         {"parameter",_DataById[1000020]},
-    
-                        {"character",_DataById[1000021]},
     
                         {"mapObject",_DataById[1000022]},
     
@@ -727,8 +911,6 @@ namespace Form
                         {"event",_DataById[1000027]},
     
                         {"scene",_DataById[1000028]},
-    
-                        {"name",_DataById[1000029]},
     
                         {"introduction",_DataById[1000030]},
     
@@ -852,8 +1034,6 @@ namespace Form
     
                         {"skillEvent",_DataById[1000090]},
     
-                        {"map",_DataById[1000091]},
-    
                         {"setPos",_DataById[1000092]},
     
                         {"partSetting",_DataById[1000093]},
@@ -869,18 +1049,6 @@ namespace Form
                         {"chooseModel",_DataById[1000098]},
     
                         {"chooseEquipPart",_DataById[1000099]},
-    
-                        {"",_DataById[1000100]},
-    
-                        {"LeftHand",_DataById[1000101]},
-    
-                        {"RightHand",_DataById[1000102]},
-    
-                        {"Head",_DataById[1000103]},
-    
-                        {"Body",_DataById[1000104]},
-    
-                        {"label",_DataById[1000105]},
     
                         {"Choose show equipped item style",_DataById[1000106]},
     
@@ -1166,8 +1334,6 @@ namespace Form
     
                         {"test",_DataById[1000247]},
     
-                        {"cantSaveWhenTest",_DataById[1000248]},
-    
                         {"sceneObjectParameter",_DataById[1000249]},
     
                         {"Choose Skill",_DataById[1000250]},
@@ -1185,6 +1351,216 @@ namespace Form
                         {"Left",_DataById[1000256]},
     
                         {"Right",_DataById[1000257]},
+    
+                        {"check",_DataById[1000258]},
+    
+                        {"Choose active character",_DataById[1000259]},
+    
+                        {"choose value max parameter",_DataById[1000260]},
+    
+                        {"choose value min parameter",_DataById[1000261]},
+    
+                        {"Choose scene",_DataById[1000262]},
+    
+                        {"delete confirm",_DataById[1000263]},
+    
+                        {"input local variable name",_DataById[1000264]},
+    
+                        {"1",_DataById[1000265]},
+    
+                        {"2",_DataById[1000266]},
+    
+                        {"3",_DataById[1000267]},
+    
+                        {"12",_DataById[1000268]},
+    
+                        {"initial active team",_DataById[1000269]},
+    
+                        {"initial items",_DataById[1000270]},
+    
+                        {"initial team",_DataById[1000271]},
+    
+                        {"mission",_DataById[1000272]},
+    
+                        {"outPut",_DataById[1000273]},
+    
+                        {"setLabel",_DataById[1000274]},
+    
+                        {"skillParameter",_DataById[1000275]},
+    
+                        {"X",_DataById[1000276]},
+    
+                        {"anim",_DataById[1000277]},
+    
+                        {"audio",_DataById[1000278]},
+    
+                        {"detect",_DataById[1000279]},
+    
+                        {"list",_DataById[1000280]},
+    
+                        {"sceneObject",_DataById[1000281]},
+    
+                        {"transform",_DataById[1000282]},
+    
+                        {"invoke",_DataById[1000283]},
+    
+                        {"onBoundaryTouchEvent",_DataById[1000284]},
+    
+                        {"onClickMinimapEvent",_DataById[1000285]},
+    
+                        {"onEnterEvent",_DataById[1000286]},
+    
+                        {"onInteractEvent",_DataById[1000287]},
+    
+                        {"onLeaveEvent",_DataById[1000288]},
+    
+                        {"onLeaveSceneEvent",_DataById[1000289]},
+    
+                        {"onTileTouchEvent",_DataById[1000290]},
+    
+                        {"AlwaysWithPanelAndScene",_DataById[1000291]},
+    
+                        {"AlwaysWithPanelAndSceneWithoutPlayer",_DataById[1000292]},
+    
+                        {"AddMission",_DataById[1000293]},
+    
+                        {"Audio",_DataById[1000294]},
+    
+                        {"ChangeBgm",_DataById[1000295]},
+    
+                        {"CharacterChat",_DataById[1000296]},
+    
+                        {"CharacterPlayAnim",_DataById[1000297]},
+    
+                        {"CharacterStun",_DataById[1000298]},
+    
+                        {"DestroyCharacter",_DataById[1000299]},
+    
+                        {"DoneMission",_DataById[1000300]},
+    
+                        {"Effect",_DataById[1000301]},
+    
+                        {"FloatingText",_DataById[1000302]},
+    
+                        {"GetCharacterForwardVector",_DataById[1000303]},
+    
+                        {"GetCharacterParameter",_DataById[1000304]},
+    
+                        {"GetCharacterPosition",_DataById[1000305]},
+    
+                        {"GetCharacterRightVector",_DataById[1000306]},
+    
+                        {"GetCharacterRotation",_DataById[1000307]},
+    
+                        {"GetCharactersInArea",_DataById[1000308]},
+    
+                        {"GetCurrentCharacter",_DataById[1000309]},
+    
+                        {"GetLength",_DataById[1000310]},
+    
+                        {"GetLookAtRotation",_DataById[1000311]},
+    
+                        {"GetNormalizedVector",_DataById[1000312]},
+    
+                        {"GetObjectForwardVector",_DataById[1000313]},
+    
+                        {"GetObjectPosition",_DataById[1000314]},
+    
+                        {"GetObjectRightVector",_DataById[1000315]},
+    
+                        {"GetObjectRotation",_DataById[1000316]},
+    
+                        {"GetSceneObjectParameter",_DataById[1000317]},
+    
+                        {"GetSkillParameter",_DataById[1000318]},
+    
+                        {"GetVarKeys",_DataById[1000319]},
+    
+                        {"GetVarValues",_DataById[1000320]},
+    
+                        {"GetVectorByRotation",_DataById[1000321]},
+    
+                        {"GetVectorLength",_DataById[1000322]},
+    
+                        {"HasMissionDone",_DataById[1000323]},
+    
+                        {"IsCharacterActive",_DataById[1000324]},
+    
+                        {"IsMissionAdded",_DataById[1000325]},
+    
+                        {"IsObjectActive",_DataById[1000326]},
+    
+                        {"IsObjectEnableCollision",_DataById[1000327]},
+    
+                        {"IsUnobstructed",_DataById[1000328]},
+    
+                        {"MakeChoice",_DataById[1000329]},
+    
+                        {"MoveCharacter",_DataById[1000330]},
+    
+                        {"MoveCharacterRelative",_DataById[1000331]},
+    
+                        {"MoveObjectRelative",_DataById[1000332]},
+    
+                        {"MoveToScene",_DataById[1000333]},
+    
+                        {"NewVector",_DataById[1000334]},
+    
+                        {"ParameterDelta",_DataById[1000335]},
+    
+                        {"PlayAudio",_DataById[1000336]},
+    
+                        {"Return",_DataById[1000337]},
+    
+                        {"SelfCharacter",_DataById[1000338]},
+    
+                        {"SelfSceneObject",_DataById[1000339]},
+    
+                        {"SetCharacterNavigate",_DataById[1000340]},
+    
+                        {"SetCharacterNavigateRelative",_DataById[1000341]},
+    
+                        {"SetCharacterPosition",_DataById[1000342]},
+    
+                        {"SetCharacterPositionRelative",_DataById[1000343]},
+    
+                        {"SetCharacterRotation",_DataById[1000344]},
+    
+                        {"SetImagePosition",_DataById[1000345]},
+    
+                        {"SetObjectPosition",_DataById[1000346]},
+    
+                        {"SetObjectRotation",_DataById[1000347]},
+    
+                        {"SetSceneObjectParameter",_DataById[1000348]},
+    
+                        {"SetSkillParameter",_DataById[1000349]},
+    
+                        {"ShowDialogWithChoice",_DataById[1000350]},
+    
+                        {"ShowDialogWithIllustration",_DataById[1000351]},
+    
+                        {"ShowEffectByCharacter",_DataById[1000352]},
+    
+                        {"ShowImagePermanently",_DataById[1000353]},
+    
+                        {"ShowTeamerSelect",_DataById[1000354]},
+    
+                        {"ShowVideo",_DataById[1000355]},
+    
+                        {"Skill",_DataById[1000356]},
+    
+                        {"StopCharacterNavigate",_DataById[1000357]},
+    
+                        {"TargetSkill",_DataById[1000358]},
+    
+                        {"TriggerTargetCharacter",_DataById[1000359]},
+    
+                        {"TriggerTargetSceneObject",_DataById[1000360]},
+    
+                        {"UseSkill",_DataById[1000361]},
+    
+                        {"Video",_DataById[1000362]},
     
                     
                     };

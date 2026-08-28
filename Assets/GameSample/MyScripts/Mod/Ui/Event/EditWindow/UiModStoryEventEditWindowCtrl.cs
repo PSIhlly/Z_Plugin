@@ -330,10 +330,6 @@ namespace Ui.ModStoryEventEditWindow
 
             RefreshUnitDetail();
             RefreshUnit();
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
-            },gameObject);
         }
 
         private void SetLab(string category, string type)
@@ -362,11 +358,7 @@ namespace Ui.ModStoryEventEditWindow
 
             unitCon.Refresh();
 
-
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(view.rtf_unitRoot.gameObject, true);
-            }, gameObject);
+            UiManager.Rebuild(view.scr_units.gameObject, true);
 
         }
         public void RefreshUnitDetail()
@@ -390,10 +382,6 @@ namespace Ui.ModStoryEventEditWindow
         {
             model.selUnit = node;
             Refresh(); 
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(view.scr_units.gameObject, true);
-            }, gameObject);
             if (node != null)
             {
                 TimeManager.instance.AddCurLateUpdateAction(() =>

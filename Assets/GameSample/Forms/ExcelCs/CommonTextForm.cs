@@ -163,13 +163,13 @@ namespace Form
 
                 {5,new Data(5,"stop","Stop","停止")},
 
-                {6,new Data(6,"custom","Costom","自定义")},
+                {6,new Data(6,"custom","Custom","自定义")},
 
                 {7,new Data(7,"gain","Gain","获得")},
 
                 {8,new Data(8,"lost","Lost","失去")},
 
-                {10001,new Data(10001,"savePopupTitle","Do you need Save?","需要保存吗?")},
+                {10001,new Data(10001,"savePopupTitle","Save changes?","是否保存？")},
 
                 {20001,new Data(20001,"play_2","Start","开始游戏")},
 
@@ -195,7 +195,7 @@ namespace Form
 
                 {20012,new Data(20012,"character","Character","角色")},
 
-                {20013,new Data(20013,"basicInformation","Basic Information","基础信息")},
+                {20013,new Data(20013,"basicInformation","Basic information","基础信息")},
 
                 {20014,new Data(20014,"all","All","全部")},
 
@@ -223,7 +223,7 @@ namespace Form
 
                 {20026,new Data(20026,"save","Save","保存")},
 
-                {20027,new Data(20027,"save success","Save success!","保存成功")},
+                {20027,new Data(20027,"save success","Saved successfully!","保存成功！")},
 
                 {20028,new Data(20028,"input value","Input value","输入值")},
 
@@ -243,23 +243,43 @@ namespace Form
 
                 {20036,new Data(20036,"name","Name","名称")},
 
-                {20037,new Data(20037,"cd(s)","CD(s)","冷却(秒)")},
+                {20037,new Data(20037,"cd(s)","Cooldown (s)","冷却时间（秒）")},
 
                 {20038,new Data(20038,"LightAttack","Light attack","轻击")},
 
                 {20039,new Data(20039,"HeavyAttack","Heavy attack","重击")},
 
-                {20040,new Data(20040,"E","E button","E技能")},
+                {20040,new Data(20040,"E","E skill","E 技能")},
 
-                {20041,new Data(20041,"Q","Q button","Q技能")},
+                {20041,new Data(20041,"Q","Q skill","Q 技能")},
 
                 {20042,new Data(20042,"Passive","Passive","被动技能")},
 
                 {20043,new Data(20043,"unequip","Unequip","卸下")},
 
-                {20044,new Data(20044,"Equip character","Equip character","装备角色")},
+                {20044,new Data(20044,"Equip character","Choose character to equip","选择要装备的角色")},
 
                 {20045,new Data(20045,"Equipment","Equipment","装备")},
+
+                {20046,new Data(20046,"cantSaveWhenTest","Can't save while testing.","测试时无法保存")},
+
+                {20047,new Data(20047,"LeftHand","Left hand","左手")},
+
+                {20048,new Data(20048,"RightHand","Right hand","右手")},
+
+                {20049,new Data(20049,"Head","Head","头部")},
+
+                {20050,new Data(20050,"Body","Body","身体")},
+
+                {20051,new Data(20051,"","","无")},
+
+                {20052,new Data(20052,"go to ","Go to ","前往")},
+
+                {20053,new Data(20053,"input drop amount","Enter amount to drop","输入丢弃数量")},
+
+                {20054,new Data(20054,"m","m","米")},
+
+                {20055,new Data(20055,"↓","↓","↓")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -373,6 +393,26 @@ namespace Form
                         {"Equip character",_DataById[20044]},
     
                         {"Equipment",_DataById[20045]},
+    
+                        {"cantSaveWhenTest",_DataById[20046]},
+    
+                        {"LeftHand",_DataById[20047]},
+    
+                        {"RightHand",_DataById[20048]},
+    
+                        {"Head",_DataById[20049]},
+    
+                        {"Body",_DataById[20050]},
+    
+                        {"",_DataById[20051]},
+    
+                        {"go to ",_DataById[20052]},
+    
+                        {"input drop amount",_DataById[20053]},
+    
+                        {"m",_DataById[20054]},
+    
+                        {"↓",_DataById[20055]},
     
                     
                     };

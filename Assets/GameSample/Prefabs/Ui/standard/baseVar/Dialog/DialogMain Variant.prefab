@@ -1253,11 +1253,11 @@ PrefabInstance:
     - target: {fileID: 3804532890159928127, guid: 003469a4284ab6a47b3cb067f3fddf9d, type: 3}
       propertyPath: elementTrsLst.Array.data[5]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 6750014652081010745}
     - target: {fileID: 3804532890159928127, guid: 003469a4284ab6a47b3cb067f3fddf9d, type: 3}
       propertyPath: elementTrsLst.Array.data[6]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 6750014652081010745}
     - target: {fileID: 4055602769719995540, guid: 003469a4284ab6a47b3cb067f3fddf9d, type: 3}
       propertyPath: preloadConfig
       value: 

@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -25,9 +23,13 @@ namespace Ui.Notify
     {
 
         UiContainer<UiSelectionCtrl> con;
+        RectTransform scrollRectTransform;
+        float defaultScrollHeight;
         public override void OnCreate()
         {
             con = new UiContainer<UiSelectionCtrl>(this, view.sub_Selection.gameObject);
+            scrollRectTransform = view.scr_.GetComponent<RectTransform>();
+            defaultScrollHeight = scrollRectTransform.sizeDelta.y;
             view.btn_close.onClick.AddListener(() =>
             {
                 Close();
@@ -45,7 +47,6 @@ namespace Ui.Notify
                 model.info = param.info;
             }
             Refresh();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
 
         }
         public void Refresh()
@@ -68,14 +69,16 @@ namespace Ui.Notify
                     });
                 }
             }
-            if (view.scr_.content.rect.height > 200)
-                view.scr_.GetComponent<RectTransform>().sizeDelta = new Vector2(view.scr_.GetComponent<RectTransform>().sizeDelta.x,Mathf.Min(view.scr_.content.rect.height+50f,500f));
             con.Refresh();
             UiManager.Rebuild(gameObject, true);
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                UiManager.Rebuild(gameObject, true);
-            }, gameObject);
+
+            var size = scrollRectTransform.sizeDelta;
+            size.y = view.scr_.content.rect.height > 200f
+                ? Mathf.Min(view.scr_.content.rect.height + 50f, 500f)
+                : defaultScrollHeight;
+            scrollRectTransform.sizeDelta = size;
+
+            UiManager.Rebuild(gameObject, true);
         }
 
     }

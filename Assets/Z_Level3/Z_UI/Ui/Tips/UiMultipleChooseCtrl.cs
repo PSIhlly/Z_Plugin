@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine;
-using UnityEngine.UI;
-using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
@@ -84,8 +83,9 @@ namespace Ui.Notify
                 });
             }
             colCon.Refresh();
-
             itemCon.Clear();
+            UiManager.Rebuild(gameObject, true);
+
             if (model.deepth-1 <= model.sel.deepth)
             {
                 var cur=GetTarItem(model.sel, model.deepth - 1);
@@ -98,10 +98,7 @@ namespace Ui.Notify
                 }
             }
             itemCon.Refresh();
-            TimeManager.instance.AddCurLateUpdateAction(() =>
-            {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            },gameObject);
+            UiManager.Rebuild(gameObject, true);
         }
         public int GetDeepth(EntryItem item)
         {

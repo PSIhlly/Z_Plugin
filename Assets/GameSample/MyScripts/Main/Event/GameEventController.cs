@@ -407,7 +407,7 @@ public class GameEventController : Z_Controller<GameManager>
         var res = new EntryItem();
         foreach (var data in EventTriggerForm.DataByName.Values)
         {
-            res.Add(TextManager.instance.GetTxt(data.name), id: data.uid);
+            res.Add(TextManager.instance.GetTxt(data.name.Split("$")[0]), id: data.uid);
 
         }
         return res;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Debug;
@@ -25,7 +26,9 @@ namespace Z_Ui
         public Dictionary<string, UiHolder> uiCtrlName2OriUi = new Dictionary<string, UiHolder>();
         public Dictionary<string, List<UiHolder>> uiCtrlName2Uis = new Dictionary<string, List<UiHolder>>();
 
-        private static List<RectTransform> rectTemp = new List<RectTransform>();
+        private static readonly List<RectTransform> rectTemp = new List<RectTransform>();
+        private static readonly List<TMP_InputField> tmpInputFieldTemp = new List<TMP_InputField>();
+        private static readonly List<TMP_Text> tmpTextTemp = new List<TMP_Text>();
         protected override void Awake()
         {
             base.Awake();
@@ -162,21 +165,39 @@ namespace Z_Ui
         }
         public static void Rebuild(GameObject go, bool recursion = false)
         {
+            if (!go || !go.activeInHierarchy)
+                return;
+
             var rt = go.GetComponent<RectTransform>();
-            if (!rt||go && go.activeInHierarchy)
+            if (!rt)
+                return;
+
+            tmpInputFieldTemp.Clear();
+            go.GetComponentsInChildren(false, tmpInputFieldTemp);
+            for (int i = 0; i < tmpInputFieldTemp.Count; i++)
             {
-                if (recursion)
+                tmpInputFieldTemp[i].ForceLabelUpdate();
+            }
+
+            tmpTextTemp.Clear();
+            go.GetComponentsInChildren(false, tmpTextTemp);
+            for (int i = 0; i < tmpTextTemp.Count; i++)
+            {
+                tmpTextTemp[i].ForceMeshUpdate();
+            }
+
+            if (recursion)
+            {
+                rectTemp.Clear();
+                go.GetComponentsInChildren(false, rectTemp);
+                for (int i = rectTemp.Count - 1; i >= 0; i--)
                 {
-                    go.GetComponentsInChildren(false, rectTemp);
-                    for (int i = rectTemp.Count - 1; i >= 0; i--)
-                    {
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(rectTemp[i]);
-                    }
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(rectTemp[i]);
                 }
-                else
-                {
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
-                }
+            }
+            else
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
             }
         }
 

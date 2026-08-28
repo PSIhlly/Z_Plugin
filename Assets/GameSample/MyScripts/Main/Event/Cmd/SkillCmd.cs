@@ -17,7 +17,7 @@ namespace Z_Code
         }
         public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
-            ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose skill"), (form) =>
+            ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (form) =>
             {
                 act.Invoke($"\"{GlobalEventHelper.GetName(GlobalEventHelper.SKILL, form.uid.ToString())}\"");
             });

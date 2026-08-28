@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Ui.ModSceneMenu;
 using Ui.PlaySceneMenu;
 using UnityEngine;
-using UnityEngine.UI;
 using Z_Map;
 using Z_ObjectAnimator.Base;
 using Z_ObjectAnimator.Core;
@@ -99,11 +98,7 @@ namespace Ui.PlaySceneMain.PlaySceneMessage
                 parent.RemoveMessage(model.id);
                 return true;
             }, uiHolder);
-            TimeManager.instance.AddNextBigFrameAction(() =>
-            {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(view.txt_.rectTransform);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            }, gameObject);
+            UiManager.Rebuild(gameObject, true);
         }
     }
 

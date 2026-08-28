@@ -461,7 +461,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 items.Add(data.name, TexAssetForm.DataById[data.avatarTex].GetSprite());
             }
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 if (item == addItem)
@@ -491,7 +491,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 items.Add(data.name, TexAssetForm.DataById[data.avatarTex].GetSprite());
             }
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 if (item == addItem)
@@ -705,7 +705,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(data.name, TexAssetForm.DataById[data.clips[0][0].tex].GetSprite(), data.uid);
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 act?.Invoke(EffectForm.DataByUid[item.id]);
@@ -750,7 +750,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(data.name, TexAssetForm.DataById[data.icon].GetSprite(), data.uid);
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 act?.Invoke(SkillProductForm.DataByUid[item.id]);
@@ -1029,7 +1029,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 items.Add(data.name, TexAssetForm.DataById[data.iconTexName].GetSprite());
             }
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 if (item == addItem)
@@ -1242,7 +1242,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(data.name, StoryTexAssetForm.DataById.GetDv(data.miniMap, StoryTexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]).GetSprite(), data.uid);
         }
-        NotifyManager.instance.AddChoose(TextManager.instance.GetTxt(title),
+        NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
                 act?.Invoke(SceneForm.DataByUid[item.id]);

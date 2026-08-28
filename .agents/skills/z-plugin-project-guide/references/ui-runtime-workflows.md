@@ -125,6 +125,11 @@ Rules:
 - Render Model → View in a dedicated `Refresh()` method; avoid hidden writes while rendering.
 - Check `active` before refreshing a hidden UI from a global event.
 - Use `UiManager.ShowUi<T>`, `CloseUi<T>`, and existing containers instead of manually instantiating UI prefabs.
+- `Txt.languageTranslatable` treats `oriText` and serialized/overridden `m_text` as exact translation keys; include prefab-variant overrides in translation audits.
+- `TextBaseForm.DataByKey` is shared by CommonText and ModText. Keep keys globally unique, put runtime/shared UI keys in CommonText, and reserve ModText for Mod-only UI.
+- Translate chooser titles exactly once. Render user-authored code/text raw, and translate only the stable prefix of composite trigger keys before `$`.
+- After changing dynamic TMP text when its RectTransform size is needed immediately, call `UiManager.Rebuild` on the active layout root. It synchronizes descendant `TMP_InputField` labels and `TMP_Text` meshes before rebuilding the layout; pass `recursion: true` for nested ContentSizeFitter/LayoutGroup chains.
+- Do not use `StartTimer`, `AddNextBigFrameAction`, or `AddCurLateUpdateAction` merely to wait for TMP/layout to settle. Refresh pooled containers first, then rebuild synchronously; delay only operations such as scroll jumps that intentionally depend on final-frame coordinates.
 - `NotifyManager.AddTip` wraps Tip text at 30 characters per line while preserving explicit line breaks; Popup and input-area text are not wrapped by this rule.
 - `UiModAssetSelectWindow` exposes `ipt_labelName` and `btn_lableDelete` for the active Label filter; renaming reuses matching labels and deletion moves affected assets to unclassified before removing the Label record.
 - `UiModAssetSelectWindow`'s `btn_replace` opens the single-asset picker for the selected item, updates the existing asset in place (keeping its ID), and clears texture runtime caches before refreshing.

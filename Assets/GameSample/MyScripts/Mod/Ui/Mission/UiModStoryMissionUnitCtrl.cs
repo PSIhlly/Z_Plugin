@@ -81,7 +81,7 @@ namespace Ui.ModStory.ModStoryMission.ModStoryMissionUnit
 
             view.btn_guideScene.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ChooseScene(TextManager.instance.GetTxt("ChooseScene"), (data) =>
+                ModManager.instance.assetCtrl.ChooseScene(TextManager.instance.GetTxt("Choose scene"), (data) =>
                 {
                     model.data.targetSceneId = data.uid;
                     Refresh();

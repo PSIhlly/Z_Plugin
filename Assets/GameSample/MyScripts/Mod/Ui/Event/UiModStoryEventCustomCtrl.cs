@@ -224,7 +224,8 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             if (model.data != null)
             {
                 view.txt_name.text = model.data.name;
-                view.txt_desc.oriText=model.data.code;
+                view.txt_desc.languageTranslatable = false;
+                view.txt_desc.text = model.data.code;
             }
 
         }

@@ -91,7 +91,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         downPos = Vector2.zero;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
-        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 5, 15);
+        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 4, 15);
         //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
         switch (DynamicGlobalSettings.cameraMode)
         {

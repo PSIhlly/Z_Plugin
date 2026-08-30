@@ -1120,7 +1120,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return null;
 
         GameManager.instance.mapCtrl.RegisterObject(result, data);
-        result.euler = new Vector3(result.euler.x, angle, result.euler.z);
+        mapManager.updateCtrl.ApplyMove(
+            result.unit,
+            result.pos,
+            new Vector3(result.euler.x, angle, result.euler.z),
+            true);
         return result;
     }
 

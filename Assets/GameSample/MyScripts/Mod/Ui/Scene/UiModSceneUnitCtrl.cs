@@ -35,7 +35,7 @@ namespace Ui.ModSceneUnit
                 var newPos = new Vector3(x, data.pos.y, data.pos.z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
-                    data.pos = newPos;
+                    MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, newPos, data.euler, true);
                     ModManager.instance.sceneCtrl.ForceUpdate();
                 }
             }
@@ -70,7 +70,7 @@ namespace Ui.ModSceneUnit
 
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
-                    data.pos = newPos;
+                    MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, newPos, data.euler, true);
                     ModManager.instance.sceneCtrl.ForceUpdate();
                 }
             }
@@ -89,7 +89,7 @@ namespace Ui.ModSceneUnit
                 var newPos = new Vector3(data.pos.x, data.pos.y, z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
-                    data.pos = newPos;
+                    MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, newPos, data.euler, true);
                     ModManager.instance.sceneCtrl.ForceUpdate();
                 }
             }
@@ -104,7 +104,11 @@ namespace Ui.ModSceneUnit
             {
                 int.TryParse(value, out int v);
                 v = (v % 360 + 360) % 360;
-                data.euler = new Vector3(data.euler.x, v, data.euler.z);
+                MapManager.instance.updateCtrl.ApplyMove(
+                    (MapUnit)data.unit,
+                    data.pos,
+                    new Vector3(data.euler.x, v, data.euler.z),
+                    true);
                 ModManager.instance.sceneCtrl.ForceUpdate();
             }
             get

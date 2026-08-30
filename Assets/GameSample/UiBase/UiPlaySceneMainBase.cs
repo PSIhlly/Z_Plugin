@@ -132,16 +132,16 @@ namespace PlaySceneMission
     public partial class UiPlaySceneMissionView:UiView
     {
 
+            public GameObject go_mission;
             public Txt txt_;
             public Txt txt_distance;
-            public GameObject go_mission;
             public Btn btn_mission;
         public UiPlaySceneMissionView(UiHolder uiHolder):base(uiHolder)
         {
 
-            txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
-            txt_distance = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            go_mission = uiHolder.elementTrsLst[2].gameObject;
+            go_mission = uiHolder.elementTrsLst[0].gameObject;
+            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            txt_distance = uiHolder.elementTrsLst[2].GetComponent<Txt>();
             btn_mission = uiHolder.elementTrsLst[3].GetComponent<Btn>();
         }
 
@@ -351,9 +351,6 @@ namespace PlaySceneMinimap
     {
 
             public Btn btn_map;
-            public RectTransform rtf_guide;
-            public GameObject go_self;
-            public RectTransform rtf_self;
             public RectTransform rtf_area;
             public RImg rimg_unlock;
             public GameObject go_mark;
@@ -362,22 +359,25 @@ namespace PlaySceneMinimap
             public GameObject go_mission;
             public Img img_mission;
             public UiMissionCtrl sub_mission;
+            public RectTransform rtf_guide;
+            public GameObject go_self;
+            public RectTransform rtf_self;
             public Img img_real;
         public UiPlaySceneMinimapView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_map = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            rtf_guide = uiHolder.elementTrsLst[1].GetComponent<RectTransform>();
-            go_self = uiHolder.elementTrsLst[2].gameObject;
-            rtf_self = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
-            rtf_area = uiHolder.elementTrsLst[4].GetComponent<RectTransform>();
-            rimg_unlock = uiHolder.elementTrsLst[5].GetComponent<RImg>();
-            go_mark = uiHolder.elementTrsLst[6].gameObject;
-            img_mark = uiHolder.elementTrsLst[7].GetComponent<Img>();
-            sub_mark = (UiMarkCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            go_mission = uiHolder.elementTrsLst[9].gameObject;
-            img_mission = uiHolder.elementTrsLst[10].GetComponent<Img>();
-            sub_mission = (UiMissionCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            rtf_area = uiHolder.elementTrsLst[1].GetComponent<RectTransform>();
+            rimg_unlock = uiHolder.elementTrsLst[2].GetComponent<RImg>();
+            go_mark = uiHolder.elementTrsLst[3].gameObject;
+            img_mark = uiHolder.elementTrsLst[4].GetComponent<Img>();
+            sub_mark = (UiMarkCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            go_mission = uiHolder.elementTrsLst[6].gameObject;
+            img_mission = uiHolder.elementTrsLst[7].GetComponent<Img>();
+            sub_mission = (UiMissionCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            rtf_guide = uiHolder.elementTrsLst[9].GetComponent<RectTransform>();
+            go_self = uiHolder.elementTrsLst[10].gameObject;
+            rtf_self = uiHolder.elementTrsLst[11].GetComponent<RectTransform>();
             img_real = uiHolder.elementTrsLst[12].GetComponent<Img>();
         }
 
@@ -429,16 +429,16 @@ namespace PlaySceneMinimap
             public GameObject go_teamer;
             public Btn btn_;
             public Txt txt_;
-            public Img img_;
             public UiParamShowCtrl model_ParamShow;
+            public Img img_;
         public UiTeamerView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_teamer = uiHolder.elementTrsLst[0].gameObject;
             btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            img_ = uiHolder.elementTrsLst[3].GetComponent<Img>();
-            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            model_ParamShow = (UiParamShowCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            img_ = uiHolder.elementTrsLst[4].GetComponent<Img>();
         }
 
     }

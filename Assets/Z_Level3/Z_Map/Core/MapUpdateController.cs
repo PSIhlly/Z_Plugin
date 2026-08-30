@@ -355,6 +355,7 @@ namespace Z_Map
         private List<((int, int) pos, float sqrDist)> bfsStartLst = new List<((int, int), float)>();
         private static Comparison<((int, int) pos, float sqrDist)> bfsDistCompare =
             (a, b) => a.sqrDist.CompareTo(b.sqrDist);
+        private const float OcclusionDegree = 0.5f;
 
         /// <summary>
         /// BFS遍历指定y层的tile，从(centerX,centerZ)开始，对遮挡层有tile的位置设置透明度
@@ -398,6 +399,35 @@ namespace Z_Map
                 }
             }
         }
+
+        private void UpdateCurrentLayerObjectOcclusion(Vector3Int center, bool isSideView)
+        {
+            if (!isSideView)
+                return;
+
+            var handled = new HashSet<ObjectUnit>();
+            int maxCellsBelow = _super.data.mainData.viewSize.y;
+            for (int cellsBelow = 1; cellsBelow <= maxCellsBelow; cellsBelow++)
+            {
+                var tileData = _super.utilCtrl.GetTileData(
+                    center.x,
+                    center.y,
+                    center.z - cellsBelow);
+                if (tileData == null)
+                    continue;
+
+                foreach (var unit in objectTileDic.Get(tileData.unit))
+                {
+                    if (!handled.Add(unit)
+                        || _super.utilCtrl.GetVisionHeightInTiles(unit.data, center.y) <= cellsBelow)
+                        continue;
+
+                    unit.VisOn();
+                    unit.VisDegree(OcclusionDegree);
+                }
+            }
+        }
+
         /// <summary>
         /// Manage vison
         /// </summary>
@@ -450,7 +480,9 @@ namespace Z_Map
                 {
                     var pos = d.pos;
                     float sqrDist = d.sqrDist;
-                    float degree = Math.Clamp(Mathf.Sqrt(sqrDist) - 0.75f, 0, 1);
+                    float degree = Mathf.Max(
+                        OcclusionDegree,
+                        Math.Clamp(Mathf.Sqrt(sqrDist) - 0.75f, 0, 1));
 
                     // OVERLAY_HIDE额外逻辑：靠近的tile，其相连的高层也消失
                     bool nearHide = false;
@@ -468,9 +500,11 @@ namespace Z_Map
                         }
                     }
 
-                    BfsLayerVision(i, pos.Item1, pos.Item2, nearHide ? 0 : degree);
+                    BfsLayerVision(i, pos.Item1, pos.Item2, nearHide ? OcclusionDegree : degree);
                 }
             }
+
+            UpdateCurrentLayerObjectOcclusion(realViewCenter, isSideView);
         }
 
 
@@ -492,6 +526,15 @@ namespace Z_Map
 
             if (characterOverlapTileDic.Get(unit).Count == 0)
                 characterOverlapTileDic.Add(unit, owner);
+        }
+        public void RefreshObjectOverlap(ObjectUnit unit)
+        {
+            if (unit == null)
+                return;
+
+            objectTileDic.Del(unit);
+            foreach (var tile in _super.utilCtrl.GetVisionOverlap(unit.data))
+                objectTileDic.Add(unit, tile);
         }
         public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999, float agentRadius = 0f)
         {
@@ -656,8 +699,6 @@ namespace Z_Map
             {
                 if (movingCharacter != null)
                     characterTileDic.Move(movingCharacter, newMap);
-                else if (unit is ObjectUnit obj)
-                    objectTileDic.Move(obj, newMap);
                 else if (unit is ItemUnit item)
                     itemTileDic.Move(item, newMap);
             }
@@ -672,6 +713,8 @@ namespace Z_Map
             unit.data.euler = euler;
             if (movingCharacter != null)
                 RefreshCharacterOverlap(movingCharacter);
+            else if (unit is ObjectUnit movingObject)
+                RefreshObjectOverlap(movingObject);
         }
         public void CheckCollideEvent(Unit unit, Vector3 dir, IEnumerable<TileUnit> extraTiles = null)
         {
@@ -834,10 +877,7 @@ namespace Z_Map
             {
                 if (_super.data.CheckObjectUnit(objectData))
                 {
-                    foreach (var m in _super.utilCtrl.GetOverlap(objectData))
-                    {
-                        objectTileDic.Add(objectData.unit, m);
-                    }
+                    RefreshObjectOverlap(objectData.unit);
                 }
                 else
                 {

@@ -98,7 +98,7 @@ Shader "DisFadeCode"
 
                 #if _ALPHATEST_ON
                     clip(alphaColor.r- _Cutoff);
-                    clip(_Show- _Cutoff);
+                    clip(_Show - 0.001);
                     clip(baseColor.a - _Cutoff);
                 #endif
 
@@ -118,7 +118,7 @@ Shader "DisFadeCode"
                 // 3. 计算阴影强度衰减后的漫反射（降低模型被遮挡时的亮度）
                 half3 diffuse = mainLight.color * lightAmount * baseColor.rgb * shadowStrength * input.dark;
                 
-                return half4(diffuse.rgb,saturate(_Alpha));
+                return half4(diffuse.rgb, saturate(_Alpha * _Show));
             }
             ENDHLSL
         }
@@ -173,6 +173,7 @@ Shader "DisFadeCode"
                 half4 baseColor = tex2D(_Tex, input.uv);
                 half4 alphaColor = tex2D(_AlphaTex, input.uv);
                 #if _ALPHATEST_ON
+                    clip(_Show - 0.001);
                     clip(baseColor.a - _Cutoff);
                 #endif
                 return 0;

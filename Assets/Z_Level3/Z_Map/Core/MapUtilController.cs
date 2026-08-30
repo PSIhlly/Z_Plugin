@@ -549,7 +549,7 @@ namespace Z_Map
 
             return new List<TileUnit>(result);
         }
-        public List<TileUnit> GetOverlap(ObjectUnitForm.Data oData)
+        public List<TileUnit> GetColliderOverlap(ObjectUnitForm.Data oData)
         {
             var all = new List<List<Vector3Int>>();
             foreach (var c in oData.unit.GetMeshes(CollideType.All))
@@ -557,7 +557,6 @@ namespace Z_Map
                 all.Add(Graph.GetRoughOverlapIntPos(c.positions));
             }
             var res = Graph.DeduplicateIntPos(all);
-            _super.updateCtrl.objectTileDic.Del(oData.unit);
             var ans = new List<TileUnit>();
             foreach (var p in res)
             {
@@ -571,6 +570,158 @@ namespace Z_Map
             }
 
             return ans;
+        }
+
+        public List<TileUnit> GetVisionOverlap(ObjectUnitForm.Data oData)
+        {
+            var result = new List<TileUnit>();
+            var added = new HashSet<TileUnit>();
+            TryGetVisionBounds(oData, out Bounds visionBounds);
+            Vector3 min = RealPos2MapPos(visionBounds.min);
+            Vector3 max = RealPos2MapPos(visionBounds.max);
+
+            // 先加入锚点，使 ObjectUnit.belongTile 的 GetFirst 语义保持稳定。
+            Vector3Int anchor = RealPos2MapPosInt(oData.pos);
+            AddVisionOverlapTile(anchor.x, anchor.y, anchor.z, added, result);
+
+            int minX = Mathf.FloorToInt(min.x - 0.5f) + 1;
+            int maxX = Mathf.CeilToInt(max.x + 0.5f) - 1;
+            int minY = Mathf.FloorToInt(min.y - 0.5f) + 1;
+            int maxY = Mathf.CeilToInt(max.y + 0.5f) - 1;
+            int minZ = Mathf.FloorToInt(min.z - 0.5f) + 1;
+            int maxZ = Mathf.CeilToInt(max.z + 0.5f) - 1;
+
+            for (int x = minX; x <= maxX; x++)
+            for (int y = minY; y <= maxY; y++)
+            for (int z = minZ; z <= maxZ; z++)
+                AddVisionOverlapTile(x, y, z, added, result);
+
+            return result;
+        }
+
+        public bool TryGetVisionBounds(ObjectUnitForm.Data oData, out Bounds visionBounds)
+        {
+            visionBounds = default;
+            bool hasBounds = false;
+            GameObject root = oData.unit.prefab;
+            if (root != null)
+            {
+                Matrix4x4 rootToRuntime = Matrix4x4.TRS(
+                    oData.pos,
+                    Quaternion.Euler(oData.euler),
+                    oData.scale);
+
+                // GameSample 运行时 Object prefab 的直接子节点保存了 MapModel 的 pos/scale。
+                // CombineNewGoByPrefabs 会给 localPosition 额外加 0.5Y，因此先还原模型底部，
+                // 再按视觉高度求中心。该路径不受 PerspectiveKeeper 或 colliderScale 影响。
+                if (root.GetComponent<ObjectInstance>() != null)
+                {
+                    for (int i = 0; i < root.transform.childCount; i++)
+                    {
+                        Transform child = root.transform.GetChild(i);
+                        Vector3 visualScale = new Vector3(
+                            Mathf.Abs(child.localScale.x),
+                            Mathf.Abs(child.localScale.y),
+                            Mathf.Abs(child.localScale.z));
+                        Vector3 visualBase = child.localPosition - Vector3.up * 0.5f;
+                        Vector3 visualCenter = visualBase + Vector3.up * (visualScale.y * 0.5f);
+                        Matrix4x4 visualToRuntime = rootToRuntime
+                            * Matrix4x4.TRS(visualCenter, child.localRotation, visualScale);
+
+                        for (int x = 0; x < 2; x++)
+                        for (int y = 0; y < 2; y++)
+                        for (int z = 0; z < 2; z++)
+                        {
+                            Vector3 worldCorner = visualToRuntime.MultiplyPoint3x4(new Vector3(
+                                x == 0 ? -0.5f : 0.5f,
+                                y == 0 ? -0.5f : 0.5f,
+                                z == 0 ? -0.5f : 0.5f));
+                            if (hasBounds)
+                                visionBounds.Encapsulate(worldCorner);
+                            else
+                            {
+                                visionBounds = new Bounds(worldCorner, Vector3.zero);
+                                hasBounds = true;
+                            }
+                        }
+                    }
+
+                    if (hasBounds)
+                        return true;
+                }
+
+                Matrix4x4 prefabWorldToRoot = root.transform.worldToLocalMatrix;
+
+                foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (!renderer.enabled
+                        || renderer.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
+                        continue;
+
+                    Matrix4x4 rendererToRuntime = rootToRuntime
+                        * prefabWorldToRoot
+                        * renderer.transform.localToWorldMatrix;
+                    Bounds localBounds = renderer.localBounds;
+                    Vector3 localMin = localBounds.min;
+                    Vector3 localMax = localBounds.max;
+
+                    for (int x = 0; x < 2; x++)
+                    for (int y = 0; y < 2; y++)
+                    for (int z = 0; z < 2; z++)
+                    {
+                        Vector3 localCorner = new Vector3(
+                            x == 0 ? localMin.x : localMax.x,
+                            y == 0 ? localMin.y : localMax.y,
+                            z == 0 ? localMin.z : localMax.z);
+                        Vector3 worldCorner = rendererToRuntime.MultiplyPoint3x4(localCorner);
+                        if (hasBounds)
+                            visionBounds.Encapsulate(worldCorner);
+                        else
+                        {
+                            visionBounds = new Bounds(worldCorner, Vector3.zero);
+                            hasBounds = true;
+                        }
+                    }
+                }
+            }
+
+            if (hasBounds)
+                return true;
+
+            // 无可视 Renderer 时保留锚点盒，避免 Object 从空间索引中消失。
+            Vector3 scale = new Vector3(
+                Mathf.Abs(oData.scale.x),
+                Mathf.Abs(oData.scale.y),
+                Mathf.Abs(oData.scale.z));
+            Quaternion rotation = Quaternion.Euler(oData.euler);
+            Vector3 center = oData.pos + rotation * new Vector3(0f, scale.y * 0.5f, 0f);
+            Vector3[] corners = Graph.GetCubeEightPoint(center, scale, oData.euler);
+            visionBounds = new Bounds(corners[0], Vector3.zero);
+            for (int i = 1; i < corners.Length; i++)
+                visionBounds.Encapsulate(corners[i]);
+            return false;
+        }
+
+        public float GetVisionHeightInTiles(ObjectUnitForm.Data oData, int layerY)
+        {
+            TryGetVisionBounds(oData, out Bounds visionBounds);
+            float layerBaseY = MapPos2RealPos(new Vector3(0, layerY, 0)).y;
+            float cellHeight = _super.enable
+                ? Mathf.Max(0.0001f, Mathf.Abs(_super.data.mainData.mapUnitSize.y))
+                : 1f;
+            return (visionBounds.max.y - layerBaseY) / cellHeight;
+        }
+
+        private void AddVisionOverlapTile(
+            int x,
+            int y,
+            int z,
+            HashSet<TileUnit> added,
+            List<TileUnit> result)
+        {
+            TileUnit tile = GetTile(x, y, z);
+            if (tile != null && added.Add(tile))
+                result.Add(tile);
         }
     }
 }

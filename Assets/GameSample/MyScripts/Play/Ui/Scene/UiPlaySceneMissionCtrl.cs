@@ -34,20 +34,18 @@ namespace Ui.PlaySceneMain.PlaySceneMission
        
         public void Refresh()
         {
-            gameObject.SetActive(GameManager.instance.curProgress.enableMission);
             var data = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-            if (data == null || !data.received)
-            {
-                view.txt_.text = "";
-                view.txt_distance.text = "";
-            }
-            else
-            {
-                view.txt_.text = data.desc;
-                var targetScene = SceneForm.DataByUid.GetDv(data.targetSceneId, null);
-                if (targetScene != null)
-                    view.txt_distance.text = data.targetSceneId == GameManager.instance.curScene.uid ? Vector3.Magnitude(data.targetPos - PlayManager.instance.sceneCtrl.GetPlayerPos()) + TextManager.instance.GetTxt("m") : TextManager.instance.GetTxt("go to ") + targetScene.name;
-            }
+            var hasMission = GameManager.instance.curProgress.enableMission &&
+                             data != null && data.show && data.received && !data.fail && !data.done;
+            gameObject.SetActive(hasMission);
+            if (!hasMission)
+                return;
+
+            view.txt_.text = data.desc;
+            view.txt_distance.text = "";
+            var targetScene = SceneForm.DataByUid.GetDv(data.targetSceneId, null);
+            if (targetScene != null)
+                view.txt_distance.text = data.targetSceneId == GameManager.instance.curScene.uid ? Vector3.Magnitude(data.targetPos - PlayManager.instance.sceneCtrl.GetPlayerPos()) + TextManager.instance.GetTxt("m") : TextManager.instance.GetTxt("go to ") + targetScene.name;
         }
     }
 

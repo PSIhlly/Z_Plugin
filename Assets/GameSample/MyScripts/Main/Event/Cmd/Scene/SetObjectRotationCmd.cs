@@ -39,11 +39,12 @@ namespace Z_Code
                 if (data != null && data is ObjectUnitForm.Data oData)
                 {
                     var step = Mathf.Min(1, Time.deltaTime / time) * (euler - oData.euler.y);
-                    oData.euler = oData.euler.NewSetY(oData.euler.y + step);
-                    if (oData.unit.ins != null)
-                    {
-                        oData.unit.ins.transform.eulerAngles = oData.euler;
-                    }
+                    var nextEuler = oData.euler.NewSetY(oData.euler.y + step);
+                    MapManager.instance.updateCtrl.ApplyMove(
+                        oData.unit,
+                        oData.pos,
+                        nextEuler,
+                        true);
                 }
                 prm[2].num -= Time.deltaTime;
                 if (prm[2].num <= 0)

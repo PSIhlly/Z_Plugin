@@ -13,7 +13,7 @@ public class CameraInstance : Z_MonoSingleton<CameraInstance>
     private Vector3 limitMin;
     private float orthographicSizeMax=7;
     private float orthographicSizeMin=7;
-    public void Register(Vector3 limitMin, Vector3 limitMax, float orthographicSizeMin, float orthographicSizeMax,float defaultographicSize=5)
+    public void Register(Vector3 limitMin, Vector3 limitMax, float orthographicSizeMin, float orthographicSizeMax,float defaultographicSize=4)
     {
         this.limitMax = limitMax;
         this.limitMin = limitMin;

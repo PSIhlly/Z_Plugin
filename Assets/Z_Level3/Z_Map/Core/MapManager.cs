@@ -169,11 +169,7 @@ public class MapManager : Z_MonoManager<MapManager>
         }
         oData.name = name;
         oData.pos = realPos;
-        foreach (var m in utilCtrl.GetOverlap(oData))
-        {
-            updateCtrl.objectTileDic.Add(oData.unit, m);
-
-        }
+        updateCtrl.RefreshObjectOverlap(oData.unit);
         oData.unit.Create();
         updateCtrl.UpdateSingleOne(oData.unit);
         return oData;

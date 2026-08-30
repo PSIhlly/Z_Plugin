@@ -787,9 +787,9 @@ MonoBehaviour:
   path: \GameSample\UiBase
   parent: {fileID: 8663685129743173840}
   elementTrsLst:
+  - {fileID: 3401279286525455543}
   - {fileID: 2550931022777514567}
   - {fileID: 5763082386908769925}
-  - {fileID: 3401279286525455543}
   - {fileID: 2827867979454153077}
   subUiHolderLst: []
   uiType: 0
@@ -850,9 +850,6 @@ MonoBehaviour:
   parent: {fileID: 8663685129743173840}
   elementTrsLst:
   - {fileID: 6202768390838765056}
-  - {fileID: 1497249693900144495}
-  - {fileID: 4818058382029980844}
-  - {fileID: 4818058382029980844}
   - {fileID: 6960759605739151601}
   - {fileID: 2032921133679404959}
   - {fileID: 9200184646858163650}
@@ -861,6 +858,9 @@ MonoBehaviour:
   - {fileID: 4723192075460414051}
   - {fileID: 4723192075460414051}
   - {fileID: 4723192075460414051}
+  - {fileID: 1497249693900144495}
+  - {fileID: 4818058382029980844}
+  - {fileID: 4818058382029980844}
   - {fileID: 9037216558993199688}
   subUiHolderLst:
   - {fileID: 5978855893578363786}
@@ -2455,7 +2455,7 @@ GameObject:
   - component: {fileID: 4167004135415328159}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: GameObject
+  m_Name: bg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3160,7 +3160,7 @@ PrefabInstance:
     - target: {fileID: 7366837555827469874, guid: e0816da125c0d8c4c916bab902c62b2b, type: 3}
       propertyPath: parent
       value: 
-      objectReference: {fileID: 7631549977694880036}
+      objectReference: {fileID: 8663685129743173840}
     - target: {fileID: 8787911976273547767, guid: e0816da125c0d8c4c916bab902c62b2b, type: 3}
       propertyPath: m_Name
       value: go_qStick
@@ -4657,7 +4657,7 @@ PrefabInstance:
     - target: {fileID: 7366837555827469874, guid: e0816da125c0d8c4c916bab902c62b2b, type: 3}
       propertyPath: parent
       value: 
-      objectReference: {fileID: 7631549977694880036}
+      objectReference: {fileID: 8663685129743173840}
     - target: {fileID: 8787911976273547767, guid: e0816da125c0d8c4c916bab902c62b2b, type: 3}
       propertyPath: m_Name
       value: go_eStick
@@ -5453,6 +5453,14 @@ PrefabInstance:
       propertyPath: parent
       value: 
       objectReference: {fileID: 8663685129743173840}
+    - target: {fileID: 7481103742162438238, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
+      propertyPath: elementTrsLst.Array.data[3]
+      value: 
+      objectReference: {fileID: 2921262798781289973}
+    - target: {fileID: 7481103742162438238, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
+      propertyPath: elementTrsLst.Array.data[4]
+      value: 
+      objectReference: {fileID: 1662557084030397533}
     - target: {fileID: 9060301463146511607, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -5466,6 +5474,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
+--- !u!224 &1662557084030397533 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7582641339761100935, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
+  m_PrefabInstance: {fileID: 9090624443005789402}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1871908598081645700 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7481103742162438238, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
@@ -5477,6 +5490,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &2921262798781289973 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6242565012867248431, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}
+  m_PrefabInstance: {fileID: 9090624443005789402}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &4531145567629989898 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4668471564666944720, guid: 576f3a76112c58a46909dacd0d6f3dd3, type: 3}

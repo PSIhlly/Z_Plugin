@@ -74,7 +74,7 @@ namespace Z_Map
             Dictionary<CharacterUnit, Vector3> push = new Dictionary<CharacterUnit, Vector3>();
             if (dir != Vector3.zero && data.isObstacle)
             {
-                foreach (var tile in manager.utilCtrl.GetOverlap(data))
+                foreach (var tile in manager.utilCtrl.GetColliderOverlap(data))
                 {
                     foreach (var ch in manager.updateCtrl.characterOverlapTileDic.Get(tile))
                     {

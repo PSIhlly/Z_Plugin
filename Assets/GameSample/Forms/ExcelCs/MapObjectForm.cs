@@ -82,6 +82,10 @@ namespace Form
                 
         public static Action<Data,int,int> changeMinimapiconAction;
                 
+        public static Action<Data,FaceType,FaceType> changeFacetypeAction;
+                
+        public static Action<Data,Dictionary<AnimDirecton,List<int>>,Dictionary<AnimDirecton,List<int>>> changeAnimclipAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -177,11 +181,47 @@ namespace Form
                  
                      }
                     
+                    private FaceType  _faceType;
+                    /// <summary>
+                    ///朝向类型
+                    ///</summary>
+                    public FaceType  faceType{
+                                get{return _faceType;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeFacetype(this,_faceType,value); 
+                    }
+        
+                _faceType = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<AnimDirecton,List<int>>  _animClip;
+                    /// <summary>
+                    ///方向动画贴图
+                    ///</summary>
+                    public Dictionary<AnimDirecton,List<int>>  animClip{
+                                get{return _animClip;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeAnimclip(this,_animClip,value); 
+                    }
+        
+                _animClip = value;
+                }
+                 
+                     }
+                    
             public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.labId)
             {
             }
             
-            public Data(int id,string name,int icon,MapModelForm.Data model,int labId,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon):base(id,name,icon,labId)
+            public Data(int id,string name,int icon,MapModelForm.Data model,int labId,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon,FaceType faceType,Dictionary<AnimDirecton,List<int>> animClip):base(id,name,icon,labId)
             {
 
              this.id = id;
@@ -193,6 +233,8 @@ namespace Form
              this.events = events;
              this.paramDic = paramDic;
              this.minimapIcon = minimapIcon;
+             this.faceType = faceType;
+             this.animClip = animClip;
 
             }
             public void Reset(Data data)
@@ -207,11 +249,13 @@ namespace Form
              this.events = data.events;
              this.paramDic = data.paramDic;
              this.minimapIcon = data.minimapIcon;
+             this.faceType = data.faceType;
+             this.animClip = data.animClip;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,labId,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon);
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,labId,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip));
                 }
             
             public override  void BeforeGet()
@@ -221,7 +265,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,0,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0);
+                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,0,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0,FaceType.Fixed,new Dictionary<AnimDirecton,List<int>>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -352,7 +396,11 @@ namespace Form
 
                 jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon"),
+
+                jo.SelectToken("faceType")==null?defaultData.faceType:jo.Get<FaceType>("faceType"),
+
+                jo.SelectToken("animClip")==null?defaultData.animClip:jo.Get<Dictionary<AnimDirecton,List<int>>>("animClip")
                     );
 
             return data;
@@ -382,6 +430,10 @@ namespace Form
             jo.Set<Dictionary<string,MapObjectParamForm.Data>>("paramDic",data.paramDic);
 
             jo.Set<int>("minimapIcon",data.minimapIcon);
+
+            jo.Set<FaceType>("faceType",data.faceType);
+
+            jo.Set<Dictionary<AnimDirecton,List<int>>>("animClip",data.animClip);
 
             return jo;
         }
@@ -579,6 +631,26 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeMinimapiconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeFacetype(Data superData,FaceType oldV,FaceType newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeFacetypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAnimclip(Data superData,Dictionary<AnimDirecton,List<int>> oldV,Dictionary<AnimDirecton,List<int>> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAnimclipAction?.Invoke(data,oldV,newV);
                 }
                     
             }

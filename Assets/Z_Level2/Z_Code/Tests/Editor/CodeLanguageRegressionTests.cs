@@ -162,6 +162,56 @@ Return i;";
         }
 
         [Test]
+        public void EmptyArgumentSlots_CompileAndExecuteAsEmptyStrings()
+        {
+            var functionName = $"EmptyArguments_{Guid.NewGuid():N}";
+            var function = CompileProgram(
+                functionName,
+                "Return param1+param2+param3;",
+                $"empty arguments function {functionName}");
+
+            ProgramDataForm.AddData(function);
+            try
+            {
+                string source = $"Return {functionName}(,\"middle\",);";
+                var zCode = Compile(source, out _, out _, out _, "explicit empty argument slots");
+                Assert.That(zCode.Count(value => value == string.Empty), Is.EqualTo(2));
+
+                var result = Execute(source);
+                Assert.That(result.ret.str, Is.EqualTo("middle"));
+            }
+            finally
+            {
+                ProgramDataForm.RemoveData(function.uid);
+            }
+        }
+
+        [Test]
+        public void CommandArguments_OmittedAtEnd_AreEmptyStrings()
+        {
+            const string commandName = "Len";
+            bool hadPrevious = BaseData.cmdDic.TryGetValue(commandName, out var previous);
+            BaseData.cmdDic[commandName] = new LenCmd();
+
+            try
+            {
+                var result = Execute("Return Len();");
+                Assert.That(result.ret.num, Is.EqualTo(0f).Within(0.0001f));
+            }
+            finally
+            {
+                if (hadPrevious)
+                {
+                    BaseData.cmdDic[commandName] = previous;
+                }
+                else
+                {
+                    BaseData.cmdDic.Remove(commandName);
+                }
+            }
+        }
+
+        [Test]
         public void TryApplyCode_DoesNotOverwriteLastValidProgramOnCompileFailure()
         {
             var program = CompileProgram("SafeApply", "Return 1;", "initial valid program");

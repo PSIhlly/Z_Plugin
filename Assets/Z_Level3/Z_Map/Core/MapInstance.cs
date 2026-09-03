@@ -14,7 +14,7 @@ namespace Z_Map
         }
         private float degree = 0;
 
-        public Timer[] animTimer = new Timer[3];
+        public Timer[] animTimer = new Timer[6];
         private PerspectiveKeeper[] _keepers;
         public PerspectiveKeeper[] keepers
         {
@@ -22,7 +22,11 @@ namespace Z_Map
             {
                 if (_keepers == null)
                 {
-                    _keepers = GetComponentsInChildren<PerspectiveKeeper>();
+                    // Pooled/custom prefabs can keep the image hierarchy
+                    // inactive until its material is assigned. Keep the
+                    // perspective helpers discoverable so a same-frame object
+                    // rotation can still be applied.
+                    _keepers = GetComponentsInChildren<PerspectiveKeeper>(true);
                 }
                 return _keepers;
             }

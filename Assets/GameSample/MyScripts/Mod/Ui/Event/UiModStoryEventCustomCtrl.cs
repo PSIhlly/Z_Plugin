@@ -225,7 +225,10 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             {
                 view.txt_name.text = model.data.name;
                 view.txt_desc.languageTranslatable = false;
-                view.txt_desc.text = model.data.code;
+                // Keep the source text in sync as this view is reused for
+                // different events. This also clears/rebuilds any inline
+                // images left by the previously selected event.
+                view.txt_desc.oriText = model.data.code;
             }
 
         }

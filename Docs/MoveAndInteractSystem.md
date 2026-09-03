@@ -637,6 +637,12 @@ ObjectUnit.Move(dir):
 
 大体型角色不能使用固定九宫格 broad phase：移动与接地按实际 Collider swept AABB 枚举 Tile，其他单位通过 `characterOverlapTileDic` 查到跨格角色。寻路查询把实际水平碰撞半径换算成 footprint，并要求 footprint 内每个偏移格都能完成同一条导航边，防止中心点路径穿过过窄通道。
 
+### 6.9 MapTexture PassType 通行约束（已接入）
+
+Tile 使用的三层 MapTexture ID 已保存在 `TileUnitForm.texDic` 的地表槽位。每次进入场景时，将三层材质各自非零的 `MapTextureForm.passType` 聚合进 `TileUnit.passTypes`；`0` 表示该材质不增加限制。角色能力从所属 `CharacterProductForm.passType` 重算进 `CharacterUnit.passTypes`。
+
+人物只有包含目标 Tile 的全部要求类型时才能通行。手动移动按角色实际 Collider footprint 截断在不满足类型的 Tile 前；BFS 的 clearance 检查和直线路径平滑同样检查 footprint 内每个 `NavUnit.passTypes`，因此寻路与实际移动使用一致规则。`TileUnitForm.passType` 只保留首个类型 ID 作为兼容缓存，完整要求集合不压缩进该 int 字段。
+
 ## 附录：关键文件索引
 
 | 文件 | 职责 |

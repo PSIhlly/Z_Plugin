@@ -114,6 +114,9 @@ Compatibility behavior:
 
 - Adding a field uses the key-0 default value for an old save.
 - `CharacterProductForm.size` is a positive integer uniform model/collider scale. Keep its key-0 default at `1`; normalize it after load and before save, and never trust a scene-level `CharacterUnitForm.scale` over the owning Product.
+- `PassTypeForm` is the story-owned registry for terrain traversal types. Persist it as `ptf`, load it before `MapTextureForm` and `CharacterProductForm`, and clear those consumers before clearing PassType. Every nonzero `int passType` and every element of `CharacterProductForm.passType` is a `PassTypeForm.id`; `0` means unrestricted and is not a registry row. Deleting a PassType must first reset matching MapTexture references to `0` and remove it from Character Product lists.
+- `MapTextureForm.enableFrontPart` gates its optional `frontPartTexs` animation list. Preserve the list while disabled so re-enabling restores the authored front animation; old stories inherit both fields from the key-0 MapTexture default.
+- `MapObjectForm.faceType` and `MapObjectForm.animClip` own Object-facing persistence. `animClip` maps each `AnimDirecton` to its animation texture IDs; `MapModelForm.subUnitTexsName[0]` remains a compatibility mirror for old stories and shared model consumers. On load, seed missing directional clips from that legacy list; before save, mirror `Fixed` or `Up` according to `faceType`.
 - Renaming, deleting, or changing a field type is not migrated. The old key is silently ignored.
 - Perform migration in this order: parse raw `JArray/JObject` → rewrite legacy keys/values → call generated deserialization → `AddData()`.
 - Load referenced tables first. Reset dependents before their referenced roots.

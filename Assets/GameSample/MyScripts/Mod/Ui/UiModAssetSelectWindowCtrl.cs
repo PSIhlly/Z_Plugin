@@ -47,6 +47,11 @@ namespace Ui.ModAssetSelectWindow
             {
                 if (model.sel != null)
                 {
+                    if (string.IsNullOrEmpty(model.sel.name))
+                    {
+                        NotifyManager.instance.AddTip(TextManager.instance.GetTxt("cantDeleteDefaultAsset"));
+                        return;
+                    }
                     AssetForm.RemoveData(model.sel.id);
                     model.sel = null;
                     Refresh();

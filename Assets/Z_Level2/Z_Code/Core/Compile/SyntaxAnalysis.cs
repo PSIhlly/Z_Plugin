@@ -52,6 +52,7 @@ namespace Z_Code
 
         public const int MaxNestingDepth = 256;
         public const string EmptyNodeCode = "__empty";
+        public const string EmptyArgumentNodeCode = "__empty_argument";
 
         private sealed class ParseException : Exception
         {
@@ -427,11 +428,23 @@ namespace Z_Code
                 {
                     while (true)
                     {
+                        if (Match(","))
+                        {
+                            args.Add(EmptyArgumentNode(Previous().startIndex));
+                            if (Check(")"))
+                            {
+                                args.Add(EmptyArgumentNode(CurrentCodeIndex()));
+                                break;
+                            }
+                            continue;
+                        }
+
                         args.Add(ParseExpression());
                         if (Match(","))
                         {
                             if (Check(")"))
                             {
+                                args.Add(EmptyArgumentNode(CurrentCodeIndex()));
                                 break;
                             }
                             continue;
@@ -490,9 +503,21 @@ namespace Z_Code
             return ActionNode(EmptyNodeCode, codeIndex, new List<SyntaxNode>());
         }
 
+        private static SyntaxNode EmptyArgumentNode(int codeIndex)
+        {
+            return ActionNode(EmptyArgumentNodeCode, codeIndex, new List<SyntaxNode>());
+        }
+
         public static bool IsEmptyNode(SyntaxNode node)
         {
-            return node != null && node.desc.type == CodeType.Action && node.desc.code == EmptyNodeCode;
+            return node != null && node.desc.type == CodeType.Action &&
+                   (node.desc.code == EmptyNodeCode || node.desc.code == EmptyArgumentNodeCode);
+        }
+
+        public static bool IsEmptyArgumentNode(SyntaxNode node)
+        {
+            return node != null && node.desc.type == CodeType.Action &&
+                   node.desc.code == EmptyArgumentNodeCode;
         }
 
         private static bool IsAssignable(SyntaxNode node)

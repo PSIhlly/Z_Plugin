@@ -139,6 +139,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.unit.productInfo = (newCharacter.uid, -1);
                 if (GameMapData.ApplyCharacterProductSize(data, newCharacter))
                     MapManager.instance.updateCtrl.RefreshCharacterOverlap(data.unit);
+                GameMapData.ApplyCharacterProductPassTypes(data, newCharacter);
                 _characterDic[newCharacter] = data;
                 if (data.minimapIcon<=0)
                 {
@@ -151,6 +152,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 data.unit.productInfo = (ch.uid, -1);
                 if (GameMapData.ApplyCharacterProductSize(data, ch))
                     MapManager.instance.updateCtrl.RefreshCharacterOverlap(data.unit);
+                GameMapData.ApplyCharacterProductPassTypes(data, ch);
                 _characterDic[ch] = data;
             }
         }
@@ -179,6 +181,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 }
             }
         }
+        foreach (var data in TileUnitForm.DataByUid.Values)
+            GameMapData.ApplyTilePassTypes(data);
 
         MapManager.instance.navigationCtrl.UpdateMap(int.MaxValue);
 

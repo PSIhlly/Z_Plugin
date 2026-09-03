@@ -106,6 +106,8 @@ namespace Form
                 
         public static Action<Data,int,int> changeSizeAction;
                 
+        public static Action<Data,List<int>,List<int>> changePasstypeAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -401,7 +403,7 @@ namespace Form
                     
                     private int  _size;
                     /// <summary>
-                    ///瑙掕壊妯″瀷缂╂斁鍊嶆暟
+                    ///尺寸
                     ///</summary>
                     public int  size{
                                 get{return _size;}
@@ -417,11 +419,29 @@ namespace Form
                  
                      }
                     
+                    private List<int>  _passType;
+                    /// <summary>
+                    ///通过类型
+                    ///</summary>
+                    public List<int>  passType{
+                                get{return _passType;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangePasstype(this,_passType,value); 
+                    }
+        
+                _passType = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.labId,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,int labId,int avatarTex,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,int illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav,int minimapIcon,int size):base(uid,name,labId,protoUid)
+            public Data(int uid,string name,int labId,int avatarTex,Dictionary<string,CharacterParamForm.Data> paramDic,int protoUid,Dictionary<string,CharacterAnimForm.Data> animDic,Dictionary<string,string> defaultAnimName,FaceType faceType,string speedParamName,string hpParamName,Dictionary<string,EventTriggerForm.Data> events,Dictionary<EquipPartType,int> equips,string desc,int illustration,bool unique,Dictionary<SkillType,int> skill,float recoveryTime,bool enableNav,int minimapIcon,int size,List<int> passType):base(uid,name,labId,protoUid)
             {
 
              this.uid = uid;
@@ -445,6 +465,7 @@ namespace Form
              this.enableNav = enableNav;
              this.minimapIcon = minimapIcon;
              this.size = size;
+             this.passType = passType;
 
             }
             public void Reset(Data data)
@@ -471,11 +492,12 @@ namespace Form
              this.enableNav = data.enableNav;
              this.minimapIcon = data.minimapIcon;
              this.size = data.size;
+             this.passType = data.passType;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon,size);
+        return new Data(sameId? uid:uidChain.GetId(),name,labId,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon,size,passType==null?new List<int>():new List<int>(passType));
                 }
             
             public override  void BeforeGet()
@@ -485,7 +507,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,0,new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"",0,false,new Dictionary<SkillType,int>(){},0f,false,0,1);
+                   private static Data _defaultData=new Data(0,"",0,0,new Dictionary<string,CharacterParamForm.Data>(){},0,new Dictionary<string,CharacterAnimForm.Data>(){},new Dictionary<string,string>(){},FaceType.Fixed,"","",new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<EquipPartType,int>(){},"",0,false,new Dictionary<SkillType,int>(){},0f,false,0,1,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -668,7 +690,9 @@ namespace Form
 
                 jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon"),
 
-                jo.SelectToken("size")==null?defaultData.size:jo.Get<int>("size")
+                jo.SelectToken("size")==null?defaultData.size:jo.Get<int>("size"),
+
+                jo.SelectToken("passType")==null?defaultData.passType:jo.Get<List<int>>("passType")
                     );
 
             return data;
@@ -722,6 +746,8 @@ namespace Form
             jo.Set<int>("minimapIcon",data.minimapIcon);
 
             jo.Set<int>("size",data.size);
+
+            jo.Set<List<int>>("passType",data.passType);
 
             return jo;
         }
@@ -1087,6 +1113,16 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeSizeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePasstype(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePasstypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

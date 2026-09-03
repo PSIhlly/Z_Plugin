@@ -7,6 +7,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Xml.Linq;
 using Ui.ModAssetSelectWindow;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
@@ -243,6 +244,56 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #endregion
 
 
+    #region pass type
+
+    public void CreatePassType(string name = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            name = StringHelper.GetUniqueName(PassTypeForm.DataByName.Keys);
+        PassTypeForm.AddData(new PassTypeForm.Data(-1, name));
+    }
+
+    public void RenamePassType(int id, string newName)
+    {
+        if (PassTypeForm.DataById.TryGetValue(id, out var data) &&
+            !string.IsNullOrWhiteSpace(newName) &&
+            (data.name == newName || StringHelper.IsUniqueName(PassTypeForm.DataByName.Keys, newName)))
+        {
+            data.name = newName;
+        }
+    }
+
+    public void DeletePassType(int id)
+    {
+        if (!PassTypeForm.DataById.ContainsKey(id))
+            return;
+
+        foreach (var texture in MapTextureForm.DataById.Values)
+        {
+            if (texture.passType == id)
+                texture.passType = 0;
+        }
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            character.passType?.RemoveAll(value => value == id);
+            if (character.passType != null)
+                character.passType = character.passType;
+        }
+        foreach (var tile in TileUnitForm.DataByUid.Values)
+        {
+            if (tile.passType == id)
+                tile.passType = 0;
+            GameMapData.ApplyTilePassTypes(tile);
+        }
+        foreach (var character in CharacterUnitForm.DataByUid.Values)
+            GameMapData.ApplyCharacterProductPassTypes(character);
+
+        PassTypeForm.RemoveData(id);
+    }
+
+    #endregion
+
+
     #region texture
 
     public void CreateTex(int labId = 0, string name = null)
@@ -251,7 +302,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(MapTextureForm.DatasByName.Keys);
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, 1, new List<int>() { GlobalDefaultHelper.DefaultTexId }, labId, new Dictionary<string, EventTriggerForm.Data>(), false,new Dictionary<int, int>()));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, 1, new List<int>() { GlobalDefaultHelper.DefaultTexId }, labId, new Dictionary<string, EventTriggerForm.Data>(), false, new Dictionary<int, int>(), 0, false, new List<int>()));
     }
     public void ImportTex(int texId, int id = -1)
     {
@@ -272,10 +323,30 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         });
     }
 
+    public void ImportFrontPartTex(int texId, int id = -1)
+    {
+        UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
+        {
+            onComplete = (data) =>
+            {
+                var frontPartTexs = MapTextureForm.DataById[texId].frontPartTexs;
+                if (id != -1 && frontPartTexs.Count > id)
+                    frontPartTexs[id] = data.id;
+                else
+                    frontPartTexs.Add(data.id);
+            }
+        });
+    }
+
 
     public void DeleteTexId(int texId, int id)
     {
         MapTextureForm.DataById[texId].texs.RemoveAt(id);
+    }
+
+    public void DeleteFrontPartTexId(int texId, int id)
+    {
+        MapTextureForm.DataById[texId].frontPartTexs.RemoveAt(id);
     }
 
     public void DeleteTex(int texId)
@@ -351,33 +422,43 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var modelData = MapModelForm.defaultData.Copy();
         modelData.subUnitTexsName = new List<List<int>>() { new List<int>() };
-        MapObjectForm.AddData(new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, labId, false, new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId));
+        var objectData = new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, labId, false,
+            new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId,
+            FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>());
+        objectData.EnsureDirectionData();
+        MapObjectForm.AddData(objectData);
     }
-    public void DeleteObjectUnitTex(string name, int texId)
+    public void DeleteObjectUnitTex(string name, AnimDirecton direction, int texId)
     {
         var data = MapObjectForm.DataByName[name];
-        data.model.subUnitTexsName[0].RemoveAt(texId);
+        var clip = data.GetAnimClip(direction);
+        if (texId >= 0 && texId < clip.Count)
+            clip.RemoveAt(texId);
+        data.SyncLegacyAnimClip(direction);
     }
-    public void CreateObjectUnitTex(int uid)
+    public void CreateObjectUnitTex(int uid, AnimDirecton direction)
     {
         var data = MapObjectForm.DataById[uid];
-        data.model.subUnitTexsName[0].Add(GlobalDefaultHelper.DefaultTexId);
+        data.GetAnimClip(direction).Add(GlobalDefaultHelper.DefaultTexId);
+        data.SyncLegacyAnimClip(direction);
     }
-    public void ImportObjectUnitTex(int uid, int texId)
+    public void ImportObjectUnitTex(int uid, AnimDirecton direction, int texId)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
-            onComplete = (data) =>
+            onComplete = (assetData) =>
             {
-                var model = MapObjectForm.DataById[uid].model;
-                if (model.subUnitTexsName[0].Count > texId)
+                var objectData = MapObjectForm.DataById[uid];
+                var clip = objectData.GetAnimClip(direction);
+                if (texId >= 0 && clip.Count > texId)
                 {
-                    model.subUnitTexsName[0][texId] = data.id;
+                    clip[texId] = assetData.id;
                 }
                 else
                 {
-                    model.subUnitTexsName[0].Add(data.id);
+                    clip.Add(assetData.id);
                 }
+                objectData.SyncLegacyAnimClip(direction);
             }
         });
 
@@ -574,7 +655,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, labId, GlobalDefaultHelper.DefaultCharacterTexId, paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalDefaultHelper.DefaultCharacterTexId, false, new Dictionary<SkillType, int>(), 0, false, GlobalDefaultHelper.DefaultTexId, 1));
+        CharacterProductForm.AddData(new CharacterProductForm.Data(-1, name, labId, GlobalDefaultHelper.DefaultCharacterTexId, paramDic, 0, animDic, defaultAnimName, default, "", "", new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<EquipPartType, int>(), "", GlobalDefaultHelper.DefaultCharacterTexId, false, new Dictionary<SkillType, int>(), 0, false, GlobalDefaultHelper.DefaultTexId, 1, new List<int>()));
     }
     public void DeleteCharacter(int uid)
     {
@@ -959,6 +1040,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             dic[prm.name] = prm.Copy();
         }
         var model = MapModelForm.defaultData.Copy();
+        model.subUnitTexsName = new List<List<int>>() { new List<int>() };
         model.isObstacle = false;
         var styleTex = new Dictionary<ItemStyle, int>();
         foreach (ItemStyle style in Enum.GetValues(typeof(ItemStyle)))
@@ -1040,6 +1122,24 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 {
                     act?.Invoke(ItemProductForm.DataByNameProtouid.GetDv((item.content, 0), null));
                 }
+                return true;
+            }, items);
+    }
+    public void ChooseSceneObject(string title, Action<MapObjectForm.Data> act)
+    {
+        var items = new EntryItem();
+        var addedIds = new HashSet<int>();
+
+        foreach (var data in MapObjectForm.DataById.Values)
+        {
+            if (data == null || !addedIds.Add(data.id))
+                continue;
+            items.Add($"{data.name}", null, data.id);
+        }
+        NotifyManager.instance.AddChoose(title,
+            true, (item) =>
+            {
+                act?.Invoke(MapObjectForm.DataById.GetDv(item.id, null));
                 return true;
             }, items);
     }
@@ -1125,6 +1225,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             result.pos,
             new Vector3(result.euler.x, angle, result.euler.z),
             true);
+
+        MapManager.instance.updateCtrl.UpdateSingleOne(result.unit);
         return result;
     }
 
@@ -1218,7 +1320,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(SceneForm.DataByName.Keys);
         }
-        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, Vector2.zero,false,false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(), false));
+        SceneForm.AddData(new SceneForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, Vector2.zero,false,false, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<int, List<string>>(), new Dictionary<int, List<string>>(), false));
     }
 
     public void ImportSceneMiniMap(string name)

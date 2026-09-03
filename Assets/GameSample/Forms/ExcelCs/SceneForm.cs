@@ -64,6 +64,8 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
                 
+        public static Action<Data,Dictionary<int,List<string>>,Dictionary<int,List<string>>> changeTriggeringonceduringevtsAction;
+                
         public static Action<Data,Dictionary<int,List<string>>,Dictionary<int,List<string>>> changeTriggeredonceevtsAction;
                 
         public static Action<Data,bool,bool> changeNotfirsttimeAction;
@@ -199,6 +201,24 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
+                    private Dictionary<int,List<string>>  _triggeringOnceDuringEvts;
+                    /// <summary>
+                    ///触发中的一次性事件
+                    ///</summary>
+                    public Dictionary<int,List<string>>  triggeringOnceDuringEvts{
+                                get{return _triggeringOnceDuringEvts;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeTriggeringonceduringevts(this,_triggeringOnceDuringEvts,value); 
+                    }
+        
+                _triggeringOnceDuringEvts = value;
+                }
+                 
+                     }
+                    
                     private Dictionary<int,List<string>>  _triggeredOnceEvts;
                     /// <summary>
                     ///触发过的一次性事件
@@ -235,7 +255,7 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,string name,int miniMap,Vector2 pos,bool unlock,bool hideInLargeMap,Dictionary<string,EventTriggerForm.Data> events,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime)
+            public Data(int uid,string name,int miniMap,Vector2 pos,bool unlock,bool hideInLargeMap,Dictionary<string,EventTriggerForm.Data> events,Dictionary<int,List<string>> triggeringOnceDuringEvts,Dictionary<int,List<string>> triggeredOnceEvts,bool notFirstTime)
             {
 
              this.uid = uid;
@@ -245,6 +265,7 @@ public static readonly int autoUidCnt=100;
              this.unlock = unlock;
              this.hideInLargeMap = hideInLargeMap;
              this.events = events;
+             this.triggeringOnceDuringEvts = triggeringOnceDuringEvts;
              this.triggeredOnceEvts = triggeredOnceEvts;
              this.notFirstTime = notFirstTime;
 
@@ -259,13 +280,14 @@ public static readonly int autoUidCnt=100;
              this.unlock = data.unlock;
              this.hideInLargeMap = data.hideInLargeMap;
              this.events = data.events;
+             this.triggeringOnceDuringEvts = data.triggeringOnceDuringEvts;
              this.triggeredOnceEvts = data.triggeredOnceEvts;
              this.notFirstTime = data.notFirstTime;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime);
+        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggeringOnceDuringEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeringOnceDuringEvts),triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime);
                 }
             
             public virtual  void BeforeGet()
@@ -275,7 +297,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,Vector2.zero,false,false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<int,List<string>>(){},false);
+                   private static Data _defaultData=new Data(0,"",0,Vector2.zero,false,false,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<int,List<string>>(){},new Dictionary<int,List<string>>(){},false);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -382,6 +404,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
 
+                jo.SelectToken("triggeringOnceDuringEvts")==null?defaultData.triggeringOnceDuringEvts:jo.Get<Dictionary<int,List<string>>>("triggeringOnceDuringEvts"),
+
                 jo.SelectToken("triggeredOnceEvts")==null?defaultData.triggeredOnceEvts:jo.Get<Dictionary<int,List<string>>>("triggeredOnceEvts"),
 
                 jo.SelectToken("notFirstTime")==null?defaultData.notFirstTime:jo.Get<bool>("notFirstTime")
@@ -410,6 +434,8 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("hideInLargeMap",data.hideInLargeMap);
 
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
+
+            jo.Set<Dictionary<int,List<string>>>("triggeringOnceDuringEvts",data.triggeringOnceDuringEvts);
 
             jo.Set<Dictionary<int,List<string>>>("triggeredOnceEvts",data.triggeredOnceEvts);
 
@@ -572,6 +598,16 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeEventsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTriggeringonceduringevts(Data superData,Dictionary<int,List<string>> oldV,Dictionary<int,List<string>> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTriggeringonceduringevtsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

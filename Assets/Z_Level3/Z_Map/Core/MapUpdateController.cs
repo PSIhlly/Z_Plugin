@@ -536,9 +536,10 @@ namespace Z_Map
             foreach (var tile in _super.utilCtrl.GetVisionOverlap(unit.data))
                 objectTileDic.Add(unit, tile);
         }
-        public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999, float agentRadius = 0f)
+        public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999, float agentRadius = 0f,
+            IReadOnlyCollection<int> passTypes = null)
         {
-            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius);
+            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius, passTypes);
         }
         public void ResetView()
         {
@@ -655,6 +656,7 @@ namespace Z_Map
                 : new List<TileUnit>(characterOverlapTileDic.Get(movingCharacter));
             if (movingCharacter != null && !teleport)
             {
+                newPos = movingCharacter.ClampMoveToPassType(oldPos, newPos);
                 newPos = _super.utilCtrl.ClampMoveToAreaBoundary(oldPos, newPos, movingCharacter.mapBoundaryDistance);
             }
             var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);

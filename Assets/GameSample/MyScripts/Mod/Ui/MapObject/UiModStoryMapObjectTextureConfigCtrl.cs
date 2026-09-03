@@ -31,9 +31,30 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
 
         public override void OnCreate()
         {
+            view.btn_isWangTile.onClick.AddListener(() =>
+            {
+                model.data.isWangTile = !model.data.isWangTile;
+                Refresh();
+            });
+            view.btn_enableFrontPart.onClick.AddListener(() =>
+            {
+                model.data.enableFrontPart = !model.data.enableFrontPart;
+                Refresh();
+            });
+            view.btn_passType.onClick.AddListener(() =>
+            {
+                var items = new EntryItem();
+                items.Add("Unrestricted", null, 0);
+                foreach (var passType in PassTypeForm.DataById.Values.OrderBy(data => data.id))
+                    items.Add(passType.name, null, passType.id);
 
-
-
+                NotifyManager.instance.AddChoose("Choose passType", true, item =>
+                {
+                    model.data.passType = item.id;
+                    Refresh();
+                    return true;
+                }, items);
+            });
         }
         public override void OnShow()
         {
@@ -42,6 +63,17 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         }
         public void Refresh()
         {
+            view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
+            view.sta_enableFrontPart.ChangeState(model.data.enableFrontPart ? 1 : 0);
+            if (model.data.passType != 0 && !PassTypeForm.DataById.ContainsKey(model.data.passType))
+                model.data.passType = 0;
+            var passTypeText = view.btn_passType.GetComponentInChildren<Txt>(true);
+            if (passTypeText != null)
+            {
+                passTypeText.text = model.data.passType == 0
+                    ? "Unrestricted"
+                    : PassTypeForm.DataById[model.data.passType].name;
+            }
             view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
             view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });
             view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent" });

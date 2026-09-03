@@ -1877,6 +1877,58 @@ namespace ModStoryCharacterUnitConfig
 
 
 
+
+
+
+    public partial class UiPassTypeParam:UiParam
+    {
+    }
+
+    public partial class UiPassTypeView:UiView
+    {
+
+            public GameObject go_passType;
+            public Txt txt_;
+            public Btn btn_;
+            public Sta sta_;
+        public UiPassTypeView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_passType = uiHolder.elementTrsLst[0].gameObject;
+            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+        }
+
+    }
+    public partial class UiPassTypeCtrl:UiCtrl
+    {
+        public UiPassTypeView view;
+        public UiPassTypeModel model;
+        public UiPassTypeParam param;
+        public UiModStoryCharacterUnitConfigCtrl parent=>(UiModStoryCharacterUnitConfigCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiPassTypeParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiPassTypeView(uiHolder);
+            model=new UiPassTypeModel();
+
+
+        }
+
+    }
+    public partial class UiPassTypeModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryCharacterUnitConfigParam:UiParam
     {
     }
@@ -1885,6 +1937,7 @@ namespace ModStoryCharacterUnitConfig
     {
 
             public GameObject go_skills;
+            public GameObject go_passTypes;
             public GameObject go_minimap;
             public UiAnimChooseCtrl model_IdleAnimChoose;
             public UiAnimChooseCtrl model_MoveAnimChoose;
@@ -1899,6 +1952,8 @@ namespace ModStoryCharacterUnitConfig
             public UiEventChooseCtrl model_EventChooseInteract;
             public UiEventChooseCtrl model_EventChooseClickMinimap;
             public UiEventChooseCtrl model_EventChooseLeaveScene;
+            public GameObject go_passType;
+            public UiPassTypeCtrl sub_passType;
             public Btn btn_moveSpeedParameter;
             public Btn btn_faceType;
             public Btn btn_unique;
@@ -1924,41 +1979,44 @@ namespace ModStoryCharacterUnitConfig
         {
 
             go_skills = uiHolder.elementTrsLst[0].gameObject;
-            go_minimap = uiHolder.elementTrsLst[1].gameObject;
-            model_IdleAnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            model_MoveAnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            model_EventChooseCharacterTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            model_EventChooseCharacterLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            model_EventChooseTileTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
-            model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
-            model_EventChooseBoundaryTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            model_EventChooseInteract = (UiEventChooseCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
-            model_EventChooseClickMinimap = (UiEventChooseCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
-            model_EventChooseLeaveScene = (UiEventChooseCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
-            btn_moveSpeedParameter = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            btn_faceType = uiHolder.elementTrsLst[16].GetComponent<Btn>();
-            btn_unique = uiHolder.elementTrsLst[17].GetComponent<Btn>();
-            sta_unique = uiHolder.elementTrsLst[18].GetComponent<Sta>();
-            ipt_size = uiHolder.elementTrsLst[19].GetComponent<Ipt>();
-            btn_lightAttack = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            btn_heavyAttack = uiHolder.elementTrsLst[21].GetComponent<Btn>();
-            btn_e = uiHolder.elementTrsLst[22].GetComponent<Btn>();
-            btn_q = uiHolder.elementTrsLst[23].GetComponent<Btn>();
-            btn_passive1 = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            btn_passive2 = uiHolder.elementTrsLst[25].GetComponent<Btn>();
-            btn_minimapIcon = uiHolder.elementTrsLst[26].GetComponent<Btn>();
-            img_minimapIcon = uiHolder.elementTrsLst[27].GetComponent<Img>();
-            txt_moveSpeedParameter = uiHolder.elementTrsLst[28].GetComponent<Txt>();
-            txt_faceType = uiHolder.elementTrsLst[29].GetComponent<Txt>();
-            txt_lightAttack = uiHolder.elementTrsLst[30].GetComponent<Txt>();
-            txt_heavyAttack = uiHolder.elementTrsLst[31].GetComponent<Txt>();
-            txt_e = uiHolder.elementTrsLst[32].GetComponent<Txt>();
-            txt_q = uiHolder.elementTrsLst[33].GetComponent<Txt>();
-            txt_passive1 = uiHolder.elementTrsLst[34].GetComponent<Txt>();
-            txt_passive2 = uiHolder.elementTrsLst[35].GetComponent<Txt>();
+            go_passTypes = uiHolder.elementTrsLst[1].gameObject;
+            go_minimap = uiHolder.elementTrsLst[2].gameObject;
+            model_IdleAnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            model_MoveAnimChoose = (UiAnimChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            model_EventChooseCharacterTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            model_EventChooseCharacterLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            model_EventChooseObjectTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            model_EventChooseObjectLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            model_EventChooseTileTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            model_EventChooseShow = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            model_EventChoosePerSecond = (UiEventChooseCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            model_EventChooseBoundaryTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            model_EventChooseInteract = (UiEventChooseCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            model_EventChooseClickMinimap = (UiEventChooseCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            model_EventChooseLeaveScene = (UiEventChooseCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            go_passType = uiHolder.elementTrsLst[16].gameObject;
+            sub_passType = (UiPassTypeCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            btn_moveSpeedParameter = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            btn_faceType = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            btn_unique = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            sta_unique = uiHolder.elementTrsLst[21].GetComponent<Sta>();
+            ipt_size = uiHolder.elementTrsLst[22].GetComponent<Ipt>();
+            btn_lightAttack = uiHolder.elementTrsLst[23].GetComponent<Btn>();
+            btn_heavyAttack = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            btn_e = uiHolder.elementTrsLst[25].GetComponent<Btn>();
+            btn_q = uiHolder.elementTrsLst[26].GetComponent<Btn>();
+            btn_passive1 = uiHolder.elementTrsLst[27].GetComponent<Btn>();
+            btn_passive2 = uiHolder.elementTrsLst[28].GetComponent<Btn>();
+            btn_minimapIcon = uiHolder.elementTrsLst[29].GetComponent<Btn>();
+            img_minimapIcon = uiHolder.elementTrsLst[30].GetComponent<Img>();
+            txt_moveSpeedParameter = uiHolder.elementTrsLst[31].GetComponent<Txt>();
+            txt_faceType = uiHolder.elementTrsLst[32].GetComponent<Txt>();
+            txt_lightAttack = uiHolder.elementTrsLst[33].GetComponent<Txt>();
+            txt_heavyAttack = uiHolder.elementTrsLst[34].GetComponent<Txt>();
+            txt_e = uiHolder.elementTrsLst[35].GetComponent<Txt>();
+            txt_q = uiHolder.elementTrsLst[36].GetComponent<Txt>();
+            txt_passive1 = uiHolder.elementTrsLst[37].GetComponent<Txt>();
+            txt_passive2 = uiHolder.elementTrsLst[38].GetComponent<Txt>();
         }
 
     }
@@ -2009,6 +2067,8 @@ namespace ModStoryCharacterUnitConfig
             view.model_EventChooseClickMinimap.BindHolderRecursively(uiHolder.subUiHolderLst[11]);
             view.model_EventChooseLeaveScene = new UiEventChooseCtrl();
             view.model_EventChooseLeaveScene.BindHolderRecursively(uiHolder.subUiHolderLst[12]);
+            view.sub_passType = new UiPassTypeCtrl();
+            view.sub_passType.BindHolderRecursively(uiHolder.subUiHolderLst[13]);
         }
 
     }
@@ -3538,12 +3598,14 @@ namespace ModStoryMapObjectType
             public Btn btn_texture;
             public Btn btn_mask;
             public Btn btn_object;
+            public Btn btn_passType;
         public UiModStoryMapObjectTypeView(UiHolder uiHolder):base(uiHolder)
         {
 
             btn_texture = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             btn_mask = uiHolder.elementTrsLst[1].GetComponent<Btn>();
             btn_object = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_passType = uiHolder.elementTrsLst[3].GetComponent<Btn>();
         }
 
     }
@@ -3761,6 +3823,126 @@ namespace ModStoryMapObjectList
     }
 }
 
+namespace ModStoryMapObjectPassType
+
+{
+
+
+
+
+
+
+
+    public partial class UiBigItemParam:UiParam
+    {
+    }
+
+    public partial class UiBigItemView:UiView
+    {
+
+            public GameObject go_item;
+            public Sta sta_item;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Ipt ipt_name;
+            public Btn btn_delete;
+            public Sta sta_delete;
+        public UiBigItemView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_item = uiHolder.elementTrsLst[0].gameObject;
+            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            sta_exist = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_delete = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_delete = uiHolder.elementTrsLst[6].GetComponent<Sta>();
+        }
+
+    }
+    public partial class UiBigItemCtrl:UiCtrl
+    {
+        public UiBigItemView view;
+        public UiBigItemModel model;
+        public UiBigItemParam param;
+        public UiModStoryMapObjectPassTypeCtrl parent=>(UiModStoryMapObjectPassTypeCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiBigItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiBigItemView(uiHolder);
+            model=new UiBigItemModel();
+
+
+        }
+
+    }
+    public partial class UiBigItemModel:UiModel
+    {
+        
+    }
+    public partial class UiModStoryMapObjectPassTypeParam:UiParam
+    {
+    }
+
+    public partial class UiModStoryMapObjectPassTypeView:UiView
+    {
+
+            public Btn btn_back;
+            public ScrView scr_items;
+            public GameObject go_item;
+            public Sta sta_item;
+            public UiBigItemCtrl sub_item;
+        public UiModStoryMapObjectPassTypeView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            scr_items = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            go_item = uiHolder.elementTrsLst[2].gameObject;
+            sta_item = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sub_item = (UiBigItemCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStoryMapObjectPassTypeCtrl:UiCtrl
+    {
+        public UiModStoryMapObjectPassTypeView view;
+        public UiModStoryMapObjectPassTypeModel model;
+        public UiModStoryMapObjectPassTypeParam param;
+        public UiModStoryMapObjectCtrl parent=>(UiModStoryMapObjectCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStoryMapObjectPassTypeParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStoryMapObjectPassTypeView(uiHolder);
+            model=new UiModStoryMapObjectPassTypeModel();
+
+
+            view.sub_item = new UiBigItemCtrl();
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiModStoryMapObjectPassTypeModel:UiModel
+    {
+        
+    }
+}
+
 namespace ModStoryMapObjectTexture
 
 {
@@ -3833,6 +4015,64 @@ namespace ModStoryMapObjectTextureAppearance
     {
         
     }
+
+
+
+    public partial class UiFrontItemParam:UiParam
+    {
+    }
+
+    public partial class UiFrontItemView:UiView
+    {
+
+            public GameObject go_frontItem;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_;
+            public Sta sta_;
+            public Img img_;
+            public Txt txt_;
+        public UiFrontItemView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_frontItem = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiFrontItemCtrl:UiCtrl
+    {
+        public UiFrontItemView view;
+        public UiFrontItemModel model;
+        public UiFrontItemParam param;
+        public UiModStoryMapObjectTextureAppearanceCtrl parent=>(UiModStoryMapObjectTextureAppearanceCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiFrontItemParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiFrontItemView(uiHolder);
+            model=new UiFrontItemModel();
+
+
+        }
+
+    }
+    public partial class UiFrontItemModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryMapObjectTextureAppearanceParam:UiParam
     {
     }
@@ -3840,39 +4080,53 @@ namespace ModStoryMapObjectTextureAppearance
     public partial class UiModStoryMapObjectTextureAppearanceView:UiView
     {
 
+            public GameObject go_frontTexs;
             public Btn btn_delete;
             public ScrView scr_items;
             public Sta sta_show;
+            public ScrView scr_frontItems;
+            public Sta sta_frontShow;
             public Ipt ipt_name;
             public Btn btn_label;
             public Ipt ipt_interval;
-            public Btn btn_isWangTile;
-            public Sta sta_isWangTile;
             public Txt txt_label;
             public Btn btn_new;
             public Btn btn_deleteTex;
+            public Btn btn_frontNew;
+            public Btn btn_deleteFrontTex;
             public GameObject go_item;
             public UiItemCtrl sub_item;
             public Btn btn_image;
             public Img img_image;
+            public GameObject go_frontItem;
+            public UiFrontItemCtrl sub_frontItem;
+            public Btn btn_frontImage;
+            public Img img_frontImage;
         public UiModStoryMapObjectTextureAppearanceView(UiHolder uiHolder):base(uiHolder)
         {
 
-            btn_delete = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            scr_items = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            sta_show = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            ipt_name = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
-            btn_label = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            ipt_interval = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
-            btn_isWangTile = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_isWangTile = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            txt_label = uiHolder.elementTrsLst[8].GetComponent<Txt>();
-            btn_new = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            btn_deleteTex = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            go_item = uiHolder.elementTrsLst[11].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
-            btn_image = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            img_image = uiHolder.elementTrsLst[14].GetComponent<Img>();
+            go_frontTexs = uiHolder.elementTrsLst[0].gameObject;
+            btn_delete = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            sta_show = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            scr_frontItems = uiHolder.elementTrsLst[4].GetComponent<ScrView>();
+            sta_frontShow = uiHolder.elementTrsLst[5].GetComponent<Sta>();
+            ipt_name = uiHolder.elementTrsLst[6].GetComponent<Ipt>();
+            btn_label = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            ipt_interval = uiHolder.elementTrsLst[8].GetComponent<Ipt>();
+            txt_label = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            btn_new = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            btn_deleteTex = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            btn_frontNew = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            btn_deleteFrontTex = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            go_item = uiHolder.elementTrsLst[14].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            btn_image = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            img_image = uiHolder.elementTrsLst[17].GetComponent<Img>();
+            go_frontItem = uiHolder.elementTrsLst[18].gameObject;
+            sub_frontItem = (UiFrontItemCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
+            btn_frontImage = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            img_frontImage = uiHolder.elementTrsLst[21].GetComponent<Img>();
         }
 
     }
@@ -3899,6 +4153,8 @@ namespace ModStoryMapObjectTextureAppearance
 
             view.sub_item = new UiItemCtrl();
             view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_frontItem = new UiFrontItemCtrl();
+            view.sub_frontItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -3933,6 +4189,12 @@ namespace ModStoryMapObjectTextureConfig
             public UiEventChooseCtrl model_EventChooseInteract;
             public UiEventChooseCtrl model_EventChooseClickMinimap;
             public UiEventChooseCtrl model_EventChooseLeaveScene;
+            public Btn btn_isWangTile;
+            public Sta sta_isWangTile;
+            public Btn btn_enableFrontPart;
+            public Sta sta_enableFrontPart;
+            public Btn btn_passType;
+            public Txt txt_onTouchEvent;
         public UiModStoryMapObjectTextureConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3947,6 +4209,12 @@ namespace ModStoryMapObjectTextureConfig
             model_EventChooseInteract = (UiEventChooseCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
             model_EventChooseClickMinimap = (UiEventChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
             model_EventChooseLeaveScene = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            btn_isWangTile = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_isWangTile = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_enableFrontPart = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_enableFrontPart = uiHolder.elementTrsLst[14].GetComponent<Sta>();
+            btn_passType = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            txt_onTouchEvent = uiHolder.elementTrsLst[16].GetComponent<Txt>();
         }
 
     }
@@ -4226,6 +4494,58 @@ namespace ModStoryMapObjectObjectAppearance
 
 
 
+    public partial class UiDirParam:UiParam
+    {
+    }
+
+    public partial class UiDirView:UiView
+    {
+
+            public GameObject go_dir;
+            public Btn btn_;
+            public Sta sta_;
+            public Txt txt_;
+        public UiDirView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_dir = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[3].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiDirCtrl:UiCtrl
+    {
+        public UiDirView view;
+        public UiDirModel model;
+        public UiDirParam param;
+        public UiModStoryMapObjectObjectAppearanceCtrl parent=>(UiModStoryMapObjectObjectAppearanceCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiDirParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiDirView(uiHolder);
+            model=new UiDirModel();
+
+
+        }
+
+    }
+    public partial class UiDirModel:UiModel
+    {
+        
+    }
+
+
+
     public partial class UiItemParam:UiParam
     {
     }
@@ -4294,9 +4614,11 @@ namespace ModStoryMapObjectObjectAppearance
             public Ipt ipt_interval;
             public Ipt ipt_colliderScale;
             public Sta sta_show;
-            public ScrView scr_items;
             public Txt txt_label;
+            public ScrView scr_items;
             public Btn btn_deleteUnit;
+            public GameObject go_dir;
+            public UiDirCtrl sub_dir;
             public Ipt ipt_width;
             public Ipt ipt_length;
             public Ipt ipt_height;
@@ -4308,9 +4630,9 @@ namespace ModStoryMapObjectObjectAppearance
             public RectTransform rtf_image;
             public RectTransform rtf_axis;
             public UiAxisCtrl model_axis;
+            public Txt txt_model;
             public GameObject go_item;
             public UiItemCtrl sub_item;
-            public Txt txt_model;
         public UiModStoryMapObjectObjectAppearanceView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -4320,23 +4642,25 @@ namespace ModStoryMapObjectObjectAppearance
             ipt_interval = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
             ipt_colliderScale = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             sta_show = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            scr_items = uiHolder.elementTrsLst[6].GetComponent<ScrView>();
-            txt_label = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            txt_label = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            scr_items = uiHolder.elementTrsLst[7].GetComponent<ScrView>();
             btn_deleteUnit = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            ipt_width = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
-            ipt_length = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            ipt_height = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
-            ipt_posHeight = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
-            btn_reset = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            btn_model = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            btn_image = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            rimg_image = uiHolder.elementTrsLst[16].GetComponent<RImg>();
-            rtf_image = uiHolder.elementTrsLst[17].GetComponent<RectTransform>();
-            rtf_axis = uiHolder.elementTrsLst[18].GetComponent<RectTransform>();
-            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[20].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
+            go_dir = uiHolder.elementTrsLst[9].gameObject;
+            sub_dir = (UiDirCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
+            ipt_width = uiHolder.elementTrsLst[11].GetComponent<Ipt>();
+            ipt_length = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
+            ipt_height = uiHolder.elementTrsLst[13].GetComponent<Ipt>();
+            ipt_posHeight = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
+            btn_reset = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            btn_model = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            btn_image = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            rimg_image = uiHolder.elementTrsLst[18].GetComponent<RImg>();
+            rtf_image = uiHolder.elementTrsLst[19].GetComponent<RectTransform>();
+            rtf_axis = uiHolder.elementTrsLst[20].GetComponent<RectTransform>();
+            model_axis = (UiAxisCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
             txt_model = uiHolder.elementTrsLst[22].GetComponent<Txt>();
+            go_item = uiHolder.elementTrsLst[23].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[24].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -4361,10 +4685,12 @@ namespace ModStoryMapObjectObjectAppearance
             model=new UiModStoryMapObjectObjectAppearanceModel();
 
 
+            view.sub_dir = new UiDirCtrl();
+            view.sub_dir.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.model_axis = new UiAxisCtrl();
-            view.model_axis.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_axis.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.sub_item = new UiItemCtrl();
-            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
         }
 
     }
@@ -4520,8 +4846,10 @@ namespace ModStoryMapObjectObjectConfig
             public UiEventChooseCtrl model_EventChooseLeaveScene;
             public Btn btn_collision;
             public Sta sta_collision;
+            public Btn btn_faceType;
             public Btn btn_minimapIcon;
             public Img img_minimapIcon;
+            public Txt txt_faceType;
         public UiModStoryMapObjectObjectConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -4539,8 +4867,10 @@ namespace ModStoryMapObjectObjectConfig
             model_EventChooseLeaveScene = (UiEventChooseCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
             btn_collision = uiHolder.elementTrsLst[12].GetComponent<Btn>();
             sta_collision = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            btn_minimapIcon = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            img_minimapIcon = uiHolder.elementTrsLst[15].GetComponent<Img>();
+            btn_faceType = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            btn_minimapIcon = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            img_minimapIcon = uiHolder.elementTrsLst[16].GetComponent<Img>();
+            txt_faceType = uiHolder.elementTrsLst[17].GetComponent<Txt>();
         }
 
     }
@@ -4676,6 +5006,7 @@ namespace ModStoryMapObjectObjectConfig
 
             public ModStoryMapObjectType.UiModStoryMapObjectTypeCtrl page_ModStoryMapObjectType;
             public ModStoryMapObjectList.UiModStoryMapObjectListCtrl page_ModStoryMapObjectList;
+            public ModStoryMapObjectPassType.UiModStoryMapObjectPassTypeCtrl page_ModStoryMapObjectPassType;
             public ModStoryMapObjectTexture.UiModStoryMapObjectTextureCtrl page_ModStoryMapObjectTexture;
             public ModStoryMapObjectMask.UiModStoryMapObjectMaskCtrl page_ModStoryMapObjectMask;
             public ModStoryMapObjectObject.UiModStoryMapObjectObjectCtrl page_ModStoryMapObjectObject;
@@ -4684,9 +5015,10 @@ namespace ModStoryMapObjectObjectConfig
 
             page_ModStoryMapObjectType = (ModStoryMapObjectType.UiModStoryMapObjectTypeCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
             page_ModStoryMapObjectList = (ModStoryMapObjectList.UiModStoryMapObjectListCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMapObjectTexture = (ModStoryMapObjectTexture.UiModStoryMapObjectTextureCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMapObjectMask = (ModStoryMapObjectMask.UiModStoryMapObjectMaskCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            page_ModStoryMapObjectObject = (ModStoryMapObjectObject.UiModStoryMapObjectObjectCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMapObjectPassType = (ModStoryMapObjectPassType.UiModStoryMapObjectPassTypeCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMapObjectTexture = (ModStoryMapObjectTexture.UiModStoryMapObjectTextureCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMapObjectMask = (ModStoryMapObjectMask.UiModStoryMapObjectMaskCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            page_ModStoryMapObjectObject = (ModStoryMapObjectObject.UiModStoryMapObjectObjectCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -4715,12 +5047,14 @@ namespace ModStoryMapObjectObjectConfig
             view.page_ModStoryMapObjectType.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.page_ModStoryMapObjectList = new ModStoryMapObjectList.UiModStoryMapObjectListCtrl();
             view.page_ModStoryMapObjectList.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_ModStoryMapObjectPassType = new ModStoryMapObjectPassType.UiModStoryMapObjectPassTypeCtrl();
+            view.page_ModStoryMapObjectPassType.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
             view.page_ModStoryMapObjectTexture = new ModStoryMapObjectTexture.UiModStoryMapObjectTextureCtrl();
-            view.page_ModStoryMapObjectTexture.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.page_ModStoryMapObjectTexture.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.page_ModStoryMapObjectMask = new ModStoryMapObjectMask.UiModStoryMapObjectMaskCtrl();
-            view.page_ModStoryMapObjectMask.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.page_ModStoryMapObjectMask.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.page_ModStoryMapObjectObject = new ModStoryMapObjectObject.UiModStoryMapObjectObjectCtrl();
-            view.page_ModStoryMapObjectObject.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.page_ModStoryMapObjectObject.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
         }
 
     }

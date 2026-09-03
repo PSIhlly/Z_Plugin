@@ -25,14 +25,17 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         public MapTextureForm.Data data;
 
         public int id;
+        public int frontId;
     }
     public partial class UiModStoryMapObjectTextureAppearanceCtrl:IZ_Listener<AssetEvent>
     {
         UiScrViewContainer<UiItemCtrl> con;
+        UiScrViewContainer<UiFrontItemCtrl> frontCon;
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
             con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
+            frontCon = new UiScrViewContainer<UiFrontItemCtrl>(this, view.go_frontItem, view.scr_frontItems);
             view.btn_delete.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTex(model.data.id);
@@ -56,11 +59,6 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                 model.data.animTimeInterval = StringHelper.ToFloat(s, 0, true);
                 Refresh();
             };
-            view.btn_isWangTile.onClick.AddListener(() =>
-            {
-                model.data.isWangTile = !model.data.isWangTile;
-                Refresh();
-            });
             view.btn_deleteTex.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.DeleteTexId(model.data.id, model.id);
@@ -70,6 +68,16 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             view.btn_image.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ImportTex(model.data.id, model.id);
+            });
+            view.btn_deleteFrontTex.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.DeleteFrontPartTexId(model.data.id, model.frontId);
+                model.frontId = -1;
+                Refresh();
+            });
+            view.btn_frontImage.onClick.AddListener(() =>
+            {
+                ModManager.instance.assetCtrl.ImportFrontPartTex(model.data.id, model.frontId);
             });
         }
 
@@ -82,6 +90,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         public override void OnShow()
         {
             model.id = -1;
+            model.frontId = -1;
             if (param != null)
             {
                 model.id = param.id;
@@ -91,7 +100,16 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         }
         public void Refresh()
         {
+            model.data.texs ??= new List<int>();
+            model.data.frontPartTexs ??= new List<int>();
+            if (model.id >= model.data.texs.Count)
+                model.id = -1;
+            if (model.frontId >= model.data.frontPartTexs.Count)
+                model.frontId = -1;
+
             view.sta_show.ChangeState(model.id >= 0 ? 1 : 0);
+            view.go_frontTexs.SetActive(model.data.enableFrontPart);
+            view.sta_frontShow.ChangeState(model.frontId >= 0 ? 1 : 0);
 
             con.Clear();
             for (int i = 0; i < model.data.texs.Count; i++)
@@ -107,14 +125,31 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             });
             con.Refresh();
 
+            frontCon.Clear();
+            for (int i = 0; i < model.data.frontPartTexs.Count; i++)
+            {
+                frontCon.Add(new UiFrontItemParam()
+                {
+                    id = i
+                });
+            }
+            frontCon.Add(new UiFrontItemParam()
+            {
+                id = -1
+            });
+            frontCon.Refresh();
+
             if (model.id >= 0)
             {
                 view.img_image.BindTexData(TexAssetForm.DataById[model.data.texs[model.id]]);
             }
+            if (model.frontId >= 0)
+            {
+                view.img_frontImage.BindTexData(TexAssetForm.DataById[model.data.frontPartTexs[model.frontId]]);
+            }
             view.ipt_name.Set(model.data.name);
             view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
             view.ipt_interval.Set(model.data.animTimeInterval.ToString("0.##"));
-            view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
         }
     }
 
@@ -156,6 +191,45 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             {
                 view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
                 view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.texs[model.id]]);
+            }
+        }
+    }
+
+    public partial class UiFrontItemParam
+    {
+        public int id;
+    }
+    public partial class UiFrontItemModel
+    {
+        public int id;
+    }
+    public partial class UiFrontItemCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_new.onClick.AddListener(() =>
+            {
+                parent.model.data.frontPartTexs.Add(GlobalDefaultHelper.DefaultTexId);
+                parent.Refresh();
+            });
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.model.frontId = model.id;
+                parent.Refresh();
+            });
+        }
+        public override void OnShow()
+        {
+            model.id = param.id;
+            Refresh();
+        }
+        public void Refresh()
+        {
+            view.sta_exist.ChangeState(model.id != -1 ? 1 : 0);
+            if (model.id != -1)
+            {
+                view.sta_.ChangeState(model.id == parent.model.frontId ? 1 : 0);
+                view.img_.BindTexData(TexAssetForm.DataById[parent.model.data.frontPartTexs[model.id]]);
             }
         }
     }

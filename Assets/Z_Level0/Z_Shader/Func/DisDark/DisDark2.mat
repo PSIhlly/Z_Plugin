@@ -125,7 +125,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _LightSensitivity: 1
+    - _LightSensitivity: 2
     - _Metallic: 0
     - _Mode: 0
     - _NeedCloseHide: 0

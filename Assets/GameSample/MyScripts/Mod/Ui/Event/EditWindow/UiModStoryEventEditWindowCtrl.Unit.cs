@@ -63,7 +63,11 @@ namespace Ui.ModStoryEventEditWindow
                 view.txt_.text = "";
                 view.btn_.gameObject.SetActive(true);
 
-                switch (model.node.desc.type)
+                if (SyntaxAnalysis.IsEmptyArgumentNode(model.node))
+                {
+                    view.txt_.text = string.Empty;
+                }
+                else switch (model.node.desc.type)
                 {
                     case CodeType.FuncName:
                     case CodeType.Reserved:

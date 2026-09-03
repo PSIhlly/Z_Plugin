@@ -257,14 +257,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: go_item
       objectReference: {fileID: 0}
-    - target: {fileID: 5226644236414305978, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0.000030517578
-      objectReference: {fileID: 0}
-    - target: {fileID: 5226644236414305978, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8902906900523898828, guid: dbda625c37e4766429eadf4ce8d8d875, type: 3}
       propertyPath: m_Pivot.x
       value: 0.4999998

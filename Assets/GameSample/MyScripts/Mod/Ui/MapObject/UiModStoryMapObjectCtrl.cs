@@ -10,6 +10,7 @@ using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList;
 using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture;
 using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectMask;
 using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject;
+using Ui.ModStory.ModStoryMapObject.ModStoryMapObjectPassType;
 
 namespace Ui.ModStory.ModStoryMapObject
 {
@@ -50,11 +51,12 @@ namespace Ui.ModStory.ModStoryMapObject
         }
         public void Refresh()
         {
-            view.page_ModStoryMapObjectList.SetShow(model.type > 0&& model.data==null, new UiModStoryMapObjectListParam()
+            view.page_ModStoryMapObjectList.SetShow(model.type > 0 && model.type < 4 && model.data==null, new UiModStoryMapObjectListParam()
             {
                  type = model.type,
             });
             view.page_ModStoryMapObjectType.SetShow(model.type == 0);
+            view.page_ModStoryMapObjectPassType.SetShow(model.type == 4, new UiModStoryMapObjectPassTypeParam());
             view.page_ModStoryMapObjectTexture.SetShow(model.data is MapTextureForm.Data, new UiModStoryMapObjectTextureParam()
             {
                 data = model.data is MapTextureForm.Data ? (MapTextureForm.Data)model.data : null,

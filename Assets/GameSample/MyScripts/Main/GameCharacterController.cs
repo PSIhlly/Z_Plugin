@@ -147,6 +147,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
     {
         Z_EventHelper.Register(this);
         CharacterProductForm.changeSizeAction += OnCharacterSizeChanged;
+        CharacterProductForm.changePasstypeAction += OnCharacterPassTypeChanged;
     }
     public Dictionary<CharacterUnitForm.Data, AnimController> animControllerDic = new Dictionary<CharacterUnitForm.Data, AnimController>();
 
@@ -160,6 +161,15 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 continue;
             if (GameMapData.ApplyCharacterProductSize(unitData, validSize))
                 MapManager.instance.updateCtrl.RefreshCharacterOverlap(unitData.unit);
+        }
+    }
+
+    private void OnCharacterPassTypeChanged(CharacterProductForm.Data productData, List<int> oldValue, List<int> newValue)
+    {
+        foreach (var unitData in CharacterUnitForm.DataByUid.Values)
+        {
+            if (unitData.unit.productInfo.Item1 == productData.uid)
+                GameMapData.ApplyCharacterProductPassTypes(unitData, productData);
         }
     }
 
@@ -456,6 +466,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         foreach (var keeper in ins.keepers)
         {
             keeper.enableFixedYRotation = form.faceType != FaceType.Flexible;
+            keeper.enableFixedZRotation0 = form.faceType != FaceType.Flexible;
             keeper.fixedYRotation = 0;
         }
     }
@@ -515,6 +526,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             case MapEventType.Show:
                 if (GameMapData.ApplyCharacterProductSize(evt.unit.data))
                     MapManager.instance.updateCtrl.RefreshCharacterOverlap(evt.unit);
+                GameMapData.ApplyCharacterProductPassTypes(evt.unit.data);
                 RegisterAnim(evt.unit.data);
                 LoadModel(evt.unit.ins);
                 break;
@@ -525,6 +537,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 {
                     if (GameMapData.ApplyCharacterProductSize(evt.unit.data, productData))
                         MapManager.instance.updateCtrl.RefreshCharacterOverlap(evt.unit);
+                    GameMapData.ApplyCharacterProductPassTypes(evt.unit.data, productData);
                     evt.unit.data.navEnabled = productData.enableNav && _super.curProgress.seconds > productData.recoveryTime;
                 }
                 CheckAnim(evt.unit.ins);

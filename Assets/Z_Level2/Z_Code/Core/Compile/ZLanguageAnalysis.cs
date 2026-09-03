@@ -125,7 +125,15 @@ namespace Z_Code
         {
             foreach (var argument in node.subNodes)
             {
-                BuildZl(commands, argument);
+                if (SyntaxAnalysis.IsEmptyArgumentNode(argument))
+                {
+                    AddCmd(commands, Op.PushStr, argument.desc.codeIndex);
+                    AddCmd(commands, string.Empty, argument.desc.codeIndex);
+                }
+                else
+                {
+                    BuildZl(commands, argument);
+                }
             }
             PushNumber(commands, node.subNodes.Count.ToString(), node.desc.codeIndex);
             AddCmd(commands, discardReturn ? Op.CallDiscard : Op.Call, node.desc.codeIndex);

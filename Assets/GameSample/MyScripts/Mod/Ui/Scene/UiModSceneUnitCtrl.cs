@@ -109,6 +109,14 @@ namespace Ui.ModSceneUnit
                     data.pos,
                     new Vector3(data.euler.x, v, data.euler.z),
                     true);
+                if (data.unit is ObjectUnit objectUnit)
+                {
+                    Z_EventHelper.Invoke(new ObjectEvent()
+                    {
+                        type = MapEventType.Move,
+                        unit = objectUnit
+                    });
+                }
                 ModManager.instance.sceneCtrl.ForceUpdate();
             }
             get

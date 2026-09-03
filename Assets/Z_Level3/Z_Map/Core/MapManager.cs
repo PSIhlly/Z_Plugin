@@ -171,7 +171,6 @@ public class MapManager : Z_MonoManager<MapManager>
         oData.pos = realPos;
         updateCtrl.RefreshObjectOverlap(oData.unit);
         oData.unit.Create();
-        updateCtrl.UpdateSingleOne(oData.unit);
         return oData;
     }
     public ItemUnitForm.Data AddItem(string name, Vector3 realPos, string prefabName, object[] prms = null)

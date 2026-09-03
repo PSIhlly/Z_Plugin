@@ -32,6 +32,24 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public override void OnCreate()
         {
 
+            view.btn_faceType.onClick.AddListener(() =>
+            {
+                var items = new EntryItem();
+                foreach (FaceType faceType in Enum.GetValues(typeof(FaceType)))
+                {
+                    items.Add(TextManager.instance.GetTxt(faceType.ToString()), null, (int)faceType);
+                }
+                NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose faceType"),
+                    true, item =>
+                    {
+                        model.data.EnsureDirectionData();
+                        model.data.faceType = (FaceType)item.id;
+                        model.data.SyncLegacyAnimClip(model.data.GetDefaultAnimDirection());
+                        Refresh();
+                        return true;
+                    }, items);
+            });
+
             view.btn_collision.onClick.AddListener(() =>
             {
                 model.data.collision = !model.data.collision;
@@ -46,10 +64,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public override void OnShow()
         {
             model.data = param.data;
+            model.data.EnsureDirectionData();
             Refresh();
         }
         public void Refresh()
         {
+            view.txt_faceType.oriText = model.data.faceType.ToString();
             view.sta_collision.ChangeState(model.data.collision?1:0);
 
             view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });

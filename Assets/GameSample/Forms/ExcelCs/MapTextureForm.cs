@@ -82,6 +82,12 @@ namespace Form
                 
         public static Action<Data,Dictionary<int,int>,Dictionary<int,int>> changeWangtiledicAction;
                 
+        public static Action<Data,int,int> changePasstypeAction;
+                
+        public static Action<Data,bool,bool> changeEnablefrontpartAction;
+                
+        public static Action<Data,List<int>,List<int>> changeFrontparttexsAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -177,11 +183,65 @@ namespace Form
                  
                      }
                     
+                    private int  _passType;
+                    /// <summary>
+                    ///通行类型
+                    ///</summary>
+                    public int  passType{
+                                get{return _passType;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangePasstype(this,_passType,value); 
+                    }
+        
+                _passType = value;
+                }
+                 
+                     }
+                    
+                    private bool  _enableFrontPart;
+                    /// <summary>
+                    ///启用前部贴图
+                    ///</summary>
+                    public bool  enableFrontPart{
+                                get{return _enableFrontPart;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEnablefrontpart(this,_enableFrontPart,value); 
+                    }
+        
+                _enableFrontPart = value;
+                }
+                 
+                     }
+                    
+                    private List<int>  _frontPartTexs;
+                    /// <summary>
+                    ///前部贴图
+                    ///</summary>
+                    public List<int>  frontPartTexs{
+                                get{return _frontPartTexs;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeFrontparttexs(this,_frontPartTexs,value); 
+                    }
+        
+                _frontPartTexs = value;
+                }
+                 
+                     }
+                    
             public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.labId)
             {
             }
             
-            public Data(int id,string name,int icon,float animTimeInterval,List<int> texs,int labId,Dictionary<string,EventTriggerForm.Data> events,bool isWangTile,Dictionary<int,int> WangTileDic):base(id,name,icon,labId)
+            public Data(int id,string name,int icon,float animTimeInterval,List<int> texs,int labId,Dictionary<string,EventTriggerForm.Data> events,bool isWangTile,Dictionary<int,int> WangTileDic,int passType,bool enableFrontPart,List<int> frontPartTexs):base(id,name,icon,labId)
             {
 
              this.id = id;
@@ -193,6 +253,9 @@ namespace Form
              this.events = events;
              this.isWangTile = isWangTile;
              this.WangTileDic = WangTileDic;
+             this.passType = passType;
+             this.enableFrontPart = enableFrontPart;
+             this.frontPartTexs = frontPartTexs;
 
             }
             public void Reset(Data data)
@@ -207,11 +270,14 @@ namespace Form
              this.events = data.events;
              this.isWangTile = data.isWangTile;
              this.WangTileDic = data.WangTileDic;
+             this.passType = data.passType;
+             this.enableFrontPart = data.enableFrontPart;
+             this.frontPartTexs = data.frontPartTexs;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),labId,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isWangTile,WangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(WangTileDic));
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),labId,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isWangTile,WangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(WangTileDic),passType,enableFrontPart,frontPartTexs==null?new List<int>():new List<int>(frontPartTexs));
                 }
             
             public override  void BeforeGet()
@@ -221,7 +287,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,0f,null,0,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<int,int>(){});
+                   private static Data _defaultData=new Data(0,"",0,0f,null,0,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<int,int>(){},0,false,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -347,7 +413,13 @@ namespace Form
 
                 jo.SelectToken("isWangTile")==null?defaultData.isWangTile:jo.Get<bool>("isWangTile"),
 
-                    _defaultData.WangTileDic
+                    _defaultData.WangTileDic,
+
+                jo.SelectToken("passType")==null?defaultData.passType:jo.Get<int>("passType"),
+
+                jo.SelectToken("enableFrontPart")==null?defaultData.enableFrontPart:jo.Get<bool>("enableFrontPart"),
+
+                jo.SelectToken("frontPartTexs")==null?defaultData.frontPartTexs:jo.Get<List<int>>("frontPartTexs")
                     );
 
             return data;
@@ -375,6 +447,12 @@ namespace Form
             jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
 
             jo.Set<bool>("isWangTile",data.isWangTile);
+
+            jo.Set<int>("passType",data.passType);
+
+            jo.Set<bool>("enableFrontPart",data.enableFrontPart);
+
+            jo.Set<List<int>>("frontPartTexs",data.frontPartTexs);
 
             return jo;
         }
@@ -584,6 +662,36 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeWangtiledicAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePasstype(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePasstypeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEnablefrontpart(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEnablefrontpartAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeFrontparttexs(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeFrontparttexsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

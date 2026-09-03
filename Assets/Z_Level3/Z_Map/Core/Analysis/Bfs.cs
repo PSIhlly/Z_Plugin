@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Z_DesignStyle;
 
@@ -28,7 +29,8 @@ namespace Z_Map.Analysis
         /// BFS寻路核心方法：从cur到tar寻找可行路径，返回第一步的移动方向
         /// maxStep: 最大搜索步数限制
         /// </summary>
-        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius)
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
+            IReadOnlyCollection<int> passTypes)
         {
 
             pre.Clear();
@@ -91,7 +93,7 @@ namespace Z_Map.Analysis
                 }
                 foreach (var nxt in now.links)
                 {
-                    if (CanPass(now, nxt, clearanceOffsets))
+                    if (CanPass(now, nxt, clearanceOffsets, passTypes))
                     {
                         steps[nxt] = step + 1;
                         queue.Enqueue(nxt);
@@ -105,13 +107,18 @@ namespace Z_Map.Analysis
                     }
                 }
             }
-            if (!pre.ContainsKey(end))
+            bool reachedTarget = pre.ContainsKey(end);
+            if (!reachedTarget)
             {
                 //太远，说明没希望
                 if (minDis2 > 2*2)
                     return Vector3.zero;
                 end = minUnit;
+                if (end == first)
+                    return Vector3.zero;
             }
+
+            Vector3 finalTarget = reachedTarget ? tar : end.realPos;
 
             {
                 NavUnit now = end;
@@ -168,7 +175,8 @@ namespace Z_Map.Analysis
                     }
                     
                     //换层 先断
-                    if (!Check(checkLeft - smoothingRadiusX, checkRight + smoothingRadiusX, nxt.y, y, checkBack - smoothingRadiusZ, checkForward + smoothingRadiusZ))
+                    if (!Check(checkLeft - smoothingRadiusX, checkRight + smoothingRadiusX, nxt.y, y,
+                            checkBack - smoothingRadiusZ, checkForward + smoothingRadiusZ, passTypes))
                     {
                         //那就只走第一步
                         if (i == path.Count - 2)
@@ -181,10 +189,10 @@ namespace Z_Map.Analysis
 
                 if (i < 0)
                 {
-                    return nc.GetNormalWithoutY(tar - cur);
+                    return nc.GetNormalWithoutY(finalTarget - cur);
                 }
             }
-            return nc.GetNormalWithoutY(tar - cur);
+            return nc.GetNormalWithoutY(finalTarget - cur);
         }
 
         /// <summary>
@@ -197,7 +205,8 @@ namespace Z_Map.Analysis
         /// <summary>
         /// 判断从from到tar是否可通行
         /// </summary>
-        public bool CanPass(NavUnit from, NavUnit tar, IReadOnlyList<Vector2Int> clearanceOffsets)
+        public bool CanPass(NavUnit from, NavUnit tar, IReadOnlyList<Vector2Int> clearanceOffsets,
+            IReadOnlyCollection<int> passTypes)
         {
             if (steps.ContainsKey(tar))
                 return false;
@@ -206,7 +215,8 @@ namespace Z_Map.Analysis
             {
                 if (!nc.TryGetOffsetUnit(from, offset, out var fromUnit) ||
                     !nc.TryGetOffsetUnit(tar, offset, out var toUnit) ||
-                    !fromUnit.links.Contains(toUnit))
+                    !fromUnit.links.Contains(toUnit) ||
+                    !HasAllPassTypes(toUnit, passTypes))
                 {
                     return false;
                 }
@@ -218,7 +228,8 @@ namespace Z_Map.Analysis
         /// 视线检测：验证指定矩形区域内所有导航格均无障碍且高度差在阈值内
         /// 用于判断路径上是否可以直线到达（无需绕行）
         /// </summary>
-        public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ)
+        public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ,
+            IReadOnlyCollection<int> passTypes)
         {
             for (int i = startX; i <= endX; i++)
                 for (int k = startZ; k <= endZ; k++)
@@ -226,7 +237,8 @@ namespace Z_Map.Analysis
                     if (!nc.navUnits.ContainsKey((i, mapY, k)))
                         return false;
                     var unit = nc.navUnits[(i, mapY, k)];
-                    if (unit.links.Count == 0 || Mathf.Abs(unit.realPos.y - realY) > nc.step)
+                    if (unit.links.Count == 0 || Mathf.Abs(unit.realPos.y - realY) > nc.step ||
+                        !HasAllPassTypes(unit, passTypes))
                     {
                         return false;
                     }
@@ -234,6 +246,21 @@ namespace Z_Map.Analysis
 
             return true;
 
+        }
+
+        private static bool HasAllPassTypes(NavUnit unit, IReadOnlyCollection<int> passTypes)
+        {
+            if (unit.passTypes == null || unit.passTypes.Count == 0)
+                return true;
+            if (passTypes == null || passTypes.Count == 0)
+                return false;
+
+            foreach (int requiredType in unit.passTypes)
+            {
+                if (!passTypes.Contains(requiredType))
+                    return false;
+            }
+            return true;
         }
         public void DebugPath(List<NavUnit> lst)
         {

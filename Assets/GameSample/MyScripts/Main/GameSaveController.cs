@@ -5,12 +5,14 @@ using RenderHeads.Media.AVProVideo;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.WSA;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
+using Z_Map.Form;
 using Z_Texture;
 using Z_UnitSystem;
 
@@ -39,6 +41,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string videoAssetFormFileName => "vaff";
     public string labFormFileName => "lf";
     public string missionFormFileName => "msf";
+    public string passTypeFormFileName => "ptf";
 
     public string assetFolder => "ast/";
     public GameSaveController(GameManager super) : base(super)
@@ -89,6 +92,7 @@ public class GameSaveController : Z_Controller<GameManager>
         string path = Main2StoryManager.GetStorySaveFolder(id);
 
         SaveLab(path);
+        SavePassType(path);
         SaveMaterial(path);
         SaveObject(path);
         SaveCharacter(path);
@@ -114,6 +118,7 @@ public class GameSaveController : Z_Controller<GameManager>
         string path = Main2StoryManager.GetStoryCoreFolder(id);
 
         SaveLab(path);
+        SavePassType(path);
         SaveMaterial(path);
         SaveObject(path);
         SaveCharacter(path);
@@ -151,6 +156,12 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveAndLoad.Save(storyFolder + "/" + labFormFileName, LabForm.GetJaByDatas().ToString());
     }
 
+    public void SavePassType(string storyFolder)
+    {
+        RepairPassTypeReferences();
+        SaveAndLoad.Save(storyFolder + "/" + passTypeFormFileName, PassTypeForm.GetJaByDatas().ToString());
+    }
+
     public void SaveMaterial(string storyCoreFolder)
     {
 
@@ -164,6 +175,11 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectParamFormFileName, MapObjectParamForm.GetJaByDatas().ToString());
 
+        foreach (var data in MapObjectForm.DataById.Values)
+        {
+            data.EnsureDirectionData();
+            data.SyncLegacyAnimClip(data.GetDefaultAnimDirection());
+        }
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectFormFileName, MapObjectForm.GetJaByDatas().ToString());
 
     }
@@ -322,10 +338,12 @@ public class GameSaveController : Z_Controller<GameManager>
         var folder = Main2StoryManager.GetStoryCoreFolder(id);
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
         LoadLab(folder);
+        LoadPassType(folder);
         LoadScene(folder);
         LoadMaterial(folder);
         LoadObject(folder);
         LoadCharacter(folder);
+        RepairPassTypeReferences();
         LoadSkill(folder);
 
         LoadItem(folder);
@@ -356,6 +374,7 @@ public class GameSaveController : Z_Controller<GameManager>
         LoadProgress(null);
         LoadUiItem(null);
         LoadAsset(null);
+        LoadPassType(null);
         LoadLab(null);
     }
     public void LoadSaveStory(int id)
@@ -365,10 +384,12 @@ public class GameSaveController : Z_Controller<GameManager>
 
         var assetFolder = Main2StoryManager.GetStoryAssetFolder(id);
         LoadLab(folder);
+        LoadPassType(folder);
         LoadScene(folder);
         LoadMaterial(folder);
         LoadObject(folder);
         LoadCharacter(folder);
+        RepairPassTypeReferences();
         LoadSkill(folder);
 
         LoadItem(folder);
@@ -421,6 +442,20 @@ public class GameSaveController : Z_Controller<GameManager>
                 LabForm.AddData(form);
             }
         }
+    }
+
+    public void LoadPassType(string folder)
+    {
+        PassTypeForm.ClearAuto();
+        if (folder == null)
+            return;
+
+        var pathForm = folder + passTypeFormFileName;
+        if (!SaveAndLoad.Exist(pathForm))
+            return;
+
+        foreach (var form in PassTypeForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            PassTypeForm.AddData(form);
     }
 
     private static void MigrateFlatLabIds(JArray forms, string belong, params string[] legacyKeys)
@@ -523,6 +558,8 @@ public class GameSaveController : Z_Controller<GameManager>
             MigrateFlatLabIds(forms, nameof(MapObjectForm), "label");
             foreach (var form in MapObjectForm.GetDatasByJa(forms))
             {
+                form.EnsureDirectionData();
+                form.SyncLegacyAnimClip(form.GetDefaultAnimDirection());
                 MapObjectForm.AddData(form);
             }
         }
@@ -776,6 +813,28 @@ public class GameSaveController : Z_Controller<GameManager>
 
     }
     #region util
+
+    public void RepairPassTypeReferences()
+    {
+        foreach (var texture in MapTextureForm.DataById.Values)
+        {
+            if (texture.passType != 0 && !PassTypeForm.DataById.ContainsKey(texture.passType))
+                texture.passType = 0;
+        }
+
+        foreach (var character in CharacterProductForm.DataByUid.Values)
+        {
+            if (character.passType == null)
+                character.passType = new List<int>();
+            character.passType.RemoveAll(id => id == 0 || !PassTypeForm.DataById.ContainsKey(id));
+            character.passType = character.passType.Distinct().ToList();
+        }
+
+        foreach (var tile in TileUnitForm.DataByUid.Values)
+            GameMapData.ApplyTilePassTypes(tile);
+        foreach (var character in CharacterUnitForm.DataByUid.Values)
+            GameMapData.ApplyCharacterProductPassTypes(character);
+    }
 
 
     public void RepairMissingCharacterTextureReferences()

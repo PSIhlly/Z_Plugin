@@ -1,5 +1,6 @@
 using Form;
 using System;
+using System.Collections.Generic;
 using Ui.Axis;
 using UnityEngine;
 using Z_DataSystem;
@@ -137,7 +138,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             view.ipt_interval.Set(model.data.model.animTimeInterval.ToString("0.##"));
 
             itemCon.Clear();
-            var texs = model.data.model.subUnitTexsName[0];
+            var texs = GetModelTextureList();
             if (texs != null)
             {
                 for (int i = 0; i < texs.Count; i++)
@@ -154,6 +155,21 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             });
             itemCon.Refresh();
 
+        }
+
+        public List<int> GetModelTextureList()
+        {
+            if (model.data?.model == null)
+                return null;
+
+            if (model.data.model.subUnitTexsName == null)
+                model.data.model.subUnitTexsName = new System.Collections.Generic.List<System.Collections.Generic.List<int>>();
+            if (model.data.model.subUnitTexsName.Count == 0)
+                model.data.model.subUnitTexsName.Add(new System.Collections.Generic.List<int>());
+            if (model.data.model.subUnitTexsName[0] == null)
+                model.data.model.subUnitTexsName[0] = new System.Collections.Generic.List<int>();
+
+            return model.data.model.subUnitTexsName[0];
         }
 
         private void RefreshView()
@@ -247,7 +263,7 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitAppearance
             view.sta_exist.ChangeState(model.id>=0?1:0);
             if (model.id>=0)
             {
-                var texs = parent.model.data.model.subUnitTexsName[0];
+                var texs = parent.GetModelTextureList();
                 var tex = TexAssetForm.DataById.GetDk(texs != null && texs.Count > model.id ? texs[model.id] : GlobalDefaultHelper.DefaultTexId);
                 view.txt_.text = tex.name;
                 view.img_.BindTexData(tex);

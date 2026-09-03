@@ -1,10 +1,13 @@
 using Form;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Ui.AnimChoose;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Text;
 using Z_Ui.Notify;
+using Z_Ui.Base;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitConfig
 {
@@ -20,8 +23,11 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
     }
     public partial class UiModStoryCharacterUnitConfigCtrl
     {
+        private UiContainer<UiPassTypeCtrl> passTypeCon;
+
         public override void OnCreate()
         {
+            passTypeCon = new UiContainer<UiPassTypeCtrl>(this, view.go_passType);
             view.ipt_size.contentType = TMPro.TMP_InputField.ContentType.IntegerNumber;
             view.ipt_size.onFinishInput += value =>
             {
@@ -132,6 +138,17 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         }
         public void Refresh()
         {
+            if (model.data.passType == null)
+                model.data.passType = new List<int>();
+            model.data.passType.RemoveAll(id => id == 0 || !PassTypeForm.DataById.ContainsKey(id));
+            model.data.passType = model.data.passType.Distinct().ToList();
+
+            passTypeCon.Clear();
+            foreach (var passType in PassTypeForm.DataById.Values.OrderBy(data => data.id))
+                passTypeCon.Add(new UiPassTypeParam { id = passType.id });
+            passTypeCon.Refresh();
+            view.go_passTypes.SetActive(PassTypeForm.DataById.Count > 0);
+
             if (model.data.size < 1)
                 model.data.size = 1;
             view.ipt_size.Set(model.data.size.ToString());
@@ -176,6 +193,47 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
             view.img_minimapIcon.BindTexData(TexAssetForm.DataById.GetDv(model.data.minimapIcon, TexAssetForm.DataById[GlobalDefaultHelper.DefaultStoryTexId]));
 
+        }
+    }
+
+    public partial class UiPassTypeParam
+    {
+        public int id;
+    }
+
+    public partial class UiPassTypeModel
+    {
+        public int id;
+    }
+
+    public partial class UiPassTypeCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_.onClick.AddListener(() =>
+            {
+                var selected = parent.model.data.passType;
+                if (selected.Contains(model.id))
+                    selected.Remove(model.id);
+                else
+                    selected.Add(model.id);
+                parent.model.data.passType = selected;
+                parent.Refresh();
+            });
+        }
+
+        public override void OnShow()
+        {
+            model.id = param.id;
+            Refresh();
+        }
+
+        public void Refresh()
+        {
+            if (!PassTypeForm.DataById.TryGetValue(model.id, out var passType))
+                return;
+            view.txt_.text = passType.name;
+            view.sta_.ChangeState(parent.model.data.passType.Contains(model.id) ? 1 : 0);
         }
     }
 

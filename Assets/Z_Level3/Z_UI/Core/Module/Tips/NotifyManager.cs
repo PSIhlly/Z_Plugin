@@ -245,7 +245,7 @@ namespace Z_Ui.Notify
                 });
             }
         }
-        public void AddPopup(string title, string content, bool canClose, List<string> words=null, List<Func<bool>> funcs=null,bool enableScr=false)
+        public void AddPopup(string title, string content, bool canClose, List<string> words=null, List<Func<bool>> funcs=null,bool enableScr=true)
         {
             var info = new PopupInfo()
             {

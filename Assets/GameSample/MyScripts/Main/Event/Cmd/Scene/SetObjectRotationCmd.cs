@@ -45,6 +45,11 @@ namespace Z_Code
                         oData.pos,
                         nextEuler,
                         true);
+                    Z_EventHelper.Invoke(new ObjectEvent()
+                    {
+                        type = MapEventType.Move,
+                        unit = oData.unit
+                    });
                 }
                 prm[2].num -= Time.deltaTime;
                 if (prm[2].num <= 0)

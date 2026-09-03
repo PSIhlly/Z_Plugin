@@ -54,16 +54,26 @@ public class GameUtilController : Z_Controller<GameManager>
         if (model == null)
             return new GameObject(name);
 
+        var prefabKeys = model.subPrefabUnitName ?? new List<int>();
         var showShadow = new List<bool>();
-        for (int i = 0; i < model.subPrefabUnitName.Count; i++)
-            showShadow.Add(true);
-
-        var lst0 = new List<int>();
-        foreach (var lst in model.subUnitTexsName)
+        var texRealId = new List<int>();
+        var poss = new List<Vector3>();
+        var scales = new List<Vector3>();
+        for (int i = 0; i < prefabKeys.Count; i++)
         {
-            lst0.Add(lst != null && lst.Count > 0 ? lst[0] : GlobalDefaultHelper.DefaultTexId);
+            showShadow.Add(true);
+            texRealId.Add(model.subUnitTexsName != null && i < model.subUnitTexsName.Count &&
+                          model.subUnitTexsName[i] != null && model.subUnitTexsName[i].Count > 0
+                ? model.subUnitTexsName[i][0]
+                : GlobalDefaultHelper.DefaultTexId);
+            poss.Add(model.subPrefabUnitPos != null && i < model.subPrefabUnitPos.Count
+                ? model.subPrefabUnitPos[i]
+                : Vector3.zero);
+            scales.Add(model.subPrefabUnitScale != null && i < model.subPrefabUnitScale.Count
+                ? model.subPrefabUnitScale[i]
+                : Vector3.one);
         }
-        var res = CombineNewGoByPrefabs(name, model.subPrefabUnitName, lst0, model.subPrefabUnitPos, model.subPrefabUnitScale, showShadow);
+        var res = CombineNewGoByPrefabs(name, prefabKeys, texRealId, poss, scales, showShadow);
         foreach (var col in res.GetComponentsInChildren<BoxCollider>())
         {
             col.transform.localScale = new Vector3(model.colliderScale, 1, model.colliderScale);

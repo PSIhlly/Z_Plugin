@@ -37,6 +37,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectType
                 parent.SelType(3);
             });
 
+            view.btn_passType.onClick.AddListener(() =>
+            {
+                parent.SelType(4);
+            });
+
         }
         public override void OnShow()
         {

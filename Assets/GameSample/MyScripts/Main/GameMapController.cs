@@ -136,6 +136,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             DynamicGlobalSettings.cameraMode = now;
         };
+        MapTextureForm.changePasstypeAction += (_, _, _) =>
+        {
+            foreach (var tileData in TileUnitForm.DataByUid.Values)
+                GameMapData.ApplyTilePassTypes(tileData);
+        };
 
         UnitForm.beforeGetAction += (data) =>
         {
@@ -209,6 +214,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
         if (validAnimTexs != null && validAnimTexs.Count > 0)
         {
+            renderer.gameObject.SetActive(true);
 
             if (isMask)
             {
@@ -263,11 +269,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 ins.animTimer[rendererId] = TimeManager.instance.StartTimer(timeProgress, interval, () =>
                 {
                     MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                    ins.renderers[tempId].GetPropertyBlock(propBlock);
+                    renderer.GetPropertyBlock(propBlock);
                     cur = (cur + 1) % validAnimTexs.Count;
                     animCurCache[data][tempId] = cur;
                     propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
-                    ins.renderers[tempId].SetPropertyBlock(propBlock);
+                    renderer.SetPropertyBlock(propBlock);
                     return false;
                 }, ins);
             }
@@ -278,13 +284,14 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
         else if (hasConfiguredTextures)
         {
+            renderer.gameObject.SetActive(true);
             renderer.enabled = true;
             TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
             propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
             if (!isMask)
                 propBlock.SetTexture("_Tex", GetDefaultTexture());
         }
-        else if(!isMask)
+        else if (!isMask)
         {
             renderer.enabled = false;
             propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
@@ -324,33 +331,43 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         switch (evt.type)
         {
             case MapEventType.Show:
-                int i = 0;
-                for (; i < evt.unit.ins.renderers.Length; i++)
+                int baseRendererCount = Mathf.Min(GlobalSettings.TERRAIN_LAYER_MAX, evt.unit.ins.renderers.Length);
+                for (int layer = 0; layer < baseRendererCount; layer++)
                 {
-                    var texName = evt.unit.data.texDic.GetDv(i, -1);
+                    var texName = evt.unit.data.texDic.GetDv(layer, -1);
                     var data = MapTextureForm.DataById.GetDv(texName, null);
                     if (data != null
                         && data.isWangTile
                         && data.WangTileDic != null
-                        && data.WangTileDic.TryGetValue(GetWangTileMask(evt.unit, i, texName), out int wangTexId))
+                        && data.WangTileDic.TryGetValue(GetWangTileMask(evt.unit, layer, texName), out int wangTexId))
                     {
-                        ShowFinalMat(evt.unit.ins, i, new List<int>() { wangTexId }, 0, false);
+                        ShowFinalMat(evt.unit.ins, layer, new List<int>() { wangTexId }, 0, false);
                     }
                     else
                     {
-                        ShowFinalMat(evt.unit.ins, i, data != null ? data.texs : null, data != null ? data.animTimeInterval : 0, false);
+                        ShowFinalMat(evt.unit.ins, layer, data != null ? data.texs : null, data != null ? data.animTimeInterval : 0, false);
+                    }
+
+                    int frontRendererId = GlobalSettings.TERRAIN_LAYER_MAX + layer;
+                    if (frontRendererId < evt.unit.ins.renderers.Length)
+                    {
+                        var frontPartTexs = data != null && data.enableFrontPart ? data.frontPartTexs : null;
+                        ShowFinalMat(evt.unit.ins, frontRendererId, frontPartTexs, data != null ? data.animTimeInterval : 0, false);
                     }
                 }
-                for (; i < evt.unit.ins.renderers.Length + GlobalSettings.TERRAIN_LAYER_MAX; i++)
+
+                for (int layer = 0; layer < baseRendererCount; layer++)
                 {
-                    var texName = evt.unit.data.texDic.GetDv(i, -1);
+                    int maskKey = GlobalSettings.TERRAIN_LAYER_MAX + layer;
+                    var texName = evt.unit.data.texDic.GetDv(maskKey, -1);
                     var data = MapMaskForm.DataById.GetDv(texName, null);
 
-                    ShowFinalMat(evt.unit.ins, i - evt.unit.ins.renderers.Length, data != null ? data.texsName : null, 0, true);
+                    ShowFinalMat(evt.unit.ins, layer, data != null ? data.texsName : null, 0, true);
 
                 }
                 break;
             case MapEventType.AfterUpdate:
+                GameMapData.ApplyTilePassTypes(evt.unit.data);
                 break;
         }
     }
@@ -359,15 +376,47 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         switch (evt.type)
         {
             case MapEventType.Show:
-                var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
-                if (data != null && data.model.subUnitTexsName.Count > 0)
                 {
-                    ShowFinalMat(evt.unit.ins, 0, data.model.subUnitTexsName[0], data.model.animTimeInterval, false);
+                    var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                    if (data != null)
+                    {
+                        data.EnsureDirectionData();
+                        foreach (var keeper in evt.unit.ins.keepers)
+                        {
+                            keeper.enableFixedYRotation = data.faceType != FaceType.Flexible;
+                            keeper.enableFixedZRotation0 = data.faceType != FaceType.Flexible;
+                            keeper.fixedYRotation = 0;
+                        }
+                        RefreshObjectAppearance(evt.unit, data);
+                    }
+                    break;
                 }
-                break;
-            case MapEventType.AfterUpdate:
-                break;
+            case MapEventType.Move:
+                {
+                    var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                    if (data != null)
+                        RefreshObjectAppearance(evt.unit, data);
+                    break;
+                }
         }
+    }
+
+    private void RefreshObjectAppearance(ObjectUnit unit, MapObjectForm.Data data)
+    {
+        if (unit.ins == null)
+            return;
+
+        // Keep this independent from renderer availability: pooled/custom
+        // prefabs may start with their renderer GameObject disabled, while the
+        // perspective helper still needs the new root rotation immediately.
+        foreach (var keeper in unit.ins.keepers)
+            keeper.RefreshNow();
+
+        if (unit.ins.renderers == null || unit.ins.renderers.Length == 0)
+            return;
+
+        var direction = data.GetAnimDirection(unit.data.euler.y);
+        ShowFinalMat(unit.ins, 0, data.GetAnimClip(direction), data.model.animTimeInterval, false);
     }
     public void OnEvent(ItemEvent evt)
     {
@@ -375,7 +424,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             case MapEventType.Show:
                 var data = ItemProductForm.DataByUid.GetDv(evt.unit.productInfo.Item1, null);
-                if (data != null && data.model.subUnitTexsName.Count > 0)
+                if (data != null && data.model != null && data.model.subUnitTexsName != null && data.model.subUnitTexsName.Count > 0)
                 {
                     ShowFinalMat(evt.unit.ins, 0, data.model.subUnitTexsName[0], data.model.animTimeInterval, false);
                 }

@@ -98,6 +98,7 @@ public static partial class GlobalEventHelper
     public static string CHARACTER = "$ch$";
     public static string ITEM = "$it$";
     public static string SCENEOBJECT = "$so$";
+    public static string SCENEOBJECTPROTO = "$sop$";
     public static string EFFECT = "$ef$";
     public static string UIIMAGE = "$ui$";
     public static string VECTOR = "$vt$";
@@ -238,7 +239,7 @@ public class GameEventController : Z_Controller<GameManager>
     public void ClearScene()
     {
         EventInterpretDataForm.DataByUid.Clear();
-        GameManager.instance.curScene.triggeredOnceEvts.Clear();
+        GameManager.instance.curScene.triggeringOnceDuringEvts.Clear();
         tasks.Clear();
     }
 
@@ -311,8 +312,8 @@ public class GameEventController : Z_Controller<GameManager>
         }
         foreach (var trigger in releaseTriggerTuple)
         {
-            if (GameManager.instance.curScene.triggeredOnceEvts.ContainsKey(trigger.Item1))
-                GameManager.instance.curScene.triggeredOnceEvts[trigger.Item1].Remove(trigger.Item2);
+            if (GameManager.instance.curScene.triggeringOnceDuringEvts.ContainsKey(trigger.Item1))
+                GameManager.instance.curScene.triggeringOnceDuringEvts[trigger.Item1].Remove(trigger.Item2);
         }
     }
 
@@ -324,10 +325,12 @@ public class GameEventController : Z_Controller<GameManager>
             return;
         }
         List<string> triggered;
-        var dict = GameManager.instance.curScene.triggeredOnceEvts;
+        
         switch (trigger.type)
         {
             case TriggerType.Once:
+                { 
+                var dict = GameManager.instance.curScene.triggeredOnceEvts;
                 if (dict.TryGetValue(user, out triggered))
                 {
                     if (triggered.Contains(trigger.name))
@@ -342,9 +345,12 @@ public class GameEventController : Z_Controller<GameManager>
                 {
                     Execute(EventProgramDataForm.DataByUid.GetDv(id, null), user, defaultHeap, trigger.name);
                 }
-                trigger.evt.Clear();//once can clear
+
                 break;
+                }
             case TriggerType.OnceDuring:
+                {
+                var dict = GameManager.instance.curScene.triggeringOnceDuringEvts;
                 if (dict.TryGetValue(user, out triggered))
                 {
                     if (triggered.Contains(trigger.name))
@@ -360,6 +366,7 @@ public class GameEventController : Z_Controller<GameManager>
                     Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user, defaultHeap, trigger.name);
                 }
                 break;
+                }
             default:
                 foreach (var nm in trigger.evt)
                 {
@@ -369,11 +376,11 @@ public class GameEventController : Z_Controller<GameManager>
         }
     }
     int debugId = 0;
-    public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "")
+    public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "", bool noreleaseTrigger = false)
     {
         if (evt == null)
             return;
-        if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent"&& releaseTrigger != "onLeaveEvent")
+        if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent" && releaseTrigger != "onLeaveEvent")
             return;
         var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;
@@ -398,7 +405,7 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 res.subs[cat].Add(type);
             }
-            res.subs[cat].subs[type].Add(data.name,null,data.uid);
+            res.subs[cat].subs[type].Add(data.name, null, data.uid);
         }
         return res;
     }

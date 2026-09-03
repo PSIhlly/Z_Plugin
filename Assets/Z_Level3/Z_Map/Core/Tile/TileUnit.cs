@@ -13,6 +13,13 @@ namespace Z_Map
 
     public partial class TileUnit : MapUnit
     {
+        private readonly HashSet<int> _passTypes = new HashSet<int>();
+
+        /// <summary>
+        /// 此地块要求角色具备的全部通行类型。0 表示无限制，不进入该集合。
+        /// </summary>
+        public IReadOnlyCollection<int> passTypes => _passTypes;
+
         public TileUnit(TileUnitForm.Data data) : base(data)
         {
         }
@@ -25,6 +32,19 @@ namespace Z_Map
         public override Type GetInsType()
         {
             return typeof(TileInstance);
+        }
+
+        public void SetPassTypes(IEnumerable<int> values)
+        {
+            _passTypes.Clear();
+            if (values == null)
+                return;
+
+            foreach (int value in values)
+            {
+                if (value != 0)
+                    _passTypes.Add(value);
+            }
         }
 
         public override void Show()

@@ -23,7 +23,6 @@ namespace Ui.Mod
     {
 
             public GameObject go_item;
-            public Sta sta_item;
             public Sta sta_exist;
             public Btn btn_new;
             public Btn btn_;
@@ -34,13 +33,12 @@ namespace Ui.Mod
         {
 
             go_item = uiHolder.elementTrsLst[0].gameObject;
-            sta_item = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            sta_exist = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            btn_new = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_ = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            img_ = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            txt_ = uiHolder.elementTrsLst[7].GetComponent<Txt>();
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[6].GetComponent<Txt>();
         }
 
     }
@@ -83,7 +81,6 @@ namespace Ui.Mod
             public Txt txt_title;
             public ScrView scr_items;
             public GameObject go_item;
-            public Sta sta_item;
             public UiItemCtrl sub_item;
         public UiModView(UiHolder uiHolder):base(uiHolder)
         {
@@ -92,8 +89,7 @@ namespace Ui.Mod
             txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
             go_item = uiHolder.elementTrsLst[3].gameObject;
-            sta_item = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
         }
 
     }

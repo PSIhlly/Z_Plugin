@@ -17,6 +17,7 @@ using Z_Math;
 using Z_DataSystem;
 using Ui.Axis;
 using Z_DesignStyle;
+using Z_Ui;
 
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjectObjectAppearance
 {
@@ -28,15 +29,18 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
     public partial class UiModStoryMapObjectObjectAppearanceModel
     {
         public MapObjectForm.Data data;
+        public AnimDirecton dir;
         public int id;
     }
     public partial class UiModStoryMapObjectObjectAppearanceCtrl:IZ_Listener<AssetEvent>
     {
         UiScrViewContainer<UiItemCtrl> itemCon;
+        UiContainer<UiDirCtrl> dirCon;
         public override void OnCreate()
         {
             Z_EventHelper.Register(this);
             itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
+            dirCon = new UiContainer<UiDirCtrl>(this, view.go_dir);
             view.btn_reset.onClick.AddListener(() =>
             {
                 model.data.model.subPrefabUnitScale[0] = Vector3.one;
@@ -62,7 +66,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             {
                 if (model.id >= 0)
                 {
-                    ModManager.instance.assetCtrl.DeleteObjectUnitTex(model.data.name, model.id);
+                    ModManager.instance.assetCtrl.DeleteObjectUnitTex(model.data.name, model.dir, model.id);
                     model.id = -1;
                     Refresh();
                 }
@@ -103,7 +107,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             };
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.id, model.id);
+                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.id, model.dir, model.id);
                 Refresh();
             });
             view.ipt_interval.onFinishInput += (s) =>
@@ -123,6 +127,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             {
                 model.data = param.data;
             }
+            model.data.EnsureDirectionData();
+            model.dir = model.data.GetDefaultAnimDirection();
             model.id = -1;
             DisplayCameraAreaManager.instance.Show();
             Refresh();
@@ -130,6 +136,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
         public void Refresh()
         {
+            model.data.EnsureDirectionData();
+            if (model.data.faceType == FaceType.FourDirection && model.dir == AnimDirecton.Fixed)
+                model.dir = AnimDirecton.Up;
+            else if (model.data.faceType != FaceType.FourDirection && model.dir != AnimDirecton.Fixed)
+                model.dir = AnimDirecton.Fixed;
+
             view.sta_show.ChangeState(model.id == -1 ? 0 : 1);
 
             view.ipt_name.Set(model.data.name);
@@ -161,8 +173,24 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.ipt_interval.Set(model.data.model.animTimeInterval.ToString("0.##"));
             view.ipt_colliderScale.Set(model.data.model.colliderScale.ToString("0.##"));
 
+            dirCon.Clear();
+            switch (model.data.faceType)
+            {
+                case FaceType.Fixed:
+                case FaceType.Flexible:
+                    dirCon.Add(new UiDirParam() { dir = AnimDirecton.Fixed });
+                    break;
+                case FaceType.FourDirection:
+                    dirCon.Add(new UiDirParam() { dir = AnimDirecton.Up });
+                    dirCon.Add(new UiDirParam() { dir = AnimDirecton.Down });
+                    dirCon.Add(new UiDirParam() { dir = AnimDirecton.Left });
+                    dirCon.Add(new UiDirParam() { dir = AnimDirecton.Right });
+                    break;
+            }
+            dirCon.Refresh();
+
             itemCon.Clear();
-            var texs = model.data.model.subUnitTexsName[0];
+            var texs = model.data.GetAnimClip(model.dir);
             if (texs != null)
             {
                 for (int i = 0; i < texs.Count; i++)
@@ -178,11 +206,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 id = -1,
             });
             itemCon.Refresh();
+            UiManager.Rebuild(gameObject, true);
 
         }
         private void RefreshView()
         {
             DisplayCameraAreaManager.instance.Clear();
+            model.data.SyncLegacyAnimClip(model.dir);
             var showGo = GameManager.instance.utilCtrl.CombineNewObjectByPrefabs("fakeObj", model.data.model, false);
             showGo.SetActive(true);
             DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
@@ -192,6 +222,41 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             if (active)
                 Refresh();
+        }
+    }
+
+    public partial class UiDirParam
+    {
+        public AnimDirecton dir;
+    }
+
+    public partial class UiDirModel
+    {
+        public AnimDirecton dir;
+    }
+
+    public partial class UiDirCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_.onClick.AddListener(() =>
+            {
+                parent.model.dir = model.dir;
+                parent.model.id = -1;
+                parent.Refresh();
+            });
+        }
+
+        public override void OnShow()
+        {
+            model.dir = param.dir;
+            Refresh();
+        }
+
+        public void Refresh()
+        {
+            view.txt_.oriText = model.dir.ToString();
+            view.sta_.ChangeState(model.dir == parent.model.dir ? 1 : 0);
         }
     }
 
@@ -210,7 +275,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateObjectUnitTex(parent.model.data.id);
+                ModManager.instance.assetCtrl.CreateObjectUnitTex(parent.model.data.id, parent.model.dir);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>
@@ -233,7 +298,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.sta_exist.ChangeState(model.id >= 0 ? 1 : 0);
             if (model.id >= 0)
             {
-                var texs = parent.model.data.model.subUnitTexsName[0];
+                var texs = parent.model.data.GetAnimClip(parent.model.dir);
                 var tex = TexAssetForm.DataById.GetDv(texs != null && texs.Count > model.id ? texs[model.id] : -1,null);
                 view.txt_.text = "";
                 if (tex != null)

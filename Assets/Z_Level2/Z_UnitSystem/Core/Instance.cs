@@ -46,7 +46,7 @@ namespace Z_UnitSystem
             }
         }
         private Renderer[] _renderers;
-        public Renderer[] renderers
+        public virtual Renderer[] renderers
         {
             get
             {

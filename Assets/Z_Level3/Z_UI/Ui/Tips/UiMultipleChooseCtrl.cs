@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine;
+using UnityEngine.UI;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -84,7 +86,6 @@ namespace Ui.Notify
             }
             colCon.Refresh();
             itemCon.Clear();
-            UiManager.Rebuild(gameObject, true);
 
             if (model.deepth-1 <= model.sel.deepth)
             {
@@ -97,8 +98,16 @@ namespace Ui.Notify
                     });
                 }
             }
+            // A previous branch may have left the ScrollRect at its old
+            // bottom position. Start the new branch from the top so the
+            // freshly calculated content bounds are used immediately.
+            if (view.scr_subItems != null)
+                view.scr_subItems.verticalNormalizedPosition = 1f;
             itemCon.Refresh();
-            UiManager.Rebuild(gameObject, true);
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            }, gameObject);
         }
         public int GetDeepth(EntryItem item)
         {

@@ -26,10 +26,12 @@ namespace Z_Map.Analysis
         public Vector3 realPos;
         public List<NavUnit> links;
         public float[] dirMaxY;
+        public HashSet<int> passTypes;
     }
     public interface NaviComponent
     {
-        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius);
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
+            IReadOnlyCollection<int> passTypes);
     }
     public class NavigationController : Z_Controller<MapManager>
     {
@@ -89,6 +91,7 @@ namespace Z_Map.Analysis
                 navUnit.realPos = map.pos;
                 navUnit.pos = map.mapPos;
                 navUnit.isNull = map.scale == Vector3.zero;
+                navUnit.passTypes = new HashSet<int>(map.unit.passTypes);
                 navUnit.dirMaxY = new float[4]
                 {
                     map.unit.GetYByPoint(offset[0]),
@@ -351,9 +354,10 @@ namespace Z_Map.Analysis
                 (center.pos.x + offset.x, center.pos.y, center.pos.z + offset.y),
                 out unit);
         }
-        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius)
+        public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
+            IReadOnlyCollection<int> passTypes)
         {
-            var res = bfs.GetNextDir(cur, tar, maxStep, agentRadius);
+            var res = bfs.GetNextDir(cur, tar, maxStep, agentRadius, passTypes);
             res.y = 0;
             return res;
         }

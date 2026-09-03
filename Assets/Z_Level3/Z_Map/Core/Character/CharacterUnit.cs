@@ -13,6 +13,13 @@ namespace Z_Map
      
     public partial class CharacterUnit : MapUnit
     {
+        private readonly HashSet<int> _passTypes = new HashSet<int>();
+
+        /// <summary>
+        /// 此角色具备的通行类型。0 表示无限制，不进入该集合。
+        /// </summary>
+        public IReadOnlyCollection<int> passTypes => _passTypes;
+
         public CharacterUnit(CharacterUnitForm.Data data) : base(data)
         {
         }
@@ -37,6 +44,72 @@ namespace Z_Map
         public override Type GetInsType()
         {
             return typeof(CharacterInstance);
+        }
+
+        public void SetPassTypes(IEnumerable<int> values)
+        {
+            _passTypes.Clear();
+            if (values == null)
+                return;
+
+            foreach (int value in values)
+            {
+                if (value != 0)
+                    _passTypes.Add(value);
+            }
+        }
+
+        public bool CanPass(TileUnit tile)
+        {
+            if (tile == null)
+                return true;
+
+            foreach (int requiredType in tile.passTypes)
+            {
+                if (!_passTypes.Contains(requiredType))
+                    return false;
+            }
+            return true;
+        }
+
+        public Vector3 ClampMoveToPassType(Vector3 oldPos, Vector3 newPos)
+        {
+            Vector3 horizontalMove = newPos - oldPos;
+            horizontalMove.y = 0f;
+            if (horizontalMove.sqrMagnitude <= 0.00000001f)
+                return newPos;
+
+            // 兼容旧存档中出生在不满足条件地块上的角色：允许先离开该地块。
+            if (!CanOccupyByPassType(oldPos))
+                return newPos;
+
+            if (CanOccupyByPassType(newPos))
+                return newPos;
+
+            float low = 0f;
+            float high = 1f;
+            for (int i = 0; i < 10; i++)
+            {
+                float mid = (low + high) * 0.5f;
+                Vector3 candidate = Vector3.Lerp(oldPos, newPos, mid);
+                if (CanOccupyByPassType(candidate))
+                    low = mid;
+                else
+                    high = mid;
+            }
+
+            return Vector3.Lerp(oldPos, newPos, low);
+        }
+
+        private bool CanOccupyByPassType(Vector3 pos)
+        {
+            foreach (TileUnit tile in manager.utilCtrl.GetCharacterCollisionTiles(
+                         this, pos - data.pos, CollideType.All))
+            {
+                if (!CanPass(tile))
+                    return false;
+            }
+            return true;
         }
         public override void Show()
         {
@@ -70,7 +143,7 @@ namespace Z_Map
                     //首次激活nav时初始化计时器，避免立即触发脱困位移
                     if (lastNavMoveTime < 0f)
                         lastNavMoveTime = Time.time;
-                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis, GetNavigationRadius());
+                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis, GetNavigationRadius(), passTypes);
                     bool movedThisFrame = false;
                     if(avoidPos<=0)
                     {

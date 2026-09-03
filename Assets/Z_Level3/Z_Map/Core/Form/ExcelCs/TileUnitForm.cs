@@ -94,6 +94,8 @@ namespace Z_Map.Form
                 
         public static Action<Data,bool,bool> changeUnlockAction;
                 
+        public static Action<Data,int,int> changePasstypeAction;
+                
 
 
         public partial class Data : UnitForm.Data
@@ -182,11 +184,29 @@ namespace Z_Map.Form
                  
                      }
                     
+                    private int  _passType;
+                    /// <summary>
+                    ///通过类型
+                    ///</summary>
+                    public int  passType{
+                                get{return _passType;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangePasstype(this,_passType,value); 
+                    }
+        
+                _passType = value;
+                }
+                 
+                     }
+                    
             public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
             
-            public Data(int uid,string name,Dictionary<int,int> texDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,bool unlock):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
+            public Data(int uid,string name,Dictionary<int,int> texDic,Vector3Int mapPos,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,bool unlock,int passType):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -202,6 +222,7 @@ namespace Z_Map.Form
              this.extra = extra;
              this.enteredScene = enteredScene;
              this.unlock = unlock;
+             this.passType = passType;
 
                     _unit=new TileUnit(this);
 
@@ -222,11 +243,12 @@ namespace Z_Map.Form
              this.extra = data.extra;
              this.enteredScene = data.enteredScene;
              this.unlock = data.unlock;
+             this.passType = data.passType;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,texDic==null?new Dictionary<int,int>():new Dictionary<int,int>(texDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,unlock);
+        return new Data(sameId? uid:uidChain.GetId(),name,texDic==null?new Dictionary<int,int>():new Dictionary<int,int>(texDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,unlock,passType);
                 }
             
             public override  void BeforeGet()
@@ -236,7 +258,7 @@ namespace Z_Map.Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,false);
+                   private static Data _defaultData=new Data(0,"",new Dictionary<int,int>(){},Vector3Int.zero,"",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,false,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -361,7 +383,9 @@ namespace Z_Map.Form
 
                 jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene"),
 
-                jo.SelectToken("unlock")==null?defaultData.unlock:jo.Get<bool>("unlock")
+                jo.SelectToken("unlock")==null?defaultData.unlock:jo.Get<bool>("unlock"),
+
+                jo.SelectToken("passType")==null?defaultData.passType:jo.Get<int>("passType")
                     );
 
             return data;
@@ -399,6 +423,8 @@ namespace Z_Map.Form
             jo.Set<bool>("enteredScene",data.enteredScene);
 
             jo.Set<bool>("unlock",data.unlock);
+
+            jo.Set<int>("passType",data.passType);
 
             return jo;
         }
@@ -617,6 +643,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeUnlockAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePasstype(Data superData,int oldV,int newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePasstypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

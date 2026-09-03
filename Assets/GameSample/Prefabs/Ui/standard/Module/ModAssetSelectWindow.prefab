@@ -1367,8 +1367,12 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 26a9a3082d2c0be439adfb42864a1b39, type: 3}
     - target: {fileID: 6373986811067304439, guid: 22d26888e56088549b4fa113573edeb2, type: 3}
       propertyPath: m_fontSize
-      value: 36.35
+      value: 23.75
       objectReference: {fileID: 0}
+    - target: {fileID: 6480410667502243522, guid: 22d26888e56088549b4fa113573edeb2, type: 3}
+      propertyPath: parent
+      value: 
+      objectReference: {fileID: 5423354900220170574}
     - target: {fileID: 7742053546253195392, guid: 22d26888e56088549b4fa113573edeb2, type: 3}
       propertyPath: m_SizeDelta.x
       value: 212.2031
@@ -2041,6 +2045,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: scr_labs
       objectReference: {fileID: 0}
+    - target: {fileID: 5391441833639603568, guid: 46403b387f258f1439fefc38b40bbf96, type: 3}
+      propertyPath: parent
+      value: 
+      objectReference: {fileID: 5423354900220170574}
     - target: {fileID: 8637228248310376344, guid: 46403b387f258f1439fefc38b40bbf96, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100.388

@@ -634,15 +634,22 @@ namespace Z_Code
                 var cmd = cmdTemplate.GetNew();
                 var form = cmd.GetForm();
                 int expectedParameterCount = form.prmNames == null ? 0 : form.prmNames.Count;
-                if (parameterCount != expectedParameterCount)
+                if (parameterCount > expectedParameterCount)
                 {
-                    throw new InvalidOperationException($"命令 {funcName} 需要 {expectedParameterCount} 个参数，实际为 {parameterCount} 个");
+                    throw new InvalidOperationException($"命令 {funcName} 最多接受 {expectedParameterCount} 个参数，实际为 {parameterCount} 个");
                 }
 
-                var parameters = new BoxDataForm.Data[parameterCount];
+                var parameters = new BoxDataForm.Data[expectedParameterCount];
+                int missingParameterCount = expectedParameterCount - parameterCount;
+                for (int i = 0; i < missingParameterCount; i++)
+                {
+                    // CmdBase reverses the array immediately before execution. Prefixing here therefore
+                    // appends omitted arguments after the caller-supplied arguments in source order.
+                    parameters[i] = CodeHelper.CreateBoxByStr(string.Empty);
+                }
                 for (int i = 0; i < parameterCount; i++)
                 {
-                    parameters[i] = GetBox(data.stack[data.top - i - 1]);
+                    parameters[missingParameterCount + i] = GetBox(data.stack[data.top - i - 1]);
                 }
 
                 if (!asyncTask.IsRuning() && !asyncTask.IsComplete())

@@ -89,7 +89,7 @@ namespace Ui.ModStoryEventEditWindow
                 int curRender = model.prm.con.GetNowRenderId();
                 foreach (var sub in model.prm.node.subNodes)
                 {
-                    if (sub.desc.type == CodeType.Action)
+                    if (sub.desc.type == CodeType.Action && !SyntaxAnalysis.IsEmptyNode(sub))
                     {
                         model.prm.con.Add(new UiItemParam()
                         {
@@ -133,6 +133,10 @@ namespace Ui.ModStoryEventEditWindow
 
         public string GetNodeDesc(SyntaxNode node)
         {
+            if (SyntaxAnalysis.IsEmptyArgumentNode(node))
+            {
+                return string.Empty;
+            }
 
             string res = "";
             switch (node.desc.type)

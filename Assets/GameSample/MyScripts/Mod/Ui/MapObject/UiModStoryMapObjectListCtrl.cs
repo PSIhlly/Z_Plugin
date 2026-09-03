@@ -293,10 +293,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                 return texData.texs[0];
             if (data is MapMaskForm.Data maskData && maskData.texsName != null && maskData.texsName.Count > 0)
                 return maskData.texsName[0];
-            if (data is MapObjectForm.Data objData && objData.model != null
-                && objData.model.subUnitTexsName != null && objData.model.subUnitTexsName.Count > 0
-                && objData.model.subUnitTexsName[0] != null && objData.model.subUnitTexsName[0].Count > 0)
-                return objData.model.subUnitTexsName[0][0];
+            if (data is MapObjectForm.Data objData)
+            {
+                var clip = objData.GetAnimClip(objData.GetDefaultAnimDirection());
+                if (clip.Count > 0)
+                    return clip[0];
+            }
             return 0;
         }
     }

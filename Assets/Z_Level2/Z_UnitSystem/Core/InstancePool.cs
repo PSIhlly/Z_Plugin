@@ -10,17 +10,20 @@ namespace Z_UnitSystem
     {
         public readonly GameObject prefab;
         public MaterialPropertyBlock[] blocks;
+        private readonly bool[] rendererActiveStates;
         private Transform root;
         public InstancePool(GameObject prefab,Transform root)
         {
             this.prefab = prefab;
             this.root = root;
-            var renders = prefab.GetComponentsInChildren<Renderer>();
+            var renders = prefab.GetComponentsInChildren<Renderer>(true);
             blocks = new MaterialPropertyBlock[renders.Length];
+            rendererActiveStates = new bool[renders.Length];
             for (int i=0;i<renders.Length;i++)
             {
                 blocks[i] = new MaterialPropertyBlock();
                 renders[i].GetPropertyBlock(blocks[i]);
+                rendererActiveStates[i] = renders[i].gameObject.activeSelf;
             }
         }
         public override void Clear(GameObject obj)
@@ -47,9 +50,10 @@ namespace Z_UnitSystem
 
         public override void Fresh(GameObject obj)
         {
-            var renders = obj.GetComponentsInChildren<Renderer>();
+            var renders = obj.GetComponentsInChildren<Renderer>(true);
             for(int i=0;i< renders.Length;i++)
             {
+                renders[i].gameObject.SetActive(rendererActiveStates[i]);
                 renders[i].SetPropertyBlock(blocks[i]);
             }
             obj.gameObject.SetActive(true);

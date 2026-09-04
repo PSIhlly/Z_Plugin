@@ -216,7 +216,8 @@ namespace Ui.Notify
         }
         public void Refresh()
         {
-            view.txt_.text = model.cur.content;
+            view.txt_.languageTranslatable = false;
+            view.txt_.oriText = model.cur.content;
             view.img_.sprite = model.cur.sprite;
             view.sta_sel.ChangeState(parent.parent.model.sel.IsChildOf(model.cur)? 1:0);
         }
@@ -252,7 +253,8 @@ namespace Ui.Notify
         }
         public void Refresh()
         {
-            view.txt_.text= model.cur.content;
+            view.txt_.languageTranslatable = false;
+            view.txt_.oriText = model.cur.content;
             view.img_.sprite = model.cur.sprite;
             view.sta_sel.ChangeState(parent.model.sel.IsChildOf(model.cur) ? 1 : 0);
         }

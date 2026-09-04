@@ -39,7 +39,6 @@ namespace Z_Code
                     GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);
                     MapManager.instance.updateCtrl.UpdateSingleOne(newObjectData.unit);
                     asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, newObjectData.uid.ToString())) };
-                    Debug.Log(Time.frameCount+"A");
                     return true;
                 }
             }

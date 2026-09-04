@@ -2,6 +2,7 @@ using Form;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Ui.CmdInputArea;
 using Ui.ModSceneMenu;
 using UnityEngine;
 using Z_Map;
@@ -91,16 +92,10 @@ namespace Ui.ModSceneMain
             });
             view.btn_modCmd.onClick.AddListener(() =>
             {
-                NotifyManager.instance.AddInputArea("ModCmd", true, command =>
+                UiManager.instance.ShowUi<UiCmdInputAreaCtrl>(new UiCmdInputAreaParam
                 {
-                    if (string.IsNullOrWhiteSpace(command))
-                        return false;
-
-                    bool success = ModCmd.TryExecute(command.Trim(), ModCmdScope.Scene, out string result);
-                    NotifyManager.instance.AddTip(result);
-                    if (success)
-                        Refresh();
-                    return success;
+                    scope = ModCmdScope.Scene,
+                    onSuccess = Refresh
                 });
             });
             view.btn_view.onClick.AddListener(() =>

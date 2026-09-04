@@ -1,1 +1,78 @@
-[]
+[
+  {
+    "uid": 7,
+    "name": "血瓶",
+    "labId": 0,
+    "iconTexName": 49,
+    "paramDic": [],
+    "protoUid": 0,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.4|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 49
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "desc": "加50点血",
+    "amount": 1,
+    "maxAmountPer": 99,
+    "equip": 0,
+    "styleTex": [
+      {
+        "k": 0,
+        "v": 49
+      },
+      {
+        "k": 1,
+        "v": 49
+      },
+      {
+        "k": 2,
+        "v": 49
+      }
+    ],
+    "price": 0,
+    "canEquipe": false,
+    "events": [
+      {
+        "k": "onUseEvent",
+        "v": {
+          "uid": -1,
+          "name": "onUseEvent",
+          "evt": [
+            {
+              "v": 16
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "isConsume": true,
+    "paramDicCharacter": [],
+    "minimapIcon": 210000
+  }
+]

@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Editor\TxtEditor.cs" />
+    <Compile Include="Assets\Z_Level4\Z_Editor\Editor\FindReference\FindReference.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Editor\ScrViewEditor.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Editor\UiHolderEditor.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Editor\ImgEditor.cs" />

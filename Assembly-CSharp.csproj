@@ -145,6 +145,7 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Btn.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Character\GetCharacterRightVectorCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\PlayAssetController.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiCmdInputAreaBase.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemInstance.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\Tips\UiNotifyCtrl.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiModStoryItemListModelBase.cs" />
@@ -280,6 +281,7 @@
     <Compile Include="Assets\GameSample\MyScripts\Util\DisplayCameraAreaManager.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Ui\Dialog\ShowDialogCmd.cs" />
     <Compile Include="Assets\Z_Level2\Z_Text\Core\TextManager.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiCmdInputAreaCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Image\SetImagePositionCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Ui\Dialog\ShowVideoCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\VarCmd.cs" />

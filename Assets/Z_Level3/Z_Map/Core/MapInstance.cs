@@ -31,6 +31,11 @@ namespace Z_Map
                 return _keepers;
             }
         }
+        protected virtual bool IsRendererVisibleInDisplayLayer(int rendererIndex)
+        {
+            return rendererIndex <= displayLayer;
+        }
+
         public override void VisOn()
         {
 
@@ -40,12 +45,13 @@ namespace Z_Map
             for (int i = 0; i < renderers.Length; i++)
             {
                 var render = renderers[i];
+                var isVisible = IsRendererVisibleInDisplayLayer(i);
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 render.GetPropertyBlock(propBlock);
-                propBlock.SetFloat("_Show", i <= displayLayer ? 1 : 0);
-                degree = i <= displayLayer ? 1 : 0;
+                propBlock.SetFloat("_Show", isVisible ? 1 : 0);
                 render.SetPropertyBlock(propBlock);
             }
+            degree = 1;
         }
         public override void VisDegree(float degree)
         {
@@ -54,7 +60,7 @@ namespace Z_Map
                 return;
             for (int i = 0; i < renderers.Length; i++)
             {
-                if (i > displayLayer)
+                if (!IsRendererVisibleInDisplayLayer(i))
                     continue;
                 var render = renderers[i];
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();

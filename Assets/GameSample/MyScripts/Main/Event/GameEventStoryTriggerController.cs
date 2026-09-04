@@ -90,6 +90,11 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
                 _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onLostItemEvent${evt.data.uid}", null), 0, heap);
                 _super.TriggerEventExecute(GameManager.instance.curScene.events.GetDv($"onLostItemEvent$", null), 0, heap);
                 break;
+            case StoryItemEventType.Use:
+                heap["target"] = heap["self"];
+                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, GameManager.instance.curProgress.characterUid.ToString()));
+                _super.TriggerEventExecute(evt.data.events.GetDv("onUseEvent", null), evt.data.uid, heap);
+                break;
         }
     }
 

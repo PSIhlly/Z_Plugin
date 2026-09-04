@@ -3330,8 +3330,8 @@ namespace ModStoryItemUnitConfig
     public partial class UiModStoryItemUnitConfigView:UiView
     {
 
-            public GameObject go_equip;
             public GameObject go_minimap;
+            public GameObject go_equipToggle;
             public Sta sta_equip;
             public UiEventChooseCtrl model_EventChooseCharacterTouch;
             public UiEventChooseCtrl model_EventChooseCharacterLeave;
@@ -3358,8 +3358,8 @@ namespace ModStoryItemUnitConfig
         public UiModStoryItemUnitConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_equip = uiHolder.elementTrsLst[0].gameObject;
-            go_minimap = uiHolder.elementTrsLst[1].gameObject;
+            go_minimap = uiHolder.elementTrsLst[0].gameObject;
+            go_equipToggle = uiHolder.elementTrsLst[1].gameObject;
             sta_equip = uiHolder.elementTrsLst[2].GetComponent<Sta>();
             model_EventChooseCharacterTouch = (UiEventChooseCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             model_EventChooseCharacterLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
@@ -3846,7 +3846,6 @@ namespace ModStoryMapObjectPassType
             public Btn btn_new;
             public Ipt ipt_name;
             public Btn btn_delete;
-            public Sta sta_delete;
         public UiBigItemView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -3856,7 +3855,6 @@ namespace ModStoryMapObjectPassType
             btn_new = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
             btn_delete = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            sta_delete = uiHolder.elementTrsLst[6].GetComponent<Sta>();
         }
 
     }

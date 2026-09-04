@@ -325,8 +325,10 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
         if (!bagName2UidDic.ContainsKey(item.name))
             bagName2UidDic[item.name] = new List<int>();
-        foreach (var mineUid in bagName2UidDic[item.name])
+        var itemUids = bagName2UidDic[item.name];
+        for (int i = 0; i < itemUids.Count && item.amount > 0;)
         {
+            var mineUid = itemUids[i];
             var old = ItemProductForm.DataByUid[mineUid];
             var lost = Mathf.Min(old.amount, item.amount);
             item.amount -= lost;
@@ -334,9 +336,13 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
             if (old.amount <= 0)
             {
-                bagName2UidDic[item.name].Remove(old.uid);
+                itemUids.RemoveAt(i);
                 GameManager.instance.curProgress.bag.Remove(old.uid);
                 old.DestroyProduct();
+            }
+            else
+            {
+                i++;
             }
         }
         item.amount = (amount - item.amount);

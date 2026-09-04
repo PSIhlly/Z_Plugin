@@ -71,8 +71,11 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
         }
         public void Refresh()
         {
-            view.sta_canEquipped.ChangeState(model.data.canEquipe ? 1 : 0);
+            view.go_equipToggle.SetActive(GameManager.instance.curProgress.enableEquip);
+            view.sta_canEquipped.ChangeState(model.data.canEquipe? 1 : 0);
             view.sta_equip.ChangeState(model.data.canEquipe ? 1 : 0);
+            
+
             view.sta_isConsume.ChangeState(model.data.isConsume ? 1 : 0);
 
 
@@ -94,7 +97,6 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
 
             view.model_EventChooseLeaveScene.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onLeaveSceneEvent" });
 
-            view.go_equip.SetActive(GameManager.instance.curProgress.enableEquip);
 
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
             view.img_minimapIcon.BindTexData(TexAssetForm.DataById.GetDv(model.data.minimapIcon, TexAssetForm.DataById[GlobalDefaultHelper.DefaultStoryTexId]));

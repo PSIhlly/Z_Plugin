@@ -25,6 +25,8 @@ namespace Z_Ui.Base
     public class Txt : TextMeshProUGUI, ITextPreprocessor
     {
         private string _oriTxt;
+        private string _runtimeText;
+        private bool hasRuntimeTextOverride;
         private bool suppressImageRefresh;
         public string oriText
         {
@@ -35,6 +37,8 @@ namespace Z_Ui.Base
             set
             {
                 _oriTxt = value;
+                _runtimeText = null;
+                hasRuntimeTextOverride = false;
 
                 Refresh();
 
@@ -55,6 +59,12 @@ namespace Z_Ui.Base
                     base.text = value;
                     return;
                 }
+
+                // Assigning text is an explicit raw runtime override. Keep it
+                // across pooling/OnEnable; assigning oriText switches back to
+                // the translatable source-text path.
+                _runtimeText = value;
+                hasRuntimeTextOverride = true;
 
                 if (imageEnable)
                 {
@@ -127,8 +137,8 @@ namespace Z_Ui.Base
             HideImages();
             sprites.Clear();
 
-            var sourceText = oriText;
-            if (languageTranslatable)
+            var sourceText = hasRuntimeTextOverride ? _runtimeText : oriText;
+            if (!hasRuntimeTextOverride && languageTranslatable)
             {
                 sourceText = TextManager.instance.GetTxt(oriText);
             }

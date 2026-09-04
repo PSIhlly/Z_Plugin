@@ -220,16 +220,12 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             });
             itemCon.Refresh();
 
-            view.go_show.SetActive(model.data != null);
             if (model.data != null)
             {
                 view.txt_name.text = model.data.name;
-                view.txt_desc.languageTranslatable = false;
-                // Keep the source text in sync as this view is reused for
-                // different events. This also clears/rebuilds any inline
-                // images left by the previously selected event.
-                view.txt_desc.oriText = model.data.code;
+                view.txt_desc.text = model.data.code;
             }
+            view.go_show.SetActive(model.data != null);
 
         }
         public void Sel(string cat = null, string type = null, EventProgramDataForm.Data data = null)
@@ -303,12 +299,18 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public void Refresh()
         {
+            view.txt_.text = model.isNew
+                ? TextManager.instance.GetTxt("new")
+                : model.cat == null
+                    ? TextManager.instance.GetTxt("all")
+                    : string.IsNullOrEmpty(model.cat)
+                        ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab)
+                        : model.cat;
 
             if (model.isNew)
             {
                 view.sta_state.ChangeState(UiLabRenderHelper.NewState);
                 view.sta_.ChangeState(0);
-                view.txt_.text = TextManager.instance.GetTxt("new");
                 return;
             }
 
@@ -318,11 +320,6 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
                     ? UiLabRenderHelper.UnclassifiedState
                     : UiLabRenderHelper.LabState);
             view.sta_.ChangeState(model.cat == parent.model.cat ? 1 : 0);
-            view.txt_.text = model.cat == null
-                ? TextManager.instance.GetTxt("all")
-                : string.IsNullOrEmpty(model.cat)
-                    ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab)
-                    : model.cat;
         }
     }
 
@@ -359,12 +356,18 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public void Refresh()
         {
+            view.txt_.text = model.isNew
+                ? TextManager.instance.GetTxt("new")
+                : model.type == null
+                    ? TextManager.instance.GetTxt("all")
+                    : string.IsNullOrEmpty(model.type)
+                        ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab)
+                        : model.type;
 
             if (model.isNew)
             {
                 view.sta_state.ChangeState(UiLabRenderHelper.NewState);
                 view.sta_.ChangeState(0);
-                view.txt_.text = TextManager.instance.GetTxt("new");
                 return;
             }
 
@@ -374,11 +377,6 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
                     ? UiLabRenderHelper.UnclassifiedState
                     : UiLabRenderHelper.LabState);
             view.sta_.ChangeState(model.type == parent.model.type ? 1 : 0);
-            view.txt_.text = model.type == null
-                ? TextManager.instance.GetTxt("all")
-                : string.IsNullOrEmpty(model.type)
-                    ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab)
-                    : model.type;
         }
     }
     public partial class UiItemParam
@@ -418,14 +416,15 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
         public void Refresh()
         {
-            view.sta_state.ChangeState(model.data == null
+            bool isNew = model.data == null;
+            view.txt_.text = isNew
+                ? TextManager.instance.GetTxt("new")
+                : model.data.name;
+
+            view.sta_state.ChangeState(isNew
                 ? UiLabRenderHelper.NewState
                 : UiLabRenderHelper.LabState);
-            if (model.data != null)
-            {
-                view.sta_.ChangeState(parent.model.data == model.data ? 1 : 0);
-                view.txt_.text = model.data.name;
-            }
+            view.sta_.ChangeState(!isNew && parent.model.data == model.data ? 1 : 0);
         }
     }
 

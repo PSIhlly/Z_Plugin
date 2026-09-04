@@ -57,6 +57,8 @@ Story and scene transitions must coordinate:
 5. Load or copy logical map data from Core/Save/Cache.
 6. Begin Map and the target mode.
 
+`ModStory` Test/Play must show `UiLoading` and allow it to render for one frame before synchronous story save/unload work begins. Keep a transition-owned loading item active until `PlayManager`/scene loading has registered its own loading items, so the loading UI cannot flicker closed between phases.
+
 Test consecutive stories and repeated mode entry; many failures are stale singleton, listener, Form, or cache state rather than local logic.
 
 ## UiHolder generation model
@@ -125,7 +127,7 @@ Rules:
 - Render Model → View in a dedicated `Refresh()` method; avoid hidden writes while rendering.
 - Check `active` before refreshing a hidden UI from a global event.
 - Use `UiManager.ShowUi<T>`, `CloseUi<T>`, and existing containers instead of manually instantiating UI prefabs.
-- `Txt.languageTranslatable` treats `oriText` and serialized/overridden `m_text` as exact translation keys; include prefab-variant overrides in translation audits.
+- `Txt.languageTranslatable` treats `oriText` and serialized/overridden `m_text` as exact translation keys; include prefab-variant overrides in translation audits. Assigning `Txt.text` creates a raw runtime override that survives `OnEnable` and pooling, while assigning `oriText` clears that override and returns to the translatable source-text path. Use `oriText` for translation keys and `text` for runtime-authored literal content.
 - `TextBaseForm.DataByKey` is shared by CommonText and ModText. Keep keys globally unique, put runtime/shared UI keys in CommonText, and reserve ModText for Mod-only UI.
 - Translate chooser titles exactly once. Render user-authored code/text raw, and translate only the stable prefix of composite trigger keys before `$`.
 - After changing dynamic TMP text when its RectTransform size is needed immediately, call `UiManager.Rebuild` on the active layout root. It synchronizes descendant `TMP_InputField` labels and `TMP_Text` meshes before rebuilding the layout; pass `recursion: true` for nested ContentSizeFitter/LayoutGroup chains.
@@ -156,6 +158,8 @@ Rules:
 Core command infrastructure is under `Assets/Z_Level2/Z_Code/Core`; product commands are under `Assets/GameSample/MyScripts/Main/Event/Cmd`.
 
 `ModCmd` UI entry points use explicit execution scopes: ModStory accepts Form/story-data operations, while ModScene accepts only `*Scene*` operations. Enforce the scope inside `ModCmd` before parsing or mutating data; UI-only filtering is insufficient.
+
+Both entry points open the shared top-level `UiCmdInputAreaCtrl`. Its Tips button resolves the `storyCmdTips` or `sceneCmdTips` ModText key for the active scope and shows the translated command reference in a scrollable Popup. Keep those two table entries synchronized with supported command names and editable `SetStory*` JSON fields.
 
 When adding a command:
 

@@ -5,14 +5,17 @@ using System.Collections;
 using System.Collections.Generic;
 using Ui.Loading;
 using Ui.Mod;
+using Ui.CmdInputArea;
 using Ui.ModStory.ModStoryMission;
 using Ui.ModStoryEditorStyleWindow;
 using UnityEngine;
 using Z_DataSystem;
 using Z_Text;
 using Z_Texture;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
+using Z_Ui.Loading;
 using Z_Ui.Notify;
 
 namespace Ui.ModStory
@@ -20,9 +23,11 @@ namespace Ui.ModStory
     public partial class UiModStoryModel
     {
         public UiCtrl curUi;
+        public bool startingTest;
     }
     public partial class UiModStoryCtrl
     {
+        private const string TestLoadingItem = "modStoryTest";
 
         public override void OnCreate()
         {
@@ -34,11 +39,33 @@ namespace Ui.ModStory
             });
             view.btn_play.onClick.AddListener(() =>
             {
-                GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
-                Close();
+                if (model.startingTest)
+                    return;
+
                 int curId = GameManager.instance.curStory.id;
-                Main2StoryManager.instance.UnloadStoryUgc();
-                Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
+                model.startingTest = true;
+                LoadingManager.instance.AddLoadItem(TestLoadingItem);
+
+                // Let the loading UI finish one render before starting the
+                // synchronous save/unload work that can stall the main thread.
+                TimeManager.instance.AddCurFrameEndWithoutCheckAction(() =>
+                {
+                    TimeManager.instance.AddNextUpdateWithoutCheckAction(() =>
+                    {
+                        try
+                        {
+                            GameManager.instance.saveCtrl.SaveCoreStory(curId);
+                            Close();
+                            Main2StoryManager.instance.UnloadStoryUgc();
+                            Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
+                        }
+                        finally
+                        {
+                            LoadingManager.instance.RemoveLoadItem(TestLoadingItem);
+                            model.startingTest = false;
+                        }
+                    });
+                });
 
             });
             view.btn_save.onClick.AddListener(() =>
@@ -48,16 +75,10 @@ namespace Ui.ModStory
             });
             view.btn_modCmd.onClick.AddListener(() =>
             {
-                NotifyManager.instance.AddInputArea("ModCmd", true, command =>
+                UiManager.instance.ShowUi<UiCmdInputAreaCtrl>(new UiCmdInputAreaParam
                 {
-                    if (string.IsNullOrWhiteSpace(command))
-                        return false;
-
-                    bool success = ModCmd.TryExecute(command.Trim(), ModCmdScope.Story, out string result);
-                    NotifyManager.instance.AddTip(result);
-                    if (success)
-                        Refresh();
-                    return success;
+                    scope = ModCmdScope.Story,
+                    onSuccess = Refresh
                 });
             });
             view.btn_delete.onClick.AddListener(() =>

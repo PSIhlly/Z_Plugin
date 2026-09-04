@@ -20,6 +20,7 @@
 - Event-editor Cmd parameter replacement compiles one expression as a temporary terminated statement. Add the missing trailing semicolon only in that single-node editor path; complete stored event programs continue to require explicit statement terminators.
 - Recompile each complete ef record from source after code-generation changes. Keep zCode and zCodeMap counts equal.
 - `onTileTouchEvent` is a unit-owned scene trigger fired when a moving MapUnit enters a Tile physical Collider. Its heap exposes the moving unit as `self` and the Tile as `target`, both using the existing scene-object handle format; map-edge contact remains `onBoundaryTouchEvent`.
+- An Item Product's `onUseEvent` is dispatched when the backpack uses that item. Its heap exposes the current Character Product as `self` and the used Item Product as `target`; execute it with the used Item Product UID as the trigger owner so per-owner trigger modes remain isolated.
 - The `SceneObject` and `Item` constant commands use the same chooser path as other wrapped constants: `SceneObject` wraps a current scene Object/Item unit UID as `$so$uid$so$`, while `Item` wraps an ItemProduct UID as `$it$uid$it$`.
 
 ## Limits and validation

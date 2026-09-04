@@ -43,6 +43,7 @@
         }
       }
     ],
+    "triggeringOnceDuringEvts": [],
     "triggeredOnceEvts": [],
     "notFirstTime": false
   }

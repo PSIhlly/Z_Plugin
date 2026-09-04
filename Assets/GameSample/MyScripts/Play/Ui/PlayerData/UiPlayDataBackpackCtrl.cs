@@ -22,7 +22,7 @@ namespace Ui.PlayDataBackpack
         public ItemProductForm.Data sel;
         public int? labId;
     }
-    public partial class UiPlayDataBackpackCtrl
+    public partial class UiPlayDataBackpackCtrl : IZ_Listener<StoryItemEvent>
     {
 
         UiScrViewContainer<UiGameItemCtrl> itemCon;
@@ -94,9 +94,21 @@ namespace Ui.PlayDataBackpack
         }
         public override void OnShow()
         {
+            this.Register<StoryItemEvent>();
             model.labId = HasUnclassified() ? LabForm.NoneId : (int?)null;
             model.sel = null;
             Refresh();
+        }
+        public override void OnHide()
+        {
+            this.Unregister<StoryItemEvent>();
+        }
+        public void OnEvent(StoryItemEvent evt)
+        {
+            if (active)
+            {
+                Refresh();
+            }
         }
         bool HasUnclassified()
         {
@@ -106,6 +118,19 @@ namespace Ui.PlayDataBackpack
         }
         public void Refresh()
         {
+            if (model.sel != null)
+            {
+                if (!GameManager.instance.curProgress.bag.Contains(model.sel.uid) ||
+                    !ItemProductForm.DataByUid.TryGetValue(model.sel.uid, out var selected))
+                {
+                    model.sel = null;
+                }
+                else
+                {
+                    model.sel = selected;
+                }
+            }
+
             var hasUnclassified = HasUnclassified();
             if (model.labId == LabForm.NoneId && !hasUnclassified)
                 model.labId = null;

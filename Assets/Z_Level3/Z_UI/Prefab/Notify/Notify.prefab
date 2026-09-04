@@ -32,8 +32,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5462428485166432310}
   - {fileID: 2474303551479676585}
+  - {fileID: 5462428485166432310}
   m_Father: {fileID: 5195805738712941273}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Label
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 3666178644676843896}
@@ -197,6 +198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: InputArea
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 1614467867034934810}
@@ -282,8 +284,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 539196940513700503}
   - {fileID: 1890490273717393209}
+  - {fileID: 539196940513700503}
   m_Father: {fileID: 2815507054172754294}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -341,6 +343,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: SubItem
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 7581341612324926456}
@@ -616,6 +619,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Popup
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 1614467867034934810}
@@ -768,6 +772,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Notify
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 0}
@@ -883,6 +888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Tip
   path: \Z_Level3\Z_UI\Sample\Ui\UiBase
   parent: {fileID: 1614467867034934810}
@@ -1021,6 +1027,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Selection
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 1614467866672078582}
@@ -1353,6 +1360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: QuickItem
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 7039422851965084946}
@@ -1730,6 +1738,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: MultipleChoose
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 1614467867034934810}
@@ -2062,6 +2071,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Column
   path: \GameSample\UiBase
   parent: {fileID: 7581341612324926456}
@@ -2505,6 +2515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Choose
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 1614467867034934810}
@@ -3162,6 +3173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: QuickChoose
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 1614467867034934810}
@@ -3263,6 +3275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd567c6ff12180d4d8c28926a7cb57ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preloadConfig: {fileID: 0}
   uiName: Item
   path: \Z_Level3\Z_UI\Ui\UiBase
   parent: {fileID: 8537747419153652977}

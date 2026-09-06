@@ -43,28 +43,65 @@ namespace Z_Map
         private Vector3 lastPos;
         private Vector3 lastEuler;
         private Vector3 lastScale;
+        // Bake geometry around the origin; translation reuses the world arrays.
+        private readonly List<MeshInfo> collisionOffsets = new List<MeshInfo>();
 
         public Dictionary<CollideType,List<MeshInfo>> _zMeshes;
+        public void InvalidateCollisionGeometry()
+        {
+            _zMeshes = null;
+            collisionOffsets.Clear();
+        }
+
         public List<MeshInfo> GetMeshes(CollideType type)
         {
-            if (_zMeshes == null
+            bool rebuild = _zMeshes == null
                 || lastPrefabName != data.prefabName
-                || lastPos != data.pos
                 || lastEuler != data.euler
-                || lastScale != data.scale)
+                || lastScale != data.scale;
+            if (rebuild)
             {
                 lastPrefabName = data.prefabName;
-                lastPos = data.pos;
                 lastEuler = data.euler;
                 lastScale = data.scale;
+                var sourcePrefab = prefab;
+                collisionOffsets.Clear();
                 _zMeshes = new Dictionary<CollideType, List<MeshInfo>>();
-                _zMeshes[CollideType.CollideOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.CollideOnly);
-                _zMeshes[CollideType.TriggerOnly] = MapManager.instance.utilCtrl.GetCollidersMesh(prefab, data.pos, data.euler, data.scale, CollideType.TriggerOnly);
+                CacheCollisionGeometry(sourcePrefab, CollideType.CollideOnly);
+                CacheCollisionGeometry(sourcePrefab, CollideType.TriggerOnly);
                 _zMeshes[CollideType.All] = new List<MeshInfo>();
                 _zMeshes[CollideType.All].AddRange(_zMeshes[CollideType.CollideOnly]);
                 _zMeshes[CollideType.All].AddRange(_zMeshes[CollideType.TriggerOnly]);
             }
+            if (rebuild || lastPos != data.pos)
+            {
+                lastPos = data.pos;
+                var meshes = _zMeshes[CollideType.All];
+                for (int i = 0; i < meshes.Count; i++)
+                {
+                    var offset = collisionOffsets[i];
+                    var mesh = meshes[i];
+                    mesh.center = offset.center + lastPos;
+                    for (int j = 0; j < mesh.positions.Length; j++)
+                        mesh.positions[j] = offset.positions[j] + lastPos;
+                }
+            }
             return _zMeshes[type];
+        }
+
+        private void CacheCollisionGeometry(GameObject sourcePrefab, CollideType type)
+        {
+            var offsets = manager.utilCtrl.GetCollidersMesh(
+                sourcePrefab, Vector3.zero, lastEuler, lastScale, type);
+            collisionOffsets.AddRange(offsets);
+            var meshes = new List<MeshInfo>(offsets.Count);
+            foreach (var offset in offsets)
+                meshes.Add(new MeshInfo
+                {
+                    type = offset.type,
+                    positions = new Vector3[offset.positions.Length]
+                });
+            _zMeshes[type] = meshes;
         }
         
         public void Create()

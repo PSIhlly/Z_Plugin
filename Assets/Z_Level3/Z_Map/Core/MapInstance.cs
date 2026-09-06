@@ -13,6 +13,22 @@ namespace Z_Map
             get { return (MapUnit)base.unit; }
         }
         private float degree = 0;
+        private static readonly int ShowProperty = Shader.PropertyToID("_Show");
+        private MaterialPropertyBlock visionBlock;
+        private bool visionApplied;
+        private int appliedDisplayLayer;
+        private Unit visionOwner;
+
+        protected virtual void OnEnable()
+        {
+            // Pool refresh restores the prefab's property blocks before reuse.
+            visionApplied = false;
+        }
+
+        protected virtual void OnDisable()
+        {
+            visionApplied = false;
+        }
 
         public Timer[] animTimer = new Timer[6];
         private PerspectiveKeeper[] _keepers;
@@ -38,53 +54,42 @@ namespace Z_Map
 
         public override void VisOn()
         {
-
-            if (vising)
-                return;
-            vising = true;
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                var render = renderers[i];
-                var isVisible = IsRendererVisibleInDisplayLayer(i);
-                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                render.GetPropertyBlock(propBlock);
-                propBlock.SetFloat("_Show", isVisible ? 1 : 0);
-                render.SetPropertyBlock(propBlock);
-            }
-            degree = 1;
+            ApplyVision(vising && degree > 0f ? degree : 1f);
         }
         public override void VisDegree(float degree)
         {
-
-            if (degree == this.degree)
-                return;
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                if (!IsRendererVisibleInDisplayLayer(i))
-                    continue;
-                var render = renderers[i];
-                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                render.GetPropertyBlock(propBlock);
-                propBlock.SetFloat("_Show", degree);
-                render.SetPropertyBlock(propBlock);
-            }
-            this.degree = degree;
-
+            ApplyVision(degree);
         }
         public override void VisOff()
         {
-            if (!vising)
+            ApplyVision(0f);
+        }
+
+        /// <summary>Submit only a changed final visibility state, including display-layer/pool changes.</summary>
+        public void ApplyVision(float value)
+        {
+            value = Mathf.Clamp01(value);
+            bool visible = value > 0f;
+            if (visionApplied && degree == value && vising == visible
+                && appliedDisplayLayer == displayLayer && visionOwner == base.unit)
                 return;
-            vising = false;
+
+            if (visionBlock == null)
+                visionBlock = new MaterialPropertyBlock();
             for (int i = 0; i < renderers.Length; i++)
             {
                 var render = renderers[i];
-                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                render.GetPropertyBlock(propBlock);
-                propBlock.SetFloat("_Show", 0);
-                degree = 0;
-                render.SetPropertyBlock(propBlock);
+                // Texture/animation code shares this block. Read before modifying
+                // _Show so a reused block never overwrites another renderer's values.
+                render.GetPropertyBlock(visionBlock);
+                visionBlock.SetFloat(ShowProperty, IsRendererVisibleInDisplayLayer(i) ? value : 0f);
+                render.SetPropertyBlock(visionBlock);
             }
+            degree = value;
+            vising = visible;
+            appliedDisplayLayer = displayLayer;
+            visionOwner = base.unit;
+            visionApplied = true;
         }
     }
 }

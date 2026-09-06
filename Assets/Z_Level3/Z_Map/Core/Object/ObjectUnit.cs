@@ -117,6 +117,11 @@ namespace Z_Map
         {
             ObjectUnitForm.RemoveData(data.uid);
             base.Remove();
+            Z_EventHelper.Invoke(new ObjectEvent()
+            {
+                type = MapEventType.Remove,
+                unit = this
+            });
         }
 
     }

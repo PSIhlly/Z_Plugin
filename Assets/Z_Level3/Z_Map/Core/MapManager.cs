@@ -62,6 +62,7 @@ namespace Z_Map
         Move,
         BoundaryTouch,
         Hide,
+        Remove,
     }
     public class ItemEvent : Z_Event
     {

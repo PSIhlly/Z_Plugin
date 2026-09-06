@@ -5,8 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_Code;
@@ -141,8 +139,23 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     string interActKey = "onInteractEvent";
     public void OnEvent(CollideEvent evt)
     {
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
+        if (!(evt.a is MapUnit)
+            || (evt.type != CollideEventType.TriggerEnter && evt.type != CollideEventType.TriggerExit)
+            || (!(evt.b is CharacterUnit) && !(evt.b is ObjectUnit)
+                && !(evt.b is TileUnit && evt.type == CollideEventType.TriggerEnter)))
+            return;
+
+        QueueCollideEvent(evt);
+    }
+
+    private void QueueCollideEvent(CollideEvent evt)
+    {
+        evts += () =>
         {
+            // A queued trigger can outlive either Object involved in it.
+            if (IsRemovedObject(evt.a) || IsRemovedObject(evt.b))
+                return;
+
             if (evt.a is MapUnit mapUnit)
             {
                 var heap = new Dictionary<string, BoxDataForm.Data>();
@@ -170,7 +183,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         if (evt.b is CharacterUnit chU)
                         {
                             mapUnit.ExecuteEvt("onCharacterTouchEvent", heap);
-                            if (mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM.uid)
+                            if (!IsRemovedObject(mapUnit) && mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM.uid)
                                 Z_EventHelper.Invoke(new SceneActionEvent() { unitUid = mapUnit.data.uid, type = SceneActionEventType.Add });
                         }
                         else if (evt.b is ObjectUnit)
@@ -200,135 +213,100 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
             }
         };
     }
+    private static bool IsRemovedObject(Z_UnitSystem.Unit unit)
+    {
+        return unit is ObjectUnit obj &&
+               (!ObjectUnitForm.DataByUid.TryGetValue(obj.data.uid, out var registered) ||
+                !ReferenceEquals(registered, obj.data));
+    }
+
+    // Resolve supported lifecycle types before allocating the deferred callback.
+    // Character Create uses a product reference; BoundaryTouch keeps a scene-unit
+    // reference, matching the existing event-language self contract.
+    private void QueueUnitEvent(MapUnit unit, MapEventType type,
+        bool allowBoundaryTouch = false, bool characterOnCreate = false)
+    {
+        if (unit == null)
+            return;
+
+        string eventName;
+        bool characterSelf;
+        switch (type)
+        {
+            case MapEventType.Create:
+                eventName = "onShowEvent";
+                characterSelf = characterOnCreate;
+                break;
+            case MapEventType.BoundaryTouch when allowBoundaryTouch:
+                eventName = "onBoundaryTouchEvent";
+                characterSelf = false;
+                break;
+            default:
+                return;
+        }
+
+        EnqueueUnitEvent(unit, eventName, characterSelf);
+    }
+
+    private void EnqueueUnitEvent(MapUnit unit, string eventName, bool characterSelf)
+    {
+        // Keep closure allocation out of the filtering method's early-return path.
+        evts += () => ExecuteUnitEvent(unit, eventName, characterSelf);
+    }
+
+    private static void ExecuteUnitEvent(MapUnit unit, string eventName, bool characterSelf)
+    {
+        var heap = new Dictionary<string, BoxDataForm.Data>();
+        heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(
+            characterSelf ? GlobalEventHelper.CHARACTER : GlobalEventHelper.SCENEOBJECT,
+            characterSelf ? unit.productInfo.Item1.ToString() : unit.data.uid.ToString()));
+        unit.ExecuteEvt(eventName, heap);
+    }
+
     public void OnEvent(TileEvent evt)
     {
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
-        {
-            if (evt.unit is MapUnit mapUnit)
-            {
-                var heap = new Dictionary<string, BoxDataForm.Data>();
-                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
-
-                switch (evt.type)
-                {
-                    case MapEventType.Create:
-                        mapUnit.ExecuteEvt("onShowEvent", heap);//create enterScene leaveScene destroy
-                        break;
-                }
-            }
-        };
+        QueueUnitEvent(evt.unit, evt.type);
     }
+
     public void OnEvent(CharacterEvent evt)
     {
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
-        {
-            if (evt.unit is MapUnit mapUnit)
-            {
-
-                switch (evt.type)
-                {
-                    case MapEventType.Create:
-                        {
-                            var heap = new Dictionary<string, BoxDataForm.Data>();
-                            heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.unit.productInfo.Item1.ToString()));
-
-                            mapUnit.ExecuteEvt("onShowEvent", heap);
-                        }
-                        break;
-                    case MapEventType.BoundaryTouch:
-                        {
-                            var heap = new Dictionary<string, BoxDataForm.Data>();
-                            heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
-                            mapUnit.ExecuteEvt("onBoundaryTouchEvent", heap);
-                        }
-
-                        break;
-                }
-            }
-        };
+        QueueUnitEvent(evt.unit, evt.type, allowBoundaryTouch: true, characterOnCreate: true);
     }
+
     public void OnEvent(ItemEvent evt)
     {
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
-        {
-            if (evt.unit is MapUnit mapUnit)
-            {
-
-                switch (evt.type)
-                {
-                    case MapEventType.Create:
-                        var heap = new Dictionary<string, BoxDataForm.Data>();
-                        heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
-
-                        mapUnit.ExecuteEvt("onShowEvent", heap);
-                        break;
-                }
-            }
-        };
+        QueueUnitEvent(evt.unit, evt.type);
     }
+
     public void OnEvent(ObjectEvent evt)
     {
-        if (evt.unit is MapUnit mapUnit)
+        if (evt.type == MapEventType.Remove)
         {
-
-
-            switch (evt.type)
+            // Removal does not guarantee TriggerExit; clear the option immediately.
+            Z_EventHelper.Invoke(new SceneActionEvent()
             {
-                case MapEventType.Create:
-                    {
-                        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
-                         {
-
-                             var heap = new Dictionary<string, BoxDataForm.Data>();
-                             heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
-
-                             mapUnit.ExecuteEvt("onShowEvent", heap);
-                         };
-                        break;
-                    }
-                case MapEventType.BoundaryTouch:
-                    {
-                        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
-                        {
-
-                            var heap = new Dictionary<string, BoxDataForm.Data>();
-                            heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, evt.unit.data.uid.ToString()));
-                            mapUnit.ExecuteEvt("onBoundaryTouchEvent", heap);
-                        };
-                        break;
-                    }
-            }
+                unitUid = evt.unit.data.uid,
+                type = SceneActionEventType.Remove
+            });
+            return;
         }
+
+        QueueUnitEvent(evt.unit, evt.type, allowBoundaryTouch: true);
     }
 
     public void OnEvent(StoryLifeEvent evt)
     {
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts += () =>
+        if (evt.type != StoryLifeEventType.EverySecond)
+            return;
+
+        evts += () =>
         {
-            if (evt.type == StoryLifeEventType.EverySecond)
-            {
-                foreach (var data in ItemUnitForm.DataByUid.Values)
-                {
-                    var heap = new Dictionary<string, BoxDataForm.Data>();
-                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, data.uid.ToString()));
-
-                    data.unit.ExecuteEvt("onPerSecondEvent", heap);
-                }
-                foreach (var data in CharacterUnitForm.DataByUid.Values)
-                {
-                    var heap = new Dictionary<string, BoxDataForm.Data>();
-                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, data.unit.productInfo.Item1.ToString()));
-
-                    data.unit.ExecuteEvt("onPerSecondEvent", heap);
-                }
-                foreach (var data in ObjectUnitForm.DataByUid.Values)
-                {
-                    var heap = new Dictionary<string, BoxDataForm.Data>();
-                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, data.uid.ToString()));
-
-                    data.unit.ExecuteEvt("onPerSecondEvent", heap);
-                }
-            }
+            foreach (var data in ItemUnitForm.DataByUid.Values)
+                ExecuteUnitEvent(data.unit, "onPerSecondEvent", false);
+            foreach (var data in CharacterUnitForm.DataByUid.Values)
+                ExecuteUnitEvent(data.unit, "onPerSecondEvent", true);
+            foreach (var data in ObjectUnitForm.DataByUid.Values)
+                ExecuteUnitEvent(data.unit, "onPerSecondEvent", false);
         };
     }
 }

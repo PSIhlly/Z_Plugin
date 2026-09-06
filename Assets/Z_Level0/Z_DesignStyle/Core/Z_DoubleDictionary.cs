@@ -21,25 +21,39 @@ namespace Z_DesignStyle
             }
             public List<T1> Get(T2 key)
             {
-                if (!d2.ContainsKey(key))
-                    d2[key] = new List<T1>();
-
-                return d2[key];
+                if (!d2.TryGetValue(key, out var values))
+                    d2.Add(key, values = new List<T1>());
+                return values;
             }
             public List<T2> Get(T1 key)
             {
-                if (!d1.ContainsKey(key))
-                    d1[key] = new List<T2>();
-
-                return d1[key];
+                if (!d1.TryGetValue(key, out var values))
+                    d1.Add(key, values = new List<T2>());
+                return values;
             }
             public T2 GetFirst(T1 key)
             {
-                if (!d1.ContainsKey(key))
-                    d1[key] = new List<T2>();
-                if (d1[key].Count > 0)
-                return d1[key][0];
-                return default(T2);
+                var values = Get(key);
+                return values.Count > 0 ? values[0] : default(T2);
+            }
+            // Read-only queries: unlike Get, missing keys do not create lists.
+            public bool TryGet(T1 key, out List<T2> values)
+            {
+                return d1.TryGetValue(key, out values);
+            }
+            public bool TryGet(T2 key, out List<T1> values)
+            {
+                return d2.TryGetValue(key, out values);
+            }
+            public bool TryGetFirst(T1 key, out T2 value)
+            {
+                if (d1.TryGetValue(key, out var values) && values.Count > 0)
+                {
+                    value = values[0];
+                    return true;
+                }
+                value = default(T2);
+                return false;
             }
             public void Move(T1 t1, T2 cur, T2 old)
             {

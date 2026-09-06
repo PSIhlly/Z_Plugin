@@ -226,6 +226,8 @@ namespace Z_Map
         }
         public void UpdateSingleOne(MapUnit unit)
         {
+            // Also covers replacement of Collider data under the same prefab name.
+            unit.InvalidateCollisionGeometry();
             if (unit is TileUnit tl)
             {
                 for(int i=tl.data.mapPos.x-1;i<= tl.data.mapPos.x +1;i++)
@@ -356,6 +358,10 @@ namespace Z_Map
         private static Comparison<((int, int) pos, float sqrDist)> bfsDistCompare =
             (a, b) => a.sqrDist.CompareTo(b.sqrDist);
         private const float OcclusionDegree = 0.5f;
+        private Dictionary<MapUnit, float> previousVision = new Dictionary<MapUnit, float>();
+        private Dictionary<MapUnit, float> nextVision = new Dictionary<MapUnit, float>();
+        private readonly HashSet<ObjectUnit> occlusionObjects = new HashSet<ObjectUnit>();
+        private readonly HashSet<TileUnit> characterOverlapBuffer = new HashSet<TileUnit>();
 
         /// <summary>
         /// BFS遍历指定y层的tile，从(centerX,centerZ)开始，对遮挡层有tile的位置设置透明度
@@ -377,7 +383,7 @@ namespace Z_Map
             {
                 var cur = bfsQueue.Dequeue();
                 var map = _super.utilCtrl.GetTileData(cur.Item1, layerY, cur.Item2);
-                SetGroupVision(map.unit, degree);
+                nextVision[map.unit] = degree;
 
                 for (int x = cur.Item1 - 1; x <= cur.Item1 + 1; x += 2)
                 {
@@ -402,10 +408,10 @@ namespace Z_Map
 
         private void UpdateCurrentLayerObjectOcclusion(Vector3Int center, bool isSideView)
         {
+            occlusionObjects.Clear();
             if (!isSideView)
                 return;
 
-            var handled = new HashSet<ObjectUnit>();
             int maxCellsBelow = _super.data.mainData.viewSize.y;
             for (int cellsBelow = 1; cellsBelow <= maxCellsBelow; cellsBelow++)
             {
@@ -413,17 +419,16 @@ namespace Z_Map
                     center.x,
                     center.y,
                     center.z - cellsBelow);
-                if (tileData == null)
+                if (tileData == null || !objectTileDic.TryGet(tileData.unit, out var objects))
                     continue;
 
-                foreach (var unit in objectTileDic.Get(tileData.unit))
+                foreach (var unit in objects)
                 {
-                    if (!handled.Add(unit)
+                    if (!occlusionObjects.Add(unit)
                         || _super.utilCtrl.GetVisionHeightInTiles(unit.data, center.y) <= cellsBelow)
                         continue;
 
-                    unit.VisOn();
-                    unit.VisDegree(OcclusionDegree);
+                    nextVision[unit] = OcclusionDegree;
                 }
             }
         }
@@ -433,6 +438,26 @@ namespace Z_Map
         /// </summary>
         private void UpdateVision()
         {
+            nextVision.Clear();
+            CollectVision();
+
+            // A wide Object can stop occluding while its owner is outside the
+            // current Tile set. Restore it if its instance is still displayed.
+            foreach (var old in previousVision)
+                if (!nextVision.ContainsKey(old.Key) && old.Key.isShowing)
+                    ApplyUnitVision(old.Key, 1f);
+
+            foreach (var current in nextVision)
+                ApplyUnitVision(current.Key, current.Value);
+
+            var buffer = previousVision;
+            previousVision = nextVision;
+            nextVision = buffer;
+            nextVision.Clear();
+        }
+
+        private void CollectVision()
+        {
             var viewSize = _super.data.mainData.viewSize;
             var realViewCenter = _super.utilCtrl.RealPos2MapPosInt(curCenterPos);
             bool overlayHide = GlobalSettings.OVERLAY_HIDE;
@@ -441,15 +466,7 @@ namespace Z_Map
 
             foreach (var curMap in curTileLst)
             {
-                if (curMap.mapPos.y < realViewCenter.y)
-                {
-
-                    SetGroupVision(curMap.unit, 1);
-                }
-                else
-                {
-                    SetGroupVision(curMap.unit, 1);
-                }
+                nextVision[curMap.unit] = 1f;
             }
 
             // 处理高层tile的遮挡：按距离从近到远，从各起始点BFS相连的高层
@@ -505,6 +522,33 @@ namespace Z_Map
             }
 
             UpdateCurrentLayerObjectOcclusion(realViewCenter, isSideView);
+            CollectAttachedVision();
+        }
+
+        private void CollectAttachedVision()
+        {
+            // Tiles are final now. Visit displayed units once, not the three
+            // reverse indexes for every Tile during both reset and BFS.
+            foreach (var data in curObjectLst)
+            {
+                var unit = data.unit;
+                // Visual-footprint occlusion overrides the owner's degree,
+                // including Objects whose owner lies outside the current view.
+                if (!nextVision.ContainsKey(unit))
+                    CollectUnitVision(unit, objectTileDic);
+            }
+            foreach (var data in curItemLst)
+                CollectUnitVision(data.unit, itemTileDic);
+            foreach (var data in curCharacterLst)
+                CollectUnitVision(data.unit, characterTileDic);
+        }
+
+        private void CollectUnitVision<T>(T unit, DoubleDictionary<T, TileUnit> owners) where T : MapUnit
+        {
+            float degree = 1f;
+            if (owners.TryGetFirst(unit, out var owner) && nextVision.TryGetValue(owner, out var tileDegree))
+                degree = tileDegree;
+            nextVision[unit] = degree;
         }
 
 
@@ -514,18 +558,29 @@ namespace Z_Map
                 return;
 
             TileUnit owner = characterTileDic.GetFirst(unit);
-            characterOverlapTileDic.Del(unit);
             if (owner == null)
-                return;
-
-            foreach (var tile in _super.utilCtrl.GetCharacterCollisionTiles(unit, Vector3.zero, CollideType.All))
             {
-                if (!characterOverlapTileDic.Contains(unit, tile))
-                    characterOverlapTileDic.Add(unit, tile);
+                characterOverlapTileDic.Del(unit);
+                return;
             }
 
-            if (characterOverlapTileDic.Get(unit).Count == 0)
-                characterOverlapTileDic.Add(unit, owner);
+            // This query has no callbacks, so one controller-owned scratch set is
+            // safe. Always query the complete footprint, including upper layers.
+            characterOverlapBuffer.Clear();
+            characterOverlapBuffer.UnionWith(
+                _super.utilCtrl.GetCharacterCollisionTiles(unit, Vector3.zero, CollideType.All));
+            if (characterOverlapBuffer.Count == 0)
+                characterOverlapBuffer.Add(owner);
+
+            var oldTiles = characterOverlapTileDic.Get(unit);
+            for (int i = oldTiles.Count - 1; i >= 0; i--)
+                if (!characterOverlapBuffer.Contains(oldTiles[i]))
+                    characterOverlapTileDic.Del(unit, oldTiles[i]);
+
+            foreach (var tile in characterOverlapBuffer)
+                if (!oldTiles.Contains(tile))
+                    characterOverlapTileDic.Add(unit, tile);
+            characterOverlapBuffer.Clear();
         }
         public void RefreshObjectOverlap(ObjectUnit unit)
         {
@@ -565,83 +620,40 @@ namespace Z_Map
         }
         public void SetGroupVision(TileUnit unit, float degree)
         {
-            if (degree <= 0)
-            {
-                unit.VisOff();
-                foreach (var curObj in objectTileDic.Get(unit))
-                {
-                    if (curObj.belongTile == unit)
-                        curObj.VisOff();
-                }
-                foreach (var curItem in itemTileDic.Get(unit))
-                {
-                    if (curItem.belongTile == unit)
-                        curItem.VisOff();
-                }
-                foreach (var curCh in characterTileDic.Get(unit))
-                {
-                    if (curCh.belongTile == unit)
-                        curCh.VisOff();
-                }
-            }
-            else if (degree >= 1)
-            {
+            // Preserve the immediate public operation; per-frame collection
+            // uses the tile-first path instead of repeatedly expanding groups.
+            ApplyUnitVision(unit, degree);
+            if (objectTileDic.TryGet(unit, out var objects))
+                foreach (var obj in objects)
+                    if (obj.belongTile == unit)
+                        ApplyUnitVision(obj, degree);
+            if (itemTileDic.TryGet(unit, out var items))
+                foreach (var item in items)
+                    if (item.belongTile == unit)
+                        ApplyUnitVision(item, degree);
+            if (characterTileDic.TryGet(unit, out var characters))
+                foreach (var character in characters)
+                    if (character.belongTile == unit)
+                        ApplyUnitVision(character, degree);
+        }
 
-                unit.VisOn();
-                unit.VisDegree(1f);
-                foreach (var curObj in objectTileDic.Get(unit))
-                {
-
-                    if (curObj.belongTile == unit)
-                    {
-                        curObj.VisOn();
-                        curObj.VisDegree(1f);
-                    }
-                }
-                foreach (var curItem in itemTileDic.Get(unit))
-                {
-                    if (curItem.belongTile == unit)
-                    {
-
-                        curItem.VisOn();
-                        curItem.VisDegree(1f);
-                    }
-                }
-                foreach (var curCh in characterTileDic.Get(unit))
-                {
-                    if (curCh.belongTile == unit)
-                    {
-                        curCh.VisOn();
-                        curCh.VisDegree(1f);
-                    }
-                }
-            }
+        private static void ApplyUnitVision(Unit unit, float degree)
+        {
+            if (unit.ins == null)
+                return;
+            if (unit.ins is MapInstance instance)
+                instance.ApplyVision(degree);
+            else if (degree <= 0f)
+                unit.ins.VisOff();
             else
             {
-                unit.VisDegree(degree);
-                foreach (var curObj in objectTileDic.Get(unit))
-                {
-                    if (curObj.belongTile == unit)
-                    {
-                        curObj.VisDegree(degree);
-                    }
-                }
-                foreach (var curItem in itemTileDic.Get(unit))
-                {
-                    if (curItem.belongTile == unit)
-                    {
-                        curItem.VisDegree(degree);
-                    }
-                }
-                foreach (var curCh in characterTileDic.Get(unit))
-                {
-                    if (curCh.belongTile == unit)
-                    {
-                        curCh.VisDegree(degree);
-                    }
-                }
+                unit.ins.VisOn();
+                unit.ins.VisDegree(degree);
             }
 
+            // Bound units may have been shown/replaced independently this frame.
+            foreach (var child in unit.subUnits)
+                ApplyUnitVision(child, degree);
         }
         /// <summary>
         /// 应用移动：更新单位位置、朝向、所属tile，并触发碰撞事件
@@ -930,6 +942,10 @@ namespace Z_Map
             characterTileDic.Clear();
             characterOverlapTileDic.Clear();
             itemTileDic.Clear();
+            previousVision.Clear();
+            nextVision.Clear();
+            occlusionObjects.Clear();
+            characterOverlapBuffer.Clear();
         }
         public void DebugShow()
         {

@@ -441,7 +441,7 @@ ApplyMove(unit, newPos, euler, teleport=false):
      // 此时 Mesh 仍位于 oldPos，检测段正好是 oldPos → newPos
 6. 更新 owner DoubleDictionary (unit ↔ tile)
 7. 写入 ins.transform 与 data.pos/euler
-8. 重建角色 overlap 索引
+8. 查询完整角色覆盖格，增量删除离开的关联并加入新覆盖的关联
 ```
 
 **tile 关联策略**：当前实现取 `GetTile(x, y, z)` 返回的下方最近 tile。角色 Y 轴吸附逻辑（deltaY ≤ 0.0001f 时吸附到 tile 高度）目前被注释掉，依赖重力系统维持地面接触。
@@ -450,7 +450,7 @@ ApplyMove(unit, newPos, euler, teleport=false):
 - `characterTileDic`：只保存中心/支撑 owner Tile，供 `belongTile`、可见性、迷雾和编辑器放置使用。
 - `characterOverlapTileDic`：保存实际 `All` Collider AABB 覆盖的 broad-phase Tile，供移动碰撞、接地、Trigger、CaptureCast 和 Object 推动使用。
 
-`ApplyMove` 在旧坐标上完成旧位置到新位置的 Trigger 扫掠，再移动 owner、写入新的 `data.pos/euler` 并重建 overlap 索引；传送不执行移动 Trigger 扫掠。size 或 Product 变化也必须重建 overlap，但没有 owner 的非当前地图角色不得加入索引。
+`ApplyMove` 在旧坐标上完成旧位置到新位置的 Trigger 扫掠，再移动 owner、写入新的 `data.pos/euler` 并增量更新 overlap 索引；传送不执行移动 Trigger 扫掠。size 或 Product 变化也必须重新查询完整覆盖范围，但没有 owner 的非当前地图角色不得加入索引。
 
 角色的地图边缘可行走范围随体型缩小：`CharacterProductForm.size` 映射到统一的 `CharacterUnitForm.scale` 后，非传送移动会在 `ApplyMove` 写入位置前沿连续可行走 Tile 查找真实水平外边界，并按 `max(1, scale.x) * 0.2` 钳制角色中心。size 为 `1` 时保持原来的 `0.2`；同一距离也用于角色 `BoundaryTouch`。Object 移动不使用固定内缩距离，仅当请求的目标中心真正触到或越过地图区域时触发 Object `BoundaryTouch`；通用 `InArea(Vector3)` 仍默认使用 `0.2`。
 
@@ -466,7 +466,7 @@ ApplyMove(unit, newPos, euler, teleport=false):
 - `CollideOnly`：`isTrigger=false` 的 Collider，用于物理碰撞
 - `TriggerOnly`：`isTrigger=true` 的 Collider，用于触发器事件
 
-Mesh 在 `data.pos` 变化时重新计算（通过 `lastPos` 检测）。
+预制、旋转或缩放变化时重建以原点为基准的几何缓存；仅位置变化时，从缓存偏移更新已有世界 Mesh 和顶点数组，不再扫描 Collider 或创建新 Mesh。不要累加平移差值，避免浮点误差累积。`UpdateSingleOne` 会显式失效缓存以支持同名预制编辑。返回的 Mesh 是实时缓存，不是可长期保存的快照。
 
 ### 4.2 Trigger 事件触发流程
 
@@ -570,8 +570,13 @@ ObjectUnit.Move(dir):
 
 1. **AABB 快速排除**：`SphereIntersectCube` 开头用 AABB 最近点距离 > `radius + mag` 直接返回 None
 2. **SAT 轴去重**：`AddAxisCheckSphere` 检查轴是否已存在（含反向），避免重复检测
-3. **Mesh 缓存**：`GetMeshes` 在 `data.pos` 不变时返回缓存的 Mesh
+3. **Mesh 缓存**：平移只更新已有顶点；预制、旋转或缩放变化才重建几何
 4. **existUnit 去重**：Move 中用 `HashSet<MapUnit>` 避免同一帧重复检测同一 Unit
+5. **覆盖关联增量更新**：每次仍查询完整范围（含上层），仅修改新旧覆盖格的差集；owner 索引与实际覆盖索引继续分离。
+6. **遮挡最终状态提交**：先完成地块初始化和 BFS，只记录地块最终透明度；再各遍历一次 `curObjectLst/curItemLst/curCharacterLst`，按所属地块取最终值（无 owner 或不在本帧地块集合时为 1）。Object 的视觉覆盖遮挡优先，并保留列表外候选的遮挡与恢复。附属列表沿用 `UpdateSingleOne`、视野刷新和删除流程维护；公开 `SetGroupVision` 仍立即作用于一组单位。最后按实例的上次提交状态决定是否写入，复用 MaterialPropertyBlock，保留其它材质属性；绑定子单位、对象池复用、显示层和 owner 变化仍需正确刷新。
+7. **只读字典查询**：`DoubleDictionary.Get/GetFirst` 命中时合并为一次查找，保留缺失时建空列表的兼容行为。渲染查询使用 `TryGet/TryGetFirst`，空地块和缺失 owner 不会为查询创建空列表或污染关联索引。
+
+隔离回归入口：`Docs/Tests/Run-MapRuntimeRegression.ps1`。它编译真实生产程序集，并在 Temp 下的独立 Unity 工程验证几何等价、双向覆盖关联、遮挡提交和事件过滤；不加载当前故事或玩家存档。实际移动、Shader 画面和目标设备性能仍需 Play/Player 复测。
 
 ---
 

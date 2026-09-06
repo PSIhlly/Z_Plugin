@@ -237,13 +237,14 @@ namespace Ui.PlaySceneMain
             switch(evt.type)
             {
                 case SceneActionEventType.Add:
+                    if (actionUnitUids.Contains(evt.unitUid))
+                        break;
                     actionUnitUids.Add(evt.unitUid);
                     Refresh();
                     break;
                 case SceneActionEventType.Remove:
-                    if(actionUnitUids.Contains(evt.unitUid))
+                    if (actionUnitUids.RemoveAll(uid => uid == evt.unitUid) > 0)
                     {
-                        actionUnitUids.Remove(evt.unitUid);
                         Refresh();
                     }
                     break;

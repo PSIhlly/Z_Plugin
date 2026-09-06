@@ -145,6 +145,8 @@ Rules:
 
 ## Global event bus
 
+- `ObjectUnit.Remove()` emits `ObjectEvent` with `MapEventType.Remove` after Form deregistration and instance cleanup. `GameEventSceneTriggerController` immediately forwards it as `SceneActionEvent.Remove` to clear interaction options without waiting for TriggerExit. Deferred collision callbacks reject removed Object instances, including removal during a touch event; the UI keeps one option per unit UID.
+
 `Z_EventHelper` stores listeners in a static dictionary keyed by exact event type.
 
 - Register once at construction/Begin/OnCreate according to the owner's lifetime.
@@ -152,6 +154,7 @@ Rules:
 - Avoid duplicate registration and cross-story listener retention.
 - Do not expect base-event or interface polymorphism; dispatch only matches the event's exact runtime type.
 - Remember that the static dictionary strongly references listeners.
+- Scene lifecycle listeners route Tile/Item/Character/Object through `QueueUnitEvent`: Tile/Item handle Create only; Character/Object also handle BoundaryTouch. Filter before the separate closure-allocating enqueue method. Keep Character Create self as a product reference and BoundaryTouch self as a scene-unit reference; preserve deferred execution. Story lifecycle processing here only accepts EverySecond.
 
 ## Event command system
 

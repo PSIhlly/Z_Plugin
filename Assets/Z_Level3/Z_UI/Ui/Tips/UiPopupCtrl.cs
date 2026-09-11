@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -70,7 +71,17 @@ namespace Ui.Notify
                 }
             }
             con.Refresh();
-            UiManager.Rebuild(gameObject, true);
+            RebuildLayout();
+            TimeManager.instance.AddCurLateUpdateAction(RebuildLayout, gameObject);
+        }
+
+        void RebuildLayout()
+        {
+            if (!active)
+                return;
+
+            UiManager.Rebuild(view.txt_content.gameObject, true);
+            UiManager.Rebuild(view.scr_.content.gameObject, true);
 
             var size = scrollRectTransform.sizeDelta;
             size.y = view.scr_.content.rect.height > 200f

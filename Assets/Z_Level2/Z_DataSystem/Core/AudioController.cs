@@ -55,7 +55,8 @@ namespace Z_DataSystem
         public string GetMark() => AssetDefines.AUDIO_MARK;
         public string[] GetSupportedExtensions() => new[]
 {
-        ".mp3"
+        ".mp3",
+        ".wav"
         };
 
         public AudioController(AssetManager super) : base(super)
@@ -136,11 +137,13 @@ namespace Z_DataSystem
             if (data == null)
                 return null;
 
-            var nm = GetMark() + BytesSerialize.GetHash(data) + GetMark();
+            var hash = BytesSerialize.GetHash(data);
+            var nm = GetMark() + hash + GetMark();
             if (!Directory.Exists(AssetManager.cachePath))
                 Directory.CreateDirectory(AssetManager.cachePath);
             File.WriteAllBytes(AssetManager.cachePath + nm, data);
             var form = CreateDataByPath(AssetManager.cachePath + nm, name);
+            form.hash = hash;
             Z_EventHelper.Invoke(new AssetEvent()
             {
                 importAssetName = nm
@@ -153,7 +156,7 @@ namespace Z_DataSystem
         }
         public AudioAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new AudioAssetForm.Data(-1, name, "", data, "", null, 0);
+            return new AudioAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null, 0);
         }
         public AudioAssetForm.Data CreateDataByPath(string path, string name)
         {

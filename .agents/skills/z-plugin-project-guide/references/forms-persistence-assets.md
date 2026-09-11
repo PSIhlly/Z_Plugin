@@ -103,6 +103,8 @@ Inspect the generated result instead of inventing an expected PascalCase API.
 - `Clear()` removes static and dynamic rows and does not repopulate static Excel data in the same process.
 - Generated `ClearAuto()` uses a strict pool-bound comparison. Avoid allocating or manually assigning the exact pool maximum; use a Form-specific helper where one exists.
 - `Copy()` copies List/Dictionary containers but not every nested object; `Reset()` can reuse references. Inspect nested mutability before treating either as deep copy.
+- `CopyStory*` commands deep-clone the generated Form payload through `GetJoByData`/`GetDataByJo`, replace the copied name, reset its primary key to `-1`, and then register it with `AddData()`. Do not implement these commands with generated `Data.Copy(false)`, because nested animation, event, parameter, and model objects can remain shared.
+- Scene `MapUnit.productInfo` intentionally keeps an ID link to its Product, while each unit's mutable `paramInfo` values must be copied from Product defaults. Never put the Product's parameter `Data` instances directly into a scene unit; otherwise a scene event can mutate the Product or another unit through a shared reference.
 - `GetDatasByJa()` only creates Data objects. Register every loaded object with `AddData()`.
 - Lazy `Init()` and `RuntimeInitializeOnLoadMethod` JSON registration are part of the generated runtime contract.
 
@@ -112,6 +114,8 @@ Generated JSON contains the primary key plus fields marked `write` and not marke
 
 Compatibility behavior:
 
+- `StoryForm.icon` is a Base64 `string` containing the cover image bytes (empty string means no cover). `Story.xls` is the schema authority. Encode once at cover selection and decode for display/package output; `SaveOverview` saves the string directly. Runtime loading accepts only this new schema, by design. Existing local `Core/sf` files were migrated once from the legacy `[{"v": byte}, ...]` representation with byte-for-byte image verification and backups; legacy external stories/packages require offline migration before use.
+- `StoryForm.randomSeed` is the persistent string seed for deterministic story randomness. New stories receive a GUID seed; old stories missing the field use the key-0 empty default and `Random` falls back to the stable Story ID.
 - Adding a field uses the key-0 default value for an old save.
 - `CharacterProductForm.size` is a positive integer uniform model/collider scale. Keep its key-0 default at `1`; normalize it after load and before save, and never trust a scene-level `CharacterUnitForm.scale` over the owning Product.
 - `PassTypeForm` is the story-owned registry for terrain traversal types. Persist it as `ptf`, load it before `MapTextureForm` and `CharacterProductForm`, and clear those consumers before clearing PassType. Every nonzero `int passType` and every element of `CharacterProductForm.passType` is a `PassTypeForm.id`; `0` means unrestricted and is not a registry row. Deleting a PassType must first reset matching MapTexture references to `0` and remove it from Character Product lists.
@@ -181,9 +185,11 @@ AssetForm
 - The entire tree shares `AssetForm.idChain`; media types do not have independent ID spaces.
 - Serialized reference markers include `$i$ID$i$`, `$a$ID$a$`, `$v$ID$v$`, and `$g$ID$g$`.
 - Story asset manifests are `iaff`, `aaff`, and `vaff`; entity bytes/files live under `Core/ast/`.
+- Story entity filenames include both the stable asset ID and the content hash: `$i$ID$HASH$i$`, `$a$ID$HASH$a$`, and `$v$ID$HASH$v$`. Serialized references keep the shorter `$i$ID$i$` / `$a$ID$a$` / `$v$ID$v$` markers. Before saving manifests, recompute each non-built-in asset hash from its current bytes or backing file so stale non-empty metadata cannot preserve an obsolete filename. Save a file only when its full ID-and-hash filename is absent, remove stale hash versions after saving, and fall back to the legacy ID-only filename while loading old stories.
 - Many `bytes/path/asset` fields are `unsave`; rebind loaded data to the absolute `ast/` path.
 - Import through `GameSaveController.AddStoryTex/AddStoryAudio/AddStoryVideo` so data is converted to the concrete Story subtype, IDs and Lab ownership are normalized, and asset events are emitted.
 - Batch media selection goes through `TexController/AudioController/VideoController.SelectMultiple`. Windows Editor uses `AssetFilePicker`'s native multi-file dialog; supported Player platforms delegate to NativeGallery. Import every returned item through the matching `GameSaveController.AddStory*` method rather than registering the batch directly.
+- Audio asset import recognizes `.mp3` and `.wav` files when scanning folders and in the Windows multi-file picker; Player platforms continue to use NativeGallery's audio MIME filter.
 - After a story's asset manifests load, repair missing character-animation `partTex` references through `GameSaveController.RepairMissingCharacterTextureReferences`. It creates one transparent Story texture per missing legacy ID and rewrites every affected `CharacterProductForm` entry so the repair persists on the next save.
 - Do not register base `TexAssetForm.Data` directly as Story data or reuse a base Form's Lab ID under a Story subtype.
 - Built-in map assets load through `Resources.LoadAll("Z_Map/")`; preserve their reserved names.

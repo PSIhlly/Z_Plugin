@@ -29,7 +29,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         if (!SaveAndLoad.Exist(GetStoryCoreFolder(storyFolder)))
         {
             GameManager.instance.saveCtrl.ResetStory();
-            StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", null));
+            StoryForm.AddData(new StoryForm.Data(storyId, "new" + storyId, "empty", string.Empty, Guid.NewGuid().ToString("N")));
             SceneForm.Clear();
             var sceneData = new SceneForm.Data(1, "scene", GlobalDefaultHelper.DefaultTexId, Vector2.zero, false, false, new Dictionary<string, EventTriggerForm.Data>(),new Dictionary<int, List<string>>(), new Dictionary<int, List<string>>(), false);
             SceneForm.AddData(sceneData);

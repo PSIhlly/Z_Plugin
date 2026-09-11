@@ -259,17 +259,22 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
         private void RefreshView()
         {
             var partTex = model.data.animClip[model.dir][model.id].partTex;
-            var upperPartTextureId = partTex != null && partTex.TryGetValue(BodyPartType.UpperPart, out var textureId)
-                ? textureId
-                : GlobalDefaultHelper.DefaultTexId;
             List<int> texNameLst = new List<int>() {
-                upperPartTextureId,
-                -1,
-                GlobalDefaultHelper.DefaultTexId
+                GetPartTextureId(partTex, BodyPartType.UpperPart),
+                GetPartTextureId(partTex, BodyPartType.LowerPart)
                 };
             var showGo = GameManager.instance.utilCtrl.CombineNewCharacterByPrefabs("fakeChara", texNameLst, false);
             showGo.SetActive(true);
             DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
+        }
+
+        private static int GetPartTextureId(Dictionary<BodyPartType, int> partTex, BodyPartType part)
+        {
+            return partTex != null &&
+                   partTex.TryGetValue(part, out var textureId) &&
+                   TexAssetForm.DataById.ContainsKey(textureId)
+                ? textureId
+                : GlobalDefaultHelper.DefaultTexId;
         }
 
         public void OnEvent(AssetEvent evt)

@@ -1,11 +1,15 @@
 [
   {
-    "id": 3,
-    "name": "水2",
-    "icon": 85,
+    "id": 12,
+    "name": "水",
+    "icon": 10,
     "animTimeInterval": 1.0,
-    "texs": [],
-    "labId": 3,
+    "texs": [
+      {
+        "v": 10
+      }
+    ],
+    "labId": 1,
     "events": [],
     "isWangTile": true,
     "passType": 0,
@@ -13,35 +17,18 @@
     "frontPartTexs": []
   },
   {
-    "id": 1,
-    "name": "grass",
-    "icon": 111706,
-    "animTimeInterval": 0.0,
+    "id": 7,
+    "name": "草",
+    "icon": 203,
+    "animTimeInterval": 1.0,
     "texs": [
       {
-        "v": 111706
+        "v": 203
       }
     ],
     "labId": 1,
     "events": [],
     "isWangTile": false,
-    "passType": 0,
-    "enableFrontPart": false,
-    "frontPartTexs": []
-  },
-  {
-    "id": 2,
-    "name": "草1-0",
-    "icon": 34,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 34
-      }
-    ],
-    "labId": 2,
-    "events": [],
-    "isWangTile": true,
     "passType": 0,
     "enableFrontPart": true,
     "frontPartTexs": [
@@ -51,26 +38,24 @@
     ]
   },
   {
-    "id": 15,
-    "name": "水1",
-    "icon": 25,
+    "id": 6,
+    "name": "New0",
+    "icon": 10,
     "animTimeInterval": 1.0,
     "texs": [
       {
-        "v": 25
-      },
-      {
-        "v": 26
-      },
-      {
-        "v": 27
+        "v": 10
       }
     ],
-    "labId": 3,
+    "labId": 0,
     "events": [],
-    "isWangTile": false,
+    "isWangTile": true,
     "passType": 0,
     "enableFrontPart": false,
-    "frontPartTexs": []
+    "frontPartTexs": [
+      {
+        "v": 198
+      }
+    ]
   }
 ]

@@ -120,10 +120,6 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterEquip
         public void Refresh()
         {
             view.sta_exist.ChangeState(model.data != null ? 1 : 0);
-            if (model.data != null)
-            {
-                view.img_.BindTexData(TexAssetForm.DataById[model.data.iconTexName]);
-            }
             view.txt_.text = TextManager.instance.GetTxt(model.part.ToString());
 
         }

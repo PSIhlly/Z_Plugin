@@ -450,6 +450,9 @@ using Z_Texture;
 
         public void GenerateFile()
         {
+            if (!SaveCurrentPrefabChanges())
+                return;
+
             if (uiHolder.uiType != UiType.Panel)
             {
                 var generatedPath = WriteGeneratedFile();
@@ -476,7 +479,7 @@ using Z_Texture;
                 var sourceEditor = (UiHolderEditor)CreateEditor(persistentHolder);
                 try
                 {
-                    Debug.LogWarning($"Generate uses the saved Prefab source '{AssetDatabase.GetAssetPath(persistentUi)}'. Apply or save relevant instance changes first; scene-only overrides are ignored.");
+                    Debug.Log($"Generate uses the saved Prefab source '{AssetDatabase.GetAssetPath(persistentUi)}'.");
                     sourceEditor.GeneratePanelFile(persistentUi, preloadConfig);
                 }
                 finally
@@ -487,6 +490,65 @@ using Z_Texture;
             }
 
             GeneratePanelFile(persistentUi, preloadConfig);
+        }
+
+        private bool SaveCurrentPrefabChanges()
+        {
+            var sourceUi = uiHolder.gameObject;
+            var prefabStage = PrefabStageUtility.GetPrefabStage(sourceUi);
+            if (prefabStage != null && prefabStage.prefabContentsRoot != null)
+            {
+                if (!prefabStage.scene.isDirty)
+                    return true;
+
+                PrefabUtility.SaveAsPrefabAsset(
+                    prefabStage.prefabContentsRoot,
+                    prefabStage.assetPath,
+                    out var savedSuccessfully);
+                if (!savedSuccessfully)
+                {
+                    Debug.LogError($"Failed to save Prefab '{prefabStage.assetPath}' before Generate.");
+                    return false;
+                }
+
+                prefabStage.ClearDirtiness();
+                AssetDatabase.SaveAssets();
+                return true;
+            }
+
+            if (EditorUtility.IsPersistent(sourceUi))
+            {
+                var prefabRoot = sourceUi.transform.root.gameObject;
+                var assetPath = AssetDatabase.GetAssetPath(prefabRoot);
+                if (!assetPath.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                PrefabUtility.SavePrefabAsset(prefabRoot, out var savedSuccessfully);
+                if (!savedSuccessfully)
+                {
+                    Debug.LogError($"Failed to save Prefab '{assetPath}' before Generate.");
+                    return false;
+                }
+
+                AssetDatabase.SaveAssets();
+                return true;
+            }
+
+            var instanceRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(sourceUi);
+            if (instanceRoot == null || !PrefabUtility.HasPrefabInstanceAnyOverrides(instanceRoot, false))
+                return true;
+
+            try
+            {
+                PrefabUtility.ApplyPrefabInstance(instanceRoot, InteractionMode.AutomatedAction);
+                AssetDatabase.SaveAssets();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Failed to apply Prefab instance changes before Generate: {exception.Message}");
+                return false;
+            }
         }
 
         private void GeneratePanelFile(GameObject persistentUi, UiPreloadConfig preloadConfig)

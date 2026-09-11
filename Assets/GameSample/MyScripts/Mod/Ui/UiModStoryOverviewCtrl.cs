@@ -67,7 +67,7 @@ namespace Ui.ModStory.ModStoryOverview
         {
             try
             {
-                view.img_image.BindTexData(AssetManager.instance.texCtrl.CreateDataByBytes(GameManager.instance.curStory.icon.ToArray(), "tmp"));
+                view.img_image.BindTexData(AssetManager.instance.texCtrl.CreateDataByBytes(Convert.FromBase64String(GameManager.instance.curStory.icon), "tmp"));
             }
             catch (Exception ex)
             {

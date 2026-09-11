@@ -57,6 +57,7 @@ namespace Ui.PlayDataCharacter
         }
         public override void OnShow()
         {
+            model.module = 1;
             model.sel = null;
             if (GameManager.instance.curProgress.team.Count>0)
             {

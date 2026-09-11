@@ -40,6 +40,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-echo Split complete: 1.png through 9.png.
+echo Split complete: 1.png through 29.png and 50.png through 51.png.
 pause
 exit /b 0

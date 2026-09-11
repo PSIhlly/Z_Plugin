@@ -59,7 +59,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                GameManager.instance.curStory.icon = data.GetBytes().ToList();
+                GameManager.instance.curStory.icon = Convert.ToBase64String(data.GetBytes());
             }
         });
     }

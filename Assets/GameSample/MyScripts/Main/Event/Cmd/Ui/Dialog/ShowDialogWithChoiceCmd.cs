@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
 using Z_DataSystem;
+using Z_DataSystem.Form;
+using Z_DesignStyle;
 using Z_Ui.Dialog;
 using Z_Ui.Notify;
 
@@ -44,7 +46,7 @@ namespace Z_Code
                 }, items);
                 over = false;
             }
-            DialogManager.instance.Begin(heapTemp[2].str, heapTemp[3].str, AssetManager.instance.texCtrl.GetId(heapTemp[0].str), 0, AssetManager.instance.texCtrl.GetId(heapTemp[1].str), 0, () => { if (over) asyncTask.Complete(); }, over);
+            DialogManager.instance.Begin(heapTemp[2].str, heapTemp[3].str, AssetManager.instance.texCtrl.GetId(heapTemp[0].str), 0, AssetManager.instance.texCtrl.GetId(heapTemp[1].str), AssetManager.instance.audioCtrl.GetId(heapTemp[4].str), () => { if (over) asyncTask.Complete(); }, over);
             return false;
         }
     }

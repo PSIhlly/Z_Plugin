@@ -23,12 +23,12 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
     public partial class UiPlayDataCharacterSkillCtrl
     {
 
-        UiScrViewContainer<UiGameSkillCtrl> gameSkillCon;
+        UiContainer<UiGameEquipCtrl> gameSkillCon;
         UiScrViewContainer<UiGameArgsCtrl> gameArgsCon;
         public override void OnCreate()
         {
 
-            gameSkillCon = new UiScrViewContainer<UiGameSkillCtrl>(this, view.go_gameSkill, view.scr_gameSkill);
+            gameSkillCon = new UiContainer<UiGameEquipCtrl>(this, view.go_gameEquip);
             gameArgsCon = new UiScrViewContainer<UiGameArgsCtrl>(this, view.go_gameArgs, view.scr_gameArgs);
 
         }
@@ -61,7 +61,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
             gameSkillCon.Clear();
             foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
             {
-                gameSkillCon.Add(new UiGameSkillParam()
+                gameSkillCon.Add(new UiGameEquipParam()
                 {
                     part = type
                 });
@@ -71,16 +71,16 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
         }
     }
 
-    public partial class UiGameSkillParam
+    public partial class UiGameEquipParam
     {
         public SkillType part;
     }
-    public partial class UiGameSkillModel
+    public partial class UiGameEquipModel
     {
         public SkillType part;
         public SkillProductForm.Data data;
     }
-    public partial class UiGameSkillCtrl
+    public partial class UiGameEquipCtrl
     {
 
         public override void OnCreate()

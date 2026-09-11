@@ -155,10 +155,6 @@ namespace Ui.PlayDataBackpack
                     state = UiLabRenderHelper.LabState
                 });
             }
-            labCon.Add(new UiLabParam()
-            {
-                state = UiLabRenderHelper.NewState
-            });
             labCon.Refresh();
 
             itemCon.Clear();
@@ -222,16 +218,6 @@ namespace Ui.PlayDataBackpack
 
             view.btn_.onClick.AddListener(() =>
             {
-                if (model.state == UiLabRenderHelper.NewState)
-                {
-                    UiLabRenderHelper.Create(nameof(ItemProductForm), labId =>
-                    {
-                        parent.model.labId = labId;
-                        parent.Refresh();
-                    });
-                    return;
-                }
-
                 parent.model.labId = model.labId;
                 parent.Refresh();
             });
@@ -245,10 +231,9 @@ namespace Ui.PlayDataBackpack
         }
         public void Refresh()
         {
-            var isNew = model.state == UiLabRenderHelper.NewState;
             view.sta_state.ChangeState(model.state);
-            view.sta_.ChangeState(!isNew && parent.model.labId == model.labId ? 1 : 0);
-            view.txt_.text = UiLabRenderHelper.GetText(model.labId, isNew);
+            view.sta_.ChangeState(parent.model.labId == model.labId ? 1 : 0);
+            view.txt_.text = UiLabRenderHelper.GetText(model.labId, false);
         }
     }
     public partial class UiGameItemParam

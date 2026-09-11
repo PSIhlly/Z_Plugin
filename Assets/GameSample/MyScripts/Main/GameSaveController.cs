@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.WSA;
+using Z_ByteSerialize;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -55,7 +56,7 @@ public class GameSaveController : Z_Controller<GameManager>
         Texture2D icon;
         try
         { 
-            icon = (Texture2D)AssetManager.instance.texCtrl.CreateDataByBytes(GameManager.instance.curStory.icon.ToArray(),"tmp").GetTex();
+            icon = (Texture2D)AssetManager.instance.texCtrl.CreateDataByBytes(Convert.FromBase64String(GameManager.instance.curStory.icon), "tmp").GetTex();
         }
         catch (Exception e)
         {
@@ -246,32 +247,35 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveAssets(string storyCoreFolder)
     {
+        EnsureStoryAssetHashes();
 
         SaveAndLoad.Save(storyCoreFolder + "/" + imageAssetFormFileName, StoryTexAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + audioAssetFormFileName, StoryAudioAssetForm.GetJaByDatas().ToString());
         SaveAndLoad.Save(storyCoreFolder + "/" + videoAssetFormFileName, StoryVideoAssetForm.GetJaByDatas().ToString());
 
+        var expectedAssetNames = new HashSet<string>(StringComparer.Ordinal);
         foreach (var data in StoryTexAssetForm.DataById.Values)
         {
-            SaveStoryTex(data.id, storyCoreFolder);
+            var name = SaveStoryTex(data, storyCoreFolder);
+            if (name != null)
+                expectedAssetNames.Add(name);
         }
         foreach (var data in StoryAudioAssetForm.DataById.Values)
         {
-            SaveStoryAudio(data.id, storyCoreFolder);
+            var name = SaveStoryAudio(data, storyCoreFolder);
+            if (name != null)
+                expectedAssetNames.Add(name);
         }
         foreach (var data in StoryVideoAssetForm.DataById.Values)
         {
-            SaveStoryVideo(data.id, storyCoreFolder);
+            var name = SaveStoryVideo(data, storyCoreFolder);
+            if (name != null)
+                expectedAssetNames.Add(name);
         }
         SaveAndLoad.EachFile(storyCoreFolder + assetFolder, (name) =>
         {
-            var id1 = AssetManager.instance.texCtrl.GetId(name);
-            var id2 = AssetManager.instance.audioCtrl.GetId(name);
-            var id3 = AssetManager.instance.videoCtrl.GetId(name);
-            if (!StoryTexAssetForm.DataById.ContainsKey(id1) && !StoryAudioAssetForm.DataById.ContainsKey(id2) && !StoryVideoAssetForm.DataById.ContainsKey(id3))
-            {
+            if (!expectedAssetNames.Contains(name))
                 SaveAndLoad.Delete(storyCoreFolder + assetFolder + name);
-            }
         });
     }
     #region util
@@ -289,44 +293,107 @@ public class GameSaveController : Z_Controller<GameManager>
 
         }
     }
-    private void SaveStoryTex(int texId, string path)
+    private string SaveStoryTex(StoryTexAssetForm.Data data, string path)
     {
-        var data = TexAssetForm.DataById.GetDv(texId, null);
-        if (data != null && data.bytes != null && !GlobalDefaultHelper.IsInnerAssetName(texId))
+        if (data == null || GlobalDefaultHelper.IsInnerAssetName(data.id))
+            return null;
+
+        var name = GetStoryAssetFileName(AssetManager.instance.texCtrl, data);
+        path = path + assetFolder + name;
+        if (!SaveAndLoad.Exist(path))
         {
-            var tex = StoryTexAssetForm.DataById[texId];
-            path = path + assetFolder + AssetManager.instance.texCtrl.GetName(texId);
-            if (!SaveAndLoad.Exist(path))
-            {
+            var bytes = GetAssetBytes(data);
+            if (bytes != null)
+                SaveAndLoad.Save(path, bytes);
+        }
+        if (SaveAndLoad.Exist(path))
+            data.path = SaveAndLoad.GetRealPath(path);
+        return name;
+    }
+    private string SaveStoryVideo(StoryVideoAssetForm.Data data, string path)
+    {
+        if (data == null || GlobalDefaultHelper.IsInnerAssetName(data.id))
+            return null;
+
+        var name = GetStoryAssetFileName(AssetManager.instance.videoCtrl, data);
+        path = path + assetFolder + name;
+        if (!SaveAndLoad.Exist(path))
+        {
+            if (data.bytes != null)
                 SaveAndLoad.Save(path, data.bytes);
-            }
-        }
-    }
-    private void SaveStoryVideo(int videoId, string path)
-    {
-        var data = VideoAssetForm.DataById.GetDv(videoId, null);
-        if (data != null && !GlobalDefaultHelper.IsInnerAssetName(videoId))
-        {
-            var tex = VideoAssetForm.DataById[videoId];
-            path = path + assetFolder + AssetManager.instance.videoCtrl.GetName(videoId);
-            if (!SaveAndLoad.Exist(path))
-            {
+            else if (!string.IsNullOrEmpty(data.path))
                 SaveAndLoad.Copy(data.path, path);
-            }
         }
+        if (SaveAndLoad.Exist(path))
+            data.path = SaveAndLoad.GetRealPath(path);
+        return name;
     }
-    private void SaveStoryAudio(int audioId, string path)
+    private string SaveStoryAudio(StoryAudioAssetForm.Data data, string path)
     {
-        var data = AudioAssetForm.DataById.GetDv(audioId, null);
-        if (data != null && !GlobalDefaultHelper.IsInnerAssetName(audioId))
+        if (data == null || GlobalDefaultHelper.IsInnerAssetName(data.id))
+            return null;
+
+        var name = GetStoryAssetFileName(AssetManager.instance.audioCtrl, data);
+        path = path + assetFolder + name;
+        if (!SaveAndLoad.Exist(path))
         {
-            var tex = AudioAssetForm.DataById[audioId];
-            path = path + assetFolder + AssetManager.instance.audioCtrl.GetName(audioId);
-            if (!SaveAndLoad.Exist(path))
-            {
+            if (data.bytes != null)
+                SaveAndLoad.Save(path, data.bytes);
+            else if (!string.IsNullOrEmpty(data.path))
                 SaveAndLoad.Copy(data.path, path);
-            }
         }
+        if (SaveAndLoad.Exist(path))
+            data.path = SaveAndLoad.GetRealPath(path);
+        return name;
+    }
+    private void EnsureStoryAssetHashes()
+    {
+        foreach (var data in StoryTexAssetForm.DataById.Values)
+            EnsureAssetHash(data);
+        foreach (var data in StoryAudioAssetForm.DataById.Values)
+            EnsureAssetHash(data);
+        foreach (var data in StoryVideoAssetForm.DataById.Values)
+            EnsureAssetHash(data);
+    }
+    private static void EnsureAssetHash(AssetForm.Data data)
+    {
+        if (data == null || GlobalDefaultHelper.IsInnerAssetName(data.id))
+            return;
+
+        var bytes = GetAssetBytes(data);
+        if (bytes == null)
+            return;
+
+        var contentHash = BytesSerialize.GetHash(bytes);
+        if (!string.Equals(data.hash, contentHash, StringComparison.Ordinal))
+            data.hash = contentHash;
+    }
+    private static byte[] GetAssetBytes(AssetForm.Data data)
+    {
+        if (data.bytes != null)
+            return data.bytes;
+        if (string.IsNullOrEmpty(data.path))
+            return null;
+
+        var path = Path.IsPathRooted(data.path) ? data.path : SaveAndLoad.GetRealPath(data.path);
+        return File.Exists(path) ? File.ReadAllBytes(path) : null;
+    }
+    private static string GetStoryAssetFileName(IAssetController controller, AssetForm.Data data)
+    {
+        if (string.IsNullOrEmpty(data.hash))
+            return controller.GetName(data.id);
+        return $"{controller.GetMark()}{data.id}${data.hash}{controller.GetMark()}";
+    }
+    private string GetStoryAssetPath(string folder, IAssetController controller, AssetForm.Data data)
+    {
+        var hashPath = folder + assetFolder + GetStoryAssetFileName(controller, data);
+        if (!string.IsNullOrEmpty(data.hash) && SaveAndLoad.Exist(hashPath))
+            return SaveAndLoad.GetRealPath(hashPath);
+
+        var legacyPath = folder + assetFolder + controller.GetName(data.id);
+        if (SaveAndLoad.Exist(legacyPath))
+            return SaveAndLoad.GetRealPath(legacyPath);
+        return SaveAndLoad.GetRealPath(hashPath);
     }
     #endregion
     #endregion
@@ -715,7 +782,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 if (form != null)
                 {
                     StoryTexAssetForm.AddData(form);
-                    form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.texCtrl.GetName(form.id));
+                    form.path = GetStoryAssetPath(folder, AssetManager.instance.texCtrl, form);
                 }
             }
         }
@@ -727,7 +794,7 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in StoryAudioAssetForm.GetDatasByJa(forms))
             {
                 StoryAudioAssetForm.AddData(form);
-                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.audioCtrl.GetName(form.id));
+                form.path = GetStoryAssetPath(folder, AssetManager.instance.audioCtrl, form);
             }
         }
         path = folder + videoAssetFormFileName;
@@ -738,7 +805,7 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in StoryVideoAssetForm.GetDatasByJa(forms))
             {
                 StoryVideoAssetForm.AddData(form);
-                form.path = SaveAndLoad.GetRealPath(folder + assetFolder + AssetManager.instance.videoCtrl.GetName(form.id));
+                form.path = GetStoryAssetPath(folder, AssetManager.instance.videoCtrl, form);
             }
         }
 

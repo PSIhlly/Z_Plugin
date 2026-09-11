@@ -87,21 +87,35 @@ namespace Z_Map
                             {
                                 if (!_paramInfo.ContainsKey(pair.Key))
                                 {
-                                    _paramInfo[pair.Key] = pair.Value;
+                                    _paramInfo[pair.Key] = pair.Value.Copy();
                                 }
                             }
                         }
                     }
                     else if (this is ObjectUnit obj)
                     {
-                        var objp = CharacterProductForm.DataByUid.GetDv(obj.productInfo.Item1, null);
+                        var objp = MapObjectForm.DataById.GetDv(obj.productInfo.Item1, null);
                         if (objp != null)
                         {
                             foreach (var pair in objp.paramDic)
                             {
                                 if (!_paramInfo.ContainsKey(pair.Key))
                                 {
-                                    _paramInfo[pair.Key] = pair.Value;
+                                    _paramInfo[pair.Key] = pair.Value.Copy();
+                                }
+                            }
+                        }
+                    }
+                    else if (this is ItemUnit item)
+                    {
+                        var itemp = ItemProductForm.DataByUid.GetDv(item.productInfo.Item1, null);
+                        if (itemp != null)
+                        {
+                            foreach (var pair in itemp.paramDic)
+                            {
+                                if (!_paramInfo.ContainsKey(pair.Key))
+                                {
+                                    _paramInfo[pair.Key] = pair.Value.Copy();
                                 }
                             }
                         }
@@ -191,6 +205,17 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 return texture;
         }
         return GetDefaultTexture();
+    }
+
+    MapTextureForm.Data GetMapTextureOrFirst(int mapTextureId)
+    {
+        if (MapTextureForm.DataById.TryGetValue(mapTextureId, out var data))
+            return data;
+
+        return MapTextureForm.DataById
+            .OrderBy(pair => pair.Key)
+            .Select(pair => pair.Value)
+            .FirstOrDefault();
     }
 
 
@@ -307,7 +332,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         newObjectData.unit.productInfo = (objectData.id, -1);
         newObjectData.unit.paramInfo = new Dictionary<string, GameParamForm.Data>();
         foreach (var pair in objectData.paramDic)
-            newObjectData.unit.paramInfo[pair.Key] = pair.Value;
+            newObjectData.unit.paramInfo[pair.Key] = pair.Value.Copy();
 
         newObjectData.isObstacle = objectData.collision;
     }
@@ -335,7 +360,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 for (int layer = 0; layer < baseRendererCount; layer++)
                 {
                     var texName = evt.unit.data.texDic.GetDv(layer, -1);
-                    var data = MapTextureForm.DataById.GetDv(texName, null);
+                    var data = GetMapTextureOrFirst(texName);
                     if (data != null
                         && data.isWangTile
                         && data.WangTileDic != null

@@ -146,11 +146,13 @@ namespace Z_DataSystem
             if (data == null)
                 return null;
 
-            var nm = GetMark() + BytesSerialize.GetHash(data) + GetMark();
+            var hash = BytesSerialize.GetHash(data);
+            var nm = GetMark() + hash + GetMark();
             if (!Directory.Exists(AssetManager.cachePath))
                 Directory.CreateDirectory(AssetManager.cachePath);
             File.WriteAllBytes(AssetManager.cachePath + nm, data);
             var form = CreateDataByPath(AssetManager.cachePath + nm, name);
+            form.hash = hash;
             Z_EventHelper.Invoke(new AssetEvent()
             {
                 importAssetName = name
@@ -163,7 +165,7 @@ namespace Z_DataSystem
         }
         public VideoAssetForm.Data CreateDataByBytes(byte[] data, string name)
         {
-            return new VideoAssetForm.Data(-1, name, "", data, "", null, 0);
+            return new VideoAssetForm.Data(-1, name, "", data, BytesSerialize.GetHash(data), null, 0);
         }
         public VideoAssetForm.Data CreateDataByPath(string path, string name)
         {

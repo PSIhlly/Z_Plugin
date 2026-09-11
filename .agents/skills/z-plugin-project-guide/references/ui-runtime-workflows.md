@@ -110,13 +110,17 @@ Shared Lab-list contract:
 - Build Lab rows from `LabForm.DatasByBelong[nameof(ConcreteForm)]`, so empty labels remain visible and Lab identity keeps its concrete `belong`.
 - In UI filters, `null` means All; `LabForm.NoneId == 0` remains unclassified and is not interchangeable with `null`.
 - Render the unclassified row only when the current screen has actual `labId=0` data; when it disappears, reset an active unclassified filter to the screen's valid fallback instead of leaving an invisible selection.
+- `UiPlayDataBackpack` is a read-only Label filter: show All, optional Unclassified, and existing Item labels, but never render the New row or create labels from Play mode.
+- `UiPlayDataCharacter` resets to its Data module each time the panel is shown; Equip and Skill remain user-selected secondary tabs for that opening.
 - For New, prompt through `NotifyManager`, resolve with `LabForm.GetOrCreateDisplayName(input, nameof(ConcreteForm))`, then select a nonzero result and refresh.
+- Mod list screens with `ipt_lab` and `btn_deleteLab` expose those controls only for a concrete selected Lab. Renaming reuses a matching Lab and moves every reference in that concrete Form; deletion moves references to unclassified before removing the Lab. Map Texture, Mask, and Object lists apply this within the currently selected map type.
 - After renaming a prefixed object in a shared prefab, regenerate every owning Panel and update all partial Controller references to the generated field.
 
 Rules:
 
 - Do not hand-edit `UiBase`; the generator deletes and rewrites its target file.
 - Do not restore a scene or `UiManager` preload list, and do not hand-write object references in the config asset.
+- `UiHolderEditor.Generate` saves dirty Prefab Mode contents or applies current Prefab-instance overrides before reading the persistent Prefab source.
 - Do not add an implicit Resources/default-config fallback; missing Manager or Holder references are configuration errors.
 - Keep the registry free of null entries and duplicate `uiName` values; only top-level Panels are registered.
 - Put state in the partial Model, input in Param, rendering references in generated View, and behavior in the partial Controller.
@@ -131,16 +135,18 @@ Rules:
 - `TextBaseForm.DataByKey` is shared by CommonText and ModText. Keep keys globally unique, put runtime/shared UI keys in CommonText, and reserve ModText for Mod-only UI.
 - Translate chooser titles exactly once. Render user-authored code/text raw, and translate only the stable prefix of composite trigger keys before `$`.
 - After changing dynamic TMP text when its RectTransform size is needed immediately, call `UiManager.Rebuild` on the active layout root. It synchronizes descendant `TMP_InputField` labels and `TMP_Text` meshes before rebuilding the layout; pass `recursion: true` for nested ContentSizeFitter/LayoutGroup chains.
+- `UiPopupCtrl` is pooled: after changing `txt_content`, rebuild the text and ScrollRect content in the current LateUpdate before reading `content.rect.height`, then resize the ScrollRect and rebuild the Popup root. Measuring synchronously in `OnShow` can reuse the previous Popup's content height.
 - Prefer synchronous rebuilds after refreshing pooled containers. `UiMultipleChooseCtrl` is a verified exception: refresh both virtualized lists first, then schedule `LayoutRebuilder.ForceRebuildLayoutImmediate(rect)` through `TimeManager.AddCurLateUpdateAction`; its pooled ScrollRects and nested ContentSizeFitters have not settled when the synchronous controller code finishes.
 - `Txt.OnPreRenderText` runs inside the Canvas graphic-rebuild loop. Inline-image callbacks may only capture TMP character geometry there; create, resize, enable, disable, or change `Img` sprites after the loop has finished.
 - `NotifyManager.AddTip` wraps Tip text at 30 characters per line while preserving explicit line breaks; Popup and input-area text are not wrapped by this rule.
 - `UiModAssetSelectWindow` exposes `ipt_labelName` and `btn_lableDelete` for the active Label filter; renaming reuses matching labels and deletion moves affected assets to unclassified before removing the Label record.
 - `UiModAssetSelectWindow`'s `btn_replace` opens the single-asset picker for the selected item, updates the existing asset in place (keeping its ID), and clears texture runtime caches before refreshing.
+- `UiModAssetSelectWindow` closes its AVPro audio preview when hidden or shown again; preview playback must not resume from a previous selection.
 - `UiModAssetSelectWindowCtrl.OnShow` keeps the last Label filter when reopening within the same asset scope; if that label is no longer visible, fall back to unclassified when available, otherwise All.
 - Map Object Config edits `MapObjectForm.faceType`; Object Appearance displays `Fixed` for Fixed/Flexible objects and `Up/Down/Left/Right` for FourDirection objects, with a separate animation-frame list per direction. Runtime direction thresholds match Character (`Up` around 0°, then Right/Down/Left by 90° quadrants); Flexible uses the Fixed clip while allowing the perspective holder to follow Object rotation.
 - Map Object Type opens `ModStoryMapObjectPassType` as its fourth mode. That page owns PassType add/delete/rename; MapTexture Config chooses one type or `0 = unrestricted`, while Character Unit Config renders all registered types as a multi-select backed by `CharacterProductForm.passType`.
 - MapTexture Config owns both `isWangTile` and `enableFrontPart`. MapTexture Appearance always edits the normal `texs` animation list and shows the mirrored `frontPartTexs` list only while `enableFrontPart` is on; disabling the option hides, but does not delete, the authored front frames.
-- `UiPlayMap` uses `PlayMapController.heightMap` and `unlockTextureMap`, which are generated for every Tile height when the scene begins. Area-map height controls traverse only sorted heights that contain Tiles, display player-facing height coordinates, and show marks and the active mission only when their Tile/target height matches the browsed height.
+- `UiPlayMap` uses `PlayMapController.heightMap` and `unlockTextureMap`, which are generated for every Tile height when the scene begins. Its area-map ScrollRect content keeps 200 pixels of padding on every edge while map images, marks, and missions share the inner map bounds. Area-map height controls traverse only sorted heights that contain Tiles, display player-facing height coordinates, and show marks and the active mission only when their Tile/target height matches the browsed height.
 - `UiPlaySceneMission` is visible only when missions are enabled and the selected mission is shown, received, unfinished, and not failed. Its active parent listens for `MissionEvent` so a hidden mission widget can reappear when a mission is added.
 
 ## Global event bus

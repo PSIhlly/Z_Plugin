@@ -93,7 +93,7 @@ namespace Ui.Story
                 view.txt_.text = model.data.name;
                 try
                 {
-                    view.img_.BindTexData(AssetManager.instance.texCtrl.CreateDataByBytes(model.data.icon.ToArray(), "tmp"));
+                    view.img_.BindTexData(AssetManager.instance.texCtrl.CreateDataByBytes(Convert.FromBase64String(model.data.icon), "tmp"));
                 }
                 catch (Exception ex)
                 {

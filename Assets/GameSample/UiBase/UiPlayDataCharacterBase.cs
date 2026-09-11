@@ -79,7 +79,6 @@ namespace PlayDataCharacterData
             public ScrView scr_gameArgs;
             public Txt txt_desc;
             public Txt txt_name;
-            public Img img_tachie;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
             public UiGameArgsCtrl sub_gameArgs;
@@ -89,10 +88,9 @@ namespace PlayDataCharacterData
             scr_gameArgs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             txt_desc = uiHolder.elementTrsLst[1].GetComponent<Txt>();
             txt_name = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            img_tachie = uiHolder.elementTrsLst[3].GetComponent<Img>();
-            go_gameArgs = uiHolder.elementTrsLst[4].gameObject;
-            sta_gameArgs = uiHolder.elementTrsLst[5].GetComponent<Sta>();
-            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_gameArgs = uiHolder.elementTrsLst[3].gameObject;
+            sta_gameArgs = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -147,19 +145,17 @@ namespace PlayDataCharacterEquip
 
             public GameObject go_gameEquip;
             public Sta sta_exist;
-            public Txt txt_;
             public Btn btn_;
             public Sta sta_;
-            public Img img_;
+            public Txt txt_;
         public UiGameEquipView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_gameEquip = uiHolder.elementTrsLst[0].gameObject;
             sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[4].GetComponent<Sta>();
-            img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
     }
@@ -324,41 +320,41 @@ namespace PlayDataCharacterSkill
 
 
 
-    public partial class UiGameSkillParam:UiParam
+    public partial class UiGameEquipParam:UiParam
     {
     }
 
-    public partial class UiGameSkillView:UiView
+    public partial class UiGameEquipView:UiView
     {
 
-            public GameObject go_gameSkill;
+            public GameObject go_gameEquip;
             public Sta sta_exist;
-            public Txt txt_;
             public Btn btn_;
             public Sta sta_;
+            public Txt txt_;
             public Img img_;
-        public UiGameSkillView(UiHolder uiHolder):base(uiHolder)
+        public UiGameEquipView(UiHolder uiHolder):base(uiHolder)
         {
 
-            go_gameSkill = uiHolder.elementTrsLst[0].gameObject;
+            go_gameEquip = uiHolder.elementTrsLst[0].gameObject;
             sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
             img_ = uiHolder.elementTrsLst[5].GetComponent<Img>();
         }
 
     }
-    public partial class UiGameSkillCtrl:UiCtrl
+    public partial class UiGameEquipCtrl:UiCtrl
     {
-        public UiGameSkillView view;
-        public UiGameSkillModel model;
-        public UiGameSkillParam param;
+        public UiGameEquipView view;
+        public UiGameEquipModel model;
+        public UiGameEquipParam param;
         public UiPlayDataCharacterSkillCtrl parent=>(UiPlayDataCharacterSkillCtrl)uiHolder.parent.ctrl;
 
         public override void SetParam(UiParam param)
         {
-            this.param = (UiGameSkillParam)param;
+            this.param = (UiGameEquipParam)param;
         }
 
         public override void BindHolderRecursively(UiHolder uiHolder)
@@ -366,14 +362,14 @@ namespace PlayDataCharacterSkill
 
             base.BindHolderRecursively(uiHolder);
 
-            view = new UiGameSkillView(uiHolder);
-            model=new UiGameSkillModel();
+            view = new UiGameEquipView(uiHolder);
+            model=new UiGameEquipModel();
 
 
         }
 
     }
-    public partial class UiGameSkillModel:UiModel
+    public partial class UiGameEquipModel:UiModel
     {
         
     }
@@ -434,27 +430,25 @@ namespace PlayDataCharacterSkill
     public partial class UiPlayDataCharacterSkillView:UiView
     {
 
-            public ScrView scr_gameSkill;
             public Txt txt_;
             public Txt txt_name;
             public ScrView scr_gameArgs;
-            public GameObject go_gameSkill;
-            public UiGameSkillCtrl sub_gameSkill;
+            public GameObject go_gameEquip;
+            public UiGameEquipCtrl sub_gameEquip;
             public GameObject go_gameArgs;
             public Sta sta_gameArgs;
             public UiGameArgsCtrl sub_gameArgs;
         public UiPlayDataCharacterSkillView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_gameSkill = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            txt_name = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            scr_gameArgs = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
-            go_gameSkill = uiHolder.elementTrsLst[4].gameObject;
-            sub_gameSkill = (UiGameSkillCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            go_gameArgs = uiHolder.elementTrsLst[6].gameObject;
-            sta_gameArgs = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            txt_name = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+            scr_gameArgs = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            go_gameEquip = uiHolder.elementTrsLst[3].gameObject;
+            sub_gameEquip = (UiGameEquipCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            go_gameArgs = uiHolder.elementTrsLst[5].gameObject;
+            sta_gameArgs = uiHolder.elementTrsLst[6].GetComponent<Sta>();
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -479,8 +473,8 @@ namespace PlayDataCharacterSkill
             model=new UiPlayDataCharacterSkillModel();
 
 
-            view.sub_gameSkill = new UiGameSkillCtrl();
-            view.sub_gameSkill.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_gameEquip = new UiGameEquipCtrl();
+            view.sub_gameEquip.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_gameArgs = new UiGameArgsCtrl();
             view.sub_gameArgs.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
@@ -564,6 +558,7 @@ namespace PlayDataCharacterSkill
             public PlayDataCharacterEquip.UiPlayDataCharacterEquipCtrl page_PlayDataCharacterEquip;
             public PlayDataCharacterSkill.UiPlayDataCharacterSkillCtrl page_PlayDataCharacterSkill;
             public Btn btn_back;
+            public Img img_tachie;
             public GameObject go_gameItem;
             public UiGameItemCtrl sub_gameItem;
             public Btn btn_data;
@@ -580,14 +575,15 @@ namespace PlayDataCharacterSkill
             page_PlayDataCharacterEquip = (PlayDataCharacterEquip.UiPlayDataCharacterEquipCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             page_PlayDataCharacterSkill = (PlayDataCharacterSkill.UiPlayDataCharacterSkillCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
             btn_back = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            go_gameItem = uiHolder.elementTrsLst[5].gameObject;
-            sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
-            btn_data = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            sta_data = uiHolder.elementTrsLst[8].GetComponent<Sta>();
-            btn_equip = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            sta_equip = uiHolder.elementTrsLst[10].GetComponent<Sta>();
-            btn_skill = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            sta_skill = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            img_tachie = uiHolder.elementTrsLst[5].GetComponent<Img>();
+            go_gameItem = uiHolder.elementTrsLst[6].gameObject;
+            sub_gameItem = (UiGameItemCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            btn_data = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_data = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_equip = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_equip = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            btn_skill = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_skill = uiHolder.elementTrsLst[13].GetComponent<Sta>();
         }
 
     }

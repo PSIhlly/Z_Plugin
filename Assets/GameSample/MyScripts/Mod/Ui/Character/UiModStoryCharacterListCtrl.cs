@@ -33,6 +33,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
             itemCon = new UiScrViewContainer<UiBigItemCtrl>(this, view.go_bigItem, view.scr_bigItems);
+            view.ipt_lab.onFinishInput += RenameCurrentLab;
+            view.btn_deleteLab.onClick.AddListener(DeleteCurrentLab);
 
         }
         public override void OnShow()
@@ -77,6 +79,8 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
             });
             labCon.Refresh();
 
+            RefreshLabEditor();
+
             itemCon.Clear();
             var datas = model.labId == null
                 ? (CharacterProductForm.DatasByProtouid.ContainsKey(0) ? CharacterProductForm.DatasByProtouid[0] : new List<CharacterProductForm.Data>())
@@ -98,6 +102,69 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterList
 
 
 
+        }
+
+        bool TryGetCurrentLab(out LabForm.Data lab)
+        {
+            lab = null;
+            return model.labId.HasValue &&
+                   model.labId.Value != LabForm.NoneId &&
+                   LabForm.TryGetData(model.labId.Value, out lab) &&
+                   lab.belong == nameof(CharacterProductForm);
+        }
+
+        void RefreshLabEditor()
+        {
+            var canEdit = TryGetCurrentLab(out _);
+            view.ipt_lab.gameObject.SetActive(canEdit);
+            view.btn_deleteLab.gameObject.SetActive(canEdit);
+            view.ipt_lab.Set(canEdit ? LabForm.GetDisplayName(model.labId.Value) : "");
+        }
+
+        void RenameCurrentLab(string value)
+        {
+            if (!TryGetCurrentLab(out var currentLab) || string.IsNullOrWhiteSpace(value))
+            {
+                Refresh();
+                return;
+            }
+
+            var oldLabId = currentLab.id;
+            var newLabId = LabForm.GetOrCreateDisplayName(value.Trim(), nameof(CharacterProductForm), oldLabId);
+            if (newLabId == LabForm.NoneId)
+            {
+                Refresh();
+                return;
+            }
+
+            if (newLabId != oldLabId)
+            {
+                foreach (var data in CharacterProductForm.DataByUid.Values.ToList())
+                {
+                    if (data.labId == oldLabId)
+                        data.labId = newLabId;
+                }
+                LabForm.RemoveData(oldLabId);
+                model.labId = newLabId;
+            }
+
+            Refresh();
+        }
+
+        void DeleteCurrentLab()
+        {
+            if (!TryGetCurrentLab(out var currentLab))
+                return;
+
+            var oldLabId = currentLab.id;
+            foreach (var data in CharacterProductForm.DataByUid.Values.ToList())
+            {
+                if (data.labId == oldLabId)
+                    data.labId = LabForm.NoneId;
+            }
+            LabForm.RemoveData(oldLabId);
+            model.labId = HasUnclassified() ? LabForm.NoneId : (int?)null;
+            Refresh();
         }
     }
 

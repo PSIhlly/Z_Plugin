@@ -129,13 +129,12 @@ These are audited current conditions, not desired behavior. Re-check before acti
 1. `GameSaveController.LoadLab()` calls generated `LabForm.ClearAuto()` while `LabForm.ClearRuntimeData()` exists but is unused.
 2. Generated `ClearAuto()` uses a strict `< idChain.cnt`; a dynamic ID exactly at the pool maximum can survive reset.
 3. `LoadProgress()` relies on surrounding lifecycle clearing rather than clearing its Form itself.
-4. Story entity resources are only written when the target file does not exist; replacing bytes under the same ID can leave stale `Core/ast` content.
-5. `VideoController.GetSupportedExtensions()` currently reports `.mp3`, which appears inconsistent with video import behavior.
-6. `TimeManager.Awake()` hides the base Awake path and deserves focused lifecycle testing if touched.
-7. Several runtime-path product files have unguarded or suspicious Unity Editor namespace references; Player build closure is not established.
-8. Build Settings has no valid enabled scene and no formal automated test suite is present.
-9. Static high-range Lab IDs are a serialized protocol; deleting or renumbering them can strand references in old stories.
-10. Existing generated files and comments contain formatting/encoding noise; broad rewrites can hide functional diffs.
+4. `VideoController.GetSupportedExtensions()` currently reports `.mp3`, which appears inconsistent with video import behavior.
+5. `TimeManager.Awake()` hides the base Awake path and deserves focused lifecycle testing if touched.
+6. Several runtime-path product files have unguarded or suspicious Unity Editor namespace references; Player build closure is not established.
+7. Build Settings has no valid enabled scene and no formal automated test suite is present.
+8. Static high-range Lab IDs are a serialized protocol; deleting or renumbering them can strand references in old stories.
+9. Existing generated files and comments contain formatting/encoding noise; broad rewrites can hide functional diffs.
 
 Use the audit script for a quick current snapshot:
 

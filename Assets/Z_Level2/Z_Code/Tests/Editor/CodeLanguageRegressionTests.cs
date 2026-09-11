@@ -114,6 +114,30 @@ Return i;";
         }
 
         [Test]
+        public void IfElse_BlocksRemainDistinctFromTheIfNode()
+        {
+            const string source = "if(a==0){}else{}";
+            var compiler = new Compiler();
+
+            var success = compiler.TryCompile(source, out _, out var syntaxNodes,
+                out _, out _, out _, out var errors);
+
+            Assert.That(success, Is.True, string.Join("\n", errors.Select(error => error.ToString())));
+            Assert.That(syntaxNodes, Has.Count.EqualTo(1));
+
+            var ifNode = syntaxNodes[0];
+            Assert.That(ifNode.desc.type, Is.EqualTo(CodeType.Reserved));
+            Assert.That(ifNode.desc.code, Is.EqualTo("if"));
+            Assert.That(ifNode.subNodes, Has.Count.EqualTo(3));
+            Assert.That(ifNode.subNodes[1].desc.type, Is.EqualTo(CodeType.Action));
+            Assert.That(ifNode.subNodes[1].desc.code, Is.EqualTo("then"));
+            Assert.That(ifNode.subNodes[1].subNodes, Is.Empty);
+            Assert.That(ifNode.subNodes[2].desc.type, Is.EqualTo(CodeType.Action));
+            Assert.That(ifNode.subNodes[2].desc.code, Is.EqualTo("else"));
+            Assert.That(ifNode.subNodes[2].subNodes, Is.Empty);
+        }
+
+        [Test]
         public void StringEscapes_AreDecodedExactlyOnce()
         {
             const string source = "Return \"quote:\\\" slash:\\\\ newline:\\n tab:\\t\";";

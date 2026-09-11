@@ -82,7 +82,7 @@ namespace Z_DataSystem
 #if UNITY_EDITOR_WIN
             callback?.Invoke(GetFiles(
                 "Select audio files",
-                "Audio files\0*.mp3;*.aac;*.flac\0All files\0*.*\0\0"));
+                "Audio files\0*.mp3;*.aac;*.flac;*.wav\0All files\0*.*\0\0"));
 #else
             NativeGallery.GetAudiosFromGallery(paths => callback?.Invoke(paths));
 #endif

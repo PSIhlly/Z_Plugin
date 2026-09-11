@@ -109,6 +109,7 @@ namespace Ui.ModAssetSelectWindow
         }
         public override void OnShow()
         {
+            StopPreviewAudio();
             var previousPrm = model.prm;
             var preserveLabTab = model.labTabInitialized &&
                                   GetLabScope(previousPrm) == GetLabScope(param);
@@ -125,6 +126,20 @@ namespace Ui.ModAssetSelectWindow
 
             model.sel = null;
             Refresh();
+        }
+
+        public override void OnHide()
+        {
+            StopPreviewAudio();
+        }
+
+        void StopPreviewAudio()
+        {
+            if (view?.mp_ == null)
+                return;
+
+            view.mp_.Stop();
+            view.mp_.CloseMedia();
         }
 
         string GetLabScope(UiModAssetSelectWindowParam prm)
@@ -381,6 +396,10 @@ namespace Ui.ModAssetSelectWindow
             model.sel.bytes = source.bytes;
             model.sel.hash = source.hash;
             model.sel.asset = source.asset;
+            Z_EventHelper.Invoke(new AssetEvent
+            {
+                importAssetName = model.sel.name
+            });
             Refresh();
         }
         public void Import(int labId)

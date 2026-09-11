@@ -35,7 +35,6 @@ public partial class ModCmd
         public MethodInfo removeData;
         public MethodInfo getJoByData;
         public MethodInfo getDataByJo;
-        public MethodInfo copy;
         public MethodInfo reset;
     }
 
@@ -88,9 +87,15 @@ public partial class ModCmd
             return false;
         }
 
-        var copy = form.copy.Invoke(source, new object[] { false });
         var copyName = GetCopyName(form, GetName(form, source), GetProtoUid(form, source));
-        form.name.SetValue(copy, copyName);
+
+        // Generated Data.Copy(false) only clones the outer List/Dictionary containers.
+        // Round-trip the complete persisted payload so nested Form data (animations,
+        // event triggers, model data, parameters, and so on) is also recreated.
+        var snapshot = (JObject)form.getJoByData.Invoke(null, new[] { source });
+        snapshot[form.keyName] = -1;
+        snapshot["name"] = copyName;
+        var copy = form.getDataByJo.Invoke(null, new object[] { snapshot });
 
         var uid = (int)form.addData.Invoke(null, new object[] { copy });
         if (uid < 0)
@@ -258,13 +263,12 @@ public partial class ModCmd
             removeData = formType.GetMethod("RemoveData", staticFlags, null, new[] { typeof(int) }, null),
             getJoByData = formType.GetMethod("GetJoByData", staticFlags, null, new[] { dataType }, null),
             getDataByJo = formType.GetMethod("GetDataByJo", staticFlags, null, new[] { typeof(JObject) }, null),
-            copy = dataType.GetMethod("Copy", instanceFlags, null, new[] { typeof(bool) }, null),
             reset = dataType.GetMethod("Reset", instanceFlags, null, new[] { dataType }, null)
         };
 
         return api.key == null || api.name == null || api.defaultData == null || api.dataByKey == null ||
                api.addData == null || api.removeData == null || api.getJoByData == null ||
-               api.getDataByJo == null || api.copy == null || api.reset == null
+               api.getDataByJo == null || api.reset == null
             ? null
             : api;
     }

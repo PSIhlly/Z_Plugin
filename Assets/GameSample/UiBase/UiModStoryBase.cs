@@ -935,60 +935,6 @@ namespace ModStoryCharacterList
 
 
 
-    public partial class UiLabParam:UiParam
-    {
-    }
-
-    public partial class UiLabView:UiView
-    {
-
-            public GameObject go_lab;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiLabView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiLabCtrl:UiCtrl
-    {
-        public UiLabView view;
-        public UiLabModel model;
-        public UiLabParam param;
-        public UiModStoryCharacterListCtrl parent=>(UiModStoryCharacterListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiLabParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiLabView(uiHolder);
-            model=new UiLabModel();
-
-
-        }
-
-    }
-    public partial class UiLabModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiBigItemParam:UiParam
     {
     }
@@ -1046,6 +992,60 @@ namespace ModStoryCharacterList
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryCharacterListCtrl parent=>(UiModStoryCharacterListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryCharacterListParam:UiParam
     {
     }
@@ -1053,23 +1053,27 @@ namespace ModStoryCharacterList
     public partial class UiModStoryCharacterListView:UiView
     {
 
-            public ScrView scr_labs;
             public ScrView scr_bigItems;
-            public GameObject go_lab;
-            public UiLabCtrl sub_lab;
+            public ScrView scr_labs;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public GameObject go_bigItem;
             public Sta sta_bigItem;
             public UiBigItemCtrl sub_bigItem;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStoryCharacterListView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[2].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            scr_bigItems = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_labs = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             go_bigItem = uiHolder.elementTrsLst[4].gameObject;
             sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             sub_bigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[7].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -1094,10 +1098,10 @@ namespace ModStoryCharacterList
             model=new UiModStoryCharacterListModel();
 
 
-            view.sub_lab = new UiLabCtrl();
-            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_bigItem = new UiBigItemCtrl();
-            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -2225,60 +2229,6 @@ namespace ModStorySkillList
 
 
 
-    public partial class UiLabParam:UiParam
-    {
-    }
-
-    public partial class UiLabView:UiView
-    {
-
-            public GameObject go_lab;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiLabView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiLabCtrl:UiCtrl
-    {
-        public UiLabView view;
-        public UiLabModel model;
-        public UiLabParam param;
-        public UiModStorySkillListCtrl parent=>(UiModStorySkillListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiLabParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiLabView(uiHolder);
-            model=new UiLabModel();
-
-
-        }
-
-    }
-    public partial class UiLabModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiBigItemParam:UiParam
     {
     }
@@ -2336,6 +2286,60 @@ namespace ModStorySkillList
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStorySkillListCtrl parent=>(UiModStorySkillListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStorySkillListParam:UiParam
     {
     }
@@ -2343,23 +2347,27 @@ namespace ModStorySkillList
     public partial class UiModStorySkillListView:UiView
     {
 
-            public ScrView scr_labs;
             public ScrView scr_bigItems;
-            public GameObject go_lab;
-            public UiLabCtrl sub_lab;
+            public ScrView scr_labs;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public GameObject go_bigItem;
             public Sta sta_bigItem;
             public UiBigItemCtrl sub_bigItem;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStorySkillListView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[2].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            scr_bigItems = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_labs = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             go_bigItem = uiHolder.elementTrsLst[4].gameObject;
             sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             sub_bigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[7].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -2384,10 +2392,10 @@ namespace ModStorySkillList
             model=new UiModStorySkillListModel();
 
 
-            view.sub_lab = new UiLabCtrl();
-            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_bigItem = new UiBigItemCtrl();
-            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -2741,60 +2749,6 @@ namespace ModStoryItemList
 
 
 
-    public partial class UiLabParam:UiParam
-    {
-    }
-
-    public partial class UiLabView:UiView
-    {
-
-            public GameObject go_lab;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiLabView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiLabCtrl:UiCtrl
-    {
-        public UiLabView view;
-        public UiLabModel model;
-        public UiLabParam param;
-        public UiModStoryItemListCtrl parent=>(UiModStoryItemListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiLabParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiLabView(uiHolder);
-            model=new UiLabModel();
-
-
-        }
-
-    }
-    public partial class UiLabModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiBigItemParam:UiParam
     {
     }
@@ -2852,6 +2806,60 @@ namespace ModStoryItemList
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryItemListCtrl parent=>(UiModStoryItemListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryItemListParam:UiParam
     {
     }
@@ -2859,23 +2867,27 @@ namespace ModStoryItemList
     public partial class UiModStoryItemListView:UiView
     {
 
-            public ScrView scr_labs;
             public ScrView scr_bigItems;
-            public GameObject go_lab;
-            public UiLabCtrl sub_lab;
+            public ScrView scr_labs;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public GameObject go_bigItem;
             public Sta sta_bigItem;
             public UiBigItemCtrl sub_bigItem;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStoryItemListView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[2].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            scr_bigItems = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_labs = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             go_bigItem = uiHolder.elementTrsLst[4].gameObject;
             sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             sub_bigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[7].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -2900,10 +2912,10 @@ namespace ModStoryItemList
             model=new UiModStoryItemListModel();
 
 
-            view.sub_lab = new UiLabCtrl();
-            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_bigItem = new UiBigItemCtrl();
-            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -3649,60 +3661,6 @@ namespace ModStoryMapObjectList
 
 
 
-    public partial class UiLabParam:UiParam
-    {
-    }
-
-    public partial class UiLabView:UiView
-    {
-
-            public GameObject go_lab;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiLabView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiLabCtrl:UiCtrl
-    {
-        public UiLabView view;
-        public UiLabModel model;
-        public UiLabParam param;
-        public UiModStoryMapObjectListCtrl parent=>(UiModStoryMapObjectListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiLabParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiLabView(uiHolder);
-            model=new UiLabModel();
-
-
-        }
-
-    }
-    public partial class UiLabModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiBigItemParam:UiParam
     {
     }
@@ -3760,6 +3718,60 @@ namespace ModStoryMapObjectList
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryMapObjectListCtrl parent=>(UiModStoryMapObjectListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryMapObjectListParam:UiParam
     {
     }
@@ -3767,25 +3779,29 @@ namespace ModStoryMapObjectList
     public partial class UiModStoryMapObjectListView:UiView
     {
 
-            public ScrView scr_labs;
             public Btn btn_back;
             public ScrView scr_bigItems;
-            public GameObject go_lab;
-            public UiLabCtrl sub_lab;
+            public ScrView scr_labs;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public GameObject go_bigItem;
             public Sta sta_bigItem;
             public UiBigItemCtrl sub_bigItem;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStoryMapObjectListView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            btn_back = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            scr_bigItems = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[3].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            scr_labs = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[4].GetComponent<Btn>();
             go_bigItem = uiHolder.elementTrsLst[5].gameObject;
             sta_bigItem = uiHolder.elementTrsLst[6].GetComponent<Sta>();
             sub_bigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[8].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -3810,10 +3826,10 @@ namespace ModStoryMapObjectList
             model=new UiModStoryMapObjectListModel();
 
 
-            view.sub_lab = new UiLabCtrl();
-            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_bigItem = new UiBigItemCtrl();
-            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -5079,60 +5095,6 @@ namespace ModStoryEffectList
 
 
 
-    public partial class UiLabParam:UiParam
-    {
-    }
-
-    public partial class UiLabView:UiView
-    {
-
-            public GameObject go_lab;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiLabView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiLabCtrl:UiCtrl
-    {
-        public UiLabView view;
-        public UiLabModel model;
-        public UiLabParam param;
-        public UiModStoryEffectListCtrl parent=>(UiModStoryEffectListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiLabParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiLabView(uiHolder);
-            model=new UiLabModel();
-
-
-        }
-
-    }
-    public partial class UiLabModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiBigItemParam:UiParam
     {
     }
@@ -5190,6 +5152,60 @@ namespace ModStoryEffectList
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryEffectListCtrl parent=>(UiModStoryEffectListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryEffectListParam:UiParam
     {
     }
@@ -5197,23 +5213,27 @@ namespace ModStoryEffectList
     public partial class UiModStoryEffectListView:UiView
     {
 
-            public ScrView scr_labs;
             public ScrView scr_bigItems;
-            public GameObject go_lab;
-            public UiLabCtrl sub_lab;
+            public ScrView scr_labs;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public GameObject go_bigItem;
             public Sta sta_bigItem;
             public UiBigItemCtrl sub_bigItem;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStoryEffectListView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[2].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            scr_bigItems = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_labs = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             go_bigItem = uiHolder.elementTrsLst[4].gameObject;
             sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             sub_bigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[7].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -5238,10 +5258,10 @@ namespace ModStoryEffectList
             model=new UiModStoryEffectListModel();
 
 
-            view.sub_lab = new UiLabCtrl();
-            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_bigItem = new UiBigItemCtrl();
-            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -5529,60 +5549,6 @@ namespace ModStoryMissionList
 
 
 
-    public partial class UiLabParam:UiParam
-    {
-    }
-
-    public partial class UiLabView:UiView
-    {
-
-            public GameObject go_lab;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiLabView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_lab = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiLabCtrl:UiCtrl
-    {
-        public UiLabView view;
-        public UiLabModel model;
-        public UiLabParam param;
-        public UiModStoryMissionListCtrl parent=>(UiModStoryMissionListCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiLabParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiLabView(uiHolder);
-            model=new UiLabModel();
-
-
-        }
-
-    }
-    public partial class UiLabModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiBigItemParam:UiParam
     {
     }
@@ -5640,6 +5606,60 @@ namespace ModStoryMissionList
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryMissionListCtrl parent=>(UiModStoryMissionListCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryMissionListParam:UiParam
     {
     }
@@ -5647,23 +5667,27 @@ namespace ModStoryMissionList
     public partial class UiModStoryMissionListView:UiView
     {
 
-            public ScrView scr_labs;
             public ScrView scr_bigItems;
-            public GameObject go_lab;
-            public UiLabCtrl sub_lab;
+            public ScrView scr_labs;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public GameObject go_bigItem;
             public Sta sta_bigItem;
             public UiBigItemCtrl sub_bigItem;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStoryMissionListView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_labs = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            scr_bigItems = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[2].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+            scr_bigItems = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            scr_labs = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             go_bigItem = uiHolder.elementTrsLst[4].gameObject;
             sta_bigItem = uiHolder.elementTrsLst[5].GetComponent<Sta>();
             sub_bigItem = (UiBigItemCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[7].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -5688,10 +5712,10 @@ namespace ModStoryMissionList
             model=new UiModStoryMissionListModel();
 
 
-            view.sub_lab = new UiLabCtrl();
-            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
             view.sub_bigItem = new UiBigItemCtrl();
-            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.sub_bigItem.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

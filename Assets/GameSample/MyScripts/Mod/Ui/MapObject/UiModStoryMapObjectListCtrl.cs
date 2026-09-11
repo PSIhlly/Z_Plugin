@@ -33,6 +33,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             model.datas = new Dictionary<int, List<MapBaseForm.Data>>();
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
             itemCon = new UiScrViewContainer<UiBigItemCtrl>(this, view.go_bigItem, view.scr_bigItems);
+            view.ipt_lab.onFinishInput += RenameCurrentLab;
+            view.btn_deleteLab.onClick.AddListener(DeleteCurrentLab);
             view.btn_back.onClick.AddListener(() =>
             {
                 parent.SelType(0);
@@ -140,6 +142,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                 isNew = true
             });
             labCon.Refresh();
+            RefreshLabEditor();
             itemCon.Clear();
 
             List<MapBaseForm.Data> datas = null;
@@ -174,6 +177,90 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
 
 
 
+        }
+
+        bool TryGetCurrentLab(out LabForm.Data lab)
+        {
+            lab = null;
+            return model.labId.HasValue &&
+                   model.labId.Value != LabForm.NoneId &&
+                   LabForm.TryGetData(model.labId.Value, out lab) &&
+                   lab.belong == GetLabBelong();
+        }
+
+        void RefreshLabEditor()
+        {
+            var canEdit = TryGetCurrentLab(out _);
+            view.ipt_lab.gameObject.SetActive(canEdit);
+            view.btn_deleteLab.gameObject.SetActive(canEdit);
+            view.ipt_lab.Set(canEdit ? LabForm.GetDisplayName(model.labId.Value) : "");
+        }
+
+        void RenameCurrentLab(string value)
+        {
+            if (!TryGetCurrentLab(out var currentLab) || string.IsNullOrWhiteSpace(value))
+            {
+                Refresh();
+                return;
+            }
+
+            var oldLabId = currentLab.id;
+            var newLabId = LabForm.GetOrCreateDisplayName(value.Trim(), GetLabBelong(), oldLabId);
+            if (newLabId == LabForm.NoneId)
+            {
+                Refresh();
+                return;
+            }
+
+            if (newLabId != oldLabId)
+            {
+                ReassignLab(oldLabId, newLabId);
+                LabForm.RemoveData(oldLabId);
+                model.labId = newLabId;
+                Update();
+            }
+
+            Refresh();
+        }
+
+        void DeleteCurrentLab()
+        {
+            if (!TryGetCurrentLab(out var currentLab))
+                return;
+
+            ReassignLab(currentLab.id, LabForm.NoneId);
+            LabForm.RemoveData(currentLab.id);
+            Update();
+            model.labId = HasUnclassified() ? LabForm.NoneId : (int?)null;
+            Refresh();
+        }
+
+        void ReassignLab(int oldLabId, int newLabId)
+        {
+            switch (param.type)
+            {
+                case 1:
+                    foreach (var data in MapTextureForm.DataById.Values.ToList())
+                    {
+                        if (data.labId == oldLabId)
+                            data.labId = newLabId;
+                    }
+                    break;
+                case 2:
+                    foreach (var data in MapMaskForm.DataById.Values.ToList())
+                    {
+                        if (data.labId == oldLabId)
+                            data.labId = newLabId;
+                    }
+                    break;
+                case 3:
+                    foreach (var data in MapObjectForm.DataById.Values.ToList())
+                    {
+                        if (data.labId == oldLabId)
+                            data.labId = newLabId;
+                    }
+                    break;
+            }
         }
 
         public string GetLabBelong()

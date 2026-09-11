@@ -183,7 +183,10 @@ namespace Z_Code
             Consume("(", "if 后需要 '('");
             var condition = ParseExpression();
             Consume(")", "if 条件后需要 ')'");
-            var thenBlock = ParseBlock("if");
+            // Keep the branch container distinct from the reserved if node. The event editor
+            // renders Action node names as branch rows, so naming this block "if" makes a
+            // compiled if appear to contain another if.
+            var thenBlock = ParseBlock("then");
 
             var children = new List<SyntaxNode> { condition, thenBlock };
             if (Match("else"))

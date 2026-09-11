@@ -36,6 +36,7 @@ namespace Ui.PlayMap
     }
     public partial class UiPlayMapCtrl
     {
+        private const float AreaEdgePadding = 200f;
         public PlayMapController mapCtrl;
         private float lastRefreshTime;
         private bool forceAreaContentRefresh;
@@ -102,7 +103,11 @@ namespace Ui.PlayMap
                     {
                         model.cur = mapCtrl.curScene.uid;
                         model.y = GetClosestHeight(playerHeight);
-                        view.rtf_area.sizeDelta = new UnityEngine.Vector2(mapCtrl.cols * mapCtrl.tileSize, mapCtrl.rows * mapCtrl.tileSize);
+                        view.rtf_area.sizeDelta = new Vector2(
+                            mapCtrl.cols * mapCtrl.tileSize + AreaEdgePadding * 2,
+                            mapCtrl.rows * mapCtrl.tileSize + AreaEdgePadding * 2);
+                        view.rimg_unlock.rectTransform.offsetMin = Vector2.one * AreaEdgePadding;
+                        view.rimg_unlock.rectTransform.offsetMax = Vector2.one * -AreaEdgePadding;
                         forceAreaContentRefresh = true;
                     }
 
@@ -290,7 +295,7 @@ namespace Ui.PlayMap
         {
             view.img_mark.sprite = model.prm.icon;
             var relativePos = new Vector2((model.prm.pos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.pos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
-            view.go_mark.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
+            view.go_mark.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rimg_unlock.rectTransform);
             
         }
     }
@@ -333,7 +338,7 @@ namespace Ui.PlayMap
         public void Refresh()
         {
             var relativePos = new Vector2((model.prm.data.targetPos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.data.targetPos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
-            view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
+            view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rimg_unlock.rectTransform);
             view.rtf_area.sizeDelta.Set(model.prm.data.radius*2, model.prm.data.radius*2);
             
         }

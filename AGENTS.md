@@ -2,9 +2,9 @@
 - Project name: Z_Plugin
 - Unity version: Unity 2022.3.61t4
 - Active game object:
-  - Name: bolder
+  - Name: DialogBg
   - Tag: Untagged
-  - Layer: UI
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
 
 ## Codex project knowledge

@@ -26,7 +26,7 @@ Story 指令用于修改 ModStory 中的故事数据表。固定结构如下：
 其中：
   Add   新增数据。
   Del   删除数据。
-  Copy  复制数据，并自动生成名称：原名称 Copy；重名时追加 2、3……。
+  Copy  深拷贝全部数据，并自动生成名称：原名称 Copy；重名时追加 2、3……。
   Set   修改已有数据；后面的 JSON 只覆盖指定字段，未指定字段保持不变。
   FormName 是故事 Form 的名称，例如 Character、Item、Mission 等。
 

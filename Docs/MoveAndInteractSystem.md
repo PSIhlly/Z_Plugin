@@ -193,6 +193,7 @@ Move(dir):
 - **移动队列**：初始方向被墙阻挡后，计算滑行方向重新入队，支持多次重试
 - **首次尝试标记**：`firstTry=true` 时即使 `res=0` 也计算避障；后续迭代要求 `res>0.001` 才滑行，防止无限循环
 - **邻域遍历**：只检测 `GetNineTile` 返回的有界邻域，且跳过低于当前层的 tile。候选不能再按 Tile 锚点的三维距离排除，跨层 Collider 由 Mesh 的 AABB/SAT 判定实际是否接触
+- **通行类型**：只检查人物中心所属的逻辑 Tile，不读取 Collider/Trigger，也不因人物尺寸或相邻 Tile 受限而提前拦截。目标中心落入不满足 `passType` 的 Tile 时，通过带通行类型过滤的最近有效位置搜索，把中心放到距离目标最近的合法 Tile 内。
 - **自动朝向**：非玩家角色累计实际水平位移；只有严格超过 `abs(speed) / 3` 才朝本次实际移动方向转向并清零累计值。碰撞未移动、纯 Y 位移和短距离移动均保持旧朝向
 
 ### 3.3 碰撞检测调度
@@ -570,13 +571,17 @@ ObjectUnit.Move(dir):
 
 1. **AABB 快速排除**：`SphereIntersectCube` 开头用 AABB 最近点距离 > `radius + mag` 直接返回 None
 2. **SAT 轴去重**：`AddAxisCheckSphere` 检查轴是否已存在（含反向），避免重复检测
-3. **Mesh 缓存**：平移只更新已有顶点；预制、旋转或缩放变化才重建几何
+3. **Mesh 与 mapground 覆盖缓存**：平移只更新已有顶点；预制、旋转或缩放变化才重建几何。周期导航刷新复用每个 `mapground` 已覆盖的 NavUnit 坐标，不再重复扫描 Collider 顶点和三维候选格；仅在该 Tile 的 prefab、mapPos、pos、euler、scale、地图格尺寸变化，或导航 Tile 新增/删除/中心移动时失效。
 4. **existUnit 去重**：Move 中用 `HashSet<MapUnit>` 避免同一帧重复检测同一 Unit
 5. **覆盖关联增量更新**：每次仍查询完整范围（含上层），仅修改新旧覆盖格的差集；owner 索引与实际覆盖索引继续分离。
-6. **遮挡最终状态提交**：先完成地块初始化和 BFS，只记录地块最终透明度；再各遍历一次 `curObjectLst/curItemLst/curCharacterLst`，按所属地块取最终值（无 owner 或不在本帧地块集合时为 1）。Object 的视觉覆盖遮挡优先，并保留列表外候选的遮挡与恢复。附属列表沿用 `UpdateSingleOne`、视野刷新和删除流程维护；公开 `SetGroupVision` 仍立即作用于一组单位。最后按实例的上次提交状态决定是否写入，复用 MaterialPropertyBlock，保留其它材质属性；绑定子单位、对象池复用、显示层和 owner 变化仍需正确刷新。
+6. **遮挡最终状态提交**：先完成地块初始化和 BFS，只记录地块最终透明度；再各遍历一次 `curObjectLst/curItemLst/curCharacterLst`，按所属地块取最终值（无 owner 或不在本帧地块集合时为 1）。Object 的视觉覆盖遮挡优先，并保留列表外候选的遮挡与恢复。附属列表沿用 `UpdateSingleOne`、视野刷新和删除流程维护；公开 `SetGroupVision` 仍立即作用于一组单位。最后按实例的上次提交状态决定是否写入，复用 MaterialPropertyBlock，保留其它材质属性；绑定子单位、对象池复用、显示层和 owner 变化仍需正确刷新。ModScene 的 Tile 显示仍使用层级上限；低于当前选择层的 normal/front Renderer 对将各自记录的初始 `_LightSensitivity` 减半，当前层保持初始值，Event、退出 Mod 和对象池复用时恢复初始值且不重复折半。
 7. **只读字典查询**：`DoubleDictionary.Get/GetFirst` 命中时合并为一次查找，保留缺失时建空列表的兼容行为。渲染查询使用 `TryGet/TryGetFirst`，空地块和缺失 owner 不会为查询创建空列表或污染关联索引。
+8. **Play 高层遮挡按层高差触发 BFS，并保留一格 Z 误差**：侧视模式以小 Z 为遮挡方向，满足 `人物 mapPos.z - 高层 mapPos.z <= 高层 mapPos.y - 人物 mapPos.y + 1` 时触发；额外一格是固定误差，不做透明度渐变。X 默认与人物对齐，仅在 `OVERLAY_HIDE` 开启时使用原有容差。对每个高层 Tile `(x, highY, z)`，先查询投影格 `(x, currentY, z + highY - currentY)` 的基础 `NavUnit` 可走性；节点缺失、落空或没有连接时，该高层 Tile 不做透明/半透明处理并且不产生高层 Object 遮挡候选。此判断不读取 `passType`。Tile 的 front 使用 Renderer `3/4/5`，再独立检查投影格 `(x, currentY, z + highY - currentY - 1)`；该格基础不可走时，只让 front 保持不透明，普通 Renderer `0/1/2` 与附属单位仍沿用 Tile 原本的遮挡结果。普通触发结果为半透明（`_Show=0.5`），但只应用在距人物当前 Tile 的 X/Z 欧几里得距离不超过 3 格的范围。只有同一高层在人物左、右、前、后四个相邻 X/Z 格都存在 Tile 时，该层才采用全透明（`_Show=0`）；人物正上方的中心格不参与条件，允许为空。全透明 BFS 先从四邻格启动，再处理普通起点，因此空心包围的四边也会隐藏；触发后仍遍历当前配置视野内对应相连高层，但投影到不可走导航格的 Tile 始终保持不透明。超出 Z 误差的孤立高层保持显示。俯视仍从同 X/Z 起点触发（另叠加 `OVERLAY_HIDE` 容差），本层 Object 的侧视遮挡检测继续使用完整配置视野。高层 Object 跟随覆盖 Tile 的最低透明度；同时覆盖本层时仍以本层半透明（`_Show=0.5`）优先，不依赖 owner 或关联顺序。保留附属单位继承、离开遮挡层恢复和 End 清理。`DisFadeCode` 的 ShadowCaster 不读取 `_Show`，所以透明或半透明的 Tile/Object 仍投射阴影；阴影轮廓继续按 `_AlphaTex` 和贴图 Alpha 裁切，且 Renderer 本身必须开启投影。
+9. **Mod 高层统一半透明**：`GlobalSettings.MOD_HIGH_LAYER_HALF_TRANSPARENT` 默认开启。`DynamicGlobalSettings.playing == false` 时，以相机目标所在 map 层为本层，当前视野内全部更高层 Tile 及其附属 Item/Character 统一使用 `_Show=0.5`，并跳过 Play 高层遮挡 BFS。Object 按视觉覆盖高层收集，因此 owner 在视野外也能半透明；本层和低层 Tile 不受影响，本层 Object 的既有遮挡规则继续生效。进入 Play 后恢复第 8 条的普通遮挡逻辑。
+10. **删除 Tile 后保持高度索引稀疏一致**：`MapInfo.UnRegisterMap` 删除某个高度后，若该 X/Z 已无任何 Tile，会一并删除空的 `mapXZ2Y` 键。视野刷新只枚举 `mapXZ2Y` 中真实登记的高度，并跳过找不到精确 Tile 数据的陈旧项，不再把 `Min..Max` 之间的空层当成 Tile；因此 Mod 的 all erase/delete all 删除整列或中间层后，下一帧 `FreshMap` 不会读取空数据。
+11. **视野集合直接增量维护**：`curTileLst/newMapLst/delMapLst` 与可见 Object/Item/Character 均为无序 `HashSet`。视野边界未变化时 `FreshMap` 直接返回；普通跨格移动只枚举进入视野的非重叠薄片，`ShowAndAddLst` 仅对 `HashSet.Add` 成功的新 Tile 调用 `Show`，离开 Tile 在一次可见集合扫描中直接记录并批量移除。首次、强制刷新或新旧视野完全不重叠时才完整扫描当前视野，不再复制整个集合后用多次 `List.Remove` 求差集。附属单位根据“任一关联 Tile 仍在显示”决定最终显示状态，不依赖进入/离开集合的枚举顺序。
 
-隔离回归入口：`Docs/Tests/Run-MapRuntimeRegression.ps1`。它编译真实生产程序集，并在 Temp 下的独立 Unity 工程验证几何等价、双向覆盖关联、遮挡提交和事件过滤；不加载当前故事或玩家存档。实际移动、Shader 画面和目标设备性能仍需 Play/Player 复测。
+隔离回归入口：`Docs/Tests/Run-MapRuntimeRegression.ps1`。它编译真实生产程序集，并在 Temp 下的独立 Unity 工程验证几何等价、双向覆盖关联、通行类型移动边界、遮挡提交和事件过滤；不加载当前故事或玩家存档。实际移动、Shader 画面和目标设备性能仍需 Play/Player 复测。
 
 ---
 
@@ -632,7 +637,7 @@ ObjectUnit.Move(dir):
 
 **根因**：`NavigationController` 的 `blocked` 集合没有根据 Tile Collider 填充。
 
-**修复**：构建导航时读取 `mapground` 的 `CollideOnly` 网格，按实际包围范围标记被占据的下层导航单元，同时排除其自身单元以保留顶面可行走。
+**修复**：构建导航时读取 `mapground` 的 `CollideOnly` 网格，按实际包围范围标记被占据的下层导航单元，同时排除其自身单元以保留顶面可行走。覆盖结果按 `mapground` Tile 缓存；周期刷新直接合并缓存坐标，只有 Tile 几何签名或导航格布局变化时才重新计算。
 
 ---
 
@@ -646,7 +651,13 @@ ObjectUnit.Move(dir):
 
 Tile 使用的三层 MapTexture ID 已保存在 `TileUnitForm.texDic` 的地表槽位。每次进入场景时，将三层材质各自非零的 `MapTextureForm.passType` 聚合进 `TileUnit.passTypes`；`0` 表示该材质不增加限制。角色能力从所属 `CharacterProductForm.passType` 重算进 `CharacterUnit.passTypes`。
 
-人物只有包含目标 Tile 的全部要求类型时才能通行。手动移动按角色实际 Collider footprint 截断在不满足类型的 Tile 前；BFS 的 clearance 检查和直线路径平滑同样检查 footprint 内每个 `NavUnit.passTypes`，因此寻路与实际移动使用一致规则。`TileUnitForm.passType` 只保留首个类型 ID 作为兼容缓存，完整要求集合不压缩进该 int 字段。
+人物只有包含其中心目标 Tile 的全部要求类型时才能通行。手动移动的目标中心落入不满足类型的 Tile 后，会搜索并落到距离目标最近的合法位置；人物尺寸和 Collider/Trigger 不参与该判定。BFS 仍按 footprint 检查物理通道宽度，但 `passType` 只检查人物中心经过的 `NavUnit`，因此不会被相邻受限 Tile 误拦。`TileUnitForm.passType` 只保留首个类型 ID 作为兼容缓存，完整要求集合不压缩进该 int 字段。
+
+### 6.10 WangTile 动画帧
+
+开启 `isWangTile` 或 `frontIsWangTile` 后，每一张配置的源动画帧都要按同一个 8 邻接 mask 拆成 WangTile 变体。相同 mask 的生成贴图按源列表顺序组成动画，并继续使用 `MapTextureForm.animTimeInterval` 切换；普通层和前景层分别维护序列。`WangTileDic` 与 `FrontWangTileDic` 保留第一张有效变体用于兼容和静态采样，完整动画缓存随场景生成、卸载和重载一起清理。
+
+Tile（含 WangTile 的普通层与前景层）、Object、Item 的贴图动画不以实例出现时间起拍。Play 中统一用 `ProgressForm.seconds` 计算当前帧，新进入视野或从对象池恢复的实例会直接加入已有动画相位，游戏时长暂停时画面也保持当前帧。底层 `Z_Time` 通过 `animationTimeGetter` 获取该时钟，避免反向依赖存档程序集；UGC 编辑预览继续使用 `Time.time`。人物动画不使用这套全局相位。
 
 ## 附录：关键文件索引
 

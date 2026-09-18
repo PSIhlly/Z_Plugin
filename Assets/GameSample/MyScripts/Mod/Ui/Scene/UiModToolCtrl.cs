@@ -131,17 +131,6 @@ namespace Ui.ModSceneMain.ModTool
                 return ModManager.instance.sceneCtrl.posing;
             }
         }
-        public int layer
-        {
-            set
-            {
-                ModManager.instance.sceneCtrl.layer = value;
-            }
-            get
-            {
-                return ModManager.instance.sceneCtrl.layer;
-            }
-        }
     }
 
     public partial class UiModToolCtrl
@@ -251,21 +240,6 @@ namespace Ui.ModSceneMain.ModTool
                   Refresh();
               });
 
-            view.btn_layer0.onClick.AddListener(() =>
-            {
-                model.layer = 0;
-                Refresh();
-            });
-            view.btn_layer1.onClick.AddListener(() =>
-            {
-                model.layer = 1;
-                Refresh();
-            });
-            view.btn_layer2.onClick.AddListener(() =>
-            {
-                model.layer = 2;
-                Refresh();
-            });
         }
         public override void OnShow()
         {
@@ -408,13 +382,6 @@ namespace Ui.ModSceneMain.ModTool
             view.ipt_posSetY.Set(model.posY);
             view.ipt_posSetZ.Set(model.posZ);
             view.ipt_rotateSet.Set(model.angle);
-
-            view.go_layer.SetActive(model.curType.needLayer
-                || (model.curData != null && model.curData is MapEraseForm.Data erase && erase.texture));
-
-            view.sta_layer0.ChangeState(model.layer == 0 ? 1 : 0);
-            view.sta_layer1.ChangeState(model.layer == 1 ? 1 : 0);
-            view.sta_layer2.ChangeState(model.layer == 2 ? 1 : 0);
 
         }
         void RefreshLabs()

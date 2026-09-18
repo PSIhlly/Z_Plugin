@@ -187,6 +187,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     public void EndScene()
     {
+        effectCtrl.End();
         _sceneCtrl.End();
         _infoCtrl.End();
         mapCtrl.End();

@@ -70,6 +70,10 @@ namespace Form
     {
         public partial class Data
         {
+            // Runtime-only owner identity for scene events. The uid can be reused
+            // after removal, so checking the integer alone cannot identify a stale event.
+            public UnitForm.Data sceneOwner;
+
             public override RetInfo Interpret()
             {
                 if (_interpreter == null)
@@ -194,53 +198,185 @@ public static partial class GlobalSettings
 }
 public class GameEventController : Z_Controller<GameManager>
 {
+    private sealed class EventTask
+    {
+        private readonly InterpretAsyncTask asyncTask;
+        private readonly InterpretDataForm.Data interpretOwner;
+        private readonly EventInterpretDataForm.Data eventOwner;
+        private readonly Func<bool> update;
+        private bool isCancelled;
+
+        public EventTask(InterpretAsyncTask asyncTask, InterpretDataForm.Data interpretOwner,
+            EventInterpretDataForm.Data eventOwner, Func<bool> update)
+        {
+            this.asyncTask = asyncTask;
+            this.interpretOwner = interpretOwner;
+            this.eventOwner = eventOwner;
+            this.update = update;
+        }
+
+        public bool IsOwnedBy(UnitForm.Data unitData)
+        {
+            return eventOwner != null && ReferenceEquals(eventOwner.sceneOwner, unitData);
+        }
+
+        public bool IsOwnedBy(EventInterpretDataForm.Data data)
+        {
+            return ReferenceEquals(eventOwner, data);
+        }
+
+        public void Cancel()
+        {
+            isCancelled = true;
+            asyncTask.Cancel();
+        }
+
+        public bool Update()
+        {
+            if (isCancelled || interpretOwner.IsCancelled || asyncTask.IsCancelled())
+                return true;
+
+            if (eventOwner != null && !IsSceneEventOwnerAlive(eventOwner))
+            {
+                Cancel();
+                return true;
+            }
+
+            bool complete = update();
+            return complete || isCancelled || interpretOwner.IsCancelled || asyncTask.IsCancelled();
+        }
+    }
 
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
-    List<Func<bool>> tasks;
+    List<EventTask> tasks;
     HashSet<(int, string)> releaseTriggerTuple;
+    EventInterpretDataForm.Data currentEventData;
     public GameEventController(GameManager super) : base(super)
     {
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
         storyTriggerCtrl = new GameEventStoryTriggerController(this);
-        tasks = new List<Func<bool>>();
+        tasks = new List<EventTask>();
         releaseTriggerTuple = new HashSet<(int, string)>();
 
     }
     public void Reset()
     {
         sceneTriggerCtrl.evts -= sceneTriggerCtrl.evts;
+        foreach (var data in EventInterpretDataForm.DataByUid.Values)
+        {
+            data.Cancel();
+        }
+        CancelAllTasks();
         EventInterpretDataForm.Clear();
-        tasks.Clear();
         releaseTriggerTuple.Clear();
+        currentEventData = null;
     }
     public void ClearSceneEvent()
     {
-        var clearLst = new List<int>();
+        var clearLst = new List<EventInterpretDataForm.Data>();
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
             if (GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user))
             {
-                clearLst.Add(data.uid);
+                data.Cancel();
+                CancelEventTasks(data);
+                clearLst.Add(data);
             }
         }
-        foreach (var id in clearLst)
+        foreach (var data in clearLst)
         {
-            EventInterpretDataForm.RemoveData(id);
+            EventInterpretDataForm.RemoveData(data.uid);
         }
     }
-    public void StartTask(Func<bool> func)
+    public void StartTask(InterpretAsyncTask asyncTask, Func<bool> func)
     {
-        if (!func())
+        var interpretData = asyncTask.interpreter.data;
+        var eventOwner = interpretData as EventInterpretDataForm.Data;
+        if (eventOwner == null && interpretData.rootUid > 0)
         {
-            tasks.Add(func);
+            EventInterpretDataForm.DataByUid.TryGetValue(interpretData.rootUid, out eventOwner);
         }
+        InterpretDataForm.Data taskOwner = eventOwner ?? interpretData;
+        var task = new EventTask(asyncTask, taskOwner, eventOwner, func);
+
+        if (!task.Update())
+        {
+            tasks.Add(task);
+        }
+    }
+    private void CancelEventTasks(EventInterpretDataForm.Data eventData)
+    {
+        foreach (var task in tasks)
+        {
+            if (task.IsOwnedBy(eventData))
+                task.Cancel();
+        }
+    }
+    private void CancelAllTasks()
+    {
+        foreach (var task in tasks)
+        {
+            task.Cancel();
+        }
+        tasks.Clear();
+    }
+    public void CompleteUnitEvents(UnitForm.Data unitData)
+    {
+        if (unitData == null)
+            return;
+
+        foreach (var task in tasks)
+        {
+            if (task.IsOwnedBy(unitData))
+                task.Cancel();
+        }
+
+        foreach (var data in new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values))
+        {
+            if (!ReferenceEquals(data.sceneOwner, unitData)
+                || !GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user)
+                || ReferenceEquals(data, currentEventData))
+                continue;
+
+            data.Cancel();
+            CancelEventTasks(data);
+            ReleaseSceneTrigger(data.user, data.releaseTrigger);
+
+            if (GameManager.instance.curProgress.blockProgramUid == data.uid)
+                GameManager.instance.curProgress.blockProgramUid = 0;
+        }
+    }
+    private static bool IsSceneEventOwnerAlive(EventInterpretDataForm.Data data)
+    {
+        if (!GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user))
+            return true;
+
+        return data.sceneOwner != null
+            && UnitForm.DataByUid.TryGetValue(data.user, out var registered)
+            && ReferenceEquals(registered, data.sceneOwner);
+    }
+    private static void ReleaseSceneTrigger(int unitUid, string triggerName)
+    {
+        if (string.IsNullOrEmpty(triggerName)
+            || GameManager.instance.curScene == null
+            || !GameManager.instance.curScene.triggeringOnceDuringEvts.TryGetValue(unitUid, out var triggers))
+            return;
+
+        triggers.Remove(triggerName);
+        if (triggers.Count == 0)
+            GameManager.instance.curScene.triggeringOnceDuringEvts.Remove(unitUid);
     }
     public void ClearScene()
     {
+        foreach (var data in EventInterpretDataForm.DataByUid.Values)
+        {
+            data.Cancel();
+        }
+        CancelAllTasks();
         EventInterpretDataForm.DataByUid.Clear();
         GameManager.instance.curScene.triggeringOnceDuringEvts.Clear();
-        tasks.Clear();
+        currentEventData = null;
     }
 
     public void LateUpdate()
@@ -255,19 +391,38 @@ public class GameEventController : Z_Controller<GameManager>
         releaseTriggerTuple.Clear();
         foreach (var data in lst)
         {
-            if (GameManager.instance.curProgress.blockProgramUid != 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
+            bool complete = data.IsCancelled;
+            if (!complete && GameManager.instance.curProgress.blockProgramUid != 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
             {
                 continue;
             }
-            bool complete = false;
-            if (GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user) && !UnitForm.DataByUid.ContainsKey(data.user))
+            if (!complete && !IsSceneEventOwnerAlive(data))
             {
+                data.Cancel();
                 complete = true;
             }
-            else
+            else if (!complete)
             {
-                var retInfo = data.Interpret();
+                RetInfo retInfo;
+                currentEventData = data;
+                try
+                {
+                    retInfo = data.Interpret();
+                }
+                finally
+                {
+                    currentEventData = null;
+                }
                 complete = retInfo.complete;
+
+                // DestroyObject may remove this event's owner while Interpret is on
+                // the stack. Let that current pass finish, then stop any continuation
+                // and cancel tasks created by the event before polling them below.
+                if (!IsSceneEventOwnerAlive(data))
+                {
+                    data.Cancel();
+                    complete = true;
+                }
                 if (retInfo.errors.Count > 0)
                 {
                     var errSb = new System.Text.StringBuilder();
@@ -283,6 +438,7 @@ public class GameEventController : Z_Controller<GameManager>
             }
             if (complete)
             {
+                CancelEventTasks(data);
                 if (!string.IsNullOrEmpty(data.releaseTrigger))
                 {
                     releaseTriggerTuple.Add((data.user, data.releaseTrigger));
@@ -297,7 +453,7 @@ public class GameEventController : Z_Controller<GameManager>
         }
         for (int i = 0; i < tasks.Count; i++)
         {
-            if (tasks[i]())
+            if (tasks[i].Update())
             {
                 tasks.RemoveAt(i);
                 i--;
@@ -384,6 +540,10 @@ public class GameEventController : Z_Controller<GameManager>
             return;
         var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;
+        if (GlobalEventHelper.IsSceneTrigger(releaseTrigger, user))
+        {
+            data.sceneOwner = UnitForm.DataByUid.GetDv(user, null);
+        }
         EventInterpretDataForm.AddData(data);
 
     }

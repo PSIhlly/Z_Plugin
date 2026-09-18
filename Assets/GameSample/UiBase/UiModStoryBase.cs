@@ -4209,6 +4209,8 @@ namespace ModStoryMapObjectTextureConfig
             public Sta sta_enableFrontPart;
             public Btn btn_passType;
             public Txt txt_onTouchEvent;
+            public Btn btn_frontIsWangTile;
+            public Sta sta_frontIsWangTile;
         public UiModStoryMapObjectTextureConfigView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -4229,6 +4231,8 @@ namespace ModStoryMapObjectTextureConfig
             sta_enableFrontPart = uiHolder.elementTrsLst[14].GetComponent<Sta>();
             btn_passType = uiHolder.elementTrsLst[15].GetComponent<Btn>();
             txt_onTouchEvent = uiHolder.elementTrsLst[16].GetComponent<Txt>();
+            btn_frontIsWangTile = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            sta_frontIsWangTile = uiHolder.elementTrsLst[18].GetComponent<Sta>();
         }
 
     }

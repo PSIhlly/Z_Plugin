@@ -35,106 +35,98 @@ namespace Z_Map
             private set;
         }
         = new HashSet<TileUnitForm.Data>();
-        public List<TileUnitForm.Data> newMapLst
+        public HashSet<TileUnitForm.Data> newMapLst
         {
             get;
             private set;
         }
-        = new List<TileUnitForm.Data>();
-        public List<TileUnitForm.Data> delMapLst
+        = new HashSet<TileUnitForm.Data>();
+        public HashSet<TileUnitForm.Data> delMapLst
         {
             get;
             private set;
         }
-        = new List<TileUnitForm.Data>();
-        public List<ObjectUnitForm.Data> curObjectLst
+        = new HashSet<TileUnitForm.Data>();
+        public HashSet<ObjectUnitForm.Data> curObjectLst
         {
             get;
             private set;
         }
-        = new List<ObjectUnitForm.Data>();
-        public List<CharacterUnitForm.Data> curCharacterLst
+        = new HashSet<ObjectUnitForm.Data>();
+        public HashSet<CharacterUnitForm.Data> curCharacterLst
         {
             get;
             private set;
         }
-    = new List<CharacterUnitForm.Data>();
-        public List<ItemUnitForm.Data> curItemLst
+        = new HashSet<CharacterUnitForm.Data>();
+        public HashSet<ItemUnitForm.Data> curItemLst
         {
             get;
             private set;
         }
-       = new List<ItemUnitForm.Data>();
+        = new HashSet<ItemUnitForm.Data>();
         public (int, int, int, int, int, int) lastView
         {
             get;
             private set;
         }
+        private bool hasView;
 
-        private void FreshMap()
+        private void FreshMap(bool forceFullScan)
         {
-
-            HashSet<TileUnitForm.Data> nowTmp = new HashSet<TileUnitForm.Data>();
             var viewSize = _super.data.mainData.viewSize;
             var curView = (viewCenter.x - viewSize.x, viewCenter.x + viewSize.x, viewCenter.y - viewSize.y, viewCenter.y + viewSize.y, viewCenter.z - viewSize.z, viewCenter.z + viewSize.z);
+            newMapLst.Clear();
+            delMapLst.Clear();
+            if (!forceFullScan && hasView && curView.Equals(lastView))
+                return;
+
             (int, int, int, int, int, int) commonView = (Mathf.Max(curView.Item1, lastView.Item1), Mathf.Min(curView.Item2, lastView.Item2),
                 Mathf.Max(curView.Item3, lastView.Item3), Mathf.Min(curView.Item4, lastView.Item4),
                 Mathf.Max(curView.Item5, lastView.Item5), Mathf.Min(curView.Item6, lastView.Item6));
 
-            //old:
+            // Remove only Tiles that actually left this view (or were replaced in-place).
             foreach (var map in curTileLst)
             {
                 if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
                     || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
-                     || map.mapPos.z >= curView.Item6 || map.mapPos.z < curView.Item5)
+                    || map.mapPos.z >= curView.Item6 || map.mapPos.z < curView.Item5
+                    || !_super.data.maps.TryGetValue((map.mapPos.x, map.mapPos.y, map.mapPos.z), out var current)
+                    || !ReferenceEquals(current, map))
                 {
                     map.unit.Hide();
-                }
-                else
-                {
-                    nowTmp.Add(map);
+                    delMapLst.Add(map);
                 }
             }
-            //fill
-            if (curView.Item1 < lastView.Item1)
-            {
-                ShowAndAddLst(nowTmp, curView.Item1, Mathf.Min(lastView.Item1, curView.Item2), curView.Item3, curView.Item4, curView.Item5, curView.Item6);
-            }
-            else if (curView.Item2 > lastView.Item2)
-            {
-                ShowAndAddLst(nowTmp, Mathf.Max(lastView.Item2, curView.Item1), curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
-            }
+            curTileLst.ExceptWith(delMapLst);
 
-            if (curView.Item3 < lastView.Item3)
-            {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, curView.Item3, Mathf.Min(lastView.Item3, curView.Item4), curView.Item5, curView.Item6);
-            }
-            else if (curView.Item4 > lastView.Item4)
-            {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, Mathf.Max(lastView.Item4, curView.Item3), curView.Item4, curView.Item5, curView.Item6);
-            }
+            bool overlapsLastView = hasView
+                && curView.Item1 < lastView.Item2 && curView.Item2 > lastView.Item1
+                && curView.Item3 < lastView.Item4 && curView.Item4 > lastView.Item3
+                && curView.Item5 < lastView.Item6 && curView.Item6 > lastView.Item5;
 
-            if (curView.Item5 < lastView.Item5)
+            // First/forced/non-overlapping refresh scans the current view once.
+            // Ordinary movement scans only the non-overlapping entering slabs.
+            if (forceFullScan || !overlapsLastView)
             {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, curView.Item5, Mathf.Min(lastView.Item5, curView.Item6));
+                ShowAndAddLst(curTileLst, curView.Item1, curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
             }
-            else if (curView.Item6 > lastView.Item6)
+            else
             {
-                ShowAndAddLst(nowTmp, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, Mathf.Max(lastView.Item6, curView.Item5), curView.Item6);
-            }
-            newMapLst.Clear();
-            foreach (var now in nowTmp)
-            {
-                newMapLst.Add(now);
-            }
-            foreach (var old in curTileLst)
-            {
-                newMapLst.Remove(old);
-                delMapLst.Add(old);
-            }
-            foreach (var now in nowTmp)
-            {
-                delMapLst.Remove(now);
+                if (curView.Item1 < lastView.Item1)
+                    ShowAndAddLst(curTileLst, curView.Item1, Mathf.Min(lastView.Item1, curView.Item2), curView.Item3, curView.Item4, curView.Item5, curView.Item6);
+                if (curView.Item2 > lastView.Item2)
+                    ShowAndAddLst(curTileLst, Mathf.Max(lastView.Item2, curView.Item1), curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
+
+                if (curView.Item3 < lastView.Item3)
+                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, curView.Item3, Mathf.Min(lastView.Item3, curView.Item4), curView.Item5, curView.Item6);
+                if (curView.Item4 > lastView.Item4)
+                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, Mathf.Max(lastView.Item4, curView.Item3), curView.Item4, curView.Item5, curView.Item6);
+
+                if (curView.Item5 < lastView.Item5)
+                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, curView.Item5, Mathf.Min(lastView.Item5, curView.Item6));
+                if (curView.Item6 > lastView.Item6)
+                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, Mathf.Max(lastView.Item6, curView.Item5), curView.Item6);
             }
 
             foreach (var newMap in newMapLst)
@@ -147,20 +139,17 @@ namespace Z_Map
                 UpdateRelatedUnit(delMap.unit);
 
             }
-
-            curTileLst = nowTmp;
             lastView = curView;
+            hasView = true;
         }
         private void UpdateRelatedUnit(TileUnit tile)
         {
-            bool show = tile.isShowing;
             foreach (var ch in characterTileDic.Get(tile))
             {
-                if (show)
+                if (HasShowingTile(ch, characterTileDic))
                 {
                     ch.Show();
-                    if (!curCharacterLst.Contains(ch.data))
-                        curCharacterLst.Add(ch.data);
+                    curCharacterLst.Add(ch.data);
                 }
                 else
                 {
@@ -170,11 +159,10 @@ namespace Z_Map
             }
             foreach (var item in itemTileDic.Get(tile))
             {
-                if (show)
+                if (HasShowingTile(item, itemTileDic))
                 {
                     item.Show();
-                    if (!curItemLst.Contains(item.data))
-                        curItemLst.Add(item.data);
+                    curItemLst.Add(item.data);
                 }
                 else
                 {
@@ -185,11 +173,10 @@ namespace Z_Map
 
             foreach (var obj in objectTileDic.Get(tile))
             {
-                if (show)
+                if (HasShowingTile(obj, objectTileDic))
                 {
                     obj.Show();
-                    if (!curObjectLst.Contains(obj.data))
-                        curObjectLst.Add(obj.data);
+                    curObjectLst.Add(obj.data);
                 }
                 else
                 {
@@ -199,6 +186,15 @@ namespace Z_Map
             }
 
         }
+        private static bool HasShowingTile<T>(T unit, DoubleDictionary<T, TileUnit> tileDictionary)
+        {
+            if (!tileDictionary.TryGet(unit, out var tiles))
+                return false;
+            foreach (var tile in tiles)
+                if (tile.isShowing)
+                    return true;
+            return false;
+        }
         private void ShowAndAddLst(HashSet<TileUnitForm.Data> lst, int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
         {
             for (int i = minX; i < maxX; i++)
@@ -206,18 +202,26 @@ namespace Z_Map
 
                 for (int k = minZ; k < maxZ; k++)
                 {
-                    if (!_super.data.mapXZ2Y.ContainsKey((i, k)))
+                    if (!_super.data.mapXZ2Y.TryGetValue((i, k), out var yLevels)
+                        || yLevels.Count == 0)
                         continue;
-                    int yMax = Mathf.Min(_super.data.mapXZ2Y[(i, k)].Max + 1, maxY);
-                    int yMin = Mathf.Max(_super.data.mapXZ2Y[(i, k)].Min, minY);
-                    for (int j = yMin; j < yMax; j++)
-                    {
-                        if (!_super.utilCtrl.InArea((i, j, k)))
-                            continue;
-                        var map = _super.utilCtrl.GetTileData(i, j, k);
-                        map.unit.Show();
-                        lst.Add(map);
 
+                    // Height columns are sparse after erase operations. Enumerate
+                    // only registered levels instead of assuming Min..Max is dense.
+                    foreach (int j in yLevels)
+                    {
+                        if (j < minY)
+                            continue;
+                        if (j >= maxY)
+                            break;
+                        if (!_super.data.maps.TryGetValue((i, j, k), out var map) || map == null)
+                            continue;
+
+                        if (lst.Add(map))
+                        {
+                            map.unit.Show();
+                            newMapLst.Add(map);
+                        }
                     }
                 }
             }
@@ -230,21 +234,7 @@ namespace Z_Map
             unit.InvalidateCollisionGeometry();
             if (unit is TileUnit tl)
             {
-                for(int i=tl.data.mapPos.x-1;i<= tl.data.mapPos.x +1;i++)
-                for(int j=tl.data.mapPos.z-1;j<= tl.data.mapPos.z +1;j++)
-                    {
-                        var cur = _super.data.maps.GetDv((i, tl.data.mapPos.y, j), null);
-                        if(cur!=null)
-                        {
-                            cur.unit.Hide();
-                            if(!curTileLst.Contains(cur))
-                            {
-                                curTileLst.Add(cur);
-                            }
-                            cur.unit.Show();
-                            UpdateRelatedUnit(cur.unit);
-                        }
-                    }
+                UpdateTileNeighbours(tl.data.mapPos);
                       
             }
             else if (unit is CharacterUnit ch)
@@ -254,8 +244,7 @@ namespace Z_Map
                     if (tile.isShowing)
                     {
                         ch.Show();
-                        if (!curCharacterLst.Contains(ch.data))
-                            curCharacterLst.Add(ch.data);
+                        curCharacterLst.Add(ch.data);
                     }
                 }
             }
@@ -266,8 +255,7 @@ namespace Z_Map
                     if (tile.isShowing)
                     {
                         it.Show();
-                        if (!curItemLst.Contains(it.data))
-                            curItemLst.Add(it.data);
+                        curItemLst.Add(it.data);
                     }
                 }
             }
@@ -278,12 +266,27 @@ namespace Z_Map
                     if (tile.isShowing)
                     {
                         ob.Show();
-                        if (!curObjectLst.Contains(ob.data))
-                            curObjectLst.Add(ob.data);
+                        curObjectLst.Add(ob.data);
                     }
                 }
             }
 
+        }
+
+        public void UpdateTileNeighbours(Vector3Int mapPos)
+        {
+            for (int x = mapPos.x - 1; x <= mapPos.x + 1; x++)
+            for (int z = mapPos.z - 1; z <= mapPos.z + 1; z++)
+            {
+                var cur = _super.data.maps.GetDv((x, mapPos.y, z), null);
+                if (cur == null)
+                    continue;
+
+                cur.unit.Hide();
+                curTileLst.Add(cur);
+                cur.unit.Show();
+                UpdateRelatedUnit(cur.unit);
+            }
         }
 
         private void UpdateMapInfo()
@@ -354,20 +357,28 @@ namespace Z_Map
 
         private HashSet<(int, int)> bfsVisited = new HashSet<(int, int)>();
         private Queue<(int, int)> bfsQueue = new Queue<(int, int)>();
-        private List<((int, int) pos, float sqrDist)> bfsStartLst = new List<((int, int), float)>();
-        private static Comparison<((int, int) pos, float sqrDist)> bfsDistCompare =
-            (a, b) => a.sqrDist.CompareTo(b.sqrDist);
-        private const float OcclusionDegree = 0.5f;
+        private const float FullHighLayerOcclusionDegree = 0f;
+        private const float HalfHighLayerOcclusionDegree = 0.5f;
+        private const int HalfHighLayerOcclusionRadius = 3;
+        private const int HalfHighLayerOcclusionRadiusSqr =
+            HalfHighLayerOcclusionRadius * HalfHighLayerOcclusionRadius;
+        private const float CurrentLayerObjectOcclusionDegree = 0.5f;
         private Dictionary<MapUnit, float> previousVision = new Dictionary<MapUnit, float>();
         private Dictionary<MapUnit, float> nextVision = new Dictionary<MapUnit, float>();
+        private readonly Dictionary<TileUnit, float> frontVisionOverrides = new Dictionary<TileUnit, float>();
         private readonly HashSet<ObjectUnit> occlusionObjects = new HashSet<ObjectUnit>();
+        private readonly Dictionary<ObjectUnit, float> highLayerOcclusionObjects = new Dictionary<ObjectUnit, float>();
         private readonly HashSet<TileUnit> characterOverlapBuffer = new HashSet<TileUnit>();
 
         /// <summary>
-        /// BFS遍历指定y层的tile，从(centerX,centerZ)开始，对遮挡层有tile的位置设置透明度
-        /// 如果起始位置不存在tile则直接返回
+        /// 在当前视野内广搜起点相连的高层 Tile；半透明只应用到玩家周围的圆形范围。
         /// </summary>
-        private void BfsLayerVision(int layerY, int centerX, int centerZ, float degree)
+        private void BfsLayerVision(
+            int layerY,
+            int centerX,
+            int centerZ,
+            float degree,
+            Vector3Int playerMapPos)
         {
             if (!_super.utilCtrl.ContainsTile(centerX, layerY, centerZ))
                 return;
@@ -383,7 +394,32 @@ namespace Z_Map
             {
                 var cur = bfsQueue.Dequeue();
                 var map = _super.utilCtrl.GetTileData(cur.Item1, layerY, cur.Item2);
-                nextVision[map.unit] = degree;
+                int offsetX = cur.Item1 - playerMapPos.x;
+                int offsetZ = cur.Item2 - playerMapPos.z;
+                bool withinHalfTransparentRange =
+                    offsetX * offsetX + offsetZ * offsetZ <= HalfHighLayerOcclusionRadiusSqr;
+                int projectedZ = cur.Item2 + layerY - playerMapPos.y;
+                bool projectedTileWalkable = _super.navigationCtrl != null
+                    && _super.navigationCtrl.IsBaseWalkable(cur.Item1, playerMapPos.y, projectedZ);
+                if (!projectedTileWalkable)
+                {
+                    nextVision[map.unit] = 1f;
+                }
+                else if (degree == FullHighLayerOcclusionDegree || withinHalfTransparentRange)
+                {
+                    nextVision[map.unit] = degree;
+                    // The authored front part projects one cell nearer to the player
+                    // than the Tile body. Keep only renderer slots 3..5 opaque when
+                    // that separate projected navigation cell is blocked.
+                    bool frontProjectedTileWalkable = _super.navigationCtrl != null
+                        && _super.navigationCtrl.IsBaseWalkable(
+                            cur.Item1,
+                            playerMapPos.y,
+                            projectedZ - 1);
+                    if (!frontProjectedTileWalkable)
+                        frontVisionOverrides[map.unit] = 1f;
+                    CollectHighLayerObjectCandidates(map.unit, degree);
+                }
 
                 for (int x = cur.Item1 - 1; x <= cur.Item1 + 1; x += 2)
                 {
@@ -404,6 +440,43 @@ namespace Z_Map
                     }
                 }
             }
+        }
+
+        private void CollectHighLayerObjectCandidates(TileUnit tile, float degree)
+        {
+            if (objectTileDic.TryGet(tile, out var objects))
+                foreach (var unit in objects)
+                    if (!highLayerOcclusionObjects.TryGetValue(unit, out var oldDegree) || degree < oldDegree)
+                        highLayerOcclusionObjects[unit] = degree;
+        }
+
+        private void CollectHighLayerObjectOcclusion(int currentLayer)
+        {
+            foreach (var occlusion in highLayerOcclusionObjects)
+            {
+                var unit = occlusion.Key;
+                float degree = occlusion.Value;
+                if (objectTileDic.TryGet(unit, out var tiles))
+                {
+                    foreach (var tile in tiles)
+                    {
+                        if (tile.data.mapPos.y != currentLayer)
+                            continue;
+                        // Visual coverage of the current layer wins, regardless of owner/link order.
+                        degree = CurrentLayerObjectOcclusionDegree;
+                        break;
+                    }
+                }
+                nextVision[unit] = degree;
+            }
+        }
+
+        private bool HasHighLayerOnFourSides(int layerY, Vector3Int center)
+        {
+            return _super.utilCtrl.ContainsTile(center.x - 1, layerY, center.z)
+                && _super.utilCtrl.ContainsTile(center.x + 1, layerY, center.z)
+                && _super.utilCtrl.ContainsTile(center.x, layerY, center.z - 1)
+                && _super.utilCtrl.ContainsTile(center.x, layerY, center.z + 1);
         }
 
         private void UpdateCurrentLayerObjectOcclusion(Vector3Int center, bool isSideView)
@@ -428,7 +501,7 @@ namespace Z_Map
                         || _super.utilCtrl.GetVisionHeightInTiles(unit.data, center.y) <= cellsBelow)
                         continue;
 
-                    nextVision[unit] = OcclusionDegree;
+                    nextVision[unit] = CurrentLayerObjectOcclusionDegree;
                 }
             }
         }
@@ -439,6 +512,7 @@ namespace Z_Map
         private void UpdateVision()
         {
             nextVision.Clear();
+            frontVisionOverrides.Clear();
             CollectVision();
 
             // A wide Object can stop occluding while its owner is outside the
@@ -448,7 +522,13 @@ namespace Z_Map
                     ApplyUnitVision(old.Key, 1f);
 
             foreach (var current in nextVision)
-                ApplyUnitVision(current.Key, current.Value);
+            {
+                if (current.Key is TileUnit tile
+                    && frontVisionOverrides.TryGetValue(tile, out float frontDegree))
+                    ApplyUnitVision(current.Key, current.Value, frontDegree);
+                else
+                    ApplyUnitVision(current.Key, current.Value);
+            }
 
             var buffer = previousVision;
             previousVision = nextVision;
@@ -460,67 +540,68 @@ namespace Z_Map
         {
             var viewSize = _super.data.mainData.viewSize;
             var realViewCenter = _super.utilCtrl.RealPos2MapPosInt(curCenterPos);
+            highLayerOcclusionObjects.Clear();
             bool overlayHide = GlobalSettings.OVERLAY_HIDE;
             // 侧视模式：相机角度让前方(z更小方向)的高层会遮挡视线，需要扩展z检测范围
             bool isSideView = DynamicGlobalSettings.cameraMode == CameraMode.Isometric;
+            bool modHighLayerHalfTransparent = GlobalSettings.MOD_HIGH_LAYER_HALF_TRANSPARENT
+                && !DynamicGlobalSettings.playing;
 
             foreach (var curMap in curTileLst)
             {
-                nextVision[curMap.unit] = 1f;
+                bool isHighLayer = curMap.mapPos.y > realViewCenter.y;
+                nextVision[curMap.unit] = modHighLayerHalfTransparent && isHighLayer
+                    ? HalfHighLayerOcclusionDegree
+                    : 1f;
+                if (modHighLayerHalfTransparent && isHighLayer)
+                    CollectHighLayerObjectCandidates(curMap.unit, HalfHighLayerOcclusionDegree);
             }
 
-            // 处理高层tile的遮挡：按距离从近到远，从各起始点BFS相连的高层
-            int range = overlayHide ? 1 : 0;
-            // 侧视模式下，dz范围扩展到-viewSize.y（角色前方z更小的方向），与OVERLAY_HIDE与否都生效
-            int startDz = -range - (isSideView ? viewSize.y : 0);
-
-            for (int i = realViewCenter.y + 1; i < realViewCenter.y + viewSize.y; i++)
+            // Mod 编辑时高层统一半透明，不再应用 Play 的高层遮挡 BFS。
+            if (!modHighLayerHalfTransparent)
             {
-                bfsVisited.Clear();
-                bfsQueue.Clear();
-                bfsStartLst.Clear();
+                // 侧视模式按层高差向前扩展，并保留 1 格误差；命中后直接全透明。
+                int range = overlayHide ? 1 : 0;
 
-                for (int dx = -range; dx <= range; dx++)
+                for (int i = realViewCenter.y + 1; i < realViewCenter.y + viewSize.y; i++)
                 {
-                    for (int dz = startDz; dz <= range; dz++)
+                    bfsVisited.Clear();
+                    bfsQueue.Clear();
+                    int layerOffset = i - realViewCenter.y;
+                    bool surroundedByHighLayer = HasHighLayerOnFourSides(i, realViewCenter);
+                    float degree = surroundedByHighLayer
+                        ? FullHighLayerOcclusionDegree
+                        : HalfHighLayerOcclusionDegree;
+
+                    // 四邻格都存在时从四边开始；玩家正上方的中心格允许为空。
+                    if (surroundedByHighLayer)
                     {
-                        int checkX = realViewCenter.x + dx;
-                        int checkZ = realViewCenter.z + dz;
-                        float dxN = curCenterPos.x - checkX;
-                        float dzN = curCenterPos.z - checkZ;
-                        bfsStartLst.Add(((checkX, checkZ), dxN * dxN + dzN * dzN));
+                        BfsLayerVision(i, realViewCenter.x - 1, realViewCenter.z, degree, realViewCenter);
+                        BfsLayerVision(i, realViewCenter.x + 1, realViewCenter.z, degree, realViewCenter);
+                        BfsLayerVision(i, realViewCenter.x, realViewCenter.z - 1, degree, realViewCenter);
+                        BfsLayerVision(i, realViewCenter.x, realViewCenter.z + 1, degree, realViewCenter);
                     }
-                }
-                bfsStartLst.Sort(bfsDistCompare);
 
-                foreach (var d in bfsStartLst)
-                {
-                    var pos = d.pos;
-                    float sqrDist = d.sqrDist;
-                    float degree = Mathf.Max(
-                        OcclusionDegree,
-                        Math.Clamp(Mathf.Sqrt(sqrDist) - 0.75f, 0, 1));
+                    // Isometric occlusion comes from smaller Z. Allow one extra cell
+                    // beyond the layer gap as the fixed trigger tolerance.
+                    int startDz = -range - (isSideView
+                        ? layerOffset + 1
+                        : 0);
 
-                    // OVERLAY_HIDE额外逻辑：靠近的tile，其相连的高层也消失
-                    bool nearHide = false;
-                    if (overlayHide && sqrDist < 0.25f) // 0.5f^2
+                    for (int dx = -range; dx <= range; dx++)
                     {
-                        for (int yOffset = 0; yOffset <= 2; yOffset++)
+                        for (int dz = startDz; dz <= range; dz++)
                         {
-                            int baseY = realViewCenter.y - yOffset;
-                            if (baseY < 0) continue;
-                            if (_super.utilCtrl.ContainsTile(pos.Item1, baseY, pos.Item2))
-                            {
-                                nearHide = true;
-                                break;
-                            }
+                            int checkX = realViewCenter.x + dx;
+                            int checkZ = realViewCenter.z + dz;
+                            BfsLayerVision(i, checkX, checkZ, degree, realViewCenter);
                         }
                     }
-
-                    BfsLayerVision(i, pos.Item1, pos.Item2, nearHide ? OcclusionDegree : degree);
                 }
             }
 
+            CollectHighLayerObjectOcclusion(realViewCenter.y);
+            // Apply this last so a current-layer occluder can never be overwritten as fully hidden.
             UpdateCurrentLayerObjectOcclusion(realViewCenter, isSideView);
             CollectAttachedVision();
         }
@@ -611,7 +692,7 @@ namespace Z_Map
                 {
                     Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:" + viewCenter);
                 }
-                FreshMap();
+                FreshMap(forceFresh);
                 lastCenterPos = curCenterPos;
             }
             UpdateVision();
@@ -637,11 +718,13 @@ namespace Z_Map
                         ApplyUnitVision(character, degree);
         }
 
-        private static void ApplyUnitVision(Unit unit, float degree)
+        private static void ApplyUnitVision(Unit unit, float degree, float? tileFrontDegree = null)
         {
             if (unit.ins == null)
                 return;
-            if (unit.ins is MapInstance instance)
+            if (tileFrontDegree.HasValue && unit.ins is TileInstance tileInstance)
+                tileInstance.ApplyVision(degree, tileFrontDegree.Value);
+            else if (unit.ins is MapInstance instance)
                 instance.ApplyVision(degree);
             else if (degree <= 0f)
                 unit.ins.VisOff();
@@ -668,14 +751,18 @@ namespace Z_Map
                 : new List<TileUnit>(characterOverlapTileDic.Get(movingCharacter));
             if (movingCharacter != null && !teleport)
             {
-                newPos = movingCharacter.ClampMoveToPassType(oldPos, newPos);
                 newPos = _super.utilCtrl.ClampMoveToAreaBoundary(oldPos, newPos, movingCharacter.mapBoundaryDistance);
+                // 先完成地图边界修正，再以最终中心所属 Tile 检查 passType。
+                // 否则边界修正可能把已检查的位置再推入受限 Tile。
+                newPos = movingCharacter.ClampMoveToPassType(oldPos, newPos);
             }
             var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
             {
                 //InArea已包含下方有tile的判断，此处为完全不在区域内，拉回最近有效位置
-                newPos = _super.utilCtrl.GetClosestInArea(newPos);
+                newPos = movingCharacter == null
+                    ? _super.utilCtrl.GetClosestInArea(newPos)
+                    : _super.utilCtrl.GetClosestInArea(newPos, movingCharacter.passTypes);
                 newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             }
             // 决定关联哪个tile：防止重力微移导致y截断后误切换到下方tile
@@ -868,6 +955,7 @@ namespace Z_Map
         public void Begin()
         {
 
+            hasView = false;
             viewCenter = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
             var failList = new List<int>();
             foreach (var itemData in ItemUnitForm.DataByUid.Values)
@@ -937,6 +1025,7 @@ namespace Z_Map
                 curItemLst.Clear();
 
             lastView = (0, 0, 0, 0, 0, 0);
+            hasView = false;
             lastCenterPos = Vector3.one * -9999999;
             objectTileDic.Clear();
             characterTileDic.Clear();
@@ -944,7 +1033,9 @@ namespace Z_Map
             itemTileDic.Clear();
             previousVision.Clear();
             nextVision.Clear();
+            frontVisionOverrides.Clear();
             occlusionObjects.Clear();
+            highLayerOcclusionObjects.Clear();
             characterOverlapBuffer.Clear();
         }
         public void DebugShow()

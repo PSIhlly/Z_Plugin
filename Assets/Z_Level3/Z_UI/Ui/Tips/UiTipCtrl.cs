@@ -37,7 +37,17 @@ namespace Ui.Notify
                 return true;
             }, uiHolder);
 
-            UiManager.Rebuild(gameObject,true);
+            RebuildLayout();
+            TimeManager.instance.AddCurLateUpdateAction(RebuildLayout, gameObject);
+        }
+
+        private void RebuildLayout()
+        {
+            if (!active)
+                return;
+
+            UiManager.Rebuild(view.txt_.gameObject, true);
+            UiManager.Rebuild(gameObject, true);
         }
 
     }

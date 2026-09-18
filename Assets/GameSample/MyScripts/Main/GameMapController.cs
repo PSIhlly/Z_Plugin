@@ -173,6 +173,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     public Dictionary<(int, int), Texture2D> alphaTextureDic = new Dictionary<(int, int), Texture2D>();
     public Dictionary<UnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<UnitForm.Data, Dictionary<int, int>>();
+    private static readonly Dictionary<(int mapTextureId, bool frontPart, int mask), List<int>>
+        wangTileAnimationTextures = new Dictionary<(int, bool, int), List<int>>();
     private static readonly (int x, int z, int bit)[] wangTileNeighbours =
     {
         (-1, 1, 0), (0, 1, 1), (1, 1, 2),
@@ -183,9 +185,34 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         alphaTextureDic.Clear();
         animCurCache.Clear();
+        ClearWangTileAnimationTextures();
     }
 
-    Texture GetDefaultTexture()
+    internal static void ClearWangTileAnimationTextures()
+    {
+        wangTileAnimationTextures.Clear();
+    }
+
+    internal static void RegisterWangTileAnimationTexture(
+        int mapTextureId, bool frontPart, int mask, int textureId)
+    {
+        var key = (mapTextureId, frontPart, mask);
+        if (!wangTileAnimationTextures.TryGetValue(key, out List<int> textures))
+        {
+            textures = new List<int>();
+            wangTileAnimationTextures.Add(key, textures);
+        }
+        textures.Add(textureId);
+    }
+
+    private static bool TryGetWangTileAnimationTextures(
+        int mapTextureId, bool frontPart, int mask, out List<int> textures)
+    {
+        return wangTileAnimationTextures.TryGetValue((mapTextureId, frontPart, mask), out textures)
+            && textures.Count > 0;
+    }
+
+    static Texture GetDefaultTexture()
     {
         if (TexAssetForm.DataById.TryGetValue(GlobalDefaultHelper.DefaultTexId, out var data))
         {
@@ -196,7 +223,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         return Texture2D.whiteTexture;
     }
 
-    Texture GetTextureOrDefault(int texId)
+    static Texture GetTextureOrDefault(int texId)
     {
         if (TexAssetForm.DataById.TryGetValue(texId, out var data))
         {
@@ -207,7 +234,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         return GetDefaultTexture();
     }
 
-    MapTextureForm.Data GetMapTextureOrFirst(int mapTextureId)
+    static MapTextureForm.Data GetMapTextureOrFirst(int mapTextureId)
     {
         if (MapTextureForm.DataById.TryGetValue(mapTextureId, out var data))
             return data;
@@ -216,6 +243,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             .OrderBy(pair => pair.Key)
             .Select(pair => pair.Value)
             .FirstOrDefault();
+    }
+
+    internal static int GetAnimationFrameIndex(float animationTime, float interval, int frameCount)
+    {
+        if (interval <= 0 || frameCount <= 1)
+            return 0;
+
+        long frame = (long)Math.Floor(Math.Max(0, animationTime) / interval);
+        return (int)(frame % frameCount);
     }
 
 
@@ -233,9 +269,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         renderer.GetPropertyBlock(propBlock);
 
         var hasConfiguredTextures = animTexs != null && animTexs.Count > 0;
-        if (animTexs != null)
-            animTexs.RemoveAll(texId => !TexAssetForm.DataById.ContainsKey(texId));
-        var validAnimTexs = animTexs == null ? null : new List<int>(animTexs);
+        var validAnimTexs = animTexs == null
+            ? null
+            : animTexs.Where(texId => TexAssetForm.DataById.ContainsKey(texId)).ToList();
 
         if (validAnimTexs != null && validAnimTexs.Count > 0)
         {
@@ -280,22 +316,25 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
             TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
 
-            if (interval > 0)
+            if (interval > 0 && validAnimTexs.Count > 1)
             {
-                float all = interval * validAnimTexs.Count;
-
-                int cur = (int)((Time.time % all) / interval);
-                float timeProgress = (Time.time % interval);
+                int cur = GetAnimationFrameIndex(
+                    TimeManager.GetAnimationTime(), interval, validAnimTexs.Count);
 
                 renderer.GetPropertyBlock(propBlock);
                 animCurCache[data][rendererId] = cur;
                 propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
                 int tempId = rendererId;
-                ins.animTimer[rendererId] = TimeManager.instance.StartTimer(timeProgress, interval, () =>
+                ins.animTimer[rendererId] = TimeManager.instance.StartAnimationTimer(interval, () =>
                 {
+                    int next = GetAnimationFrameIndex(
+                        TimeManager.GetAnimationTime(), interval, validAnimTexs.Count);
+                    if (next == cur)
+                        return false;
+
                     MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                     renderer.GetPropertyBlock(propBlock);
-                    cur = (cur + 1) % validAnimTexs.Count;
+                    cur = next;
                     animCurCache[data][tempId] = cur;
                     propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
                     renderer.SetPropertyBlock(propBlock);
@@ -318,6 +357,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
         else if (!isMask)
         {
+            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
             renderer.enabled = false;
             propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
         }
@@ -336,21 +376,66 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
         newObjectData.isObstacle = objectData.collision;
     }
-    private int GetWangTileMask(TileUnit unit, int rendererId, int mapTextureId)
+    private static int GetWangTileMask(TileUnitForm.Data tileData, int layer, int mapTextureId)
     {
         int mask = 0;
-        Vector3Int mapPos = unit.data.mapPos;
+        Vector3Int mapPos = tileData.mapPos;
         foreach (var neighbour in wangTileNeighbours)
         {
             var pos = (mapPos.x + neighbour.x, mapPos.y, mapPos.z + neighbour.z);
             if (MapManager.instance.data.maps.TryGetValue(pos, out TileUnitForm.Data neighbourData)
-                && neighbourData.texDic.GetDv(rendererId, -1) == mapTextureId)
+                && neighbourData.texDic != null
+                && neighbourData.texDic.TryGetValue(layer, out int neighbourTextureId)
+                && neighbourTextureId == mapTextureId)
             {
                 mask |= 1 << neighbour.bit;
             }
         }
         return mask;
     }
+
+    private static (List<int> textures, float interval) GetTileLayerTextures(TileUnitForm.Data tileData,
+        int layer, bool frontPart = false)
+    {
+        if (tileData?.texDic == null || !tileData.texDic.TryGetValue(layer, out int mapTextureId))
+            return (null, 0);
+
+        var data = GetMapTextureOrFirst(mapTextureId);
+        if (data == null || (frontPart && !data.enableFrontPart))
+            return (null, 0);
+
+        bool isWangTile = frontPart ? data.frontIsWangTile : data.isWangTile;
+        var variants = frontPart ? data.FrontWangTileDic : data.WangTileDic;
+        if (isWangTile)
+        {
+            int mask = GetWangTileMask(tileData, layer, mapTextureId);
+            if (TryGetWangTileAnimationTextures(mapTextureId, frontPart, mask, out List<int> animationTextures))
+            {
+                var textures = new List<int>(animationTextures);
+                return (textures, textures.Count > 1 ? data.animTimeInterval : 0);
+            }
+            if (variants != null && variants.TryGetValue(mask, out int textureId))
+                return (new List<int> { textureId }, 0);
+        }
+
+        return (frontPart ? data.frontPartTexs : data.texs, data.animTimeInterval);
+    }
+
+    // Minimap sampling shares the scene's tile selection, without requiring a visible TileInstance.
+    internal static Texture GetTileLayerTexture(TileUnitForm.Data tileData, int layer)
+    {
+        var (textures, _) = GetTileLayerTextures(tileData, layer);
+        if (textures == null || textures.Count == 0)
+            return null;
+
+        foreach (int textureId in textures)
+        {
+            if (TexAssetForm.DataById.ContainsKey(textureId))
+                return GetTextureOrDefault(textureId);
+        }
+        return GetDefaultTexture();
+    }
+
     public void OnEvent(TileEvent evt)
     {
         switch (evt.type)
@@ -359,25 +444,14 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 int baseRendererCount = Mathf.Min(GlobalSettings.TERRAIN_LAYER_MAX, evt.unit.ins.renderers.Length);
                 for (int layer = 0; layer < baseRendererCount; layer++)
                 {
-                    var texName = evt.unit.data.texDic.GetDv(layer, -1);
-                    var data = GetMapTextureOrFirst(texName);
-                    if (data != null
-                        && data.isWangTile
-                        && data.WangTileDic != null
-                        && data.WangTileDic.TryGetValue(GetWangTileMask(evt.unit, layer, texName), out int wangTexId))
-                    {
-                        ShowFinalMat(evt.unit.ins, layer, new List<int>() { wangTexId }, 0, false);
-                    }
-                    else
-                    {
-                        ShowFinalMat(evt.unit.ins, layer, data != null ? data.texs : null, data != null ? data.animTimeInterval : 0, false);
-                    }
+                    var (textures, interval) = GetTileLayerTextures(evt.unit.data, layer);
+                    ShowFinalMat(evt.unit.ins, layer, textures, interval, false);
 
                     int frontRendererId = GlobalSettings.TERRAIN_LAYER_MAX + layer;
                     if (frontRendererId < evt.unit.ins.renderers.Length)
                     {
-                        var frontPartTexs = data != null && data.enableFrontPart ? data.frontPartTexs : null;
-                        ShowFinalMat(evt.unit.ins, frontRendererId, frontPartTexs, data != null ? data.animTimeInterval : 0, false);
+                        var (frontTextures, frontInterval) = GetTileLayerTextures(evt.unit.data, layer, true);
+                        ShowFinalMat(evt.unit.ins, frontRendererId, frontTextures, frontInterval, false);
                     }
                 }
 
@@ -387,7 +461,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     var texName = evt.unit.data.texDic.GetDv(maskKey, -1);
                     var data = MapMaskForm.DataById.GetDv(texName, null);
 
-                    ShowFinalMat(evt.unit.ins, layer, data != null ? data.texsName : null, 0, true);
+                    // A retained mask must not re-enable an intentionally empty base layer.
+                    if (evt.unit.data.texDic.ContainsKey(layer))
+                        ShowFinalMat(evt.unit.ins, layer, data != null ? data.texsName : null, 0, true);
 
                 }
                 break;

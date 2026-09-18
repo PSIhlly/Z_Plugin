@@ -302,7 +302,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             name = StringHelper.GetUniqueName(MapTextureForm.DatasByName.Keys);
         }
-        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, 1, new List<int>() { GlobalDefaultHelper.DefaultTexId }, labId, new Dictionary<string, EventTriggerForm.Data>(), false, new Dictionary<int, int>(), 0, false, new List<int>()));
+        MapTextureForm.AddData(new MapTextureForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, 1, new List<int>() { GlobalDefaultHelper.DefaultTexId }, labId, new Dictionary<string, EventTriggerForm.Data>(), false, new Dictionary<int, int>(), 0, false, new List<int>(), false, new Dictionary<int, int>()));
     }
     public void ImportTex(int texId, int id = -1)
     {

@@ -35,15 +35,48 @@ namespace Z_Map.Analysis
     }
     public class NavigationController : Z_Controller<MapManager>
     {
+        private const string MapGroundPrefabName = "MapPrefab$mapground";
+
+        private sealed class MapGroundCoverageCache
+        {
+            public string prefabName;
+            public GameObject prefab;
+            public Vector3Int mapPos;
+            public Vector3 pos;
+            public Vector3 euler;
+            public Vector3 scale;
+            public Vector3 cellSize;
+            public readonly List<(int, int, int)> coveredNavUnits = new List<(int, int, int)>();
+
+            public bool Matches(TileUnitForm.Data map, GameObject currentPrefab, Vector3 currentCellSize)
+            {
+                return prefabName == map.prefabName
+                    && prefab == currentPrefab
+                    && mapPos == map.mapPos
+                    && pos == map.pos
+                    && euler == map.euler
+                    && scale == map.scale
+                    && cellSize == currentCellSize;
+            }
+        }
+
         public NavigationController(MapManager super) : base(super)
         { }
         NaviComponent bfs;
         public Dictionary<(int, int, int), NavUnit> navUnits;
         public float step;
+        private readonly Dictionary<int, MapGroundCoverageCache> mapGroundCoverageCaches =
+            new Dictionary<int, MapGroundCoverageCache>();
+        private bool navCellLayoutInitialized;
+        private int navCellLayoutCount;
+        private int navCellLayoutHash;
+
         public void Build()
         {
             step = _super.data.mainData.mapUnitSize.y * 1 / 3;
             navUnits = new Dictionary<(int, int, int), NavUnit>(_super.data.maps.Count);
+            mapGroundCoverageCaches.Clear();
+            navCellLayoutInitialized = false;
             UpdateMap(int.MaxValue);
             bfs = new Bfs(this);
         }
@@ -59,6 +92,8 @@ namespace Z_Map.Analysis
         IEnumerator UpdateInternal(int step)
         {
             int times = step;
+            int currentNavCellLayoutCount = 0;
+            int currentNavCellLayoutHash = 17;
             curUpdateCount = 0;
             //build single unit
             curUpdateTileList.Clear();
@@ -78,6 +113,13 @@ namespace Z_Map.Analysis
                 var map = curUpdateTileList[curUpdateCount];
                 if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
                     continue;
+                currentNavCellLayoutCount++;
+                unchecked
+                {
+                    currentNavCellLayoutHash = currentNavCellLayoutHash * 31 + map.uid;
+                    currentNavCellLayoutHash = currentNavCellLayoutHash * 31 + map.mapPos.GetHashCode();
+                    currentNavCellLayoutHash = currentNavCellLayoutHash * 31 + map.pos.GetHashCode();
+                }
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
                 if (!navUnits.ContainsKey(pos))
                 {
@@ -99,6 +141,18 @@ namespace Z_Map.Analysis
                     map.unit.GetYByPoint(offset[2]),
                     map.unit.GetYByPoint(offset[3])
                 };
+            }
+
+            // Adding/removing a NavUnit, or moving its cell center, can change
+            // which cells an otherwise unchanged mapground volume covers.
+            if (!navCellLayoutInitialized
+                || navCellLayoutCount != currentNavCellLayoutCount
+                || navCellLayoutHash != currentNavCellLayoutHash)
+            {
+                mapGroundCoverageCaches.Clear();
+                navCellLayoutInitialized = true;
+                navCellLayoutCount = currentNavCellLayoutCount;
+                navCellLayoutHash = currentNavCellLayoutHash;
             }
             //先扫描障碍物，记录blocked位置
             curUpdateObjList.Clear();
@@ -267,10 +321,37 @@ namespace Z_Map.Analysis
 
         private void MarkMapGroundCoveredNavUnits(TileUnitForm.Data map, HashSet<(int, int, int)> blocked)
         {
-            if (map.scale == Vector3.zero || map.prefabName != MapInfo.GetPrefabName("mapground"))
+            if (map.scale == Vector3.zero || map.prefabName != MapGroundPrefabName)
                 return;
 
             Vector3 cellSize = _super.data.mainData.mapUnitSize;
+            GameObject prefab = map.unit.prefab;
+            if (!mapGroundCoverageCaches.TryGetValue(map.uid, out var coverage)
+                || !coverage.Matches(map, prefab, cellSize))
+            {
+                coverage = BuildMapGroundCoverage(map, prefab, cellSize);
+                mapGroundCoverageCaches[map.uid] = coverage;
+            }
+
+            for (int i = 0; i < coverage.coveredNavUnits.Count; i++)
+                blocked.Add(coverage.coveredNavUnits[i]);
+        }
+
+        private MapGroundCoverageCache BuildMapGroundCoverage(
+            TileUnitForm.Data map,
+            GameObject prefab,
+            Vector3 cellSize)
+        {
+            var coverage = new MapGroundCoverageCache
+            {
+                prefabName = map.prefabName,
+                prefab = prefab,
+                mapPos = map.mapPos,
+                pos = map.pos,
+                euler = map.euler,
+                scale = map.scale,
+                cellSize = cellSize
+            };
             const float overlapEpsilon = 0.0001f;
             Vector3 halfCell = new Vector3(cellSize.x * 0.5f, 0f, cellSize.z * 0.5f);
 
@@ -308,10 +389,13 @@ namespace Z_Map.Analysis
                     bool overlapX = cellMax.x > min.x + overlapEpsilon && cellMin.x < max.x - overlapEpsilon;
                     bool overlapY = cellMax.y > min.y + overlapEpsilon && cellMin.y < max.y - overlapEpsilon;
                     bool overlapZ = cellMax.z > min.z + overlapEpsilon && cellMin.z < max.z - overlapEpsilon;
-                    if (overlapX && overlapY && overlapZ)
-                        blocked.Add(key);
+                    if (overlapX && overlapY && overlapZ
+                        && !coverage.coveredNavUnits.Contains(key))
+                        coverage.coveredNavUnits.Add(key);
                 }
             }
+
+            return coverage;
         }
 
 
@@ -354,6 +438,19 @@ namespace Z_Map.Analysis
                 (center.pos.x + offset.x, center.pos.y, center.pos.z + offset.y),
                 out unit);
         }
+
+        /// <summary>
+        /// 检查导航节点本身是否可走，不考虑角色的 passType 能力。
+        /// </summary>
+        public bool IsBaseWalkable(int x, int y, int z)
+        {
+            return navUnits != null
+                && navUnits.TryGetValue((x, y, z), out var unit)
+                && !unit.isNull
+                && unit.links != null
+                && unit.links.Count > 0;
+        }
+
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
             IReadOnlyCollection<int> passTypes)
         {

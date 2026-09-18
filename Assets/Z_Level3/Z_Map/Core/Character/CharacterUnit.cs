@@ -74,42 +74,14 @@ namespace Z_Map
 
         public Vector3 ClampMoveToPassType(Vector3 oldPos, Vector3 newPos)
         {
-            Vector3 horizontalMove = newPos - oldPos;
-            horizontalMove.y = 0f;
-            if (horizontalMove.sqrMagnitude <= 0.00000001f)
+            Vector3Int mapPos = manager.utilCtrl.RealPos2MapPosInt(newPos);
+            TileUnit targetTile = manager.utilCtrl.GetTile(mapPos.x, mapPos.y, mapPos.z);
+            if (CanPass(targetTile))
                 return newPos;
 
-            // 兼容旧存档中出生在不满足条件地块上的角色：允许先离开该地块。
-            if (!CanOccupyByPassType(oldPos))
-                return newPos;
-
-            if (CanOccupyByPassType(newPos))
-                return newPos;
-
-            float low = 0f;
-            float high = 1f;
-            for (int i = 0; i < 10; i++)
-            {
-                float mid = (low + high) * 0.5f;
-                Vector3 candidate = Vector3.Lerp(oldPos, newPos, mid);
-                if (CanOccupyByPassType(candidate))
-                    low = mid;
-                else
-                    high = mid;
-            }
-
-            return Vector3.Lerp(oldPos, newPos, low);
-        }
-
-        private bool CanOccupyByPassType(Vector3 pos)
-        {
-            foreach (TileUnit tile in manager.utilCtrl.GetCharacterCollisionTiles(
-                         this, pos - data.pos, CollideType.All))
-            {
-                if (!CanPass(tile))
-                    return false;
-            }
-            return true;
+            // passType 只看人物中心所属 Tile，不使用物理 Collider/Trigger 范围。
+            // 目标 Tile 不可通行时，放到目标附近最靠近的合法位置。
+            return manager.utilCtrl.GetClosestInArea(newPos, passTypes);
         }
         public override void Show()
         {

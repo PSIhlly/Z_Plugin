@@ -13,6 +13,7 @@ using Z_Input;
 using Z_Map;
 using Z_Map.Form;
 using Z_Time;
+using Z_Text;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
@@ -44,13 +45,11 @@ public interface ExternalModSceneController
 
     public MapBaseForm.Data curData { get; set; }
 
-    public int tileLayerDisplayMode { get; set; }
-
     public void SetCamera(float x, float y, float z);
 
     public void ForceUpdate();
 }
-public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>
+public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>, IZ_Listener<TileEvent>
 {
     MapManager mapMgr => MapManager.instance;
     public ModSceneController(ModManager super) : base(super)
@@ -60,11 +59,13 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         this.Register<InputMouseDownEvent>();
         this.Register<InputMouseUpEvent>();
         this.Register<InputMouseScrollEvent>();
+        this.Register<TileEvent>();
     }
 
     bool enable = false;
     bool waitForActive = false;
     Vector2 downPos;
+    bool eventLayerBrushTipShown;
     #region internal Var
     private string _fileName;
     public string fileName { get => _fileName; }
@@ -73,7 +74,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     #region extern Var
     private DesignType _designType;
 
-    private int _layer = 0;
+    private int _layer = GlobalSettings.TERRAIN_LAYER_MAX - 1;
     private int _cntX = 1;
     private int _cntY = 1;
     private int _angle = 0;
@@ -83,11 +84,29 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     private bool _posing;
     private MapBaseForm.Data _curData;
-    public DesignType designType { get => _designType; set => _designType = value; }
+    public DesignType designType
+    {
+        get => _designType;
+        set
+        {
+            _designType = value;
+            eventLayerBrushTipShown = false;
+            RefreshTileLayerDisplay();
+        }
+    }
 
 
 
-    public int layer { get => _layer; set => _layer = value; }
+    public int layer
+    {
+        get => _layer;
+        set
+        {
+            _layer = Mathf.Clamp(value, 0, GlobalSettings.TERRAIN_LAYER_MAX - 1);
+            // Layer buttons also leave Event mode, including a reselected layer.
+            designType = DesignType.MapObject;
+        }
+    }
     public int cntX { get => _cntX; set => _cntX = value; }
     public int cntY { get => _cntY; set => _cntY = value; }
     public int angle { get => _angle; set => _angle = value; }
@@ -95,19 +114,17 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public float posZ { get => _posZ; set => _posZ = value; }
     public float posY { get => _posY; set => _posY = value; }
     public bool posing { get => _posing; set => _posing = value; }
-    public MapBaseForm.Data curData { get => _curData; set => _curData = value; }
-
-    private int _tileLayerDisplayMode = int.MaxValue;
-    public int tileLayerDisplayMode
+    public MapBaseForm.Data curData
     {
-        get => _tileLayerDisplayMode;
+        get => _curData;
         set
         {
-            if (_tileLayerDisplayMode == value) return;
-            _tileLayerDisplayMode = value;
-            RefreshTileLayerDisplay();
+            _curData = value;
+            eventLayerBrushTipShown = false;
         }
     }
+    public int tileLayerDisplayMode => designType == DesignType.Event
+        ? int.MaxValue : layer;
     #endregion
 
 
@@ -118,7 +135,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         _cntY = 1;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
-        _tileLayerDisplayMode = int.MaxValue;
+        _layer = GlobalSettings.TERRAIN_LAYER_MAX - 1;
+        _designType = DesignType.MapObject;
+        eventLayerBrushTipShown = false;
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 4, 6);
         CameraInstance.instance.tarTrs.position = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
         switch (DynamicGlobalSettings.cameraMode)
@@ -132,7 +151,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             case CameraMode.Isometric:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
-                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 70;
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 50;
                 CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
@@ -239,8 +258,22 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             }
         }
         var hitPos = mapMgr.utilCtrl.RealPos2MapPosInt(worldPosition);
+        bool brushUsesLayer = curData is MapTextureForm.Data || curData is MapMaskForm.Data
+            || (curData is MapEraseForm.Data eraseBrush && eraseBrush.texture);
+        if (designType == DesignType.Event && brushUsesLayer)
+        {
+            bool onGround = mapMgr.data.maps.ContainsKey((hitPos.x, hitPos.y, hitPos.z))
+                || hits.Any(hit => hit.transform.GetComponentInParent<TileInstance>() != null);
+            if (onGround && !eventLayerBrushTipShown)
+            {
+                NotifyManager.instance.AddTip(TextManager.instance.GetTxt("cantUseInEventMod"));
+                eventLayerBrushTipShown = true;
+            }
+            return;
+        }
         //manage
-        switch (designType)
+        // Non-layer brushes remain usable without leaving Event mode.
+        switch (curData != null ? DesignType.MapObject : designType)
         {
             case DesignType.MapObject:
                 if (curData != null)
@@ -405,8 +438,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                             if (eraseData.texture)
                             {
-                                if (mapData.texDic.ContainsKey(layer))
-                                    mapData.texDic.Remove(layer);
+                                if (mapData.texDic.Remove(layer))
+                                    mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
                             }
                         });
                     }
@@ -510,17 +543,24 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     {
         foreach (var mapData in mapMgr.data.maps.Values)
         {
-            if (mapData.unit.ins != null)
-            {
-                mapData.unit.ins.displayLayer = _tileLayerDisplayMode;
-                if (mapData.unit.ins.vising)
-                {
-                    // 重新应用 VisOn 以刷新各层 Renderer 显隐
-                    mapData.unit.ins.vising = false;
-                    mapData.unit.ins.VisOn();
-                }
-            }
+            ApplyTileLayerDisplay(mapData.unit.ins);
         }
+    }
+
+    private void ApplyTileLayerDisplay(TileInstance ins)
+    {
+        if (ins == null)
+            return;
+        ins.displayLayer = enable ? tileLayerDisplayMode : int.MaxValue;
+        if (ins.vising)
+            ins.VisOn();
+    }
+
+    public void OnEvent(TileEvent evt)
+    {
+        // Keep pooled Tiles synchronized; Play must not inherit a Mod-only ceiling.
+        if (evt.type == MapEventType.Show)
+            ApplyTileLayerDisplay(evt.unit.ins);
     }
 
     public void Update()
@@ -589,6 +629,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         if (evt.ui == null)
         {
             downPos = evt.pos;
+            eventLayerBrushTipShown = false;
         }
         else
         {

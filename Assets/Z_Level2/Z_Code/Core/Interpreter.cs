@@ -98,6 +98,17 @@ namespace Z_Code
             {
                 public int debugId;
                 protected Interpreter _interpreter;
+                public bool IsCancelled { get; private set; }
+
+                public void Cancel()
+                {
+                    if (IsCancelled)
+                        return;
+
+                    IsCancelled = true;
+                    _interpreter?.Cancel();
+                    subInterpret?.Cancel();
+                }
 
                 public virtual RetInfo Interpret()
                 {
@@ -117,6 +128,7 @@ namespace Z_Code
                 public void Reset()
                 {
                     _interpreter?.Reset();
+                    IsCancelled = false;
                     p = 0;
                     stack?.Clear();
                     top = -1;
@@ -195,6 +207,7 @@ namespace Z_Code
 
         private bool isRuning;
         private bool isComplete;
+        private bool isCancelled;
 
         public bool IsRuning()
         {
@@ -206,12 +219,25 @@ namespace Z_Code
             return isComplete;
         }
 
+        public bool IsCancelled()
+        {
+            return isCancelled;
+        }
+
         public void Run()
         {
             isComplete = false;
             isRuning = true;
+            isCancelled = false;
             error = null;
             res = null;
+        }
+
+        public void Cancel()
+        {
+            isCancelled = true;
+            isComplete = true;
+            isRuning = false;
         }
 
         public void Complete()
@@ -224,6 +250,7 @@ namespace Z_Code
         {
             isComplete = false;
             isRuning = false;
+            isCancelled = false;
             error = null;
             res = null;
         }
@@ -271,6 +298,11 @@ namespace Z_Code
             errors.Clear();
             opCode = null;
 
+            if (data == null || data.IsCancelled)
+            {
+                return MakeRetInfo(true);
+            }
+
             if (!TryPrepare(out var zCode))
             {
                 return MakeRetInfo(true);
@@ -285,6 +317,11 @@ namespace Z_Code
 
             while (data.p < count)
             {
+                if (data.IsCancelled)
+                {
+                    return MakeRetInfo(true);
+                }
+
                 if (!budget.TryConsumeInstruction())
                 {
                     return MakeRetInfo(false);
@@ -657,6 +694,11 @@ namespace Z_Code
                     cmd.Execute(parameters, data.heap, asyncTask);
                 }
 
+                if (data.IsCancelled)
+                {
+                    return MakeRetInfo(true);
+                }
+
                 if (!asyncTask.IsComplete())
                 {
                     return MakeRetInfo(false);
@@ -751,6 +793,11 @@ namespace Z_Code
             finally
             {
                 budget.ExitSubProgram();
+            }
+
+            if (data.IsCancelled)
+            {
+                return MakeRetInfo(true);
             }
 
             if (subResult.errors != null && subResult.errors.Count > 0)
@@ -1113,6 +1160,11 @@ namespace Z_Code
             numberCacheValid = null;
             integerCache = null;
             integerCacheValid = null;
+        }
+
+        public void Cancel()
+        {
+            asyncTask.Cancel();
         }
 
         private BoxDataForm.Data ValuePlus(BoxDataForm.Data left, BoxDataForm.Data right)

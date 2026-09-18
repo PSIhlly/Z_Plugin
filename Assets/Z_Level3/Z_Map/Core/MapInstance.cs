@@ -16,6 +16,7 @@ namespace Z_Map
         private static readonly int ShowProperty = Shader.PropertyToID("_Show");
         private MaterialPropertyBlock visionBlock;
         private bool visionApplied;
+        private float appliedSecondaryDegree;
         private int appliedDisplayLayer;
         private Unit visionOwner;
 
@@ -52,6 +53,13 @@ namespace Z_Map
             return rendererIndex <= displayLayer;
         }
 
+        protected virtual void ApplyRendererDisplayLayerProperties(
+            Renderer renderer,
+            int rendererIndex,
+            MaterialPropertyBlock block)
+        {
+        }
+
         public override void VisOn()
         {
             ApplyVision(vising && degree > 0f ? degree : 1f);
@@ -68,9 +76,20 @@ namespace Z_Map
         /// <summary>Submit only a changed final visibility state, including display-layer/pool changes.</summary>
         public void ApplyVision(float value)
         {
+            ApplyVisionValues(value, value);
+        }
+
+        /// <summary>
+        /// Submit a primary and secondary visibility value. Derived instances decide
+        /// which renderer slots, if any, use the secondary value.
+        /// </summary>
+        protected void ApplyVisionValues(float value, float secondaryValue)
+        {
             value = Mathf.Clamp01(value);
-            bool visible = value > 0f;
+            secondaryValue = Mathf.Clamp01(secondaryValue);
+            bool visible = value > 0f || secondaryValue > 0f;
             if (visionApplied && degree == value && vising == visible
+                && appliedSecondaryDegree == secondaryValue
                 && appliedDisplayLayer == displayLayer && visionOwner == base.unit)
                 return;
 
@@ -82,14 +101,25 @@ namespace Z_Map
                 // Texture/animation code shares this block. Read before modifying
                 // _Show so a reused block never overwrites another renderer's values.
                 render.GetPropertyBlock(visionBlock);
-                visionBlock.SetFloat(ShowProperty, IsRendererVisibleInDisplayLayer(i) ? value : 0f);
+                float rendererValue = GetRendererVisionDegree(i, value, secondaryValue);
+                visionBlock.SetFloat(ShowProperty, IsRendererVisibleInDisplayLayer(i) ? rendererValue : 0f);
+                ApplyRendererDisplayLayerProperties(render, i, visionBlock);
                 render.SetPropertyBlock(visionBlock);
             }
             degree = value;
             vising = visible;
+            appliedSecondaryDegree = secondaryValue;
             appliedDisplayLayer = displayLayer;
             visionOwner = base.unit;
             visionApplied = true;
+        }
+
+        protected virtual float GetRendererVisionDegree(
+            int rendererIndex,
+            float primaryValue,
+            float secondaryValue)
+        {
+            return primaryValue;
         }
     }
 }

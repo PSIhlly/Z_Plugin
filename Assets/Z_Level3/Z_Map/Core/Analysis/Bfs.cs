@@ -176,7 +176,8 @@ namespace Z_Map.Analysis
                     
                     //换层 先断
                     if (!Check(checkLeft - smoothingRadiusX, checkRight + smoothingRadiusX, nxt.y, y,
-                            checkBack - smoothingRadiusZ, checkForward + smoothingRadiusZ, passTypes))
+                            checkBack - smoothingRadiusZ, checkForward + smoothingRadiusZ) ||
+                        !HasPassTypesOnCenterLine(nxt, tryPos, passTypes))
                     {
                         //那就只走第一步
                         if (i == path.Count - 2)
@@ -208,15 +209,14 @@ namespace Z_Map.Analysis
         public bool CanPass(NavUnit from, NavUnit tar, IReadOnlyList<Vector2Int> clearanceOffsets,
             IReadOnlyCollection<int> passTypes)
         {
-            if (steps.ContainsKey(tar))
+            if (steps.ContainsKey(tar) || !HasAllPassTypes(tar, passTypes))
                 return false;
 
             foreach (var offset in clearanceOffsets)
             {
                 if (!nc.TryGetOffsetUnit(from, offset, out var fromUnit) ||
                     !nc.TryGetOffsetUnit(tar, offset, out var toUnit) ||
-                    !fromUnit.links.Contains(toUnit) ||
-                    !HasAllPassTypes(toUnit, passTypes))
+                    !fromUnit.links.Contains(toUnit))
                 {
                     return false;
                 }
@@ -228,8 +228,7 @@ namespace Z_Map.Analysis
         /// 视线检测：验证指定矩形区域内所有导航格均无障碍且高度差在阈值内
         /// 用于判断路径上是否可以直线到达（无需绕行）
         /// </summary>
-        public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ,
-            IReadOnlyCollection<int> passTypes)
+        public bool Check(int startX, int endX, int mapY, float realY, int startZ, int endZ)
         {
             for (int i = startX; i <= endX; i++)
                 for (int k = startZ; k <= endZ; k++)
@@ -237,8 +236,7 @@ namespace Z_Map.Analysis
                     if (!nc.navUnits.ContainsKey((i, mapY, k)))
                         return false;
                     var unit = nc.navUnits[(i, mapY, k)];
-                    if (unit.links.Count == 0 || Mathf.Abs(unit.realPos.y - realY) > nc.step ||
-                        !HasAllPassTypes(unit, passTypes))
+                    if (unit.links.Count == 0 || Mathf.Abs(unit.realPos.y - realY) > nc.step)
                     {
                         return false;
                     }
@@ -246,6 +244,41 @@ namespace Z_Map.Analysis
 
             return true;
 
+        }
+
+        private bool HasPassTypesOnCenterLine(Vector3Int from, Vector3Int to,
+            IReadOnlyCollection<int> passTypes)
+        {
+            int x = from.x;
+            int z = from.z;
+            int deltaX = Mathf.Abs(to.x - from.x);
+            int deltaZ = Mathf.Abs(to.z - from.z);
+            int stepX = from.x < to.x ? 1 : -1;
+            int stepZ = from.z < to.z ? 1 : -1;
+            int error = deltaX - deltaZ;
+
+            while (true)
+            {
+                if (!nc.navUnits.TryGetValue((x, from.y, z), out NavUnit unit) ||
+                    !HasAllPassTypes(unit, passTypes))
+                {
+                    return false;
+                }
+                if (x == to.x && z == to.z)
+                    return true;
+
+                int doubleError = error * 2;
+                if (doubleError > -deltaZ)
+                {
+                    error -= deltaZ;
+                    x += stepX;
+                }
+                if (doubleError < deltaX)
+                {
+                    error += deltaX;
+                    z += stepZ;
+                }
+            }
         }
 
         private static bool HasAllPassTypes(NavUnit unit, IReadOnlyCollection<int> passTypes)

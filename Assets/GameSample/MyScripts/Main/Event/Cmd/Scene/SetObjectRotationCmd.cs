@@ -30,7 +30,7 @@ namespace Z_Code
         {
             var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
 
-            GameManager.instance.evtCtrl.StartTask(() =>
+            GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
                 var euler = prm[1].num;
                 var time = Mathf.Max(0.0001f, prm[2].num);

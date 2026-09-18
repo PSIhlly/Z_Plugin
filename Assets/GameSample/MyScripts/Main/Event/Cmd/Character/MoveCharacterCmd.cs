@@ -33,7 +33,7 @@ namespace Z_Code
             var heapTemp = asyncTask.interpreter.data.heapTemp;
             var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(heapTemp[0].str, GlobalEventHelper.CHARACTER)];
 
-            GameManager.instance.evtCtrl.StartTask(() =>
+            GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
                 var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
                 if (data != null)

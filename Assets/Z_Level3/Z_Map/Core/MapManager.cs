@@ -40,6 +40,7 @@ namespace Z_Map
         public const bool NAV_DEBUG = true;
         public const bool MAP_SHOW_DEBUG = false;
         public const bool OVERLAY_HIDE = false;
+        public const bool MOD_HIGH_LAYER_HALF_TRANSPARENT = true;
         public const UpdateType UPDATE_TILE_TYPE = UpdateType.None;
         public const UpdateType UPDATE_CHARACTER_TYPE = UpdateType.All;
         public const UpdateType UPDATE_OBJECT_TYPE = UpdateType.None;
@@ -211,6 +212,7 @@ public class MapManager : Z_MonoManager<MapManager>
     }
     public void RemoveTile(TileUnitForm.Data form)
     {
+        var mapPos = form.mapPos;
         data.RemoveTile(form);
 
         updateCtrl.characterTileDic.Del(form.unit);
@@ -218,6 +220,7 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.itemTileDic.Del(form.unit);
         updateCtrl.objectTileDic.Del(form.unit);
         updateCtrl.curTileLst.Remove(form);
+        updateCtrl.UpdateTileNeighbours(mapPos);
     }
     public void RemoveCharacter(CharacterUnitForm.Data form)
     {

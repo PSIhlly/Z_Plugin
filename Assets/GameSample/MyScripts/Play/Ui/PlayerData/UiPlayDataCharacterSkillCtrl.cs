@@ -19,6 +19,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
         public CharacterProductForm.Data data;
         public SkillType selSkill;
         public SkillProductForm.Data sel;
+        public bool hasSelection;
     }
     public partial class UiPlayDataCharacterSkillCtrl
     {
@@ -38,6 +39,9 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
             {
                 model.data = param.data;
             }
+            model.sel = model.hasSelection
+                ? SkillProductForm.DataByUid.GetDv(model.data.skill.GetDv(model.selSkill, 0), null)
+                : null;
             Refresh();
         }
         public void Refresh()
@@ -88,6 +92,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
 
             view.btn_.onClick.AddListener(() =>
             {
+                parent.model.hasSelection = true;
                 parent.model.sel = model.data;
                 parent.model.selSkill = model.part;
                 parent.Refresh();

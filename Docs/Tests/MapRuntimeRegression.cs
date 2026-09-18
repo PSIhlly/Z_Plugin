@@ -4,10 +4,12 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
 using Z_Mesh;
+using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 using Object = UnityEngine.Object;
@@ -30,9 +32,17 @@ public static class MapRuntimeRegression
             SetUp();
             DictionaryQueries();
             Geometry();
+            MapGroundCoverageCaching();
             Coverage();
+            PassTypeMovement();
+            WangTileAnimationSelection();
+            SharedAnimationClock();
+            CanvasHolderResetAfterPoolTeardown();
+            SparseViewRefreshAfterErase();
+            IncrementalViewRefresh();
             Visibility();
             TileFirstVisibility();
+            OcclusionTransparencyAndPriority();
             Events();
             Debug.Log("MAP_RUNTIME_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
@@ -58,9 +68,11 @@ public static class MapRuntimeRegression
         map = mapGo.AddComponent<MapManager>();
         typeof(Z_MonoSingleton<MapManager>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)
             .SetValue(null, map);
+        map.navigationCtrl = new Z_Map.Analysis.NavigationController(map);
         map.utilCtrl = new MapUtilController(map);
         map.updateCtrl = new MapUpdateController(map);
         map.enable = true;
+        DynamicGlobalSettings.playing = true;
         map.data = new MapInfo
         {
             mainData = new MapMainForm.Data(1, new Vector3(1, 1.5f, 1),
@@ -106,6 +118,14 @@ public static class MapRuntimeRegression
                 source.name, new Vector3(x, y * 1.5f, z), Vector3.zero, Vector3.one,
                 UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
             map.data.RegisterMap(tile);
+        }
+
+        map.navigationCtrl.navUnits = new Dictionary<(int, int, int), Z_Map.Analysis.NavUnit>();
+        foreach (var tile in map.data.maps.Values)
+        {
+            var navUnit = NavUnit(tile.mapPos.x, tile.mapPos.z, tile.mapPos.y);
+            navUnit.links.Add(navUnit);
+            map.navigationCtrl.navUnits[(tile.mapPos.x, tile.mapPos.y, tile.mapPos.z)] = navUnit;
         }
     }
 
@@ -249,6 +269,204 @@ public static class MapRuntimeRegression
         Require(ctrl.characterOverlapTileDic.GetDicT2().Values.All(v => !v.Contains(unit)), "unowned reverse links removed");
     }
 
+    private static void MapGroundCoverageCaching()
+    {
+        var groundPrefab = Go(MapInfo.GetPrefabName("mapground"));
+        var groundCollider = groundPrefab.AddComponent<BoxCollider>();
+        groundCollider.center = new Vector3(0f, -1f, 0f);
+        groundCollider.size = new Vector3(0.8f, 2f, 0.8f);
+        pool.AddPool(groundPrefab);
+
+        var tile = map.utilCtrl.GetTile(5, 1, 5);
+        string originalPrefabName = tile.data.prefabName;
+        Vector3 originalPos = tile.data.pos;
+        Vector3 originalEuler = tile.data.euler;
+        Vector3 originalScale = tile.data.scale;
+        tile.data.prefabName = groundPrefab.name;
+        tile.data.pos = new Vector3(5f, 1.5f, 5f);
+        tile.data.euler = Vector3.zero;
+        tile.data.scale = Vector3.one;
+        tile.InvalidateCollisionGeometry();
+
+        var mark = typeof(Z_Map.Analysis.NavigationController).GetMethod(
+            "MarkMapGroundCoveredNavUnits",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var cacheField = typeof(Z_Map.Analysis.NavigationController).GetField(
+            "mapGroundCoverageCaches",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var blocked = new HashSet<(int, int, int)>();
+        mark.Invoke(map.navigationCtrl, new object[] { tile.data, blocked });
+        Require(blocked.Contains((5, 0, 5)),
+            "mapground coverage still blocks the lower NavUnit");
+
+        var caches = (System.Collections.IDictionary)cacheField.GetValue(map.navigationCtrl);
+        object firstCache = caches[tile.data.uid];
+        blocked.Clear();
+        mark.Invoke(map.navigationCtrl, new object[] { tile.data, blocked });
+        Require(ReferenceEquals(firstCache, caches[tile.data.uid]),
+            "unchanged mapground reuses its covered-NavUnit cache");
+
+        tile.data.pos += Vector3.up * 2f;
+        tile.InvalidateCollisionGeometry();
+        blocked.Clear();
+        mark.Invoke(map.navigationCtrl, new object[] { tile.data, blocked });
+        Require(!ReferenceEquals(firstCache, caches[tile.data.uid]),
+            "mapground transform changes invalidate its coverage cache");
+        Require(!blocked.Contains((5, 0, 5)) && blocked.Contains((5, 2, 5)),
+            "rebuilt mapground coverage follows the changed transform");
+
+        tile.data.prefabName = originalPrefabName;
+        tile.data.pos = originalPos;
+        tile.data.euler = originalEuler;
+        tile.data.scale = originalScale;
+        tile.InvalidateCollisionGeometry();
+        caches.Remove(tile.data.uid);
+    }
+
+    private static void PassTypeMovement()
+    {
+        var unit = new CharacterUnitForm.Data(9050, false, Vector3.zero, 1, 1, 1, false, "",
+            source.name, new Vector3(5, 0, 5), Vector3.zero, Vector3.one * 3,
+            UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+        var owner = map.utilCtrl.GetTile(5, 0, 5);
+        var restricted = map.utilCtrl.GetTile(6, 0, 5);
+        map.updateCtrl.characterTileDic.Add(unit, owner);
+        restricted.SetPassTypes(new[] { 7001 });
+
+        Vector3 oldPos = unit.data.pos;
+        Vector3 sameCenterTile = new Vector3(5.49f, 0, 5);
+        Require(Vector3.Distance(unit.ClampMoveToPassType(oldPos, sameCenterTile), sameCenterTile) < 0.0001f,
+            "character size and Collider do not affect center-Tile pass type checks");
+
+        Vector3 enterRestricted = new Vector3(5.51f, 0, 5);
+        Vector3 corrected = unit.ClampMoveToPassType(oldPos, enterRestricted);
+        Vector3Int correctedMapPos = map.utilCtrl.RealPos2MapPosInt(corrected);
+        TileUnit correctedTile = map.utilCtrl.GetTile(correctedMapPos.x, correctedMapPos.y, correctedMapPos.z);
+        Require(unit.CanPass(correctedTile) && Mathf.Abs(corrected.x - 5.49f) < 0.0001f,
+            "restricted center Tile moves the character to the closest legal position");
+
+        Vector3 restrictedRightSide = new Vector3(6.4f, 0, 5);
+        corrected = unit.ClampMoveToPassType(oldPos, restrictedRightSide);
+        Require(Mathf.Abs(corrected.x - 6.51f) < 0.0001f,
+            "closest legal position is selected from the nearest side of the restricted Tile");
+
+        var navigation = new Z_Map.Analysis.NavigationController(map)
+        {
+            navUnits = new Dictionary<(int, int, int), Z_Map.Analysis.NavUnit>()
+        };
+        var navFrom = NavUnit(5, 5);
+        var navTarget = NavUnit(6, 5);
+        var navFootprint = NavUnit(7, 5);
+        navFootprint.passTypes.Add(7001);
+        navFrom.links.Add(navTarget);
+        navTarget.links.Add(navFootprint);
+        navigation.navUnits[(5, 0, 5)] = navFrom;
+        navigation.navUnits[(6, 0, 5)] = navTarget;
+        navigation.navUnits[(7, 0, 5)] = navFootprint;
+        var bfs = new Z_Map.Analysis.Bfs(navigation);
+        var clearance = new List<Vector2Int> { Vector2Int.zero, Vector2Int.right };
+        Require(bfs.CanPass(navFrom, navTarget, clearance, Array.Empty<int>()),
+            "navigation pass type ignores restricted neighbouring footprint Tiles");
+        navTarget.passTypes.Add(7001);
+        Require(!bfs.CanPass(navFrom, navTarget, clearance, Array.Empty<int>()),
+            "navigation pass type still rejects a restricted center Tile");
+        Require(navigation.IsBaseWalkable(6, 0, 5),
+            "base navigation walkability ignores pass type requirements");
+        navTarget.links.Clear();
+        Require(!navigation.IsBaseWalkable(6, 0, 5),
+            "base navigation walkability rejects a NavUnit without connections");
+        navTarget.links.Add(navFootprint);
+
+        unit.SetPassTypes(new[] { 7001 });
+        Require(Vector3.Distance(unit.ClampMoveToPassType(oldPos, enterRestricted), enterRestricted) < 0.0001f,
+            "matching character pass type permits entry");
+
+        restricted.SetPassTypes(null);
+        map.updateCtrl.characterTileDic.Del(unit);
+    }
+
+    private static Z_Map.Analysis.NavUnit NavUnit(int x, int z, int y = 0)
+    {
+        return new Z_Map.Analysis.NavUnit
+        {
+            pos = new Vector3Int(x, y, z),
+            realPos = new Vector3(x, y * 1.5f, z),
+            links = new List<Z_Map.Analysis.NavUnit>(),
+            passTypes = new HashSet<int>()
+        };
+    }
+
+    private static void WangTileAnimationSelection()
+    {
+        const int mapTextureId = 7701;
+        var clear = typeof(GameMapController).GetMethod(
+            "ClearWangTileAnimationTextures",
+            BindingFlags.Static | BindingFlags.NonPublic);
+        var register = typeof(GameMapController).GetMethod(
+            "RegisterWangTileAnimationTexture",
+            BindingFlags.Static | BindingFlags.NonPublic);
+        var resolve = typeof(GameMapController).GetMethod(
+            "TryGetWangTileAnimationTextures",
+            BindingFlags.Static | BindingFlags.NonPublic);
+
+        clear.Invoke(null, null);
+        register.Invoke(null, new object[] { mapTextureId, false, 0, 9101 });
+        register.Invoke(null, new object[] { mapTextureId, false, 0, 9102 });
+        object[] baseArgs = { mapTextureId, false, 0, null };
+        Require((bool)resolve.Invoke(null, baseArgs)
+            && ((List<int>)baseArgs[3]).SequenceEqual(new[] { 9101, 9102 }),
+            "base WangTile retains every generated frame in source order");
+
+        register.Invoke(null, new object[] { mapTextureId, true, 0, 9201 });
+        register.Invoke(null, new object[] { mapTextureId, true, 0, 9202 });
+        object[] frontArgs = { mapTextureId, true, 0, null };
+        Require((bool)resolve.Invoke(null, frontArgs)
+            && ((List<int>)frontArgs[3]).SequenceEqual(new[] { 9201, 9202 }),
+            "front WangTile keeps an independent ordered animation sequence");
+
+        clear.Invoke(null, null);
+    }
+
+    private static void SharedAnimationClock()
+    {
+        var previousGetter = TimeManager.animationTimeGetter;
+        try
+        {
+            TimeManager.animationTimeGetter = () => 3.25f;
+            Require(Mathf.Approximately(TimeManager.GetAnimationTime(), 3.25f),
+                "lower-level animation clock uses its configured gameplay-time delegate");
+
+            var getFrame = typeof(GameMapController).GetMethod(
+                "GetAnimationFrameIndex",
+                BindingFlags.Static | BindingFlags.NonPublic);
+            Require((int)getFrame.Invoke(null, new object[] { TimeManager.GetAnimationTime(), 0.5f, 4 }) == 2,
+                "non-character animation frame is selected from absolute gameplay time");
+
+            TimeManager.animationTimeGetter = () => 4f;
+            Require((int)getFrame.Invoke(null, new object[] { TimeManager.GetAnimationTime(), 0.5f, 4 }) == 0,
+                "absolute animation phase wraps deterministically");
+        }
+        finally
+        {
+            TimeManager.animationTimeGetter = previousGetter;
+        }
+    }
+
+    private static void CanvasHolderResetAfterPoolTeardown()
+    {
+        var holder = Go("canvas-holder").AddComponent<CanvasHolder>();
+        var slider = Go("destroyed-slider").AddComponent<Slider>();
+        var sliders = (Dictionary<int, Slider>)typeof(CanvasHolder)
+            .GetField("sliderDic", BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(holder);
+        sliders.Add(1, slider);
+
+        Object.DestroyImmediate(slider.gameObject);
+        holder.Reset();
+        Require(sliders.Count == 0,
+            "CanvasHolder reset tolerates Slider children already destroyed by pool teardown");
+    }
+
     private static void Visibility()
     {
         var go = Go("vision-probe");
@@ -267,6 +485,7 @@ public static class MapRuntimeRegression
         {
             block.Clear();
             block.SetFloat("_RegressionTextureProperty", i + 10);
+            block.SetFloat("_LightSensitivity", i + 2);
             instance.renderers[i].SetPropertyBlock(block);
         }
 
@@ -275,7 +494,7 @@ public static class MapRuntimeRegression
         map.updateCtrl.curTileLst.Add(tile.data);
         var update = typeof(MapUpdateController).GetMethod("UpdateVision", BindingFlags.Instance | BindingFlags.NonPublic);
         update.Invoke(map.updateCtrl, null);
-        Require(ReadShow(instance, 0) == 0.5f, "occlusion final half opacity");
+        Require(ReadShow(instance, 0) == 0f, "high Tile occlusion is fully transparent");
         int reads = instance.rendererReads;
         update.Invoke(map.updateCtrl, null);
         Require(instance.rendererReads == reads, "unchanged frame skips renderer submissions");
@@ -285,12 +504,42 @@ public static class MapRuntimeRegression
         for (int i = 0; i < 6; i++)
         {
             instance.renderers[i].GetPropertyBlock(block);
-            Require(block.GetFloat("_Show") == (i == 0 || i == 3 ? 0.5f : 0f), "normal/front layer pairing");
+            Require(block.GetFloat("_Show") == 0f, "all high Tile renderers are hidden");
             Require(block.GetFloat("_RegressionTextureProperty") == i + 10, "other property preserved per renderer");
         }
         map.updateCtrl.curCenterPos = new Vector3(5, 4.5f, 5);
         update.Invoke(map.updateCtrl, null);
         Require(ReadShow(instance, 0) == 1f, "departed occlusion restored");
+        for (int i = 0; i < 6; i++)
+        {
+            Require(ReadShow(instance, i) == (i == 0 || i == 3 ? 1f : 0f), "restored normal/front layer pairing");
+            Require(ReadLightSensitivity(instance, i) == i + 2, "layer 0 keeps every initial light sensitivity");
+        }
+        instance.displayLayer = 1;
+        instance.VisOn();
+        for (int i = 0; i < 6; i++)
+        {
+            bool lowerLayer = i == 0 || i == 3;
+            bool displayed = lowerLayer || i == 1 || i == 4;
+            Require(ReadShow(instance, i) == (displayed ? 1f : 0f), "layer 1 keeps the cumulative display ceiling");
+            Require(ReadLightSensitivity(instance, i) == (i + 2) * (lowerLayer ? 0.5f : 1f),
+                "layer 1 halves only lower-layer light sensitivity");
+        }
+        instance.displayLayer = 2;
+        instance.VisOn();
+        for (int i = 0; i < 6; i++)
+        {
+            bool currentLayer = i == 2 || i == 5;
+            Require(ReadShow(instance, i) == 1f, "layer 2 displays all layers cumulatively");
+            Require(ReadLightSensitivity(instance, i) == (i + 2) * (currentLayer ? 1f : 0.5f),
+                "layer 2 halves both lower layers from their recorded initial values");
+        }
+        instance.displayLayer = int.MaxValue;
+        instance.VisOn();
+        for (int i = 0; i < 6; i++)
+            Require(ReadLightSensitivity(instance, i) == i + 2, "unrestricted display restores initial light sensitivity");
+        instance.displayLayer = 0;
+        instance.VisOn();
         var reusedBlock = typeof(MapInstance).GetField("visionBlock", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(instance);
         instance.ApplyVision(0.5f);
         Require(ReferenceEquals(reusedBlock, typeof(MapInstance).GetField("visionBlock", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(instance)), "property block reused");
@@ -313,6 +562,13 @@ public static class MapRuntimeRegression
         var block = new MaterialPropertyBlock();
         instance.renderers[index].GetPropertyBlock(block);
         return block.GetFloat("_Show");
+    }
+
+    private static float ReadLightSensitivity(MapInstance instance, int index)
+    {
+        var block = new MaterialPropertyBlock();
+        instance.renderers[index].GetPropertyBlock(block);
+        return block.GetFloat("_LightSensitivity");
     }
 
     private static RegressionTileInstance Probe(Unit unit)
@@ -379,11 +635,12 @@ public static class MapRuntimeRegression
         int charactersBefore = ctrl.characterTileDic.GetDicT2().Count;
         update();
         var final = (Dictionary<MapUnit, float>)finalField.GetValue(ctrl);
-        Require(final[high] == 0.5f && final[obj] == 0.5f && final[item] == 0.5f,
-            "attached units inherit final BFS degree instead of Tile initialization order");
+        Require(final[high] == 0f && final[obj] == 0.5f && final[item] == 0f,
+            "high Tile/items are hidden but an Object covering both layers stays half transparent");
         Require(final[character] == 1 && ReadShow(characterIns, 0) == 1,
             "character visibility uses owner, not collision coverage");
-        Require(final[tall] == 1 && ReadShow(tallIns, 0) == 1, "out-of-view Object owner falls back to opaque");
+        Require(final[tall] == 0.5f && ReadShow(tallIns, 0) == 0.5f,
+            "mixed-layer visual coverage wins even with an out-of-view owner");
         Require(final[orphan] == 1 && !ctrl.itemTileDic.GetDicT1().ContainsKey(orphan),
             "missing owner restores opaque without creating ownership");
         Require(ctrl.objectTileDic.GetDicT2().Count == objectsBefore && ctrl.itemTileDic.GetDicT2().Count == itemsBefore
@@ -406,7 +663,7 @@ public static class MapRuntimeRegression
         ctrl.characterTileDic.Move(character, high);
         ctrl.itemTileDic.Move(item, outside);
         update();
-        Require(ReadShow(characterIns, 0) == 0.5f && ReadShow(itemIns, 0) == 1,
+        Require(ReadShow(characterIns, 0) == 0f && ReadShow(itemIns, 0) == 1,
             "moving ownership refreshes degree even outside current Tile set");
 
         var late = new ItemUnitForm.Data(9106, "", source.name, high.data.pos,
@@ -416,7 +673,7 @@ public static class MapRuntimeRegression
         update();
         var lateIns = Probe(late);
         update();
-        Require(ReadShow(lateIns, 0) == 0.5f, "newly shown instance receives previously collected degree");
+        Require(ReadShow(lateIns, 0) == 0f, "newly shown instance receives previously collected degree");
 
         DynamicGlobalSettings.cameraMode = CameraMode.Isometric;
         // Special visual-footprint candidates must work even outside the visible list.
@@ -424,6 +681,9 @@ public static class MapRuntimeRegression
         update();
         Require(ReadShow(tallIns, 0) == 0.5f, "visual coverage occludes tall Object with offscreen owner");
         DynamicGlobalSettings.cameraMode = CameraMode.Overhead;
+        update();
+        Require(ReadShow(tallIns, 0) == 0.5f, "mixed-layer precedence also applies outside side view and visible list");
+        ctrl.objectTileDic.Del(tall, high);
         update();
         Require(ReadShow(tallIns, 0) == 1, "departed visual-footprint override restores omitted visible Object");
 
@@ -440,8 +700,276 @@ public static class MapRuntimeRegression
         ctrl.curObjectLst.Add(obj.data);
         ctrl.objectTileDic.Add(obj, high);
         update();
-        Require(ReadShow(objIns, 0) == 0.5f, "visibility rebuilds after End and re-entry");
+        Require(ReadShow(objIns, 0) == 0f, "visibility rebuilds high-only Object after End and re-entry");
         ctrl.End();
+    }
+
+    private static void SparseViewRefreshAfterErase()
+    {
+        var ctrl = map.updateCtrl;
+        ctrl.End();
+        var column = new List<TileUnitForm.Data>();
+        for (int y = 0; y <= 2; y++)
+        {
+            var tile = new TileUnitForm.Data(22000 + y, "", new Dictionary<int, int>(), new Vector3Int(14, y, 14),
+                source.name, new Vector3(14, y * 1.5f, 14), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+            map.data.RegisterMap(tile);
+            column.Add(tile);
+        }
+
+        map.data.UnRegisterMap(column[1]);
+        Require(map.data.mapXZ2Y.TryGetValue((14, 14), out var sparseLevels)
+            && sparseLevels.SetEquals(new[] { 0, 2 }),
+            "erasing a middle Tile keeps a sparse height index");
+
+        Probe(column[0].unit);
+        Probe(column[2].unit);
+        var visible = new HashSet<TileUnitForm.Data>();
+        var showAndAdd = typeof(MapUpdateController).GetMethod(
+            "ShowAndAddLst",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        showAndAdd.Invoke(ctrl, new object[] { visible, 14, 15, 0, 3, 14, 15 });
+        Require(visible.Count == 2 && visible.Contains(column[0]) && visible.Contains(column[2]),
+            "view refresh skips erased gaps in sparse height columns");
+
+        map.data.UnRegisterMap(column[0]);
+        map.data.UnRegisterMap(column[2]);
+        Require(!map.data.mapXZ2Y.ContainsKey((14, 14)),
+            "erasing the last Tile removes the empty X/Z height index");
+        visible.Clear();
+        showAndAdd.Invoke(ctrl, new object[] { visible, 14, 15, 0, 3, 14, 15 });
+        Require(visible.Count == 0,
+            "view refresh remains safe after erasing the whole height column");
+        ctrl.End();
+    }
+
+    private static void IncrementalViewRefresh()
+    {
+        var ctrl = map.updateCtrl;
+        ctrl.End();
+        var originalViewSize = map.data.mainData.viewSize;
+        map.data.mainData.viewSize = new Vector3Int(2, 1, 1);
+        var tiles = new List<TileUnitForm.Data>();
+        for (int x = 30; x <= 34; x++)
+        {
+            var tile = new TileUnitForm.Data(23000 + x, "", new Dictionary<int, int>(), new Vector3Int(x, 0, 30),
+                source.name, new Vector3(x, 0, 30), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+            map.data.RegisterMap(tile);
+            Probe(tile.unit);
+            tiles.Add(tile);
+        }
+        var spanningObject = new ObjectUnitForm.Data(24000, false, "", source.name, tiles[0].pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+        ctrl.objectTileDic.Add(spanningObject, tiles[0].unit);
+        ctrl.objectTileDic.Add(spanningObject, tiles[1].unit);
+        Probe(spanningObject);
+
+        var viewCenterField = typeof(MapUpdateController).GetField(
+            "viewCenter",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var freshMethod = typeof(MapUpdateController).GetMethod(
+            "FreshMap",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var fresh = (Action<bool>)Delegate.CreateDelegate(typeof(Action<bool>), ctrl, freshMethod);
+
+        viewCenterField.SetValue(ctrl, new Vector3Int(32, 0, 30));
+        fresh(true);
+        Require(ctrl.curTileLst.SetEquals(tiles.Take(4))
+            && ctrl.newMapLst.Count == 4 && ctrl.delMapLst.Count == 0,
+            "first view refresh records only its visible Tiles as additions");
+
+        fresh(false);
+        Require(ctrl.newMapLst.Count == 0 && ctrl.delMapLst.Count == 0,
+            "unchanged view bounds skip Tile additions and removals");
+
+        viewCenterField.SetValue(ctrl, new Vector3Int(33, 0, 30));
+        fresh(false);
+        Require(ctrl.curTileLst.Count == 4
+            && ctrl.newMapLst.SetEquals(new[] { tiles[4] })
+            && ctrl.delMapLst.SetEquals(new[] { tiles[0] }),
+            "one-cell movement updates only the entering and leaving slabs");
+        Require(spanningObject.isShowing && ctrl.curObjectLst.Contains(spanningObject.data),
+            "unordered Tile changes keep an Object visible while any covered Tile remains visible");
+
+        ctrl.End();
+        foreach (var tile in tiles)
+        {
+            tile.unit.Hide();
+            map.data.UnRegisterMap(tile);
+        }
+        map.data.mainData.viewSize = originalViewSize;
+    }
+
+    private static void OcclusionTransparencyAndPriority()
+    {
+        var ctrl = map.updateCtrl;
+        ctrl.End();
+        var originalViewSize = map.data.mainData.viewSize;
+        map.data.mainData.viewSize = new Vector3Int(20, 9, 20);
+        for (int y = 5; y <= 6; y++)
+        {
+            var tile = new TileUnitForm.Data(20000 + y, "", new Dictionary<int, int>(), new Vector3Int(6, y, 6),
+                source.name, new Vector3(6, y * 1.5f, 6), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+            map.data.RegisterMap(tile);
+        }
+        var layerRelativeSeedData = new TileUnitForm.Data(20003, "", new Dictionary<int, int>(), new Vector3Int(6, 3, 1),
+            source.name, new Vector3(6, 4.5f, 1), Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+        map.data.RegisterMap(layerRelativeSeedData);
+        var surroundedPositions = new[]
+        {
+            new Vector3Int(5, 4, 6),
+            new Vector3Int(7, 4, 6),
+            new Vector3Int(6, 4, 5),
+            new Vector3Int(6, 4, 7),
+        };
+        for (int i = 0; i < surroundedPositions.Length; i++)
+        {
+            var mapPos = surroundedPositions[i];
+            var tile = new TileUnitForm.Data(20010 + i, "", new Dictionary<int, int>(), mapPos,
+                source.name, new Vector3(mapPos.x, mapPos.y * 1.5f, mapPos.z), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+            map.data.RegisterMap(tile);
+        }
+        foreach (var tile in map.data.maps.Values)
+            ctrl.curTileLst.Add(tile);
+        typeof(MapUpdateController).GetField("viewCenter", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(ctrl, new Vector3Int(6, 0, 6));
+        ctrl.curCenterPos = new Vector3(6, 0, 6);
+        var high = map.utilCtrl.GetTile(6, 1, 5);
+        var ground = map.utilCtrl.GetTile(6, 0, 5);
+        var highOnly = OcclusionObject(9201, high.data.pos, high);
+        var currentOnly = OcclusionObject(9202, ground.data.pos, ground);
+        var highOwnerMixed = OcclusionObject(9203, high.data.pos, high, ground);
+        var groundOwnerMixed = OcclusionObject(9204, ground.data.pos, ground, high);
+        var omittedMixed = OcclusionObject(9205, high.data.pos, high, ground);
+        var omittedHigh = OcclusionObject(9206, high.data.pos, high);
+        ctrl.curObjectLst.Remove(omittedMixed.data);
+        ctrl.curObjectLst.Remove(omittedHigh.data);
+        var fartherObjectTile = map.utilCtrl.GetTile(6, 0, 0);
+        var fartherObject = OcclusionObject(9207, fartherObjectTile.data.pos, fartherObjectTile);
+        var layerRelativeSeedTile = map.utilCtrl.GetTile(6, 3, 1);
+        var halfHighTile = map.utilCtrl.GetTile(6, 5, 6);
+        var halfHighObject = OcclusionObject(9208, halfHighTile.data.pos, halfHighTile);
+        var frontProjectionTile = map.utilCtrl.GetTile(6, 6, 6);
+        var frontProjectionInstance = ProbeTile(frontProjectionTile);
+        var surroundedHighTile = map.utilCtrl.GetTile(5, 4, 6);
+        var surroundedHighObject = OcclusionObject(9209, surroundedHighTile.data.pos, surroundedHighTile);
+        map.navigationCtrl.navUnits[(6, 0, 11)].links.Clear();
+        map.navigationCtrl.navUnits[(5, 0, 10)].links.Clear();
+        map.navigationCtrl.navUnits[(6, 0, 12)].passTypes.Add(7001);
+
+        var updateMethod = typeof(MapUpdateController).GetMethod("UpdateVision", BindingFlags.Instance | BindingFlags.NonPublic);
+        var update = (Action)Delegate.CreateDelegate(typeof(Action), ctrl, updateMethod);
+        var finalField = typeof(MapUpdateController).GetField("previousVision", BindingFlags.Instance | BindingFlags.NonPublic);
+        Require(!map.utilCtrl.ContainsTile(6, 4, 6),
+            "four-side full transparency does not require a center Tile above the player");
+        foreach (var mode in new[] { CameraMode.Overhead, CameraMode.Isometric })
+        {
+            DynamicGlobalSettings.cameraMode = mode;
+            update();
+            var final = (Dictionary<MapUnit, float>)finalField.GetValue(ctrl);
+            Require(final[map.utilCtrl.GetTile(12, 1, 6)] == 0f, "connected high Tile searches the full view width: " + mode);
+            Require(final[map.utilCtrl.GetTile(10, 1, 10)] == 0f, "connected diagonal high Tile is not radius-limited: " + mode);
+            Require(final[halfHighTile] == 1f && final[frontProjectionTile] == 0.5f,
+                "half-transparent high Tiles require a walkable projected NavUnit and ignore pass type: " + mode);
+            for (int i = 0; i < 6; i++)
+                Require(ReadShow(frontProjectionInstance, i) == (i < 3 ? 0.5f : 1f),
+                    "front renderers stay opaque over their one-cell-nearer blocked projection: " + mode);
+            Require(final[surroundedHighTile] == 1f && final[map.utilCtrl.GetTile(7, 4, 6)] == 0f
+                && final[map.utilCtrl.GetTile(6, 4, 5)] == 0f && final[map.utilCtrl.GetTile(6, 4, 7)] == 1f,
+                "full-transparent high Tiles also stay opaque over an unwalkable projected NavUnit: " + mode);
+            Require(final[halfHighObject] == 1f && final[surroundedHighObject] == 1f,
+                "Objects on projection-blocked high Tiles remain opaque: " + mode);
+            Require(final[layerRelativeSeedTile] == 1f,
+                "isolated high Tile beyond layer-gap-plus-one seed distance stays opaque: " + mode);
+            Require(final[highOnly] == 0f && ReadShow(((MapUnit)highOnly).ins, 0) == 0f,
+                "high-only Object fully hidden: " + mode);
+            Require(final[highOwnerMixed] == 0.5f && final[groundOwnerMixed] == 0.5f,
+                "current-layer priority is independent of owner/link order: " + mode);
+            Require(final[omittedMixed] == 0.5f && final[omittedHigh] == 0f,
+                "high-layer visual-footprint candidates work outside the visible Object list: " + mode);
+            Require(final[currentOnly] == (mode == CameraMode.Isometric ? 0.5f : 1f),
+                "current-only Object retains side-view occlusion rule: " + mode);
+            Require(final[fartherObject] == (mode == CameraMode.Isometric ? 0.5f : 1f),
+                "current-layer forward search uses the full configured view range: " + mode);
+        }
+
+        DynamicGlobalSettings.playing = false;
+        foreach (var mode in new[] { CameraMode.Overhead, CameraMode.Isometric })
+        {
+            DynamicGlobalSettings.cameraMode = mode;
+            update();
+            var final = (Dictionary<MapUnit, float>)finalField.GetValue(ctrl);
+            Require(final[map.utilCtrl.GetTile(12, 1, 6)] == 0.5f
+                && final[map.utilCtrl.GetTile(6, 6, 6)] == 0.5f
+                && final[layerRelativeSeedTile] == 0.5f
+                && final[surroundedHighTile] == 0.5f,
+                "Mod mode makes every higher Tile half transparent: " + mode);
+            Require(final[highOnly] == 0.5f && final[omittedHigh] == 0.5f
+                && final[halfHighObject] == 0.5f && final[surroundedHighObject] == 0.5f,
+                "Mod mode makes higher Objects half transparent, including offscreen owners: " + mode);
+            Require(final[ground] == 1f,
+                "Mod higher-layer option does not change current-layer Tiles: " + mode);
+            Require(ReadShow(frontProjectionInstance, 3) == 0.5f,
+                "Mod higher-layer opacity resets the Play-only front projection override: " + mode);
+        }
+        DynamicGlobalSettings.playing = true;
+
+        DynamicGlobalSettings.cameraMode = CameraMode.Isometric;
+        ctrl.curCenterPos = new Vector3(6, 0, 5);
+        update();
+        Require(((Dictionary<MapUnit, float>)finalField.GetValue(ctrl))[layerRelativeSeedTile] == 1f,
+            "valid layer-gap-plus-one seed outside the three-Tile radius stays opaque");
+        ctrl.curCenterPos = new Vector3(6, 0, 4);
+        update();
+        Require(((Dictionary<MapUnit, float>)finalField.GetValue(ctrl))[layerRelativeSeedTile] == 0.5f,
+            "non-surrounding high Tile at the three-Tile radius boundary is half transparent");
+        ctrl.curCenterPos = new Vector3(6, 0, 6);
+        update();
+
+        int objectsBefore = ctrl.objectTileDic.GetDicT2().Count;
+        for (int i = 0; i < 10; i++) update();
+        long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 100; i++) update();
+        Require(GC.GetAllocatedBytesForCurrentThread() == allocatedBefore, "full-view occlusion is allocation-free after warmup");
+        Require(ctrl.objectTileDic.GetDicT2().Count == objectsBefore, "full-view search does not create reverse-index keys");
+        ctrl.curCenterPos = new Vector3(12, 4.5f, 12);
+        update();
+        Require(ReadShow(((MapUnit)omittedHigh).ins, 0) == 1f && ReadShow(((MapUnit)omittedMixed).ins, 0) == 1f,
+            "leaving the occluding layers restores omitted high/mixed Objects from full/half transparency");
+        ctrl.End();
+        map.data.mainData.viewSize = originalViewSize;
+    }
+
+    private static ObjectUnit OcclusionObject(int uid, Vector3 pos, params TileUnit[] tiles)
+    {
+        var unit = new ObjectUnitForm.Data(uid, false, "", source.name, pos,
+            Vector3.zero, new Vector3(1, 12, 1), UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+        foreach (var tile in tiles)
+            map.updateCtrl.objectTileDic.Add(unit, tile);
+        map.updateCtrl.curObjectLst.Add(unit.data);
+        Probe(unit);
+        return unit;
+    }
+
+    private static RegressionTileInstance ProbeTile(TileUnit unit)
+    {
+        var go = Go("tile-vision-probe");
+        for (int i = 0; i < 6; i++)
+        {
+            var rendererGo = Go("renderer-" + i);
+            rendererGo.transform.SetParent(go.transform, false);
+            rendererGo.AddComponent<MeshRenderer>();
+        }
+
+        var instance = go.AddComponent<RegressionTileInstance>();
+        unit.ins = instance;
+        instance.unit = unit;
+        return instance;
     }
 
     private static void Events()

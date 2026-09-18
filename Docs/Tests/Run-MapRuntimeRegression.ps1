@@ -3,6 +3,17 @@ param(
     [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe"
 )
 $ErrorActionPreference = "Stop"
+$shaderPath = Join-Path $ProjectRoot "Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeCode.shader"
+$shaderSource = Get-Content -LiteralPath $shaderPath -Raw
+$shadowStart = $shaderSource.IndexOf('Name "ShadowCaster"')
+$shadowEnd = if ($shadowStart -ge 0) { $shaderSource.IndexOf("ENDHLSL", $shadowStart) } else { -1 }
+if ($shadowStart -lt 0 -or $shadowEnd -lt 0) { throw "DisFadeCode ShadowCaster pass is missing." }
+$shadowSource = $shaderSource.Substring($shadowStart, $shadowEnd - $shadowStart)
+if ($shadowSource.Contains("clip(_Show") -or
+    !$shadowSource.Contains("clip(alphaColor.r - _Cutoff)") -or
+    !$shadowSource.Contains("clip(baseColor.a - _Cutoff)")) {
+    throw "DisFadeCode ShadowCaster must ignore visibility while retaining texture/mask cutouts."
+}
 # Build the production assembly first. All tests run in a separate temporary
 # Unity project; no original scene, singleton, Form, asset or save is modified.
 & dotnet build (Join-Path $ProjectRoot "Assembly-CSharp.csproj") --no-restore --nologo -v:quiet

@@ -29,15 +29,15 @@ namespace Ui.ModSceneMain
                 return ModManager.instance.sceneCtrl.designType;
             }
         }
-        public int tileLayerDisplayMode
+        public int layer
         {
             set
             {
-                ModManager.instance.sceneCtrl.tileLayerDisplayMode = value;
+                ModManager.instance.sceneCtrl.layer = value;
             }
             get
             {
-                return ModManager.instance.sceneCtrl.tileLayerDisplayMode;
+                return ModManager.instance.sceneCtrl.layer;
             }
         }
         public string viewX
@@ -119,11 +119,6 @@ namespace Ui.ModSceneMain
                 model.viewZ = v;
                 Refresh();
             };
-            view.btn_mapObject.onClick.AddListener(() =>
-            {
-                model.designType = DesignType.MapObject;
-                Refresh();
-            });
             view.btn_event.onClick.AddListener(() =>
             {
                 model.designType = DesignType.Event;
@@ -131,17 +126,17 @@ namespace Ui.ModSceneMain
             });
             view.btn_layer0.onClick.AddListener(() =>
             {
-                model.tileLayerDisplayMode = 0;
+                model.layer = 0;
                 Refresh();
             });
             view.btn_layer1.onClick.AddListener(() =>
             {
-                model.tileLayerDisplayMode = 1;
+                model.layer = 1;
                 Refresh();
             });
             view.btn_layer2.onClick.AddListener(() =>
             {
-                model.tileLayerDisplayMode = 2;
+                model.layer = 2;
                 Refresh();
             });
             Refresh();
@@ -150,7 +145,7 @@ namespace Ui.ModSceneMain
         public override void OnShow()
         {
             model.designType = DesignType.MapObject;
-
+            Refresh();
         }
 
         public void OnEvent(CameraMoveEvent evt)
@@ -164,13 +159,12 @@ namespace Ui.ModSceneMain
             view.ipt_viewPosSetY.Set(model.viewY);
 
             view.ipt_viewPosSetZ.Set(model.viewZ);
-            view.sta_mapObject.ChangeState(model.designType == DesignType.MapObject ? 1 : 0);
             view.sta_event.ChangeState(model.designType == DesignType.Event ? 1 : 0);
 
-            var mode = model.tileLayerDisplayMode;
-            view.sta_layer0.ChangeState(mode == 0 ? 1 : 0);
-            view.sta_layer1.ChangeState(mode == 1 ? 1 : 0);
-            view.sta_layer2.ChangeState(mode >= 2 ? 1 : 0);
+            bool editingLayer = model.designType == DesignType.MapObject;
+            view.sta_layer0.ChangeState(editingLayer && model.layer == 0 ? 1 : 0);
+            view.sta_layer1.ChangeState(editingLayer && model.layer == 1 ? 1 : 0);
+            view.sta_layer2.ChangeState(editingLayer && model.layer == 2 ? 1 : 0);
         }
     }
 

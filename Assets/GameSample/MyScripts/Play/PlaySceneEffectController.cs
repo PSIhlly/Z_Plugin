@@ -30,6 +30,8 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("canvas"));
     private Dictionary<int, CanvasHolder> canvasDic = new Dictionary<int, CanvasHolder>();
     private int updateFrame;
+    private int lifecycleVersion;
+    private bool active;
     private List<string> needShowParamName = new List<string>();
     private List<string> needShowParamNameWithoutPlayer = new List<string>();
     public PlaySceneEffectController(PlayManager super) : base(super)
@@ -39,6 +41,9 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
     public void Begin()
     {
+        ReleaseAllCanvases();
+        lifecycleVersion++;
+        active = true;
         needShowParamName.Clear();
         needShowParamNameWithoutPlayer.Clear();
         foreach (var prm in CharacterParamForm.DataByName.Values)
@@ -55,7 +60,34 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 needShowParamNameWithoutPlayer.Add(prm.name);
             }
         }
-        canvasDic.Clear(); updateFrame = 0;
+        updateFrame = 0;
+    }
+
+    public void End()
+    {
+        active = false;
+        lifecycleVersion++;
+        ReleaseAllCanvases();
+    }
+
+    private void ReleaseAllCanvases()
+    {
+        foreach (var canvas in canvasDic.Values)
+            ReleaseCanvas(canvas);
+        canvasDic.Clear();
+    }
+
+    private void ReleaseCanvas(CanvasHolder canvas)
+    {
+        if (canvas == null)
+            return;
+
+        canvas.Reset();
+        var prefab = canvasPrefab;
+        if (prefab != null)
+            InstancePoolManager.instance.DeleteInstance(canvas.gameObject, prefab);
+        else
+            UnityEngine.Object.Destroy(canvas.gameObject);
     }
     public void CreatEffect(int uid, Vector3 pos, float rot, Action<ImageHolder> beforeUpdate = null)
     {
@@ -160,12 +192,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 if (!CharacterUnitForm.DataByUid.ContainsKey(pair.Key))
                 {
                     temps.Add(pair.Key);
-                    pair.Value.Reset();
-                    if(pair.Value!=null)
-                    {
-                        InstancePoolManager.instance.DeleteInstance(pair.Value.gameObject, canvasPrefab);
-                    }
-
+                    ReleaseCanvas(pair.Value);
                 }
             }
             foreach (var temp in temps)
@@ -181,12 +208,24 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         var productData = CharacterProductForm.DataByUid.GetDv(unitData.unit.productInfo.Item1, null);
         if (productData == null)
         {
-            canvasDic.Remove(unitData.uid);
+            if (canvasDic.TryGetValue(unitData.uid, out var oldCanvas))
+            {
+                ReleaseCanvas(oldCanvas);
+                canvasDic.Remove(unitData.uid);
+            }
             return;
         }
+        int version = lifecycleVersion;
         TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
         {
+            if (!active || version != lifecycleVersion
+                || !CharacterUnitForm.DataByUid.TryGetValue(unitData.uid, out var currentData)
+                || !ReferenceEquals(currentData, unitData))
+                return;
+
             var canvas = GetCanvas(unitData);
+            if (canvas == null || GameManager.instance.curProgress == null)
+                return;
             switch (GameManager.instance.curProgress.cameraMode)
             {
                 case CameraMode.Overhead:
@@ -253,20 +292,28 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             return;
         }
         var canvas = canvasDic[unit.uid];
-        canvas.Chat(txt, img, time);
+        if (canvas != null)
+            canvas.Chat(txt, img, time);
     }
     public CanvasHolder GetCanvas(CharacterUnitForm.Data unitData)
     {
-        if (!canvasDic.ContainsKey(unitData.uid))
+        if (!active)
+            return null;
+
+        if (!canvasDic.TryGetValue(unitData.uid, out var canvas) || canvas == null)
         {
-            canvasDic[unitData.uid] = InstancePoolManager.instance.CreateInstance(canvasPrefab).GetComponent<CanvasHolder>();
-            canvasDic[unitData.uid].gameObject.SetActive(true);
+            var prefab = canvasPrefab;
+            if (prefab == null)
+                return null;
+            canvas = InstancePoolManager.instance.CreateInstance(prefab).GetComponent<CanvasHolder>();
+            canvasDic[unitData.uid] = canvas;
+            canvas.gameObject.SetActive(true);
         }
-        return canvasDic[unitData.uid];
+        return canvas;
     }
     public void OnEvent(CharacterEvent evt)
     {
-        if (!_super.enable)
+        if (!_super.enable || !active)
         {
             return;
         }

@@ -40,17 +40,21 @@ namespace Z_Map
         }
         public void Reset()
         {
+            if (chatTimer != null)
+                TimeManager.instance.CancelTimer(chatTimer);
+            chatTimer = null;
+            if (chat != null)
+                chat.SetActive(false);
+
             foreach (var obj in textDic.Values)
             {
-                Destroy(obj.gameObject);
+                if (obj != null)
+                    Destroy(obj.gameObject);
             }
             foreach (var obj in sliderDic.Values)
             {
-                Destroy(obj.gameObject);
-            }
-            foreach (var obj in sliderTextDic.Values)
-            {
-                Destroy(obj.gameObject);
+                if (obj != null)
+                    Destroy(obj.gameObject);
             }
             textDic.Clear();
             sliderDic.Clear();
@@ -59,23 +63,26 @@ namespace Z_Map
         }
         public void ShowText(string text, int key = -1)
         {
-            if (!textDic.ContainsKey(key))
+            if (!textDic.TryGetValue(key, out var textObject) || textObject == null)
             {
-                textDic[key] = Instantiate(textProto.gameObject, textProto.transform.parent).GetComponent<TextMeshProUGUI>();
-                textDic[key].gameObject.SetActive(true);
+                textObject = Instantiate(textProto.gameObject, textProto.transform.parent).GetComponent<TextMeshProUGUI>();
+                textDic[key] = textObject;
+                textObject.gameObject.SetActive(true);
             }
-            textDic[key].text = text;
+            textObject.text = text;
         }
         public void ShowSlider(float v, float max, int key = -1)
         {
-            if (!sliderDic.ContainsKey(key))
+            if (!sliderDic.TryGetValue(key, out var slider) || slider == null)
             {
-                sliderDic[key] = Instantiate(sliderProto.gameObject, sliderProto.transform.parent).GetComponent<Slider>();
-                sliderTextDic[sliderDic[key]] = sliderDic[key].transform.GetComponentInChildren<TextMeshProUGUI>();
-                sliderDic[key].gameObject.SetActive(true);
+                slider = Instantiate(sliderProto.gameObject, sliderProto.transform.parent).GetComponent<Slider>();
+                sliderDic[key] = slider;
+                sliderTextDic[slider] = slider.transform.GetComponentInChildren<TextMeshProUGUI>();
+                slider.gameObject.SetActive(true);
             }
-            sliderDic[key].value = v / max;
-            sliderTextDic[sliderDic[key]].text = $"{v}/{max}";
+            slider.value = max == 0 ? 0 : v / max;
+            if (sliderTextDic.TryGetValue(slider, out var sliderText) && sliderText != null)
+                sliderText.text = $"{v}/{max}";
         }
         public void Chat(string text, int img, float lastTime)
         {

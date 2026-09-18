@@ -336,9 +336,9 @@ def split_image() -> None:
         crop_closed(source, 1, quarter, two_thirds_y + 1, five_sixths_y),
         crop_closed(source, half_x + 1, three_quarters_x, half_y + 1, two_thirds_y),
     )
+    image_6 = complete_wang_corners(image_6, source, (0, 0))
     save_png(image_6, "6.png")
-    image_22 = complete_wang_corners(image_6, source, (0, 0))
-    save_png(fill_percentage(image_22, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "22.png")
+    save_png(fill_percentage(image_6, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "22.png")
 
     image_7 = composite_3x3(
         crop_closed(source, three_quarters_x + 1, x, 1, sixth),
@@ -347,9 +347,9 @@ def split_image() -> None:
         crop_closed(source, three_quarters_x + 1, x, half_y + 1, two_thirds_y),
         crop_closed(source, quarter + 1, half_x, half_y + 1, two_thirds_y),
     )
+    image_7 = complete_wang_corners(image_7, source, (0, 2))
     save_png(image_7, "7.png")
-    image_23 = complete_wang_corners(image_7, source, (0, 2))
-    save_png(fill_percentage(image_23, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "23.png")
+    save_png(fill_percentage(image_7, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "23.png")
 
     image_8 = composite_3x3(
         crop_closed(source, half_x + 1, three_quarters_x, sixth + 1, third_y),
@@ -358,9 +358,9 @@ def split_image() -> None:
         crop_closed(source, half_x + 1, three_quarters_x, two_thirds_y + 1, five_sixths_y),
         crop_closed(source, 1, quarter, two_thirds_y + 1, five_sixths_y),
     )
+    image_8 = complete_wang_corners(image_8, source, (2, 0))
     save_png(image_8, "8.png")
-    image_24 = complete_wang_corners(image_8, source, (2, 0))
-    save_png(fill_percentage(image_24, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "24.png")
+    save_png(fill_percentage(image_8, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "24.png")
 
     image_9 = composite_3x3(
         crop_closed(source, three_quarters_x + 1, x, sixth + 1, third_y),
@@ -369,8 +369,9 @@ def split_image() -> None:
         crop_closed(source, quarter + 1, half_x, two_thirds_y + 1, five_sixths_y),
         crop_closed(source, three_quarters_x + 1, x, two_thirds_y + 1, five_sixths_y),
     )
+    image_9 = complete_wang_corners(image_9, source, (2, 2))
     save_png(image_9, "9.png")
-    image_25 = complete_wang_corners(image_9, source, (2, 2))
+    image_25 = image_9.copy()
     image_25.paste(
         crop_half_open(source, 2 * quarter, 3 * sixth, 3 * quarter, 4 * sixth),
         (2 * quarter, 0),
@@ -391,6 +392,27 @@ def center_part(image: Image.Image, cell_width: int, cell_height: int) -> Image.
     if image.size != expected:
         image = image.resize(expected, Image.Resampling.LANCZOS)
     return crop_closed(image, cell_width + 1, 2 * cell_width, cell_height + 1, 2 * cell_height)
+
+
+def corner_tile_2x2(
+    image: Image.Image,
+    left: bool,
+    bottom: bool,
+    target_size: tuple[int, int],
+) -> Image.Image:
+    """Extract one corner tile from a 2x2 image using the image's proportions."""
+    tile_width = image.width // 2
+    tile_height = image.height // 2
+    if tile_width <= 0 or tile_height <= 0:
+        raise ValueError("A 2x2 source image must be at least 2 pixels wide and high.")
+    left_edge = 0 if left else tile_width
+    top_edge = tile_height if bottom else 0
+    right_edge = tile_width if left else image.width
+    bottom_edge = image.height if bottom else tile_height
+    return resize_to(
+        crop_half_open(image, left_edge, top_edge, right_edge, bottom_edge),
+        target_size,
+    )
 
 
 def resize_to(image: Image.Image, size: tuple[int, int]) -> Image.Image:
@@ -565,10 +587,23 @@ def join_image() -> None:
     result.paste(center_part(images[7], quarter, sixth), (3 * quarter, 0))
     result.paste(center_part(images[8], quarter, sixth), (2 * quarter, sixth))
     result.paste(center_part(images[9], quarter, sixth), (3 * quarter, sixth))
-    result.paste(crop_half_open(corner_images[1], 0, 0, quarter, sixth), (0, third_y))
-    result.paste(crop_half_open(corner_images[2], quarter, 0, 2 * quarter, sixth), (3 * quarter, third_y))
-    result.paste(crop_half_open(corner_images[3], 0, sixth, quarter, 2 * sixth), (0, 5 * sixth))
-    result.paste(crop_half_open(corner_images[4], quarter, sixth, 2 * quarter, 2 * sixth), (3 * quarter, 5 * sixth))
+    result.paste(
+        corner_tile_2x2(corner_images[1], left=True, bottom=False, target_size=(quarter, sixth)),
+        (0, third_y),
+    )
+    result.paste(
+        corner_tile_2x2(corner_images[2], left=False, bottom=False, target_size=(quarter, sixth)),
+        (3 * quarter, third_y),
+    )
+    # 12.png / 13.png are 2x2 crops: use their lower-left / lower-right tile.
+    result.paste(
+        corner_tile_2x2(corner_images[3], left=True, bottom=True, target_size=(quarter, sixth)),
+        (0, 5 * sixth),
+    )
+    result.paste(
+        corner_tile_2x2(corner_images[4], left=False, bottom=True, target_size=(quarter, sixth)),
+        (3 * quarter, 5 * sixth),
+    )
     save_png(result, "0.png")
 
 

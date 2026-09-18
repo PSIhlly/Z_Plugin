@@ -32,7 +32,7 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             UiManager.instance.ShowUi<UiTeamSelectWindowCtrl>();
-            GameManager.instance.evtCtrl.StartTask(() =>
+            GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
                 if (UiManager.instance.GetUi<UiTeamSelectWindowCtrl>() == null || !UiManager.instance.GetUi<UiTeamSelectWindowCtrl>().active)
                 {

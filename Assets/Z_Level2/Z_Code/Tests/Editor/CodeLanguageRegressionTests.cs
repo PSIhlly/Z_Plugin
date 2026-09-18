@@ -26,6 +26,18 @@ namespace Z_Code.Tests
             public string returnValue = string.Empty;
         }
 
+        private sealed class CancelInterpreterCmd : CmdBase
+        {
+            public override string GetName() => "Len";
+            public override CmdBase GetNew() => new CancelInterpreterCmd();
+
+            protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+            {
+                asyncTask.interpreter.data.Cancel();
+                return true;
+            }
+        }
+
         [Test]
         public void ExistingEfPrograms_CompileWithoutErrorsOrCarriageReturnOperands()
         {
@@ -221,6 +233,34 @@ Return i;";
             {
                 var result = Execute("Return Len();");
                 Assert.That(result.ret.num, Is.EqualTo(0f).Within(0.0001f));
+            }
+            finally
+            {
+                if (hadPrevious)
+                {
+                    BaseData.cmdDic[commandName] = previous;
+                }
+                else
+                {
+                    BaseData.cmdDic.Remove(commandName);
+                }
+            }
+        }
+
+        [Test]
+        public void CancellationDuringCommand_StopsBeforeTheNextOpcode()
+        {
+            const string commandName = "Len";
+            bool hadPrevious = BaseData.cmdDic.TryGetValue(commandName, out var previous);
+            BaseData.cmdDic[commandName] = new CancelInterpreterCmd();
+
+            try
+            {
+                var result = Execute("Len();value=1;Return value;", out var data);
+
+                Assert.That(result.complete, Is.True);
+                Assert.That(data.IsCancelled, Is.True);
+                Assert.That(data.heap.ContainsKey("value"), Is.False);
             }
             finally
             {

@@ -115,8 +115,13 @@ namespace Z_Map
             if (maps.ContainsKey((data.mapPos.x, data.mapPos.y, data.mapPos.z)))
                 maps.Remove((data.mapPos.x, data.mapPos.y, data.mapPos.z));
 
-            if (mapXZ2Y.ContainsKey((data.mapPos.x, data.mapPos.z)))
-                mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Remove(data.mapPos.y);
+            var xz = (data.mapPos.x, data.mapPos.z);
+            if (mapXZ2Y.TryGetValue(xz, out var yLevels))
+            {
+                yLevels.Remove(data.mapPos.y);
+                if (yLevels.Count == 0)
+                    mapXZ2Y.Remove(xz);
+            }
         }
         #region unit
         public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)

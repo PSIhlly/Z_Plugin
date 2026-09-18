@@ -50,7 +50,7 @@ namespace Z_Code
                 Set(heapTemp[1].num);
                 return true;
             }
-            GameManager.instance.evtCtrl.StartTask(() =>
+            GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
                 var euler = heapTemp[1].num;
                 var time = Mathf.Max(heapTemp[2].num,0.0001f);

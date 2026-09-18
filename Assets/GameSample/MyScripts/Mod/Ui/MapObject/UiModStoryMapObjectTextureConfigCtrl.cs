@@ -13,6 +13,7 @@ using Z_Code.Form;
 using Z_String;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Ui;
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObjectTextureConfig
 {
 
@@ -41,6 +42,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                 model.data.enableFrontPart = !model.data.enableFrontPart;
                 Refresh();
             });
+            view.btn_frontIsWangTile.onClick.AddListener(() =>
+            {
+                model.data.frontIsWangTile = !model.data.frontIsWangTile;
+                Refresh();
+            });
             view.btn_passType.onClick.AddListener(() =>
             {
                 var items = new EntryItem();
@@ -65,6 +71,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
         {
             view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
             view.sta_enableFrontPart.ChangeState(model.data.enableFrontPart ? 1 : 0);
+            view.sta_frontIsWangTile.ChangeState(model.data.frontIsWangTile ? 1 : 0);
             if (model.data.passType != 0 && !PassTypeForm.DataById.ContainsKey(model.data.passType))
                 model.data.passType = 0;
             var passTypeText = view.btn_passType.GetComponentInChildren<Txt>(true);
@@ -84,6 +91,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
             view.model_EventChooseLeaveScene.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onLeaveSceneEvent" });
 
+            UiManager.Rebuild(gameObject, true);
         }
     }
 

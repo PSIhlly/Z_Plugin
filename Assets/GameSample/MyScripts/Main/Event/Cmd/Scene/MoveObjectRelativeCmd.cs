@@ -33,7 +33,7 @@ namespace Z_Code
                 asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
             var heapTemp = asyncTask.interpreter.data.heapTemp;
 
-            GameManager.instance.evtCtrl.StartTask(() =>
+            GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
                 var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(heapTemp[0].str, GlobalEventHelper.SCENEOBJECT), null);
                 if (data != null)

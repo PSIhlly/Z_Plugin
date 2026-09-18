@@ -88,6 +88,10 @@ namespace Form
                 
         public static Action<Data,List<int>,List<int>> changeFrontparttexsAction;
                 
+        public static Action<Data,bool,bool> changeFrontiswangtileAction;
+                
+        public static Action<Data,Dictionary<int,int>,Dictionary<int,int>> changeFrontwangtiledicAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -237,11 +241,47 @@ namespace Form
                  
                      }
                     
+                    private bool  _frontIsWangTile;
+                    /// <summary>
+                    ///前景贴图是WangTile
+                    ///</summary>
+                    public bool  frontIsWangTile{
+                                get{return _frontIsWangTile;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeFrontiswangtile(this,_frontIsWangTile,value); 
+                    }
+        
+                _frontIsWangTile = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<int,int>  _FrontWangTileDic;
+                    /// <summary>
+                    ///前景WangTile九宫格压位2texId
+                    ///</summary>
+                    public Dictionary<int,int>  FrontWangTileDic{
+                                get{return _FrontWangTileDic;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeFrontwangtiledic(this,_FrontWangTileDic,value); 
+                    }
+        
+                _FrontWangTileDic = value;
+                }
+                 
+                     }
+                    
             public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.labId)
             {
             }
             
-            public Data(int id,string name,int icon,float animTimeInterval,List<int> texs,int labId,Dictionary<string,EventTriggerForm.Data> events,bool isWangTile,Dictionary<int,int> WangTileDic,int passType,bool enableFrontPart,List<int> frontPartTexs):base(id,name,icon,labId)
+            public Data(int id,string name,int icon,float animTimeInterval,List<int> texs,int labId,Dictionary<string,EventTriggerForm.Data> events,bool isWangTile,Dictionary<int,int> WangTileDic,int passType,bool enableFrontPart,List<int> frontPartTexs,bool frontIsWangTile,Dictionary<int,int> FrontWangTileDic):base(id,name,icon,labId)
             {
 
              this.id = id;
@@ -256,6 +296,8 @@ namespace Form
              this.passType = passType;
              this.enableFrontPart = enableFrontPart;
              this.frontPartTexs = frontPartTexs;
+             this.frontIsWangTile = frontIsWangTile;
+             this.FrontWangTileDic = FrontWangTileDic;
 
             }
             public void Reset(Data data)
@@ -273,11 +315,13 @@ namespace Form
              this.passType = data.passType;
              this.enableFrontPart = data.enableFrontPart;
              this.frontPartTexs = data.frontPartTexs;
+             this.frontIsWangTile = data.frontIsWangTile;
+             this.FrontWangTileDic = data.FrontWangTileDic;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),labId,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isWangTile,WangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(WangTileDic),passType,enableFrontPart,frontPartTexs==null?new List<int>():new List<int>(frontPartTexs));
+        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),labId,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isWangTile,WangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(WangTileDic),passType,enableFrontPart,frontPartTexs==null?new List<int>():new List<int>(frontPartTexs),frontIsWangTile,FrontWangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(FrontWangTileDic));
                 }
             
             public override  void BeforeGet()
@@ -287,7 +331,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,0f,null,0,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<int,int>(){},0,false,null);
+                   private static Data _defaultData=new Data(0,"",0,0f,null,0,new Dictionary<string,EventTriggerForm.Data>(){},false,new Dictionary<int,int>(){},0,false,null,false,new Dictionary<int,int>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -419,7 +463,11 @@ namespace Form
 
                 jo.SelectToken("enableFrontPart")==null?defaultData.enableFrontPart:jo.Get<bool>("enableFrontPart"),
 
-                jo.SelectToken("frontPartTexs")==null?defaultData.frontPartTexs:jo.Get<List<int>>("frontPartTexs")
+                jo.SelectToken("frontPartTexs")==null?defaultData.frontPartTexs:jo.Get<List<int>>("frontPartTexs"),
+
+                jo.SelectToken("frontIsWangTile")==null?defaultData.frontIsWangTile:jo.Get<bool>("frontIsWangTile"),
+
+                    _defaultData.FrontWangTileDic
                     );
 
             return data;
@@ -453,6 +501,8 @@ namespace Form
             jo.Set<bool>("enableFrontPart",data.enableFrontPart);
 
             jo.Set<List<int>>("frontPartTexs",data.frontPartTexs);
+
+            jo.Set<bool>("frontIsWangTile",data.frontIsWangTile);
 
             return jo;
         }
@@ -692,6 +742,26 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeFrontparttexsAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeFrontiswangtile(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeFrontiswangtileAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeFrontwangtiledic(Data superData,Dictionary<int,int> oldV,Dictionary<int,int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeFrontwangtiledicAction?.Invoke(data,oldV,newV);
                 }
                     
             }

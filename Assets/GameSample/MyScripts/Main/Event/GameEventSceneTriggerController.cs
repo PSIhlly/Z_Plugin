@@ -20,6 +20,7 @@ using Z_Text;
 using Z_Time;
 using Z_Ui.Notify;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 
 public enum SceneEventType
 {
@@ -251,7 +252,23 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     private void EnqueueUnitEvent(MapUnit unit, string eventName, bool characterSelf)
     {
         // Keep closure allocation out of the filtering method's early-return path.
-        evts += () => ExecuteUnitEvent(unit, eventName, characterSelf);
+        evts += () =>
+        {
+            // A deferred lifecycle callback can outlive the original unit. Check
+            // both registration and identity so a reused uid cannot target a new unit.
+            if (IsRemovedUnit(unit))
+                return;
+
+            ExecuteUnitEvent(unit, eventName, characterSelf);
+        };
+    }
+
+    private static bool IsRemovedUnit(Z_UnitSystem.Unit unit)
+    {
+        return unit == null
+            || unit.data == null
+            || !UnitForm.DataByUid.TryGetValue(unit.data.uid, out var registered)
+            || !ReferenceEquals(registered, unit.data);
     }
 
     private static void ExecuteUnitEvent(MapUnit unit, string eventName, bool characterSelf)
@@ -282,6 +299,10 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     {
         if (evt.type == MapEventType.Remove)
         {
+            // Stop other scene events owned by this exact unit before its uid can be
+            // reused. The event currently performing removal finishes its current pass.
+            GameManager.instance.evtCtrl.CompleteUnitEvents(evt.unit.data);
+
             // Removal does not guarantee TriggerExit; clear the option immediately.
             Z_EventHelper.Invoke(new SceneActionEvent()
             {

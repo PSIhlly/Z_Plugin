@@ -30,6 +30,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Math;
 using Z_Texture;
+using Z_Time;
 using Z_Ui;
 using Z_Ui.Dialog;
 using Z_UnitSystem;
@@ -172,6 +173,11 @@ public class GameManager : Z_MonoManager<GameManager>
     {
         innerAssetDic = new Dictionary<string, AssetForm.Data>();
         base.Init();
+        TimeManager.animationTimeGetter = () =>
+        {
+            var progress = curProgress;
+            return DynamicGlobalSettings.playing && progress != null ? progress.seconds : Time.time;
+        };
         AudioManager.instance.BgmStreaming(GlobalSettings.BGM_FILE_NAME);
         LanguageManager.instance.SetLanguage(Language.Cn);
 

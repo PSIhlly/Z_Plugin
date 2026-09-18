@@ -270,7 +270,7 @@ namespace Z_Map
             Vector3 newPos = pos;
             if (_super.enable)
             {
-                newPos = SearchClosedExist(MapPos2RealPos(pos));
+                newPos = SearchClosestExist(MapPos2RealPos(pos));
             }
             return RealPos2MapPosInt(newPos);
         }
@@ -278,15 +278,24 @@ namespace Z_Map
         {
             var newPos = pos;
             if (_super.enable)
-                newPos = SearchClosedExist(pos);
+                newPos = SearchClosestExist(pos);
             return newPos;
         }
-        private Vector3 SearchClosedExist(Vector3 pos)
+        public Vector3 GetClosestInArea(Vector3 pos, IReadOnlyCollection<int> passTypes)
         {
+            var newPos = pos;
+            if (_super.enable)
+                newPos = SearchClosestExist(pos, passTypes);
+            return newPos;
+        }
 
+        private Vector3 SearchClosestExist(Vector3 pos, IReadOnlyCollection<int> passTypes = null)
+        {
             Vector3Int mapPos = RealPos2MapPosInt(pos);
-            if (ContainsTile(mapPos.x, mapPos.y, mapPos.z))
+            TileUnit exactTile = GetTileData(mapPos.x, mapPos.y, mapPos.z)?.unit;
+            if (CanUseTile(exactTile, passTypes))
                 return pos;
+
             //groundFirst
             int floor = -1;
             if (GlobalSettings.ENABLE_GRAVITY)
@@ -295,19 +304,12 @@ namespace Z_Map
                 {
                     foreach (var u in _super.data.mapXZ2Y[(mapPos.x, mapPos.z)])
                     {
-                        if (u <= mapPos.y && u > floor)
+                        TileUnit floorTile = GetTileData(mapPos.x, u, mapPos.z)?.unit;
+                        if (u <= mapPos.y && u > floor && CanUseTile(floorTile, passTypes))
                         {
                             floor = u;
                         }
                     }
-                }
-
-            }
-            else
-            {
-                if (ContainsTile(mapPos.x, mapPos.y, mapPos.z))
-                {
-                    floor = 1;
                 }
             }
 
@@ -320,30 +322,36 @@ namespace Z_Map
             //search
             float disMin = float.MaxValue;
             Vector3 tar = Vector3.zero;
+            bool found = false;
             for (int x = -2; x <= 2; x++)
                 for (int y = -1; y <= 1; y++)
                     for (int z = -2; z <= 2; z++)
                     {
-                        var cur = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapPos.x + x, mapPos.y + y, mapPos.z + z), _super.data.mainData.mapUnitSize);
+                        var candidatePos = new Vector3Int(mapPos.x + x, mapPos.y + y, mapPos.z + z);
+                        TileUnit candidate = GetTile(candidatePos.x, candidatePos.y, candidatePos.z);
+                        if (!CanUseTile(candidate, passTypes))
+                            continue;
 
-                        if (InArea(cur) && disMin > (cur - pos).sqrMagnitude)
+                        Vector3 cur = MapPos2RealPos(candidate.data.mapPos);
+                        Vector3 closest = GetClosestPositionInTile(pos, cur);
+                        float distance = (closest - pos).sqrMagnitude;
+                        if (disMin > distance)
                         {
-                            disMin = (cur - pos).sqrMagnitude;
+                            disMin = distance;
                             tar = cur;
+                            found = true;
                         }
                     }
 
-            if (disMin == float.MaxValue)
+            if (!found)
             {
                 //forceGet(BFS)
                 var queue = new Queue<(int, int, int)>();
                 var vis = new HashSet<(int, int, int)>();
                 queue.Enqueue((mapPos.x, mapPos.y, mapPos.z));
                 vis.Add((mapPos.x, mapPos.y, mapPos.z));
-                int deepth = 100;
-                while (queue.Count > 0&& deepth>0)
+                while (queue.Count > 0)
                 {
-                    deepth++;
                     var cur = queue.Dequeue();
                     var dirs = new (int, int, int)[]{
                             (cur.Item1+1,cur.Item2,cur.Item3), (cur.Item1 - 1, cur.Item2, cur.Item3),
@@ -354,10 +362,12 @@ namespace Z_Map
                     {
                         if (!vis.Contains(d) && InLimit(d))
                         {
-                            if (ContainsTile(d.Item1, d.Item2, d.Item3))
+                            TileUnit candidate = GetTile(d.Item1, d.Item2, d.Item3);
+                            if (CanUseTile(candidate, passTypes))
                             {
-                                tar = new Vector3(d.Item1, d.Item2, d.Item3);
+                                tar = MapPos2RealPos(candidate.data.mapPos);
                                 finded = true;
+                                found = true;
                                 break;
                             }
                             else
@@ -371,24 +381,46 @@ namespace Z_Map
                         break;
                 }
             }
-            {
-                var size = _super.data.mainData.mapUnitSize;
-                if (tar.x < mapPos.x)
-                    pos.x = tar.x + size.x / 2 - 0.01f;
-                if (tar.x > mapPos.x)
-                    pos.x = tar.x - size.x / 2 + 0.01f;
 
-                if (tar.y > mapPos.y)
-                    pos.y = tar.y;
+            return found ? GetClosestPositionInTile(pos, tar) : pos;
+        }
 
-
-                if (tar.z < mapPos.z)
-                    pos.z = tar.z + size.z / 2 - 0.01f;
-                if (tar.z > mapPos.z)
-                    pos.z = tar.z - size.z / 2 + 0.01f;
-            }
-
+        private Vector3 GetClosestPositionInTile(Vector3 pos, Vector3 tileCenter)
+        {
+            Vector3 size = _super.data.mainData.mapUnitSize;
+            float insetX = Mathf.Min(0.01f, Mathf.Abs(size.x) * 0.25f);
+            float insetZ = Mathf.Min(0.01f, Mathf.Abs(size.z) * 0.25f);
+            float halfX = Mathf.Abs(size.x) * 0.5f;
+            float halfZ = Mathf.Abs(size.z) * 0.5f;
+            pos.x = Mathf.Clamp(pos.x, tileCenter.x - halfX + insetX, tileCenter.x + halfX - insetX);
+            pos.z = Mathf.Clamp(pos.z, tileCenter.z - halfZ + insetZ, tileCenter.z + halfZ - insetZ);
+            if (tileCenter.y > pos.y)
+                pos.y = tileCenter.y;
             return pos;
+        }
+
+        private static bool CanUseTile(TileUnit tile, IReadOnlyCollection<int> passTypes)
+        {
+            if (tile == null)
+                return false;
+            if (passTypes == null)
+                return true;
+
+            foreach (int requiredType in tile.passTypes)
+            {
+                bool contains = false;
+                foreach (int passType in passTypes)
+                {
+                    if (passType == requiredType)
+                    {
+                        contains = true;
+                        break;
+                    }
+                }
+                if (!contains)
+                    return false;
+            }
+            return true;
         }
 
         public bool InLimit(Vector3Int pos)

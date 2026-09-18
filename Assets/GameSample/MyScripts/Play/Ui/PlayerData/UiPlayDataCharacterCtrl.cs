@@ -68,6 +68,11 @@ namespace Ui.PlayDataCharacter
         public void Refresh()
         {
 
+            if (model.sel != null)
+            {
+                view.img_tachie.BindTexData(TexAssetForm.DataById.GetDv(model.sel.illustration, TexAssetForm.DataById[GlobalDefaultHelper.DefaultCharacterTexId]));
+            }
+
             itemCon.Clear();
             foreach (var uid in GameManager.instance.curProgress.team.OrderBy(u => u))
             {

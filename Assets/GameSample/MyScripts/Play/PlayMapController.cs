@@ -1,37 +1,13 @@
 using Form;
-using Microsoft.Win32;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using System.Security.Cryptography;
-using System.Security.Policy;
-using TuanjieMuse.Chat.ViewModel;
-using Ui;
-using Ui.ModSceneUnit;
-using Ui.PlaySceneMain;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using Z_Code;
-using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
-using Z_Debug;
 using Z_DesignStyle;
-using Z_Input;
 using Z_Map;
 using Z_Map.Form;
-using Z_Text;
 using Z_Texture;
-using Z_Time;
-using Z_Ui;
-using Z_Ui.Notify;
-using Z_UnitSystem;
-using static UnityEditor.Progress;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEvent>, IZ_Listener<ItemEvent>, IZ_Listener<CharacterEvent>, IZ_Listener<TileEvent>
 {
@@ -126,7 +102,7 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
         {
             if (!dic.ContainsKey(kvp.Value.mapPos.y))
             {
-                dic[kvp.Value.mapPos.y] = new List<TileUnitForm.Data>() { kvp.Value };
+                dic[kvp.Value.mapPos.y] = new List<TileUnitForm.Data>();
             }
 
             dic[kvp.Value.mapPos.y].Add(kvp.Value);
@@ -139,35 +115,26 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
             foreach (var tileData in tileDatas)
             {
                 int col = tileData.mapPos.x - size.Item3;
-                int row = size.Item1 - tileData.mapPos.z;
+                // Texture rows run bottom-to-top, matching increasing map Z and WangTile UVs.
+                int row = tileData.mapPos.z - size.Item2;
 
-                if (tileData.texDic != null && tileData.texDic.TryGetValue(0, out int texId))
+                var tileTexture = GameMapController.GetTileLayerTexture(tileData, 0) as Texture2D;
+                if (tileTexture != null)
+                    tileTextures[row * cols + col] = TextureTransform.GetTargetSize(tileTexture, tileSize, tileSize);
+
+                if (tileData.unlock)
                 {
-                    var data = MapTextureForm.DataById.GetDv(texId, null);
-                    if (data != null && data.texs.Count > 0)
+                    for (int i = 0; i < tileSize; i++)
                     {
-                        var texAsset = TexAssetForm.DataById.GetDv(data.texs[0], null);
-                        if (texAsset != null)
+                        for (int j = 0; j < tileSize; j++)
                         {
-
-                            tileTextures[row * cols + col] = TextureTransform.GetTargetSize((Texture2D)texAsset.GetTex(), tileSize, tileSize);
-                        }
-                        if (tileData.unlock)
-                        {
-                            for (int i = 0; i < tileSize; i++)
-                            {
-                                for (int j = 0; j < tileSize; j++)
-                                {
-                                    unlock.SetPixel(col * tileSize + i, row * tileSize + j, Color.black);
-                                }
-                            }
-                            unlockTiles.Add(tileData.uid);
+                            unlock.SetPixel(col * tileSize + i, row * tileSize + j, Color.black);
                         }
                     }
+                    unlockTiles.Add(tileData.uid);
                 }
             }
-            Texture2D minimapTex = TextureTransform.FlipTexture(TextureCombine.FillTexture2DsToTexture2D(tileTextures, cols, rows, 1, (Vector2Int.one * tileSize)), false, true);
-            unlock = TextureTransform.FlipTexture(unlock, false, true);
+            Texture2D minimapTex = TextureCombine.FillTexture2DsToTexture2D(tileTextures, cols, rows, 1, (Vector2Int.one * tileSize));
             minimapTex.wrapMode = TextureWrapMode.Clamp;
             unlock.wrapMode = TextureWrapMode.Clamp;
             Sprite minimapSprite = TextureHelper.GetSpriteByTexture(minimapTex);
@@ -182,14 +149,14 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
         if (!_super.enable)
             return;
         int col = data.mapPos.x - size.Item3;
-        int row = size.Item1 - data.mapPos.z;
+        int row = data.mapPos.z - size.Item2;
         if (unlockTextureMap.TryGetValue(data.mapPos.y, out Texture2D unlock))
         {
             for (int i = 0; i < tileSize; i++)
             {
                 for (int j = 0; j < tileSize; j++)
                 {
-                    unlock.SetPixel(col * tileSize + i, unlock.height - (row * tileSize + j) - 1, Color.black);
+                    unlock.SetPixel(col * tileSize + i, row * tileSize + j, Color.black);
                 }
             }
             unlock.Apply();

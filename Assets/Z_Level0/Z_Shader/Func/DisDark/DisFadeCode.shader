@@ -26,14 +26,16 @@ Shader "DisFadeCode"
         Pass
         {
             Name "Universal Forward"
-             Tags
+            Tags
             {
                 "LightMode" = "UniversalForward"
             }
 
-        Blend SrcAlpha OneMinusSrcAlpha
-        ZTest LEqual
-        ZWrite On
+            // Screen-space dithering represents opacity through pixel coverage.
+            // With depth writes enabled, the nearest surface wins without stacked alpha.
+            Blend One Zero
+            ZTest LEqual
+            ZWrite On
 
             HLSLPROGRAM
 
@@ -47,6 +49,7 @@ Shader "DisFadeCode"
             #define _ALPHATEST_ON 1
 
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Random.hlsl"
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Texture.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -98,9 +101,12 @@ Shader "DisFadeCode"
 
                 #if _ALPHATEST_ON
                     clip(alphaColor.r- _Cutoff);
-                    clip(_Show - 0.001);
                     clip(baseColor.a - _Cutoff);
                 #endif
+
+                half finalAlpha = saturate(_Alpha * _Show);
+                half ditherThreshold = InterleavedGradientNoise(input.positionHCS.xy, 0);
+                clip(finalAlpha - ditherThreshold - 0.001h);
 
                 // ���ģ�������Ӱ���꣨URP���ߺ�����
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
@@ -118,7 +124,7 @@ Shader "DisFadeCode"
                 // 3. 计算阴影强度衰减后的漫反射（降低模型被遮挡时的亮度）
                 half3 diffuse = mainLight.color * lightAmount * baseColor.rgb * shadowStrength * input.dark;
                 
-                return half4(diffuse.rgb, saturate(_Alpha * _Show));
+                return half4(diffuse.rgb, 1.0h);
             }
             ENDHLSL
         }
@@ -145,7 +151,6 @@ Shader "DisFadeCode"
                 sampler2D _Tex;
                 sampler2D _AlphaTex;
                 float _Cutoff;
-                float _Show;
             CBUFFER_END
 
             struct Attributes
@@ -173,7 +178,9 @@ Shader "DisFadeCode"
                 half4 baseColor = tex2D(_Tex, input.uv);
                 half4 alphaColor = tex2D(_AlphaTex, input.uv);
                 #if _ALPHATEST_ON
-                    clip(_Show - 0.001);
+                    // Visibility fading must not remove the caster. Keep only the
+                    // authored texture/mask cutouts in the shadow silhouette.
+                    clip(alphaColor.r - _Cutoff);
                     clip(baseColor.a - _Cutoff);
                 #endif
                 return 0;

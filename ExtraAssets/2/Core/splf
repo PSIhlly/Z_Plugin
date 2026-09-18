@@ -1,36 +1,18 @@
 [
   {
-    "uid": 17,
-    "name": "触击",
-    "labId": 10,
+    "uid": 5,
+    "name": "魔符·星屑幻想",
+    "labId": 9,
     "protoUid": 0,
-    "icon": 210000,
+    "icon": 33,
     "paramDic": [],
     "skillTypes": [
       {
-        "v": 0
+        "v": 2
       }
     ],
     "characterUid": 0,
-    "cd": 1.0,
-    "lastUseTime": 0.0,
-    "events": [],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 3,
-    "name": "札弹",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 46,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.4,
+    "cd": 10.0,
     "lastUseTime": 0.0,
     "events": [
       {
@@ -40,7 +22,7 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 5
+              "v": 13
             }
           ],
           "type": 0
@@ -82,19 +64,19 @@
     "triggerConditionUid": 0
   },
   {
-    "uid": 5,
-    "name": "魔符·星屑幻想",
-    "labId": 9,
+    "uid": 3,
+    "name": "札弹",
+    "labId": 10,
     "protoUid": 0,
-    "icon": 33,
+    "icon": 46,
     "paramDic": [],
     "skillTypes": [
       {
-        "v": 2
+        "v": 0
       }
     ],
     "characterUid": 0,
-    "cd": 10.0,
+    "cd": 0.4,
     "lastUseTime": 0.0,
     "events": [
       {
@@ -104,13 +86,31 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 13
+              "v": 5
             }
           ],
           "type": 0
         }
       }
     ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 17,
+    "name": "触击",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 210000,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 1.0,
+    "lastUseTime": 0.0,
+    "events": [],
     "triggerConditionUid": 0
   }
 ]

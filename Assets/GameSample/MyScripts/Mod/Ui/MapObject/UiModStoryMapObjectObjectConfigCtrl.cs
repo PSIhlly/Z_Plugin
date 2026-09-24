@@ -45,6 +45,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                         model.data.EnsureDirectionData();
                         model.data.faceType = (FaceType)item.id;
                         model.data.SyncLegacyAnimClip(model.data.GetDefaultAnimDirection());
+                        if (model.data.isWangTile)
+                            Main2StoryManager.instance.RefreshObjectWangTileTextures(model.data);
                         Refresh();
                         return true;
                     }, items);
@@ -53,6 +55,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.btn_collision.onClick.AddListener(() =>
             {
                 model.data.collision = !model.data.collision;
+                Refresh();
+            });
+            view.btn_isWangTile.onClick.AddListener(() =>
+            {
+                model.data.isWangTile = !model.data.isWangTile;
+                Main2StoryManager.instance.RefreshObjectWangTileTextures(model.data);
                 Refresh();
             });
             view.btn_minimapIcon.onClick.AddListener(() =>
@@ -71,6 +79,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             view.txt_faceType.oriText = model.data.faceType.ToString();
             view.sta_collision.ChangeState(model.data.collision?1:0);
+            view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
 
             view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
             view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });

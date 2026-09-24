@@ -37,7 +37,8 @@ namespace Z_Code
         Mod,
         Not,
         CallDiscard,
-        Discard
+        Discard,
+        AddAssign
     }
 
     internal sealed class InterpretBudget
@@ -484,27 +485,33 @@ namespace Z_Code
                             data.p++;
                             break;
                         }
+                        case Op.AddAssign:
+                        {
+                            var target = Pop();
+                            if (string.IsNullOrEmpty(target.valName))
+                            {
+                                throw new InvalidOperationException("赋值目标不是变量或成员");
+                            }
+
+                            var right = Pop();
+                            var value = AddValues(GetBox(target), right).DeepCopy();
+                            if (target.str != null)
+                            {
+                                data.heap[target.valName].dic[target.str] = value;
+                            }
+                            else
+                            {
+                                data.heap[target.valName] = value;
+                            }
+
+                            data.p++;
+                            break;
+                        }
                         case Op.Plus:
                         {
                             var left = GetBox(Pop());
                             var right = GetBox(Pop());
-                            if (HasDictionary(left) && HasDictionary(right))
-                            {
-                                var result = CodeHelper.CreateBox();
-                                foreach (var pair in left.dic)
-                                {
-                                    if (right.dic.TryGetValue(pair.Key, out var rightValue))
-                                    {
-                                        result.dic[pair.Key] = ValuePlus(pair.Value, rightValue);
-                                    }
-                                }
-
-                                Push(result);
-                            }
-                            else
-                            {
-                                Push(ValuePlus(left, right));
-                            }
+                            Push(AddValues(left, right));
 
                             data.p++;
                             break;
@@ -1167,6 +1174,25 @@ namespace Z_Code
             asyncTask.Cancel();
         }
 
+        private BoxDataForm.Data AddValues(BoxDataForm.Data left, BoxDataForm.Data right)
+        {
+            left = GetBox(left);
+            right = GetBox(right);
+            if (HasDictionary(left) && HasDictionary(right))
+            {
+                var result = CodeHelper.CreateBox();
+                foreach (var pair in left.dic)
+                {
+                    if (right.dic.TryGetValue(pair.Key, out var rightValue))
+                    {
+                        result.dic[pair.Key] = ValuePlus(pair.Value, rightValue);
+                    }
+                }
+                return result;
+            }
+            return ValuePlus(left, right);
+        }
+
         private BoxDataForm.Data ValuePlus(BoxDataForm.Data left, BoxDataForm.Data right)
         {
             left = GetBox(left);
@@ -1178,12 +1204,12 @@ namespace Z_Code
 
             if (left.str != null && right.str == null)
             {
-                return CodeHelper.CreateBoxByStr(left.str + right.num.ToString(CultureInfo.InvariantCulture));
+                return CodeHelper.CreateBoxByStr(left.str + right.ToString());
             }
 
             if (left.str == null)
             {
-                return CodeHelper.CreateBoxByStr(left.num.ToString(CultureInfo.InvariantCulture) + right.str);
+                return CodeHelper.CreateBoxByStr(left.ToString() + right.str);
             }
 
             return CodeHelper.CreateBoxByStr(left.str + right.str);

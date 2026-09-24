@@ -17,6 +17,27 @@ namespace Z_Code.Form
                 }
                 return new Data(sameId ? uid : uidChain.GetId(), str, valName, num, tmpDic);
             }
+            public override string ToString()
+            {
+                if (dic != null && dic.Count > 0)
+                {
+                    var str = "(";
+                    foreach (var kv in dic)
+                    {
+                        str += kv.Key + ":" + kv.Value.ToString()+" ";
+                    }
+                    str += ")";
+                    return str;
+                }
+                else if (str == null)
+                {
+                    return num.ToString();
+                }
+                else
+                {
+                    return str;
+                }
+            }
         }
     }
     public static partial class ProgramDataForm

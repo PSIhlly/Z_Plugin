@@ -102,6 +102,8 @@ namespace Z_Map.Form
                 
         public static Action<Data,int,int> changeMinimapiconAction;
                 
+        public static Action<Data,List<int>,List<int>> changePasstypeAction;
+                
 
 
         public partial class Data : UnitForm.Data
@@ -262,11 +264,29 @@ namespace Z_Map.Form
                  
                      }
                     
+                    private List<int>  _passType;
+                    /// <summary>
+                    ///通过类型
+                    ///</summary>
+                    public List<int>  passType{
+                                get{return _passType;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangePasstype(this,_passType,value); 
+                    }
+        
+                _passType = value;
+                }
+                 
+                     }
+                    
             public Data(UnitForm.Data data):base(data.uid,data.name,data.prefabName,data.pos,data.euler,data.scale,data.updateType,data.collidingUnitUid,data.extra)
             {
             }
             
-            public Data(int uid,bool navEnabled,Vector3 destination,float speed,float alertDis,float pathDis,bool isMine,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,int minimapIcon):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
+            public Data(int uid,bool navEnabled,Vector3 destination,float speed,float alertDis,float pathDis,bool isMine,string name,string prefabName,Vector3 pos,Vector3 euler,Vector3 scale,UpdateType updateType,List<int> collidingUnitUid,string extra,bool enteredScene,int minimapIcon,List<int> passType):base(uid,name,prefabName,pos,euler,scale,updateType,collidingUnitUid,extra)
             {
 
              this.uid = uid;
@@ -286,6 +306,7 @@ namespace Z_Map.Form
              this.extra = extra;
              this.enteredScene = enteredScene;
              this.minimapIcon = minimapIcon;
+             this.passType = passType;
 
                     _unit=new CharacterUnit(this);
 
@@ -310,11 +331,12 @@ namespace Z_Map.Form
              this.extra = data.extra;
              this.enteredScene = data.enteredScene;
              this.minimapIcon = data.minimapIcon;
+             this.passType = data.passType;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),navEnabled,destination,speed,alertDis,pathDis,isMine,name,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,minimapIcon);
+        return new Data(sameId? uid:uidChain.GetId(),navEnabled,destination,speed,alertDis,pathDis,isMine,name,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,minimapIcon,passType==null?new List<int>():new List<int>(passType));
                 }
             
             public override  void BeforeGet()
@@ -324,7 +346,7 @@ namespace Z_Map.Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,false,Vector3.zero,0f,0f,0f,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,0);
+                   private static Data _defaultData=new Data(0,false,Vector3.zero,0f,0f,0f,false,"","",Vector3.zero,Vector3.zero,Vector3.zero,UpdateType.ShowOnly,null,"",false,0,null);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -438,7 +460,9 @@ namespace Z_Map.Form
 
                 jo.SelectToken("enteredScene")==null?defaultData.enteredScene:jo.Get<bool>("enteredScene"),
 
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon")
+                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon"),
+
+                jo.SelectToken("passType")==null?defaultData.passType:jo.Get<List<int>>("passType")
                     );
 
             return data;
@@ -484,6 +508,8 @@ namespace Z_Map.Form
             jo.Set<bool>("enteredScene",data.enteredScene);
 
             jo.Set<int>("minimapIcon",data.minimapIcon);
+
+            jo.Set<List<int>>("passType",data.passType);
 
             return jo;
         }
@@ -735,6 +761,16 @@ UnitForm.RemoveData(uid);
                 {
 
                 changeMinimapiconAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangePasstype(Data superData,List<int> oldV,List<int> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changePasstypeAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using Z_Code;
 using Z_Code.Form;
-using Z_String;
 using Z_Text;
 using Z_Ui.Base;
 using Z_Ui.Notify;
@@ -23,53 +22,63 @@ namespace Ui.ModStoryEventEditWindow
     }
     public partial class UiItemCtrl
     {
-
+        private UiContainer<UiUnitCtrl> unitCon;
+        private UiContainer<UiDeepthCtrl> deepthCon;
+        private readonly List<UiUnitCtrl> renderedUnits = new List<UiUnitCtrl>();
 
         public override void OnCreate()
         {
-            view.btn_.onClick.AddListener(() =>
+            if (param == null)
             {
-                if (model.prm.node == null)
-                {
-                    ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "void", (item) =>
-                    {
-                        if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
-                        {
-                            var data = GameCmdDataForm.DataByUid[item.id];
-                            GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
-                            string defaultCode = sel.defaultCode;
-                            if (!string.IsNullOrEmpty(sel.allowAsVoid))
-                                defaultCode = $"{sel.allowAsVoid}{defaultCode};";
-                            if (!parent.TryCompileSyntax(defaultCode, out var res))
-                                return;
-                            model.prm.targetNewList.AddRange(res);
-                            parent.ApplyEntry();
-                        }else if(ProgramDataForm.DataByName.ContainsKey(item.content))
-                        {
-                            var data = ProgramDataForm.DataByName[item.content];
-                            var paramCount = data.paramCount;
-                            var rawCode = item.content + "(";
-                            for (int i = 0; i < paramCount; i++)
-                            {
-                                rawCode += $"{(i==0?"":",")}param{i+1}";
-                            }
-                            rawCode += ");";
-                            if (!parent.TryCompileSyntax(rawCode, out var res))
-                                return;
-                            model.prm.targetNewList.AddRange(res);
-                            parent.ApplyEntry();
-                        }
-                        
-                    });
-                }
-                else
-                {
-                    parent.SelItem(model.prm.node);
-                }
-            });
-
+                gameObject.SetActive(false);
+                return;
+            }
+            view.txt_new.raycastTarget = false;
+            deepthCon = new UiContainer<UiDeepthCtrl>(this, view.go_deepth);
+            unitCon = new UiContainer<UiUnitCtrl>(this, view.go_unit, false);
             model.prm = param;
             Refresh();
+        }
+
+        public void OnLineClick()
+        {
+            if (model.prm.node == null)
+            {
+                ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "void", (item) =>
+                {
+                    if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
+                    {
+                        var data = GameCmdDataForm.DataByUid[item.id];
+                        GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
+                        string defaultCode = sel.defaultCode;
+                        if (!string.IsNullOrEmpty(sel.allowAsVoid))
+                            defaultCode = $"{sel.allowAsVoid}{defaultCode};";
+                        if (!parent.TryCompileSyntax(defaultCode, out var res))
+                            return;
+                        model.prm.targetNewList.AddRange(res);
+                        parent.ApplyEntry();
+                    }
+                    else if (ProgramDataForm.DataByName.ContainsKey(item.content))
+                    {
+                        var data = ProgramDataForm.DataByName[item.content];
+                        var paramCount = data.paramCount;
+                        var rawCode = item.content + "(";
+                        for (int i = 0; i < paramCount; i++)
+                        {
+                            rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
+                        }
+                        rawCode += ");";
+                        if (!parent.TryCompileSyntax(rawCode, out var res))
+                            return;
+                        model.prm.targetNewList.AddRange(res);
+                        parent.ApplyEntry();
+                    }
+                });
+            }
+            else
+            {
+                parent.SelUnit(model.prm.node, model.prm.node);
+            }
         }
         public override void OnShow()
         {
@@ -79,10 +88,18 @@ namespace Ui.ModStoryEventEditWindow
 
         public void Refresh()
         {
+            unitCon.Clear();
+            renderedUnits.Clear();
+            deepthCon.Clear();
+            for (int i = 0; i < model.prm.deepth; i++)
+                deepthCon.Add(new UiDeepthParam());
+            deepthCon.Refresh();
+            for (int i = 0; i < deepthCon.paramLst.Count; i++)
+                deepthCon.Get(deepthCon.paramLst[i]).transform.SetSiblingIndex(view.go_deepth.transform.GetSiblingIndex() + i + 1);
             view.sta_isEmpty.ChangeState(model.prm.node == null ? 0 : 1);
             if (model.prm.node == null)
             {
-                view.txt_new.text = " ".Repeat(model.prm.deepth) + TextManager.instance.GetTxt("new");
+                view.txt_new.text = TextManager.instance.GetTxt("new");
             }
             else
             {
@@ -91,13 +108,36 @@ namespace Ui.ModStoryEventEditWindow
                 {
                     if (sub.desc.type == CodeType.Action && !SyntaxAnalysis.IsEmptyNode(sub))
                     {
-                        model.prm.con.Add(new UiItemParam()
+                        if (model.prm.node.desc.type == CodeType.Reserved && model.prm.node.desc.code == "for")
                         {
-                            con = model.prm.con,
-                            node = sub,
-                            deepth = model.prm.deepth + 1,
-                            targetNewList = model.prm.targetNewList,
-                        }, ++curRender);
+                            foreach (var statement in sub.subNodes)
+                            {
+                                model.prm.con.Add(new UiItemParam()
+                                {
+                                    con = model.prm.con,
+                                    node = statement,
+                                    deepth = model.prm.deepth + 1,
+                                    targetNewList = sub.subNodes,
+                                }, ++curRender);
+                            }
+                            model.prm.con.Add(new UiItemParam()
+                            {
+                                con = model.prm.con,
+                                node = null,
+                                deepth = model.prm.deepth + 1,
+                                targetNewList = sub.subNodes,
+                            }, ++curRender);
+                        }
+                        else
+                        {
+                            model.prm.con.Add(new UiItemParam()
+                            {
+                                con = model.prm.con,
+                                node = sub,
+                                deepth = model.prm.deepth + 1,
+                                targetNewList = model.prm.targetNewList,
+                            }, ++curRender);
+                        }
                     }
 
                 }
@@ -123,64 +163,58 @@ namespace Ui.ModStoryEventEditWindow
                     }, ++curRender);
                 }
 
-                view.txt_.oriText = " ".Repeat(model.prm.deepth) + GetNodeDesc(model.prm.node);
+                unitCon.Add(new UiUnitParam()
+                {
+                    con = unitCon,
+                    parent = view.rtf_unitRoot,
+                    node = model.prm.node,
+                });
             }
+            unitCon.Refresh();
+        }
 
+        public void RegisterRenderedUnit(UiUnitCtrl unit)
+        {
+            renderedUnits.Add(unit);
+        }
 
-
+        public void RefreshUnitSelection()
+        {
+            foreach (var unit in renderedUnits)
+            {
+                if (unit.active)
+                    unit.RefreshSelection();
+            }
         }
 
 
-        public string GetNodeDesc(SyntaxNode node)
+    }
+
+    public partial class UiLineParam
+    {
+        public UiItemCtrl item;
+        public SyntaxNode node;
+        public int index;
+    }
+
+    public partial class UiLineCtrl
+    {
+        public override void OnCreate()
         {
-            if (SyntaxAnalysis.IsEmptyArgumentNode(node))
+            if (param == null)
             {
-                return string.Empty;
+                gameObject.SetActive(false);
+                return;
             }
+            view.btn_.onClick.AddListener(() => param.item.OnLineClick());
+            RefreshSelection();
+        }
 
-            string res = "";
-            switch (node.desc.type)
-            {
-                case CodeType.FuncName:
-                case CodeType.Reserved:
-                case CodeType.Operator:
-                    if (CmdDataForm.DataByName.ContainsKey(node.desc.code))
-                    {
-                        var form = CmdDataForm.DataByName[node.desc.code];
-                        res = form.desc;
-                        if (form.prmNames != null)
-                        {
-                            int i = 0;
-                            for (; i < node.subNodes.Count; i++)
-                            {
-                                res = res.Replace($"{{{i}}}", GetNodeDesc(node.subNodes[i]));
-                            }
-                            for (; i < form.prmNames.Count; i++)
-                            {
-                                res = res.Replace($"{{{i}}}", "");
-                            }
-                        }
-
-                    }
-                    else if (int.TryParse(node.desc.code, out int evtId) && EventProgramDataForm.DataByUid.ContainsKey(evtId))
-                    {
-                        var evtData = EventProgramDataForm.DataByUid[evtId];
-                        res = evtData.name + "(";
-
-                        for (int i = 0; i < node.subNodes.Count; i++)
-                        {
-                            res += $"{(i > 0 ? "," : "")}param{i + 1}={GetNodeDesc(node.subNodes[i])}";
-                        }
-                        res += ")";
-                    }
-                    else
-                        res = node.desc.code;
-                    break;
-                default:
-                    res = node.desc.code;
-                    break;
-            }
-            return res;
+        public void RefreshSelection()
+        {
+            view.sta_.ChangeState(param.node != null && parent.model.selItem == param.node
+                ? 2
+                : param.index % 2);
         }
     }
 }

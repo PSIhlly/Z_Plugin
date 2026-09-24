@@ -24,6 +24,8 @@ namespace Z_DataSystem.Form
             private Texture _texture => (Texture)asset;
             private List<GifFrameData> _gifFrames;
             private List<Sprite> _gifSprites;
+            private List<AnimatedFrameData> _webPFrames;
+            private List<Sprite> _webPSprites;
             Z_MultiTask<Texture> texTask = new Z_MultiTask<Texture>();
             Z_MultiTask<Sprite> spriteTask = new Z_MultiTask<Sprite>();
 
@@ -33,13 +35,17 @@ namespace Z_DataSystem.Form
                 _sprite = null;
                 _gifFrames = null;
                 _gifSprites = null;
+                _webPFrames = null;
+                _webPSprites = null;
             }
 
             public bool isGif
             {
                 get
                 {
-                    if (!string.IsNullOrEmpty(path))
+                    if (bytes != null)
+                        return bytes.Length >= 3 && bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F';
+                    if (!string.IsNullOrEmpty(path) && File.Exists(path))
                     {
                         if (path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
                             return true;
@@ -58,8 +64,6 @@ namespace Z_DataSystem.Form
                             return true;
                     }
 
-                    if (bytes != null && bytes.Length > 3 && bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F')
-                        return true;
                     return false;
                 }
             }
@@ -74,6 +78,53 @@ namespace Z_DataSystem.Form
                         _gifFrames = TextureHelper.GetGifFramesByPath(path);
                 }
                 return _gifFrames;
+            }
+
+            public bool isWebP
+            {
+                get
+                {
+                    if (bytes != null)
+                        return TextureHelper.IsWebP(bytes);
+                    if (string.IsNullOrEmpty(path))
+                        return false;
+                    if (path.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                    if (!File.Exists(path))
+                        return false;
+                    var header = new byte[12];
+                    using (var stream = File.OpenRead(path))
+                        return stream.Read(header, 0, header.Length) == header.Length && TextureHelper.IsWebP(header);
+                }
+            }
+
+            public IReadOnlyList<AnimatedFrameData> GetAnimationFrames()
+            {
+                if (isGif)
+                    return GetGifFrames();
+                if (!isWebP)
+                    return null;
+                if (_webPFrames == null)
+                    _webPFrames = bytes != null
+                        ? TextureHelper.GetWebPFramesByByte(bytes)
+                        : TextureHelper.GetWebPFramesByPath(path);
+                return _webPFrames;
+            }
+
+            public IReadOnlyList<Sprite> GetAnimationSprites()
+            {
+                if (isGif)
+                    return GetGifSprites();
+                var frames = GetAnimationFrames();
+                if (frames == null)
+                    return null;
+                if (_webPSprites == null)
+                {
+                    _webPSprites = new List<Sprite>(frames.Count);
+                    foreach (var frame in frames)
+                        _webPSprites.Add(TextureHelper.GetSpriteByTexture(frame.texture));
+                }
+                return _webPSprites;
             }
 
             public List<Sprite> GetGifSprites()
@@ -101,18 +152,12 @@ namespace Z_DataSystem.Form
             {
                 if (_texture == null)
                 {
-                    if (bytes == null)
-                    {
-                        asset = TextureHelper.GetTextureByPath(path);
-                    }
-                    else if (path != null)
-                    {
+                    if (bytes != null)
                         asset = TextureHelper.GetTextureByByte(bytes);
-                    }
+                    else if (!string.IsNullOrEmpty(path))
+                        asset = TextureHelper.GetTextureByPath(path);
                     else
-                    {
                         asset = TextureHelper.transparentTexture;
-                    }
                 }
                 return _texture;
             }
@@ -134,7 +179,9 @@ namespace Z_DataSystem.Form
             {
                 if (_sprite == null)
                 {
-                    _sprite = TextureHelper.GetSpriteByTexture(GetTex());
+                    var texture = GetTex();
+                    if (texture != null)
+                        _sprite = TextureHelper.GetSpriteByTexture(texture);
                 }
                 return _sprite;
             }
@@ -184,7 +231,9 @@ namespace Z_DataSystem
             public override void Run(TexController ctrl)
             {
                 base.Run(ctrl);
-                NativeGallery.GetImageFromGallery((path) => OnImportComplete(string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path), Path.GetFileNameWithoutExtension(path)));
+                AssetFilePicker.GetImage(path =>
+                    OnImportComplete(string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path),
+                        string.IsNullOrEmpty(path) ? null : Path.GetFileNameWithoutExtension(path)));
             }
             public override void OnImportComplete(byte[] data,string name)
             {
@@ -253,8 +302,10 @@ namespace Z_DataSystem
                 return null;
 
             var tex = (Texture2D)TextureHelper.GetTextureByByte(data);
-            if (forceSize != Vector2Int.zero)
-                tex = TextureTransform.GetTargetSize(tex, forceSize.x, forceSize.y);
+            if (tex == null)
+                return null;
+            // Validation creates a temporary texture; the asset itself stores the source bytes.
+            UnityEngine.Object.Destroy(tex);
             var form = CreateDataByBytes(data, name);
             Z_EventHelper.Invoke(new AssetEvent()
             {

@@ -175,6 +175,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public Dictionary<UnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<UnitForm.Data, Dictionary<int, int>>();
     private static readonly Dictionary<(int mapTextureId, bool frontPart, int mask), List<int>>
         wangTileAnimationTextures = new Dictionary<(int, bool, int), List<int>>();
+    private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), List<int>>
+        objectWangTileAnimationTextures = new Dictionary<(int, AnimDirecton, int), List<int>>();
+    private readonly Dictionary<ObjectUnit, Bounds> objectWangTileBounds = new Dictionary<ObjectUnit, Bounds>();
     private static readonly (int x, int z, int bit)[] wangTileNeighbours =
     {
         (-1, 1, 0), (0, 1, 1), (1, 1, 2),
@@ -185,12 +188,14 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         alphaTextureDic.Clear();
         animCurCache.Clear();
+        objectWangTileBounds.Clear();
         ClearWangTileAnimationTextures();
     }
 
     internal static void ClearWangTileAnimationTextures()
     {
         wangTileAnimationTextures.Clear();
+        objectWangTileAnimationTextures.Clear();
     }
 
     internal static void RegisterWangTileAnimationTexture(
@@ -210,6 +215,50 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         return wangTileAnimationTextures.TryGetValue((mapTextureId, frontPart, mask), out textures)
             && textures.Count > 0;
+    }
+
+    internal static void RegisterObjectWangTileAnimationTexture(
+        int mapObjectId, AnimDirecton direction, int mask, int textureId)
+    {
+        var key = (mapObjectId, direction, mask);
+        if (!objectWangTileAnimationTextures.TryGetValue(key, out List<int> textures))
+        {
+            textures = new List<int>();
+            objectWangTileAnimationTextures.Add(key, textures);
+        }
+        textures.Add(textureId);
+    }
+
+    internal static void ClearObjectWangTileAnimationTextures(int mapObjectId)
+    {
+        foreach (var key in objectWangTileAnimationTextures.Keys
+                     .Where(key => key.mapObjectId == mapObjectId).ToList())
+            objectWangTileAnimationTextures.Remove(key);
+    }
+
+    public void RefreshObjectWangTileAppearances(int mapObjectId)
+    {
+        var data = MapObjectForm.DataById.GetDv(mapObjectId, null);
+        if (data == null)
+            return;
+
+        foreach (ObjectUnitForm.Data objectData in ObjectUnitForm.DataByUid.Values)
+        {
+            ObjectUnit unit = objectData.unit;
+            if (unit.productInfo.Item1 != mapObjectId)
+                continue;
+
+            if (data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds))
+                objectWangTileBounds[unit] = bounds;
+            else
+                objectWangTileBounds.Remove(unit);
+
+            if (unit.isShowing)
+            {
+                ConfigureObjectKeepers(unit, data);
+                RefreshObjectAppearance(unit, data);
+            }
+        }
     }
 
     static Texture GetDefaultTexture()
@@ -375,6 +424,97 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             newObjectData.unit.paramInfo[pair.Key] = pair.Value.Copy();
 
         newObjectData.isObstacle = objectData.collision;
+        if (objectData.isWangTile)
+            UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
+    }
+
+    // Bits match TileHelper's 3x3 mask: NW,N,NE,W,E,SW,S,SE.
+    // Visual bounds include the root scale and the model's actual footprint.
+    internal static int GetObjectNeighbourBits(Bounds center, Bounds other)
+    {
+        const float tolerance = 0.001f;
+        if (Mathf.Min(center.max.y, other.max.y) - Mathf.Max(center.min.y, other.min.y) <= tolerance)
+            return 0;
+
+        bool left = Mathf.Abs(center.min.x - other.max.x) <= tolerance;
+        bool right = Mathf.Abs(center.max.x - other.min.x) <= tolerance;
+        bool down = Mathf.Abs(center.min.z - other.max.z) <= tolerance;
+        bool up = Mathf.Abs(center.max.z - other.min.z) <= tolerance;
+        bool xOverlap = Mathf.Min(center.max.x, other.max.x) - Mathf.Max(center.min.x, other.min.x) > tolerance;
+        bool zOverlap = Mathf.Min(center.max.z, other.max.z) - Mathf.Max(center.min.z, other.min.z) > tolerance;
+
+        int mask = 0;
+        if (left && up) mask |= 1 << 0;
+        if (xOverlap && up) mask |= 1 << 1;
+        if (right && up) mask |= 1 << 2;
+        if (left && zOverlap) mask |= 1 << 3;
+        if (right && zOverlap) mask |= 1 << 4;
+        if (left && down) mask |= 1 << 5;
+        if (xOverlap && down) mask |= 1 << 6;
+        if (right && down) mask |= 1 << 7;
+        return mask;
+    }
+
+    private static bool TryGetObjectWangTileBounds(ObjectUnit unit, out Bounds bounds)
+    {
+        return MapManager.instance.utilCtrl.TryGetVisionBounds(unit.data, out bounds);
+    }
+
+    private static int GetObjectWangTileMask(ObjectUnit unit, int mapObjectId, Bounds bounds)
+    {
+        int mask = 0;
+        foreach (ObjectUnitForm.Data otherData in ObjectUnitForm.DataByUid.Values)
+        {
+            ObjectUnit other = otherData.unit;
+            if (other == unit || other.productInfo.Item1 != mapObjectId
+                || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
+                continue;
+            mask |= GetObjectNeighbourBits(bounds, otherBounds);
+        }
+        return mask;
+    }
+
+    private void UpdateObjectWangTileNeighbours(ObjectUnit unit, MapObjectForm.Data data)
+    {
+        if (!data.isWangTile)
+            return;
+
+        bool hadOldBounds = objectWangTileBounds.TryGetValue(unit, out Bounds oldBounds);
+        bool hasNewBounds = TryGetObjectWangTileBounds(unit, out Bounds newBounds);
+        if (hasNewBounds)
+            objectWangTileBounds[unit] = newBounds;
+        else
+            objectWangTileBounds.Remove(unit);
+
+        foreach (ObjectUnitForm.Data otherData in ObjectUnitForm.DataByUid.Values)
+        {
+            ObjectUnit other = otherData.unit;
+            if (other == unit || other.productInfo.Item1 != data.id || !other.isShowing
+                || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
+                continue;
+            if ((hadOldBounds && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
+                || (hasNewBounds && GetObjectNeighbourBits(otherBounds, newBounds) != 0))
+                RefreshObjectAppearance(other, data);
+        }
+
+    }
+
+    private void RemoveObjectWangTileNeighbours(ObjectUnit unit, MapObjectForm.Data data)
+    {
+        bool hadBounds = objectWangTileBounds.TryGetValue(unit, out Bounds oldBounds)
+            || TryGetObjectWangTileBounds(unit, out oldBounds);
+        objectWangTileBounds.Remove(unit);
+        if (!data.isWangTile || !hadBounds)
+            return;
+
+        foreach (ObjectUnitForm.Data otherData in ObjectUnitForm.DataByUid.Values)
+        {
+            ObjectUnit other = otherData.unit;
+            if (other.productInfo.Item1 == data.id && other.isShowing
+                && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
+                && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
+                RefreshObjectAppearance(other, data);
+        }
     }
     private static int GetWangTileMask(TileUnitForm.Data tileData, int layer, int mapTextureId)
     {
@@ -482,23 +622,47 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     if (data != null)
                     {
                         data.EnsureDirectionData();
-                        foreach (var keeper in evt.unit.ins.keepers)
-                        {
-                            keeper.enableFixedYRotation = data.faceType != FaceType.Flexible;
-                            keeper.enableFixedZRotation0 = data.faceType != FaceType.Flexible;
-                            keeper.fixedYRotation = 0;
-                        }
+                        ConfigureObjectKeepers(evt.unit, data);
                         RefreshObjectAppearance(evt.unit, data);
+                        if (data.isWangTile)
+                            UpdateObjectWangTileNeighbours(evt.unit, data);
                     }
                     break;
                 }
             case MapEventType.Move:
+            case MapEventType.BoundaryTouch:
+            case MapEventType.Refresh:
                 {
                     var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
                     if (data != null)
+                    {
+                        if (data.isWangTile)
+                            UpdateObjectWangTileNeighbours(evt.unit, data);
                         RefreshObjectAppearance(evt.unit, data);
+                    }
                     break;
                 }
+            case MapEventType.Remove:
+                {
+                    var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                    if (data != null)
+                        RemoveObjectWangTileNeighbours(evt.unit, data);
+                    else
+                        objectWangTileBounds.Remove(evt.unit);
+                    break;
+                }
+        }
+    }
+
+    private static void ConfigureObjectKeepers(ObjectUnit unit, MapObjectForm.Data data)
+    {
+        if (unit.ins == null)
+            return;
+        foreach (var keeper in unit.ins.keepers)
+        {
+            keeper.enableFixedYRotation = data.faceType != FaceType.Flexible;
+            keeper.enableFixedZRotation0 = data.faceType != FaceType.Flexible;
+            keeper.fixedYRotation = 0;
         }
     }
 
@@ -517,7 +681,17 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             return;
 
         var direction = data.GetAnimDirection(unit.data.euler.y);
-        ShowFinalMat(unit.ins, 0, data.GetAnimClip(direction), data.model.animTimeInterval, false);
+        if (data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds)
+            && objectWangTileAnimationTextures.TryGetValue(
+                (data.id, direction, GetObjectWangTileMask(unit, data.id, bounds)), out List<int> textures)
+            && textures.Count > 0)
+        {
+            ShowFinalMat(unit.ins, 0, textures, textures.Count > 1 ? data.model.animTimeInterval : 0, false);
+        }
+        else
+        {
+            ShowFinalMat(unit.ins, 0, data.GetAnimClip(direction), data.model.animTimeInterval, false);
+        }
     }
     public void OnEvent(ItemEvent evt)
     {

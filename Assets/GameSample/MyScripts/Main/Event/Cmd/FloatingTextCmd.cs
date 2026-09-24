@@ -19,14 +19,7 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             var pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)));
-            if (prm[0].str == null)
-            {
-                PlayManager.instance.effectCtrl.FloatingText(prm[0].num.ToString(), pos);
-            }
-            else
-            {
-                PlayManager.instance.effectCtrl.FloatingText(prm[0].str, pos);
-            }
+            PlayManager.instance.effectCtrl.FloatingText(prm[0].ToString(), pos);
 
             return true;
         }

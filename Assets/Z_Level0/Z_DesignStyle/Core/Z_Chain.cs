@@ -45,8 +45,14 @@ namespace Z_DesignStyle
             }
             private void GenerateNewHead()
             {
+                if (chainHead == null)
+                    return;
+
+                var oldHead = chainHead;
+                var recycledHead = oldHead.nxt;
                 IdChainItem newHead = null;
-                while (localCnt < cnt)
+                // cnt is the exclusive auto-ID boundary used by generated ClearAuto().
+                while (localCnt + 1 < cnt)
                 {
                     ++localCnt;
                     if (id2ChainItem.ContainsKey(localCnt))
@@ -59,12 +65,19 @@ namespace Z_DesignStyle
 
                 if (newHead == null)
                 {
-                    newHead = chainHead.nxt;
+                    newHead = recycledHead;
                 }
-                newHead.pre = null;
-                chainHead.pre = null;
-                chainHead.nxt = null;
+                else
+                {
+                    newHead.nxt = recycledHead;
+                    if (recycledHead != null)
+                        recycledHead.pre = newHead;
+                }
 
+                oldHead.pre = null;
+                oldHead.nxt = null;
+                if (newHead != null)
+                    newHead.pre = null;
                 chainHead = newHead;
             }
             public void PopId(int v)

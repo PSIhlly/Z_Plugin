@@ -23,6 +23,7 @@ Re-read the source files instead of assuming this snapshot remains current:
 - Windows BGM playback is owned by `Z_Audio.AudioManager` through Unity `AudioSource` and `UnityWebRequestMultimedia`; it intentionally bypasses AVPro Video 2.7's Windows MediaEngine path after that native path returned `0x80070651` on Windows build 26200. AVPro remains the backend for video and non-BGM media paths.
 - Packages/features: Visual Scripting, AI Navigation, Timeline, Unity Test Framework package.
 - Native vendors: AVProVideo and NativeGallery under `Assets/Z_Level0/Plugins`.
+- WebP: vendored `unity.webp` 0.3.22 under `Assets/Z_Level0/Plugins/WebP` supplies native decoder/demux binaries, with upstream MIT and libwebp BSD notices retained. It is kept in Assets because a Git package dependency can remain unresolved when the Tuanjie Package Manager authorization fails. Validate the actual Editor and target Player (especially Windows and Android IL2CPP); C# compilation alone cannot prove native loading.
 - Default BGM: `Assets/StreamingAssets/Bgm.mp3`.
 
 Consequences:
@@ -50,7 +51,7 @@ The read-only audit script reports runtime-path files that mention `UnityEditor`
 ## Repository hygiene
 
 - Start with `git status --short`; the worktree may already contain user and generated changes.
-- Preserve unrelated `.xls`, generated Forms, Unity layouts, package locks, font assets, `.vs` files, and project settings.
+- Preserve unrelated `.xlsx`, generated Forms, Unity layouts, package locks, font assets, `.vs` files, and project settings.
 - Scope diff review to the requested files and generated outputs. Do not clean a dirty tree to make validation convenient.
 - Do not hand-maintain root `.csproj` or `.sln`; Unity regenerates them and ignore rules are inconsistent.
 - Preserve existing line endings and encodings. Some historical generated comments are garbled and generated formatting is irregular.

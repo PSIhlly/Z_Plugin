@@ -6,6 +6,48 @@
     "labId": 0
   },
   {
+    "id": 217,
+    "name": "木桩rm",
+    "hash": "55fcec30a26f7be1a020233b8aa6a79af766a8a5",
+    "labId": 27
+  },
+  {
+    "id": 803,
+    "name": "rm石柱",
+    "hash": "db7d10ac476dd8af7381f831eef326fc53eb7f7a",
+    "labId": 27
+  },
+  {
+    "id": 802,
+    "name": "rm石块",
+    "hash": "2a79a11228d38ba15ace80549c5779a8e82af689",
+    "labId": 27
+  },
+  {
+    "id": 801,
+    "name": "rm枯木2",
+    "hash": "05799e8d8f3fad02bd660bfcebbf42ca8e6a7c47",
+    "labId": 27
+  },
+  {
+    "id": 800,
+    "name": "rm枯木",
+    "hash": "a0a658dac69859bc533c27d6907f77111afa4570",
+    "labId": 27
+  },
+  {
+    "id": 799,
+    "name": "rm柴堆",
+    "hash": "62f021e54ac41498fae19e2c959c81b26b3fb760",
+    "labId": 27
+  },
+  {
+    "id": 798,
+    "name": "篱笆1",
+    "hash": "111d1b459d226293ec7d3fad65b3bc8f6d80b325",
+    "labId": 27
+  },
+  {
     "id": 170,
     "name": "ttt",
     "hash": "3c0edf50307ede5099add86e2561d3c780a0d61a",
@@ -1240,5 +1282,53 @@
     "name": "Codex 图像 2026年9月11日 19_43_36_左_左脚",
     "hash": "67a553d629b963ee590e53b1d3f8497ca7f5a5f4",
     "labId": 37
+  },
+  {
+    "id": 51,
+    "name": "树2",
+    "hash": "35e118a3600847e4a2c8c1effb81672608e5d124",
+    "labId": 27
+  },
+  {
+    "id": 52,
+    "name": "树3",
+    "hash": "e30d4b80d5a7b46069890755c56929a5216369dd",
+    "labId": 27
+  },
+  {
+    "id": 53,
+    "name": "剑弹",
+    "hash": "e588159c874468f7c885147eca9b5194e6f459ac",
+    "labId": 18
+  },
+  {
+    "id": 54,
+    "name": "rm麦苗",
+    "hash": "8273eca3b748b7c944a0321571fd661b08a555d6",
+    "labId": 27
+  },
+  {
+    "id": 58,
+    "name": "rm荷叶",
+    "hash": "097d4479c6c62d1c3a9635bea9e985e22a0677cd",
+    "labId": 27
+  },
+  {
+    "id": 127,
+    "name": "rm蘑菇",
+    "hash": "f363dc4a671b1e83ec868d4a8d150776cc9a6edb",
+    "labId": 27
+  },
+  {
+    "id": 157,
+    "name": "rm桥2",
+    "hash": "563c9a8ad2cabd96cd833432f27dbc9700e48cb7",
+    "labId": 27
+  },
+  {
+    "id": 216,
+    "name": "rm桥1",
+    "hash": "1bc3bbed4f3714ee260b0df3ad6551463011daf1",
+    "labId": 27
   }
 ]

@@ -8,7 +8,7 @@ using Z_Math;
 [DefaultExecutionOrder(10000)]
 public class PerspectiveKeeper : MonoBehaviour
 {
-    private const float IsometricPitch = 45f;
+    private const float SquareDiagonalPitch = 45f;
     private const float MinimumCubeSize = 0.0001f;
     private const string SpherePrefabName = "MapPrefab$sphere";
 
@@ -135,7 +135,7 @@ public class PerspectiveKeeper : MonoBehaviour
             case CameraMode.Isometric:
                 // Cubes use the Y-Z diagonal; spheres use a diameter-sized square.
                 scaleHolder.position = ins.position + new Vector3(0, 1, -1) * deepth;
-                transform.eulerAngles = Vector3.right * IsometricPitch;
+                transform.eulerAngles = Vector3.right * GetIsometricPitch();
                 scaleHolder.localScale = IsSphere()
                     ? GetSphereRendererScale()
                     : GetDiagonalRendererScale();
@@ -154,6 +154,20 @@ public class PerspectiveKeeper : MonoBehaviour
             ? diagonal / height
             : 1f;
         return new Vector3(1f, heightScale, 1f);
+    }
+
+    private float GetIsometricPitch()
+    {
+        if (IsSphere())
+            return SquareDiagonalPitch;
+
+        Vector3 cubeSize = ins.lossyScale;
+        float height = Mathf.Abs(cubeSize.y);
+        float depth = Mathf.Abs(cubeSize.z);
+        if (height <= MinimumCubeSize && depth <= MinimumCubeSize)
+            return SquareDiagonalPitch;
+
+        return Mathf.Atan2(depth, height) * Mathf.Rad2Deg;
     }
 
     private Vector3 GetSphereRendererScale()
@@ -182,11 +196,11 @@ public class PerspectiveKeeper : MonoBehaviour
         return isSphere;
     }
 
-    private static float GetBasePitch()
+    private float GetBasePitch()
     {
         return DynamicGlobalSettings.cameraMode == CameraMode.Overhead
             ? 90f
-            : IsometricPitch;
+            : GetIsometricPitch();
     }
 
 }

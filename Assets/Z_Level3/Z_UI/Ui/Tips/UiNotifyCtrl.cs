@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Z_Time;
+using Z_Ui;
 using Z_Ui.Base;
 using Z_Ui.Notify;
 
@@ -12,6 +13,7 @@ namespace Ui.Notify
     public partial class UiNotifyParam
     {
         public TipInfo tipInfo;
+        public CommentInfo commentInfo;
         public PopupInfo popupInfo;
         public ChooseInfo chooseInfo;
         public QuickChooseInfo quickChooseInfo;
@@ -21,6 +23,7 @@ namespace Ui.Notify
     public partial class UiNotifyModel
     {
         public List<TipInfo> tipInfos = new List<TipInfo>();
+        public List<CommentInfo> commentInfos = new List<CommentInfo>();
         public List<PopupInfo> popupInfos = new List<PopupInfo>();
         public List<ChooseInfo> chooseInfos = new List<ChooseInfo>();
         public List<QuickChooseInfo> quickChooseInfos = new List<QuickChooseInfo>();
@@ -32,6 +35,7 @@ namespace Ui.Notify
     public partial class UiNotifyCtrl
     {
         UiContainer<UiTipCtrl> tipCon;
+        UiContainer<UiCommentCtrl> commentCon;
         UiContainer<UiChooseCtrl> chooseCon; 
         UiContainer<UiQuickChooseCtrl> quickChooseCon;
         UiContainer<UiMultipleChooseCtrl> multipleChooseCon;
@@ -40,6 +44,7 @@ namespace Ui.Notify
         public override void OnCreate()
         {
             tipCon = new UiContainer<UiTipCtrl>(this, view.sub_Tip.gameObject);
+            commentCon = new UiContainer<UiCommentCtrl>(this, view.sub_Comment.gameObject);
             chooseCon = new UiContainer<UiChooseCtrl>(this, view.sub_Choose.gameObject);
             quickChooseCon = new UiContainer<UiQuickChooseCtrl>(this, view.sub_QuickChoose.gameObject);
             popupCon = new UiContainer<UiPopupCtrl>(this, view.sub_Popup.gameObject);
@@ -58,6 +63,8 @@ namespace Ui.Notify
             {
                 if (param.tipInfo != null)
                     Add(param.tipInfo);
+                if (param.commentInfo != null)
+                    Add(param.commentInfo);
                 if (param.chooseInfo != null)
                     Add(param.chooseInfo);
                 if (param.multipleChooseInfo != null)
@@ -90,6 +97,11 @@ namespace Ui.Notify
                 });
             }
             tipCon.Refresh();
+            // Comments remain visible until their own back buttons are clicked.
+            commentCon.Clear();
+            foreach (var comment in model.commentInfos)
+                commentCon.Add(new UiCommentParam() { info = comment });
+            commentCon.Refresh();
             //choose
             chooseCon.Clear();
             if (model.chooseInfos.Count > 0)
@@ -161,6 +173,11 @@ namespace Ui.Notify
             model.tipInfos.Add(info);
             Refresh();
         }
+        public void Add(CommentInfo info)
+        {
+            model.commentInfos.Add(info);
+            Refresh();
+        }
         
         public void Add(ChooseInfo info)
         {
@@ -199,6 +216,11 @@ namespace Ui.Notify
                     break;
                 }
             }
+            Refresh();
+        }
+        public void RemoveComment(int id)
+        {
+            model.commentInfos.RemoveAll(comment => comment.id == id);
             Refresh();
         }
         public void RemoveChoose(int id)
@@ -268,12 +290,67 @@ namespace Ui.Notify
         public void ClearAll()
         {
             model.tipInfos.Clear();
+            model.commentInfos.Clear();
             model.popupInfos.Clear();
             model.chooseInfos.Clear();
             model.quickChooseInfos.Clear();
             model.multipleChooseInfos.Clear();
             model.inputAreaInfos.Clear();
             Refresh();
+        }
+    }
+
+    public partial class UiCommentParam
+    {
+        public CommentInfo info;
+    }
+
+    public partial class UiCommentModel
+    {
+        public CommentInfo info;
+    }
+
+    public partial class UiCommentCtrl
+    {
+        public override void OnCreate()
+        {
+            if (param == null)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+            view.btn_back.onClick.AddListener(() => parent.RemoveComment(model.info.id));
+        }
+
+        public override void OnShow()
+        {
+            if (param == null)
+                return;
+            model.info = param.info;
+            view.txt_.text = model.info.content;
+            UiManager.Rebuild(view.txt_.gameObject, true);
+            UiManager.Rebuild(gameObject, true);
+            PositionAtScreenPoint();
+            TimeManager.instance.AddCurLateUpdateAction(() =>
+            {
+                if (active)
+                {
+                    UiManager.Rebuild(gameObject, true);
+                    PositionAtScreenPoint();
+                }
+            }, gameObject);
+        }
+
+        private void PositionAtScreenPoint()
+        {
+            var parentRect = (RectTransform)rect.parent;
+            var canvas = gameObject.GetComponentInParent<Canvas>()?.rootCanvas;
+            var camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? canvas.worldCamera
+                : null;
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
+                    parentRect, model.info.screenPosition, camera, out var worldPosition))
+                rect.position = worldPosition;
         }
     }
 

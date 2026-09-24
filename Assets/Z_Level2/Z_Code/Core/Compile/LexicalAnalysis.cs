@@ -92,7 +92,7 @@ namespace Z_Code
 
         private static readonly string[] CompoundOperators =
         {
-            "==", "!=", ">=", "<=", "&&", "||"
+            "==", "!=", ">=", "<=", "&&", "||", "++", "+="
         };
 
         private string _originalCode;

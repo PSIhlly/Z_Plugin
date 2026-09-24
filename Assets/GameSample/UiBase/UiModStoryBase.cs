@@ -4862,6 +4862,8 @@ namespace ModStoryMapObjectObjectConfig
             public UiEventChooseCtrl model_EventChooseInteract;
             public UiEventChooseCtrl model_EventChooseClickMinimap;
             public UiEventChooseCtrl model_EventChooseLeaveScene;
+            public Btn btn_isWangTile;
+            public Sta sta_isWangTile;
             public Btn btn_collision;
             public Sta sta_collision;
             public Btn btn_faceType;
@@ -4883,12 +4885,14 @@ namespace ModStoryMapObjectObjectConfig
             model_EventChooseInteract = (UiEventChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
             model_EventChooseClickMinimap = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
             model_EventChooseLeaveScene = (UiEventChooseCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            btn_collision = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            sta_collision = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            btn_faceType = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            btn_minimapIcon = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            img_minimapIcon = uiHolder.elementTrsLst[16].GetComponent<Img>();
-            txt_faceType = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            btn_isWangTile = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_isWangTile = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            btn_collision = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            sta_collision = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            btn_faceType = uiHolder.elementTrsLst[16].GetComponent<Btn>();
+            btn_minimapIcon = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            img_minimapIcon = uiHolder.elementTrsLst[18].GetComponent<Img>();
+            txt_faceType = uiHolder.elementTrsLst[19].GetComponent<Txt>();
         }
 
     }

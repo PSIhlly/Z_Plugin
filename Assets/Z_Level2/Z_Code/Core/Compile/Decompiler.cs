@@ -86,15 +86,11 @@ namespace Z_Code
                 {
                     var result = new StringBuilder();
                     result.Append(prefix).Append("if (").Append(RenderChild(node, 0)).Append(")\n");
-                    result.Append(prefix).Append("{\n");
-                    result.Append(node.subNodes.Count > 1 ? RenderAction(node.subNodes[1], indent + 1) : string.Empty);
-                    result.Append(prefix).Append('}');
+                    AppendBlock(result, node.subNodes.Count > 1 ? node.subNodes[1] : null, indent);
                     if (node.subNodes.Count > 2)
                     {
                         result.Append("\n").Append(prefix).Append("else\n");
-                        result.Append(prefix).Append("{\n");
-                        result.Append(RenderAction(node.subNodes[2], indent + 1));
-                        result.Append(prefix).Append('}');
+                        AppendBlock(result, node.subNodes[2], indent);
                     }
                     if (terminateSimple)
                     {
@@ -106,9 +102,7 @@ namespace Z_Code
                 {
                     var result = new StringBuilder();
                     result.Append(prefix).Append("while (").Append(RenderChild(node, 0)).Append(")\n");
-                    result.Append(prefix).Append("{\n");
-                    result.Append(node.subNodes.Count > 1 ? RenderAction(node.subNodes[1], indent + 1) : string.Empty);
-                    result.Append(prefix).Append('}');
+                    AppendBlock(result, node.subNodes.Count > 1 ? node.subNodes[1] : null, indent);
                     if (terminateSimple)
                     {
                         result.Append('\n');
@@ -122,10 +116,9 @@ namespace Z_Code
                     string iteration = RenderForClause(node, 2);
                     var result = new StringBuilder();
                     result.Append(prefix).Append("for (").Append(init).Append(';')
-                        .Append(condition).Append(';').Append(iteration).Append(")\n");
-                    result.Append(prefix).Append("{\n");
-                    result.Append(node.subNodes.Count > 3 ? RenderAction(node.subNodes[3], indent + 1) : string.Empty);
-                    result.Append(prefix).Append('}');
+                        .Append(condition.Length > 0 ? " " : string.Empty).Append(condition).Append(';')
+                        .Append(iteration.Length > 0 ? " " : string.Empty).Append(iteration).Append(")\n");
+                    AppendBlock(result, node.subNodes.Count > 3 ? node.subNodes[3] : null, indent);
                     if (terminateSimple)
                     {
                         result.Append('\n');
@@ -135,6 +128,13 @@ namespace Z_Code
                 default:
                     return prefix + node.desc.code + suffix;
             }
+        }
+
+        private void AppendBlock(StringBuilder result, SyntaxNode body, int indent)
+        {
+            result.Append(Indent(indent)).Append("{\n");
+            result.Append(RenderAction(body, indent + 1));
+            result.Append(Indent(indent)).Append('}');
         }
 
         private string RenderAction(SyntaxNode action, int indent)
@@ -187,7 +187,7 @@ namespace Z_Code
                     {
                         if (i > 0)
                         {
-                            args.Append(',');
+                            args.Append(", ");
                         }
                         args.Append(RenderExpression(node.subNodes[i]));
                     }
@@ -206,26 +206,85 @@ namespace Z_Code
 
         private string RenderOperator(SyntaxNode node)
         {
+            if (node.desc.code == "++" && node.subNodes.Count == 1)
+            {
+                return RenderOperand(node.subNodes[0], GetPrecedence(node), false) + "++";
+            }
             if (node.subNodes.Count == 1)
             {
-                return node.desc.code + "(" + RenderExpression(node.subNodes[0]) + ")";
+                string operand = RenderOperand(node.subNodes[0], GetPrecedence(node), false);
+                // Keep adjacent unary plus operators separate from the postfix ++ token.
+                if (node.desc.code == "+" && operand.StartsWith("+"))
+                    operand = " " + operand;
+                return node.desc.code + operand;
             }
             if (node.subNodes.Count < 2)
             {
                 return node.desc.code;
             }
 
-            string right = RenderExpression(node.subNodes[0]);
-            string left = RenderExpression(node.subNodes[1]);
+            int precedence = GetPrecedence(node);
+            if (node.desc.code == "[")
+                return RenderOperand(node.subNodes[1], precedence, false)
+                    + "[" + RenderExpression(node.subNodes[0]) + "]";
+
+            bool rightAssociative = node.desc.code == "=" || node.desc.code == "+=";
+            string right = RenderOperand(node.subNodes[0], precedence, !rightAssociative);
+            string left = RenderOperand(node.subNodes[1], precedence, rightAssociative);
             switch (node.desc.code)
             {
                 case ".":
+                    // The lexer consumes the dot in "1.member" as part of a number.
+                    if (node.subNodes[1].desc.type == CodeType.Num)
+                        left = "(" + left + ")";
                     return left + "." + right;
-                case "[":
-                    return left + "[" + right + "]";
                 default:
-                    // Full parenthesization guarantees round-trip semantics for all precedence levels.
-                    return "(" + left + node.desc.code + right + ")";
+                    return left + " " + node.desc.code + " " + right;
+            }
+        }
+
+        private string RenderOperand(SyntaxNode node, int parentPrecedence, bool parenthesizeOnEqual)
+        {
+            string expression = RenderExpression(node);
+            if (node?.desc?.type != CodeType.Operator)
+                return expression;
+
+            int precedence = GetPrecedence(node);
+            return precedence < parentPrecedence || (precedence == parentPrecedence && parenthesizeOnEqual)
+                ? "(" + expression + ")"
+                : expression;
+        }
+
+        // Mirrors SyntaxAnalysis.ParseAssignment through ParsePostfix. Equal-precedence
+        // right operands stay grouped for left-associative operators (including + and *:
+        // reassociation can change floating-point or string results).
+        private static int GetPrecedence(SyntaxNode node)
+        {
+            if (node?.desc?.type != CodeType.Operator)
+                return 10;
+            if (node.subNodes.Count == 1)
+                return node.desc.code == "++" ? 9 : 8;
+
+            switch (node.desc.code)
+            {
+                case "=":
+                case "+=": return 1;
+                case "||": return 2;
+                case "&&": return 3;
+                case "==":
+                case "!=": return 4;
+                case ">":
+                case "<":
+                case ">=":
+                case "<=": return 5;
+                case "+":
+                case "-": return 6;
+                case "*":
+                case "/":
+                case "%": return 7;
+                case ".":
+                case "[": return 9;
+                default: return 0;
             }
         }
 

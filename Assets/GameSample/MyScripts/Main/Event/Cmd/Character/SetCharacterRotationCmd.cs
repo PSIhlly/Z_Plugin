@@ -34,35 +34,42 @@ namespace Z_Code
             var heapTemp = asyncTask.interpreter.data.heapTemp;
             var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(heapTemp[0].str, GlobalEventHelper.CHARACTER)];
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
+            if (!(data?.unit is CharacterUnit unit))
+                return true;
+
+            float targetYaw = Mathf.Repeat(heapTemp[1].num, 360f);
 
             void Set(float y)
             {
-                data.unit.forceEuler = data.euler.NewSetY(y);
-                data.euler = data.euler.NewSetY(y);
-                if (data.unit.ins != null)
-                {
-                    data.unit.ins.transform.eulerAngles = data.unit.ins.transform.eulerAngles.NewSetY(y);
-                }
+                Vector3 euler = data.euler.NewSetY(Mathf.Repeat(y, 360f));
+                unit.forceEuler = euler;
+                data.euler = euler;
+                if (unit.ins != null)
+                    unit.ins.transform.eulerAngles = euler;
             }
 
             if (heapTemp[2].num <= 0)
             {
-                Set(heapTemp[1].num);
+                Set(targetYaw);
                 return true;
             }
+
+            float duration = heapTemp[2].num;
+            float startYaw = data.euler.y;
+            float elapsed = 0f;
             GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
-                var euler = heapTemp[1].num;
-                var time = Mathf.Max(heapTemp[2].num,0.0001f);
-                
-                
-                if(data!=null)
+                if (!ReferenceEquals(data.unit, unit))
                 {
-                    var step = Mathf.Min(1, Time.deltaTime / time) * (euler - data.euler.y);
-                    Set(step);
+                    asyncTask.Complete();
+                    return true;
                 }
-                heapTemp[2].num -= Time.deltaTime;
-                if (heapTemp[2].num <= 0)
+
+                elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+                Set(elapsed >= duration
+                    ? targetYaw
+                    : Mathf.LerpAngle(startYaw, targetYaw, elapsed / duration));
+                if (elapsed >= duration)
                 {
                     asyncTask.Complete();
                     return true;

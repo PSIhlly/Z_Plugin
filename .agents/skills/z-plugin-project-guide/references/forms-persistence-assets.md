@@ -16,7 +16,7 @@ Use this reference before changing any Excel-backed Form, generated API, seriali
 ## Data pipeline
 
 ```text
-Excels/*.xls
+Excels/*.xlsx
   → Z_OtherProjects/Z_Tool/Excel2Cs/Excel2Cs.py
   → ExcelCs/*Form.cs
   → hand-written partials/controllers
@@ -46,11 +46,11 @@ Every workbook's first sheet uses this physical layout:
 
 Require a primary-key `0` default row. Generated deserialization reads `_defaultData`; key `0` is not inserted into `DataById/DataByUid` and is not emitted by `GetJaByDatas()`.
 
-Treat `.xls` as a binary source file:
+Treat `.xlsx` as the workbook source file:
 
 - Do not edit it with text patches.
 - Preserve format, sheet structure, styles, formula caches, and its existing `.meta` GUID.
-- Close Excel and remove no files while a `~$*.xls` lock file exists; the generator may try to parse the lock file.
+- Close Excel before generation; the generator skips `~$` lock files. A process holding a workbook open may still prevent moving or writing either format.
 - Keep authoritative data on the first sheet because the generator uses the default sheet read.
 
 Generation flags are case-sensitive:
@@ -73,7 +73,7 @@ Generation flags are case-sensitive:
 ## Generation and inheritance
 
 - Never hand-edit `ExcelCs/*Form.cs`; use a sibling partial file for runtime behavior.
-- `<Child>_<Parent>.xls` generates `ChildForm.Data : ParentForm.Data`.
+- `<Child>_<Parent>.xlsx` generates `ChildForm.Data : ParentForm.Data`.
 - The filename parser uses only the first two underscore-separated components. Avoid extra underscores in Form names.
 - Output is flat within one `ExcelCs`; duplicate child names in different source subfolders overwrite one another.
 - Repeat every required parent-constructor field in a child sheet. Mark inherited fields `override` and preserve constructor order and type exactly.
@@ -102,9 +102,11 @@ Inspect the generated result instead of inventing an expected PascalCase API.
 - `uniqueIndex` has weak conflict diagnostics; duplicate static keys may fail initialization and runtime duplicates can corrupt the unique lookup.
 - `Clear()` removes static and dynamic rows and does not repopulate static Excel data in the same process.
 - Generated `ClearAuto()` uses a strict pool-bound comparison. Avoid allocating or manually assigning the exact pool maximum; use a Form-specific helper where one exists.
+- `Z_Chain.Chain` must preserve IDs returned through `PushId()` when it advances into previously uncreated sequential IDs. Repeated `ClearAuto()` and reload cycles must not reduce the remaining automatic-ID capacity.
 - `Copy()` copies List/Dictionary containers but not every nested object; `Reset()` can reuse references. Inspect nested mutability before treating either as deep copy.
 - `CopyStory*` commands deep-clone the generated Form payload through `GetJoByData`/`GetDataByJo`, replace the copied name, reset its primary key to `-1`, and then register it with `AddData()`. Do not implement these commands with generated `Data.Copy(false)`, because nested animation, event, parameter, and model objects can remain shared.
 - Scene `MapUnit.productInfo` intentionally keeps an ID link to its Product, while each unit's mutable `paramInfo` values must be copied from Product defaults. Never put the Product's parameter `Data` instances directly into a scene unit; otherwise a scene event can mutate the Product or another unit through a shared reference.
+- `MapObject_MapBase.xlsx` owns the `MapObjectForm.Data.isWangTile` bool. Regenerate `MapObjectForm.cs` after schema changes; old story JSON omitting the field loads with `false`. Object WangTile source frames come from each enabled `animClip` direction; generated GameTex mask variants are scene-scoped and cleared with Tile WangTile assets on scene unload/reload. Mod changes to the flag, face type, or a real source frame rebuild only that Object product's generated variants and refresh its visible instances immediately; adding an empty/default frame waits for import rather than trying to parse the placeholder as an autotile sheet.
 - `GetDatasByJa()` only creates Data objects. Register every loaded object with `AddData()`.
 - Lazy `Init()` and `RuntimeInitializeOnLoadMethod` JSON registration are part of the generated runtime contract.
 
@@ -114,11 +116,12 @@ Generated JSON contains the primary key plus fields marked `write` and not marke
 
 Compatibility behavior:
 
-- `StoryForm.icon` is a Base64 `string` containing the cover image bytes (empty string means no cover). `Story.xls` is the schema authority. Encode once at cover selection and decode for display/package output; `SaveOverview` saves the string directly. Runtime loading accepts only this new schema, by design. Existing local `Core/sf` files were migrated once from the legacy `[{"v": byte}, ...]` representation with byte-for-byte image verification and backups; legacy external stories/packages require offline migration before use.
+- `StoryForm.icon` is a Base64 `string` containing the cover image bytes (empty string means no cover). `Story.xlsx` is the schema authority. Encode once at cover selection and decode for display/package output; `SaveOverview` saves the string directly. Runtime loading accepts only this new schema, by design. Existing local `Core/sf` files were migrated once from the legacy `[{"v": byte}, ...]` representation with byte-for-byte image verification and backups; legacy external stories/packages require offline migration before use.
 - `StoryForm.randomSeed` is the persistent string seed for deterministic story randomness. New stories receive a GUID seed; old stories missing the field use the key-0 empty default and `Random` falls back to the stable Story ID.
 - Adding a field uses the key-0 default value for an old save.
 - `CharacterProductForm.size` is a positive integer uniform model/collider scale. Keep its key-0 default at `1`; normalize it after load and before save, and never trust a scene-level `CharacterUnitForm.scale` over the owning Product.
 - `PassTypeForm` is the story-owned registry for terrain traversal types. Persist it as `ptf`, load it before `MapTextureForm` and `CharacterProductForm`, and clear those consumers before clearing PassType. Every nonzero `int passType` and every element of `CharacterProductForm.passType` is a `PassTypeForm.id`; `0` means unrestricted and is not a registry row. Deleting a PassType must first reset matching MapTexture references to `0` and remove it from Character Product lists.
+- `CharacterUnit_Unit.xlsx` and `TileUnit_Unit.xlsx` now save `passType` as `List<int>`. The scene unit list mirrors the Product's available types or the Tile's terrain-texture requirements; the runtime `passTypes` set is refreshed from that list. Never reduce a Tile's requirements to one ID. Before generated Tile deserialization, migrate legacy scalar `passType` JSON (`0` to an empty list, nonzero to a one-element list) because the generated list reader cannot read an integer.
 - `MapTextureForm.enableFrontPart` gates its optional `frontPartTexs` animation list. Preserve the list while disabled so re-enabling restores the authored front animation; old stories inherit both fields from the key-0 MapTexture default.
 - `MapTextureForm.frontIsWangTile` is a saved, independently selectable front-part autotile flag (default `false` for old stories). `FrontWangTileDic`, like `WangTileDic`, is `write;unsave`: scene entry rebuilds its generated texture IDs and unload clears them; never persist the generated IDs or replace the authored `frontPartTexs` list with split tiles.
 - `MapObjectForm.faceType` and `MapObjectForm.animClip` own Object-facing persistence. `animClip` maps each `AnimDirecton` to its animation texture IDs; `MapModelForm.subUnitTexsName[0]` remains a compatibility mirror for old stories and shared model consumers. On load, seed missing directional clips from that legacy list; before save, mirror `Fixed` or `Up` according to `faceType`.
@@ -152,20 +155,20 @@ Do not assume all registered Forms are persisted automatically.
 - Represent every semantic label as `int labId`.
 - Reserve `LabForm.NoneId == 0` for unclassified. Do not create an empty Lab row.
 - Treat nullable UI selection as “all”; do not conflate it with `labId=0`.
-- Define identity as `(lv1Lab, lv2Lab, lv3Lab, belong)`.
+- Define identity as `(lv1Lab, lv2Lab, lv3Lab, belong)` for new runtime labels. Static GameCmd Lab IDs are legacy aliases after flattening: several IDs may intentionally share one first-level identity.
 - Set `belong` to `nameof(ConcreteForm)`, never a shared base Form name.
 - Use `GetOrCreate`, `GetOrCreateDisplayName`, and `GetOrCreateForBelong`; do not duplicate construction logic.
 - Display through `GetDisplayName`. When editing an existing display path, pass the current ID to avoid reparsing an unchanged path containing `/`.
 - Prefer creating a new Lab and repointing consumers over mutating an identity path in place. There is no automatic orphan collection or cascade.
 - Load Lab before consumers, save Lab before consumers, and clear consumers before Lab.
-- Treat static GameCmd Lab IDs `10001..10025` as a stable serialized protocol.
-- Map `GameCmdDataForm.labId` to Lab `lv1Lab/lv2Lab`. Update `Lab.xls` and `GameCmdData_CmdData.xls` together when adding command categories.
+- Treat static GameCmd Lab IDs `10001..10025` as a stable serialized protocol. They now have only `lv1Lab`; former `lv2Lab` values are empty, and multiple IDs can point at one first-level category. The Lab sheet omits `uniqueIndex3` because those aliases share a path; `GetOrCreate` chooses the lowest matching ID.
+- Map `GameCmdDataForm.labId` to Lab `lv1Lab` only. `GameCmdData_CmdData.xlsx` uses one canonical ID per first-level category: `basic=10001`, `character=10007`, `effect=10013`, `item=10014`, `mission=10015`, `sceneObject=10016`, `skill=10020`, `ui=10022`. The other static IDs remain as legacy aliases, not new command references. New command categories need a first-level row in `Lab.xlsx` and a corresponding `GameCmdData_CmdData.xlsx` reference.
 - Validate both ID existence and exact concrete `belong` for Asset, Product, MapBase, Effect, Mission, EventProgramData, and GameCmdData trees.
 
 Legacy label migration remains:
 
 - Flat string → `lv1Lab`; leave levels 2 and 3 empty.
-- EventProgram `category/type` → `lv1Lab/lv2Lab`.
+- EventProgram labels are flat: legacy `category/type` is collapsed during `LoadEvent` to the original `category` (`lv1Lab`), discarding `type` (`lv2Lab`). Programs sharing a category appear together. The repository sample `ExtraAssets/2/Core/lf` uses the original first-level category names and retains the referenced IDs in `ef`.
 - Existing `labId` with the wrong `belong` → clone the same path under the correct concrete Form.
 - Historical Mission bodies that were never saved cannot be reconstructed from a label migration.
 
@@ -190,6 +193,7 @@ AssetForm
 - Many `bytes/path/asset` fields are `unsave`; rebind loaded data to the absolute `ast/` path.
 - Import through `GameSaveController.AddStoryTex/AddStoryAudio/AddStoryVideo` so data is converted to the concrete Story subtype, IDs and Lab ownership are normalized, and asset events are emitted.
 - Batch media selection goes through `TexController/AudioController/VideoController.SelectMultiple`. Windows Editor uses `AssetFilePicker`'s native multi-file dialog; supported Player platforms delegate to NativeGallery. Import every returned item through the matching `GameSaveController.AddStory*` method rather than registering the batch directly.
+- Texture import accepts PNG/JPG/BMP/GIF/WebP. WebP is detected by its RIFF/WEBP signature as saved story asset filenames have no original extension. `TextureHelper.GetTextureByByte` returns the first composited WebP frame for static texture consumers; `TexAssetForm.Data.GetAnimationFrames/GetAnimationSprites` provides all frames to `Img` for timed playback. Keep the original WebP bytes in story asset storage so reloading can rebuild frames and sprites. The single-image and batch Windows Editor pickers both include `.webp`.
 - Audio asset import recognizes `.mp3` and `.wav` files when scanning folders and in the Windows multi-file picker; Player platforms continue to use NativeGallery's audio MIME filter.
 - After a story's asset manifests load, repair missing character-animation `partTex` references through `GameSaveController.RepairMissingCharacterTextureReferences`. It creates one transparent Story texture per missing legacy ID and rewrites every affected `CharacterProductForm` entry so the repair persists on the next save.
 - Do not register base `TexAssetForm.Data` directly as Story data or reuse a base Form's Lab ID under a Story subtype.

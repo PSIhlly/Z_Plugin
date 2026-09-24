@@ -490,19 +490,34 @@ namespace Z_Map
 
             var fromMesh = Mesh.GetMesh(from, radius, Vector3.zero, Vector3.one);
             var toMesh = Mesh.GetMesh(to, radius, Vector3.zero, Vector3.one);
-            var lst = Graph.GetRoughOverlapIntPos(fromMesh.positions);
-            lst.AddRange(Graph.GetRoughOverlapIntPos(toMesh.positions));
+            // The cast sweeps across the whole segment. Sampling only the two
+            // endpoint spheres misses intermediate Tile and Object colliders.
+            var sweepPoints = new Vector3[fromMesh.positions.Length + toMesh.positions.Length];
+            fromMesh.positions.CopyTo(sweepPoints, 0);
+            toMesh.positions.CopyTo(sweepPoints, fromMesh.positions.Length);
+            var lst = Graph.GetRoughOverlapIntPos(sweepPoints);
 
 
+            var checkedColumns = new HashSet<(int, int)>();
             foreach (var pos in lst)
             {
-                var mapPos = _super.utilCtrl.RealPos2MapPosInt(pos);
-                var tile = GetTile(mapPos.x, mapPos.y, mapPos.z);
-                if (tile != null)
+                var mapPos = RealPos2MapPosInt(pos);
+                if (!checkedColumns.Add((mapPos.x, mapPos.z)) ||
+                    !_super.data.mapXZ2Y.TryGetValue((mapPos.x, mapPos.z), out var yLevels))
+                    continue;
+
+                // A Tile collider can extend into a different logical height layer.
+                // Check every real Tile in this column and let the mesh sweep decide.
+                foreach (var y in yLevels)
                 {
+                    if (!_super.data.maps.TryGetValue((mapPos.x, y, mapPos.z), out var tileData))
+                        continue;
+                    var tile = tileData.unit;
                     var unitLst = new List<MapUnit>() { tile };
-                    unitLst.AddRange(_super.updateCtrl.objectTileDic.Get(tile));
-                    unitLst.AddRange(_super.updateCtrl.characterOverlapTileDic.Get(tile));
+                    if (_super.updateCtrl.objectTileDic.TryGet(tile, out var objects))
+                        unitLst.AddRange(objects);
+                    if (_super.updateCtrl.characterOverlapTileDic.TryGet(tile, out var characters))
+                        unitLst.AddRange(characters);
                     foreach (var u in unitLst)
                     {
                         if (exist.Contains(u.data.uid))
@@ -516,10 +531,9 @@ namespace Z_Map
                         }
 
                     }
-
                 }
-                Debug.DrawLine(from, to, Color.green);
             }
+            Debug.DrawLine(from, to, Color.green);
             return res;
         }
         public List<TileUnit> GetCharacterCollisionTiles(CharacterUnit unit, Vector3 displacement, CollideType type)

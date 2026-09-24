@@ -281,8 +281,6 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         foreach (var tile in TileUnitForm.DataByUid.Values)
         {
-            if (tile.passType == id)
-                tile.passType = 0;
             GameMapData.ApplyTilePassTypes(tile);
         }
         foreach (var character in CharacterUnitForm.DataByUid.Values)
@@ -424,7 +422,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         modelData.subUnitTexsName = new List<List<int>>() { new List<int>() };
         var objectData = new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, labId, false,
             new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId,
-            FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>());
+            FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false);
         objectData.EnsureDirectionData();
         MapObjectForm.AddData(objectData);
     }
@@ -435,6 +433,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         if (texId >= 0 && texId < clip.Count)
             clip.RemoveAt(texId);
         data.SyncLegacyAnimClip(direction);
+        if (data.isWangTile)
+            Main2StoryManager.instance.RefreshObjectWangTileTextures(data);
     }
     public void CreateObjectUnitTex(int uid, AnimDirecton direction)
     {
@@ -459,6 +459,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     clip.Add(assetData.id);
                 }
                 objectData.SyncLegacyAnimClip(direction);
+                if (objectData.isWangTile)
+                    Main2StoryManager.instance.RefreshObjectWangTileTextures(objectData);
             }
         });
 

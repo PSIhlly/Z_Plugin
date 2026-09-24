@@ -18,14 +18,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowTipCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            if (prm[0].str == null)
-            {
-                NotifyManager.instance.AddTip(prm[0].num.ToString());
-            }
-            else
-            {
-                NotifyManager.instance.AddTip(prm[0].str);
-            }
+
+                NotifyManager.instance.AddTip(prm[0].ToString());
 
             return true;
         }

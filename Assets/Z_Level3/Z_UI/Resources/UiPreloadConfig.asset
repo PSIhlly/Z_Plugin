@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec59a41b64414dc3a773e88f088de7c0, type: 3}
   m_Name: UiPreloadConfig
   m_EditorClassIdentifier: 
-  preloadUis: []
+  preloadUis:
+  - {fileID: 1614467867034934814, guid: fed789db9e891cd4bb07ea99b1f032d9, type: 3}

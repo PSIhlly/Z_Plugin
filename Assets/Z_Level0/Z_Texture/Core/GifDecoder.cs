@@ -5,11 +5,13 @@ using UnityEngine;
 
 namespace Z_Texture
 {
-    public class GifFrameData
+    public class AnimatedFrameData
     {
         public Texture2D texture;
         public float delaySeconds;
     }
+
+    public class GifFrameData : AnimatedFrameData { }
 
     public static class GifDecoder
     {

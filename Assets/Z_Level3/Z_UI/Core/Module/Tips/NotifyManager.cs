@@ -60,6 +60,12 @@ namespace Z_Ui.Notify
         public string content;
         public int id;
     }
+    public class CommentInfo
+    {
+        public string content;
+        public Vector2 screenPosition;
+        public int id;
+    }
     public class ChooseInfo
     {
         public string title;
@@ -116,6 +122,7 @@ namespace Z_Ui.Notify
         private const int TipLineCharLimit = 30;
 
         public static int tipIdCnt;
+        public static int commentIdCnt;
         public static int chooseIdCnt;
         public static int popupIdCnt;
         public virtual void ClearAll()
@@ -146,6 +153,29 @@ namespace Z_Ui.Notify
                     tipInfo = info
                 });
             }
+        }
+
+        public int AddComment(string content, Vector2 screenPosition)
+        {
+            var info = new CommentInfo()
+            {
+                content = WrapTipContent(content),
+                screenPosition = screenPosition,
+                id = commentIdCnt++
+            };
+            var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
+            if (ctrl != null && ctrl.active)
+            {
+                ctrl.Add(info);
+            }
+            else
+            {
+                UiManager.instance.ShowUi<UiNotifyCtrl>(new UiNotifyParam()
+                {
+                    commentInfo = info
+                });
+            }
+            return info.id;
         }
 
         private static string WrapTipContent(string content)

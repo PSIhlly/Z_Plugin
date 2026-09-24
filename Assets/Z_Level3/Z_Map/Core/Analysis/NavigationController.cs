@@ -26,6 +26,7 @@ namespace Z_Map.Analysis
         public Vector3 realPos;
         public List<NavUnit> links;
         public float[] dirMaxY;
+        public float[] dirGroundY;
         public HashSet<int> passTypes;
     }
     public interface NaviComponent
@@ -36,6 +37,7 @@ namespace Z_Map.Analysis
     public class NavigationController : Z_Controller<MapManager>
     {
         private const string MapGroundPrefabName = "MapPrefab$mapground";
+        private const float PassableObstacleHeight = 0.2f;
 
         private sealed class MapGroundCoverageCache
         {
@@ -141,6 +143,7 @@ namespace Z_Map.Analysis
                     map.unit.GetYByPoint(offset[2]),
                     map.unit.GetYByPoint(offset[3])
                 };
+                navUnit.dirGroundY = (float[])navUnit.dirMaxY.Clone();
             }
 
             // Adding/removing a NavUnit, or moving its cell center, can change
@@ -230,7 +233,10 @@ namespace Z_Map.Analysis
                                     unit.realPos.z + offset[dir].y * _super.data.mainData.mapUnitSize.z);
                                 if (Graph.IsPointInQuad(quad, dir2D))
                                 {
-                                    unit.dirMaxY[dir] = Mathf.Max(maxY, unit.dirMaxY[dir]);
+                                    // Small protrusions above the walkable surface do not
+                                    // contribute to navigation obstacle height.
+                                    if (maxY - unit.dirGroundY[dir] >= PassableObstacleHeight)
+                                        unit.dirMaxY[dir] = Mathf.Max(maxY, unit.dirMaxY[dir]);
                                 }
                             }
                         }
@@ -389,13 +395,27 @@ namespace Z_Map.Analysis
                     bool overlapX = cellMax.x > min.x + overlapEpsilon && cellMin.x < max.x - overlapEpsilon;
                     bool overlapY = cellMax.y > min.y + overlapEpsilon && cellMin.y < max.y - overlapEpsilon;
                     bool overlapZ = cellMax.z > min.z + overlapEpsilon && cellMin.z < max.z - overlapEpsilon;
+                    // A solid Tile can clip the bottom of a neighbouring cell
+                    // without rising enough above its floor to block passage.
                     if (overlapX && overlapY && overlapZ
+                        && max.y - GetNavGroundHeight(navUnit) >= PassableObstacleHeight
                         && !coverage.coveredNavUnits.Contains(key))
                         coverage.coveredNavUnits.Add(key);
                 }
             }
 
             return coverage;
+        }
+
+        private static float GetNavGroundHeight(NavUnit unit)
+        {
+            if (unit.dirGroundY == null || unit.dirGroundY.Length == 0)
+                return unit.realPos.y;
+
+            float lowestGround = unit.dirGroundY[0];
+            for (int i = 1; i < unit.dirGroundY.Length; i++)
+                lowestGround = Mathf.Min(lowestGround, unit.dirGroundY[i]);
+            return lowestGround;
         }
 
 

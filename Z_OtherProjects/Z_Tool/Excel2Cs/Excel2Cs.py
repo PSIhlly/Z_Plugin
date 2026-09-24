@@ -15,7 +15,7 @@ form_info_list = []
 def create_forms():
     for root, dirs, files in os.walk(files_root_excels):
         for file in files:
-            if file.endswith('.xlsx') or file.endswith('.xls'):
+            if not file.startswith('~$') and (file.endswith('.xlsx') or file.endswith('.xls')):
                 print('manage:' + file + "\n")
                 formInfo = FormInfo(file_using,file_namespace)
 

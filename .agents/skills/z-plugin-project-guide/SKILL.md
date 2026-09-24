@@ -25,7 +25,7 @@ Work from the repository's actual source-of-truth files while preserving its lay
 
 - Read [architecture.md](references/architecture.md) when locating a module, changing dependencies, managers, scenes, units, commands, or platform-facing code.
 - Read [event-language.md](references/event-language.md) before changing the compiler, interpreter, event code generation, command names, ProgramData, or persisted ef.
-- Read [forms-persistence-assets.md](references/forms-persistence-assets.md) before touching `.xls`, `ExcelCs`, Form inheritance, IDs, JSON, saves, LabForm, or assets.
+- Read [forms-persistence-assets.md](references/forms-persistence-assets.md) before touching `.xlsx`, `ExcelCs`, Form inheritance, IDs, JSON, saves, LabForm, or assets.
 - Read [ui-runtime-workflows.md](references/ui-runtime-workflows.md) before touching UiHolder-generated UI, Game/Mod/Play flows, controllers, or global events.
 - Read [map-collision.md](references/map-collision.md) before changing map movement, collision, trigger, navigation, tile association, or map resource behavior.
 - Read [constraints-validation.md](references/constraints-validation.md) before final verification, player-build work, package changes, or third-party plugin changes.
@@ -38,7 +38,7 @@ Work from the repository's actual source-of-truth files while preserving its lay
 - Do not make a lower asmdef reference `Assembly-CSharp`. Check the physical asmdef boundary rather than trusting the `Z_Level` folder or namespace.
 - Do not replace logical story-scene loading with Unity `SceneManager` loading.
 - Preserve every existing `.meta` GUID. Pair every new Unity asset or script with a unique `.meta`.
-- Preserve binary `.xls` format, workbook layout, styles, formulas, and lock-file hygiene.
+- Preserve `.xlsx` workbook layout, styles, formulas, existing `.meta` GUIDs, and lock-file hygiene.
 - Treat save/load as an explicit allow-list. A new Form is not persistent until save, load, reset, ordering, and migration are handled deliberately.
 - Treat `labId=0` as unclassified and nullable UI state as “all”. Use concrete `belong` Form names for Lab identities.
 - Use existing Manager, Controller, Unit, Map, UI, Asset, and event entry points instead of bypassing them with direct long-lived Unity objects.

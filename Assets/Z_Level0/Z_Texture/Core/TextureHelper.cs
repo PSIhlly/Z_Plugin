@@ -65,6 +65,8 @@ namespace Z_Texture
         }
         public static Texture GetTextureByByte(byte[] data)
         {
+            if (IsWebP(data))
+                return WebPDecoder.DecodeFirstFrame(data);
             // 使用 RGBA32 格式，禁用 mipmap，避免边缘问题
             Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             texture.LoadImage(data);
@@ -73,6 +75,28 @@ namespace Z_Texture
             // 设置钳制模式，避免边缘采样时从另一侧取像素
             texture.wrapMode = TextureWrapMode.Clamp;
             return texture;
+        }
+
+        public static bool IsWebP(byte[] data)
+        {
+            return data != null && data.Length >= 12 &&
+                   data[0] == 'R' && data[1] == 'I' && data[2] == 'F' && data[3] == 'F' &&
+                   data[8] == 'W' && data[9] == 'E' && data[10] == 'B' && data[11] == 'P';
+        }
+
+        public static List<AnimatedFrameData> GetWebPFramesByByte(byte[] data)
+        {
+            return WebPDecoder.Decode(data);
+        }
+
+        public static List<AnimatedFrameData> GetWebPFramesByPath(string path)
+        {
+            if (!File.Exists(path))
+            {
+                Debug.LogError("WebP file not found: " + path);
+                return null;
+            }
+            return WebPDecoder.Decode(File.ReadAllBytes(path));
         }
         public static Sprite GetSpriteByPath(string path)
         {
@@ -383,7 +407,7 @@ namespace Z_Texture
         {
 
             // 尝试获取文件的字节数组
-            foreach (var extension in new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif" }) // 添加你需要的后缀
+            foreach (var extension in new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp" })
             {
                 string fileWithExtension = path + extension;
 

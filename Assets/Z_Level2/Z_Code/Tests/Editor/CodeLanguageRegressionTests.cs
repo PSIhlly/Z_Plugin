@@ -126,6 +126,175 @@ Return i;";
         }
 
         [Test]
+        public void PostIncrementAndAddAssign_WorkInStatementsAndForClauses()
+        {
+            const string source = @"
+i=0;
+sum=0;
+for(;i<4;i++)
+{
+    sum+=i;
+}
+i++;
+Return sum+i;";
+
+            Assert.That(Execute(source).ret.num, Is.EqualTo(11f).Within(0.0001f));
+        }
+
+        [Test]
+        public void PostIncrementAndAddAssign_UpdateMemberAndIndexTargets()
+        {
+            const string source = @"
+owner.value=2;
+owner.value++;
+owner.value+=3;
+items[""key""]=4;
+items[""key""]++;
+items[""key""]+=2;
+Return owner.value+items[""key""];";
+
+            Assert.That(Execute(source).ret.num, Is.EqualTo(13f).Within(0.0001f));
+        }
+
+        [Test]
+        public void ReturnPostIncrement_ReturnsBeforeIncrement()
+        {
+            var result = Execute("i=7;Return i++;", out var data);
+
+            Assert.That(result.ret.num, Is.EqualTo(7f).Within(0.0001f));
+            Assert.That(data.heap["i"].num, Is.EqualTo(7f).Within(0.0001f));
+        }
+
+        [Test]
+        public void PostIncrementInOtherExpressions_IsRejectedWithoutExecutableCode()
+        {
+            var compiler = new Compiler();
+            var success = compiler.TryCompile("i=1;Return i++ + 1;", out var zCode, out _,
+                out _, out _, out _, out var errors);
+
+            Assert.That(success, Is.False);
+            Assert.That(zCode, Is.Empty);
+            Assert.That(errors, Is.Not.Empty);
+        }
+
+        [Test]
+        public void IncrementSyntax_RoundTripsThroughDecompiler()
+        {
+            const string source = "i=0;for(;i<2;i++){i+=1;}Return i++;";
+            var compiler = new Compiler();
+            var success = compiler.TryCompile(source, out _, out var syntaxNodes,
+                out _, out _, out _, out var errors);
+
+            Assert.That(success, Is.True, string.Join("\n", errors));
+            var restored = new Decompiler().Decompile(syntaxNodes);
+            Assert.That(restored, Does.Contain("i++"));
+            Assert.That(restored, Does.Contain("i += 1"));
+            Compile(restored, out _, out _, out _, "increment decompiler round-trip");
+        }
+
+        [TestCase("a=1+2*3;", "a = 1 + 2 * 3;\n")]
+        [TestCase("a=(1+2)*3;", "a = (1 + 2) * 3;\n")]
+        [TestCase("a=10-(3-1);", "a = 10 - (3 - 1);\n")]
+        [TestCase("a=10/(5/2);", "a = 10 / (5 / 2);\n")]
+        [TestCase("a=1+(2+3);", "a = 1 + (2 + 3);\n")]
+        [TestCase("a=-(1+2);", "a = -(1 + 2);\n")]
+        [TestCase("a=!!b;", "a = !!b;\n")]
+        [TestCase("a=+ +b;", "a = + +b;\n")]
+        [TestCase("a=1+ +b;", "a = 1 + +b;\n")]
+        [TestCase("a=(1||2)&&3;", "a = (1 || 2) && 3;\n")]
+        [TestCase("a=foo.bar+items[1+2];", "a = foo.bar + items[1 + 2];\n")]
+        public void Decompiler_UsesOnlyRequiredExpressionParentheses(string source, string expected)
+        {
+            var compiler = new Compiler();
+            Assert.That(compiler.TryCompile(source, out var originalCode, out var syntaxNodes,
+                out _, out _, out _, out var errors), Is.True, string.Join("\n", errors));
+
+            var restored = new Decompiler().Decompile(syntaxNodes);
+            Assert.That(restored, Is.EqualTo(expected));
+            Assert.That(compiler.TryCompile(restored, out var restoredCode, out _,
+                out _, out _, out _, out errors), Is.True, string.Join("\n", errors));
+            Assert.That(restoredCode, Is.EqualTo(originalCode), "decompilation changed expression evaluation");
+        }
+
+        [Test]
+        public void Decompiler_LeavesConditionAndArgumentsReadable()
+        {
+            const string source = "if(a==0||b>2&&c<3){Wait(1+2*3);}";
+            var compiler = new Compiler();
+            Assert.That(compiler.TryCompile(source, out var originalCode, out var syntaxNodes,
+                out _, out _, out _, out var errors), Is.True, string.Join("\n", errors));
+
+            var restored = new Decompiler().Decompile(syntaxNodes);
+            Assert.That(restored, Does.Contain("if (a == 0 || b > 2 && c < 3)"));
+            Assert.That(restored, Does.Contain("Wait(1 + 2 * 3);"));
+            Assert.That(compiler.TryCompile(restored, out var restoredCode, out _,
+                out _, out _, out _, out errors), Is.True, string.Join("\n", errors));
+            Assert.That(restoredCode, Is.EqualTo(originalCode));
+        }
+
+        [Test]
+        public void Decompiler_SpacesArgumentsWithoutChangingStringsOrEmptySlots()
+        {
+            const string source = "ShowDialog(\"a,b + c\",,\"title\",\"text\",);";
+            var compiler = new Compiler();
+            Assert.That(compiler.TryCompile(source, out var originalCode, out var syntaxNodes,
+                out _, out _, out _, out var errors), Is.True, string.Join("\n", errors));
+
+            var restored = new Decompiler().Decompile(syntaxNodes);
+            Assert.That(restored, Is.EqualTo("ShowDialog(\"a,b + c\", , \"title\", \"text\", );\n"));
+            Assert.That(compiler.TryCompile(restored, out var restoredCode, out _,
+                out _, out _, out _, out errors), Is.True, string.Join("\n", errors));
+            Assert.That(restoredCode, Is.EqualTo(originalCode));
+        }
+
+        [Test]
+        public void Decompiler_KeepsCompletelyEmptyForClausesCompact()
+        {
+            var compiler = new Compiler();
+            Assert.That(compiler.TryCompile("for(;;){break;}", out _, out var syntaxNodes,
+                out _, out _, out _, out var errors), Is.True, string.Join("\n", errors));
+
+            Assert.That(new Decompiler().Decompile(syntaxNodes),
+                Is.EqualTo("for (;;)\n{\n    break;\n}\n"));
+        }
+
+        [Test]
+        public void Decompiler_IndentsNestedBraceContentsByFourSpaces()
+        {
+            const string source = "if(a){x=1;while(b){y=2;if(c){z=3;}else{z=4;}}}for(i=0;i<2;i++){Wait(i);}";
+            const string expected = "if (a)\n" +
+                                    "{\n" +
+                                    "    x = 1;\n" +
+                                    "    while (b)\n" +
+                                    "    {\n" +
+                                    "        y = 2;\n" +
+                                    "        if (c)\n" +
+                                    "        {\n" +
+                                    "            z = 3;\n" +
+                                    "        }\n" +
+                                    "        else\n" +
+                                    "        {\n" +
+                                    "            z = 4;\n" +
+                                    "        }\n" +
+                                    "    }\n" +
+                                    "}\n" +
+                                    "for (i = 0; i < 2; i++)\n" +
+                                    "{\n" +
+                                    "    Wait(i);\n" +
+                                    "}\n";
+
+            var compiler = new Compiler();
+            Assert.That(compiler.TryCompile(source, out var originalCode, out var syntaxNodes,
+                out _, out _, out _, out var errors), Is.True, string.Join("\n", errors));
+
+            var restored = new Decompiler().Decompile(syntaxNodes);
+            Assert.That(restored, Is.EqualTo(expected));
+            Assert.That(compiler.TryCompile(restored, out var restoredCode, out _,
+                out _, out _, out _, out errors), Is.True, string.Join("\n", errors));
+            Assert.That(restoredCode, Is.EqualTo(originalCode));
+        }
+
+        [Test]
         public void IfElse_BlocksRemainDistinctFromTheIfNode()
         {
             const string source = "if(a==0){}else{}";

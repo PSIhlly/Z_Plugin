@@ -1,3 +1,7 @@
 {
-	"name": "Z_Texture"
+    "name": "Z_Texture",
+    "references": [
+        "GUID:9e04c6f1d83f64c85a18cbf2fcccc31c"
+    ],
+    "allowUnsafeCode": true
 }

@@ -1,5 +1,4 @@
 using Form;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Z_Code;
 using Z_Code.Form;
@@ -14,7 +13,6 @@ namespace Ui.ModStoryEventEditWindow
         public Transform parent;
         public UiContainer<UiUnitCtrl> con;
         public SyntaxNode node;
-        public int deepth;
         public string txt;
     }
     public partial class UiUnitModel
@@ -22,7 +20,6 @@ namespace Ui.ModStoryEventEditWindow
         public Transform parent;
         public UiContainer<UiUnitCtrl> con;
         public SyntaxNode node;
-        public int deepth;
         public string txt;
     }
     public partial class UiUnitCtrl
@@ -33,30 +30,35 @@ namespace Ui.ModStoryEventEditWindow
         {
             view.btn_.onClick.AddListener(() =>
             {
-                parent.SelUnit(model.node);
-
+                parent.parent.SelUnit(model.node, parent.model.prm.node);
             });
         }
         public override void OnEnable()
         {
+            if (param == null)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
             model.parent = param.parent;
             model.node = param.node;
-            model.deepth = param.deepth;
             model.txt = param.txt;
             model.con = param.con;
+            parent.RegisterRenderedUnit(this);
             Refresh();
         }
 
 
         public void Refresh()
         {
-            view.sta_.ChangeState(parent.model.selUnit != null && parent.model.selUnit == model.node ? 1 : 0);
+            RefreshSelection();
             gameObject.transform.parent = model.parent;
-            float height = 200f - 20 * model.deepth;
             if (model.node == null)
             {
                 view.txt_.text = model.txt;
                 view.btn_.gameObject.SetActive(false);
+                view.go_image.SetActive(false);
+                view.txt_.gameObject.SetActive(true);
             }
             else
             {
@@ -105,10 +107,15 @@ namespace Ui.ModStoryEventEditWindow
                         {
                             var evtData = EventProgramDataForm.DataByUid[evtId];
                             CreateTxt(evtData.name + "(");
+                            bool hasVisibleArgument = false;
                             for (int i = 0; i < model.node.subNodes.Count; i++)
                             {
-                                CreateTxt($"{(i > 0 ? "," : "")}param{i + 1}=");
-                                CreateNode(model.node.subNodes[i]);
+                                var argument = model.node.subNodes[i];
+                                if (!IsVisibleArgument(argument))
+                                    continue;
+                                CreateTxt($"{(hasVisibleArgument ? "," : "")}param{i + 1}=");
+                                CreateNode(argument);
+                                hasVisibleArgument = true;
                             }
                             CreateTxt(")");
                         }
@@ -121,29 +128,30 @@ namespace Ui.ModStoryEventEditWindow
                         view.txt_.text = model.node.desc.code;
                         break;
                 }
-                view.img_.gameObject.SetActive(AssetManager.instance.texCtrl.IsAsset(model.node.desc.code));
-                view.txt_.gameObject.SetActive(!AssetManager.instance.texCtrl.IsAsset(model.node.desc.code));
+                var isImage = AssetManager.instance.texCtrl.IsAsset(model.node.desc.code);
+                view.go_image.SetActive(isImage);
+                view.txt_.gameObject.SetActive(!isImage);
 
-                if (AssetManager.instance.texCtrl.IsAsset(model.node.desc.code))
+                if (isImage)
                 {
                     view.img_.BindTexData(TexAssetForm.DataById.GetDk(AssetManager.instance.texCtrl.GetId(model.node.desc.code), GlobalDefaultHelper.DefaultTexId));
                 }
             }
 
-            var size = view.rtf_root.sizeDelta;
-            size.y = height;
-            view.rtf_root.sizeDelta = size;
-            view.img_.rectTransform.sizeDelta = new Vector2(height, height);
+        }
 
-
+        public void RefreshSelection()
+        {
+            view.sta_.ChangeState(parent.parent.model.selUnit != null && parent.parent.model.selUnit == model.node ? 1 : 0);
         }
 
         private void CreateTxt(string desc)
         {
+            if (string.IsNullOrEmpty(desc))
+                return;
             model.con.Add(new UiUnitParam()
             {
                 con = model.con,
-                deepth = model.deepth + 1,
                 parent = view.rtf_root.transform,
                 txt = desc,
                 node = null
@@ -151,13 +159,20 @@ namespace Ui.ModStoryEventEditWindow
         }
         private void CreateNode(SyntaxNode node)
         {
+            if (!IsVisibleArgument(node))
+                return;
             model.con.Add(new UiUnitParam()
             {
                 con = model.con,
-                deepth = model.deepth + 1,
                 parent = view.rtf_root.transform,
                 node = node
             });
+        }
+
+        private static bool IsVisibleArgument(SyntaxNode node)
+        {
+            return node != null && !SyntaxAnalysis.IsEmptyArgumentNode(node) &&
+                   (node.desc.type != CodeType.Str || !string.IsNullOrEmpty(node.desc.code));
         }
     }
 }

@@ -799,15 +799,15 @@ namespace Form
 
                 {1000334,new Data(1000334,"NewVector","New vector","新建向量")},
 
-                {1000335,new Data(1000335,"ParameterDelta","Parameter delta","参数变化量")},
+                {1000335,new Data(1000335,"ParameterDelta","Parameter 3 (change)","参数3（变化量）")},
 
                 {1000336,new Data(1000336,"PlayAudio","Play audio","播放音频")},
 
                 {1000337,new Data(1000337,"Return","Return","返回")},
 
-                {1000338,new Data(1000338,"SelfCharacter","Self character","自身角色")},
+                {1000338,new Data(1000338,"SelfCharacter","Parameter 1 (character)","参数1（角色）")},
 
-                {1000339,new Data(1000339,"SelfSceneObject","Self scene object","自身场景物体")},
+                {1000339,new Data(1000339,"SelfSceneObject","Parameter 1 (scene object)","参数1（场景物体）")},
 
                 {1000340,new Data(1000340,"SetCharacterNavigate","Navigate character","角色寻路")},
 
@@ -845,11 +845,11 @@ namespace Form
 
                 {1000357,new Data(1000357,"StopCharacterNavigate","Stop character navigation","停止角色寻路")},
 
-                {1000358,new Data(1000358,"TargetSkill","Target skill","目标技能")},
+                {1000358,new Data(1000358,"TargetSkill","Parameter 2 (skill)","参数2（技能）")},
 
-                {1000359,new Data(1000359,"TriggerTargetCharacter","Trigger target character","触发目标角色")},
+                {1000359,new Data(1000359,"TriggerTargetCharacter","Parameter 2 (character)","参数2（角色）")},
 
-                {1000360,new Data(1000360,"TriggerTargetSceneObject","Trigger target scene object","触发目标场景物体")},
+                {1000360,new Data(1000360,"TriggerTargetSceneObject","Parameter 2 (scene object)","参数2（场景物体）")},
 
                 {1000361,new Data(1000361,"UseSkill","Use skill","使用技能")},
 

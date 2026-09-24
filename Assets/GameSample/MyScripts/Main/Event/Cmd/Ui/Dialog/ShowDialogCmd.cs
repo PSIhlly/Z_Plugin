@@ -39,7 +39,7 @@ namespace Z_Code
                     int handle = PlayManager.instance.assetCtrl.Add(texId, 1);
                     handles.Add(handle);
                     PlayManager.instance.assetCtrl.SetRemoveTime(handle, int.MaxValue);
-                    PlayManager.instance.assetCtrl.SetPos(handle, new Vector2(1 / 6f * (illustrationIndex + 1), 0), 0);
+                    PlayManager.instance.assetCtrl.SetPos(handle, new Vector2(1 / 6f * (illustrationIndex + 1), 0.3f), 0);
                 }
             }
 

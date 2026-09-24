@@ -280,9 +280,9 @@ namespace Ui.PlayMap
             view.btn_mark.onClick.AddListener(() =>
             {
                 var heap = new Dictionary<string, BoxDataForm.Data>();
-                heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, (model.prm.unit).productInfo.Item1.ToString()));
-                heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString()));
-                (model.prm.unit).ExecuteEvt("onClickMinimapEvent", null);
+                heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, (model.prm.unit).productInfo.Item1.ToString()));
+                heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString()));
+                (model.prm.unit).ExecuteEvt("onClickMinimapEvent", heap);
             });
         }
         public override void OnShow()

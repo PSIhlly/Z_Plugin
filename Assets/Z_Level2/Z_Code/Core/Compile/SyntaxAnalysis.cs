@@ -291,7 +291,7 @@ namespace Z_Code
         private SyntaxNode ParseAssignment()
         {
             var left = ParseLogicalOr();
-            if (Match("="))
+            if (Match("=", "+="))
             {
                 var op = Previous();
                 var right = ParseNested(Peek(), ParseAssignment);
@@ -401,6 +401,16 @@ namespace Z_Code
                     var memberNode = new SyntaxNode(new Desc(member.rawCode, CodeType.VarName, member.startIndex));
                     expression = BinaryNode(op, expression, memberNode);
                     continue;
+                }
+                if (Match("++"))
+                {
+                    var op = Previous();
+                    if (!IsAssignable(expression))
+                    {
+                        Report(op, "自增目标必须是变量或一层容器访问");
+                    }
+                    expression = new SyntaxNode(op.desc, new List<SyntaxNode> { expression });
+                    break;
                 }
                 break;
             }

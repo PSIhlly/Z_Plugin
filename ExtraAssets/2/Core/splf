@@ -112,5 +112,37 @@
     "lastUseTime": 0.0,
     "events": [],
     "triggerConditionUid": 0
+  },
+  {
+    "uid": 9,
+    "name": "剑弹",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 53,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 19
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
   }
 ]

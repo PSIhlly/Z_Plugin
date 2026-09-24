@@ -1,0 +1,3 @@
+interface:
+  display_name: "Webm to Gif"
+  short_description: "Convert WebM to GIF and report frame count"

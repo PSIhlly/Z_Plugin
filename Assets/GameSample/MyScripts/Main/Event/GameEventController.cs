@@ -556,16 +556,14 @@ public class GameEventController : Z_Controller<GameManager>
                 continue;
             LabForm.TryGetData(data.labId, out var lab);
             var cat = string.IsNullOrEmpty(lab?.lv1Lab) ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : lab.lv1Lab;
-            var type = string.IsNullOrEmpty(lab?.lv2Lab) ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : lab.lv2Lab;
             if (!res.subs.ContainsKey(cat))
             {
                 res.Add(cat);
             }
-            if (!res.subs[cat].subs.ContainsKey(type))
-            {
-                res.subs[cat].Add(type);
-            }
-            res.subs[cat].subs[type].Add(data.name, null, data.uid);
+            var name = data.name;
+            if (res.subs[cat].subs.ContainsKey(name))
+                name = $"{name} ({data.uid})";
+            res.subs[cat].Add(name, null, data.uid);
         }
         return res;
     }
@@ -607,15 +605,12 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 res.Add(category);
             }
-            string type = TextManager.instance.GetTxt(lab?.lv2Lab ?? string.Empty);
-            if (!res.subs[category].subs.ContainsKey(type))
-            {
-                res.subs[category].Add(type);
-            }
             string name = TextManager.instance.GetTxt(data.name);
-            res.subs[category].subs[type].Add(name, null, data.uid);
+            if (res.subs[category].subs.ContainsKey(name))
+                name = $"{name} ({data.uid})";
+            res.subs[category].Add(name, null, data.uid);
             if (defaultItem == null)
-                defaultItem = res.subs[category].subs[type].subs[name];
+                defaultItem = res.subs[category].subs[name];
         }
         return res;
     }

@@ -33,11 +33,10 @@ namespace Z_Code
             var to = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num))) + Vector3.up * 0.5f;
             var radius = prm[2].num;
             var res = MapManager.instance.utilCtrl.CaptureCast(from, to, radius);
-            res = MapManager.instance.utilCtrl.CaptureCast(from, to, radius);
             asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(1) };
             foreach (var u in res)
             {
-                if (u is ObjectUnit obj && obj.data.isObstacle)
+                if (u is TileUnit || (u is ObjectUnit obj && obj.data.isObstacle))
                 {
                     asyncTask.res[0].num = 0;
                     break;

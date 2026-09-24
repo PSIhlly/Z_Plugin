@@ -100,8 +100,8 @@ $excelChanges = @($gitStatus | Where-Object { $_ -match '\.xlsx?($|\")' })
 $previousConsoleEncoding = [Console]::OutputEncoding
 try {
     [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-    $trackedAssets = @(
-        & git -C $projectRootResolved -c core.quotepath=false ls-files -- Assets
+    $worktreeAssets = @(
+        & git -C $projectRootResolved -c core.quotepath=false ls-files --cached --others --exclude-standard -- Assets
     )
     if ($LASTEXITCODE -ne 0) {
         throw "git ls-files failed for '$projectRootResolved'."
@@ -113,7 +113,7 @@ finally {
 
 $missingMeta = [System.Collections.Generic.List[string]]::new()
 $orphanMeta = [System.Collections.Generic.List[string]]::new()
-foreach ($relativePath in $trackedAssets) {
+foreach ($relativePath in $worktreeAssets) {
     if ([string]::IsNullOrWhiteSpace($relativePath)) {
         continue
     }
@@ -122,6 +122,9 @@ foreach ($relativePath in $trackedAssets) {
     }
     $nativeRelative = $relativePath.Replace('/', [IO.Path]::DirectorySeparatorChar)
     $absolutePath = Join-Path $projectRootResolved $nativeRelative
+    if (-not (Test-Path -LiteralPath $absolutePath)) {
+        continue
+    }
     if ($relativePath.EndsWith('.meta', [StringComparison]::OrdinalIgnoreCase)) {
         $assetPath = $absolutePath.Substring(0, $absolutePath.Length - 5)
         if (-not (Test-Path -LiteralPath $assetPath)) {
@@ -135,7 +138,7 @@ foreach ($relativePath in $trackedAssets) {
 
 $excelLocks = @(
     Get-ChildItem -LiteralPath (Join-Path $projectRootResolved "Assets") `
-        -Recurse -File -Filter '~$*.xls' -ErrorAction SilentlyContinue |
+        -Recurse -File -Filter '~$*.xls*' -ErrorAction SilentlyContinue |
         ForEach-Object { $_.FullName.Substring($projectRootResolved.Length + 1) }
 )
 
@@ -281,11 +284,11 @@ Write-Output "Generated-area changes: $($generatedChanges.Count)"
 Write-Output "Excel changes: $($excelChanges.Count)"
 Write-Output "Managed Form sources/generated: $($managedSourceFormFiles.Count)/$($generatedFormFiles.Count)"
 Write-Output "Unmanaged/legacy workbook files: $($sourceFormFiles.Count - $managedSourceFormFiles.Count)"
-Write-Output "Tracked assets missing meta: $($missingMeta.Count)"
-Write-Output "Orphan tracked meta files: $($orphanMeta.Count)"
+Write-Output "Assets missing meta: $($missingMeta.Count)"
+Write-Output "Orphan meta files: $($orphanMeta.Count)"
 
-Write-List -Title "Tracked assets missing meta" -Values @($missingMeta)
-Write-List -Title "Orphan tracked meta files" -Values @($orphanMeta)
+Write-List -Title "Assets missing meta" -Values @($missingMeta)
+Write-List -Title "Orphan meta files" -Values @($orphanMeta)
 Write-List -Title "Missing generated Forms" -Values $missingGeneratedForms
 Write-List -Title "Potential orphan generated Forms" -Values $orphanGeneratedForms
 Write-List -Title "Excel lock files" -Values $excelLocks

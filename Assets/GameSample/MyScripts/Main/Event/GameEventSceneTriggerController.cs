@@ -162,20 +162,20 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 var heap = new Dictionary<string, BoxDataForm.Data>();
                 if (evt.a is CharacterUnit ch)
                 {
-                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch.productInfo.Item1.ToString()));
+                    heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch.productInfo.Item1.ToString()));
                 }
                 else if (evt.a is MapUnit sceneObject)
                 {
-                    heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, sceneObject.data.uid.ToString()));
+                    heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, sceneObject.data.uid.ToString()));
                 }
 
                 if (evt.b is CharacterUnit ch2)
                 {
-                    heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch2.productInfo.Item1.ToString()));
+                    heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, ch2.productInfo.Item1.ToString()));
                 }
                 else if (evt.b is MapUnit targetSceneObject)
                 {
-                    heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, targetSceneObject.data.uid.ToString()));
+                    heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, targetSceneObject.data.uid.ToString()));
                 }
 
                 switch (evt.type)
@@ -223,7 +223,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
     // Resolve supported lifecycle types before allocating the deferred callback.
     // Character Create uses a product reference; BoundaryTouch keeps a scene-unit
-    // reference, matching the existing event-language self contract.
+    // reference, matching the event-language param1 contract.
     private void QueueUnitEvent(MapUnit unit, MapEventType type,
         bool allowBoundaryTouch = false, bool characterOnCreate = false)
     {
@@ -274,7 +274,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     private static void ExecuteUnitEvent(MapUnit unit, string eventName, bool characterSelf)
     {
         var heap = new Dictionary<string, BoxDataForm.Data>();
-        heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(
+        heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(
             characterSelf ? GlobalEventHelper.CHARACTER : GlobalEventHelper.SCENEOBJECT,
             characterSelf ? unit.productInfo.Item1.ToString() : unit.data.uid.ToString()));
         unit.ExecuteEvt(eventName, heap);

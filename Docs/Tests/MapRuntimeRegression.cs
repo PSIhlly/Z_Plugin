@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,10 +33,13 @@ public static class MapRuntimeRegression
             SetUp();
             DictionaryQueries();
             Geometry();
+            CaptureCastWholeSegment();
             MapGroundCoverageCaching();
             Coverage();
+            LegacyPassTypeSceneData();
             PassTypeMovement();
             WangTileAnimationSelection();
+            ObjectWangTileNeighbourSelection();
             SharedAnimationClock();
             CanvasHolderResetAfterPoolTeardown();
             SparseViewRefreshAfterErase();
@@ -116,7 +120,7 @@ public static class MapRuntimeRegression
             int uid = 1 + x * 100 + y * 20 + z;
             var tile = new TileUnitForm.Data(uid, "", new Dictionary<int, int>(), new Vector3Int(x, y, z),
                 source.name, new Vector3(x, y * 1.5f, z), Vector3.zero, Vector3.one,
-                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
             map.data.RegisterMap(tile);
         }
 
@@ -139,7 +143,7 @@ public static class MapRuntimeRegression
     {
         return new CharacterUnitForm.Data(9001, false, Vector3.zero, 1, 1, 1, false, "",
             source.name, new Vector3(5, 0, 5), Vector3.zero, Vector3.one,
-            UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+            UpdateType.ShowOnly, new List<int>(), "", false, 0, new List<int>()).unit;
     }
 
     private static void Geometry()
@@ -178,6 +182,37 @@ public static class MapRuntimeRegression
         pool.AddPool(alternate);
         unit.data.prefabName = alternate.name;
         CompareGeometry(unit);
+    }
+
+    private static void CaptureCastWholeSegment()
+    {
+        var middleTile = map.utilCtrl.GetTile(5, 0, 2);
+        var upperTile = map.utilCtrl.GetTile(5, 1, 2);
+        var upperPrefab = Object.Instantiate(source);
+        objects.Add(upperPrefab);
+        upperPrefab.name = "downward-tile-collider";
+        var upperBox = upperPrefab.GetComponentInChildren<BoxCollider>();
+        upperBox.transform.localPosition = new Vector3(0, -0.8f, 0);
+        upperBox.transform.localEulerAngles = Vector3.zero;
+        upperBox.transform.localScale = Vector3.one;
+        upperBox.center = Vector3.zero;
+        upperBox.size = Vector3.one;
+        pool.AddPool(upperPrefab);
+
+        var originalPrefabName = upperTile.data.prefabName;
+        try
+        {
+            upperTile.data.prefabName = upperPrefab.name;
+            upperTile.InvalidateCollisionGeometry();
+            var hits = map.utilCtrl.CaptureCast(new Vector3(2, 0.6f, 2), new Vector3(8, 0.6f, 2), 0.1f);
+            Require(hits.Contains(middleTile), "CaptureCast includes a Tile collider between its endpoints");
+            Require(hits.Contains(upperTile), "CaptureCast includes a Tile collider extending down from a higher layer");
+        }
+        finally
+        {
+            upperTile.data.prefabName = originalPrefabName;
+            upperTile.InvalidateCollisionGeometry();
+        }
     }
 
     private sealed class HashProbe
@@ -306,6 +341,24 @@ public static class MapRuntimeRegression
         Require(ReferenceEquals(firstCache, caches[tile.data.uid]),
             "unchanged mapground reuses its covered-NavUnit cache");
 
+        groundCollider.center = new Vector3(0f, -2.31f, 0f); // top at lower floor + 0.19
+        tile.InvalidateCollisionGeometry();
+        caches.Remove(tile.data.uid); // simulate the prefab-edit cache invalidation
+        blocked.Clear();
+        mark.Invoke(map.navigationCtrl, new object[] { tile.data, blocked });
+        Require(!blocked.Contains((5, 0, 5)),
+            "mapground protruding 0.19 above the lower floor remains passable");
+
+        groundCollider.center = new Vector3(0f, -2.29f, 0f); // top at lower floor + 0.21
+        tile.InvalidateCollisionGeometry();
+        caches.Remove(tile.data.uid);
+        blocked.Clear();
+        mark.Invoke(map.navigationCtrl, new object[] { tile.data, blocked });
+        Require(blocked.Contains((5, 0, 5)),
+            "mapground protruding 0.21 above the lower floor blocks navigation");
+
+        groundCollider.center = new Vector3(0f, -1f, 0f);
+        tile.InvalidateCollisionGeometry();
         tile.data.pos += Vector3.up * 2f;
         tile.InvalidateCollisionGeometry();
         blocked.Clear();
@@ -327,7 +380,7 @@ public static class MapRuntimeRegression
     {
         var unit = new CharacterUnitForm.Data(9050, false, Vector3.zero, 1, 1, 1, false, "",
             source.name, new Vector3(5, 0, 5), Vector3.zero, Vector3.one * 3,
-            UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+            UpdateType.ShowOnly, new List<int>(), "", false, 0, new List<int>()).unit;
         var owner = map.utilCtrl.GetTile(5, 0, 5);
         var restricted = map.utilCtrl.GetTile(6, 0, 5);
         map.updateCtrl.characterTileDic.Add(unit, owner);
@@ -385,6 +438,22 @@ public static class MapRuntimeRegression
         map.updateCtrl.characterTileDic.Del(unit);
     }
 
+    private static void LegacyPassTypeSceneData()
+    {
+        var tile = new TileUnitForm.Data(9051, "", new Dictionary<int, int>(), new Vector3Int(4, 0, 4),
+            source.name, new Vector3(4, 0, 4), Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
+        var json = TileUnitForm.GetJoByData(tile);
+        json["passType"] = 7001;
+        var loaded = map.data.GetTileDatasByJa(new JArray(json).ToString());
+        Require(loaded.Count == 1 && loaded[0].passType.SequenceEqual(new[] { 7001 }),
+            "legacy scalar Tile passType loads as a one-element list");
+        json["passType"] = 0;
+        loaded = map.data.GetTileDatasByJa(new JArray(json).ToString());
+        Require(loaded.Count == 1 && loaded[0].passType.Count == 0,
+            "legacy unrestricted Tile passType loads as an empty list");
+    }
+
     private static Z_Map.Analysis.NavUnit NavUnit(int x, int z, int y = 0)
     {
         return new Z_Map.Analysis.NavUnit
@@ -425,6 +494,45 @@ public static class MapRuntimeRegression
             "front WangTile keeps an independent ordered animation sequence");
 
         clear.Invoke(null, null);
+    }
+
+    private static void ObjectWangTileNeighbourSelection()
+    {
+        var bits = typeof(GameMapController).GetMethod(
+            "GetObjectNeighbourBits", BindingFlags.Static | BindingFlags.NonPublic);
+        var center = new Bounds(Vector3.zero, new Vector3(2f, 1f, 4f));
+        int GetBits(Vector3 position, Vector3 size)
+            => (int)bits.Invoke(null, new object[] { center, new Bounds(position, size) });
+
+        var neighbours = new[]
+        {
+            (new Vector3(-2f, 0f, 4f), 0), (new Vector3(0f, 0f, 4f), 1),
+            (new Vector3(2f, 0f, 4f), 2), (new Vector3(-2f, 0f, 0f), 3),
+            (new Vector3(2f, 0f, 0f), 4), (new Vector3(-2f, 0f, -4f), 5),
+            (new Vector3(0f, 0f, -4f), 6), (new Vector3(2f, 0f, -4f), 7)
+        };
+        foreach (var (position, bit) in neighbours)
+            Require(GetBits(position, new Vector3(2f, 1f, 4f)) == 1 << bit,
+                "Object WangTile maps each side and corner to the TileHelper bit order");
+        Require(GetBits(new Vector3(2.1f, 0f, 0f), new Vector3(2f, 1f, 4f)) == 0,
+            "Object WangTile does not connect across a gap");
+        Require(GetBits(new Vector3(2f, 2f, 0f), new Vector3(2f, 1f, 4f)) == 0,
+            "Object WangTile does not connect at another height");
+
+        var clear = typeof(GameMapController).GetMethod(
+            "ClearWangTileAnimationTextures", BindingFlags.Static | BindingFlags.NonPublic);
+        var register = typeof(GameMapController).GetMethod(
+            "RegisterObjectWangTileAnimationTexture", BindingFlags.Static | BindingFlags.NonPublic);
+        var field = typeof(GameMapController).GetField(
+            "objectWangTileAnimationTextures", BindingFlags.Static | BindingFlags.NonPublic);
+        clear.Invoke(null, null);
+        register.Invoke(null, new object[] { 7601, AnimDirecton.Up, 1 << 2, 9701 });
+        register.Invoke(null, new object[] { 7601, AnimDirecton.Up, 1 << 2, 9702 });
+        var variants = (Dictionary<(int, AnimDirecton, int), List<int>>)field.GetValue(null);
+        Require(variants[(7601, AnimDirecton.Up, 1 << 2)].SequenceEqual(new[] { 9701, 9702 }),
+            "Object WangTile retains animation frames by direction and mask");
+        clear.Invoke(null, null);
+        Require(variants.Count == 0, "Object WangTile variants clear between scenes");
     }
 
     private static void SharedAnimationClock()
@@ -713,7 +821,7 @@ public static class MapRuntimeRegression
         {
             var tile = new TileUnitForm.Data(22000 + y, "", new Dictionary<int, int>(), new Vector3Int(14, y, 14),
                 source.name, new Vector3(14, y * 1.5f, 14), Vector3.zero, Vector3.one,
-                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
             map.data.RegisterMap(tile);
             column.Add(tile);
         }
@@ -755,7 +863,7 @@ public static class MapRuntimeRegression
         {
             var tile = new TileUnitForm.Data(23000 + x, "", new Dictionary<int, int>(), new Vector3Int(x, 0, 30),
                 source.name, new Vector3(x, 0, 30), Vector3.zero, Vector3.one,
-                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
             map.data.RegisterMap(tile);
             Probe(tile.unit);
             tiles.Add(tile);
@@ -812,12 +920,12 @@ public static class MapRuntimeRegression
         {
             var tile = new TileUnitForm.Data(20000 + y, "", new Dictionary<int, int>(), new Vector3Int(6, y, 6),
                 source.name, new Vector3(6, y * 1.5f, 6), Vector3.zero, Vector3.one,
-                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
             map.data.RegisterMap(tile);
         }
         var layerRelativeSeedData = new TileUnitForm.Data(20003, "", new Dictionary<int, int>(), new Vector3Int(6, 3, 1),
             source.name, new Vector3(6, 4.5f, 1), Vector3.zero, Vector3.one,
-            UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+            UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
         map.data.RegisterMap(layerRelativeSeedData);
         var surroundedPositions = new[]
         {
@@ -831,7 +939,7 @@ public static class MapRuntimeRegression
             var mapPos = surroundedPositions[i];
             var tile = new TileUnitForm.Data(20010 + i, "", new Dictionary<int, int>(), mapPos,
                 source.name, new Vector3(mapPos.x, mapPos.y * 1.5f, mapPos.z), Vector3.zero, Vector3.one,
-                UpdateType.ShowOnly, new List<int>(), "", false, false, 0);
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
             map.data.RegisterMap(tile);
         }
         foreach (var tile in map.data.maps.Values)
@@ -988,9 +1096,14 @@ public static class MapRuntimeRegression
             ctrl.OnEvent(new ItemEvent { unit = item, type = type });
             Require((ctrl.evts != null) == (type == MapEventType.Create), "item lifecycle filter");
             ctrl.evts = null;
-            ctrl.OnEvent(new ObjectEvent { unit = obj, type = type });
-            Require((ctrl.evts != null) == (type == MapEventType.Create || type == MapEventType.BoundaryTouch),
-                "object lifecycle filter");
+            // Remove requires the full GameManager event/task runtime; this isolated
+            // fixture only verifies the other Object lifecycle filters.
+            if (type != MapEventType.Remove)
+            {
+                ctrl.OnEvent(new ObjectEvent { unit = obj, type = type });
+                Require((ctrl.evts != null) == (type == MapEventType.Create || type == MapEventType.BoundaryTouch),
+                    "object lifecycle filter");
+            }
             ctrl.evts = null;
             ctrl.OnEvent(new CharacterEvent { unit = character, type = type });
             bool expected = type == MapEventType.Create || type == MapEventType.BoundaryTouch;

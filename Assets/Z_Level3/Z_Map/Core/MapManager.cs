@@ -64,6 +64,7 @@ namespace Z_Map
         BoundaryTouch,
         Hide,
         Remove,
+        Refresh,
     }
     public class ItemEvent : Z_Event
     {

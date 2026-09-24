@@ -66,6 +66,19 @@ namespace Z_DataSystem
 
     public static class AssetFilePicker
     {
+        public static void GetImage(Action<string> callback)
+        {
+#if UNITY_EDITOR_WIN
+            var files = GetFiles(
+                "Select image file",
+                "Image files\0*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp\0All files\0*.*\0\0",
+                false);
+            callback?.Invoke(files.Length > 0 ? files[0] : null);
+#else
+            NativeGallery.GetImageFromGallery(path => callback?.Invoke(path));
+#endif
+        }
+
         public static void GetImages(Action<string[]> callback)
         {
 #if UNITY_EDITOR_WIN
@@ -146,7 +159,7 @@ namespace Z_DataSystem
         private static extern bool GetOpenFileName(
             [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out] OpenFileName openFileName);
 
-        private static string[] GetFiles(string title, string filter)
+        private static string[] GetFiles(string title, string filter, bool allowMultiSelect = true)
         {
             var buffer = System.Runtime.InteropServices.Marshal.AllocHGlobal(MaxPathBuffer * sizeof(char));
             try
@@ -161,7 +174,8 @@ namespace Z_DataSystem
                     file = buffer,
                     maxFile = MaxPathBuffer,
                     title = title,
-                    flags = OfnExplorer | OfnAllowMultiSelect | OfnPathMustExist | OfnFileMustExist | OfnNoChangeDir
+                    flags = OfnExplorer | OfnPathMustExist | OfnFileMustExist | OfnNoChangeDir |
+                            (allowMultiSelect ? OfnAllowMultiSelect : 0)
                 };
                 if (!GetOpenFileName(openFileName))
                     return Array.Empty<string>();

@@ -43,6 +43,7 @@ namespace Ui.EventCustomTrigger
         }
         public override void OnShow()
         {
+            Refresh();
         }
  
         public void Set(UiEventCustomTriggerParam prm)
@@ -52,12 +53,17 @@ namespace Ui.EventCustomTrigger
         }
         public void Refresh()
         {
+            if (model.prm?.dic == null || string.IsNullOrEmpty(model.prm.defaultKey))
+                return;
+
             con.Clear();
-            foreach (var trigger in model.prm.dic.Values)
-            {
-                if (trigger.name.StartsWith(model.prm.defaultKey.Split("$")[0] + "$"))
-                    con.Add(new UiTriggerParam() { data = trigger });
-            }
+            string prefix = model.prm.defaultKey.Split('$')[0] + "$";
+            foreach (var trigger in model.prm.dic.Values
+                         .Where(trigger => trigger?.name != null && trigger.name.StartsWith(prefix, StringComparison.Ordinal))
+                         .OrderBy(trigger => trigger.evt == null || trigger.evt.Count == 0
+                             ? int.MaxValue : trigger.evt.Min())
+                         .ThenBy(trigger => trigger.name, StringComparer.Ordinal))
+                con.Add(new UiTriggerParam() { data = trigger });
             con.Add(new UiTriggerParam() { data = null });
             con.Refresh();
 
@@ -66,7 +72,8 @@ namespace Ui.EventCustomTrigger
 
         public void OnEvent(EventModifyEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
     }
 

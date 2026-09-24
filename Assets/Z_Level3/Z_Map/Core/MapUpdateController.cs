@@ -261,6 +261,7 @@ namespace Z_Map
             }
             else if (unit is ObjectUnit ob)
             {
+                RefreshObjectOverlap(ob);
                 foreach (var tile in objectTileDic.Get(ob))
                 {
                     if (tile.isShowing)
@@ -269,6 +270,11 @@ namespace Z_Map
                         curObjectLst.Add(ob.data);
                     }
                 }
+                Z_EventHelper.Invoke(new ObjectEvent
+                {
+                    type = MapEventType.Refresh,
+                    unit = ob
+                });
             }
 
         }

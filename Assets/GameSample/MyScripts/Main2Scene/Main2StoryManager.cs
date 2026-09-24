@@ -58,7 +58,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var wall = new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id,
                 new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true, 1),
                 defaultObjectLabId, true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
-                GlobalDefaultHelper.DefaultTexId, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>());
+                GlobalDefaultHelper.DefaultTexId, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false);
             wall.EnsureDirectionData();
             wall.SyncLegacyAnimClip(AnimDirecton.Fixed);
             MapObjectForm.AddData(wall);
@@ -127,6 +127,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
 
     private readonly List<int> wangTileGameTexIds = new List<int>();
+    private readonly Dictionary<int, List<int>> objectWangTileGameTexIds = new Dictionary<int, List<int>>();
 
     private void CreateWangTileTextures()
     {
@@ -141,21 +142,95 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             if (mapTexture.enableFrontPart && mapTexture.frontIsWangTile)
                 CreateWangTileTextureVariants(mapTexture, mapTexture.frontPartTexs, mapTexture.FrontWangTileDic, true);
         }
+
+        foreach (MapObjectForm.Data mapObject in MapObjectForm.DataById.Values)
+            CreateObjectWangTileTextures(mapObject);
+    }
+
+    private void CreateObjectWangTileTextures(MapObjectForm.Data mapObject)
+    {
+        if (!mapObject.isWangTile)
+            return;
+
+        mapObject.EnsureDirectionData();
+        if (mapObject.faceType == FaceType.FourDirection)
+        {
+            foreach (AnimDirecton direction in new[]
+                     { AnimDirecton.Up, AnimDirecton.Down, AnimDirecton.Left, AnimDirecton.Right })
+                CreateObjectWangTileTextureVariants(mapObject, direction);
+        }
+        else
+        {
+            CreateObjectWangTileTextureVariants(mapObject, AnimDirecton.Fixed);
+        }
+    }
+
+    public void RefreshObjectWangTileTextures(MapObjectForm.Data mapObject)
+    {
+        if (mapObject == null || GameManager.instance.curScene == null)
+            return;
+
+        GameMapController.ClearObjectWangTileAnimationTextures(mapObject.id);
+        if (objectWangTileGameTexIds.TryGetValue(mapObject.id, out List<int> ids))
+        {
+            foreach (int texId in ids)
+            {
+                if (!GameTexAssetForm.DataById.TryGetValue(texId, out GameTexAssetForm.Data data))
+                    continue;
+                if (data.asset is Texture texture)
+                    Destroy(texture);
+                GameTexAssetForm.RemoveData(texId);
+            }
+            var obsolete = new HashSet<int>(ids);
+            wangTileGameTexIds.RemoveAll(obsolete.Contains);
+            objectWangTileGameTexIds.Remove(mapObject.id);
+        }
+
+        CreateObjectWangTileTextures(mapObject);
+        GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(mapObject.id);
+    }
+
+    private void CreateObjectWangTileTextureVariants(MapObjectForm.Data mapObject, AnimDirecton direction)
+    {
+        CreateWangTileTextureVariants($"ObjectWangTile_{mapObject.id}_{direction}",
+            mapObject.GetAnimClip(direction),
+            (mask, textureId) => GameMapController.RegisterObjectWangTileAnimationTexture(
+                mapObject.id, direction, mask, textureId),
+            textureId =>
+            {
+                if (!objectWangTileGameTexIds.TryGetValue(mapObject.id, out List<int> ids))
+                {
+                    ids = new List<int>();
+                    objectWangTileGameTexIds.Add(mapObject.id, ids);
+                }
+                ids.Add(textureId);
+            });
     }
 
     private void CreateWangTileTextureVariants(MapTextureForm.Data mapTexture, List<int> textures,
         Dictionary<int, int> variants, bool frontPart)
     {
+        string partName = frontPart ? "FrontWangTile" : "WangTile";
+        CreateWangTileTextureVariants($"{partName}_{mapTexture.id}", textures, (mask, textureId) =>
+        {
+            if (!variants.ContainsKey(mask))
+                variants[mask] = textureId;
+            GameMapController.RegisterWangTileAnimationTexture(mapTexture.id, frontPart, mask, textureId);
+        });
+    }
+
+    private void CreateWangTileTextureVariants(string variantName, List<int> textures,
+        Action<int, int> registerVariant, Action<int> registerGeneratedTexture = null)
+    {
         if (textures == null || textures.Count == 0)
             return;
 
-        string partName = frontPart ? "FrontWangTile" : "WangTile";
         for (int frameIndex = 0; frameIndex < textures.Count; frameIndex++)
         {
             TexAssetForm.Data sourceData = TexAssetForm.DataById.GetDv(textures[frameIndex], null);
             if (!(sourceData?.GetTex() is Texture2D sourceTexture))
             {
-                Debug.LogError($"{partName} '{mapTexture.name}' frame {frameIndex} has no Texture2D source.");
+                Debug.LogError($"{variantName} frame {frameIndex} has no Texture2D source.");
                 continue;
             }
 
@@ -171,7 +246,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                     {
                         TexAssetForm.Data generatedData = new TexAssetForm.Data(
                             -1,
-                            $"{partName}_{mapTexture.id}_{frameIndex}_{texIdBySprite.Count}",
+                            $"{variantName}_{frameIndex}_{texIdBySprite.Count}",
                             string.Empty,
                             null,
                             string.Empty,
@@ -181,17 +256,15 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                         texId = generatedData.id;
                         texIdBySprite.Add(pair.Value, texId);
                         wangTileGameTexIds.Add(texId);
+                        registerGeneratedTexture?.Invoke(texId);
                     }
 
-                    if (!variants.ContainsKey(pair.Key))
-                        variants[pair.Key] = texId;
-                    GameMapController.RegisterWangTileAnimationTexture(
-                        mapTexture.id, frontPart, pair.Key, texId);
+                    registerVariant(pair.Key, texId);
                 }
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Failed to create {partName} '{mapTexture.name}' frame {frameIndex}: {exception.Message}");
+                Debug.LogError($"Failed to create {variantName} frame {frameIndex}: {exception.Message}");
             }
             finally
             {
@@ -215,6 +288,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             GameTexAssetForm.RemoveData(texId);
         }
         wangTileGameTexIds.Clear();
+        objectWangTileGameTexIds.Clear();
 
         foreach (MapTextureForm.Data mapTexture in MapTextureForm.DataById.Values)
         {

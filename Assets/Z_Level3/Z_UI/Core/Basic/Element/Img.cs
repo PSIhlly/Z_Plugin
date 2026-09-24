@@ -7,7 +7,6 @@ using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Language;
 using Z_Texture;
-using Z_Time;
 
 namespace Z_Ui.Base
 {
@@ -18,9 +17,10 @@ namespace Z_Ui.Base
         public Sprite en;
 
         private TexAssetForm.Data _texData;
-        private Timer _gifTimer;
-        private int _gifFrameIndex;
-        private List<Sprite> _gifSprites;
+        private Coroutine _animationCoroutine;
+        private int _animationFrameIndex;
+        private IReadOnlyList<AnimatedFrameData> _animationFrames;
+        private IReadOnlyList<Sprite> _animationSprites;
 
         public void BindTexData(TexAssetForm.Data data)
         {
@@ -31,25 +31,18 @@ namespace Z_Ui.Base
                 sprite = null;
                 return;
             }
-            if (data.isGif)
+            if (data.isGif || data.isWebP)
             {
-                _gifSprites = data.GetGifSprites();
-                if (_gifSprites == null || _gifSprites.Count <= 1)
+                _animationFrames = data.GetAnimationFrames();
+                _animationSprites = data.GetAnimationSprites();
+                if (_animationFrames == null || _animationSprites == null || _animationSprites.Count == 0)
                 {
-                    sprite = data.GetSprite();
+                    sprite = null;
                     return;
                 }
-                var frames = data.GetGifFrames();
-                _gifFrameIndex = 0;
-                sprite = _gifSprites[0];
-                _gifTimer = TimeManager.instance.StartTimerImmediate(0, frames[0].delaySeconds, () =>
-                {
-                    _gifFrameIndex = (_gifFrameIndex + 1) % _gifSprites.Count;
-                    if (this == null || gameObject == null)
-                        return true;
-                    sprite = _gifSprites[_gifFrameIndex];
-                    return false;
-                }, this);
+                _animationFrameIndex = 0;
+                sprite = _animationSprites[0];
+                StartAnimation();
             }
             else
             {
@@ -59,13 +52,37 @@ namespace Z_Ui.Base
 
         public void UnbindTexData()
         {
-            if (_gifTimer != null)
-            {
-                TimeManager.instance.CancelTimer(_gifTimer);
-                _gifTimer = null;
-            }
+            StopAnimation();
             _texData = null;
-            _gifSprites = null;
+            _animationFrames = null;
+            _animationSprites = null;
+        }
+
+        private void StartAnimation()
+        {
+            if (_animationCoroutine == null && isActiveAndEnabled && _animationSprites != null && _animationSprites.Count > 1)
+                _animationCoroutine = StartCoroutine(PlayAnimation());
+        }
+
+        private void StopAnimation()
+        {
+            if (_animationCoroutine == null)
+                return;
+            StopCoroutine(_animationCoroutine);
+            _animationCoroutine = null;
+        }
+
+        private IEnumerator PlayAnimation()
+        {
+            while (_animationFrames != null && _animationSprites != null)
+            {
+                yield return new WaitForSeconds(Mathf.Max(0.02f, _animationFrames[_animationFrameIndex].delaySeconds));
+                if (_animationFrames == null || _animationSprites == null)
+                    break;
+                _animationFrameIndex = (_animationFrameIndex + 1) % _animationSprites.Count;
+                sprite = _animationSprites[_animationFrameIndex];
+            }
+            _animationCoroutine = null;
         }
 
         protected override void OnDestroy()
@@ -92,6 +109,15 @@ namespace Z_Ui.Base
                     break;
             }
             base.OnEnable();
+            if (_animationSprites != null && _animationSprites.Count > 0)
+                sprite = _animationSprites[_animationFrameIndex];
+            StartAnimation();
+        }
+
+        protected override void OnDisable()
+        {
+            StopAnimation();
+            base.OnDisable();
         }
     }
 }

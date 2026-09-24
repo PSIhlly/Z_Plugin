@@ -108,6 +108,19 @@ namespace Z_Code
 
         private void BuildStatement(List<string> commands, SyntaxNode node)
         {
+            if (node?.desc?.type == CodeType.Operator)
+            {
+                if (node.desc.code == "++")
+                {
+                    BuildPostIncrement(commands, node);
+                    return;
+                }
+                if (node.desc.code == "+=")
+                {
+                    BuildAddAssign(commands, node);
+                    return;
+                }
+            }
             if (node?.desc?.type == CodeType.FuncName)
             {
                 BuildCall(commands, node, true);
@@ -183,7 +196,18 @@ namespace Z_Code
                     }
                     else
                     {
-                        BuildZl(commands, node.subNodes[0]);
+                        var expression = node.subNodes[0];
+                        if (expression.desc.type == CodeType.Operator && expression.desc.code == "++")
+                        {
+                            RequireChildren(expression, 1);
+                            BuildZl(commands, expression.subNodes[0]);
+                            AddCmd(commands, Op.Ret, codeIndex);
+                            // Return i++ follows the requested statement order: Return i; i++;
+                            // The increment is unreachable after Ret.
+                            BuildPostIncrement(commands, expression);
+                            return;
+                        }
+                        BuildZl(commands, expression);
                     }
                     AddCmd(commands, Op.Ret, codeIndex);
                     return;
@@ -306,6 +330,9 @@ namespace Z_Code
         {
             switch (node.desc.code)
             {
+                case "++":
+                case "+=":
+                    throw new InvalidOperationException($"{node.desc.code} 只能用作独立语句或 for 子句");
                 case "&&":
                     BuildLogicalAnd(commands, node);
                     return;
@@ -365,6 +392,22 @@ namespace Z_Code
                 case "[": AddCmd(commands, Op.Take, node.desc.codeIndex); break;
                 default: throw new InvalidOperationException($"未知运算符 {node.desc.code}");
             }
+        }
+
+        private void BuildPostIncrement(List<string> commands, SyntaxNode node)
+        {
+            RequireChildren(node, 1);
+            PushNumber(commands, "1", node.desc.codeIndex);
+            BuildZl(commands, node.subNodes[0]);
+            AddCmd(commands, Op.AddAssign, node.desc.codeIndex);
+        }
+
+        private void BuildAddAssign(List<string> commands, SyntaxNode node)
+        {
+            RequireChildren(node, 2);
+            BuildZl(commands, node.subNodes[0]);
+            BuildZl(commands, node.subNodes[1]);
+            AddCmd(commands, Op.AddAssign, node.desc.codeIndex);
         }
 
         private void BuildLogicalAnd(List<string> commands, SyntaxNode node)

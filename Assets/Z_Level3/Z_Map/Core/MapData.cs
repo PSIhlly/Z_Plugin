@@ -180,7 +180,7 @@ namespace Z_Map
 
         public virtual CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
         {
-            return new CharacterUnitForm.Data(-1, false, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
+            return new CharacterUnitForm.Data(-1, false, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0,new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId, new List<int>());
         }
         public virtual void RegisterNewCharacter(CharacterUnitForm.Data data)
         {
@@ -240,7 +240,7 @@ namespace Z_Map
 
         public virtual TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
         {
-            return new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("mapground"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false, 0);
+            return new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("mapground"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false, new List<int>());
         }
         public virtual void RegisterNewTile(TileUnitForm.Data data)
         {
@@ -248,7 +248,20 @@ namespace Z_Map
         }
         public virtual List<TileUnitForm.Data> GetTileDatasByJa(string ja)
         {
-            return TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
+            var data = JArray.Parse(ja);
+            foreach (JObject tile in data)
+            {
+                // Older scenes stored one passType as an integer. The generated List<int>
+                // reader expects its normal [{"v": id}] representation.
+                if (tile["passType"]?.Type == JTokenType.Integer)
+                {
+                    int id = tile.Value<int>("passType");
+                    tile["passType"] = id == 0
+                        ? new JArray()
+                        : new JArray(new JObject { ["v"] = id });
+                }
+            }
+            return TileUnitForm.GetDatasByJa(data);
         }
 
         public virtual bool CheckItemUnit(ItemUnitForm.Data item)

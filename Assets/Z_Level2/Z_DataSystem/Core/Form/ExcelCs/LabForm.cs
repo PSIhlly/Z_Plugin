@@ -235,16 +235,6 @@ public static readonly int autoIdCnt=10000;
                 }
             }
     
-            static Dictionary<(string,string,string,string), Data> _DataByLv1labLv2labLv3labBelong;
-            public static Dictionary<(string,string,string,string), Data> DataByLv1labLv2labLv3labBelong
-            {
-                get
-                {
-                    Init();
-                    return _DataByLv1labLv2labLv3labBelong;
-                }
-            }
-    
 
         static public void Init()
         {
@@ -260,118 +250,59 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                 _DataById = new Dictionary<int, Data>() {
 
-                {10001,new Data(10001,"basic","audio","","GameCmdDataForm")},
+                {10001,new Data(10001,"basic","","","GameCmdDataForm")},
 
-                {10002,new Data(10002,"basic","const","","GameCmdDataForm")},
+                {10002,new Data(10002,"basic","","","GameCmdDataForm")},
 
-                {10003,new Data(10003,"basic","list","","GameCmdDataForm")},
+                {10003,new Data(10003,"basic","","","GameCmdDataForm")},
 
-                {10004,new Data(10004,"basic","math","","GameCmdDataForm")},
+                {10004,new Data(10004,"basic","","","GameCmdDataForm")},
 
-                {10005,new Data(10005,"basic","process","","GameCmdDataForm")},
+                {10005,new Data(10005,"basic","","","GameCmdDataForm")},
 
-                {10006,new Data(10006,"basic","variable","","GameCmdDataForm")},
+                {10006,new Data(10006,"basic","","","GameCmdDataForm")},
 
-                {10007,new Data(10007,"character","anim","","GameCmdDataForm")},
+                {10007,new Data(10007,"character","","","GameCmdDataForm")},
 
-                {10008,new Data(10008,"character","detect","","GameCmdDataForm")},
+                {10008,new Data(10008,"character","","","GameCmdDataForm")},
 
-                {10009,new Data(10009,"character","parameter","","GameCmdDataForm")},
+                {10009,new Data(10009,"character","","","GameCmdDataForm")},
 
-                {10010,new Data(10010,"character","skill","","GameCmdDataForm")},
+                {10010,new Data(10010,"character","","","GameCmdDataForm")},
 
-                {10011,new Data(10011,"character","system","","GameCmdDataForm")},
+                {10011,new Data(10011,"character","","","GameCmdDataForm")},
 
-                {10012,new Data(10012,"character","transform","","GameCmdDataForm")},
+                {10012,new Data(10012,"character","","","GameCmdDataForm")},
 
-                {10013,new Data(10013,"effect","system","","GameCmdDataForm")},
+                {10013,new Data(10013,"effect","","","GameCmdDataForm")},
 
-                {10014,new Data(10014,"item","backpack","","GameCmdDataForm")},
+                {10014,new Data(10014,"item","","","GameCmdDataForm")},
 
-                {10015,new Data(10015,"mission","system","","GameCmdDataForm")},
+                {10015,new Data(10015,"mission","","","GameCmdDataForm")},
 
-                {10016,new Data(10016,"sceneObject","detect","","GameCmdDataForm")},
+                {10016,new Data(10016,"sceneObject","","","GameCmdDataForm")},
 
-                {10017,new Data(10017,"sceneObject","parameter","","GameCmdDataForm")},
+                {10017,new Data(10017,"sceneObject","","","GameCmdDataForm")},
 
-                {10018,new Data(10018,"sceneObject","system","","GameCmdDataForm")},
+                {10018,new Data(10018,"sceneObject","","","GameCmdDataForm")},
 
-                {10019,new Data(10019,"sceneObject","transform","","GameCmdDataForm")},
+                {10019,new Data(10019,"sceneObject","","","GameCmdDataForm")},
 
-                {10020,new Data(10020,"skill","parameter","","GameCmdDataForm")},
+                {10020,new Data(10020,"skill","","","GameCmdDataForm")},
 
-                {10021,new Data(10021,"skill","system","","GameCmdDataForm")},
+                {10021,new Data(10021,"skill","","","GameCmdDataForm")},
 
-                {10022,new Data(10022,"ui","dialog","","GameCmdDataForm")},
+                {10022,new Data(10022,"ui","","","GameCmdDataForm")},
 
-                {10023,new Data(10023,"ui","image","","GameCmdDataForm")},
+                {10023,new Data(10023,"ui","","","GameCmdDataForm")},
 
-                {10024,new Data(10024,"ui","notice","","GameCmdDataForm")},
+                {10024,new Data(10024,"ui","","","GameCmdDataForm")},
 
-                {10025,new Data(10025,"ui","window","","GameCmdDataForm")},
+                {10025,new Data(10025,"ui","","","GameCmdDataForm")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
-                    _DataByLv1labLv2labLv3labBelong = new Dictionary<(string,string,string,string), Data>() {
-    
-                        {("basic","audio","","GameCmdDataForm"),_DataById[10001]},
-    
-                        {("basic","const","","GameCmdDataForm"),_DataById[10002]},
-    
-                        {("basic","list","","GameCmdDataForm"),_DataById[10003]},
-    
-                        {("basic","math","","GameCmdDataForm"),_DataById[10004]},
-    
-                        {("basic","process","","GameCmdDataForm"),_DataById[10005]},
-    
-                        {("basic","variable","","GameCmdDataForm"),_DataById[10006]},
-    
-                        {("character","anim","","GameCmdDataForm"),_DataById[10007]},
-    
-                        {("character","detect","","GameCmdDataForm"),_DataById[10008]},
-    
-                        {("character","parameter","","GameCmdDataForm"),_DataById[10009]},
-    
-                        {("character","skill","","GameCmdDataForm"),_DataById[10010]},
-    
-                        {("character","system","","GameCmdDataForm"),_DataById[10011]},
-    
-                        {("character","transform","","GameCmdDataForm"),_DataById[10012]},
-    
-                        {("effect","system","","GameCmdDataForm"),_DataById[10013]},
-    
-                        {("item","backpack","","GameCmdDataForm"),_DataById[10014]},
-    
-                        {("mission","system","","GameCmdDataForm"),_DataById[10015]},
-    
-                        {("sceneObject","detect","","GameCmdDataForm"),_DataById[10016]},
-    
-                        {("sceneObject","parameter","","GameCmdDataForm"),_DataById[10017]},
-    
-                        {("sceneObject","system","","GameCmdDataForm"),_DataById[10018]},
-    
-                        {("sceneObject","transform","","GameCmdDataForm"),_DataById[10019]},
-    
-                        {("skill","parameter","","GameCmdDataForm"),_DataById[10020]},
-    
-                        {("skill","system","","GameCmdDataForm"),_DataById[10021]},
-    
-                        {("ui","dialog","","GameCmdDataForm"),_DataById[10022]},
-    
-                        {("ui","image","","GameCmdDataForm"),_DataById[10023]},
-    
-                        {("ui","notice","","GameCmdDataForm"),_DataById[10024]},
-    
-                        {("ui","window","","GameCmdDataForm"),_DataById[10025]},
-    
-                    
-                    };
-                    foreach(var v in _DataById.Values)
-                    {
-                        _DatasHashSet.Add(v);
-                    }
-    
                     _DatasByLv1labBelong = new Dictionary<(string,string), List<Data>>() {
     
                             {("basic","GameCmdDataForm"),new List<Data>()},
@@ -444,211 +375,143 @@ idChain=new Z_Chain.Chain (autoIdCnt);
 
                     _DatasByLv1labLv2labBelong = new Dictionary<(string,string,string), List<Data>>() {
     
-                            {("basic","audio","GameCmdDataForm"),new List<Data>()},
+                            {("basic","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","const","GameCmdDataForm"),new List<Data>()},
+                            {("character","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","list","GameCmdDataForm"),new List<Data>()},
+                            {("effect","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","math","GameCmdDataForm"),new List<Data>()},
+                            {("item","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","process","GameCmdDataForm"),new List<Data>()},
+                            {("mission","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","variable","GameCmdDataForm"),new List<Data>()},
+                            {("sceneObject","","GameCmdDataForm"),new List<Data>()},
         
-                            {("character","anim","GameCmdDataForm"),new List<Data>()},
+                            {("skill","","GameCmdDataForm"),new List<Data>()},
         
-                            {("character","detect","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","parameter","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","skill","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","system","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","transform","GameCmdDataForm"),new List<Data>()},
-        
-                            {("effect","system","GameCmdDataForm"),new List<Data>()},
-        
-                            {("item","backpack","GameCmdDataForm"),new List<Data>()},
-        
-                            {("mission","system","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","detect","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","parameter","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","system","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","transform","GameCmdDataForm"),new List<Data>()},
-        
-                            {("skill","parameter","GameCmdDataForm"),new List<Data>()},
-        
-                            {("skill","system","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","dialog","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","image","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","notice","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","window","GameCmdDataForm"),new List<Data>()},
+                            {("ui","","GameCmdDataForm"),new List<Data>()},
         
                 };
 
-                    _DatasByLv1labLv2labBelong[("basic","audio","GameCmdDataForm")].Add(_DataById[10001]);
+                    _DatasByLv1labLv2labBelong[("basic","","GameCmdDataForm")].Add(_DataById[10001]);
 
-                    _DatasByLv1labLv2labBelong[("basic","const","GameCmdDataForm")].Add(_DataById[10002]);
+                    _DatasByLv1labLv2labBelong[("basic","","GameCmdDataForm")].Add(_DataById[10002]);
 
-                    _DatasByLv1labLv2labBelong[("basic","list","GameCmdDataForm")].Add(_DataById[10003]);
+                    _DatasByLv1labLv2labBelong[("basic","","GameCmdDataForm")].Add(_DataById[10003]);
 
-                    _DatasByLv1labLv2labBelong[("basic","math","GameCmdDataForm")].Add(_DataById[10004]);
+                    _DatasByLv1labLv2labBelong[("basic","","GameCmdDataForm")].Add(_DataById[10004]);
 
-                    _DatasByLv1labLv2labBelong[("basic","process","GameCmdDataForm")].Add(_DataById[10005]);
+                    _DatasByLv1labLv2labBelong[("basic","","GameCmdDataForm")].Add(_DataById[10005]);
 
-                    _DatasByLv1labLv2labBelong[("basic","variable","GameCmdDataForm")].Add(_DataById[10006]);
+                    _DatasByLv1labLv2labBelong[("basic","","GameCmdDataForm")].Add(_DataById[10006]);
 
-                    _DatasByLv1labLv2labBelong[("character","anim","GameCmdDataForm")].Add(_DataById[10007]);
+                    _DatasByLv1labLv2labBelong[("character","","GameCmdDataForm")].Add(_DataById[10007]);
 
-                    _DatasByLv1labLv2labBelong[("character","detect","GameCmdDataForm")].Add(_DataById[10008]);
+                    _DatasByLv1labLv2labBelong[("character","","GameCmdDataForm")].Add(_DataById[10008]);
 
-                    _DatasByLv1labLv2labBelong[("character","parameter","GameCmdDataForm")].Add(_DataById[10009]);
+                    _DatasByLv1labLv2labBelong[("character","","GameCmdDataForm")].Add(_DataById[10009]);
 
-                    _DatasByLv1labLv2labBelong[("character","skill","GameCmdDataForm")].Add(_DataById[10010]);
+                    _DatasByLv1labLv2labBelong[("character","","GameCmdDataForm")].Add(_DataById[10010]);
 
-                    _DatasByLv1labLv2labBelong[("character","system","GameCmdDataForm")].Add(_DataById[10011]);
+                    _DatasByLv1labLv2labBelong[("character","","GameCmdDataForm")].Add(_DataById[10011]);
 
-                    _DatasByLv1labLv2labBelong[("character","transform","GameCmdDataForm")].Add(_DataById[10012]);
+                    _DatasByLv1labLv2labBelong[("character","","GameCmdDataForm")].Add(_DataById[10012]);
 
-                    _DatasByLv1labLv2labBelong[("effect","system","GameCmdDataForm")].Add(_DataById[10013]);
+                    _DatasByLv1labLv2labBelong[("effect","","GameCmdDataForm")].Add(_DataById[10013]);
 
-                    _DatasByLv1labLv2labBelong[("item","backpack","GameCmdDataForm")].Add(_DataById[10014]);
+                    _DatasByLv1labLv2labBelong[("item","","GameCmdDataForm")].Add(_DataById[10014]);
 
-                    _DatasByLv1labLv2labBelong[("mission","system","GameCmdDataForm")].Add(_DataById[10015]);
+                    _DatasByLv1labLv2labBelong[("mission","","GameCmdDataForm")].Add(_DataById[10015]);
 
-                    _DatasByLv1labLv2labBelong[("sceneObject","detect","GameCmdDataForm")].Add(_DataById[10016]);
+                    _DatasByLv1labLv2labBelong[("sceneObject","","GameCmdDataForm")].Add(_DataById[10016]);
 
-                    _DatasByLv1labLv2labBelong[("sceneObject","parameter","GameCmdDataForm")].Add(_DataById[10017]);
+                    _DatasByLv1labLv2labBelong[("sceneObject","","GameCmdDataForm")].Add(_DataById[10017]);
 
-                    _DatasByLv1labLv2labBelong[("sceneObject","system","GameCmdDataForm")].Add(_DataById[10018]);
+                    _DatasByLv1labLv2labBelong[("sceneObject","","GameCmdDataForm")].Add(_DataById[10018]);
 
-                    _DatasByLv1labLv2labBelong[("sceneObject","transform","GameCmdDataForm")].Add(_DataById[10019]);
+                    _DatasByLv1labLv2labBelong[("sceneObject","","GameCmdDataForm")].Add(_DataById[10019]);
 
-                    _DatasByLv1labLv2labBelong[("skill","parameter","GameCmdDataForm")].Add(_DataById[10020]);
+                    _DatasByLv1labLv2labBelong[("skill","","GameCmdDataForm")].Add(_DataById[10020]);
 
-                    _DatasByLv1labLv2labBelong[("skill","system","GameCmdDataForm")].Add(_DataById[10021]);
+                    _DatasByLv1labLv2labBelong[("skill","","GameCmdDataForm")].Add(_DataById[10021]);
 
-                    _DatasByLv1labLv2labBelong[("ui","dialog","GameCmdDataForm")].Add(_DataById[10022]);
+                    _DatasByLv1labLv2labBelong[("ui","","GameCmdDataForm")].Add(_DataById[10022]);
 
-                    _DatasByLv1labLv2labBelong[("ui","image","GameCmdDataForm")].Add(_DataById[10023]);
+                    _DatasByLv1labLv2labBelong[("ui","","GameCmdDataForm")].Add(_DataById[10023]);
 
-                    _DatasByLv1labLv2labBelong[("ui","notice","GameCmdDataForm")].Add(_DataById[10024]);
+                    _DatasByLv1labLv2labBelong[("ui","","GameCmdDataForm")].Add(_DataById[10024]);
 
-                    _DatasByLv1labLv2labBelong[("ui","window","GameCmdDataForm")].Add(_DataById[10025]);
+                    _DatasByLv1labLv2labBelong[("ui","","GameCmdDataForm")].Add(_DataById[10025]);
 
                     _DatasByLv1labLv2labLv3labBelong = new Dictionary<(string,string,string,string), List<Data>>() {
     
-                            {("basic","audio","","GameCmdDataForm"),new List<Data>()},
+                            {("basic","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","const","","GameCmdDataForm"),new List<Data>()},
+                            {("character","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","list","","GameCmdDataForm"),new List<Data>()},
+                            {("effect","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","math","","GameCmdDataForm"),new List<Data>()},
+                            {("item","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","process","","GameCmdDataForm"),new List<Data>()},
+                            {("mission","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("basic","variable","","GameCmdDataForm"),new List<Data>()},
+                            {("sceneObject","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("character","anim","","GameCmdDataForm"),new List<Data>()},
+                            {("skill","","","GameCmdDataForm"),new List<Data>()},
         
-                            {("character","detect","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","parameter","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","skill","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","system","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("character","transform","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("effect","system","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("item","backpack","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("mission","system","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","detect","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","parameter","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","system","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("sceneObject","transform","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("skill","parameter","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("skill","system","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","dialog","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","image","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","notice","","GameCmdDataForm"),new List<Data>()},
-        
-                            {("ui","window","","GameCmdDataForm"),new List<Data>()},
+                            {("ui","","","GameCmdDataForm"),new List<Data>()},
         
                 };
 
-                    _DatasByLv1labLv2labLv3labBelong[("basic","audio","","GameCmdDataForm")].Add(_DataById[10001]);
+                    _DatasByLv1labLv2labLv3labBelong[("basic","","","GameCmdDataForm")].Add(_DataById[10001]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("basic","const","","GameCmdDataForm")].Add(_DataById[10002]);
+                    _DatasByLv1labLv2labLv3labBelong[("basic","","","GameCmdDataForm")].Add(_DataById[10002]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("basic","list","","GameCmdDataForm")].Add(_DataById[10003]);
+                    _DatasByLv1labLv2labLv3labBelong[("basic","","","GameCmdDataForm")].Add(_DataById[10003]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("basic","math","","GameCmdDataForm")].Add(_DataById[10004]);
+                    _DatasByLv1labLv2labLv3labBelong[("basic","","","GameCmdDataForm")].Add(_DataById[10004]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("basic","process","","GameCmdDataForm")].Add(_DataById[10005]);
+                    _DatasByLv1labLv2labLv3labBelong[("basic","","","GameCmdDataForm")].Add(_DataById[10005]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("basic","variable","","GameCmdDataForm")].Add(_DataById[10006]);
+                    _DatasByLv1labLv2labLv3labBelong[("basic","","","GameCmdDataForm")].Add(_DataById[10006]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("character","anim","","GameCmdDataForm")].Add(_DataById[10007]);
+                    _DatasByLv1labLv2labLv3labBelong[("character","","","GameCmdDataForm")].Add(_DataById[10007]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("character","detect","","GameCmdDataForm")].Add(_DataById[10008]);
+                    _DatasByLv1labLv2labLv3labBelong[("character","","","GameCmdDataForm")].Add(_DataById[10008]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("character","parameter","","GameCmdDataForm")].Add(_DataById[10009]);
+                    _DatasByLv1labLv2labLv3labBelong[("character","","","GameCmdDataForm")].Add(_DataById[10009]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("character","skill","","GameCmdDataForm")].Add(_DataById[10010]);
+                    _DatasByLv1labLv2labLv3labBelong[("character","","","GameCmdDataForm")].Add(_DataById[10010]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("character","system","","GameCmdDataForm")].Add(_DataById[10011]);
+                    _DatasByLv1labLv2labLv3labBelong[("character","","","GameCmdDataForm")].Add(_DataById[10011]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("character","transform","","GameCmdDataForm")].Add(_DataById[10012]);
+                    _DatasByLv1labLv2labLv3labBelong[("character","","","GameCmdDataForm")].Add(_DataById[10012]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("effect","system","","GameCmdDataForm")].Add(_DataById[10013]);
+                    _DatasByLv1labLv2labLv3labBelong[("effect","","","GameCmdDataForm")].Add(_DataById[10013]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("item","backpack","","GameCmdDataForm")].Add(_DataById[10014]);
+                    _DatasByLv1labLv2labLv3labBelong[("item","","","GameCmdDataForm")].Add(_DataById[10014]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("mission","system","","GameCmdDataForm")].Add(_DataById[10015]);
+                    _DatasByLv1labLv2labLv3labBelong[("mission","","","GameCmdDataForm")].Add(_DataById[10015]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","detect","","GameCmdDataForm")].Add(_DataById[10016]);
+                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","","","GameCmdDataForm")].Add(_DataById[10016]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","parameter","","GameCmdDataForm")].Add(_DataById[10017]);
+                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","","","GameCmdDataForm")].Add(_DataById[10017]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","system","","GameCmdDataForm")].Add(_DataById[10018]);
+                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","","","GameCmdDataForm")].Add(_DataById[10018]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","transform","","GameCmdDataForm")].Add(_DataById[10019]);
+                    _DatasByLv1labLv2labLv3labBelong[("sceneObject","","","GameCmdDataForm")].Add(_DataById[10019]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("skill","parameter","","GameCmdDataForm")].Add(_DataById[10020]);
+                    _DatasByLv1labLv2labLv3labBelong[("skill","","","GameCmdDataForm")].Add(_DataById[10020]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("skill","system","","GameCmdDataForm")].Add(_DataById[10021]);
+                    _DatasByLv1labLv2labLv3labBelong[("skill","","","GameCmdDataForm")].Add(_DataById[10021]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("ui","dialog","","GameCmdDataForm")].Add(_DataById[10022]);
+                    _DatasByLv1labLv2labLv3labBelong[("ui","","","GameCmdDataForm")].Add(_DataById[10022]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("ui","image","","GameCmdDataForm")].Add(_DataById[10023]);
+                    _DatasByLv1labLv2labLv3labBelong[("ui","","","GameCmdDataForm")].Add(_DataById[10023]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("ui","notice","","GameCmdDataForm")].Add(_DataById[10024]);
+                    _DatasByLv1labLv2labLv3labBelong[("ui","","","GameCmdDataForm")].Add(_DataById[10024]);
 
-                    _DatasByLv1labLv2labLv3labBelong[("ui","window","","GameCmdDataForm")].Add(_DataById[10025]);
+                    _DatasByLv1labLv2labLv3labBelong[("ui","","","GameCmdDataForm")].Add(_DataById[10025]);
 
                     _DatasByBelong = new Dictionary<string, List<Data>>() {
     
@@ -799,8 +662,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
         DataById[data.id]=data;
         _DatasHashSet.Add(data);
     
-                    DataByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,data.lv3Lab,data.belong)]=data;
-    
                     if(!DatasByLv1labBelong.ContainsKey((data.lv1Lab,data.belong)))
                         DatasByLv1labBelong[(data.lv1Lab,data.belong)]=new List<Data>();
                     DatasByLv1labBelong[(data.lv1Lab,data.belong)].Add(data);
@@ -833,8 +694,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     _DatasHashSet.Remove(DataById[data.id]);
                     DataById.Remove(data.id);
                     
-    
-                    DataByLv1labLv2labLv3labBelong.Remove((data.lv1Lab,data.lv2Lab,data.lv3Lab,data.belong));
     
                     if(DatasByLv1labBelong.ContainsKey((data.lv1Lab,data.belong)))
                     {
@@ -943,9 +802,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                         DatasByLv1labLv2labBelong[(newV,data.lv2Lab,data.belong)]=new List<Data>();
                     DatasByLv1labLv2labBelong[(newV,data.lv2Lab,data.belong)].Add(data);
  
-                    DataByLv1labLv2labLv3labBelong.Remove((oldV,data.lv2Lab,data.lv3Lab,data.belong));
-                    DataByLv1labLv2labLv3labBelong[(newV,data.lv2Lab,data.lv3Lab,data.belong)]=data;
- 
                     DatasByLv1labLv2labLv3labBelong[(oldV,data.lv2Lab,data.lv3Lab,data.belong)].Remove(data);
                     if(DatasByLv1labLv2labLv3labBelong[(oldV,data.lv2Lab,data.lv3Lab,data.belong)].Count==0)
                         DatasByLv1labLv2labLv3labBelong.Remove((oldV,data.lv2Lab,data.lv3Lab,data.belong));
@@ -970,9 +826,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                         DatasByLv1labLv2labBelong[(data.lv1Lab,newV,data.belong)]=new List<Data>();
                     DatasByLv1labLv2labBelong[(data.lv1Lab,newV,data.belong)].Add(data);
  
-                    DataByLv1labLv2labLv3labBelong.Remove((data.lv1Lab,oldV,data.lv3Lab,data.belong));
-                    DataByLv1labLv2labLv3labBelong[(data.lv1Lab,newV,data.lv3Lab,data.belong)]=data;
- 
                     DatasByLv1labLv2labLv3labBelong[(data.lv1Lab,oldV,data.lv3Lab,data.belong)].Remove(data);
                     if(DatasByLv1labLv2labLv3labBelong[(data.lv1Lab,oldV,data.lv3Lab,data.belong)].Count==0)
                         DatasByLv1labLv2labLv3labBelong.Remove((data.lv1Lab,oldV,data.lv3Lab,data.belong));
@@ -990,9 +843,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                 if(superData is Data data)
                 {
 
-                    DataByLv1labLv2labLv3labBelong.Remove((data.lv1Lab,data.lv2Lab,oldV,data.belong));
-                    DataByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,newV,data.belong)]=data;
- 
                     DatasByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,oldV,data.belong)].Remove(data);
                     if(DatasByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,oldV,data.belong)].Count==0)
                         DatasByLv1labLv2labLv3labBelong.Remove((data.lv1Lab,data.lv2Lab,oldV,data.belong));
@@ -1030,9 +880,6 @@ foreach(var k in _DataById.Keys){ idChain.PopId(k); }
                     if(!DatasByLv1labLv2labBelong.ContainsKey((data.lv1Lab,data.lv2Lab,newV)))
                         DatasByLv1labLv2labBelong[(data.lv1Lab,data.lv2Lab,newV)]=new List<Data>();
                     DatasByLv1labLv2labBelong[(data.lv1Lab,data.lv2Lab,newV)].Add(data);
- 
-                    DataByLv1labLv2labLv3labBelong.Remove((data.lv1Lab,data.lv2Lab,data.lv3Lab,oldV));
-                    DataByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,data.lv3Lab,newV)]=data;
  
                     DatasByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,data.lv3Lab,oldV)].Remove(data);
                     if(DatasByLv1labLv2labLv3labBelong[(data.lv1Lab,data.lv2Lab,data.lv3Lab,oldV)].Count==0)

@@ -27,9 +27,17 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetLookAtRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var a = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num)));
-            var b = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)));
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(Quaternion.LookRotation(b - a).eulerAngles.y) }; 
+            // The command returns a yaw, so height must not influence the facing.
+            // Convert only the delta: the player-space origin offset cancels out.
+            var delta = new Vector3(
+                prm[1].dic["x"].num - prm[0].dic["x"].num,
+                0f,
+                prm[1].dic["y"].num - prm[0].dic["y"].num);
+            delta = MapManager.instance.utilCtrl.MapPos2RealPos(delta);
+            float yaw = delta.x == 0f && delta.z == 0f
+                ? 0f
+                : Mathf.Repeat(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg, 360f);
+            asyncTask.res = new[] { CodeHelper.CreateBoxByNum(yaw) };
             return true;
         }
     }

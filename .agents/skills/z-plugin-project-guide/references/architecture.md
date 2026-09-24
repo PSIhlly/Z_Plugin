@@ -31,6 +31,7 @@ There is currently no `Z_Level5`.
 - `Z_Math` / `Z_Mesh`: algorithms, geometry, SAT collision support.
 - `Z_Serialize`: JSON hooks, byte serialization, compression.
 - `Z_Audio` / `Z_Texture`: media services; AVProVideo and NativeGallery are vendor dependencies.
+- `Z_Texture` uses the vendored `unity.webp` assembly under `Assets/Z_Level0/Plugins/WebP` for static and animated WebP decoding; its native binaries live beside the runtime sources so compiling does not depend on fetching a Git package.
 - `Z_Code`: compiler, interpreter, command registry, command metadata Forms.
 - `Z_DataSystem`: assets, Form roots, file persistence helpers.
 - `Z_UnitSystem`: Unit, Instance, pooling, collider events.

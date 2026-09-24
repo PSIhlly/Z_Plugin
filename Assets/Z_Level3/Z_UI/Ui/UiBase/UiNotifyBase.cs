@@ -295,17 +295,17 @@ namespace Ui.Notify
     {
 
             public GameObject go_label;
+            public Sta sta_sel;
             public Img img_;
             public Btn btn_;
-            public Sta sta_sel;
             public Txt txt_;
         public UiLabelView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_label = uiHolder.elementTrsLst[0].gameObject;
-            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
-            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_sel = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_sel = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[2].GetComponent<Img>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -402,17 +402,17 @@ namespace Ui.Notify
     {
 
             public GameObject go_subItem;
+            public Sta sta_sel;
             public Img img_;
             public Btn btn_;
-            public Sta sta_sel;
             public Txt txt_;
         public UiSubItemView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_subItem = uiHolder.elementTrsLst[0].gameObject;
-            img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
-            btn_ = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_sel = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            sta_sel = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            img_ = uiHolder.elementTrsLst[2].GetComponent<Img>();
+            btn_ = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
         }
 
@@ -678,6 +678,54 @@ namespace Ui.Notify
     {
         
     }
+
+
+
+    public partial class UiCommentParam:UiParam
+    {
+    }
+
+    public partial class UiCommentView:UiView
+    {
+
+            public Btn btn_back;
+            public Txt txt_;
+        public UiCommentView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiCommentCtrl:UiCtrl
+    {
+        public UiCommentView view;
+        public UiCommentModel model;
+        public UiCommentParam param;
+        public UiNotifyCtrl parent=>(UiNotifyCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiCommentParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiCommentView(uiHolder);
+            model=new UiCommentModel();
+
+
+        }
+
+    }
+    public partial class UiCommentModel:UiModel
+    {
+        
+    }
     public partial class UiNotifyParam:UiParam
     {
     }
@@ -694,6 +742,7 @@ namespace Ui.Notify
             public UiMultipleChooseCtrl sub_MultipleChoose;
             public UiPopupCtrl sub_Popup;
             public UiInputAreaCtrl sub_InputArea;
+            public UiCommentCtrl sub_Comment;
         public UiNotifyView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -706,6 +755,7 @@ namespace Ui.Notify
             sub_MultipleChoose = (UiMultipleChooseCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
             sub_Popup = (UiPopupCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
             sub_InputArea = (UiInputAreaCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
+            sub_Comment = (UiCommentCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -742,6 +792,8 @@ namespace Ui.Notify
             view.sub_Popup.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.sub_InputArea = new UiInputAreaCtrl();
             view.sub_InputArea.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.sub_Comment = new UiCommentCtrl();
+            view.sub_Comment.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
         }
 
     }

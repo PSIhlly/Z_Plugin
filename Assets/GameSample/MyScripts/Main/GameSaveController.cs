@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.WSA;
 using Z_ByteSerialize;
@@ -571,6 +572,37 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
+    private static void FlattenEventProgramLabs(JArray forms)
+    {
+        if (!LabForm.DatasByBelong.TryGetValue(nameof(EventProgramDataForm), out var eventLabs))
+            return;
+
+        var oldLabs = eventLabs
+            .Where(lab => lab != null && (!string.IsNullOrEmpty(lab.lv2Lab) || !string.IsNullOrEmpty(lab.lv3Lab)))
+            .OrderBy(lab => lab.id)
+            .ToList();
+        var remappedIds = new Dictionary<int, int>();
+        foreach (var lab in oldLabs)
+        {
+            var category = !string.IsNullOrEmpty(lab.lv1Lab) ? lab.lv1Lab :
+                !string.IsNullOrEmpty(lab.lv2Lab) ? lab.lv2Lab : lab.lv3Lab;
+            remappedIds[lab.id] = LabForm.GetOrCreate(category, nameof(EventProgramDataForm));
+        }
+
+        if (forms != null)
+        {
+            foreach (JObject form in forms)
+            {
+                if (form.TryGetValue("labId", out var labIdToken) && labIdToken.Type == JTokenType.Integer &&
+                    remappedIds.TryGetValue(labIdToken.Value<int>(), out var newLabId))
+                    form["labId"] = newLabId;
+            }
+        }
+
+        foreach (var lab in oldLabs)
+            LabForm.RemoveData(lab.id);
+    }
+
     private static bool TryNormalizeCurrentLabId(JObject form, string belong)
     {
         if (!form.TryGetValue("labId", out var current) || current.Type != JTokenType.Integer)
@@ -820,11 +852,26 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
             MigrateHierarchicalLabIds(forms, nameof(EventProgramDataForm), "category", "type");
-            foreach (var form in EventProgramDataForm.GetDatasByJa(forms))
+            FlattenEventProgramLabs(forms);
+            var programs = EventProgramDataForm.GetDatasByJa(forms);
+            foreach (var form in programs)
             {
                 EventProgramDataForm.AddData(form);
             }
+            // Load every program first, so cross-program calls can be resolved while recompiling.
+            foreach (var form in programs)
+            {
+                var migratedCode = MigrateLegacyEventParameters(form.code);
+                if (migratedCode == form.code && form.zCode != null && form.zCode.Count > 0)
+                    continue;
+                if (!form.TryApplyCode(migratedCode, out _, out var errors))
+                {
+                    Debug.LogWarning($"Event parameter migration failed for {form.name} ({form.uid}): {string.Join("; ", errors)}");
+                }
+            }
         }
+        else if (folder != null)
+            FlattenEventProgramLabs(null);
 
 
     }
@@ -901,6 +948,23 @@ public class GameSaveController : Z_Controller<GameManager>
             GameMapData.ApplyTilePassTypes(tile);
         foreach (var character in CharacterUnitForm.DataByUid.Values)
             GameMapData.ApplyCharacterProductPassTypes(character);
+    }
+
+    private static string MigrateLegacyEventParameters(string code)
+    {
+        if (string.IsNullOrEmpty(code))
+            return code;
+        // Preserve quoted text; only standalone identifiers are event parameters.
+        return Regex.Replace(code, "\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'|(?<![A-Za-z0-9_.])(?:self|target|delta)(?![A-Za-z0-9_])", match =>
+        {
+            switch (match.Value)
+            {
+                case "self": return "param1";
+                case "target": return "param2";
+                case "delta": return "param3";
+                default: return match.Value;
+            }
+        });
     }
 
 

@@ -328,8 +328,8 @@ namespace Ui.PlaySceneMain
            view.btn_.onClick.AddListener(() =>
            {
                var heap = new Dictionary<string, BoxDataForm.Data>();
-               heap["self"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, model.data.uid.ToString()));
-               heap["target"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString()));
+               heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, model.data.uid.ToString()));
+               heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString()));
                ((MapUnit)model.data.unit).ExecuteEvt("onInteractEvent", heap);
            });
         }

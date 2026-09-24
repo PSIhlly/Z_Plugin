@@ -94,6 +94,8 @@ namespace Z_Code
         public static HashSet<string> operators = new HashSet<string>()
         {
             "+",
+            "++",
+            "+=",
             "-",
             "*",
             "/",
@@ -290,6 +292,9 @@ namespace Z_Code
                         case "[":
                             return "var";
                         case "=":
+                        case "+=":
+                            return node.subNodes.Count > 0 ? InferType(node.subNodes[0]) : "var";
+                        case "++":
                             return node.subNodes.Count > 0 ? InferType(node.subNodes[0]) : "var";
                         case "+":
                             if (node.subNodes.Count == 1)

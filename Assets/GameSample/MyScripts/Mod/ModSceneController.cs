@@ -151,7 +151,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             case CameraMode.Isometric:
                 CameraInstance.instance.cam.transform.localPosition = new Vector3(0, 8, -8);
                 CameraInstance.instance.cam.transform.eulerAngles = new Vector3(45, 0, 0);
-                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 50;
+                CameraInstance.instance.globalLight.transform.eulerAngles = Vector3.right * 70;
                 CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }

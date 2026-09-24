@@ -19,7 +19,10 @@ public class GameMapData : MapInfo
         if (productData == null)
             CharacterProductForm.DataByUid.TryGetValue(unitData.unit.productInfo.Item1, out productData);
 
-        unitData.unit.SetPassTypes(productData?.passType);
+        unitData.passType = productData?.passType == null
+            ? new List<int>()
+            : productData.passType.Where(id => id != 0).Distinct().OrderBy(id => id).ToList();
+        unitData.unit.SetPassTypes(unitData.passType);
     }
 
     public static void ApplyTilePassTypes(TileUnitForm.Data unitData)
@@ -42,9 +45,8 @@ public class GameMapData : MapInfo
             }
         }
 
-        unitData.unit.SetPassTypes(requiredTypes);
-        // 场景表中的 int 字段仅保留首个类型用于兼容和检视，完整条件由 TileUnit.passTypes 保存。
-        unitData.passType = requiredTypes.OrderBy(id => id).FirstOrDefault();
+        unitData.passType = requiredTypes.OrderBy(id => id).ToList();
+        unitData.unit.SetPassTypes(unitData.passType);
     }
 
     public static int GetCharacterProductSize(CharacterProductForm.Data productData)
@@ -84,7 +86,7 @@ public class GameMapData : MapInfo
 
     public override CharacterUnitForm.Data GetNewCharacter(string prefabName = "", bool isMine = false, string extra = "")
     {
-        var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId);
+        var form = new CharacterUnitForm.Data(-1, !isMine, Vector3.zero, 4, 4, 4, isMine, "", prefabName, Vector3.zero, Vector3.zero, Vector3.one, 0, new List<int>(), extra, false, GlobalDefaultHelper.DefaultTexId, new List<int>());
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;
@@ -122,7 +124,7 @@ public class GameMapData : MapInfo
 
     public override TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)
     {
-        var form = new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("mapground"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false, 0);
+        var form = new TileUnitForm.Data(-1, "", new Dictionary<int, int>() { { 0, 1 } }, mapPos, GetPrefabName("mapground"), Z_Math.Graph.ElementwiseMultiply(mapPos, mainData.mapUnitSize), Vector3.zero, Vector3.one, 0, new List<int>(), "",false,false, new List<int>());
         //init
         var dic = form.unit.evtDic;
         var pdt = form.unit.productInfo;
@@ -133,7 +135,7 @@ public class GameMapData : MapInfo
 
     public override List<TileUnitForm.Data> GetTileDatasByJa(string ja)
     {
-        var result = TileUnitForm.GetDatasByJa(JArray.Parse(mainData.mapJa));
+        var result = base.GetTileDatasByJa(ja);
         foreach (var data in result)
             ApplyTilePassTypes(data);
         return result;

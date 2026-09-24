@@ -52,6 +52,18 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -2520,6 +2532,18 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -3578,6 +3602,18 @@
           "max": "",
           "showType": 5
         }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -4075,6 +4111,18 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -6546,6 +6594,18 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -9014,6 +9074,18 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -11416,7 +11488,7 @@
     "skill": [
       {
         "k": 0,
-        "v": 4
+        "v": 9
       },
       {
         "k": 2,
@@ -11480,6 +11552,18 @@
         "v": {
           "uid": -1,
           "name": "Team",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
@@ -12675,6 +12759,18 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "射程",
+        "v": {
+          "uid": -1,
+          "name": "射程",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 6.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -13925,7 +14021,7 @@
           "name": "onPerSecondEvent",
           "evt": [
             {
-              "v": 18
+              "v": 20
             },
             {
               "v": 14
@@ -13942,7 +14038,7 @@
     "skill": [
       {
         "k": 0,
-        "v": 17
+        "v": 9
       }
     ],
     "recoveryTime": 0.0,

@@ -1,5 +1,597 @@
 [
   {
+    "id": 14,
+    "name": "树桩",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.2|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 217
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 36,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 217
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 88,
+    "name": "柴堆",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.2|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 799
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 36,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 799
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 87,
+    "name": "石3",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.5|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 803
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 0,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 803
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 58,
+    "name": "篱笆1",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 798
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 798
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 57,
+    "name": "枯木2",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.5|1.2"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 801
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.8
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 801
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 56,
+    "name": "枯木1",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1.2|0.3|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 800
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.8
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 53,
+    "name": "石2",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.8|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 802
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 0,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 802
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 52,
+    "name": "草7",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 58
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "labId": 36,
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 58
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
     "id": 5,
     "name": "空宝箱",
     "icon": 210000,
@@ -76,7 +668,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 4,
@@ -169,11 +762,12 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 24,
-    "name": "草1",
+    "name": "草8",
     "icon": 210000,
     "model": {
       "id": 0,
@@ -189,14 +783,14 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1|0.4|1"
+          "v": "0.5|0.5|0.5"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 172
+              "v": 127
             }
           ]
         }
@@ -216,7 +810,7 @@
         "k": 0,
         "v": [
           {
-            "v": 172
+            "v": 127
           }
         ]
       },
@@ -252,7 +846,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 20,
@@ -335,7 +930,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 19,
@@ -418,7 +1014,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 18,
@@ -515,7 +1112,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 16,
@@ -677,7 +1275,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 17,
@@ -857,7 +1456,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 2,
@@ -940,7 +1540,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 3,
@@ -1023,7 +1624,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 8,
@@ -1106,7 +1708,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 9,
@@ -1189,7 +1792,8 @@
           }
         ]
       }
-    ]
+    ],
+    "isWangTile": false
   },
   {
     "id": 10,
@@ -1256,6 +1860,628 @@
         "k": 4,
         "v": []
       }
-    ]
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 11,
+    "name": "树2",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.8|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|3|3"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 51
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.3
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 51
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 13,
+    "name": "树3",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.8|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|3|3"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 52
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.3
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 52
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 6,
+    "name": "剑弹",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 53
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "labId": 6,
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterLeaveEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterLeaveEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 9
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 53
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 15,
+    "name": "草6",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.5|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 54
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "labId": 36,
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 54
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 25,
+    "name": "桥1",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "2|0.1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 216
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 216
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 23,
+    "name": "桥2",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.1|2"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 157
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 5,
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 157
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 33,
+    "name": "草1",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.4|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 172
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "labId": 36,
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 172
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
   }
 ]

@@ -1294,6 +1294,10 @@
       <Project>{0B331B39-F032-5199-85F3-3B73EECEF4BC}</Project>
       <Name>Z_Code</Name>
     </ProjectReference>
+    <ProjectReference Include="unity.webp.csproj">
+      <Project>{88A047F6-2F57-4845-56A3-90BC56F19135}</Project>
+      <Name>unity.webp</Name>
+    </ProjectReference>
     <ProjectReference Include="Z_DesignStyle.csproj">
       <Project>{EB0D14FE-3B17-150E-A296-42E99DB263FA}</Project>
       <Name>Z_DesignStyle</Name>

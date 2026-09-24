@@ -32,31 +32,50 @@ namespace Z_Ui.Base
         private bool inited;
         private List<Vector3> offsets;
         private int visitId;
+        private readonly Vector3[] viewportCorners = new Vector3[4];
+        private readonly Vector3[] cellCorners = new Vector3[4];
 
         public RectTransform cell;
 
         public FillType fiilType;
-        float width => viewport.rect.width;
-        float height => viewport.rect.height;
-        int rowCnt
+        private Rect GetRectInContentSpace(RectTransform rectTransform, Vector3[] corners)
         {
-            get
+            rectTransform.GetWorldCorners(corners);
+            Vector3 point = content.InverseTransformPoint(corners[0]);
+            float xMin = point.x;
+            float xMax = point.x;
+            float yMin = point.y;
+            float yMax = point.y;
+            for (int i = 1; i < corners.Length; i++)
             {
-                int v = (int)((height - top) / (cell.rect.height + ySpacing));
-                if (v == 0)
-                    return 1;
-                return v;
+                point = content.InverseTransformPoint(corners[i]);
+                xMin = Mathf.Min(xMin, point.x);
+                xMax = Mathf.Max(xMax, point.x);
+                yMin = Mathf.Min(yMin, point.y);
+                yMax = Mathf.Max(yMax, point.y);
             }
+
+            return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
         }
-        int columnCnt
+
+        private Rect GetViewportRectInContentSpace()
         {
-            get
-            {
-                int v = (int)((width - left) / (cell.rect.width + xSpacing));
-                if (v == 0)
-                    return 1;
-                return v;
-            }
+            return GetRectInContentSpace(viewport, viewportCorners);
+        }
+
+        private Vector2 GetCellSizeInContentSpace()
+        {
+            return GetRectInContentSpace(cell, cellCorners).size;
+        }
+
+        private int GetRowCount(float viewportHeight, float cellHeight)
+        {
+            return Mathf.Max(1, (int)((viewportHeight - top) / (cellHeight + ySpacing)));
+        }
+
+        private int GetColumnCount(float viewportWidth, float cellWidth)
+        {
+            return Mathf.Max(1, (int)((viewportWidth - left) / (cellWidth + xSpacing)));
         }
         Dictionary<int, GameObject> id2Go = new Dictionary<int, GameObject>();
 
@@ -83,7 +102,12 @@ namespace Z_Ui.Base
             Clear();
             this.cnt = cnt;
             Vector2 cellSize = new Vector2(cell.rect.width, cell.rect.height);
-            Vector2 averageCellSize = new Vector2(width / columnCnt, height / rowCnt);
+            Rect viewportRect = GetViewportRectInContentSpace();
+            Vector2 layoutCellSize = GetCellSizeInContentSpace();
+            float width = viewportRect.width;
+            float height = viewportRect.height;
+            int rowCnt = GetRowCount(height, layoutCellSize.y);
+            int columnCnt = GetColumnCount(width, layoutCellSize.x);
             if (dir == Direction.Vertical)
             {
                 foreach (var offset in offsets)
@@ -94,7 +118,7 @@ namespace Z_Ui.Base
                 if (DEBUG)
                     Debug.Log("[sv]������" + totRow);
 
-                content.sizeDelta += new Vector2(width - content.rect.width, top + Mathf.Max(totRow, rowCnt) * (cell.rect.height + ySpacing) - (content.rect.height));
+                content.sizeDelta += new Vector2(width - content.rect.width, top + Mathf.Max(totRow, rowCnt) * (layoutCellSize.y + ySpacing) - content.rect.height);
 
 
                 content.sizeDelta += Vector2.right * offsetMax * 2.5f;
@@ -109,7 +133,7 @@ namespace Z_Ui.Base
                 int totColumn = (cnt / rowCnt) + (cnt % rowCnt != 0 ? 1 : 0);
 
 
-                content.sizeDelta += new Vector2(left + Mathf.Max(totColumn, columnCnt) * (cell.rect.width + xSpacing) - content.rect.width, height - content.rect.height);
+                content.sizeDelta += new Vector2(left + Mathf.Max(totColumn, columnCnt) * (layoutCellSize.x + xSpacing) - content.rect.width, height - content.rect.height);
 
 
                 content.sizeDelta += Vector2.up * offsetMax * 2.5f;
@@ -134,11 +158,14 @@ namespace Z_Ui.Base
         {
             if (!inited)
                 return;
-            Vector3[] viewPortCorners = new Vector3[4];
-            viewport.GetWorldCorners(viewPortCorners);
-
-            Vector3[] contentCorners = new Vector3[4];
-            content.GetWorldCorners(contentCorners);
+            Rect viewportRect = GetViewportRectInContentSpace();
+            Rect contentRect = content.rect;
+            Vector2 layoutCellSize = GetCellSizeInContentSpace();
+            float width = viewportRect.width;
+            float height = viewportRect.height;
+            int rowCnt = GetRowCount(height, layoutCellSize.y);
+            int columnCnt = GetColumnCount(width, layoutCellSize.x);
+            Vector3 contentTopLeft = new Vector3(contentRect.xMin, contentRect.yMax, 0);
 
             var relaPos = new Vector3(0, 0, 0);
 
@@ -149,12 +176,12 @@ namespace Z_Ui.Base
             {
                 if (dir == Direction.Vertical)
                 {
-                    unitSize = new Vector2(width / columnCnt * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
+                    unitSize = new Vector2(width / columnCnt, layoutCellSize.y);
 
                 }
                 else
                 {
-                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, height / rowCnt * content.lossyScale.y);
+                    unitSize = new Vector2(layoutCellSize.x, height / rowCnt);
                 }
 
             }
@@ -163,11 +190,11 @@ namespace Z_Ui.Base
                 //not main dir use average
                 if (dir == Direction.Vertical)
                 {
-                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
+                    unitSize = layoutCellSize;
                 }
                 else
                 {
-                    unitSize = new Vector2((cell.rect.width) * content.lossyScale.x, (cell.rect.height) * content.lossyScale.y);
+                    unitSize = layoutCellSize;
                 }
 
             }
@@ -180,9 +207,9 @@ namespace Z_Ui.Base
                 if (dir == Direction.Vertical)
             {
 
-                int curRowId = (int)((contentCorners[1].y - viewPortCorners[1].y) / (unitSize.y + ySpacing));
+                int curRowId = (int)((contentRect.yMax - viewportRect.yMax) / (unitSize.y + ySpacing));
                 needs.Clear();
-                while (contentCorners[1].y - curRowId * (unitSize.y + ySpacing) - top > viewPortCorners[0].y)
+                while (contentRect.yMax - curRowId * (unitSize.y + ySpacing) - top > viewportRect.yMin)
                 {
                     for (int i = 0; i < columnCnt; i++)
                     {
@@ -203,9 +230,9 @@ namespace Z_Ui.Base
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
 
 
-                    relaPos.x += (xSpacing * (column) + left) * content.lossyScale.x;
-                    relaPos.y -= (ySpacing * (row) + top) * content.lossyScale.y;
-                    Add(id, contentCorners[1] + relaPos);
+                    relaPos.x += xSpacing * column + left;
+                    relaPos.y -= ySpacing * row + top;
+                    Add(id, contentTopLeft + relaPos);
                     if (cur != visitId)
                     {
                         break;
@@ -214,9 +241,9 @@ namespace Z_Ui.Base
             }
             else
             {
-                int curColumnId = (int)((viewPortCorners[1].x - contentCorners[1].x) / (unitSize.x + xSpacing));
+                int curColumnId = (int)((viewportRect.xMin - contentRect.xMin) / (unitSize.x + xSpacing));
                 needs.Clear();
-                while (contentCorners[1].x + curColumnId * (unitSize.x + xSpacing) + left < viewPortCorners[2].x)
+                while (contentRect.xMin + curColumnId * (unitSize.x + xSpacing) + left < viewportRect.xMax)
                 {
                     for (int i = 0; i < rowCnt; i++)
                     {
@@ -237,11 +264,11 @@ namespace Z_Ui.Base
                     int row = id % rowCnt;
                     relaPos = new Vector3((column + 0.5f) * unitSize.x, -(row + 0.5f) * unitSize.y, 0);
 
-                    relaPos.x += (xSpacing * (column) + left) * content.lossyScale.x;
+                    relaPos.x += xSpacing * column + left;
 
-                    relaPos.y -= (ySpacing * (row) + top) * content.lossyScale.y;
+                    relaPos.y -= ySpacing * row + top;
 
-                    Add(id, contentCorners[1] + relaPos);
+                    Add(id, contentTopLeft + relaPos);
                     if (cur != visitId)
                     {
                         break;
@@ -276,9 +303,10 @@ namespace Z_Ui.Base
                 return;
             var obj = ContainerAdd(id);
             //reset shape
-            obj.GetComponent<RectTransform>().sizeDelta = cell.sizeDelta;
+            var rectTransform = obj.GetComponent<RectTransform>();
+            rectTransform.sizeDelta = cell.sizeDelta;
             obj.name = id.ToString();
-            obj.transform.position = pos + (offsets.Count > id ? offsets[id] : Vector3.zero);
+            rectTransform.localPosition = pos + (offsets.Count > id ? offsets[id] : Vector3.zero);
 
             id2Go[id] = obj;
         }

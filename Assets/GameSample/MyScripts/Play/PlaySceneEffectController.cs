@@ -26,6 +26,9 @@ using Z_UnitSystem;
 public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<CharacterEvent>
 {
     private const float IsometricVerticalEffectHeightScale = 1.41421356f;
+    // 侧视(Isometric)下非地面特效的 X 轴倾角：相机俯角本身就是 45°，
+    // 0° 表示贴图平面竖直立在地面上，45° 表示正对相机。
+    private const float IsometricVerticalEffectPitch = 45f;
     private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("img"));
     private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("canvas"));
     private Dictionary<int, CanvasHolder> canvasDic = new Dictionary<int, CanvasHolder>();
@@ -99,7 +102,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             bool isIsometricVerticalEffect = GameManager.instance.curProgress.cameraMode == CameraMode.Isometric && !data.ground;
 
             if (isIsometricVerticalEffect)
-                img.trs.eulerAngles = Vector3.zero;
+                img.trs.eulerAngles = Vector3.right * IsometricVerticalEffectPitch;
             else
                 img.trs.eulerAngles = Vector3.right * 90;
 
@@ -175,7 +178,10 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
     private static Vector3 GetEffectScale(Vector3 scale, bool isIsometricVerticalEffect)
     {
-        if (isIsometricVerticalEffect)
+        // √2 高度补偿只针对 X 轴 0°（竖直立在地面上）的贴图平面：
+        // 45° 俯视相机下它的纵向会被压缩 cos45。改成 45° 正对相机后不再压缩，
+        // 所以这里跟随 IsometricVerticalEffectPitch，避免出现 1.414 倍的纵向拉伸。
+        if (isIsometricVerticalEffect && Mathf.Approximately(IsometricVerticalEffectPitch, 0f))
             scale.y *= IsometricVerticalEffectHeightScale;
 
         return scale;

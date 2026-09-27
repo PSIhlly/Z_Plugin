@@ -49,7 +49,7 @@ public interface ExternalModSceneController
 
     public void ForceUpdate();
 }
-public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>, IZ_Listener<TileEvent>
+public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>
 {
     MapManager mapMgr => MapManager.instance;
     public ModSceneController(ModManager super) : base(super)
@@ -60,6 +60,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         this.Register<InputMouseUpEvent>();
         this.Register<InputMouseScrollEvent>();
         this.Register<TileEvent>();
+        this.Register<ObjectEvent>();
     }
 
     bool enable = false;
@@ -92,6 +93,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             _designType = value;
             eventLayerBrushTipShown = false;
             RefreshTileLayerDisplay();
+            NotifyObjectMarkVisibility();
         }
     }
 
@@ -157,12 +159,16 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         }
 
         enable = true;
+        foreach (var data in ObjectUnitForm.DataByUid.Values)
+            AttachObjectMark(data.unit.ins);
+        NotifyObjectMarkVisibility();
         waitForActive = false;
         UiManager.instance.ShowUi<UiModSceneMainCtrl>();
     }
     public void End()
     {
         enable = false;
+        NotifyObjectMarkVisibility();
         NotifyManager.instance.ClearAll();
         mapMgr.End();
         UiManager.instance.CloseAll();
@@ -409,39 +415,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     }
                     else if (curData is MapEraseForm.Data eraseData)
                     {
-                        ForeachPos(hitPos, worldPosition, (mapData, finalPos) =>
-                        {
-                            if (eraseData.terrain)
-                            {
-                                mapMgr.RemoveTile(mapData);
-                            }
-                            else if (eraseData.item)
-                            {
-                                foreach (var sub in mapData.unit.GetAllSubUnits())
-                                {
-                                    if (sub is ItemUnit item)
-                                    {
-                                        mapMgr.RemoveItem(item.data);
-                                    }
-                                }
-                            }
-                            else if (eraseData.mObject)
-                            {
-                                foreach (var sub in mapData.unit.GetAllSubUnits())
-                                {
-                                    if (sub is ObjectUnit item)
-                                    {
-                                        mapMgr.RemoveObject(item.data);
-                                    }
-                                }
-                            }
-
-                            if (eraseData.texture)
-                            {
-                                if (mapData.texDic.Remove(layer))
-                                    mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
-                            }
-                        });
+                        ForeachPos(hitPos, worldPosition, (mapData, _) => EraseTile(mapData, eraseData));
                     }
                     ForceUpdate();
                 }
@@ -505,6 +479,47 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         }
 
     }
+    private void EraseTile(TileUnitForm.Data mapData, MapEraseForm.Data eraseData)
+    {
+        var tile = mapData.unit;
+        var update = mapMgr.updateCtrl;
+        // Tile ownership lives in the map indexes, not the explicit Unit binding tree.
+        // Snapshot every selected owner before removal mutates the reverse indexes.
+        var ownedUnits = new List<MapUnit>();
+        if (eraseData.mObject && update.objectTileDic.TryGet(tile, out var objects))
+            foreach (var unit in objects)
+                if (unit.belongTile == tile)
+                    ownedUnits.Add(unit);
+        if (eraseData.character && update.characterTileDic.TryGet(tile, out var characters))
+            foreach (var unit in characters)
+                if (unit.belongTile == tile)
+                    ownedUnits.Add(unit);
+        if (eraseData.item && update.itemTileDic.TryGet(tile, out var items))
+            foreach (var unit in items)
+                if (unit.belongTile == tile)
+                    ownedUnits.Add(unit);
+
+        foreach (var unit in ownedUnits)
+        {
+            if (unit is ObjectUnit obj)
+                mapMgr.RemoveObject(obj.data);
+            else if (unit is CharacterUnit character)
+                mapMgr.RemoveCharacter(character.data);
+            else if (unit is ItemUnit item)
+                mapMgr.RemoveItem(item.data);
+        }
+
+        // Remove the terrain last so belongTile and local Object/Nav cleanup still
+        // have a valid Tile during entity removal. Never refresh a removed Tile.
+        if (eraseData.terrain)
+        {
+            mapMgr.RemoveTile(mapData);
+            return;
+        }
+        if (eraseData.texture && mapData.texDic.Remove(layer))
+            update.UpdateSingleOne(tile);
+    }
+
     private void ForeachPos(Vector3Int mapCenterPos, Vector3 realPos, Action<TileUnitForm.Data, Vector3> onFind)
     {
         for (int x = mapCenterPos.x - cntX / 2; x < mapCenterPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
@@ -561,6 +576,28 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         // Keep pooled Tiles synchronized; Play must not inherit a Mod-only ceiling.
         if (evt.type == MapEventType.Show)
             ApplyTileLayerDisplay(evt.unit.ins);
+    }
+
+    private void NotifyObjectMarkVisibility()
+    {
+        Z_EventHelper.Invoke(new ObjectMarkVisibilityEvent
+        {
+            visible = enable && designType == DesignType.Event
+        });
+    }
+
+    private void AttachObjectMark(ObjectInstance ins)
+    {
+        if (!enable || ins == null)
+            return;
+        var prefab = Z_UnitSystem.InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("mapMark"));
+        ins.EnsureMapMark(prefab, designType == DesignType.Event);
+    }
+
+    public void OnEvent(ObjectEvent evt)
+    {
+        if (evt.type == MapEventType.Show)
+            AttachObjectMark(evt.unit.ins);
     }
 
     public void Update()

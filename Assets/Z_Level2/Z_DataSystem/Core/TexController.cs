@@ -152,7 +152,16 @@ namespace Z_DataSystem.Form
             {
                 if (_texture == null)
                 {
-                    if (bytes != null)
+                    if (isGif)
+                    {
+                        // Static consumers (including dialogue illustration sizing)
+                        // need the GIF canvas, not a 2x2 LoadImage placeholder.
+                        var frames = GetGifFrames();
+                        asset = frames != null && frames.Count > 0
+                            ? frames[0].texture
+                            : TextureHelper.transparentTexture;
+                    }
+                    else if (bytes != null)
                         asset = TextureHelper.GetTextureByByte(bytes);
                     else if (!string.IsNullOrEmpty(path))
                         asset = TextureHelper.GetTextureByPath(path);

@@ -71,37 +71,15 @@ namespace Ui.ModStoryEventEditWindow
                 }
                 else switch (model.node.desc.type)
                 {
+                    case CodeType.Operator:
+                        RenderOperator();
+                        break;
                     case CodeType.FuncName:
                     case CodeType.Reserved:
-                    case CodeType.Operator:
                         if (CmdDataForm.DataByName.ContainsKey(model.node.desc.code))
                         {
                             var form = CmdDataForm.DataByName[model.node.desc.code];
-                            string cur = "";
-
-                            foreach (var ch in form.desc)
-                            {
-                                if (ch == '}')
-                                {
-                                    int id = int.Parse(cur);
-                                    if (id < model.node.subNodes.Count)
-                                        CreateNode(model.node.subNodes[id]);
-                                    cur = "";
-                                }
-                                else if (ch == '{')
-                                {
-                                    CreateTxt(cur);
-                                    cur = "";
-                                }
-                                else
-                                {
-                                    cur += ch;
-                                }
-                            }
-                            if (cur != "")
-                            {
-                                CreateTxt(cur);
-                            }
+                            RenderDescription(form.desc);
                         }
                         else if (int.TryParse(model.node.desc.code, out int evtId) && EventProgramDataForm.DataByUid.ContainsKey(evtId))
                         {
@@ -124,6 +102,9 @@ namespace Ui.ModStoryEventEditWindow
                             view.txt_.text = model.node.desc.code;
                         }
                         break;
+                    case CodeType.Str:
+                        view.txt_.text = string.IsNullOrEmpty(model.node.desc.code) ? "\"\"" : model.node.desc.code;
+                        break;
                     default:
                         view.txt_.text = model.node.desc.code;
                         break;
@@ -145,6 +126,72 @@ namespace Ui.ModStoryEventEditWindow
             view.sta_.ChangeState(parent.parent.model.selUnit != null && parent.parent.model.selUnit == model.node ? 1 : 0);
         }
 
+        private void RenderOperator()
+        {
+            var node = model.node;
+            if (node.subNodes.Count == 1)
+            {
+                // Unary +/- must not use the table's binary description.
+                if (node.desc.code != "++")
+                    CreateTxt(node.desc.code);
+                CreateNode(node.subNodes[0]);
+                if (node.desc.code == "++")
+                    CreateTxt("++");
+            }
+            else if (node.subNodes.Count == 2)
+            {
+                if (CmdDataForm.DataByName.TryGetValue(node.desc.code, out var form)
+                    && !string.IsNullOrEmpty(form.desc))
+                    RenderDescription(form.desc);
+                else
+                {
+                    // Binary AST children are stored right, left. Missing command
+                    // metadata must never hide either editable operand.
+                    CreateNode(node.subNodes[1]);
+                    CreateTxt(" " + node.desc.code + " ");
+                    CreateNode(node.subNodes[0]);
+                }
+            }
+            else
+            {
+                CreateTxt(node.desc.code);
+                if (node.subNodes.Count > 0)
+                {
+                    CreateTxt("(");
+                    for (int i = 0; i < node.subNodes.Count; i++)
+                    {
+                        if (i > 0)
+                            CreateTxt(", ");
+                        CreateNode(node.subNodes[i]);
+                    }
+                    CreateTxt(")");
+                }
+            }
+        }
+
+        private void RenderDescription(string description)
+        {
+            string cur = "";
+            foreach (var ch in description)
+            {
+                if (ch == '}')
+                {
+                    int id = int.Parse(cur);
+                    if (id < model.node.subNodes.Count)
+                        CreateNode(model.node.subNodes[id]);
+                    cur = "";
+                }
+                else if (ch == '{')
+                {
+                    CreateTxt(cur);
+                    cur = "";
+                }
+                else
+                    cur += ch;
+            }
+            CreateTxt(cur);
+        }
+
         private void CreateTxt(string desc)
         {
             if (string.IsNullOrEmpty(desc))
@@ -159,14 +206,22 @@ namespace Ui.ModStoryEventEditWindow
         }
         private void CreateNode(SyntaxNode node)
         {
-            if (!IsVisibleArgument(node))
+            bool isOperand = model.node?.desc.type == CodeType.Operator;
+            if (isOperand ? node == null || SyntaxAnalysis.IsEmptyArgumentNode(node) : !IsVisibleArgument(node))
                 return;
+            // Descriptions are visual prose, so explicitly group nested operators
+            // instead of relying on mathematical symbol precedence in the text.
+            bool grouped = isOperand && node.desc.type == CodeType.Operator;
+            if (grouped)
+                CreateTxt("(");
             model.con.Add(new UiUnitParam()
             {
                 con = model.con,
                 parent = view.rtf_root.transform,
                 node = node
             });
+            if (grouped)
+                CreateTxt(")");
         }
 
         private static bool IsVisibleArgument(SyntaxNode node)

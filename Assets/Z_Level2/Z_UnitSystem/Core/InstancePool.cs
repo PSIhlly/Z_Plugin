@@ -51,7 +51,9 @@ namespace Z_UnitSystem
         public override void Fresh(GameObject obj)
         {
             var renders = obj.GetComponentsInChildren<Renderer>(true);
-            for(int i=0;i< renders.Length;i++)
+            // Runtime-owned decorations may be appended after prefab renderers.
+            // They have no prefab material/active-state slot to restore.
+            for(int i=0;i< blocks.Length && i< renders.Length;i++)
             {
                 renders[i].gameObject.SetActive(rendererActiveStates[i]);
                 renders[i].SetPropertyBlock(blocks[i]);

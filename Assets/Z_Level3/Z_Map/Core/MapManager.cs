@@ -241,7 +241,7 @@ public class MapManager : Z_MonoManager<MapManager>
     public void RemoveObject(ObjectUnitForm.Data form)
     {
         data.RemoveObject(form);
-        updateCtrl.objectTileDic.Del(form.unit);
+        updateCtrl.RemoveObjectOverlap(form.unit);
         updateCtrl.curObjectLst.Remove(form);
     }
     #endregion

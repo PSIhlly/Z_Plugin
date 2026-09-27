@@ -163,6 +163,8 @@ namespace Form
 
                 {10011,new Data(10011,"sceneObjectProto")},
 
+                {10012,new Data(10012,"mission")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -189,6 +191,8 @@ namespace Form
                         {"skill",_DataByUid[10010]},
     
                         {"sceneObjectProto",_DataByUid[10011]},
+    
+                        {"mission",_DataByUid[10012]},
     
                     
                     };

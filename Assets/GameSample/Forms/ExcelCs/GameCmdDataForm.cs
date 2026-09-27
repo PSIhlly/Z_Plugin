@@ -449,13 +449,13 @@ namespace Form
 
                 {100098,new Data(100098,"CharacterChat",new List<string>(){"character","content","icon","showTime",},new List<string>(){"character","string","img","num",},null,new List<string>(){"void",},"Character {0} img:{2},chat:{1},last {4} times","CharacterChat(param1,\"empty\",\"$i$$i$\",3);",10022,EditorStyle.Rpg,"")},
 
-                {100099,new Data(100099,"IsMissionAdded",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"added",},new List<string>(){"num",},"Mission {0} is added?","IsMissionAdded(\"empty\")",10015,EditorStyle.Rpg,"")},
+                {100099,new Data(100099,"IsMissionAdded",new List<string>(){"mission",},new List<string>(){"mission",},new List<string>(){"added",},new List<string>(){"num",},"Mission {0} is added?","IsMissionAdded(\"$m$$m$\")",10015,EditorStyle.Rpg,"")},
 
-                {100100,new Data(100100,"HasMissionDone",new List<string>(){"missionName",},new List<string>(){"string",},new List<string>(){"done",},new List<string>(){"num",},"Mission {0} has done?","HasMissionDone(\"empty\")",10015,EditorStyle.Rpg,"")},
+                {100100,new Data(100100,"HasMissionDone",new List<string>(){"mission",},new List<string>(){"mission",},new List<string>(){"done",},new List<string>(){"num",},"Mission {0} has done?","HasMissionDone(\"$m$$m$\")",10015,EditorStyle.Rpg,"")},
 
-                {100101,new Data(100101,"AddMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Add mission {0}","MissionAdd(\"empty\");",10015,EditorStyle.Rpg,"")},
+                {100101,new Data(100101,"AddMission",new List<string>(){"mission",},new List<string>(){"mission",},null,new List<string>(){"void",},"Add mission {0}","AddMission(\"$m$$m$\");",10015,EditorStyle.Rpg,"")},
 
-                {100102,new Data(100102,"DoneMission",new List<string>(){"missionName",},new List<string>(){"string",},null,new List<string>(){"void",},"Done mission {0}","MissionDone(\"empty\");",10015,EditorStyle.Rpg,"")},
+                {100102,new Data(100102,"DoneMission",new List<string>(){"mission",},new List<string>(){"mission",},null,new List<string>(){"void",},"Done mission {0}","DoneMission(\"$m$$m$\");",10015,EditorStyle.Rpg,"")},
 
                 {100103,new Data(100103,"MoveToScene",new List<string>(){"sceneName","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Move to Scene {0} position: {1}","MoveToScene(\"empty\",NewVector(1,1,0));",10001,EditorStyle.AvgAdvanced,"")},
 
@@ -466,6 +466,8 @@ namespace Form
                 {100106,new Data(100106,"Random",new List<string>(){"num1","num2",},new List<string>(){"num","num",},new List<string>(){"result",},new List<string>(){"num",},"Random number from {0} to {1} (inclusive)","Random(1,10)",10001,EditorStyle.AvgAdvanced,"")},
 
                 {100107,new Data(100107,"GetCharacterName",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"name",},new List<string>(){"string",},"Get Character {0}'s name","GetCharacterName(param1)",10007,EditorStyle.Rpg,"")},
+
+                {100108,new Data(100108,"Mission",null,null,new List<string>(){"mission",},new List<string>(){"mission",},"","\"$m$$m$\"",10001,EditorStyle.Rpg,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -685,6 +687,8 @@ namespace Form
                         {"Random",_DataByUid[100106]},
     
                         {"GetCharacterName",_DataByUid[100107]},
+    
+                        {"Mission",_DataByUid[100108]},
     
                     
                     };
@@ -926,6 +930,8 @@ namespace Form
                     _DatasByLabid[10001].Add(_DataByUid[100106]);
 
                     _DatasByLabid[10007].Add(_DataByUid[100107]);
+
+                    _DatasByLabid[10001].Add(_DataByUid[100108]);
 
 
             childInitAction?.Invoke();

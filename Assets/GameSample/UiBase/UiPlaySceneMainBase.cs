@@ -133,16 +133,16 @@ namespace PlaySceneMission
     {
 
             public GameObject go_mission;
+            public Btn btn_mission;
             public Txt txt_;
             public Txt txt_distance;
-            public Btn btn_mission;
         public UiPlaySceneMissionView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_mission = uiHolder.elementTrsLst[0].gameObject;
-            txt_ = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            txt_distance = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            btn_mission = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            btn_mission = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            txt_distance = uiHolder.elementTrsLst[3].GetComponent<Txt>();
         }
 
     }

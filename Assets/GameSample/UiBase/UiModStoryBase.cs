@@ -5877,114 +5877,6 @@ namespace ModStoryEventCustom
 
 
 
-    public partial class UiCategoryParam:UiParam
-    {
-    }
-
-    public partial class UiCategoryView:UiView
-    {
-
-            public GameObject go_category;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiCategoryView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_category = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiCategoryCtrl:UiCtrl
-    {
-        public UiCategoryView view;
-        public UiCategoryModel model;
-        public UiCategoryParam param;
-        public UiModStoryEventCustomCtrl parent=>(UiModStoryEventCustomCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiCategoryParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiCategoryView(uiHolder);
-            model=new UiCategoryModel();
-
-
-        }
-
-    }
-    public partial class UiCategoryModel:UiModel
-    {
-        
-    }
-
-
-
-    public partial class UiTypeParam:UiParam
-    {
-    }
-
-    public partial class UiTypeView:UiView
-    {
-
-            public GameObject go_type;
-            public Btn btn_;
-            public Sta sta_;
-            public Sta sta_state;
-            public Txt txt_;
-        public UiTypeView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_type = uiHolder.elementTrsLst[0].gameObject;
-            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
-            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
-            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
-            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-        }
-
-    }
-    public partial class UiTypeCtrl:UiCtrl
-    {
-        public UiTypeView view;
-        public UiTypeModel model;
-        public UiTypeParam param;
-        public UiModStoryEventCustomCtrl parent=>(UiModStoryEventCustomCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiTypeParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiTypeView(uiHolder);
-            model=new UiTypeModel();
-
-
-        }
-
-    }
-    public partial class UiTypeModel:UiModel
-    {
-        
-    }
-
-
-
     public partial class UiItemParam:UiParam
     {
     }
@@ -6036,6 +5928,60 @@ namespace ModStoryEventCustom
     {
         
     }
+
+
+
+    public partial class UiLabParam:UiParam
+    {
+    }
+
+    public partial class UiLabView:UiView
+    {
+
+            public GameObject go_lab;
+            public Btn btn_;
+            public Sta sta_;
+            public Sta sta_state;
+            public Txt txt_;
+        public UiLabView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_lab = uiHolder.elementTrsLst[0].gameObject;
+            btn_ = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            sta_ = uiHolder.elementTrsLst[2].GetComponent<Sta>();
+            sta_state = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            txt_ = uiHolder.elementTrsLst[4].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiLabCtrl:UiCtrl
+    {
+        public UiLabView view;
+        public UiLabModel model;
+        public UiLabParam param;
+        public UiModStoryEventCustomCtrl parent=>(UiModStoryEventCustomCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiLabParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiLabView(uiHolder);
+            model=new UiLabModel();
+
+
+        }
+
+    }
+    public partial class UiLabModel:UiModel
+    {
+        
+    }
     public partial class UiModStoryEventCustomParam:UiParam
     {
     }
@@ -6043,41 +5989,39 @@ namespace ModStoryEventCustom
     public partial class UiModStoryEventCustomView:UiView
     {
 
-            public ScrView scr_categorys;
             public GameObject go_show;
-            public ScrView scr_types;
             public ScrView scr_items;
+            public ScrView scr_lab;
+            public Ipt ipt_lab;
+            public Btn btn_deleteLab;
             public Txt txt_name;
             public Txt txt_desc;
             public Btn btn_edit;
             public Sta sta_edit;
             public Btn btn_delete;
             public Sta sta_delete;
-            public GameObject go_category;
-            public UiCategoryCtrl sub_category;
-            public GameObject go_type;
-            public UiTypeCtrl sub_type;
             public GameObject go_item;
             public UiItemCtrl sub_item;
+            public GameObject go_lab;
+            public UiLabCtrl sub_lab;
         public UiModStoryEventCustomView(UiHolder uiHolder):base(uiHolder)
         {
 
-            scr_categorys = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
-            go_show = uiHolder.elementTrsLst[1].gameObject;
-            scr_types = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            scr_items = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
-            txt_name = uiHolder.elementTrsLst[4].GetComponent<Txt>();
-            txt_desc = uiHolder.elementTrsLst[5].GetComponent<Txt>();
-            btn_edit = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            sta_edit = uiHolder.elementTrsLst[7].GetComponent<Sta>();
-            btn_delete = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_delete = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            go_category = uiHolder.elementTrsLst[10].gameObject;
-            sub_category = (UiCategoryCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            go_type = uiHolder.elementTrsLst[12].gameObject;
-            sub_type = (UiTypeCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[14].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            go_show = uiHolder.elementTrsLst[0].gameObject;
+            scr_items = uiHolder.elementTrsLst[1].GetComponent<ScrView>();
+            scr_lab = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
+            ipt_lab = uiHolder.elementTrsLst[3].GetComponent<Ipt>();
+            btn_deleteLab = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            txt_name = uiHolder.elementTrsLst[5].GetComponent<Txt>();
+            txt_desc = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            btn_edit = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_edit = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            btn_delete = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            sta_delete = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            go_item = uiHolder.elementTrsLst[11].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            go_lab = uiHolder.elementTrsLst[13].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -6102,12 +6046,10 @@ namespace ModStoryEventCustom
             model=new UiModStoryEventCustomModel();
 
 
-            view.sub_category = new UiCategoryCtrl();
-            view.sub_category.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.sub_type = new UiTypeCtrl();
-            view.sub_type.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
             view.sub_item = new UiItemCtrl();
-            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.sub_item.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.sub_lab = new UiLabCtrl();
+            view.sub_lab.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }

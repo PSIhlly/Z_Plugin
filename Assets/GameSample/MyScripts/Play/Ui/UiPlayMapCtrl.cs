@@ -87,6 +87,8 @@ namespace Ui.PlayMap
         }
         public void Refresh()
         {
+            if (!PlayManager.instance.enable || mapCtrl == null || !mapCtrl.isReady)
+                return;
             view.sta_type.ChangeState(model.isArea ? 0 : 1);
             if (!GameManager.instance.curProgress.enableMinimap || PlayManager.instance.sceneCtrl.playerM == null || PlayManager.instance.sceneCtrl.playerM.unit.belongTile == null)
             {
@@ -122,7 +124,8 @@ namespace Ui.PlayMap
 
                     missionCon.Clear();
                     var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                    if (missionData != null && GetPositionHeight(missionData.targetPos) == model.y)
+                    if (missionData != null && missionData.targetSceneId == mapCtrl.curScene.uid
+                        && GetPositionHeight(MissionGuide.GetTargetWorldPosition(missionData)) == model.y)
                     {
                         missionCon.Add(new UiMissionParam()
                         {
@@ -294,7 +297,8 @@ namespace Ui.PlayMap
         public void Refresh()
         {
             view.img_mark.sprite = model.prm.icon;
-            var relativePos = new Vector2((model.prm.pos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.pos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
+            if (!parent.mapCtrl.TryGetRelativePosition(model.prm.pos, out var relativePos))
+                return;
             view.go_mark.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rimg_unlock.rectTransform);
             
         }
@@ -337,7 +341,8 @@ namespace Ui.PlayMap
 
         public void Refresh()
         {
-            var relativePos = new Vector2((model.prm.data.targetPos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.data.targetPos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
+            if (!parent.mapCtrl.TryGetRelativePosition(MissionGuide.GetTargetWorldPosition(model.prm.data), out var relativePos))
+                return;
             view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rimg_unlock.rectTransform);
             view.rtf_area.sizeDelta.Set(model.prm.data.radius*2, model.prm.data.radius*2);
             

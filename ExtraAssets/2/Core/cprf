@@ -64,6 +64,30 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 24.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -2461,7 +2485,7 @@
     "events": [],
     "equips": [],
     "desc": "人类魔法使",
-    "illustration": 3,
+    "illustration": 223,
     "unique": true,
     "skill": [
       {
@@ -2492,7 +2516,7 @@
           "name": "HpMax",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 50.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -2516,7 +2540,7 @@
           "name": "Hp",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 50.0,\r\n  \"dic\": []\r\n}",
           "max": "HpMax",
           "showType": 1
         }
@@ -2541,6 +2565,30 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 20.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 2.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -3614,6 +3662,30 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -4123,6 +4195,30 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 16.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 4.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -6606,6 +6702,30 @@
           "max": "",
           "showType": 0
         }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
       }
     ],
     "protoUid": 0,
@@ -9003,7 +9123,7 @@
     "events": [],
     "equips": [],
     "desc": "人类魔法使",
-    "illustration": 86,
+    "illustration": 222,
     "unique": true,
     "skill": [
       {
@@ -9083,6 +9203,30 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 16.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 2.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -11518,7 +11662,7 @@
           "name": "HpMax",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 80.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -11530,7 +11674,7 @@
           "name": "Speed",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 2.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 5
         }
@@ -11542,7 +11686,7 @@
           "name": "Hp",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 80.0,\r\n  \"dic\": []\r\n}",
           "max": "HpMax",
           "showType": 1
         }
@@ -11567,6 +11711,30 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 12.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 6.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -12722,7 +12890,7 @@
           "name": "HpMax",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 30.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }
@@ -12734,7 +12902,7 @@
           "name": "Speed",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 4.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 5
         }
@@ -12746,7 +12914,7 @@
           "name": "Hp",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 30.0,\r\n  \"dic\": []\r\n}",
           "max": "HpMax",
           "showType": 1
         }
@@ -12771,6 +12939,30 @@
           "valueType": 0,
           "min": "",
           "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 6.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "攻击",
+        "v": {
+          "uid": 6,
+          "name": "攻击",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 10.0,\r\n  \"dic\": []\r\n}",
+          "max": "",
+          "showType": 0
+        }
+      },
+      {
+        "k": "防御",
+        "v": {
+          "uid": 7,
+          "name": "防御",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
           "max": "",
           "showType": 0
         }

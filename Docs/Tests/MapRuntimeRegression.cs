@@ -38,17 +38,45 @@ public static class MapRuntimeRegression
             Coverage();
             LegacyPassTypeSceneData();
             PassTypeMovement();
+            NavigationEndpoints();
             WangTileAnimationSelection();
             ObjectWangTileNeighbourSelection();
             SharedAnimationClock();
             CanvasHolderResetAfterPoolTeardown();
             SparseViewRefreshAfterErase();
+            EraseBrushOwnedUnits();
             IncrementalViewRefresh();
+            HeightProjectedViewRefresh();
             Visibility();
             TileFirstVisibility();
             OcclusionTransparencyAndPriority();
             Events();
+            ObjectCenterPassTypeRefresh();
+            SavedBridgePassTypeCoverage();
+            ObjectTileUpwardProbeRange();
+            BridgeObstacleNavigation();
+            WholeTileObjectNavigation();
+            ObjectCollisionScalePassTypeCoverage();
+            ObjectMarksAndMissionCoordinates();
+            EventOperatorRendering();
             Debug.Log("MAP_RUNTIME_REGRESSION_PASS checks=" + checks);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            EditorApplication.Exit(1);
+        }
+    }
+
+    public static void RunViewRefresh()
+    {
+        try
+        {
+            SetUp();
+            IncrementalViewRefresh();
+            HeightProjectedViewRefresh();
+            Debug.Log("MAP_VIEW_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
         catch (Exception e)
@@ -436,6 +464,1197 @@ public static class MapRuntimeRegression
 
         restricted.SetPassTypes(null);
         map.updateCtrl.characterTileDic.Del(unit);
+    }
+
+    private static void NavigationEndpoints()
+    {
+        var navigation = new Z_Map.Analysis.NavigationController(map)
+        {
+            navUnits = new Dictionary<(int, int, int), Z_Map.Analysis.NavUnit>(),
+            step = 0.5f
+        };
+        for (int x = 1; x <= 7; x++)
+        for (int z = 1; z <= 5; z++)
+            navigation.navUnits[(x, 0, z)] = NavUnit(x, z);
+        foreach (var unit in navigation.navUnits.Values)
+            foreach (var offset in new[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back })
+                if (navigation.navUnits.TryGetValue((unit.pos.x + offset.x, 0, unit.pos.z + offset.z), out var next))
+                    unit.links.Add(next);
+        Action<Z_Map.Analysis.NavUnit> block = unit =>
+        {
+            unit.objectBlocked = true;
+            unit.links.Clear();
+            foreach (var other in navigation.navUnits.Values)
+                other.links.Remove(unit);
+        };
+        var start = navigation.navUnits[(2, 0, 3)];
+        var destination = navigation.navUnits[(6, 0, 3)];
+        block(start);
+        block(destination);
+        var bfs = new Z_Map.Analysis.Bfs(navigation);
+        var state = new Z_Map.Analysis.NavigationEndpointState();
+        Vector3 target = destination.realPos + Vector3.right * 0.1f;
+        Vector3 position = start.realPos + Vector3.right * 0.1f;
+        Vector3 direction = bfs.GetNextDir(position, target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == new Vector3(3, 0, 3)
+            && Vector3.Dot(direction, Vector3.right) > 0.999f,
+            "blocked start moves straight to its nearest walkable cell, not toward the destination");
+        bfs.GetNextDir(new Vector3(2.65f, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == new Vector3(3, 0, 3),
+            "escape continues to its anchor center after crossing into a walkable cell");
+        bool usedGraph = false;
+        bool usedFinalSegment = false;
+        for (int frame = 0; frame < 100 && Vector3.Distance(position, target) > 0.0001f; frame++)
+        {
+            direction = bfs.GetNextDir(position, target, 100, 0.5f, Array.Empty<int>(), state);
+            if (!state.directEndpoint) usedGraph = true;
+            if (state.directEndpoint && state.moveTarget == target) usedFinalSegment = true;
+            position += direction * Mathf.Min(0.15f, (state.moveTarget - position).magnitude);
+        }
+        Require(usedGraph && usedFinalSegment && Vector3.Distance(position, target) < 0.0001f,
+            "both blocked endpoints use escape, a graph route and the final direct segment");
+        direction = bfs.GetNextDir(new Vector3(5.65f, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == target && direction.x > 0.99f,
+            "entering the blocked destination cell does not reverse the final approach");
+        Require(bfs.GetNextDir(target, target, 100, 0.5f, Array.Empty<int>(), state) == Vector3.zero,
+            "the final approach stops at the original target coordinate");
+        Vector3 movingTarget = target + Vector3.forward * 0.1f;
+        direction = bfs.GetNextDir(new Vector3(5.65f, 0, 3), movingTarget, 100, 0.500005f,
+            Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == movingTarget
+            && Vector3.Dot(direction, (movingTarget - new Vector3(5.65f, 0, 3)).normalized) > 0.999f,
+            "a moving target in the same blocked cell and radius rounding do not reset the final phase");
+
+        var otherState = new Z_Map.Analysis.NavigationEndpointState();
+        bfs.GetNextDir(start.realPos + Vector3.right * 0.1f, new Vector3(1, 0, 1), 100, 0.5f,
+            Array.Empty<int>(), otherState);
+        Require(otherState.moveTarget == new Vector3(3, 0, 3), "another agent gets its own escape state");
+        direction = bfs.GetNextDir(new Vector3(5.65f, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.moveTarget == target && direction.x > 0.99f, "shared BFS does not leak another agent's phase");
+        bfs.GetNextDir(destination.realPos, new Vector3(7, 0, 5), 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget != new Vector3(7, 0, 5),
+            "changing destination cancels the old final segment and rechecks the blocked start");
+
+        state.Reset();
+        bfs.GetNextDir(start.realPos + Vector3.right * 0.1f, target, 100, 1f, Array.Empty<int>(), state);
+        Require(state.moveTarget == new Vector3(4, 0, 3),
+            "a large character escapes to a cell with a clear physical footprint");
+        state.Reset();
+        var restricted = navigation.navUnits[(3, 0, 3)];
+        restricted.passTypes.Add(7201);
+        bfs.GetNextDir(restricted.realPos + Vector3.right * 0.1f, new Vector3(7, 0, 5), 100, 0.5f,
+            Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == new Vector3(4, 0, 3),
+            "a pass-type restricted start also escapes to a legal center cell");
+        state.Reset();
+        bfs.GetNextDir(restricted.realPos, restricted.realPos + Vector3.right * 0.1f, 100, 0.5f,
+            new[] { 7201 }, state);
+        Require(!state.directEndpoint && state.moveTarget == restricted.realPos + Vector3.right * 0.1f,
+            "a character with the required pass type retains ordinary same-cell movement");
+        restricted.passTypes.Clear();
+        var restrictedTarget = navigation.navUnits[(7, 0, 5)];
+        restrictedTarget.passTypes.Add(7202);
+        state.Reset();
+        Vector3 restrictedCoordinate = restrictedTarget.realPos + Vector3.right * 0.1f;
+        bfs.GetNextDir(new Vector3(7, 0, 4), restrictedCoordinate, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == restrictedCoordinate,
+            "a pass-restricted destination is approached from the nearest legal cell");
+        direction = bfs.GetNextDir(new Vector3(7, 0, 4.65f), restrictedCoordinate, 100, 0.5f,
+            Array.Empty<int>(), state);
+        Require(state.directEndpoint && direction.z > 0f,
+            "the final phase remains active inside a pass-restricted destination");
+        restrictedTarget.passTypes.Clear();
+
+        state.Reset();
+        bfs.GetNextDir(new Vector3(0, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == new Vector3(1, 0, 3),
+            "a missing start cell escapes to the nearest actual walkable node");
+
+        state.Reset();
+        bfs.GetNextDir(new Vector3(7, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == target,
+            "a blocked target begins its final leg from the nearest reachable center");
+        state.Reset();
+        bfs.GetNextDir(new Vector3(3, 0, 2), target, 0, 0.5f, Array.Empty<int>(), state);
+        Require(!state.directEndpoint && state.moveTarget == new Vector3(3, 0, 2),
+            "a truncated BFS cannot mistake its start for the final anchor and cut through the map");
+
+        var isolated = NavUnit(6, 4);
+        isolated.realPos = target - Vector3.forward * 0.05f;
+        isolated.links.Add(isolated);
+        navigation.navUnits[(6, 0, 4)] = isolated;
+        state.Reset();
+        bfs.GetNextDir(new Vector3(7, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == target,
+            "a geometrically closer isolated cell is not selected as the destination anchor");
+        state.Reset();
+        bfs.GetNextDir(new Vector3(4, 0, 3), new Vector3(8, 0, 3), 100, 0.5f, Array.Empty<int>(), state);
+        Require(!state.directEndpoint && state.moveTarget != new Vector3(4, 0, 3),
+            "a missing destination cell routes through the graph before any final segment");
+        state.Reset();
+        var nullStart = navigation.navUnits[(2, 0, 1)];
+        nullStart.isNull = true;
+        bfs.GetNextDir(nullStart.realPos, target, 100, 0.5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget != nullStart.realPos,
+            "a zero-scale start with no floor does not throw during escape resolution");
+        navigation.navUnits.Clear();
+        state.Reset();
+        Require(bfs.GetNextDir(Vector3.zero, Vector3.one, 100, 0.5f, Array.Empty<int>(), state) == Vector3.zero,
+            "a map with no walkable cells returns no movement safely");
+
+        // Real ApplyMove must preserve ordinary/manual restrictions while only
+        // the explicitly scoped endpoint move can enter a restricted center Tile.
+        var character = Character();
+        var tile = map.utilCtrl.GetTile(6, 0, 5);
+        tile.SetPassTypes(new[] { 7201 });
+        var endpointFlag = typeof(CharacterUnit).GetProperty("isNavEndpointMove", BindingFlags.Instance | BindingFlags.NonPublic);
+        try
+        {
+            endpointFlag.GetSetMethod(true).Invoke(character, new object[] { true });
+            map.updateCtrl.ApplyMove(character, new Vector3(5.7f, 0, 5), Vector3.zero);
+            Require(Mathf.Abs(character.data.pos.x - 5.7f) < 0.0001f && character.belongTile == tile,
+                "direct endpoint application enters a restricted target without teleporting");
+            endpointFlag.GetSetMethod(true).Invoke(character, new object[] { false });
+            map.updateCtrl.ApplyMove(character, new Vector3(5.8f, 0, 5), Vector3.zero);
+            Require(Mathf.Abs(character.data.pos.x - 5.49f) < 0.0001f,
+                "manual movement still clamps to the nearest legal Tile");
+            var directMove = typeof(CharacterUnit).GetMethod("MoveForNavigation", BindingFlags.Instance | BindingFlags.NonPublic);
+            directMove.Invoke(character, new object[] { Vector3.zero, true });
+            Require(!(bool)endpointFlag.GetValue(character), "endpoint permission is reset after Move returns");
+            var characterState = (Z_Map.Analysis.NavigationEndpointState)typeof(CharacterUnit)
+                .GetField("navigationEndpointState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(character);
+            typeof(Z_Map.Analysis.NavigationEndpointState).GetField("finalApproach", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(characterState, true);
+            map.updateCtrl.ApplyMove(character, character.data.pos, Vector3.zero, true);
+            Require(!(bool)typeof(Z_Map.Analysis.NavigationEndpointState)
+                .GetField("finalApproach", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(characterState),
+                "teleport cancels any previous endpoint phase");
+        }
+        finally
+        {
+            endpointFlag.GetSetMethod(true).Invoke(character, new object[] { false });
+            tile.SetPassTypes(null);
+            map.updateCtrl.characterTileDic.Del(character);
+            foreach (var covered in map.updateCtrl.characterOverlapTileDic.Get(character).ToList())
+                map.updateCtrl.characterOverlapTileDic.Del(character, covered);
+        }
+    }
+
+    private static void ObjectCenterPassTypeRefresh()
+    {
+        // The regular fixture registers Tiles only in MapInfo. Full Nav rebuilds
+        // also consult the generated Form registry, so install it here in memory.
+        TileUnitForm.InitInternal();
+        ObjectUnitForm.InitInternal();
+        foreach (var tileData in map.data.maps.Values)
+            TileUnitForm.AddData(tileData);
+        map.navigationCtrl.navUnits = new Dictionary<(int, int, int), Z_Map.Analysis.NavUnit>();
+        var tile = map.utilCtrl.GetTile(12, 0, 12);
+        tile.SetPassTypes(new[] { 7001 });
+        var solidTile = map.utilCtrl.GetTile(6, 1, 6);
+        string solidOriginalPrefab = solidTile.data.prefabName;
+        solidTile.data.prefabName = MapInfo.GetPrefabName("mapground");
+        solidTile.InvalidateCollisionGeometry();
+        map.navigationCtrl.step = map.data.mainData.mapUnitSize.y / 3f;
+        map.navigationCtrl.RebuildNow();
+        Require(!map.navigationCtrl.IsBaseWalkable(6, 0, 6),
+            "solid terrain blocks the lower Nav cell before local Object updates");
+        var distant = map.navigationCtrl.navUnits[(0, 0, 0)];
+        var distantGround = distant.dirGroundY;
+        var distantHeights = distant.dirMaxY;
+        var distantPassTypes = distant.passTypes;
+        var first = new ObjectUnitForm.Data(25001, false, "", source.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+        var second = new ObjectUnitForm.Data(25002, false, "", source.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+
+        map.updateCtrl.RefreshObjectOverlap(first);
+        Require(tile.passTypes.Count == 0
+            && map.navigationCtrl.navUnits[(12, 0, 12)].passTypes.Count == 0,
+            "Object covering a Tile center immediately applies default pass type to Tile and Nav");
+        Require(ReferenceEquals(distantGround, distant.dirGroundY)
+            && ReferenceEquals(distantHeights, distant.dirMaxY)
+            && ReferenceEquals(distantPassTypes, distant.passTypes),
+            "Object refresh does not rebuild distant Nav cells or terrain samples");
+
+        map.updateCtrl.RefreshObjectOverlap(second);
+        map.updateCtrl.RemoveObjectOverlap(first);
+        Require(tile.passTypes.Count == 0
+            && map.navigationCtrl.navUnits[(12, 0, 12)].passTypes.Count == 0,
+            "removing one of two covering Objects keeps the Tile unrestricted");
+
+        var destination = map.utilCtrl.GetTile(11, 0, 12);
+        destination.SetPassTypes(new[] { 7002 });
+        second.data.pos = destination.data.pos;
+        map.updateCtrl.RefreshObjectOverlap(second);
+        Require(tile.passTypes.SequenceEqual(new[] { 7001 })
+            && destination.passTypes.Count == 0
+            && map.navigationCtrl.navUnits[(12, 0, 12)].passTypes.SetEquals(new[] { 7001 })
+            && map.navigationCtrl.navUnits[(11, 0, 12)].passTypes.Count == 0,
+            "moving an Object restores old and refreshes new Tile/Nav coverage");
+
+        map.updateCtrl.RemoveObjectOverlap(second);
+        Require(destination.passTypes.SequenceEqual(new[] { 7002 })
+            && map.navigationCtrl.navUnits[(11, 0, 12)].passTypes.SetEquals(new[] { 7002 }),
+            "removing the last covering Object restores terrain pass type in Tile and Nav");
+
+        var rotated = new ObjectUnitForm.Data(25003, false, "", source.name,
+            new Vector3(11.4f, 0f, 12.4f), new Vector3(0f, 45f, 0f), Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+        map.updateCtrl.RefreshObjectOverlap(rotated);
+        Require(tile.passTypes.SequenceEqual(new[] { 7001 }),
+            "rotated Object AABB overlap alone does not cover the Tile center");
+        map.updateCtrl.RemoveObjectOverlap(rotated);
+
+        var obstaclePrefab = Go("nav-obstacle");
+        obstaclePrefab.AddComponent<BoxCollider>().center = Vector3.up * 0.5f;
+        pool.AddPool(obstaclePrefab);
+        var obstacle = new ObjectUnitForm.Data(25004, true, "", obstaclePrefab.name,
+            new Vector3(6, 0, 6), Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        var nav = map.navigationCtrl.navUnits[(6, 0, 6)];
+        var groundHeights = (float[])nav.dirMaxY.Clone();
+        ObjectUnitForm.AddData(obstacle);
+        map.updateCtrl.RefreshObjectOverlap(obstacle.unit);
+        Require(nav.objectBlocked && nav.links.Count == 0,
+            "creating a tall obstacle immediately blocks the entire Nav cell");
+        RequireLocalNavMatchesFullBuild("obstacle creation");
+
+        var stationary = new ObjectUnitForm.Data(25005, true, "", obstaclePrefab.name,
+            new Vector3(6, 0, 6), Vector3.zero, new Vector3(0.8f, 0.7f, 0.8f),
+            UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        ObjectUnitForm.AddData(stationary);
+        map.updateCtrl.RefreshObjectOverlap(stationary.unit);
+        foreach (var position in new[] { new Vector3(6.1f, 0, 6), new Vector3(7.2f, 0, 6.3f), new Vector3(7, 1.5f, 6) })
+        {
+            obstacle.pos = position;
+            obstacle.euler = new Vector3(0, 31, 0);
+            obstacle.scale = new Vector3(2.2f, 2.4f, 1.4f);
+            map.updateCtrl.RefreshObjectOverlap(obstacle.unit);
+            RequireLocalNavMatchesFullBuild("overlapping obstacle move/rotation/scale " + position);
+        }
+        var rebuildMethod = typeof(Z_Map.Analysis.NavigationController).GetMethod(
+            "UpdateInternal", BindingFlags.Instance | BindingFlags.NonPublic);
+        var incremental = (System.Collections.IEnumerator)rebuildMethod.Invoke(map.navigationCtrl, new object[] { 64 });
+        incremental.MoveNext();
+        incremental.MoveNext();
+        obstacle.pos = new Vector3(8.2f, 0, 5.8f);
+        map.updateCtrl.RefreshObjectOverlap(obstacle.unit);
+        while (incremental.MoveNext()) { }
+        RequireLocalNavMatchesFullBuild("Object moved during periodic Nav rebuild");
+        Require(!map.navigationCtrl.IsBaseWalkable(6, 0, 6),
+            "local Object updates preserve solid-terrain blockage");
+        ObjectUnitForm.RemoveData(obstacle.uid);
+        map.updateCtrl.RemoveObjectOverlap(obstacle.unit);
+        RequireLocalNavMatchesFullBuild("moving obstacle removal with stationary overlap");
+        ObjectUnitForm.RemoveData(stationary.uid);
+        map.updateCtrl.RemoveObjectOverlap(stationary.unit);
+        Require(!nav.objectBlocked && nav.dirMaxY.Where((height, index) => Mathf.Abs(height - groundHeights[index]) < 0.0001f).Count() == 4,
+            "removing an obstacle clears whole-cell blockage and preserves slope ground heights");
+        tile.SetPassTypes(null);
+        destination.SetPassTypes(null);
+        solidTile.data.prefabName = solidOriginalPrefab;
+        solidTile.InvalidateCollisionGeometry();
+    }
+
+    private static void SavedBridgePassTypeCoverage()
+    {
+        // Numeric snapshot of local story 2's bridge 1: root (516,750,497),
+        // model base Y=-0.3 and size (2,0.1,1). Do not load/change the real save.
+        var fixtureTiles = new List<TileUnitForm.Data>();
+        void AddWaterTile(int x, int y, int z)
+        {
+            var tile = new TileUnitForm.Data(26000 + fixtureTiles.Count, "",
+                new Dictionary<int, int>(), new Vector3Int(x, y, z), source.name,
+                new Vector3(x, y * 1.5f, z), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int> { 2 });
+            tile.unit.SetPassTypes(tile.passType);
+            map.data.RegisterMap(tile);
+            TileUnitForm.AddData(tile);
+            fixtureTiles.Add(tile);
+        }
+        for (int x = 514; x <= 518; x++)
+        for (int z = 496; z <= 498; z++)
+            AddWaterTile(x, 500, z);
+        AddWaterTile(516, 501, 497);
+
+        var prefab = Go("saved-bridge-1");
+        prefab.AddComponent<ObjectInstance>();
+        var model = Go("bridge-model").transform;
+        model.SetParent(prefab.transform, false);
+        model.localPosition = new Vector3(0, -0.3f + 0.5f, 0);
+        model.localScale = new Vector3(2, 0.1f, 1);
+        pool.AddPool(prefab);
+        var saved = new ObjectUnitForm.Data(26020, false, "bridge 1", prefab.name,
+            new Vector3(516, 750, 497), Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        var bridge = ObjectUnitForm.GetDataByJo(ObjectUnitForm.GetJoByData(saved));
+        ObjectUnitForm.AddData(bridge);
+        // Scene-entry order: restore overlap/Tile state before the full Nav build.
+        map.updateCtrl.RefreshObjectOverlap(bridge.unit);
+        map.navigationCtrl.RebuildNow();
+        var character = new CharacterUnitForm.Data(26021, false, Vector3.zero,
+            1, 1, 1, false, "", source.name, bridge.pos, Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, 0, new List<int>()).unit;
+        var bfs = new Z_Map.Analysis.Bfs(map.navigationCtrl);
+        var footprint = new List<Vector2Int> { Vector2Int.zero };
+        for (int x = 515; x <= 517; x++)
+        {
+            var tile = map.utilCtrl.GetTile(x, 500, 497);
+            Require(tile.passTypes.Count == 0
+                && map.navigationCtrl.navUnits[(x, 500, 497)].passTypes.Count == 0
+                && character.CanPass(tile),
+                "loaded thin/down-offset bridge clears Tile/Nav/manual pass type at " + x);
+        }
+        Require(bfs.CanPass(map.navigationCtrl.navUnits[(515, 500, 497)],
+            map.navigationCtrl.navUnits[(516, 500, 497)], footprint, Array.Empty<int>()),
+            "character without water pass type can navigate across the loaded bridge");
+        Require(map.utilCtrl.GetTile(516, 501, 497).passTypes.Contains(2)
+            && map.utilCtrl.GetTile(516, 500, 496).passTypes.Contains(2)
+            && map.utilCtrl.GetTile(514, 500, 497).passTypes.Contains(2),
+            "bridge upward probe leaves other floors and horizontally uncovered water restricted");
+
+        bridge.pos += Vector3.forward;
+        map.updateCtrl.RefreshObjectOverlap(bridge.unit);
+        Require(map.utilCtrl.GetTile(516, 500, 497).passTypes.Contains(2)
+            && map.navigationCtrl.navUnits[(516, 500, 497)].passTypes.Contains(2)
+            && map.utilCtrl.GetTile(516, 500, 498).passTypes.Count == 0
+            && map.navigationCtrl.navUnits[(516, 500, 498)].passTypes.Count == 0,
+            "moving the saved bridge restores old water and clears new water locally");
+        bridge.pos -= Vector3.forward;
+        bridge.euler = new Vector3(0, 90, 0);
+        map.updateCtrl.RefreshObjectOverlap(bridge.unit);
+        Require(map.utilCtrl.GetTile(516, 500, 496).passTypes.Count == 0
+            && map.utilCtrl.GetTile(515, 500, 497).passTypes.Contains(2),
+            "rotated thin bridge uses its exact body, not only the AABB");
+        RequireLocalNavMatchesFullBuild("saved bridge movement/rotation");
+        ObjectUnitForm.RemoveData(bridge.uid);
+        map.updateCtrl.RemoveObjectOverlap(bridge.unit);
+        Require(fixtureTiles.All(tile => tile.unit.passTypes.Contains(2)
+            && map.navigationCtrl.navUnits[(tile.mapPos.x, tile.mapPos.y, tile.mapPos.z)].passTypes.Contains(2)),
+            "removing the saved bridge immediately restores all water requirements");
+        foreach (var tile in fixtureTiles)
+        {
+            map.data.UnRegisterMap(tile);
+            TileUnitForm.RemoveData(tile.uid);
+            map.navigationCtrl.navUnits.Remove((tile.mapPos.x, tile.mapPos.y, tile.mapPos.z));
+        }
+    }
+
+    private static void ObjectTileUpwardProbeRange()
+    {
+        var tile = map.utilCtrl.GetTile(10, 0, 10);
+        tile.SetPassTypes(new[] { 7004 });
+        map.navigationCtrl.RebuildNow();
+        var distant = map.navigationCtrl.navUnits[(0, 0, 0)];
+        var distantGround = distant.dirGroundY;
+        var distantPassTypes = distant.passTypes;
+        var prefab = Go("probe-body");
+        prefab.AddComponent<ObjectInstance>();
+        var model = Go("thin-probe-model").transform;
+        model.SetParent(prefab.transform, false);
+        model.localScale = new Vector3(1, 0.1f, 1);
+        pool.AddPool(prefab);
+        var obj = new ObjectUnitForm.Data(26030, false, "", prefab.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        foreach (var sample in new[]
+        {
+            (centerY: 0.05f, covered: true), // body bottom touches probe start 0
+            (centerY: 0.7f, covered: true),  // above the old 0.5 limit
+            (centerY: 1.05f, covered: true), // body bottom touches probe end 1
+            (centerY: 1.06f, covered: false),
+            (centerY: -0.05f, covered: true), // body top touches probe start 0
+            (centerY: -0.06f, covered: false)
+        })
+        {
+            model.localPosition = Vector3.up * sample.centerY;
+            map.updateCtrl.RefreshObjectOverlap(obj.unit);
+            Require((tile.passTypes.Count == 0) == sample.covered
+                && (map.navigationCtrl.navUnits[(10, 0, 10)].passTypes.Count == 0) == sample.covered,
+                "upward probe includes exactly 0..1 world units at model Y=" + sample.centerY);
+        }
+        model.localScale = new Vector3(2, 0.1f, 1);
+        model.localEulerAngles = new Vector3(0, 0, 45);
+        model.localPosition = new Vector3(-0.6f, 1.2f, 0);
+        map.updateCtrl.RefreshObjectOverlap(obj.unit);
+        Require(tile.passTypes.Contains(7004),
+            "tilted body AABB reaches probe but actual body at center column is above 1");
+        model.localPosition = new Vector3(0.6f, 1.2f, 0);
+        map.updateCtrl.RefreshObjectOverlap(obj.unit);
+        Require(tile.passTypes.Count == 0,
+            "tilted body crossing the middle of upward probe clears the requirement");
+        model.localPosition = Vector3.up * 0.5f;
+        model.localEulerAngles = Vector3.zero;
+        model.localScale = new Vector3(1, 0, 1);
+        map.updateCtrl.RefreshObjectOverlap(obj.unit);
+        Require(tile.passTypes.Count == 0,
+            "zero-thickness model crossing upward probe is detected without an inverse matrix");
+        map.updateCtrl.RemoveObjectOverlap(obj.unit);
+
+        var abovePrefab = Go("probe-above-physical-body");
+        abovePrefab.AddComponent<BoxCollider>().center = Vector3.up * 0.5f;
+        pool.AddPool(abovePrefab);
+        var above = new ObjectUnitForm.Data(26031, false, "", abovePrefab.name,
+            tile.data.pos + Vector3.up * 0.99f, Vector3.zero, new Vector3(4, 0.02f, 1),
+            UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        var neighbour = map.utilCtrl.GetTile(9, 0, 10);
+        neighbour.SetPassTypes(new[] { 7005 });
+        Require(!map.utilCtrl.GetVisionOverlap(above).Contains(neighbour),
+            "probe-only neighbour is not in the Object visual/owner index");
+        map.updateCtrl.RefreshObjectOverlap(above.unit);
+        Require(neighbour.passTypes.Count == 0
+            && map.navigationCtrl.navUnits[(9, 0, 10)].passTypes.Count == 0,
+            "upward probe independently finds reachable Object above neighbouring Tile");
+        map.updateCtrl.RemoveObjectOverlap(above.unit);
+        Require(tile.passTypes.Contains(7004) && neighbour.passTypes.Contains(7005)
+            && map.navigationCtrl.navUnits[(9, 0, 10)].passTypes.Contains(7005),
+            "removing probe-only coverage restores Tile and Nav requirements");
+        Require(ReferenceEquals(distantGround, distant.dirGroundY)
+            && ReferenceEquals(distantPassTypes, distant.passTypes),
+            "upward-probe refreshes do not rebuild distant Nav or terrain samples");
+        tile.SetPassTypes(null);
+        neighbour.SetPassTypes(null);
+    }
+
+    private static void BridgeObstacleNavigation()
+    {
+        // Play overwrites saved isObstacle=false with product.collision=true.
+        // Reproduce both complete bridge corridors, including their dry-bank caps.
+        var tiles = new List<TileUnitForm.Data>();
+        var bridges = new List<ObjectUnitForm.Data>();
+        var flatPrefab = Go("bridge-nav-flat-tile");
+        pool.AddPool(flatPrefab);
+        void AddTile(int x, int z, bool water, int y = 500)
+        {
+            var requirements = water ? new List<int> { 2 } : new List<int>();
+            var tile = new TileUnitForm.Data(27000 + tiles.Count, "", new Dictionary<int, int>(),
+                new Vector3Int(x, y, z), flatPrefab.name, new Vector3(x, y * 1.5f, z),
+                Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "",
+                false, false, requirements);
+            tile.unit.SetPassTypes(requirements);
+            map.data.RegisterMap(tile);
+            TileUnitForm.AddData(tile);
+            tiles.Add(tile);
+        }
+        for (int x = 514; x <= 518; x++)
+        for (int z = 494; z <= 500; z++)
+            AddTile(x, z, z == 497 || z == 498);
+        for (int x = 508; x <= 514; x++)
+        for (int z = 490; z <= 493; z++)
+            AddTile(x, z, x == 511 || x == 512);
+        AddTile(516, 497, false, 501);
+        AddTile(517, 497, false, 501);
+        GameObject BridgePrefab(string name, Vector3 size)
+        {
+            var prefab = Go(name);
+            prefab.AddComponent<ObjectInstance>();
+            var model = Go(name + "-model");
+            model.transform.SetParent(prefab.transform, false);
+            model.transform.localPosition = Vector3.up * 0.2f;
+            model.transform.localScale = size;
+            model.AddComponent<BoxCollider>();
+            var trigger = model.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+            trigger.size = Vector3.one + new Vector3(0.02f / size.x, 0.02f / size.y, 0.02f / size.z);
+            pool.AddPool(prefab);
+            return prefab;
+        }
+        var bridge1 = BridgePrefab("nav-bridge-1", new Vector3(2, 0.1f, 1));
+        var bridge2 = BridgePrefab("nav-bridge-2", new Vector3(1, 0.1f, 2));
+        void AddBridge(GameObject prefab, Vector3 position)
+        {
+            var obj = new ObjectUnitForm.Data(27100 + bridges.Count, false, "", prefab.name,
+                position, Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+            ObjectUnitForm.AddData(obj);
+            map.updateCtrl.RefreshObjectOverlap(obj.unit);
+            obj.isObstacle = true; // Play scene correction after the Map has begun.
+            map.updateCtrl.RefreshObjectOverlap(obj.unit);
+            bridges.Add(obj);
+        }
+        for (int z = 496; z <= 498; z++)
+            AddBridge(bridge1, new Vector3(516, 750, z));
+        for (int x = 510; x <= 513; x++)
+            AddBridge(bridge2, new Vector3(x, 750, 492));
+        map.navigationCtrl.Build();
+
+        foreach (var obj in bridges)
+        {
+            var p = map.utilCtrl.RealPos2MapPosInt(obj.pos);
+            var nav = map.navigationCtrl.navUnits[(p.x, p.y, p.z)];
+            float physicalTop = obj.unit.GetMeshes(CollideType.CollideOnly).Max(mesh => mesh.GetMaxY());
+            Require(!nav.objectBlocked && nav.dirMaxY.All(height => Mathf.Abs(height - 750f) < 0.0001f)
+                && Mathf.Abs(physicalTop - 750.25f) < 0.0001f,
+                "bridge below 0.3 stays passable without replacing Tile ground heights: " + obj.prefabName);
+        }
+        var bfs = new Z_Map.Analysis.Bfs(map.navigationCtrl);
+        var predecessors = (Dictionary<Z_Map.Analysis.NavUnit, Z_Map.Analysis.NavUnit>)typeof(Z_Map.Analysis.Bfs)
+            .GetField("pre", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(bfs);
+        void RequireRoute(Vector3 from, Vector3 to, string name)
+        {
+            Vector3 expected = (to - from).normalized;
+            Require(Vector3.Dot(bfs.GetNextDir(from, to, 100, 0.4f, Array.Empty<int>()), expected) > 0.99f,
+                name + " navigates from dry bank through bridge to the opposite bank");
+            var target = map.utilCtrl.RealPos2MapPosInt(to);
+            Require(predecessors.ContainsKey(map.navigationCtrl.navUnits[(target.x, target.y, target.z)]),
+                name + " actually reaches the opposite bank, not just the closest reachable cell");
+            Require(Vector3.Dot(bfs.GetNextDir(to, from, 100, 0.4f, Array.Empty<int>()), -expected) > 0.99f,
+                name + " also navigates in the opposite direction");
+            target = map.utilCtrl.RealPos2MapPosInt(from);
+            Require(predecessors.ContainsKey(map.navigationCtrl.navUnits[(target.x, target.y, target.z)]),
+                name + " actually reaches the starting bank in reverse");
+        }
+        RequireRoute(new Vector3(516, 750, 495), new Vector3(516, 750, 499), "bridge 1");
+        RequireRoute(new Vector3(509, 750, 492), new Vector3(514, 750, 492), "bridge 2");
+        bridges[1].pos += Vector3.right;
+        map.updateCtrl.RefreshObjectOverlap(bridges[1].unit);
+        RequireLocalNavMatchesFullBuild("bridge collider local movement");
+
+        // Physical bodies can be offset outside both visual and pass-probe cells.
+        // Reapplying an overlapping body's height must use the physical index.
+        var offsetPrefab = Go("nav-offset-body");
+        var offsetCollider = offsetPrefab.AddComponent<BoxCollider>();
+        offsetCollider.center = new Vector3(1, 1.75f, 3);
+        offsetCollider.size = new Vector3(0.8f, 0.5f, 0.8f);
+        pool.AddPool(offsetPrefab);
+        AddBridge(offsetPrefab, new Vector3(516, 750, 494));
+        var offsetObject = bridges[bridges.Count - 1];
+        var offsetTile = map.data.maps[(517, 501, 497)].unit;
+        Require(!map.updateCtrl.objectTileDic.Get(offsetObject.unit).Contains(offsetTile),
+            "offset physical body is outside its visual/owner cells");
+        Require(map.navigationCtrl.navUnits[(517, 501, 497)].objectBlocked,
+            "offset Collider creation immediately refreshes its actual upper-layer cell");
+        RequireLocalNavMatchesFullBuild("offset physical body creation");
+        offsetObject.pos += Vector3.left;
+        map.updateCtrl.RefreshObjectOverlap(offsetObject.unit);
+        Require(!map.navigationCtrl.navUnits[(517, 501, 497)].objectBlocked
+            && map.navigationCtrl.navUnits[(516, 501, 497)].objectBlocked,
+            "offset Collider movement restores the old footprint and updates the new footprint");
+        RequireLocalNavMatchesFullBuild("offset physical body movement");
+        foreach (var obj in bridges)
+        {
+            ObjectUnitForm.RemoveData(obj.uid);
+            map.updateCtrl.RemoveObjectOverlap(obj.unit);
+        }
+        RequireLocalNavMatchesFullBuild("bridge and offset physical body removal");
+        var negativeMesh = Z_Mesh.Mesh.GetMesh(new Vector3(-2.2f, -1.2f, -3.6f), Vector3.zero,
+            new Vector3(1, 0.1f, 1));
+        Require(map.utilCtrl.TryGetObjectNavigationRange(negativeMesh, out var low, out var high)
+            && low == new Vector3Int(-3, -1, -4) && high == new Vector3Int(-2, -1, -3),
+            "navigation body range handles negative positions without world-integer truncation");
+        var originalCellSize = map.data.mainData.mapUnitSize;
+        try
+        {
+            map.data.mainData.mapUnitSize = new Vector3(2, 1.5f, 3);
+            var scaledCellMesh = Z_Mesh.Mesh.GetMesh(new Vector3(-4, 1.5f, -6), Vector3.zero,
+                new Vector3(3, 1, 4));
+            Require(map.utilCtrl.TryGetObjectNavigationRange(scaledCellMesh, out low, out high)
+                && low == new Vector3Int(-3, 1, -3) && high == new Vector3Int(-1, 1, -1),
+                "navigation body range respects non-unit map cell dimensions");
+        }
+        finally
+        {
+            map.data.mainData.mapUnitSize = originalCellSize;
+        }
+        foreach (var tile in tiles)
+        {
+            map.data.UnRegisterMap(tile);
+            TileUnitForm.RemoveData(tile.uid);
+            map.navigationCtrl.navUnits.Remove((tile.mapPos.x, tile.mapPos.y, tile.mapPos.z));
+        }
+    }
+
+    private static void WholeTileObjectNavigation()
+    {
+        var controller = map.navigationCtrl;
+        var method = typeof(Z_Map.Analysis.NavigationController).GetMethod("IsObjectMeshBlocking", BindingFlags.Instance | BindingFlags.NonPublic);
+        var blocks = (Func<MeshInfo, Z_Map.Analysis.NavUnit, bool>)Delegate.CreateDelegate(
+            typeof(Func<MeshInfo, Z_Map.Analysis.NavUnit, bool>), controller, method);
+        var node = new Z_Map.Analysis.NavUnit
+        {
+            realPos = Vector3.zero, dirGroundY = new float[4]
+        };
+        MeshInfo Body(Vector3 center, Vector3 size, Vector3 rotation = default) => Z_Mesh.Mesh.GetMesh(center, rotation, size);
+        foreach (float top in new[] { 0.25f, 0.299f, 0.3f, 0.3002f, 0.31f })
+        {
+            var body = Body(new Vector3(0.4f, top * 0.5f, 0.4f), new Vector3(0.1f, top, 0.1f));
+            Require(blocks(body, node) == (top > 0.3f), "whole-cell corner body threshold " + top);
+        }
+        Require(blocks(Body(new Vector3(0, 0.5f, 0), new Vector3(0.05f, 1, 0.05f)), node),
+            "small center body missed by all four old samples blocks whole cell");
+        Require(!blocks(Body(new Vector3(0.6f, 0.5f, 0), new Vector3(0.2f, 1, 0.2f)), node),
+            "body only touching cell edge does not occupy its area");
+        Require(!blocks(Body(new Vector3(0, 0.5f, 0), new Vector3(0, 1, 1)), node),
+            "zero horizontal collisionScale does not block navigation");
+        Require(!blocks(Body(new Vector3(0, -0.5f, 0), Vector3.one), node),
+            "body below ground does not block navigation");
+        Require(!blocks(Body(new Vector3(0.9f, 0.5f, 0.9f), new Vector3(1.5f, 1, 0.05f), new Vector3(0, 45, 0)), node),
+            "rotated AABB reaching a corner does not imply physical overlap");
+        // High end is outside this Tile; only the clipped body's local height counts.
+        var tilted = Body(new Vector3(0.7f, 0.1f, 0), new Vector3(1, 0.01f, 0.2f), new Vector3(0, 0, 45));
+        Require(tilted.GetMaxY() > 0.3f && !blocks(tilted, node),
+            "Object top outside Tile does not block a low intersecting portion");
+        node.dirGroundY = new[] { 0.25f, -0.25f, 0f, 0f }; // y=x plane
+        Require(!blocks(Body(new Vector3(0.4f, 0.3f, 0), new Vector3(0.1f, 0.2f, 0.1f)), node),
+            "height measured against slope ground under actual body, not Tile minimum");
+        Require(blocks(Body(new Vector3(-0.4f, -0.1f, 0), new Vector3(0.1f, 0.2f, 0.1f)), node),
+            "low-side slope body exceeding relative threshold blocks whole cell");
+        node.realPos = new Vector3(500, 751.5f, 500);
+        node.dirGroundY = Enumerable.Repeat(751.5f, 4).ToArray();
+        Require(!blocks(Body(node.realPos + new Vector3(0, 0.15f, 0), new Vector3(0.1f, 0.3f, 0.1f)), node),
+            "0.3 equality survives large-world float rounding");
+        node.realPos = Vector3.zero;
+        node.dirGroundY = new float[4];
+        Require(blocks(Z_Mesh.Mesh.GetMesh(new Vector3(0.4f, 0.3f, 0.4f), 0.1f, Vector3.zero, Vector3.one), node),
+            "Sphere corner body blocks entire cell");
+        Require(!blocks(Z_Mesh.Mesh.GetMesh(new Vector3(0.65f, 0.4f, 0.65f), 0.2f, Vector3.zero, Vector3.one), node),
+            "Sphere AABB corner without actual overlap is not blocked");
+        var allocationBody = Body(new Vector3(0.4f, 0.5f, 0.4f), new Vector3(0.1f, 1, 0.1f));
+        for (int i = 0; i < 20; i++) blocks(allocationBody, node);
+        long allocationStart = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 1000; i++) blocks(allocationBody, node);
+        Require(GC.GetAllocatedBytesForCurrentThread() == allocationStart,
+            "whole-cell body clipping allocates no per-cell temporary geometry");
+
+        // Dedicated flat terrain; the general geometry fixture deliberately uses
+        // a rotated/sloped prefab and is not a zero-height ground plane.
+        var flat = Go("whole-cell-flat-terrain");
+        pool.AddPool(flat);
+        var fixtureTiles = new List<TileUnitForm.Data>();
+        for (int x = 610; x <= 613; x++)
+        for (int z = 610; z <= 613; z++)
+        {
+            var data = new TileUnitForm.Data(28120 + fixtureTiles.Count, "", new Dictionary<int, int>(),
+                new Vector3Int(x, 500, z), flat.name, new Vector3(x, 750, z), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
+            map.data.RegisterMap(data);
+            TileUnitForm.AddData(data);
+            fixtureTiles.Add(data);
+        }
+        controller.RebuildNow();
+        var tile = map.utilCtrl.GetTile(611, 500, 611);
+        var nav = controller.navUnits[(611, 500, 611)];
+        var from = controller.navUnits[(611, 500, 610)];
+        var far = controller.navUnits[(0, 0, 0)];
+        var farGround = far.dirGroundY;
+        var farLinks = far.links;
+        var prefab = Go("whole-tile-corner-obstacle");
+        var collider = prefab.AddComponent<BoxCollider>();
+        collider.center = new Vector3(0.4f, 0.5f, 0.4f);
+        collider.size = new Vector3(0.1f, 1, 0.1f);
+        var trigger = prefab.AddComponent<BoxCollider>();
+        trigger.isTrigger = true;
+        trigger.size = Vector3.one * 10;
+        pool.AddPool(prefab);
+        var first = new ObjectUnitForm.Data(28101, true, "", prefab.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        var second = new ObjectUnitForm.Data(28102, true, "", prefab.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        ObjectUnitForm.AddData(first);
+        ObjectUnitForm.AddData(second);
+        try
+        {
+            map.updateCtrl.RefreshObjectOverlap(first.unit);
+            map.updateCtrl.RefreshObjectOverlap(second.unit);
+            Require(nav.objectBlocked && nav.links.Count == 0 && !from.links.Contains(nav)
+                && !controller.IsBaseWalkable(611, 500, 611), "corner obstacle removes outgoing and incoming links immediately");
+            var bfs = new Z_Map.Analysis.Bfs(controller);
+            Require(!bfs.CanPass(from, nav, new List<Vector2Int> { Vector2Int.zero }, Array.Empty<int>()),
+                "BFS cannot enter whole-cell obstacle from another direction");
+            var endpointState = new Z_Map.Analysis.NavigationEndpointState();
+            Vector3 escapeDirection = bfs.GetNextDir(tile.data.pos + Vector3.right * 0.1f,
+                tile.data.pos + Vector3.right * 0.2f, 100, 0f, Array.Empty<int>(), endpointState);
+            Require(!bfs.CanPass(nav) && endpointState.directEndpoint
+                && escapeDirection != Vector3.zero
+                && endpointState.moveTarget != tile.data.pos + Vector3.right * 0.2f,
+                "blocked same-cell query first escapes to a walkable cell rather than bypassing the obstacle");
+            RequireLocalNavMatchesFullBuild("whole-cell corner obstacle");
+            farGround = far.dirGroundY;
+            farLinks = far.links;
+            ObjectUnitForm.RemoveData(first.uid);
+            map.updateCtrl.RemoveObjectOverlap(first.unit);
+            Require(nav.objectBlocked, "removing one overlap preserves other obstacle blockage");
+            second.pos += Vector3.right;
+            map.updateCtrl.RefreshObjectOverlap(second.unit);
+            Require(!nav.objectBlocked && from.links.Contains(nav) && controller.navUnits[(612, 500, 611)].objectBlocked,
+                "movement restores old cell and blocks new cell without full rebuild");
+            Require(ReferenceEquals(farGround, far.dirGroundY) && ReferenceEquals(farLinks, far.links),
+                "local object update preserves distant ground and link containers");
+            RequireLocalNavMatchesFullBuild("whole-cell movement");
+            second.scale = new Vector3(0, 1, 0);
+            map.updateCtrl.UpdateSingleOne(second.unit);
+            Require(!controller.navUnits[(612, 500, 611)].objectBlocked,
+                "zero collision footprint immediately restores Nav cell");
+            second.scale = Vector3.one;
+            map.updateCtrl.UpdateSingleOne(second.unit);
+            Require(controller.navUnits[(612, 500, 611)].objectBlocked,
+                "restoring physical footprint immediately restores blockage");
+            collider.size = new Vector3(0.1f, 0.3f, 0.1f);
+            collider.center = new Vector3(0.4f, 0.15f, 0.4f);
+            map.updateCtrl.UpdateSingleOne(second.unit);
+            Require(!controller.navUnits[(612, 500, 611)].objectBlocked, "0.3 equality becomes passable despite enlarged Trigger");
+            RequireLocalNavMatchesFullBuild("whole-cell threshold equality");
+            var spherePrefab = Go("whole-tile-sphere-obstacle");
+            spherePrefab.AddComponent<SphereCollider>().center = new Vector3(0.4f, 0.5f, 0.4f);
+            pool.AddPool(spherePrefab);
+            second.prefabName = spherePrefab.name;
+            map.updateCtrl.UpdateSingleOne(second.unit);
+            Require(controller.navUnits[(612, 500, 611)].objectBlocked, "Sphere enters physical navigation index and blocks immediately");
+            RequireLocalNavMatchesFullBuild("whole-cell sphere");
+            second.scale = Vector3.one * 0.25f;
+            map.updateCtrl.UpdateSingleOne(second.unit);
+            Require(!controller.navUnits[(612, 500, 611)].objectBlocked,
+                "scaled Sphere top below 0.3 updates its old physical coverage");
+            RequireLocalNavMatchesFullBuild("whole-cell scaled Sphere");
+        }
+        finally
+        {
+            if (ObjectUnitForm.DataByUid.ContainsKey(first.uid)) ObjectUnitForm.RemoveData(first.uid);
+            map.updateCtrl.RemoveObjectOverlap(first.unit);
+            ObjectUnitForm.RemoveData(second.uid);
+            map.updateCtrl.RemoveObjectOverlap(second.unit);
+        }
+        Require(!controller.navUnits[(612, 500, 611)].objectBlocked, "removal restores whole-cell navigation");
+        RequireLocalNavMatchesFullBuild("whole-cell final removal");
+        foreach (var data in fixtureTiles)
+        {
+            map.data.UnRegisterMap(data);
+            TileUnitForm.RemoveData(data.uid);
+            controller.navUnits.Remove((data.mapPos.x, data.mapPos.y, data.mapPos.z));
+        }
+    }
+
+    private static void ObjectCollisionScalePassTypeCoverage()
+    {
+        var tile = map.utilCtrl.GetTile(6, 0, 10);
+        var neighbour = map.utilCtrl.GetTile(5, 0, 10);
+        tile.SetPassTypes(new[] { 7101 });
+        neighbour.SetPassTypes(new[] { 7102 });
+        map.navigationCtrl.RebuildNow();
+        var farGround = map.navigationCtrl.navUnits[(0, 0, 0)].dirGroundY;
+        var farPass = map.navigationCtrl.navUnits[(0, 0, 0)].passTypes;
+
+        var prefab = Go("collision-scale-pass-body");
+        prefab.AddComponent<ObjectInstance>();
+        var model = Go("collision-scale-model");
+        model.transform.SetParent(prefab.transform, false);
+        model.transform.localPosition = new Vector3(-0.3f, 0.2f, 0);
+        model.transform.localScale = new Vector3(2, 0.1f, 1);
+        var body = Go("collision-scale-collider");
+        body.transform.SetParent(model.transform, false);
+        body.AddComponent<BoxCollider>();
+        var trigger = body.AddComponent<BoxCollider>();
+        trigger.isTrigger = true;
+        trigger.size = new Vector3(10, 10, 10);
+        var inactiveBody = Go("authored-disabled-collider");
+        inactiveBody.transform.SetParent(prefab.transform, false);
+        inactiveBody.AddComponent<BoxCollider>().size = Vector3.one * 20;
+        inactiveBody.SetActive(false);
+        prefab.SetActive(false);
+        pool.AddPool(prefab);
+        var obj = new ObjectUnitForm.Data(28001, false, "", prefab.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        ObjectUnitForm.AddData(obj);
+        var character = new CharacterUnitForm.Data(28002, false, Vector3.zero, 1, 1, 1, false, "",
+            source.name, tile.data.pos, Vector3.zero, Vector3.one, UpdateType.ShowOnly,
+            new List<int>(), "", false, 0, new List<int>()).unit;
+        var bfs = new Z_Map.Analysis.Bfs(map.navigationCtrl);
+        var footprint = new List<Vector2Int> { Vector2Int.zero };
+        try
+        {
+            foreach (float scale in new[] { 1f, 0.25f, 0.5f, 0f, 1f })
+            {
+                // Same nested Collider transform produced by MapModel.colliderScale.
+                body.transform.localScale = new Vector3(scale, 1, scale);
+                map.updateCtrl.UpdateSingleOne(obj.unit);
+                Require(obj.unit.GetMeshes(CollideType.CollideOnly).Count == 1,
+                    "inactive prefab root retains physical body but excludes authored disabled child");
+                bool centerCovered = scale >= 0.5f;
+                bool neighbourCovered = scale == 1f;
+                Require(map.utilCtrl.IsTileCenterCoveredByObject(tile, obj) == centerCovered
+                    && map.utilCtrl.IsTileCenterCoveredByObject(neighbour, obj) == neighbourCovered,
+                    "collisionScale controls exact body coverage without Trigger/visual expansion: " + scale);
+                Require((tile.passTypes.Count == 0) == centerCovered
+                    && (neighbour.passTypes.Count == 0) == neighbourCovered
+                    && (map.navigationCtrl.navUnits[(6, 0, 10)].passTypes.Count == 0) == centerCovered
+                    && (map.navigationCtrl.navUnits[(5, 0, 10)].passTypes.Count == 0) == neighbourCovered,
+                    "collisionScale change immediately updates old/new Tile and Nav pass types");
+                Require(character.CanPass(tile) == centerCovered
+                    && bfs.CanPass(map.navigationCtrl.navUnits[(6, 0, 9)], map.navigationCtrl.navUnits[(6, 0, 10)],
+                        footprint, Array.Empty<int>()) == centerCovered,
+                    "manual movement and navigation share the scaled pass requirement");
+                Require(ReferenceEquals(farGround, map.navigationCtrl.navUnits[(0, 0, 0)].dirGroundY)
+                    && ReferenceEquals(farPass, map.navigationCtrl.navUnits[(0, 0, 0)].passTypes),
+                    "collisionScale refresh does not rebuild distant Nav cells");
+                Require(map.utilCtrl.TryGetVisionBounds(obj, out var visual) && visual.size.x > 1.9f,
+                    "collisionScale never shrinks visual bounds");
+            }
+            RequireLocalNavMatchesFullBuild("collisionScale pass update");
+            obj.pos += Vector3.right * 0.3f;
+            body.transform.localScale = new Vector3(0, 1, 0);
+            map.updateCtrl.UpdateSingleOne(obj.unit);
+            Require(!map.utilCtrl.IsTileCenterCoveredByObject(tile, obj) && tile.passTypes.Contains(7101),
+                "collisionScale zero does not override pass types even directly above the probe");
+            body.transform.localScale = new Vector3(0.25f, 1, 0.25f);
+            map.updateCtrl.UpdateSingleOne(obj.unit);
+            Require(tile.passTypes.Count == 0 && neighbour.passTypes.Contains(7102),
+                "small shifted Collider covers the actual center only");
+            obj.euler = new Vector3(0, 90, 0);
+            map.updateCtrl.UpdateSingleOne(obj.unit);
+            Require(map.utilCtrl.GetObjectPassTypeOverlap(obj).All(t => map.utilCtrl.IsTileCenterCoveredByObject(t, obj)),
+                "rotated scaled body index contains only exact probe hits");
+            map.RemoveObject(obj);
+            Require(tile.passTypes.Contains(7101) && neighbour.passTypes.Contains(7102)
+                && map.navigationCtrl.navUnits[(6, 0, 10)].passTypes.Contains(7101),
+                "removing a scaled body restores original terrain pass requirements");
+        }
+        finally
+        {
+            if (ObjectUnitForm.DataByUid.ContainsKey(obj.uid)) map.RemoveObject(obj);
+            tile.SetPassTypes(null);
+            neighbour.SetPassTypes(null);
+        }
+
+        var spherePrefab = Go("collision-scale-sphere");
+        var sphereBody = Go("collision-scale-sphere-body");
+        sphereBody.transform.SetParent(spherePrefab.transform, false);
+        sphereBody.transform.localPosition = new Vector3(-0.3f, 0.5f, 0);
+        sphereBody.AddComponent<SphereCollider>().radius = 0.5f;
+        var sphereTrigger = sphereBody.AddComponent<SphereCollider>();
+        sphereTrigger.radius = 10;
+        sphereTrigger.isTrigger = true;
+        spherePrefab.SetActive(false);
+        pool.AddPool(spherePrefab);
+        var sphere = new ObjectUnitForm.Data(28003, false, "", spherePrefab.name, tile.data.pos,
+            Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+        ObjectUnitForm.AddData(sphere);
+        tile.SetPassTypes(new[] { 7101 });
+        try
+        {
+            foreach (var sample in new[] { (scale: 1f, covered: true), (scale: 0.5f, covered: false), (scale: 0.6f, covered: true) })
+            {
+                sphereBody.transform.localScale = Vector3.one * sample.scale;
+                map.updateCtrl.UpdateSingleOne(sphere.unit);
+                Require(map.utilCtrl.IsTileCenterCoveredByObject(tile, sphere) == sample.covered
+                    && (tile.passTypes.Count == 0) == sample.covered,
+                    "sphere collisionScale uses actual radius, excluding enlarged Trigger");
+            }
+            sphere.pos += Vector3.right * 0.3f;
+            sphereBody.transform.localScale = Vector3.zero;
+            map.updateCtrl.UpdateSingleOne(sphere.unit);
+            Require(!map.utilCtrl.IsTileCenterCoveredByObject(tile, sphere) && tile.passTypes.Contains(7101),
+                "zero-radius sphere directly on probe does not override terrain requirements");
+        }
+        finally
+        {
+            map.RemoveObject(sphere);
+            tile.SetPassTypes(null);
+        }
+    }
+
+    private static void ObjectMarksAndMissionCoordinates()
+    {
+        var markPrefab = Go("MapPrefab$mapMark");
+        markPrefab.AddComponent<MeshRenderer>();
+        markPrefab.AddComponent<BoxCollider>();
+        markPrefab.transform.position = new Vector3(334, 130, 95);
+        markPrefab.transform.rotation = Quaternion.Euler(90, 0, 0);
+        var objectPrefab = Go("marker-owner-template");
+        var model = Go("marker-owner-model");
+        model.transform.SetParent(objectPrefab.transform, false);
+        model.AddComponent<MeshRenderer>();
+        model.AddComponent<BoxCollider>();
+        objectPrefab.AddComponent<ObjectInstance>();
+        objectPrefab.SetActive(false);
+        var instancePool = new InstancePool(objectPrefab, Go("marker-live-instance-root").transform);
+        var root = instancePool.Get();
+        var ins = root.GetComponent<ObjectInstance>();
+        // This fixture is EditMode; drive the runtime MonoBehaviour callbacks
+        // explicitly, as Unity does for enabled/disabled instances in Play.
+        var onEnable = typeof(ObjectInstance).GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.NonPublic);
+        var onDisable = typeof(ObjectInstance).GetMethod("OnDisable", BindingFlags.Instance | BindingFlags.NonPublic);
+        onEnable.Invoke(ins, null);
+        var originalRenderers = ins.renderers;
+        try
+        {
+            ins.EnsureMapMark(markPrefab, false);
+            var mark = root.transform.Find(markPrefab.name);
+            Require(mark != null && mark.parent == root.transform
+                && mark.localScale == Vector3.one && mark.localPosition == Vector3.zero,
+                "UGC marker attaches at Object root with unit local scale and no prefab world offset");
+            Require(Quaternion.Angle(mark.localRotation, markPrefab.transform.localRotation) < 0.01f,
+                "marker preserves authored plane rotation");
+            Require(!mark.gameObject.activeSelf && !mark.GetComponent<Collider>().enabled,
+                "map-edit marker hidden and never participates in physics");
+            ins.EnsureMapMark(markPrefab, true);
+            Require(root.transform.childCount == 2 && ReferenceEquals(ins.renderers, originalRenderers)
+                && ins.renderers.Length == 1 && objectPrefab.transform.childCount == 1,
+                "marker is unique, excludes model renderer slots, and never modifies source prefab geometry");
+            Z_EventHelper.Invoke(new ObjectMarkVisibilityEvent { visible = false });
+            Require(!mark.gameObject.activeSelf, "leaving Event mode hides marker through event");
+            Z_EventHelper.Invoke(new ObjectMarkVisibilityEvent { visible = true });
+            Require(mark.gameObject.activeSelf, "entering Event mode shows marker through event");
+            instancePool.Push(root);
+            onDisable.Invoke(ins, null);
+            Require(!mark.gameObject.activeSelf, "pool disable hides marker and unregisters listener");
+            Z_EventHelper.Invoke(new ObjectMarkVisibilityEvent { visible = true });
+            Require(!mark.gameObject.activeSelf, "inactive pooled root ignores mode event");
+            var reused = instancePool.Get();
+            onEnable.Invoke(ins, null);
+            Require(reused == root && !mark.gameObject.activeSelf && root.transform.childCount == 2,
+                "pool restores original renderer slots without overflow or duplicate marker");
+            ins.EnsureMapMark(markPrefab, true);
+            Z_EventHelper.Invoke(new ObjectMarkVisibilityEvent { visible = false });
+            Require(!mark.gameObject.activeSelf, "reused Object listener re-registers for mode changes");
+            pool.AddPool(markPrefab);
+            var mod = (ModSceneController)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(ModSceneController));
+            typeof(ModSceneController).GetField("enable", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(mod, true);
+            mod.designType = DesignType.Event;
+            Require(mark.gameObject.activeSelf, "ModScene mode setter publishes Event marker visibility");
+            mod.layer = 2;
+            Require(!mark.gameObject.activeSelf, "ModScene layer selection exits Event and hides marker");
+            var objectData = new ObjectUnitForm.Data(29002, false, "", objectPrefab.name, Vector3.zero,
+                Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
+            objectData.unit.ins = ins;
+            mod.designType = DesignType.Event;
+            mod.OnEvent(new ObjectEvent { type = MapEventType.Show, unit = objectData.unit });
+            Require(mark.gameObject.activeSelf && root.transform.childCount == 2,
+                "Object Show in Event mode attaches/shows marker without duplication");
+            typeof(ModSceneController).GetField("enable", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(mod, false);
+            mod.designType = DesignType.Event;
+            Require(!mark.gameObject.activeSelf, "disabled ModScene never leaves markers in Play");
+        }
+        finally
+        {
+            onDisable.Invoke(ins, null);
+            Object.DestroyImmediate(root);
+        }
+
+        var mission = new Form.MissionForm.Data(29001, "coordinates", 0, "", true, false, false, true,
+            1, new Vector3(3, 2, -4), 0);
+        var oldSize = map.data.mainData.mapUnitSize;
+        try
+        {
+            foreach (var size in new[] { Vector3.one, new Vector3(2, 1.5f, 3) })
+            {
+                map.data.mainData.mapUnitSize = size;
+                var world = map.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(mission.targetPos));
+                Require(MissionGuide.GetTargetWorldPosition(mission) == world,
+                    "mission target converts player coordinates with origin offset and map cell size");
+                Require(Mathf.Abs(MissionGuide.GetDistance(mission, world)) < 0.0001f,
+                    "standing at mission destination displays zero distance");
+                Require(Mathf.Abs(MissionGuide.GetDistance(mission, world + new Vector3(3, 4, 0)) - 5) < 0.0001f,
+                    "mission distance is Euclidean world meters, independent of map cell size");
+            }
+        }
+        finally { map.data.mainData.mapUnitSize = oldSize; }
+        MissionHudEverySecond(mission);
+    }
+
+    private static void MissionHudEverySecond(Form.MissionForm.Data mission)
+    {
+        Form.MissionForm.InitInternal();
+        Form.ProgressForm.InitInternal();
+        Form.SceneForm.InitInternal();
+        Z_Text.Form.TextBaseForm.InitInternal();
+        Z_Text.Form.TextBaseForm.AddData(new Z_Text.Form.TextBaseForm.Data(29001, "m", "m", "米"));
+        Z_Text.Form.TextBaseForm.AddData(new Z_Text.Form.TextBaseForm.Data(29002, "go to ", "go to ", "前往"));
+        mission.received = true;
+        mission.fail = false;
+        Form.MissionForm.AddData(mission);
+        var progress = (Form.ProgressForm.Data)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(Form.ProgressForm.Data));
+        progress.uid = 1;
+        progress.enableMission = true;
+        progress.curMissionId = mission.id;
+        Form.ProgressForm.AddData(progress);
+        var scene = new Form.SceneForm.Data(1, "destination", 0, Vector2.zero, true, false,
+            new Dictionary<string, Form.EventTriggerForm.Data>(), new Dictionary<int, List<string>>(),
+            new Dictionary<int, List<string>>(), false);
+        Form.SceneForm.AddData(scene);
+        var gameGo = Go("mission-test-game");
+        gameGo.SetActive(false);
+        var game = gameGo.AddComponent<GameManager>();
+        typeof(Z_MonoSingleton<GameManager>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, game);
+        game.curScene = scene;
+        var playGo = Go("mission-test-play");
+        playGo.SetActive(false);
+        var play = playGo.AddComponent<PlayManager>();
+        typeof(Z_MonoSingleton<PlayManager>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, play);
+        var sceneCtrl = new PlaySceneController(play);
+        play.sceneCtrl = sceneCtrl;
+        var player = new CharacterUnitForm.Data(29003, false, Vector3.zero, 1, 1, 1, false, "",
+            source.name, MissionGuide.GetTargetWorldPosition(mission), Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", false, 0, new List<int>());
+        typeof(PlaySceneController).GetField("_playerM", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(sceneCtrl, player);
+        var hudGo = Go("mission-test-hud");
+        var hudHolder = hudGo.AddComponent<Z_Ui.Base.UiHolder>();
+        var widgetGo = Go("mission-test-widget");
+        widgetGo.transform.SetParent(hudGo.transform, false);
+        var widgetHolder = widgetGo.AddComponent<Z_Ui.Base.UiHolder>();
+        var distanceGo = Go("mission-test-distance");
+        distanceGo.transform.SetParent(widgetGo.transform, false);
+        // Test controller text writes without loading font assets or opening
+        // TMP's resource-import window in this headless EditMode project.
+        distanceGo.SetActive(false);
+        var distance = distanceGo.AddComponent<Z_Ui.Base.Txt>();
+        distance.languageTranslatable = false;
+        var descGo = Go("mission-test-description");
+        descGo.transform.SetParent(widgetGo.transform, false);
+        descGo.SetActive(false);
+        var desc = descGo.AddComponent<Z_Ui.Base.Txt>();
+        desc.languageTranslatable = false;
+        var widgetView = (Ui.PlaySceneMain.PlaySceneMission.UiPlaySceneMissionView)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(Ui.PlaySceneMain.PlaySceneMission.UiPlaySceneMissionView));
+        widgetView.txt_distance = distance;
+        widgetView.txt_ = desc;
+        var widget = new Ui.PlaySceneMain.PlaySceneMission.UiPlaySceneMissionCtrl
+        { uiHolder = widgetHolder, inited = true, view = widgetView };
+        var hudView = (Ui.PlaySceneMain.UiPlaySceneMainView)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(Ui.PlaySceneMain.UiPlaySceneMainView));
+        hudView.page_PlaySceneMission = widget;
+        var hud = new Ui.PlaySceneMain.UiPlaySceneMainCtrl { uiHolder = hudHolder, inited = true, view = hudView };
+        hud.Register<StoryLifeEvent>();
+        try
+        {
+            widget.Refresh();
+            Require(distance.text == "0m", "HUD starts at correct zero distance rather than origin-offset distance");
+            for (int second = 1; second <= 3; second++)
+            {
+                player.pos = MissionGuide.GetTargetWorldPosition(mission) + Vector3.right * second;
+                Z_EventHelper.Invoke(new StoryLifeEvent { type = StoryLifeEventType.EverySecond });
+                Require(distance.text == second + "m", "EverySecond updates HUD using current player data: " + second);
+            }
+            player.pos += Vector3.right;
+            Z_EventHelper.Invoke(new StoryLifeEvent { type = StoryLifeEventType.Enter });
+            Require(distance.text == "3m", "other lifecycle events do not refresh mission distance");
+            var otherScene = new Form.SceneForm.Data(2, "other destination", 0, Vector2.zero, true, false,
+                new Dictionary<string, Form.EventTriggerForm.Data>(), new Dictionary<int, List<string>>(),
+                new Dictionary<int, List<string>>(), false);
+            Form.SceneForm.AddData(otherScene);
+            mission.targetSceneId = 2;
+            Z_EventHelper.Invoke(new StoryLifeEvent { type = StoryLifeEventType.EverySecond });
+            Require(distance.text == "go to other destination", "cross-scene mission shows destination rather than meaningless distance");
+            mission.targetSceneId = 999;
+            Z_EventHelper.Invoke(new StoryLifeEvent { type = StoryLifeEventType.EverySecond });
+            Require(distance.text == "", "missing target scene clears stale distance");
+            mission.received = false;
+            hud.OnEvent(new MissionEvent { type = MissionEventType.Done, data = mission });
+            Require(!widgetGo.activeSelf, "no available mission hides widget");
+            mission.received = true;
+            mission.targetSceneId = 1;
+            hud.OnEvent(new MissionEvent { type = MissionEventType.Add, data = mission });
+            Require(widgetGo.activeSelf && distance.text == "4m", "active parent restores hidden mission widget on mission event");
+            hud.OnHide();
+            player.pos += Vector3.right;
+            Z_EventHelper.Invoke(new StoryLifeEvent { type = StoryLifeEventType.EverySecond });
+            Require(distance.text == "4m", "HUD OnHide unregisters per-second listener");
+        }
+        finally { hud.Unregister<StoryLifeEvent>(); }
+    }
+
+    private static void EventOperatorRendering()
+    {
+        // Exercise the actual Unit controller's queued child params without loading
+        // an authored panel or touching the real story/event registries.
+        var root = Go("event-operator-parts");
+        root.SetActive(false);
+        var rect = root.AddComponent<RectTransform>();
+        var holder = root.AddComponent<Z_Ui.Base.UiHolder>();
+        holder.elementTrsLst = Enumerable.Repeat<Transform>(rect, 8).ToList();
+        var unit = new Ui.ModStoryEventEditWindow.UiUnitCtrl
+        {
+            view = new Ui.ModStoryEventEditWindow.UiUnitView(holder),
+            model = new Ui.ModStoryEventEditWindow.UiUnitModel()
+        };
+        unit.model.con = new Z_Ui.Base.UiContainer<Ui.ModStoryEventEditWindow.UiUnitCtrl>(unit, root, false);
+        var render = unit.GetType().GetMethod("RenderOperator", BindingFlags.Instance | BindingFlags.NonPublic);
+        var decompiler = new Z_Code.Decompiler();
+        Z_Code.SyntaxNode Parse(string expression)
+        {
+            var errors = new List<Z_Code.CompileError>();
+            var tokens = new Z_Code.LexicalAnalysis().Execute(expression + ";", errors);
+            var nodes = new Z_Code.SyntaxAnalysis().Execute(tokens, errors);
+            Require(errors.Count == 0 && nodes.Count == 1, "event operator fixture parses: " + expression);
+            return nodes[0];
+        }
+        string Render(Z_Code.SyntaxNode node)
+        {
+            if (node.desc.type != Z_Code.CodeType.Operator)
+                return decompiler.ResetStatement(node);
+            unit.model.con.paramLst.Clear();
+            unit.model.node = node;
+            render.Invoke(unit, null);
+            var parts = unit.model.con.paramLst.Cast<Ui.ModStoryEventEditWindow.UiUnitParam>().ToArray();
+            foreach (var child in node.subNodes)
+                Require(parts.Count(part => ReferenceEquals(part.node, child)) == 1,
+                    "every operator operand remains an editable Unit exactly once: " + node.desc.code);
+            Require(parts.All(part => part.parent == rect), "operator children stay inside their owning Unit");
+            return string.Concat(parts.Select(part => part.node == null ? part.txt : Render(part.node)));
+        }
+        var cases = new[]
+        {
+            ("a&&b", "a && b"), ("a||b", "a || b"), ("!a", "!a"),
+            ("a%b", "a % b"), ("-a", "-a"), ("+a", "+a"),
+            ("i++", "i++"), ("a+=b", "a += b"),
+            ("(a||b)&&c", "(a || b) && c"), ("a&&(b||c)", "a && (b || c)"),
+            ("!(a&&b)", "!(a && b)"), ("-(a+b)", "-(a + b)"),
+            ("a-(b-c)", "a - (b - c)"), ("a==\"\"", "a equal to \"\""),
+            ("lst[i]%2", "(lst[i]) % 2")
+        };
+        foreach (var sample in cases)
+        {
+            var node = Parse(sample.Item1);
+            string original = decompiler.ResetStatement(node);
+            for (int i = 0; i < 2; i++)
+                Require(Render(node) == sample.Item2, "event Unit renders complete grouped syntax: " + sample.Item1);
+            Require(decompiler.ResetStatement(node) == original, "rendering leaves the stored syntax tree unchanged");
+        }
+        var enemyCondition = Parse("GetVectorLength(GetCharacterPosition(lst[i])-GetCharacterPosition(param1))"
+            + "<GetCharacterParameter(param1,\"射程\")&&IsUnobstructed(GetCharacterPosition(lst[i]),GetCharacterPosition(param1))");
+        string enemyText = Render(enemyCondition);
+        Require(enemyText.Contains("GetVectorLength") && enemyText.Contains("射程")
+            && enemyText.Contains(" && ") && enemyText.Contains("IsUnobstructed"),
+            "enemy acquisition condition retains range and line-of-sight expressions in Item Units");
+
+        // Even existing operators remain complete when their description is absent.
+        var forms = Z_Code.Form.CmdDataForm.DataByName;
+        var plus = forms["+"];
+        forms.Remove("+");
+        try
+        {
+            Require(Render(Parse("left+right")) == "left + right", "missing operator metadata preserves source order");
+        }
+        finally
+        {
+            forms["+"] = plus;
+        }
+        var call = Parse("Example(\"\",,a)");
+        string originalCall = decompiler.ResetStatement(call);
+        unit.model.node = call;
+        unit.model.con.paramLst.Clear();
+        var createNode = unit.GetType().GetMethod("CreateNode", BindingFlags.Instance | BindingFlags.NonPublic);
+        foreach (var argument in call.subNodes)
+            createNode.Invoke(unit, new object[] { argument });
+        Require(unit.model.con.paramLst.Count == 1
+            && ReferenceEquals(((Ui.ModStoryEventEditWindow.UiUnitParam)unit.model.con.paramLst[0]).node, call.subNodes[2]),
+            "ordinary call arguments still hide empty strings and omitted slots");
+        Require(decompiler.ResetStatement(call) == originalCall, "hidden call arguments remain in stored syntax");
+    }
+
+    private static void RequireLocalNavMatchesFullBuild(string context)
+    {
+        var local = map.navigationCtrl.navUnits.ToDictionary(pair => pair.Key, pair => (
+            blocked: pair.Value.objectBlocked,
+            heights: (float[])pair.Value.dirMaxY.Clone(),
+            passTypes: pair.Value.passTypes.ToArray(),
+            links: pair.Value.links.Select(link => link.pos).ToArray()));
+        map.navigationCtrl.RebuildNow();
+        foreach (var pair in local)
+        {
+            var full = map.navigationCtrl.navUnits[pair.Key];
+            Require(full.objectBlocked == pair.Value.blocked
+                && full.dirMaxY.Where((height, index) => Mathf.Abs(height - pair.Value.heights[index]) < 0.0001f).Count() == 4
+                && full.passTypes.SetEquals(pair.Value.passTypes)
+                && full.links.Select(link => link.pos).SequenceEqual(pair.Value.links),
+                "local Nav matches full build at " + pair.Key + ": " + context);
+        }
     }
 
     private static void LegacyPassTypeSceneData()
@@ -852,6 +2071,163 @@ public static class MapRuntimeRegression
         ctrl.End();
     }
 
+    private sealed class EraseRemovalProbe : IZ_Listener<ObjectEvent>
+    {
+        public readonly List<ObjectUnit> removed = new List<ObjectUnit>();
+        public TileUnit owner;
+        public void OnEvent(ObjectEvent evt)
+        {
+            if (evt.type != MapEventType.Remove) return;
+            removed.Add(evt.unit);
+            Require(evt.unit.belongTile == owner && map.data.maps.ContainsValue(owner.data),
+                "erase removes Objects before clearing Tile ownership/terrain");
+        }
+    }
+
+    private static void EraseBrushOwnedUnits()
+    {
+        // EditMode does not invoke the runtime child-Form registration hooks.
+        Form.MapEraseForm.InitInternal();
+        TileUnitForm.InitInternal();
+        ObjectUnitForm.InitInternal();
+        CharacterUnitForm.InitInternal();
+        ItemUnitForm.InitInternal();
+        var ctrl = map.updateCtrl;
+        var erase = typeof(ModSceneController).GetMethod("EraseTile", BindingFlags.Instance | BindingFlags.NonPublic);
+        Require(erase != null, "real ModScene erase operation exists");
+        // Avoid registering input/Tile listeners: only the erase operation is exercised.
+        var mod = (ModSceneController)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(ModSceneController));
+        var brushes = new[]
+        {
+            Form.MapEraseForm.DataByName["all erase"],
+            Form.MapEraseForm.DataByName["remain terrain"],
+            new Form.MapEraseForm.Data(0, "objects only", 0, 0, false, true, false, false, false),
+            new Form.MapEraseForm.Data(0, "characters only", 0, 0, false, false, false, true, false),
+            new Form.MapEraseForm.Data(0, "items only", 0, 0, false, false, true, false, false),
+            new Form.MapEraseForm.Data(0, "terrain only", 0, 0, true, false, false, false, false),
+            new Form.MapEraseForm.Data(0, "none", 0, 0, false, false, false, false, false)
+        };
+        var passIndex = (Z_DoubleDictionary.DoubleDictionary<ObjectUnit, TileUnit>)typeof(MapUpdateController)
+            .GetField("objectPassTypeTileDic", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(ctrl);
+        var navigationIndex = (Z_DoubleDictionary.DoubleDictionary<ObjectUnit, TileUnit>)typeof(MapUpdateController)
+            .GetField("objectNavigationTileDic", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(ctrl);
+        for (int scenario = 0; scenario < brushes.Length; scenario++)
+        {
+            ctrl.End();
+            var brush = brushes[scenario];
+            int firstId = 30000 + scenario * 20;
+            TileUnitForm.Data Tile(int offset, int x)
+            {
+                var data = new TileUnitForm.Data(firstId + offset, "", new Dictionary<int, int> { [0] = 123, [1] = 456, [3] = 789 },
+                    new Vector3Int(x, 0, 40), source.name, new Vector3(x, 0, 40), Vector3.zero, Vector3.one,
+                    UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
+                TileUnitForm.AddData(data);
+                map.data.RegisterMap(data);
+                return data;
+            }
+            var tile = Tile(0, 40);
+            var neighbour = Tile(1, 43); // Outside terrain-neighbour refresh; overlap links are explicit below.
+            ctrl.curTileLst.Add(tile);
+            var units = new List<MapUnit>();
+            for (int i = 0; i < 3; i++)
+            {
+                bool foreign = i == 2;
+                var owner = foreign ? neighbour.unit : tile.unit;
+                var other = foreign ? tile.unit : neighbour.unit;
+                var obj = new ObjectUnitForm.Data(firstId + 2 + i * 3, false, "", source.name, owner.data.pos,
+                    Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+                ObjectUnitForm.AddData(obj.data);
+                ctrl.objectTileDic.Add(obj, owner);
+                ctrl.objectTileDic.Add(obj, other);
+                passIndex.Add(obj, tile.unit);
+                navigationIndex.Add(obj, tile.unit);
+                ctrl.curObjectLst.Add(obj.data);
+                units.Add(obj);
+                var character = new CharacterUnitForm.Data(firstId + 3 + i * 3, false, Vector3.zero, 1, 1, 1, false, "",
+                    source.name, owner.data.pos, Vector3.zero, Vector3.one * 3,
+                    UpdateType.ShowOnly, new List<int>(), "", false, 0, new List<int>()).unit;
+                CharacterUnitForm.AddData(character.data);
+                ctrl.characterTileDic.Add(character, owner);
+                ctrl.characterOverlapTileDic.Add(character, tile.unit);
+                ctrl.characterOverlapTileDic.Add(character, neighbour.unit);
+                ctrl.curCharacterLst.Add(character.data);
+                units.Add(character);
+                var item = new ItemUnitForm.Data(firstId + 4 + i * 3, "", source.name, owner.data.pos,
+                    Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
+                ItemUnitForm.AddData(item.data);
+                ctrl.itemTileDic.Add(item, owner);
+                ctrl.curItemLst.Add(item.data);
+                units.Add(item);
+            }
+            Require(tile.unit.subUnits.Count == 0, "erase fixture owners are not explicit bound subUnits");
+            var probe = new EraseRemovalProbe { owner = tile.unit };
+            probe.Register<ObjectEvent>();
+            try
+            {
+                erase.Invoke(mod, new object[] { tile, brush });
+                for (int i = 0; i < units.Count; i++)
+                {
+                    var unit = units[i];
+                    bool foreign = i >= 6;
+                    bool removed = !foreign && (unit is ObjectUnit ? brush.mObject : unit is CharacterUnit ? brush.character : brush.item);
+                    bool registered;
+                    bool visible;
+                    if (unit is ObjectUnit obj)
+                    {
+                        registered = ObjectUnitForm.DataByUid.ContainsKey(obj.data.uid);
+                        visible = ctrl.curObjectLst.Contains(obj.data);
+                        if (removed)
+                            Require(!ctrl.objectTileDic.TryGet(obj, out _) && !passIndex.TryGet(obj, out _) && !navigationIndex.TryGet(obj, out _),
+                                "erase clears Object visual/pass/navigation indexes");
+                    }
+                    else if (unit is CharacterUnit character)
+                    {
+                        registered = CharacterUnitForm.DataByUid.ContainsKey(character.data.uid);
+                        visible = ctrl.curCharacterLst.Contains(character.data);
+                        if (removed)
+                            Require(!ctrl.characterTileDic.TryGet(character, out _) && !ctrl.characterOverlapTileDic.TryGet(character, out _),
+                                "erase clears Character owner/overlap indexes");
+                    }
+                    else
+                    {
+                        var item = (ItemUnit)unit;
+                        registered = ItemUnitForm.DataByUid.ContainsKey(item.data.uid);
+                        visible = ctrl.curItemLst.Contains(item.data);
+                        if (removed) Require(!ctrl.itemTileDic.TryGet(item, out _), "erase clears Item owner index");
+                    }
+                    Require(registered == !removed && visible == !removed, brush.name + " correct Form/view removal for " + unit.GetType().Name);
+                    if (foreign) Require(unit.belongTile == neighbour.unit, "neighbour-owned overlap survives erase");
+                }
+                Require(probe.removed.Count == (brush.mObject ? 2 : 0) && probe.removed.Distinct().Count() == probe.removed.Count,
+                    "each erased Object emits one removal event");
+                Require(map.data.maps.ContainsValue(tile) == !brush.terrain && TileUnitForm.DataByUid.ContainsKey(tile.uid) == !brush.terrain
+                    && ctrl.curTileLst.Contains(tile) == !brush.terrain, "erase terrain flag and sparse map cleanup");
+                Require(tile.texDic.Count == 3 && tile.texDic[0] == 123 && tile.texDic[1] == 456 && tile.texDic[3] == 789,
+                    "entity erase preserves terrain textures and masks");
+                if (!brush.terrain)
+                {
+                    erase.Invoke(mod, new object[] { tile, brush });
+                    Require(probe.removed.Count == (brush.mObject ? 2 : 0), "repeat erase does not remove neighbours or emit duplicate events");
+                }
+            }
+            finally
+            {
+                probe.Unregister<ObjectEvent>();
+                ctrl.End();
+                foreach (var unit in units)
+                {
+                    if (unit is ObjectUnit obj) ObjectUnitForm.RemoveData(obj.data.uid);
+                    else if (unit is CharacterUnit character) CharacterUnitForm.RemoveData(character.data.uid);
+                    else ItemUnitForm.RemoveData(unit.data.uid);
+                }
+                map.data.UnRegisterMap(tile);
+                map.data.UnRegisterMap(neighbour);
+                TileUnitForm.RemoveData(tile.uid);
+                TileUnitForm.RemoveData(neighbour.uid);
+            }
+        }
+    }
+
     private static void IncrementalViewRefresh()
     {
         var ctrl = map.updateCtrl;
@@ -908,6 +2284,79 @@ public static class MapRuntimeRegression
             map.data.UnRegisterMap(tile);
         }
         map.data.mainData.viewSize = originalViewSize;
+    }
+
+    private static void HeightProjectedViewRefresh()
+    {
+        var ctrl = map.updateCtrl;
+        ctrl.End();
+        var originalSize = map.data.mainData.viewSize;
+        var originalMode = DynamicGlobalSettings.cameraMode;
+        map.data.mainData.viewSize = new Vector3Int(2, 3, 2);
+        var tiles = new List<TileUnitForm.Data>();
+        int uid = 600000;
+        for (int x = 60; x <= 64; x++)
+        for (int y = -2; y <= 2; y++)
+        for (int z = 60; z <= 70; z++)
+        {
+            var tile = new TileUnitForm.Data(uid++, "", new Dictionary<int, int>(), new Vector3Int(x, y, z),
+                source.name, new Vector3(x, y, z), Vector3.zero, Vector3.one,
+                UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
+            map.data.RegisterMap(tile);
+            Probe(tile.unit);
+            tiles.Add(tile);
+        }
+        var centerField = typeof(MapUpdateController).GetField("viewCenter", BindingFlags.Instance | BindingFlags.NonPublic);
+        var fresh = (Action<bool>)Delegate.CreateDelegate(typeof(Action<bool>), ctrl,
+            typeof(MapUpdateController).GetMethod("FreshMap", BindingFlags.Instance | BindingFlags.NonPublic));
+        Action<Vector3Int, CameraMode, bool> check = (center, mode, force) =>
+        {
+            var before = new HashSet<TileUnitForm.Data>(ctrl.curTileLst);
+            // The shared geometry prefab has no TileInstance. Supply inactive
+            // probes for entering/re-entering Tiles, like instances waiting in a pool.
+            foreach (var tile in tiles)
+            {
+                if (tile.unit.ins == null)
+                    Probe(tile.unit);
+                if (!before.Contains(tile))
+                    tile.unit.ins.gameObject.SetActive(false);
+            }
+            DynamicGlobalSettings.cameraMode = mode;
+            centerField.SetValue(ctrl, center);
+            fresh(force);
+            var expected = new HashSet<TileUnitForm.Data>(tiles.Where(tile =>
+            {
+                var p = tile.mapPos;
+                int layerCenterZ = center.z;
+                if (mode == CameraMode.Isometric && p.y < center.y)
+                    layerCenterZ += center.y - p.y;
+                return p.x >= center.x - 2 && p.x < center.x + 2
+                    && p.y >= center.y - 3 && p.y < center.y + 3
+                    && p.z >= layerCenterZ - 2 && p.z < layerCenterZ + 2;
+            }));
+            Require(ctrl.curTileLst.SetEquals(expected), "projected layer rectangles match visible Tiles: " + center + "/" + mode);
+            Require(ctrl.newMapLst.SetEquals(expected.Except(before))
+                && ctrl.delMapLst.SetEquals(before.Except(expected)), "projected entering/leaving sets match full visibility difference");
+            Require(tiles.All(tile => tile.unit.isShowing == expected.Contains(tile)), "projected bounds also update pooled Tile visibility");
+        };
+        check(new Vector3Int(62, 0, 63), CameraMode.Isometric, true);
+        check(new Vector3Int(62, 0, 63), CameraMode.Isometric, false);
+        check(new Vector3Int(63, 0, 64), CameraMode.Isometric, false);
+        check(new Vector3Int(63, 1, 64), CameraMode.Isometric, false);
+        check(new Vector3Int(62, -1, 63), CameraMode.Isometric, false);
+        check(new Vector3Int(62, -1, 63), CameraMode.Overhead, false);
+        check(new Vector3Int(62, -1, 63), CameraMode.Isometric, false);
+        check(new Vector3Int(70, 1, 72), CameraMode.Isometric, false);
+        check(new Vector3Int(62, 0, 63), CameraMode.Isometric, false);
+        check(new Vector3Int(62, 0, 63), CameraMode.Isometric, true);
+        ctrl.End();
+        foreach (var tile in tiles)
+        {
+            tile.unit.Hide();
+            map.data.UnRegisterMap(tile);
+        }
+        map.data.mainData.viewSize = originalSize;
+        DynamicGlobalSettings.cameraMode = originalMode;
     }
 
     private static void OcclusionTransparencyAndPriority()
@@ -1132,6 +2581,14 @@ public static class MapRuntimeRegression
         Require(ctrl.evts == null, "unused tile exit callback filtered");
         ctrl.OnEvent(new CollideEvent { a = character, b = tile, type = CollideEventType.TriggerEnter });
         Require(ctrl.evts != null, "tile touch callback retained");
+        // This fixture passes null for its owner; it must not receive later
+        // real removal events from the erase/collision-scale fixtures.
+        ctrl.Unregister<CollideEvent>();
+        ctrl.Unregister<TileEvent>();
+        ctrl.Unregister<ItemEvent>();
+        ctrl.Unregister<ObjectEvent>();
+        ctrl.Unregister<CharacterEvent>();
+        ctrl.Unregister<StoryLifeEvent>();
     }
 
     private static void Require(bool condition, string message)

@@ -29,16 +29,14 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
     public partial class UiModStoryEventCustomCtrl
     {
 
-        UiScrViewContainer<UiCategoryCtrl> catCon;
+        UiScrViewContainer<UiLabCtrl> labCon;
         UiScrViewContainer<UiItemCtrl> itemCon;
         public override void OnCreate()
         {
-            catCon = new UiScrViewContainer<UiCategoryCtrl>(this, view.go_category, view.scr_categorys);
+            labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_lab);
             itemCon = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
-            var itemRect = (RectTransform)view.scr_items.transform;
-            var typeRect = (RectTransform)view.scr_types.transform;
-            itemRect.anchorMin = new Vector2(typeRect.anchorMin.x, itemRect.anchorMin.y);
-            view.scr_types.gameObject.SetActive(false);
+            view.ipt_lab.onFinishInput += RenameCurrentLab;
+            view.btn_deleteLab.onClick.AddListener(DeleteCurrentLab);
             view.btn_edit.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModStoryEventEditWindowCtrl>(new UiModStoryEventEditWindowParam()
@@ -116,9 +114,70 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         {
             return GetDatas(string.Empty).Count > 0;
         }
+        private bool TryGetCurrentLab(out LabForm.Data lab)
+        {
+            lab = GetEventLabs().FirstOrDefault(item =>
+                item.belong == nameof(EventProgramDataForm) &&
+                !string.IsNullOrEmpty(model.cat) &&
+                item.lv1Lab == model.cat);
+            return lab != null;
+        }
+        private void RefreshLabEditor()
+        {
+            var canEdit = TryGetCurrentLab(out _);
+            view.ipt_lab.gameObject.SetActive(canEdit);
+            view.btn_deleteLab.gameObject.SetActive(canEdit);
+            view.ipt_lab.Set(canEdit ? model.cat : string.Empty);
+        }
+        private void RenameCurrentLab(string value)
+        {
+            if (!TryGetCurrentLab(out _) || string.IsNullOrWhiteSpace(value))
+            {
+                Refresh();
+                return;
+            }
+
+            var oldName = model.cat;
+            var newName = value.Trim();
+            if (newName == oldName)
+            {
+                Refresh();
+                return;
+            }
+
+            // A row represents one first-level name, even when legacy data uses several Lab IDs.
+            var oldLabIds = GetEventLabs()
+                .Where(lab => lab.belong == nameof(EventProgramDataForm) && lab.lv1Lab == oldName)
+                .Select(lab => lab.id)
+                .ToList();
+            var newLabId = LabForm.GetOrCreate(newName, string.Empty, string.Empty, nameof(EventProgramDataForm));
+            foreach (var data in GetDatas(oldName))
+                data.labId = newLabId;
+            foreach (var oldLabId in oldLabIds)
+                LabForm.RemoveData(oldLabId);
+
+            Sel(newName, model.data);
+        }
+        private void DeleteCurrentLab()
+        {
+            if (!TryGetCurrentLab(out _))
+                return;
+
+            var oldName = model.cat;
+            var oldLabIds = GetEventLabs()
+                .Where(lab => lab.belong == nameof(EventProgramDataForm) && lab.lv1Lab == oldName)
+                .Select(lab => lab.id)
+                .ToList();
+            foreach (var data in GetDatas(oldName))
+                data.labId = LabForm.NoneId;
+            foreach (var oldLabId in oldLabIds)
+                LabForm.RemoveData(oldLabId);
+
+            Sel(string.Empty);
+        }
         public void Refresh()
         {
-            catCon.Clear();
+            labCon.Clear();
             var categories = GetCategories();
             var hasUnclassifiedCategory = HasUnclassifiedCategory();
             if (model.cat != null &&
@@ -130,23 +189,24 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
             }
             if (hasUnclassifiedCategory)
             {
-                catCon.Add(new UiCategoryParam()
+                labCon.Add(new UiLabParam()
                 {
                     cat = string.Empty
                 });
             }
             foreach (var cat in categories)
             {
-                catCon.Add(new UiCategoryParam()
+                labCon.Add(new UiLabParam()
                 {
                     cat = cat
                 });
             }
-            catCon.Add(new UiCategoryParam()
+            labCon.Add(new UiLabParam()
             {
                 isNew = true
             });
-            catCon.Refresh();
+            labCon.Refresh();
+            RefreshLabEditor();
 
             itemCon.Clear();
 
@@ -193,17 +253,17 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         }
     }
 
-    public partial class UiCategoryParam
+    public partial class UiLabParam
     {
         public string cat;
         public bool isNew;
     }
-    public partial class UiCategoryModel
+    public partial class UiLabModel
     {
         public string cat;
         public bool isNew;
     }
-    public partial class UiCategoryCtrl
+    public partial class UiLabCtrl
     {
 
         public override void OnCreate()

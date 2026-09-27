@@ -138,6 +138,8 @@ Story folders are relative to `Application.persistentDataPath`. On Windows, Unit
 <story-id>/Cache/   logical scene working copies
 ```
 
+Play scene entry must keep `PlayManager.enable` false until the map-complete position callback and player creation finish. Capture first-entry status (`ProgressForm.sceneId == 0`) before asynchronous loading; first entry converts `targetScene.Item2` to world position, while resume retains saved `pos`. Reused player units must also be placed through `ApplyMove(..., teleport: true)` so data, transform and Tile indexes match the progress position before Enter events run.
+
 `GameSaveController` is a manual allow-list. For a new persistent Form, handle all of:
 
 1. Stable short filename.
@@ -193,7 +195,7 @@ AssetForm
 - Many `bytes/path/asset` fields are `unsave`; rebind loaded data to the absolute `ast/` path.
 - Import through `GameSaveController.AddStoryTex/AddStoryAudio/AddStoryVideo` so data is converted to the concrete Story subtype, IDs and Lab ownership are normalized, and asset events are emitted.
 - Batch media selection goes through `TexController/AudioController/VideoController.SelectMultiple`. Windows Editor uses `AssetFilePicker`'s native multi-file dialog; supported Player platforms delegate to NativeGallery. Import every returned item through the matching `GameSaveController.AddStory*` method rather than registering the batch directly.
-- Texture import accepts PNG/JPG/BMP/GIF/WebP. WebP is detected by its RIFF/WEBP signature as saved story asset filenames have no original extension. `TextureHelper.GetTextureByByte` returns the first composited WebP frame for static texture consumers; `TexAssetForm.Data.GetAnimationFrames/GetAnimationSprites` provides all frames to `Img` for timed playback. Keep the original WebP bytes in story asset storage so reloading can rebuild frames and sprites. The single-image and batch Windows Editor pickers both include `.webp`.
+- Texture import accepts PNG/JPG/BMP/GIF/WebP. WebP is detected by its RIFF/WEBP signature as saved story asset filenames have no original extension. `TexAssetForm.Data.GetTex()` returns the first decoded GIF frame (or the first composited WebP frame) for static consumers and correct image dimensions; `GetAnimationFrames/GetAnimationSprites` provides all frames to `Img` for timed playback. Keep the original animated bytes in story asset storage so reloading can rebuild frames and sprites. The single-image and batch Windows Editor pickers both include `.webp`.
 - Audio asset import recognizes `.mp3` and `.wav` files when scanning folders and in the Windows multi-file picker; Player platforms continue to use NativeGallery's audio MIME filter.
 - After a story's asset manifests load, repair missing character-animation `partTex` references through `GameSaveController.RepairMissingCharacterTextureReferences`. It creates one transparent Story texture per missing legacy ID and rewrites every affected `CharacterProductForm` entry so the repair persists on the next save.
 - Do not register base `TexAssetForm.Data` directly as Story data or reuse a base Form's Lab ID under a Story subtype.

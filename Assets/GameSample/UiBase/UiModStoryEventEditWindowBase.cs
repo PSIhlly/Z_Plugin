@@ -250,12 +250,10 @@ namespace Ui.ModStoryEventEditWindow
             public Btn btn_switchMod;
             public Sta sta_switchMod;
             public Btn btn_category;
-            public Btn btn_type;
             public Ipt ipt_name;
             public Sta sta_item;
             public Btn btn_apply;
             public Txt txt_category;
-            public Txt txt_type;
             public RectTransform rtf_itemRoot;
             public Ipt ipt_code;
             public Sta sta_unit;
@@ -278,22 +276,20 @@ namespace Ui.ModStoryEventEditWindow
             btn_switchMod = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             sta_switchMod = uiHolder.elementTrsLst[7].GetComponent<Sta>();
             btn_category = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_type = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            ipt_name = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            sta_item = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            btn_apply = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            txt_category = uiHolder.elementTrsLst[13].GetComponent<Txt>();
-            txt_type = uiHolder.elementTrsLst[14].GetComponent<Txt>();
-            rtf_itemRoot = uiHolder.elementTrsLst[15].GetComponent<RectTransform>();
-            ipt_code = uiHolder.elementTrsLst[16].GetComponent<Ipt>();
-            sta_unit = uiHolder.elementTrsLst[17].GetComponent<Sta>();
-            go_item = uiHolder.elementTrsLst[18].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[19].GetComponent<UiHolder>().ctrl;
-            btn_insert = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            btn_del = uiHolder.elementTrsLst[21].GetComponent<Btn>();
-            go_line = uiHolder.elementTrsLst[22].gameObject;
-            sub_line = (UiLineCtrl) uiHolder.elementTrsLst[23].GetComponent<UiHolder>().ctrl;
-            btn_edit = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[9].GetComponent<Ipt>();
+            sta_item = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            btn_apply = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            txt_category = uiHolder.elementTrsLst[12].GetComponent<Txt>();
+            rtf_itemRoot = uiHolder.elementTrsLst[13].GetComponent<RectTransform>();
+            ipt_code = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
+            sta_unit = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            go_item = uiHolder.elementTrsLst[16].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
+            btn_insert = uiHolder.elementTrsLst[18].GetComponent<Btn>();
+            btn_del = uiHolder.elementTrsLst[19].GetComponent<Btn>();
+            go_line = uiHolder.elementTrsLst[20].gameObject;
+            sub_line = (UiLineCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
+            btn_edit = uiHolder.elementTrsLst[22].GetComponent<Btn>();
         }
 
     }

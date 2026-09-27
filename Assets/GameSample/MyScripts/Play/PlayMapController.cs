@@ -14,11 +14,14 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
     public int tileSize = 8;
     public Dictionary<int, (Vector3, Sprite)> dic;
 
-    public SceneForm.Data curScene => SceneForm.DataByUid.GetDv(GameManager.instance.curProgress.sceneId, null);
+    public SceneForm.Data curScene => GameManager.instance.curScene;
+    public bool isReady { get; private set; }
     Dictionary<(int, int, int), TileUnitForm.Data> maps => MapManager.instance.data.maps;
     public Dictionary<int, Sprite> heightMap;
     public Dictionary<int, Texture2D> unlockTextureMap;
     public HashSet<int> unlockTiles;
+    private readonly HashSet<int> dirtyUnlockLayers = new HashSet<int>();
+    private Color[] unlockedTilePixels;
     public (int, int, int, int) size;
     public int rows => size.Item1 - size.Item2 + 1;
     public int cols => size.Item4 - size.Item3 + 1;
@@ -32,6 +35,8 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
 
     public void Begin()
     {
+        isReady = false;
+        dirtyUnlockLayers.Clear();
         heightMap.Clear();
         unlockTiles.Clear();
         unlockTextureMap.Clear();
@@ -43,9 +48,12 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
         RegisterNewScene();
         GenerateMinimapFromTiles();
         curScene.unlock = true;
+        isReady = rows > 0 && cols > 0;
     }
     public void End()
     {
+        isReady = false;
+        dirtyUnlockLayers.Clear();
         this.Unregister<ObjectEvent>();
         this.Unregister<ItemEvent>();
         this.Unregister<CharacterEvent>();
@@ -76,8 +84,10 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
     }
     public void RegisterNewScene()
     {
-
-        if (!_super.enable || maps == null || maps.Count == 0)
+        // Scene setup runs before PlayManager enables its frame updates.
+        // An empty map has zero rows/columns, rather than retaining the previous scene bounds.
+        size = (0, 1, 1, 0);
+        if (maps == null || maps.Count == 0)
             return;
 
         size.Item4 = int.MinValue;
@@ -97,6 +107,12 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
     }
     public void GenerateMinimapFromTiles()
     {
+        dirtyUnlockLayers.Clear();
+        if (maps == null || rows <= 0 || cols <= 0)
+            return;
+        EnsureUnlockPixelBlock();
+        // Reuse one transparent buffer for all height masks during scene setup.
+        var clearPixels = new Color32[cols * tileSize * rows * tileSize];
         Dictionary<int, List<TileUnitForm.Data>> dic = new Dictionary<int, List<TileUnitForm.Data>>();
         foreach (var kvp in maps)
         {
@@ -109,7 +125,8 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
         }
         foreach (var pair in dic)
         {
-            Texture2D unlock = TextureTransform.GetTargetSize(TextureHelper.transparentTexture, cols * tileSize, rows * tileSize);
+            var unlock = new Texture2D(cols * tileSize, rows * tileSize, TextureFormat.RGBA32, false);
+            unlock.SetPixels32(clearPixels);
             Texture2D[] tileTextures = new Texture2D[rows * cols];
             var tileDatas = pair.Value;
             foreach (var tileData in tileDatas)
@@ -124,13 +141,7 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
 
                 if (tileData.unlock)
                 {
-                    for (int i = 0; i < tileSize; i++)
-                    {
-                        for (int j = 0; j < tileSize; j++)
-                        {
-                            unlock.SetPixel(col * tileSize + i, row * tileSize + j, Color.black);
-                        }
-                    }
+                    unlock.SetPixels(col * tileSize, row * tileSize, tileSize, tileSize, unlockedTilePixels);
                     unlockTiles.Add(tileData.uid);
                 }
             }
@@ -138,31 +149,67 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
             minimapTex.wrapMode = TextureWrapMode.Clamp;
             unlock.wrapMode = TextureWrapMode.Clamp;
             Sprite minimapSprite = TextureHelper.GetSpriteByTexture(minimapTex);
-            unlock.Apply();
+            unlock.Apply(false, false);
             heightMap[pair.Key] = minimapSprite;
             unlockTextureMap[pair.Key] = unlock;
         }
 
     }
+    public bool TryGetRelativePosition(Vector3 worldPosition, out Vector2 relativePosition)
+    {
+        relativePosition = default;
+        if (!isReady || cols <= 0 || rows <= 0)
+            return false;
+
+        var mapPosition = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
+        // Bounds describe cell centers; include the half-cell border on both sides.
+        relativePosition = new Vector2(
+            (mapPosition.x - size.Item3 + 0.5f) / cols,
+            (mapPosition.z - size.Item2 + 0.5f) / rows);
+        return !float.IsNaN(relativePosition.x) && !float.IsInfinity(relativePosition.x)
+            && !float.IsNaN(relativePosition.y) && !float.IsInfinity(relativePosition.y);
+    }
+
     public void UpdateUnlock(TileUnitForm.Data data)
     {
-        if (!_super.enable)
+        if (!_super.enable || !isReady || data == null)
             return;
         int col = data.mapPos.x - size.Item3;
         int row = data.mapPos.z - size.Item2;
-        if (unlockTextureMap.TryGetValue(data.mapPos.y, out Texture2D unlock))
+        if (col < 0 || col >= cols || row < 0 || row >= rows)
+            return;
+        if (unlockTextureMap.TryGetValue(data.mapPos.y, out Texture2D unlock) && unlockTiles.Add(data.uid))
         {
-            for (int i = 0; i < tileSize; i++)
-            {
-                for (int j = 0; j < tileSize; j++)
-                {
-                    unlock.SetPixel(col * tileSize + i, row * tileSize + j, Color.black);
-                }
-            }
-            unlock.Apply();
-            unlockTiles.Add(data.uid);
-
+            EnsureUnlockPixelBlock();
+            unlock.SetPixels(col * tileSize, row * tileSize, tileSize, tileSize, unlockedTilePixels);
+            dirtyUnlockLayers.Add(data.mapPos.y);
         }
+    }
+
+    private void EnsureUnlockPixelBlock()
+    {
+        int pixelCount = tileSize * tileSize;
+        if (unlockedTilePixels != null && unlockedTilePixels.Length == pixelCount)
+            return;
+        unlockedTilePixels = new Color[pixelCount];
+        for (int i = 0; i < pixelCount; i++)
+            unlockedTilePixels[i] = Color.black;
+    }
+
+    public int FlushUnlockTextures()
+    {
+        if (!isReady || dirtyUnlockLayers.Count == 0)
+            return 0;
+        int uploads = 0;
+        // Called once in Play LateUpdate, after movement and event-driven reveals.
+        foreach (int layer in dirtyUnlockLayers)
+            if (unlockTextureMap.TryGetValue(layer, out var unlock))
+            {
+                unlock.Apply(false, false);
+                uploads++;
+            }
+        dirtyUnlockLayers.Clear();
+        return uploads;
     }
 
     public void OnEvent(CharacterEvent evt)
@@ -182,7 +229,7 @@ public class PlayMapController : Z_Controller<PlayManager>, IZ_Listener<ObjectEv
 
     public void OnEvent(TileEvent evt)
     {
-        if (evt.type == MapEventType.Show && !unlockTiles.Contains(evt.unit.data.uid))
+        if (evt.type == MapEventType.Show)
         {
             UpdateUnlock(evt.unit.data);
         }

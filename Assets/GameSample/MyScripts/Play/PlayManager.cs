@@ -35,6 +35,8 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public bool boxPlay;
 
     public bool enable;
+    private const string ScenePresentationLoadItem = "playSceneStart";
+    private bool scenePresentationPending;
 
     #region life
 
@@ -82,6 +84,12 @@ public class PlayManager : Z_MonoManager<PlayManager>
         {
             return;
         }
+        NotifySceneEntered();
+        UpdateScene();
+    }
+
+    private void NotifySceneEntered()
+    {
         if (GameManager.instance.curProgress.targetScene.Item1 == GameManager.instance.curScene.uid && GameManager.instance.curProgress.sceneId != GameManager.instance.curScene.uid)
         {
             GameManager.instance.curProgress.sceneId = GameManager.instance.curScene.uid;
@@ -96,6 +104,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
                 Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.Enter });
             }
         }
+    }
+
+    private void UpdateScene()
+    {
         //lifeEvent
         if (GameManager.instance.curProgress.targetScene.Item1 != GameManager.instance.curScene.uid && GameManager.instance.curProgress.eventState != EventState.Leave)
         {
@@ -127,9 +139,15 @@ public class PlayManager : Z_MonoManager<PlayManager>
             return;
         }
         GameManager.instance.evtCtrl.LateUpdate();
+        mapCtrl.FlushUnlockTextures();
+        // Entry scripts have now had their normal first pass (including ShowDialog).
+        // Keep loading above the HUD until this point even if BeginScene ran after Update.
+        CompleteScenePresentation();
     }
     public async void BeginStory(int id, bool boxPlay)
     {
+        // Do not update scene state while the initial map is loading asynchronously.
+        enable = false;
         this._folderName = Main2StoryManager.GetStoryFolderNameById(id);
         this.boxPlay = boxPlay;
 
@@ -152,9 +170,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
         LoadingManager.instance.RemoveLoadItem("playData");
 
+        var firstEnter = GameManager.instance.curProgress.sceneId == 0;
         Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.targetScene.Item1, () =>
         {
-            if (GameManager.instance.curProgress.sceneId == 0)
+            if (firstEnter)
             {
                 GameManager.instance.curProgress.pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2));
             }
@@ -165,28 +184,51 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
 
 
-        enable = true;
-
     }
 
 
 
     public void EndStory()
     {
+        CompleteScenePresentation();
         _assetCtrl.End();
         GameManager.instance.evtCtrl.Reset();
         enable = false;
     }
-    public async void BeginScene(int id)
+    public void BeginScene(int id)
     {
-        _sceneCtrl.Begin(id);
-        _infoCtrl.Begin();
-        mapCtrl.Begin();
-        effectCtrl.Begin();
+        scenePresentationPending = true;
+        LoadingManager.instance.AddLoadItem(ScenePresentationLoadItem);
+        try
+        {
+            _sceneCtrl.Begin(id);
+            _infoCtrl.Begin();
+            mapCtrl.Begin();
+            effectCtrl.Begin();
+            // Position and player creation must finish before lifecycle events/updates run.
+            enable = true;
+            NotifySceneEntered();
+        }
+        catch
+        {
+            enable = false;
+            CompleteScenePresentation();
+            throw;
+        }
+    }
+
+    private void CompleteScenePresentation()
+    {
+        if (!scenePresentationPending)
+            return;
+        scenePresentationPending = false;
+        LoadingManager.instance.RemoveLoadItem(ScenePresentationLoadItem);
     }
 
     public void EndScene()
     {
+        enable = false;
+        CompleteScenePresentation();
         effectCtrl.End();
         _sceneCtrl.End();
         _infoCtrl.End();

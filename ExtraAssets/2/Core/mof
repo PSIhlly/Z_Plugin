@@ -1,5 +1,87 @@
 [
   {
+    "id": 22,
+    "name": "触发1-1-1",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "8|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 0,
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 22
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
     "id": 14,
     "name": "树桩",
     "icon": 210000,
@@ -31,7 +113,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 1.0
+      "colliderScale": 0.3
     },
     "labId": 36,
     "collision": true,
@@ -881,7 +963,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.3
+      "colliderScale": 0.4
     },
     "labId": 5,
     "collision": true,
@@ -965,7 +1047,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.3
+      "colliderScale": 0.4
     },
     "labId": 5,
     "collision": true,
@@ -1895,7 +1977,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.3
+      "colliderScale": 0.4
     },
     "labId": 5,
     "collision": true,
@@ -1979,7 +2061,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.3
+      "colliderScale": 0.4
     },
     "labId": 5,
     "collision": true,
@@ -2312,7 +2394,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 1.0
+      "colliderScale": 0.8
     },
     "labId": 5,
     "collision": true,
@@ -2380,7 +2462,7 @@
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 1.0
+      "colliderScale": 0.8
     },
     "labId": 5,
     "collision": true,
@@ -2462,6 +2544,88 @@
         "v": [
           {
             "v": 172
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false
+  },
+  {
+    "id": 21,
+    "name": "空气墙",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "labId": 0,
+    "collision": true,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 21
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
           }
         ]
       },

@@ -35,7 +35,7 @@ namespace Ui.PlayMission
         public int y = 0;
         public bool isArea;
     }
-    public partial class UiPlayMissionCtrl
+    public partial class UiPlayMissionCtrl : IZ_Listener<StoryLifeEvent>, IZ_Listener<MissionEvent>
     {
         UiContainer<UiMissionCtrl> con;
         public override void OnCreate()
@@ -56,7 +56,26 @@ namespace Ui.PlayMission
         }
         public override void OnShow()
         {
+            this.Register<StoryLifeEvent>();
+            this.Register<MissionEvent>();
             Refresh();
+        }
+        public override void OnHide()
+        {
+            this.Unregister<StoryLifeEvent>();
+            this.Unregister<MissionEvent>();
+        }
+        public void OnEvent(StoryLifeEvent evt)
+        {
+            if (!active || evt.type != StoryLifeEventType.EverySecond)
+                return;
+            foreach (var prm in con.paramLst)
+                ((UiMissionCtrl)con.Get(prm).ctrl).RefreshDistance();
+        }
+        public void OnEvent(MissionEvent evt)
+        {
+            if (active)
+                Refresh();
         }
         public void Refresh()
         {
@@ -92,7 +111,7 @@ namespace Ui.PlayMission
             view.btn_.onClick.AddListener(() =>
             {
                 GameManager.instance.curProgress.curMissionId = model.prm.data.id;
-                parent.Refresh();
+                Z_EventHelper.Invoke(new MissionEvent { type = MissionEventType.Select, data = model.prm.data });
             });
         }
         public override void OnShow()
@@ -106,9 +125,11 @@ namespace Ui.PlayMission
             view.sta_.ChangeState(GameManager.instance.curProgress.curMissionId == model.prm.data.id ? 1 : 0);
             view.txt_name.text = model.prm.data.name;
             view.txt_desc.text = model.prm.data.desc;
-            var targetScene = SceneForm.DataByUid.GetDv(model.prm.data.targetSceneId, null);
-            if (targetScene != null)
-                view.txt_distance.text = model.prm.data.targetSceneId == GameManager.instance.curScene.uid ? Vector3.Magnitude(model.prm.data.targetPos - PlayManager.instance.sceneCtrl.GetPlayerPos()) + TextManager.instance.GetTxt("m") : TextManager.instance.GetTxt("go to ") + targetScene.name;
+            RefreshDistance();
+        }
+        public void RefreshDistance()
+        {
+            view.txt_distance.text = MissionGuide.GetDistanceText(model.prm.data);
         }
     }
 

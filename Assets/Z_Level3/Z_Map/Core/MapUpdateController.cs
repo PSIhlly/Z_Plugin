@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Z_Debug;
 using Z_DesignStyle;
+using Z_Map.Analysis;
 using Z_Map.Form;
 using Z_Math;
 using Z_Mesh;
@@ -26,6 +27,8 @@ namespace Z_Map
         private Vector3Int viewCenter;
 
         public DoubleDictionary<ObjectUnit, TileUnit> objectTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
+        private readonly DoubleDictionary<ObjectUnit, TileUnit> objectPassTypeTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
+        internal readonly DoubleDictionary<ObjectUnit, TileUnit> objectNavigationTileDic = new DoubleDictionary<ObjectUnit, TileUnit>();
         public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<CharacterUnit, TileUnit> characterOverlapTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
@@ -71,26 +74,33 @@ namespace Z_Map
             private set;
         }
         private bool hasView;
+        private bool lastViewIsometric;
+
+        private static (int minX, int maxX, int minZ, int maxZ) GetLayerView(
+            (int, int, int, int, int, int) view, int layerY, bool isometric)
+        {
+            int centerY = view.Item3 + (view.Item4 - view.Item3) / 2;
+            int offsetZ = isometric ? Mathf.Max(0, centerY - layerY) : 0;
+            return (view.Item1, view.Item2, view.Item5 + offsetZ, view.Item6 + offsetZ);
+        }
 
         private void FreshMap(bool forceFullScan)
         {
             var viewSize = _super.data.mainData.viewSize;
             var curView = (viewCenter.x - viewSize.x, viewCenter.x + viewSize.x, viewCenter.y - viewSize.y, viewCenter.y + viewSize.y, viewCenter.z - viewSize.z, viewCenter.z + viewSize.z);
+            bool isometric = DynamicGlobalSettings.cameraMode == CameraMode.Isometric;
             newMapLst.Clear();
             delMapLst.Clear();
-            if (!forceFullScan && hasView && curView.Equals(lastView))
+            if (!forceFullScan && hasView && curView.Equals(lastView) && isometric == lastViewIsometric)
                 return;
-
-            (int, int, int, int, int, int) commonView = (Mathf.Max(curView.Item1, lastView.Item1), Mathf.Min(curView.Item2, lastView.Item2),
-                Mathf.Max(curView.Item3, lastView.Item3), Mathf.Min(curView.Item4, lastView.Item4),
-                Mathf.Max(curView.Item5, lastView.Item5), Mathf.Min(curView.Item6, lastView.Item6));
 
             // Remove only Tiles that actually left this view (or were replaced in-place).
             foreach (var map in curTileLst)
             {
+                var layerView = GetLayerView(curView, map.mapPos.y, isometric);
                 if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
                     || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
-                    || map.mapPos.z >= curView.Item6 || map.mapPos.z < curView.Item5
+                    || map.mapPos.z >= layerView.maxZ || map.mapPos.z < layerView.minZ
                     || !_super.data.maps.TryGetValue((map.mapPos.x, map.mapPos.y, map.mapPos.z), out var current)
                     || !ReferenceEquals(current, map))
                 {
@@ -100,33 +110,32 @@ namespace Z_Map
             }
             curTileLst.ExceptWith(delMapLst);
 
-            bool overlapsLastView = hasView
-                && curView.Item1 < lastView.Item2 && curView.Item2 > lastView.Item1
-                && curView.Item3 < lastView.Item4 && curView.Item4 > lastView.Item3
-                && curView.Item5 < lastView.Item6 && curView.Item6 > lastView.Item5;
-
-            // First/forced/non-overlapping refresh scans the current view once.
-            // Ordinary movement scans only the non-overlapping entering slabs.
-            if (forceFullScan || !overlapsLastView)
+            // Each lower layer has its own projected rectangle. Compare it with
+            // that same layer's previous rectangle, including camera height changes.
+            for (int y = curView.Item3; y < curView.Item4; y++)
             {
-                ShowAndAddLst(curTileLst, curView.Item1, curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
-            }
-            else
-            {
-                if (curView.Item1 < lastView.Item1)
-                    ShowAndAddLst(curTileLst, curView.Item1, Mathf.Min(lastView.Item1, curView.Item2), curView.Item3, curView.Item4, curView.Item5, curView.Item6);
-                if (curView.Item2 > lastView.Item2)
-                    ShowAndAddLst(curTileLst, Mathf.Max(lastView.Item2, curView.Item1), curView.Item2, curView.Item3, curView.Item4, curView.Item5, curView.Item6);
+                var current = GetLayerView(curView, y, isometric);
+                var previous = GetLayerView(lastView, y, lastViewIsometric);
+                bool overlaps = hasView && y >= lastView.Item3 && y < lastView.Item4
+                    && current.minX < previous.maxX && current.maxX > previous.minX
+                    && current.minZ < previous.maxZ && current.maxZ > previous.minZ;
+                if (forceFullScan || !overlaps)
+                {
+                    ShowAndAddLst(curTileLst, current.minX, current.maxX, y, y + 1, current.minZ, current.maxZ);
+                    continue;
+                }
 
-                if (curView.Item3 < lastView.Item3)
-                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, curView.Item3, Mathf.Min(lastView.Item3, curView.Item4), curView.Item5, curView.Item6);
-                if (curView.Item4 > lastView.Item4)
-                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, Mathf.Max(lastView.Item4, curView.Item3), curView.Item4, curView.Item5, curView.Item6);
-
-                if (curView.Item5 < lastView.Item5)
-                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, curView.Item5, Mathf.Min(lastView.Item5, curView.Item6));
-                if (curView.Item6 > lastView.Item6)
-                    ShowAndAddLst(curTileLst, commonView.Item1, commonView.Item2, commonView.Item3, commonView.Item4, Mathf.Max(lastView.Item6, curView.Item5), curView.Item6);
+                // Four non-overlapping entering strips; unchanged layers do no queries.
+                int commonMinX = Mathf.Max(current.minX, previous.minX);
+                int commonMaxX = Mathf.Min(current.maxX, previous.maxX);
+                if (current.minX < previous.minX)
+                    ShowAndAddLst(curTileLst, current.minX, previous.minX, y, y + 1, current.minZ, current.maxZ);
+                if (current.maxX > previous.maxX)
+                    ShowAndAddLst(curTileLst, previous.maxX, current.maxX, y, y + 1, current.minZ, current.maxZ);
+                if (current.minZ < previous.minZ)
+                    ShowAndAddLst(curTileLst, commonMinX, commonMaxX, y, y + 1, current.minZ, previous.minZ);
+                if (current.maxZ > previous.maxZ)
+                    ShowAndAddLst(curTileLst, commonMinX, commonMaxX, y, y + 1, previous.maxZ, current.maxZ);
             }
 
             foreach (var newMap in newMapLst)
@@ -140,6 +149,7 @@ namespace Z_Map
 
             }
             lastView = curView;
+            lastViewIsometric = isometric;
             hasView = true;
         }
         private void UpdateRelatedUnit(TileUnit tile)
@@ -674,14 +684,60 @@ namespace Z_Map
             if (unit == null)
                 return;
 
+            var affectedTiles = new HashSet<TileUnit>(objectTileDic.Get(unit));
+            if (objectPassTypeTileDic.TryGet(unit, out var oldPassTiles))
+                affectedTiles.UnionWith(oldPassTiles);
+            if (objectNavigationTileDic.TryGet(unit, out var oldNavigationTiles))
+                affectedTiles.UnionWith(oldNavigationTiles);
             objectTileDic.Del(unit);
+            objectPassTypeTileDic.Del(unit);
+            objectNavigationTileDic.Del(unit);
             foreach (var tile in _super.utilCtrl.GetVisionOverlap(unit.data))
+            {
                 objectTileDic.Add(unit, tile);
+                affectedTiles.Add(tile);
+            }
+            foreach (var tile in _super.utilCtrl.GetObjectPassTypeOverlap(unit.data))
+            {
+                objectPassTypeTileDic.Add(unit, tile);
+                affectedTiles.Add(tile);
+            }
+            foreach (var tile in _super.utilCtrl.GetObjectNavigationOverlap(unit.data))
+            {
+                objectNavigationTileDic.Add(unit, tile);
+                affectedTiles.Add(tile);
+            }
+            RefreshObjectAffectedTiles(affectedTiles);
+        }
+
+        public void RemoveObjectOverlap(ObjectUnit unit)
+        {
+            var affectedTiles = new HashSet<TileUnit>(objectTileDic.Get(unit));
+            if (objectPassTypeTileDic.TryGet(unit, out var oldPassTiles))
+                affectedTiles.UnionWith(oldPassTiles);
+            if (objectNavigationTileDic.TryGet(unit, out var oldNavigationTiles))
+                affectedTiles.UnionWith(oldNavigationTiles);
+            objectTileDic.Del(unit);
+            objectPassTypeTileDic.Del(unit);
+            objectNavigationTileDic.Del(unit);
+            RefreshObjectAffectedTiles(affectedTiles);
+        }
+
+        private void RefreshObjectAffectedTiles(IEnumerable<TileUnit> tiles)
+        {
+            foreach (var tile in tiles)
+            {
+                bool covered = objectPassTypeTileDic.TryGet(tile, out var objects) && objects.Count > 0;
+                tile.SetObjectCenterCovered(covered);
+            }
+
+            if (_super.navigationCtrl?.navUnits != null)
+                _super.navigationCtrl.RefreshObjectTiles(tiles);
         }
         public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999, float agentRadius = 0f,
-            IReadOnlyCollection<int> passTypes = null)
+            IReadOnlyCollection<int> passTypes = null, NavigationEndpointState endpointState = null)
         {
-            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius, passTypes);
+            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius, passTypes, endpointState);
         }
         public void ResetView()
         {
@@ -690,7 +746,8 @@ namespace Z_Map
         public void UpdateInfo(bool forceFresh = false)
         {
             UpdateMapInfo();
-            if (forceFresh || (curCenterPos - lastCenterPos).sqrMagnitude >= 1f)
+            if (forceFresh || (curCenterPos - lastCenterPos).sqrMagnitude >= 1f
+                || lastViewIsometric != (DynamicGlobalSettings.cameraMode == CameraMode.Isometric))
             {
                 viewCenter = _super.utilCtrl.RealPos2MapPosInt(curCenterPos);
 
@@ -751,7 +808,10 @@ namespace Z_Map
         public void ApplyMove(MapUnit unit, Vector3 newPos, Vector3 euler, bool teleport = false)
         {
             var movingCharacter = unit as CharacterUnit;
+            if (movingCharacter != null && teleport)
+                movingCharacter.ResetNavigationEndpoint();
             var oldPos = unit.data.pos;
+            var oldEuler = unit.data.euler;
             var oldCharacterOverlap = movingCharacter == null
                 ? null
                 : new List<TileUnit>(characterOverlapTileDic.Get(movingCharacter));
@@ -760,7 +820,8 @@ namespace Z_Map
                 newPos = _super.utilCtrl.ClampMoveToAreaBoundary(oldPos, newPos, movingCharacter.mapBoundaryDistance);
                 // 先完成地图边界修正，再以最终中心所属 Tile 检查 passType。
                 // 否则边界修正可能把已检查的位置再推入受限 Tile。
-                newPos = movingCharacter.ClampMoveToPassType(oldPos, newPos);
+                if (!movingCharacter.isNavEndpointMove)
+                    newPos = movingCharacter.ClampMoveToPassType(oldPos, newPos);
             }
             var newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             if (!_super.utilCtrl.InArea(newMapPos))
@@ -768,7 +829,8 @@ namespace Z_Map
                 //InArea已包含下方有tile的判断，此处为完全不在区域内，拉回最近有效位置
                 newPos = movingCharacter == null
                     ? _super.utilCtrl.GetClosestInArea(newPos)
-                    : _super.utilCtrl.GetClosestInArea(newPos, movingCharacter.passTypes);
+                    : _super.utilCtrl.GetClosestInArea(newPos,
+                        movingCharacter.isNavEndpointMove ? null : movingCharacter.passTypes);
                 newMapPos = _super.utilCtrl.RealPos2MapPosInt(newPos);
             }
             // 决定关联哪个tile：防止重力微移导致y截断后误切换到下方tile
@@ -820,7 +882,7 @@ namespace Z_Map
             unit.data.euler = euler;
             if (movingCharacter != null)
                 RefreshCharacterOverlap(movingCharacter);
-            else if (unit is ObjectUnit movingObject)
+            else if (unit is ObjectUnit movingObject && (oldPos != newPos || oldEuler != euler))
                 RefreshObjectOverlap(movingObject);
         }
         public void CheckCollideEvent(Unit unit, Vector3 dir, IEnumerable<TileUnit> extraTiles = null)
@@ -1034,6 +1096,10 @@ namespace Z_Map
             hasView = false;
             lastCenterPos = Vector3.one * -9999999;
             objectTileDic.Clear();
+            foreach (var tile in objectPassTypeTileDic.GetDicT2().Keys)
+                tile.SetObjectCenterCovered(false);
+            objectPassTypeTileDic.Clear();
+            objectNavigationTileDic.Clear();
             characterTileDic.Clear();
             characterOverlapTileDic.Clear();
             itemTileDic.Clear();

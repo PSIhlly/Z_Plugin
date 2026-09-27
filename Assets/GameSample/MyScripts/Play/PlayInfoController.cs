@@ -34,7 +34,8 @@ public enum MissionEventType
 {
     Add,
     Fail,
-    Done
+    Done,
+    Select
 }
 public class MissionEvent : Z_Event
 {

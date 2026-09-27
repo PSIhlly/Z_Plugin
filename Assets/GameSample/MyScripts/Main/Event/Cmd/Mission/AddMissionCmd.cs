@@ -23,13 +23,13 @@ namespace Z_Code
         static void Init()
         {
             Register(new AddMissionCmd());
+            RegisterAlias("MissionAdd", new AddMissionCmd());
         }
         public override string GetName() => "AddMission";
         public override CmdBase GetNew() => new AddMissionCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = MissionForm.DataByName.GetDv(prm[0].str, null);
-            if(data!=null&&!data.received)
+            if (GlobalEventHelper.TryGetMission(prm[0].str, out var data) && !data.received)
             {
                 data.received = true;
                 Z_EventHelper.Invoke(new MissionEvent { type = MissionEventType.Add, data = data });

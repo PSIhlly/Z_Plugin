@@ -9,8 +9,8 @@ namespace Z_Map.Analysis
     /// <summary>
     /// BFS广度优先搜索寻路：基于导航网格的宏观路径规划
     /// 流程：
-    /// 1. 将起点入队，BFS遍历links中可通行的NavUnit
-    /// 2. 若终点不可达，取距离终点最近的可达节点
+    /// 1. 不可走的起点先直线脱离到最近的可走节点
+    /// 2. BFS遍历links；不可走的终点经最近可达节点后直线接近
     /// 3. 回溯路径，视线检测(Check)验证路径上无障碍
     /// 4. 返回可行的移动方向（去除Y分量）
     /// </summary>
@@ -21,6 +21,7 @@ namespace Z_Map.Analysis
         Queue<NavUnit> queue = new Queue<NavUnit>();
         Dictionary<NavUnit, NavUnit> pre = new Dictionary<NavUnit, NavUnit>();
         List<NavUnit> path = new List<NavUnit>();
+        readonly NavigationEndpointState scratchEndpointState = new NavigationEndpointState();
         public Bfs(NavigationController nc)
         {
             this.nc = nc;
@@ -30,14 +31,59 @@ namespace Z_Map.Analysis
         /// maxStep: 最大搜索步数限制
         /// </summary>
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
-            IReadOnlyCollection<int> passTypes)
+            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null)
         {
-
+            // 无状态的方向查询保持独立；实际角色必须传入自己的端点状态。
+            if (endpointState == null)
+            {
+                scratchEndpointState.Reset();
+                endpointState = scratchEndpointState;
+            }
+            endpointState.Prepare(nc, tar, agentRadius, passTypes);
+            endpointState.moveTarget = cur;
             pre.Clear();
             steps.Clear();
             queue.Clear();
             path.Clear();
             var clearanceOffsets = nc.GetClearanceOffsets(agentRadius);
+            if (nc.navUnits == null || nc.navUnits.Count == 0)
+                return Vector3.zero;
+            nc.TryGetGroundUnit(cur, out var first);
+            nc.TryGetGroundUnit(tar, out var requestedEnd);
+            bool targetWalkable = IsWalkable(requestedEnd, clearanceOffsets, passTypes);
+
+            // 到达目标最近格后，即使已经进入阻断格也继续末段，不能反向脱困。
+            if (endpointState.finalApproach && !targetWalkable)
+                return GetDirection(cur, tar, endpointState, true);
+            endpointState.finalApproach = false;
+
+            bool startWalkable = IsWalkable(first, clearanceOffsets, passTypes);
+            var escape = endpointState.escapeAnchor;
+            if (escape != null && (!nc.navUnits.TryGetValue((escape.pos.x, escape.pos.y, escape.pos.z),
+                    out var cachedAnchor) || cachedAnchor != escape
+                || !IsWalkable(escape, clearanceOffsets, passTypes)))
+            {
+                escape = null;
+                endpointState.escapeAnchor = null;
+            }
+            if (escape == null && !startWalkable)
+            {
+                escape = FindClosestWalkable(cur, clearanceOffsets, passTypes);
+                endpointState.escapeAnchor = escape;
+            }
+            if (escape != null)
+            {
+                if (!IsAtAnchor(cur, escape))
+                    return GetDirection(cur, escape.realPos, endpointState, true);
+                endpointState.escapeAnchor = null;
+                first = escape;
+                startWalkable = true;
+            }
+            if (!startWalkable)
+                return Vector3.zero;
+
+            if (targetWalkable && first == requestedEnd)
+                return GetDirection(cur, tar, endpointState);
             int smoothingRadiusX = 1;
             int smoothingRadiusZ = 1;
             foreach (var offset in clearanceOffsets)
@@ -45,51 +91,29 @@ namespace Z_Map.Analysis
                 smoothingRadiusX = Mathf.Max(smoothingRadiusX, Mathf.Abs(offset.x));
                 smoothingRadiusZ = Mathf.Max(smoothingRadiusZ, Mathf.Abs(offset.y));
             }
-            Vector3Int curPos = nc.RealPos2MapPosInt(cur);
-                curPos = nc.GetClosestExistInArea(curPos);
-            Vector3Int tarPos = nc.RealPos2MapPosInt(tar);
-                tarPos = nc.GetClosestExistInArea(tarPos);
-            if (!nc.navUnits.ContainsKey((tarPos.x, tarPos.y, tarPos.z)))
-            {
-                return Vector3.zero;
-            }
-
-
-            if (curPos == tarPos)
-            {
-                return nc.GetNormalWithoutY(tar - cur);
-            }
-            var first = nc.navUnits[(curPos.x, curPos.y, curPos.z)];
-            //落地
-            while (first.isNull)
-            {
-                first = nc.navUnits[(first.pos.x, first.pos.y - 1, first.pos.z)];
-            }
-
-            var end = nc.navUnits[(tarPos.x, tarPos.y, tarPos.z)];
-
-            float minDis2 = (cur - tar).sqrMagnitude;
+            var end = targetWalkable ? requestedEnd : null;
+            float minDis2 = (first.realPos - tar).sqrMagnitude;
             NavUnit minUnit = first;
 
             queue.Enqueue(first);
             steps[first] = 0;
-            int times = 0;
-            //Vector3Int[] dirs = new[] { Vector3Int.right, Vector3Int.left, Vector3Int.up, Vector3Int.down, Vector3Int.forward, Vector3Int.back };
+            bool searchLimited = false;
             while (queue.Count > 0)
             {
-                if(times>999)
-                {
-                    Debug.LogError("cnm");
-                    break;
-                }
                 var now = queue.Dequeue();
                 int step = steps[now];
-                if (step >= maxStep)
-                    break;
-                if (minDis2 > (now.realPos - tar).sqrMagnitude)
+                if (IsCloser(now, minUnit, tar)
+                    && IsWalkable(now, clearanceOffsets, passTypes))
                 {
                     minDis2 = (now.realPos - tar).sqrMagnitude;
                     minUnit = now;
+                }
+                if (step >= maxStep)
+                {
+                    foreach (var nxt in now.links)
+                        if (CanPass(now, nxt, clearanceOffsets, passTypes))
+                            searchLimited = true;
+                    continue;
                 }
                 foreach (var nxt in now.links)
                 {
@@ -107,15 +131,22 @@ namespace Z_Map.Analysis
                     }
                 }
             }
-            bool reachedTarget = pre.ContainsKey(end);
+            bool reachedTarget = end != null && pre.ContainsKey(end);
             if (!reachedTarget)
             {
                 //太远，说明没希望
-                if (minDis2 > 2*2)
+                if (targetWalkable && minDis2 > 2*2)
                     return Vector3.zero;
                 end = minUnit;
                 if (end == first)
-                    return Vector3.zero;
+                {
+                    if (targetWalkable || searchLimited)
+                        return Vector3.zero;
+                    if (!IsAtAnchor(cur, end))
+                        return GetDirection(cur, end.realPos, endpointState);
+                    endpointState.finalApproach = true;
+                    return GetDirection(cur, tar, endpointState, true);
+                }
             }
 
             Vector3 finalTarget = reachedTarget ? tar : end.realPos;
@@ -182,18 +213,70 @@ namespace Z_Map.Analysis
                         //那就只走第一步
                         if (i == path.Count - 2)
                         {
-                            return nc.GetNormalWithoutY(path[i].realPos - cur);
+                            return GetDirection(cur, path[i].realPos, endpointState);
                         }
-                        return nc.GetNormalWithoutY(path[i + 1].realPos - cur);
+                        return GetDirection(cur, path[i + 1].realPos, endpointState);
                     }
                 }
 
                 if (i < 0)
                 {
-                    return nc.GetNormalWithoutY(finalTarget - cur);
+                    return GetDirection(cur, finalTarget, endpointState);
                 }
             }
-            return nc.GetNormalWithoutY(finalTarget - cur);
+            return GetDirection(cur, finalTarget, endpointState);
+        }
+
+        private Vector3 GetDirection(Vector3 cur, Vector3 target, NavigationEndpointState state,
+            bool directEndpoint = false)
+        {
+            state.moveTarget = target;
+            state.directEndpoint = directEndpoint;
+            return nc.GetNormalWithoutY(target - cur);
+        }
+
+        private static bool IsAtAnchor(Vector3 cur, NavUnit unit)
+        {
+            var delta = cur - unit.realPos;
+            delta.y = 0f;
+            return delta.sqrMagnitude <= 0.05f * 0.05f;
+        }
+
+        private bool IsWalkable(NavUnit unit, IReadOnlyList<Vector2Int> offsets,
+            IReadOnlyCollection<int> passTypes)
+        {
+            if (unit == null || unit.isNull || unit.objectBlocked || unit.links == null
+                || unit.links.Count == 0 || !HasAllPassTypes(unit, passTypes))
+                return false;
+            foreach (var offset in offsets)
+                if (!nc.TryGetOffsetUnit(unit, offset, out var footprint) || footprint.isNull
+                    || footprint.objectBlocked || footprint.links == null || footprint.links.Count == 0)
+                    return false;
+            return true;
+        }
+
+        private NavUnit FindClosestWalkable(Vector3 position, IReadOnlyList<Vector2Int> offsets,
+            IReadOnlyCollection<int> passTypes)
+        {
+            NavUnit closest = null;
+            foreach (var unit in nc.navUnits.Values)
+                if (IsCloser(unit, closest, position) && IsWalkable(unit, offsets, passTypes))
+                    closest = unit;
+            return closest;
+        }
+
+        private static bool IsCloser(NavUnit candidate, NavUnit current, Vector3 position)
+        {
+            if (current == null)
+                return true;
+            float candidateDistance = (candidate.realPos - position).sqrMagnitude;
+            float currentDistance = (current.realPos - position).sqrMagnitude;
+            if (candidateDistance != currentDistance)
+                return candidateDistance < currentDistance;
+            // 等距时不依赖字典/links 枚举顺序，避免每帧选择不同的最近格。
+            if (candidate.pos.y != current.pos.y) return candidate.pos.y < current.pos.y;
+            if (candidate.pos.x != current.pos.x) return candidate.pos.x < current.pos.x;
+            return candidate.pos.z < current.pos.z;
         }
 
         /// <summary>
@@ -201,7 +284,7 @@ namespace Z_Map.Analysis
         /// </summary>
         public bool CanPass(NavUnit tar)
         {
-            return !steps.ContainsKey(tar);
+            return !tar.objectBlocked && !steps.ContainsKey(tar);
         }
         /// <summary>
         /// 判断从from到tar是否可通行
@@ -209,7 +292,8 @@ namespace Z_Map.Analysis
         public bool CanPass(NavUnit from, NavUnit tar, IReadOnlyList<Vector2Int> clearanceOffsets,
             IReadOnlyCollection<int> passTypes)
         {
-            if (steps.ContainsKey(tar) || !HasAllPassTypes(tar, passTypes))
+            if (from.isNull || tar.isNull || from.objectBlocked || tar.objectBlocked
+                || steps.ContainsKey(tar) || !HasAllPassTypes(tar, passTypes))
                 return false;
 
             foreach (var offset in clearanceOffsets)

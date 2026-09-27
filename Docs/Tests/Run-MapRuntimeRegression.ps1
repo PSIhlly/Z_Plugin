@@ -1,6 +1,8 @@
 param(
     [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path,
-    [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe"
+    [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe",
+    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression')]
+    [string]$Fixture = 'MapRuntimeRegression'
 )
 $ErrorActionPreference = "Stop"
 $shaderPath = Join-Path $ProjectRoot "Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeCode.shader"
@@ -20,7 +22,7 @@ if ($shadowSource.Contains("clip(_Show") -or
 if ($LASTEXITCODE -ne 0) { throw "Production build failed." }
 $testProject = Join-Path $ProjectRoot ("Temp/MapRuntimeRegression-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path "$testProject/Assets/Plugins", "$testProject/Assets/Editor", "$testProject/Packages", "$testProject/ProjectSettings" -Force | Out-Null
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot "MapRuntimeRegression.cs") -Destination "$testProject/Assets/Editor/MapRuntimeRegression.cs"
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot "$Fixture.cs") -Destination "$testProject/Assets/Editor/$Fixture.cs"
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "map-regression-manifest.json") -Destination "$testProject/Packages/manifest.json"
 Copy-Item -LiteralPath (Join-Path $ProjectRoot "ProjectSettings/ProjectVersion.txt") -Destination "$testProject/ProjectSettings/ProjectVersion.txt"
 
@@ -62,7 +64,7 @@ try {
 }
 finally { $runtimeAssembly.Dispose() }
 $logPath = Join-Path $testProject "regression.log"
-$argumentLine = '-batchmode -nographics -projectPath "' + $testProject + '" -executeMethod MapRuntimeRegression.Run -logFile "' + $logPath + '"'
+$argumentLine = '-batchmode -nographics -projectPath "' + $testProject + '" -executeMethod ' + $Fixture + '.Run -logFile "' + $logPath + '"'
 $process = Start-Process -FilePath $UnityEditor -ArgumentList $argumentLine -WindowStyle Hidden -PassThru
 Write-Output "Regression process: $($process.Id)"
 Write-Output "Regression log: $logPath"
@@ -71,6 +73,12 @@ if ($process.ExitCode -ne 0) {
     Get-Content -LiteralPath $logPath -Tail 100
     throw "Unity regression process failed: $($process.ExitCode)"
 }
-$passed = Select-String -LiteralPath $logPath -Pattern 'MAP_RUNTIME_REGRESSION_PASS'
+$successMarker = switch ($Fixture) {
+    'MissionRuntimeRegression' { 'MISSION_RUNTIME_REGRESSION_PASS' }
+    'MinimapRuntimeRegression' { 'MINIMAP_RUNTIME_REGRESSION_PASS' }
+    'MapTextureRuntimeRegression' { 'MAP_TEXTURE_RUNTIME_REGRESSION_PASS' }
+    default { 'MAP_RUNTIME_REGRESSION_PASS' }
+}
+$passed = Select-String -LiteralPath $logPath -Pattern $successMarker
 if (!$passed) { throw "Missing regression success marker: $logPath" }
 $passed.Line

@@ -199,6 +199,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         }
         _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
         _playerM = GetOrNewCharacter(_playerG);
+        // A unique character may already exist in the scene: progress owns player placement.
+        MapManager.instance.updateCtrl.ApplyMove(_playerM.unit, GameManager.instance.curProgress.pos, _playerM.euler, true);
+        GameManager.instance.curProgress.pos = _playerM.pos;
+        lastPlayerPos = _playerM.pos;
+        SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
     }
     public void End()
     {
@@ -370,7 +375,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public Vector3 GetPlayerPos()
     {
-        return lastPlayerPos;
+        return _playerM != null ? _playerM.pos : lastPlayerPos;
     }
     public void SetPlayerPos(Vector3 pos)
     {

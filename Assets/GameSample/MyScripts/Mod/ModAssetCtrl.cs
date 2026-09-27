@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Xml.Linq;
 using Ui.ModAssetSelectWindow;
+using Ui.ModStoryEventCmdChooseWindow;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Z_Code.Form;
@@ -86,6 +87,19 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void RenameMission(string oldName, string newName)
     {
         MissionForm.DataByName[oldName].name = newName;
+    }
+    public void ChooseMission(string title, Action<MissionForm.Data> act)
+    {
+        var items = new EntryItem();
+        foreach (var data in MissionForm.DataById.Values.OrderBy(data => data.id))
+            items.Add(data.name, null, data.id);
+
+        NotifyManager.instance.AddChoose(title, true, item =>
+        {
+            if (MissionForm.DataById.TryGetValue(item.id, out var data))
+                act?.Invoke(data);
+            return true;
+        }, items);
     }
     #endregion
     #region param
@@ -959,13 +973,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ChooseCmd(SceneEventType type, string retType, Action<EntryItem> act)
     {
-        var items = GameManager.instance.evtCtrl.GetCmdEntry(type, retType, out var defaultItem);
-        items.Merge("#", GameManager.instance.evtCtrl.GetEventEntry(type, retType));
-        NotifyManager.instance.AddMultipleChoose(TextManager.instance.GetTxt("Choose command"), true, (res) =>
+        UiManager.instance.ShowUi<UiModStoryEventCmdChooseWindowCtrl>(new UiModStoryEventCmdChooseWindowParam
         {
-            act?.Invoke(res);
-            return true;
-        }, items, defaultItem);
+            type = type,
+            returnType = retType,
+            onChoose = act
+        });
     }
 
     public void CreateEvent(int labId = 0, string name = "")

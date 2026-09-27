@@ -63,6 +63,8 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
         }
         public void Refresh()
         {
+            if (!PlayManager.instance.enable || mapCtrl == null || !mapCtrl.isReady)
+                return;
             gameObject.SetActive(GameManager.instance.curProgress.enableMinimap);
             if (!GameManager.instance.curProgress.enableMinimap || PlayManager.instance.sceneCtrl.playerM == null || PlayManager.instance.sceneCtrl.playerM.unit.belongTile == null)
             {
@@ -103,7 +105,9 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
 
 
             var pos = PlayManager.instance.sceneCtrl.GetPlayerPos();
-            var relativePos = new Vector2((pos.x - mapCtrl.size.Item3) / (mapCtrl.size.Item4 - mapCtrl.size.Item3) - 0.5f, (pos.z - mapCtrl.size.Item2) / (mapCtrl.size.Item1 - mapCtrl.size.Item2) - 0.5f);
+            if (!mapCtrl.TryGetRelativePosition(pos, out var relativePos))
+                return;
+            relativePos -= Vector2.one * 0.5f;
             view.rtf_area.localPosition = -new Vector3(relativePos.x * mapCtrl.cols * mapCtrl.tileSize, relativePos.y * mapCtrl.rows * mapCtrl.tileSize, 0);
 
             if (lastRefreshTime < GameManager.instance.curProgress.seconds)
@@ -112,7 +116,7 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
                 missionCon.Clear();
                 view.rtf_guide.gameObject.SetActive(false);
                 var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                if (missionData != null)
+                if (missionData != null && missionData.targetSceneId == mapCtrl.curScene.uid)
                 {
                     missionCon.Add(new UiMissionParam()
                     {
@@ -164,7 +168,8 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
         public void Refresh()
         {
             view.img_mark.sprite = model.prm.icon;
-            var relativePos = new Vector2((model.prm.pos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.pos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
+            if (!parent.mapCtrl.TryGetRelativePosition(model.prm.pos, out var relativePos))
+                return;
             
             view.go_mark.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
         }
@@ -191,7 +196,8 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
 
         public void Refresh()
         {
-            var relativePos = new Vector2((model.prm.data.targetPos.x - parent.mapCtrl.size.Item3) / (parent.mapCtrl.size.Item4 - parent.mapCtrl.size.Item3), (model.prm.data.targetPos.z - parent.mapCtrl.size.Item2) / (parent.mapCtrl.size.Item1 - parent.mapCtrl.size.Item2));
+            if (!parent.mapCtrl.TryGetRelativePosition(MissionGuide.GetTargetWorldPosition(model.prm.data), out var relativePos))
+                return;
             view.go_mission.transform.position = Z_Math.Graph.GetRealPos(relativePos, parent.view.rtf_area);
             view.rtf_area.sizeDelta.Set(model.prm.data.radius * 2, model.prm.data.radius * 2);
             if(GameManager.instance.curProgress.curMissionId == model.prm.data.id )

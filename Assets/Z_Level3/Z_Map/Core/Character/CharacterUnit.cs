@@ -14,6 +14,8 @@ namespace Z_Map
     public partial class CharacterUnit : MapUnit
     {
         private readonly HashSet<int> _passTypes = new HashSet<int>();
+        private readonly NavigationEndpointState navigationEndpointState = new NavigationEndpointState();
+        internal bool isNavEndpointMove { get; private set; }
 
         /// <summary>
         /// 此角色具备的通行类型。0 表示无限制，不进入该集合。
@@ -48,6 +50,7 @@ namespace Z_Map
 
         public void SetPassTypes(IEnumerable<int> values)
         {
+            navigationEndpointState.Reset();
             _passTypes.Clear();
             if (values == null)
                 return;
@@ -115,14 +118,18 @@ namespace Z_Map
                     //首次激活nav时初始化计时器，避免立即触发脱困位移
                     if (lastNavMoveTime < 0f)
                         lastNavMoveTime = Time.time;
-                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis, GetNavigationRadius(), passTypes);
+                    Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis,
+                        GetNavigationRadius(), passTypes, navigationEndpointState);
                     bool movedThisFrame = false;
                     if(avoidPos<=0)
                     {
                         if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
                     {
                         Vector3 posBefore = data.pos;
-                        Move(dir * Mathf.Min(Time.deltaTime * data.speed, (data.destination - data.pos).magnitude));
+                        Vector3 targetDelta = navigationEndpointState.moveTarget - data.pos;
+                        targetDelta.y = 0f;
+                        MoveForNavigation(dir * Mathf.Min(Time.deltaTime * data.speed, targetDelta.magnitude),
+                            navigationEndpointState.directEndpoint);
                     //检测本次nav是否实际产生了位移（Move仅在res>0.01时应用位置，故阈值取1e-6足够区分）
                        if ((data.pos - posBefore).sqrMagnitude > 1e-6f)
                             movedThisFrame = true;
@@ -142,7 +149,7 @@ namespace Z_Map
                     if(avoidPos>0)
                     {
                         Vector3 right = Quaternion.Euler(0,90,0)*dir.normalized;
-                        Move(right * Time.deltaTime * data.speed);
+                        MoveForNavigation(right * Time.deltaTime * data.speed, navigationEndpointState.directEndpoint);
                         lastNavMoveTime = Time.time;
                         avoidPos-=Time.deltaTime * data.speed;
                     }
@@ -152,6 +159,7 @@ namespace Z_Map
                     //nav关闭时重置计时器，下次激活时重新计时
                     lastNavMoveTime = -1f;
                     avoidPos=-1f;
+                    navigationEndpointState.Reset();
                 }
                 //gravity: 每帧施加向下的重力移动（有地面接触时跳过，避免贴地抖动）
                 if(GlobalSettings.ENABLE_GRAVITY&&!HasGroundContact())
@@ -159,7 +167,8 @@ namespace Z_Map
 #if DEBUG_CHARACTER
                     Debug.Log($"[move]{Time.frameCount}before gravity:" + (data.pos.ToString("F10") ));
 #endif
-                    Move(Vector3.down * Time.deltaTime * 2f);
+                    MoveForNavigation(Vector3.down * Time.deltaTime * 2f,
+                        data.navEnabled && !DynamicGlobalSettings.pauseNav && navigationEndpointState.directEndpoint);
 #if DEBUG_CHARACTER
                     Debug.Log($"[move]{Time.frameCount}after gravity:" + (data.pos.ToString("F10")));
 #endif
@@ -222,6 +231,25 @@ namespace Z_Map
             }
             return hasPoint ? Mathf.Max(maxX - minX, maxZ - minZ) * 0.5f : 0f;
         }
+        private void MoveForNavigation(Vector3 dir, bool directEndpoint)
+        {
+            bool previousEndpointMove = isNavEndpointMove;
+            isNavEndpointMove = directEndpoint;
+            try
+            {
+                Move(dir);
+            }
+            finally
+            {
+                isNavEndpointMove = previousEndpointMove;
+            }
+        }
+
+        internal void ResetNavigationEndpoint()
+        {
+            navigationEndpointState.Reset();
+        }
+
         public void Move(Vector3 dir)
         {
             Vector3 moveStartPos = data.pos;

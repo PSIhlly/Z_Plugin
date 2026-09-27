@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import argparse
 import io
+import os
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 
@@ -51,7 +53,31 @@ def run_checked(command: list[str]) -> subprocess.CompletedProcess[bytes]:
     return result
 
 
-def inspect_source(ffmpeg: str, source: Path) -> tuple[tuple[int, int], int, int]:
+def choose_input_decoder(ffmpeg: str, source: Path) -> tuple[list[str], bool]:
+    """Use libvpx for VP8/VP9: native decoders may discard WebM alpha."""
+    probe = subprocess.run(
+        [ffmpeg, "-hide_banner", "-i", str(source)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    details = probe.stderr.decode("utf-8", errors="replace")
+    codec_match = re.search(r"Video:\s*(vp[89])\b", details, re.IGNORECASE)
+    if not codec_match:
+        return [], False
+
+    codec = codec_match.group(1).lower()
+    decoder = "libvpx" if codec == "vp8" else "libvpx-vp9"
+    has_alpha_metadata = bool(re.search(r"alpha_mode\s*:\s*1\b", details))
+    decoders = run_checked([ffmpeg, "-hide_banner", "-decoders"])
+    if re.search(rb"(?m)^\s*\S+\s+" + re.escape(decoder.encode("ascii")) + rb"\s", decoders.stdout):
+        return ["-c:v", decoder], has_alpha_metadata
+    if has_alpha_metadata:
+        fail(f"{codec.upper()} source declares alpha, but this FFmpeg lacks the {decoder} decoder")
+    return [], False
+
+
+def inspect_source(ffmpeg: str, source: Path, decoder: list[str]) -> tuple[tuple[int, int], int, int]:
     """Return (size, transparent pixels, partially transparent pixels) for frame one."""
     from PIL import Image
 
@@ -61,6 +87,7 @@ def inspect_source(ffmpeg: str, source: Path) -> tuple[tuple[int, int], int, int
             "-hide_banner",
             "-loglevel",
             "error",
+            *decoder,
             "-i",
             str(source),
             "-frames:v",
@@ -80,7 +107,7 @@ def inspect_source(ffmpeg: str, source: Path) -> tuple[tuple[int, int], int, int
         return rgba.size, transparent, partial
 
 
-def inspect_stream(ffmpeg: str, source: Path) -> tuple[int, float]:
+def inspect_stream(ffmpeg: str, source: Path, decoder: list[str]) -> tuple[int, float]:
     """Return decoded video frame count and duration in seconds."""
     result = subprocess.run(
         [
@@ -88,6 +115,7 @@ def inspect_stream(ffmpeg: str, source: Path) -> tuple[int, float]:
             "-hide_banner",
             "-loglevel",
             "error",
+            *decoder,
             "-i",
             str(source),
             "-map",
@@ -144,6 +172,8 @@ def inspect_gif(output: Path) -> dict[str, object]:
     from PIL import Image
 
     with Image.open(output) as image:
+        if image.format != "GIF":
+            fail(f"output is {image.format}, not GIF: {output}")
         durations: list[int] = []
         transparent_pixels = 0
         transparency_frames = 0
@@ -153,14 +183,10 @@ def inspect_gif(output: Path) -> dict[str, object]:
             if duration is not None:
                 durations.append(int(duration))
 
-            transparent_index = image.info.get("transparency")
-            if transparent_index is not None:
-                frame_transparent_pixels = sum(
-                    1 for pixel in image.convert("P").getdata() if pixel == transparent_index
-                )
-                if frame_transparent_pixels:
-                    transparency_frames += 1
-                    transparent_pixels += frame_transparent_pixels
+            frame_transparent_pixels = image.convert("RGBA").getchannel("A").histogram()[0]
+            if frame_transparent_pixels:
+                transparency_frames += 1
+                transparent_pixels += frame_transparent_pixels
 
         return {
             "size": image.size,
@@ -213,13 +239,14 @@ def main() -> int:
         fail("Pillow is required for alpha and GIF frame inspection")
 
     ffmpeg = resolve_ffmpeg(args.ffmpeg)
-    source_size, source_transparent, source_partial = inspect_source(ffmpeg, source)
+    decoder, source_has_alpha_metadata = choose_input_decoder(ffmpeg, source)
+    source_size, source_transparent, source_partial = inspect_source(ffmpeg, source, decoder)
     selected_frames: list[int] | None = None
     source_frame_count: int | None = None
     source_duration: float | None = None
     target_fps: float | None = None
     if args.frames is not None:
-        source_frame_count, source_duration = inspect_stream(ffmpeg, source)
+        source_frame_count, source_duration = inspect_stream(ffmpeg, source, decoder)
         selected_frames = choose_frame_indices(source_frame_count, args.frames, args.keep_frame_index)
 
     transforms = ["format=rgba"]
@@ -235,15 +262,19 @@ def main() -> int:
     filter_complex = (
         f"[0:v]{source_filter},split=2[main][palette];"
         "[palette]palettegen=reserve_transparent=1:stats_mode=full[p];"
-        "[main][p]paletteuse=dither=sierra2_4a"
+        "[main][p]paletteuse=alpha_threshold=128:dither=sierra2_4a"
     )
+
+    with tempfile.NamedTemporaryFile(suffix=".gif", dir=output.parent, delete=False) as temporary:
+        temporary_output = Path(temporary.name)
 
     command = [
         ffmpeg,
         "-hide_banner",
         "-loglevel",
         "warning",
-        "-y" if args.force else "-n",
+        "-y",
+        *decoder,
         "-i",
         str(source),
         "-filter_complex",
@@ -252,10 +283,18 @@ def main() -> int:
         "0",
         "-an",
         *( ["-r", f"{target_fps:g}"] if target_fps is not None else [] ),
-        str(output),
+        str(temporary_output),
     ]
-    run_checked(command)
-    report = inspect_gif(output)
+    try:
+        run_checked(command)
+        report = inspect_gif(temporary_output)
+        if source_transparent and not report["transparent_pixels"]:
+            fail("decoded source has transparent pixels, but generated GIF is opaque")
+        if output.exists() and not args.force:
+            fail(f"output appeared during conversion; pass --force to overwrite: {output}")
+        os.replace(temporary_output, output)
+    finally:
+        temporary_output.unlink(missing_ok=True)
 
     print(f"output: {output}")
     print(f"size: {report['size'][0]}x{report['size'][1]}")
@@ -264,6 +303,8 @@ def main() -> int:
     print(f"loop: {report['loop']}")
     print(f"file_bytes: {output.stat().st_size}")
     print(f"source_size: {source_size[0]}x{source_size[1]}")
+    print(f"source_decoder: {decoder[1] if decoder else 'default'}")
+    print(f"source_alpha_metadata: {source_has_alpha_metadata}")
     print(f"source_transparent_pixels_in_first_frame: {source_transparent}")
     print(f"source_partial_alpha_pixels_in_first_frame: {source_partial}")
     if selected_frames is not None:

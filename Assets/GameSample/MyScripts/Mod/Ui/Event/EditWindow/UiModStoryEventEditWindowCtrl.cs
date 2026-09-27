@@ -57,7 +57,6 @@ namespace Ui.ModStoryEventEditWindow
                 Refresh();
             };
             view.btn_category.onClick.AddListener(ChooseCategory);
-            view.btn_type.gameObject.SetActive(false);
             view.btn_switchMod.onClick.AddListener(() =>
             {
                 if (model.codeEditMode)

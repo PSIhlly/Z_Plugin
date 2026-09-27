@@ -16,6 +16,31 @@ using Z_Time;
 using Z_Ui;
 using Z_Ui.Base;
 
+// Mission positions use the same player-facing coordinates as Mod scene input.
+// Convert them once at the runtime boundary; player positions are already world positions.
+public static class MissionGuide
+{
+    public static Vector3 GetTargetWorldPosition(MissionForm.Data data)
+    {
+        return MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(data.targetPos));
+    }
+
+    public static float GetDistance(MissionForm.Data data, Vector3 playerWorldPosition)
+    {
+        return Vector3.Distance(GetTargetWorldPosition(data), playerWorldPosition);
+    }
+
+    public static string GetDistanceText(MissionForm.Data data)
+    {
+        var targetScene = SceneForm.DataByUid.GetDv(data.targetSceneId, null);
+        if (targetScene == null)
+            return "";
+        return data.targetSceneId == GameManager.instance.curScene.uid
+            ? GetDistance(data, PlayManager.instance.sceneCtrl.GetPlayerPos()).ToString("0") + TextManager.instance.GetTxt("m")
+            : TextManager.instance.GetTxt("go to ") + targetScene.name;
+    }
+}
+
 namespace Ui.PlaySceneMain.PlaySceneMission
 {
     public partial class UiPlaySceneMissionModel
@@ -42,10 +67,15 @@ namespace Ui.PlaySceneMain.PlaySceneMission
                 return;
 
             view.txt_.text = data.desc;
-            view.txt_distance.text = "";
-            var targetScene = SceneForm.DataByUid.GetDv(data.targetSceneId, null);
-            if (targetScene != null)
-                view.txt_distance.text = data.targetSceneId == GameManager.instance.curScene.uid ? Vector3.Magnitude(data.targetPos - PlayManager.instance.sceneCtrl.GetPlayerPos()) + TextManager.instance.GetTxt("m") : TextManager.instance.GetTxt("go to ") + targetScene.name;
+            RefreshDistance();
+        }
+
+        public void RefreshDistance()
+        {
+            if (!active)
+                return;
+            var data = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
+            view.txt_distance.text = data == null ? "" : MissionGuide.GetDistanceText(data);
         }
     }
 

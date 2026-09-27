@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "寻找爱丽丝",
+    "labId": 0,
+    "desc": "寻找爱丽丝",
+    "show": true,
+    "received": false,
+    "done": false,
+    "fail": false,
+    "targetSceneId": 1,
+    "targetPos": "0|0|0",
+    "radius": 0.0
+  }
+]

@@ -35,7 +35,7 @@ public class GameUtilController : Z_Controller<GameManager>
         renders[0].transform.GetComponent<PerspectiveKeeper>().deepth = 0.01f;
         renders[1].transform.GetComponent<PerspectiveKeeper>().deepth = 0.05f;
 
-        res.GetComponentsInChildren<SphereCollider>()[0].radius = 0.4f;
+        res.GetComponentsInChildren<SphereCollider>()[0].radius = 0.5f;
         GameObject.Destroy(res.GetComponentsInChildren<SphereCollider>()[2].gameObject);
         if (forGame)
         {

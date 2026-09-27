@@ -1,0 +1,23 @@
+{
+  "source": "D:\\Works\\Game\\Z_Plugin\\ExtraAssets\\琪露诺\\琪露诺立绘-喜.png",
+  "video": "D:\\Works\\Game\\Z_Plugin\\ExtraAssets\\琪露诺\\呼吸动画_5秒60帧\\琪露诺立绘-喜-呼吸5秒60帧.webm",
+  "size": [
+    1086,
+    1448
+  ],
+  "frames": 60,
+  "fps": 12,
+  "duration_seconds": 5.0,
+  "unique_rendered_frames": 60,
+  "decoded_alpha_min": 0,
+  "decoded_transparent_pixels_first_frame": 1049167,
+  "vertical_center_range_px": 17.79644775390625,
+  "loop_boundary_mean_pixel_delta": 3.580688953399658,
+  "adjacent_frame_mean_pixel_delta_range": [
+    0.47503477334976196,
+    3.618825912475586
+  ],
+  "no_canvas_clipping": true,
+  "method": "Original-art smooth deformation; premultiplied-alpha resampling",
+  "motion": "5-second periodic breathing with phase-delayed skirt, sleeves, ribbons and hair"
+}

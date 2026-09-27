@@ -132,6 +132,8 @@ Up, Down, Left, Right, Forward, Back
 
 ### 3.2 Move 核心流程
 
+导航端点使用每个人物独立的 `NavigationEndpointState`：起点格不可通行（Object 阻断、缺格、空格、通行类型或人物 footprint 不满足）时，先直线移动到距离起点最近的可走格中心，再恢复 BFS。目标格不可通行时，在 BFS 可达格中选择距离目标世界坐标最近的一格，到达格中心后再直线接近原目标坐标。末段状态不会因为人物进入目标阻断格而重新触发脱离；目标换格、体型/能力变化、停用导航和传送均重置状态。同格内的移动目标沿用当前阶段，但始终朝最新坐标移动；半径比较使用 `0.0001` 容差，避免平移的浮点误差重置阶段。搜索步数耗尽不能当成已到达末段起点。直线端点段仅放宽导航/地形通行类型限制，仍经过 `CharacterUnit.Move` 的实体碰撞、边界限制与 Trigger 扫掠，不是传送或穿墙。每帧移动距离同时受当前路点距离约束，避免越过路点后反复折返；普通手动移动的 passType 限制保持不变。
+
 [CharacterUnit.cs:103-269](file:///d:/Works/Game/Z_Plugin/Assets/Z_Level3/Z_Map/Core/Character/CharacterUnit.cs#L103-L269)
 
 ```
@@ -193,7 +195,10 @@ Move(dir):
 - **移动队列**：初始方向被墙阻挡后，计算滑行方向重新入队，支持多次重试
 - **首次尝试标记**：`firstTry=true` 时即使 `res=0` 也计算避障；后续迭代要求 `res>0.001` 才滑行，防止无限循环
 - **邻域遍历**：只检测 `GetNineTile` 返回的有界邻域，且跳过低于当前层的 tile。候选不能再按 Tile 锚点的三维距离排除，跨层 Collider 由 Mesh 的 AABB/SAT 判定实际是否接触
-- **通行类型**：只检查人物中心所属的逻辑 Tile，不读取 Collider/Trigger，也不因人物尺寸或相邻 Tile 受限而提前拦截。目标中心落入不满足 `passType` 的 Tile 时，通过带通行类型过滤的最近有效位置搜索，把中心放到距离目标最近的合法 Tile 内。
+- **通行类型**：只检查人物中心所属的逻辑 Tile，不读取 Collider/Trigger，也不因人物尺寸或相邻 Tile 受限而提前拦截。普通手动移动的目标中心落入不满足 `passType` 的 Tile 时，通过带通行类型过滤的最近有效位置搜索，把中心放到距离目标最近的合法 Tile 内；导航端点的直线段使用本节开头的定向例外，正常 BFS 路段仍要求通行类型匹配。
+- **Object 覆盖**：从 `tile.data.pos` 向上探测 `0~1` 世界单位（包含两端），这条竖直线段与 Object 本体相交时，该 Tile 的运行时通行类型暂按 default（无要求）；纹理派生的原始要求保留，最后一个覆盖 Object 离开后恢复。不是单点检测、无限向上射线或仅 X/Z 投影。优先使用 `GetMeshes(CollideOnly)` 的实际 Box/Sphere 本体，考虑 `MapModel.colliderScale`、嵌套变换及 Collider.center，排除放大的 Trigger；Sphere 半径遵循现有物理碰撞换算。池模板根节点 inactive 不影响 Collider 提取，但模板中的 inactive 子节点仍排除。没有支持的物理本体时才回退原有模型/Renderer/锚点盒；组合回退模型中心使用实际 `localPosition`（含拼装 +0.5Y），不能扣掉偏移。精确探测结果单独维护在 `objectPassTypeTileDic`，仅枚举每个本体包围盒向下扩展 1 后的附近 Tile，并用线段/旋转盒 SAT 或线段/球距离确认相交；显示/owner 索引仍不受 colliderScale 影响。Object 增删、移动、旋转或显式尺寸刷新时只更新旧/新视觉、探测及物理导航覆盖 Tile 的并集：复用缓存地形高度，重算附近障碍和通行类型，再更新这些格的出向连接及四邻格（Y 偏移 -1..1）的入向连接。不触发全图重建或重新采样所有 Tile；原有周期重建完成后只补刷其期间发生 Object 变化的覆盖格。
+- **Object 导航几何**：从 `GetMeshes(CollideOnly)` 读取实际 Box/Sphere 本体，考虑 collisionScale、嵌套变换和 Collider.center，排除 Trigger。对整个 Tile 的 X/Z 区域求真实相交部分：Box 面用复用数组裁剪，Sphere 求被区域裁切后的最高相对高度。任一 `isObstacle` Object 在相交处高出该位置的 Tile 地面严格超过 `0.3` 世界单位，就设置 `NavUnit.objectBlocked`，取消整格的出向和入向连接；等于 `0.3` 不阻断（几何容差 `0.0001`）。不是自身厚度，不是四点采样，也不能用 Tile 外的全局最高点或仅 AABB 判断。只接触边界、碰撞体水平尺寸为零、地面以下本体不阻断；薄桥高出地面 `0.25` 仍通行。地面平面复用 `dirGroundY`，不再用 Object 顶面覆盖方向高度。`objectNavigationTileDic` 继续独立保存实际物理覆盖，且在 `isObstacle=false` 时也建立，以兼容 Play 后设为产品 collision。完整/局部更新共用有界格枚举，仅更新旧/新覆盖格及邻格入向连接；移除一个 Object 时重查其余重叠障碍，删除最后一个后立即恢复。不触发全图重建，不分配每格临时几何。
+- **斜坡连接**：继续检查四方向相向侧地面高度，条件为 `目标侧高度 - 当前侧高度 < step`，不是绝对值；因此连接按方向独立建立，可能只能下坡不能上坡。整格 Object 阻挡与该方向高度差条件分开判断，实心 mapground 的 `0.2` 规则也保持不变。
 - **自动朝向**：非玩家角色累计实际水平位移；只有严格超过 `abs(speed) / 3` 才朝本次实际移动方向转向并清零累计值。碰撞未移动、纯 Y 位移和短距离移动均保持旧朝向
 
 ### 3.3 碰撞检测调度
@@ -651,13 +656,23 @@ ObjectUnit.Move(dir):
 
 Tile 使用的三层 MapTexture ID 已保存在 `TileUnitForm.texDic` 的地表槽位。每次进入场景时，将三层材质各自非零的 `MapTextureForm.passType` 聚合进 `TileUnit.passTypes`；`0` 表示该材质不增加限制。角色能力从所属 `CharacterProductForm.passType` 重算进 `CharacterUnit.passTypes`。
 
-人物只有包含其中心目标 Tile 的全部要求类型时才能通行。手动移动的目标中心落入不满足类型的 Tile 后，会搜索并落到距离目标最近的合法位置；人物尺寸和 Collider/Trigger 不参与该判定。BFS 仍按 footprint 检查物理通道宽度，但 `passType` 只检查人物中心经过的 `NavUnit`，因此不会被相邻受限 Tile 误拦。`TileUnitForm.passType` 只保留首个类型 ID 作为兼容缓存，完整要求集合不压缩进该 int 字段。
+普通移动和正常 BFS 路段要求人物包含其中心目标 Tile 的全部通行类型。手动移动的目标中心落入不满足类型的 Tile 后，会搜索并落到距离目标最近的合法位置；人物尺寸和 Collider/Trigger 不参与该判定。BFS 仍按 footprint 检查物理通道宽度，但 `passType` 只检查人物中心经过的 `NavUnit`，因此不会被相邻受限 Tile 误拦。导航起点脱离和目标末段直线接近是明确的局部例外，仍保留实体碰撞与地图边界。`TileUnitForm.passType` 只保留首个类型 ID 作为兼容缓存，完整要求集合不压缩进该 int 字段。
 
 ### 6.10 WangTile 动画帧
 
 开启 `isWangTile` 或 `frontIsWangTile` 后，每一张配置的源动画帧都要按同一个 8 邻接 mask 拆成 WangTile 变体。相同 mask 的生成贴图按源列表顺序组成动画，并继续使用 `MapTextureForm.animTimeInterval` 切换；普通层和前景层分别维护序列。`WangTileDic` 与 `FrontWangTileDic` 保留第一张有效变体用于兼容和静态采样，完整动画缓存随场景生成、卸载和重载一起清理。
 
 Tile（含 WangTile 的普通层与前景层）、Object、Item 的贴图动画不以实例出现时间起拍。Play 中统一用 `ProgressForm.seconds` 计算当前帧，新进入视野或从对象池恢复的实例会直接加入已有动画相位，游戏时长暂停时画面也保持当前帧。底层 `Z_Time` 通过 `animationTimeGetter` 获取该时钟，避免反向依赖存档程序集；UGC 编辑预览继续使用 `Time.time`。人物动画不使用这套全局相位。
+
+### 6.11 桥模型偏移被导航忽略（已修复）
+
+**现象**：Tile 的 Object 覆盖与 passType 已正确刷新，但桥仍可能没有可用导航入口。
+
+**根因**：Play 会从 MapObject 产品的 `collision` 启用桥的障碍标志。导航原先忽略模型子节点位置，将所有 BoxCollider 都放到根位置向上 0.5，并把放大的 Trigger 计入高度。存档中本应高 0.25 的桥面因此被算成约 0.55，超过默认地图的 0.5 连通高度差。只设置 `isObstacle=false` 的桥覆盖测试无法复现此问题。
+
+**修复**：完整与局部导航共用实际 `CollideOnly` Cube Mesh；独立索引实际物理覆盖，按地图格坐标枚举附近单元，避免世界整数范围的重复转换。回归覆盖两座桥完整岸到岸双向可达性、真实桥面高度、偏移到显示范围外/上层的碰撞体增删移动，以及局部结果与全量结果一致；不修改存档或降低障碍阈值。
+
+**当前整格规则**：后续导航规则改为 3.2 节的整格 `0.3` 相对地面阈值，支持 Box/Sphere。桥面高出地面 `0.25` 时继续可走，但不再把 Object 顶面写入 Tile 的方向高度；超过 `0.3` 时整格阻断。普通 BFS 不进入该格；阻断格作为起点/终点时使用 3.2 节的端点直线补偿，实体碰撞仍然生效。
 
 ## 附录：关键文件索引
 

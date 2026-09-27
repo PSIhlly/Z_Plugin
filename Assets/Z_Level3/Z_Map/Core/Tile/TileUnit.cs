@@ -14,11 +14,12 @@ namespace Z_Map
     public partial class TileUnit : MapUnit
     {
         private readonly HashSet<int> _passTypes = new HashSet<int>();
+        private bool _objectCoversCenter;
 
         /// <summary>
         /// 此地块要求角色具备的全部通行类型。0 表示无限制，不进入该集合。
         /// </summary>
-        public IReadOnlyCollection<int> passTypes => _passTypes;
+        public IReadOnlyCollection<int> passTypes => _objectCoversCenter ? Array.Empty<int>() : _passTypes;
 
         public TileUnit(TileUnitForm.Data data) : base(data)
         {
@@ -45,6 +46,11 @@ namespace Z_Map
                 if (value != 0)
                     _passTypes.Add(value);
             }
+        }
+
+        public void SetObjectCenterCovered(bool covered)
+        {
+            _objectCoversCenter = covered;
         }
 
         public override void Show()

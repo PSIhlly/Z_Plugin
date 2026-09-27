@@ -4,8 +4,6 @@ using Ui.ParamShow;
 using Ui.PlaySceneMenu;
 using Ui.Stick;
 using Unity.VisualScripting.Dependencies.Sqlite;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Z_Code;
 using Z_Code.Form;
@@ -22,7 +20,7 @@ using Ui.PlayDataCharacter;
 namespace Ui.PlaySceneMain
 {
 
-    public partial class UiPlaySceneMainCtrl : IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>, IZ_Listener<SceneActionEvent>, IZ_Listener<MissionEvent>
+    public partial class UiPlaySceneMainCtrl : IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>, IZ_Listener<SceneActionEvent>, IZ_Listener<MissionEvent>, IZ_Listener<StoryLifeEvent>
     {
         Color[] colors = new Color[] { Color.red, Color.blue, Color.yellow };
         UiContainer<UiTeamerCtrl> teamerCon;
@@ -146,7 +144,14 @@ namespace Ui.PlaySceneMain
         }
         public void OnEvent(MissionEvent evt)
         {
-            view.page_PlaySceneMission.Refresh();
+            if (active)
+                view.page_PlaySceneMission.Refresh();
+        }
+
+        public void OnEvent(StoryLifeEvent evt)
+        {
+            if (active && evt.type == StoryLifeEventType.EverySecond)
+                view.page_PlaySceneMission.RefreshDistance();
         }
 
         public override void OnShow()
@@ -156,6 +161,7 @@ namespace Ui.PlaySceneMain
             this.Register<CharacterSkillEvent>();
             this.Register<SceneActionEvent>();
             this.Register<MissionEvent>();
+            this.Register<StoryLifeEvent>();
             
             Refresh();
         }
@@ -165,6 +171,7 @@ namespace Ui.PlaySceneMain
             this.Unregister<CharacterSkillEvent>();
             this.Unregister<SceneActionEvent>();
             this.Unregister<MissionEvent>();
+            this.Unregister<StoryLifeEvent>();
         }
 
 

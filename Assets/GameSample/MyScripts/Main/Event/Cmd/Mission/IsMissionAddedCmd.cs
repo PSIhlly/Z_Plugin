@@ -28,8 +28,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new IsMissionAddedCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = MissionForm.DataByName.GetDv(prm[0].str, null);
-            var box = CodeHelper.CreateBoxByNum(data != null&&data.received ? 1 : 0);
+            var box = CodeHelper.CreateBoxByNum(
+                GlobalEventHelper.TryGetMission(prm[0].str, out var data) && data.received ? 1 : 0);
             asyncTask.res = new BoxDataForm.Data[] { box };
             return true;
         }

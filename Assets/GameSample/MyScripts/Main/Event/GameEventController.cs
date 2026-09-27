@@ -107,6 +107,7 @@ public static partial class GlobalEventHelper
     public static string UIIMAGE = "$ui$";
     public static string VECTOR = "$vt$";
     public static string SKILL = "$sk$";
+    public static string MISSION = "$m$";
     public static Dictionary<(string, string), int> idCache = new Dictionary<(string, string), int>();
     public static Dictionary<(string, string), string> nameCache = new Dictionary<(string, string), string>();
 
@@ -142,11 +143,31 @@ public static partial class GlobalEventHelper
         }
         return false;
     }
+    public static bool TryGetMission(string reference, out MissionForm.Data data)
+    {
+        data = null;
+        if (string.IsNullOrEmpty(reference))
+            return false;
+
+        if (IsAsset(reference, MISSION))
+        {
+            string idText = reference.Substring(MISSION.Length, reference.Length - MISSION.Length * 2);
+            if (!int.TryParse(idText, System.Globalization.NumberStyles.None,
+                System.Globalization.CultureInfo.InvariantCulture, out int id) || id <= 0)
+                return false;
+            return MissionForm.DataById.TryGetValue(id, out data);
+        }
+
+        // Older stories passed mission names instead of stable IDs.
+        return MissionForm.DataByName.TryGetValue(reference, out data);
+    }
     public static string GetGameRetType(Desc desc)
     {
         var res = desc.retType;
         if (desc.type == CodeType.VarName)
             res = "var";
+        else if (desc.code != null && IsAsset(desc.code, MISSION))
+            res = "mission";
         else if (AssetManager.instance.texCtrl.IsAsset(desc.code))
             res = "img";
         else if (AssetManager.instance.videoCtrl.IsAsset(desc.code))
@@ -605,7 +626,9 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 res.Add(category);
             }
-            string name = TextManager.instance.GetTxt(data.name);
+            // Mission is a constant command; reuse the existing localized type
+            // label while retaining its canonical command name/UID in metadata.
+            string name = TextManager.instance.GetTxt(data.name == "Mission" ? "mission" : data.name);
             if (res.subs[category].subs.ContainsKey(name))
                 name = $"{name} ({data.uid})";
             res.subs[category].Add(name, null, data.uid);

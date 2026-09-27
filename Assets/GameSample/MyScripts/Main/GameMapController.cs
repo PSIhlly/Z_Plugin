@@ -173,6 +173,78 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     public Dictionary<(int, int), Texture2D> alphaTextureDic = new Dictionary<(int, int), Texture2D>();
     public Dictionary<UnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<UnitForm.Data, Dictionary<int, int>>();
+    private static readonly int TextureProperty = Shader.PropertyToID("_Tex");
+    private static readonly int AlphaTextureProperty = Shader.PropertyToID("_AlphaTex");
+    private MaterialPropertyBlock textureBlock;
+
+    // A borrowed sequence or one inline ID. Never mutate an authored/cached frame list.
+    private readonly struct TextureFrames
+    {
+        public readonly IReadOnlyList<int> source;
+        private readonly int singleId;
+        private readonly bool hasSingle;
+        public int Count => source != null ? source.Count : (hasSingle ? 1 : 0);
+        public int this[int index] => source != null ? source[index] : singleId;
+        public TextureFrames(IReadOnlyList<int> source)
+        {
+            this.source = source;
+            singleId = 0;
+            hasSingle = false;
+        }
+        public TextureFrames(int id)
+        {
+            source = null;
+            singleId = id;
+            hasSingle = true;
+        }
+    }
+
+    private sealed class ValidatedTextureFrames
+    {
+        public int[] sourceIds;
+        public bool[] registered;
+        public int[] validIds;
+
+        public bool Matches(TextureFrames frames)
+        {
+            if (sourceIds.Length != frames.Count)
+                return false;
+            for (int i = 0; i < sourceIds.Length; i++)
+                if (sourceIds[i] != frames[i]
+                    || registered[i] != TexAssetForm.DataById.ContainsKey(frames[i]))
+                    return false;
+            return true;
+        }
+    }
+
+    private static readonly Dictionary<IReadOnlyList<int>, ValidatedTextureFrames> validatedTextureFrames =
+        new Dictionary<IReadOnlyList<int>, ValidatedTextureFrames>();
+
+    private static TextureFrames GetValidTextureFrames(TextureFrames frames)
+    {
+        if (frames.Count == 0)
+            return default;
+        if (frames.Count == 1)
+            return TexAssetForm.DataById.ContainsKey(frames[0]) ? new TextureFrames(frames[0]) : default;
+        if (!validatedTextureFrames.TryGetValue(frames.source, out var cached) || !cached.Matches(frames))
+        {
+            int count = frames.Count;
+            cached = new ValidatedTextureFrames { sourceIds = new int[count], registered = new bool[count] };
+            int validCount = 0;
+            for (int i = 0; i < count; i++)
+            {
+                cached.sourceIds[i] = frames[i];
+                cached.registered[i] = TexAssetForm.DataById.ContainsKey(frames[i]);
+                if (cached.registered[i]) validCount++;
+            }
+            cached.validIds = new int[validCount];
+            int target = 0;
+            for (int i = 0; i < count; i++)
+                if (cached.registered[i]) cached.validIds[target++] = cached.sourceIds[i];
+            validatedTextureFrames[frames.source] = cached;
+        }
+        return new TextureFrames(cached.validIds);
+    }
     private static readonly Dictionary<(int mapTextureId, bool frontPart, int mask), List<int>>
         wangTileAnimationTextures = new Dictionary<(int, bool, int), List<int>>();
     private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), List<int>>
@@ -194,6 +266,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     internal static void ClearWangTileAnimationTextures()
     {
+        validatedTextureFrames.Clear();
         wangTileAnimationTextures.Clear();
         objectWangTileAnimationTextures.Clear();
     }
@@ -233,7 +306,10 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         foreach (var key in objectWangTileAnimationTextures.Keys
                      .Where(key => key.mapObjectId == mapObjectId).ToList())
+        {
+            validatedTextureFrames.Remove(objectWangTileAnimationTextures[key]);
             objectWangTileAnimationTextures.Remove(key);
+        }
     }
 
     public void RefreshObjectWangTileAppearances(int mapObjectId)
@@ -306,115 +382,118 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     public void ShowFinalMat(MapInstance ins, int rendererId, List<int> animTexs, float interval, bool isMask = false)
     {
-        var data = ins.unit.data;
-        if (!animCurCache.ContainsKey(data))
+        if (isMask)
         {
-            animCurCache[data] = new Dictionary<int, int>();
+            // Compatibility path: a mask must never replace the base image,
+            // enable an empty layer, or cancel its animation.
+            var renderer = ins.renderers[rendererId];
+            ApplyTextures(renderer, null, renderer.enabled
+                ? ResolveMaskTexture(ins, rendererId, animTexs) : Texture2D.blackTexture);
+            return;
         }
+        ShowFinalTextures(ins, rendererId, new TextureFrames(animTexs), interval, Texture2D.whiteTexture);
+    }
+
+    private Texture ResolveMaskTexture(MapInstance ins, int layer, List<int> maskTextures)
+    {
+        var frames = GetValidTextureFrames(new TextureFrames(maskTextures));
+        if (frames.Count == 0)
+            return Texture2D.whiteTexture;
+
+        int linkDesc = 0;
+        var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(ins.unit.data.pos);
+        var maps = MapManager.instance.data.maps;
+        for (int x = -1; x <= 1; x++)
+        for (int z = -1; z <= 1; z++)
+        {
+            if (x == 0 && z == 0) continue;
+            var pos = ((int)(x + mapPos.x), (int)mapPos.y, (int)(z + mapPos.z));
+            if (maps.TryGetValue(pos, out var neighbour)
+                && neighbour.texDic.TryGetValue(layer, out int textureId) && textureId == frames[0])
+                linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
+        }
+        return alphaTextureDic.TryGetValue((frames[0], linkDesc), out var alpha) && alpha != null
+            ? alpha : Texture2D.whiteTexture;
+    }
+
+    private void ShowFinalTextures(MapInstance ins, int rendererId, TextureFrames frames, float interval, Texture alpha)
+    {
         Renderer renderer = ins.renderers[rendererId];
-
-
-        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-        renderer.GetPropertyBlock(propBlock);
-
-        var hasConfiguredTextures = animTexs != null && animTexs.Count > 0;
-        var validAnimTexs = animTexs == null
-            ? null
-            : animTexs.Where(texId => TexAssetForm.DataById.ContainsKey(texId)).ToList();
-
-        if (validAnimTexs != null && validAnimTexs.Count > 0)
+        if (ins.animTimer[rendererId] != null)
         {
+            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
+            ins.animTimer[rendererId] = null;
+        }
+        bool configured = frames.Count > 0;
+        if (configured && !renderer.gameObject.activeSelf)
             renderer.gameObject.SetActive(true);
-
-            if (isMask)
-            {
-
-                int linkDesc = 0;
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int z = -1; z <= 1; z++)
-                    {
-                        if (x == 0 && z == 0)
-                            continue;
-                        var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(data.pos);
-                        var pos = ((int)(x + mapPos.x), (int)(mapPos.y), (int)(z + mapPos.z));
-                        if (MapManager.instance.data.maps.ContainsKey(pos)
-                            && MapManager.instance.data.maps[pos].texDic.ContainsKey(rendererId)
-                            && MapManager.instance.data.maps[pos].texDic[rendererId] == validAnimTexs[0])
-                        {
-                            linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
-                        }
-                    }
-                }
-                if (alphaTextureDic.TryGetValue((validAnimTexs[0], linkDesc), out var alphaTexture)
-                    && alphaTexture != null)
-                    propBlock.SetTexture("_AlphaTex", alphaTexture);
-                else
-                    propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
-
-            }
-            else
-            {
-                propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
-            }
-
-
-
-            renderer.enabled = true;
-
-
-            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
-
-            if (interval > 0 && validAnimTexs.Count > 1)
-            {
-                int cur = GetAnimationFrameIndex(
-                    TimeManager.GetAnimationTime(), interval, validAnimTexs.Count);
-
-                renderer.GetPropertyBlock(propBlock);
-                animCurCache[data][rendererId] = cur;
-                propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
-                int tempId = rendererId;
-                ins.animTimer[rendererId] = TimeManager.instance.StartAnimationTimer(interval, () =>
-                {
-                    int next = GetAnimationFrameIndex(
-                        TimeManager.GetAnimationTime(), interval, validAnimTexs.Count);
-                    if (next == cur)
-                        return false;
-
-                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                    renderer.GetPropertyBlock(propBlock);
-                    cur = next;
-                    animCurCache[data][tempId] = cur;
-                    propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[cur]));
-                    renderer.SetPropertyBlock(propBlock);
-                    return false;
-                }, ins);
-            }
-            else
-            {
-                propBlock.SetTexture("_Tex", GetTextureOrDefault(validAnimTexs[0]));
-            }
-        }
-        else if (hasConfiguredTextures)
+        if (renderer.enabled != configured)
+            renderer.enabled = configured;
+        if (!configured)
         {
-            renderer.gameObject.SetActive(true);
-            renderer.enabled = true;
-            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
-            propBlock.SetTexture("_AlphaTex", Texture2D.whiteTexture);
-            if (!isMask)
-                propBlock.SetTexture("_Tex", GetDefaultTexture());
+            ApplyTextures(renderer, null, Texture2D.blackTexture);
+            return;
         }
-        else if (!isMask)
+
+        var validFrames = GetValidTextureFrames(frames);
+        bool animated = interval > 0 && validFrames.Count > 1;
+        int current = animated ? GetAnimationFrameIndex(TimeManager.GetAnimationTime(), interval, validFrames.Count) : 0;
+        Texture texture = validFrames.Count > 0 ? GetTextureOrDefault(validFrames[current]) : GetDefaultTexture();
+        ApplyTextures(renderer, texture, alpha);
+        if (animated)
+            StartTextureAnimation(ins, rendererId, frames, interval, current);
+    }
+
+    // Keep the closure out of the static-texture path: it is allocated only for animations.
+    private void StartTextureAnimation(MapInstance ins, int rendererId, TextureFrames frames, float interval, int current)
+    {
+        var owner = ins.unit;
+        if (!animCurCache.TryGetValue(owner.data, out var frameIndices))
         {
-            TimeManager.instance.CancelTimer(ins.animTimer[rendererId]);
-            renderer.enabled = false;
-            propBlock.SetTexture("_AlphaTex", Texture2D.blackTexture);
+            frameIndices = new Dictionary<int, int>();
+            animCurCache.Add(owner.data, frameIndices);
         }
+        frameIndices[rendererId] = current;
+        var renderer = ins.renderers[rendererId];
+        ins.animTimer[rendererId] = TimeManager.instance.StartAnimationTimer(interval,
+            () => UpdateTextureAnimation(ins, owner, renderer, rendererId, frames, interval, frameIndices), ins);
+    }
 
+    private bool UpdateTextureAnimation(MapInstance ins, MapUnit owner, Renderer renderer, int rendererId,
+        TextureFrames frames, float interval, Dictionary<int, int> frameIndices)
+    {
+        if (ins.unit != owner || renderer == null)
+            return true;
+        // Lists can be edited in place and asset IDs removed/replaced in Mod.
+        // Cache only validated IDs, never Texture objects or mutable renderer state.
+        var validFrames = GetValidTextureFrames(frames);
+        int next = GetAnimationFrameIndex(TimeManager.GetAnimationTime(), interval, validFrames.Count);
+        frameIndices[rendererId] = next;
+        var texture = validFrames.Count > 0 ? GetTextureOrDefault(validFrames[next]) : GetDefaultTexture();
+        ApplyTextures(renderer, texture, null);
+        return false;
+    }
 
-
-        renderer.SetPropertyBlock(propBlock);
-
+    private void ApplyTextures(Renderer renderer, Texture texture, Texture alpha)
+    {
+        if (textureBlock == null)
+            textureBlock = new MaterialPropertyBlock();
+        // Read the live renderer, including after pool reuse and visibility changes.
+        // The shared scratch block is used only in synchronous main-thread calls.
+        renderer.GetPropertyBlock(textureBlock);
+        bool changed = false;
+        if (texture != null && textureBlock.GetTexture(TextureProperty) != texture)
+        {
+            textureBlock.SetTexture(TextureProperty, texture);
+            changed = true;
+        }
+        if (alpha != null && textureBlock.GetTexture(AlphaTextureProperty) != alpha)
+        {
+            textureBlock.SetTexture(AlphaTextureProperty, alpha);
+            changed = true;
+        }
+        if (changed)
+            renderer.SetPropertyBlock(textureBlock);
     }
     public void RegisterObject(ObjectUnitForm.Data newObjectData, MapObjectForm.Data objectData)
     {
@@ -534,15 +613,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         return mask;
     }
 
-    private static (List<int> textures, float interval) GetTileLayerTextures(TileUnitForm.Data tileData,
+    private static (TextureFrames textures, float interval) GetTileLayerTextures(TileUnitForm.Data tileData,
         int layer, bool frontPart = false)
     {
         if (tileData?.texDic == null || !tileData.texDic.TryGetValue(layer, out int mapTextureId))
-            return (null, 0);
+            return (default, 0);
 
         var data = GetMapTextureOrFirst(mapTextureId);
         if (data == null || (frontPart && !data.enableFrontPart))
-            return (null, 0);
+            return (default, 0);
 
         bool isWangTile = frontPart ? data.frontIsWangTile : data.isWangTile;
         var variants = frontPart ? data.FrontWangTileDic : data.WangTileDic;
@@ -551,25 +630,25 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             int mask = GetWangTileMask(tileData, layer, mapTextureId);
             if (TryGetWangTileAnimationTextures(mapTextureId, frontPart, mask, out List<int> animationTextures))
             {
-                var textures = new List<int>(animationTextures);
-                return (textures, textures.Count > 1 ? data.animTimeInterval : 0);
+                return (new TextureFrames(animationTextures), animationTextures.Count > 1 ? data.animTimeInterval : 0);
             }
             if (variants != null && variants.TryGetValue(mask, out int textureId))
-                return (new List<int> { textureId }, 0);
+                return (new TextureFrames(textureId), 0);
         }
 
-        return (frontPart ? data.frontPartTexs : data.texs, data.animTimeInterval);
+        return (new TextureFrames(frontPart ? data.frontPartTexs : data.texs), data.animTimeInterval);
     }
 
     // Minimap sampling shares the scene's tile selection, without requiring a visible TileInstance.
     internal static Texture GetTileLayerTexture(TileUnitForm.Data tileData, int layer)
     {
         var (textures, _) = GetTileLayerTextures(tileData, layer);
-        if (textures == null || textures.Count == 0)
+        if (textures.Count == 0)
             return null;
 
-        foreach (int textureId in textures)
+        for (int i = 0; i < textures.Count; i++)
         {
+            int textureId = textures[i];
             if (TexAssetForm.DataById.ContainsKey(textureId))
                 return GetTextureOrDefault(textureId);
         }
@@ -585,27 +664,21 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 for (int layer = 0; layer < baseRendererCount; layer++)
                 {
                     var (textures, interval) = GetTileLayerTextures(evt.unit.data, layer);
-                    ShowFinalMat(evt.unit.ins, layer, textures, interval, false);
+                    Texture alpha = Texture2D.whiteTexture;
+                    if (textures.Count > 0 && evt.unit.data.texDic.TryGetValue(
+                            GlobalSettings.TERRAIN_LAYER_MAX + layer, out int maskId)
+                        && MapMaskForm.DataById.TryGetValue(maskId, out var mask))
+                        alpha = ResolveMaskTexture(evt.unit.ins, layer, mask.texsName);
+                    ShowFinalTextures(evt.unit.ins, layer, textures, interval, alpha);
 
                     int frontRendererId = GlobalSettings.TERRAIN_LAYER_MAX + layer;
                     if (frontRendererId < evt.unit.ins.renderers.Length)
                     {
                         var (frontTextures, frontInterval) = GetTileLayerTextures(evt.unit.data, layer, true);
-                        ShowFinalMat(evt.unit.ins, frontRendererId, frontTextures, frontInterval, false);
+                        ShowFinalTextures(evt.unit.ins, frontRendererId, frontTextures, frontInterval, Texture2D.whiteTexture);
                     }
                 }
 
-                for (int layer = 0; layer < baseRendererCount; layer++)
-                {
-                    int maskKey = GlobalSettings.TERRAIN_LAYER_MAX + layer;
-                    var texName = evt.unit.data.texDic.GetDv(maskKey, -1);
-                    var data = MapMaskForm.DataById.GetDv(texName, null);
-
-                    // A retained mask must not re-enable an intentionally empty base layer.
-                    if (evt.unit.data.texDic.ContainsKey(layer))
-                        ShowFinalMat(evt.unit.ins, layer, data != null ? data.texsName : null, 0, true);
-
-                }
                 break;
             case MapEventType.AfterUpdate:
                 GameMapData.ApplyTilePassTypes(evt.unit.data);

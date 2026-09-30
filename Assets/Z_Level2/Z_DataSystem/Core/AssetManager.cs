@@ -66,6 +66,10 @@ namespace Z_DataSystem
 
     public static class AssetFilePicker
     {
+#if UNITY_EDITOR_WIN
+        private const string AudioFileFilter = "Audio files\0*.mp3;*.aac;*.flac;*.wav\0All files\0*.*\0\0";
+#endif
+
         public static void GetImage(Action<string> callback)
         {
 #if UNITY_EDITOR_WIN
@@ -95,9 +99,22 @@ namespace Z_DataSystem
 #if UNITY_EDITOR_WIN
             callback?.Invoke(GetFiles(
                 "Select audio files",
-                "Audio files\0*.mp3;*.aac;*.flac;*.wav\0All files\0*.*\0\0"));
+                AudioFileFilter));
 #else
             NativeGallery.GetAudiosFromGallery(paths => callback?.Invoke(paths));
+#endif
+        }
+
+        public static void GetAudio(Action<string> callback)
+        {
+#if UNITY_EDITOR_WIN
+            var files = GetFiles(
+                "Select audio file",
+                AudioFileFilter,
+                false);
+            callback?.Invoke(files.Length > 0 ? files[0] : null);
+#else
+            NativeGallery.GetAudioFromGallery(path => callback?.Invoke(path));
 #endif
         }
 

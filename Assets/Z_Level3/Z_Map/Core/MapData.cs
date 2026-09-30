@@ -34,7 +34,7 @@ namespace Z_Map
             TileUnitForm.Clear();
             ObjectUnitForm.Clear();
             CharacterUnitForm.Clear();
-            var unitSize = new Vector3(1, 1.5f, 1);
+            var unitSize = Vector3.one;
             mainData = new MapMainForm.Data(
                 1,
                 unitSize,

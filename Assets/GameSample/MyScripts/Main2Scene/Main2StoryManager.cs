@@ -46,7 +46,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 750, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), 0, defaultStyle, false, false, true, true, true, true, true, GlobalDefaultHelper.DefaultTexId, 0, (sceneData.uid, Vector3.zero), false, EventState.Normal);
+            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 500, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), 0, defaultStyle, false, false, true, true, true, true, true, GlobalDefaultHelper.DefaultTexId, 0, (sceneData.uid, Vector3.zero), false, EventState.Normal);
             ProgressForm.AddData(progress);
             var data = new GameMapData();
 

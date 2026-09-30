@@ -466,6 +466,8 @@ public class GameSaveController : Z_Controller<GameManager>
 
         LoadEvent(folder);
         LoadProgress(folder);
+        if (RepairSavedCurrentCharacter())
+            SaveProgress(folder);
         //manage Scene
         DeleteCache(id);
         if (LackMapScene(folder))
@@ -893,6 +895,51 @@ public class GameSaveController : Z_Controller<GameManager>
             }
             DynamicGlobalSettings.cameraMode = GameManager.instance.curProgress.cameraMode;
         }
+    }
+
+    private bool RepairSavedCurrentCharacter()
+    {
+        var progress = GameManager.instance.curProgress;
+        if (progress == null || CharacterProductForm.DataByUid.ContainsKey(progress.characterUid))
+            return false;
+
+        var replacementUid = 0;
+        if (progress.teamActive != null)
+        {
+            foreach (var uid in progress.teamActive)
+            {
+                if (CharacterProductForm.DataByUid.ContainsKey(uid))
+                {
+                    replacementUid = uid;
+                    break;
+                }
+            }
+        }
+        if (replacementUid == 0 && progress.team != null)
+        {
+            foreach (var uid in progress.team)
+            {
+                if (CharacterProductForm.DataByUid.ContainsKey(uid))
+                {
+                    replacementUid = uid;
+                    break;
+                }
+            }
+        }
+        if (replacementUid == 0)
+            return false;
+
+        progress.characterUid = replacementUid;
+        if (progress.team == null)
+            progress.team = new List<int>();
+        if (!progress.team.Contains(replacementUid))
+            progress.team.Add(replacementUid);
+        if (progress.teamActive == null)
+            progress.teamActive = new List<int>();
+        if (!progress.teamActive.Contains(replacementUid))
+            progress.teamActive.Add(replacementUid);
+        Debug.LogWarning($"Repaired saved current character to UID {replacementUid}.");
+        return true;
     }
 
 

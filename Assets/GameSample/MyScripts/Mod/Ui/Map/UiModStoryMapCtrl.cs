@@ -59,7 +59,7 @@ namespace Ui.ModStory.ModStoryMap
 
         public void Refresh()
         {
-            view.btn_map.gameObject.SetActive(GameManager.instance.curProgress.enableLargeMap);
+            view.btn_map.transform.parent.gameObject.SetActive(GameManager.instance.curProgress.enableLargeMap);
             view.page_ModStoryMapMap.SetShow(model.selPage == 0 );
             view.sta_map.ChangeState(model.selPage == 0 ? 1 : 0);
 

@@ -2431,6 +2431,7 @@ namespace ModStorySkillUnitOverview
             public Ipt ipt_name;
             public Btn btn_label;
             public Ipt ipt_cd;
+            public Ipt ipt_introduction;
             public Btn btn_icon;
             public Img img_icon;
             public Btn btn_triggerCondition;
@@ -2452,19 +2453,20 @@ namespace ModStorySkillUnitOverview
             ipt_name = uiHolder.elementTrsLst[2].GetComponent<Ipt>();
             btn_label = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_cd = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            btn_icon = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            img_icon = uiHolder.elementTrsLst[6].GetComponent<Img>();
-            btn_triggerCondition = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            btn_lightAttack = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            sta_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Sta>();
-            btn_heavyAttack = uiHolder.elementTrsLst[10].GetComponent<Btn>();
-            sta_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Sta>();
-            btn_e = uiHolder.elementTrsLst[12].GetComponent<Btn>();
-            sta_e = uiHolder.elementTrsLst[13].GetComponent<Sta>();
-            btn_q = uiHolder.elementTrsLst[14].GetComponent<Btn>();
-            sta_q = uiHolder.elementTrsLst[15].GetComponent<Sta>();
-            txt_label = uiHolder.elementTrsLst[16].GetComponent<Txt>();
-            txt_triggerCondition = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            ipt_introduction = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            btn_icon = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            img_icon = uiHolder.elementTrsLst[7].GetComponent<Img>();
+            btn_triggerCondition = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            btn_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            sta_lightAttack = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            btn_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_heavyAttack = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_e = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_e = uiHolder.elementTrsLst[14].GetComponent<Sta>();
+            btn_q = uiHolder.elementTrsLst[15].GetComponent<Btn>();
+            sta_q = uiHolder.elementTrsLst[16].GetComponent<Sta>();
+            txt_label = uiHolder.elementTrsLst[17].GetComponent<Txt>();
+            txt_triggerCondition = uiHolder.elementTrsLst[18].GetComponent<Txt>();
         }
 
     }

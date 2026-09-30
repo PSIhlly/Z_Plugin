@@ -1,153 +1,5 @@
 [
   {
-    "uid": 1,
-    "name": "爆炸1",
-    "labId": 11,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 31,
-              "time": 0.8,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 0.0,
-              "transition": false
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 31,
-              "time": 0.2,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": true
-            }
-          }
-        ]
-      },
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 28,
-              "time": 0.2,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 0.0,
-              "transition": false
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 28,
-              "time": 0.2,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": true
-            }
-          }
-        ]
-      },
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 29,
-              "time": 0.4,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 0.0,
-              "transition": false
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 29,
-              "time": 0.2,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": true
-            }
-          }
-        ]
-      },
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 31,
-              "time": 0.6,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 0.0,
-              "transition": false
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 31,
-              "time": 0.2,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": true
-            }
-          }
-        ]
-      },
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 32,
-              "time": 1.0,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 0.0,
-              "transition": false
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 32,
-              "time": 0.2,
-              "pos": "0|0.5|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": true
-            }
-          }
-        ]
-      }
-    ],
-    "ground": false
-  },
-  {
     "uid": 2,
     "name": "魔符·星屑幻想",
     "labId": 12,
@@ -194,5 +46,153 @@
       }
     ],
     "ground": true
+  },
+  {
+    "uid": 1,
+    "name": "爆炸1",
+    "labId": 11,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 31,
+              "time": 0.8,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 31,
+              "time": 0.2,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 28,
+              "time": 0.2,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 28,
+              "time": 0.2,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 29,
+              "time": 0.4,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 29,
+              "time": 0.2,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 31,
+              "time": 0.6,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 31,
+              "time": 0.2,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      },
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 32,
+              "time": 1.0,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": false
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 32,
+              "time": 0.2,
+              "pos": "0|1.5|-1",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      }
+    ],
+    "ground": false
   }
 ]

@@ -190,6 +190,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         _playerM = null;
         _playerG = null;
         RefreshCurrentCharacter();
+        var sceneUi = UiManager.instance.GetUi<UiPlaySceneMainCtrl>();
+        if (sceneUi != null && sceneUi.active)
+            sceneUi.Refresh();
     }
     public void RefreshCurrentCharacter()
     {
@@ -197,7 +200,14 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         {
             MapManager.instance.RemoveCharacter(_playerM);
         }
-        _playerG = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
+        _playerG = CharacterProductForm.DataByUid.GetDv(GameManager.instance.curProgress.characterUid, null);
+        if (_playerG == null)
+        {
+            _playerM = null;
+            lastPlayerPos = GameManager.instance.curProgress.pos;
+            SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
+            return;
+        }
         _playerM = GetOrNewCharacter(_playerG);
         // A unique character may already exist in the scene: progress owns player placement.
         MapManager.instance.updateCtrl.ApplyMove(_playerM.unit, GameManager.instance.curProgress.pos, _playerM.euler, true);
@@ -308,7 +318,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             setPlayerMove = Vector3.zero;
         }
 
-        if (setPlayerRot != null)
+        if (setPlayerRot != null && _playerM != null)
         {
             _playerM.unit.forceEuler = ((Quaternion)setPlayerRot).eulerAngles;
 

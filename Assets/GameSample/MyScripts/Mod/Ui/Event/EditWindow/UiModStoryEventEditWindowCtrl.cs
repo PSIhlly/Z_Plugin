@@ -1,6 +1,7 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using Ui.ModStory.ModStoryEvent.ModStoryEventCustom;
 using UnityEngine;
@@ -54,43 +55,37 @@ namespace Ui.ModStoryEventEditWindow
             view.ipt_name.onFinishInput += (v) =>
             {
                 model.data.name = v;
-                Refresh();
+                view.txt_title.text = v;
             };
-            view.btn_category.onClick.AddListener(ChooseCategory);
+            view.btn_lab.onClick.AddListener(ChooseLab);
             view.btn_switchMod.onClick.AddListener(() =>
             {
-                if (model.codeEditMode)
-                {
-                    if (!ApplyCode())
-                        return;
-                }
-                else
-                {
-                    view.btn_apply.onClick.Invoke();//auto apply
-                }
+                if (!ApplyCurrentMode())
+                    return;
                 model.codeEditMode = !model.codeEditMode;
                 model.selItem = null;
                 model.selUnit = null;
-
-                Refresh();
-            });
-            view.btn_apply.onClick.AddListener(() =>
-            {
                 if (model.codeEditMode)
                 {
-                    ApplyCode();
-
+                    RefreshMode();
                 }
                 else
                 {
-                    ApplyEntry();
-
+                    // Item rows must be created after their panel is visible, otherwise
+                    // nested ContentSizeFitters measure the hidden hierarchy as zero.
+                    Refresh();
+                    TimeManager.instance.AddNextUpdateAction(() =>
+                    {
+                        if (active && !model.codeEditMode)
+                            UiManager.Rebuild(view.scr_items.gameObject, true);
+                    }, gameObject);
                 }
-
             });
+            view.btn_apply.onClick.AddListener(() => { ApplyCurrentMode(); });
             view.btn_close.onClick.AddListener(() =>
             {
-                Close();
+                if (ApplyCurrentMode())
+                    Close();
             });
             view.btn_edit.onClick.AddListener(() =>
             {
@@ -121,20 +116,11 @@ namespace Ui.ModStoryEventEditWindow
                             if (!TryCompileUnitSyntax(code, out var unit))
                                 return;
                             ReplaceNode(model.selUnit, unit);
-                            ApplyEntry();
                         }, model.selUnit);
                     }
-                    else if (ProgramDataForm.DataByName.ContainsKey(item.content))
+                    else if (ProgramDataForm.DataByName.TryGetValue(item.content, out var program))
                     {
-                        var data = ProgramDataForm.DataByName[item.content];
-                        var paramCount = data.paramCount;
-                        var rawCode = item.content + "(";
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
-                        }
-                        rawCode += ");";
-                        if (!TryCompileSyntax(rawCode, out var res))
+                        if (!TryCompileSyntax(BuildProgramCallCode(program), out var res))
                             return;
                         ReplaceNode(model.selUnit, res[0]);
                     }
@@ -144,15 +130,17 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_del.onClick.AddListener(() =>
             {
-
+                var deletedNode = model.selItem;
                 var parentList = FindParentList(model.curEntry, model.selItem);
                 if (parentList != null)
                 {
                     parentList.Remove(model.selItem);
+                    HideRenderedItems(deletedNode, true);
                 }
 
                 model.selItem = null;
-                ApplyEntry();
+                model.selUnit = null;
+                RefreshUnitDetail();
             });
             view.btn_insert.onClick.AddListener(() =>
             {
@@ -169,17 +157,9 @@ namespace Ui.ModStoryEventEditWindow
                             if (!string.IsNullOrEmpty(sel.allowAsVoid))
                                 defaultCode = $"{sel.allowAsVoid}{defaultCode};";
                         }
-                        else if (ProgramDataForm.DataByName.ContainsKey(item.content))
+                        else if (ProgramDataForm.DataByName.TryGetValue(item.content, out var program))
                         {
-                            var data = ProgramDataForm.DataByName[item.content];
-                            var paramCount = data.paramCount;
-                            var rawCode = item.content + "(";
-                            for (int i = 0; i < paramCount; i++)
-                            {
-                                rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
-                            }
-                            rawCode += ");";
-                            defaultCode = rawCode;
+                            defaultCode = BuildProgramCallCode(program);
                         }
 
 
@@ -193,23 +173,47 @@ namespace Ui.ModStoryEventEditWindow
                             model.selItem = r;
                             id++;
                         }
-                        ApplyEntry();
+                        model.selItem = null;
+                        model.selUnit = null;
+                        RefreshUnitDetail();
                     }
 
                 });
             });
         }
-        public void ApplyEntry()
+        internal static string BuildProgramCallCode(ProgramDataForm.Data program)
+        {
+            var code = new StringBuilder(program.name).Append('(');
+            for (var i = 1; i <= program.paramCount; i++)
+            {
+                if (i > 1)
+                    code.Append(',');
+                code.Append("param").Append(i);
+            }
+            return code.Append(");").ToString();
+        }
+
+        private bool ApplyCurrentMode()
+        {
+            return model.codeEditMode ? ApplyCode() : ApplyEntry();
+        }
+
+        public bool ApplyEntry()
         {
             var code = model.dcpr.Decompile(model.curEntry);
-            if (model.data.TryApplyCode(code, out _, out var errors, model.cpr))
+            if (model.data.TryApplyCode(code, out var syntaxNodes, out var errors, model.cpr))
             {
+                model.curEntry = syntaxNodes;
+                model.selItem = null;
+                model.selUnit = null;
                 view.ipt_code.Set(model.data.code);
                 Refresh();
+                return true;
             }
             else
             {
                 ShowCompileErrors(errors);
+                return false;
             }
         }
         public bool ApplyCode()
@@ -219,7 +223,8 @@ namespace Ui.ModStoryEventEditWindow
                     out var errors, model.cpr))
             {
                 model.curEntry = syntaxNodes;
-                Refresh();
+                model.selItem = null;
+                model.selUnit = null;
                 return true;
             }
             else
@@ -358,8 +363,7 @@ namespace Ui.ModStoryEventEditWindow
         }
         public void Refresh()
         {
-            view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
-            view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
+            RefreshMode();
 
             lineCon.Clear();
             itemCon.Clear();
@@ -399,9 +403,13 @@ namespace Ui.ModStoryEventEditWindow
 
             view.ipt_name.Set(model.data.name);
             LabForm.TryGetData(model.data.labId, out var lab);
-            view.txt_category.text = GetLabLevelText(lab?.lv1Lab);
+            view.txt_lab.text = GetLabLevelText(lab?.lv1Lab);
+        }
 
-
+        private void RefreshMode()
+        {
+            view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
+            view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
             RefreshUnitDetail();
         }
 
@@ -412,11 +420,11 @@ namespace Ui.ModStoryEventEditWindow
                 : level;
         }
 
-        private void ChooseCategory()
+        private void ChooseLab()
         {
             var categories = new List<string> { string.Empty };
             categories.AddRange(UiModStoryEventCustomCtrl.GetCategories());
-            ChooseLabLevel("category", categories, category =>
+            ChooseLabLevel("label", categories, category =>
             {
                 LabForm.TryGetData(model.data.labId, out var current);
                 if (category == (current?.lv1Lab ?? string.Empty))
@@ -424,7 +432,7 @@ namespace Ui.ModStoryEventEditWindow
 
                 model.data.labId = LabForm.GetOrCreate(
                     category, string.Empty, string.Empty, nameof(EventProgramDataForm));
-                Refresh();
+                view.txt_lab.text = GetLabLevelText(category);
             });
         }
 
@@ -478,53 +486,77 @@ namespace Ui.ModStoryEventEditWindow
         }
         public void ReplaceNode(SyntaxNode nodeNow, SyntaxNode nodeNew)
         {
-
-            foreach (var o in model.curEntry)
-            {
-                Debug.Log(o.Contains(nodeNow) + "!!!");
-            }
+            var itemNode = model.selItem;
             if (nodeNow.parentNode != null)
             {
-                var tmp = nodeNow.parentNode;
-                while (tmp != null)
-                {
-                    if (tmp == model.selItem)
-                    {
-                        Debug.Log("finded");
-                    }
-                    tmp = tmp.parentNode;
-                }
-                for (int i = 0, icnt = nodeNow.parentNode.subNodes.Count; i < icnt; i++)
-                {
-                    if (nodeNow.parentNode.subNodes[i] == nodeNow)
-                    {
-                        nodeNow.parentNode.subNodes[i] = nodeNew;
-                        nodeNew.parentNode = nodeNow.parentNode;
-                    }
-                }
+                var parentNode = nodeNow.parentNode;
+                var index = parentNode.subNodes.IndexOf(nodeNow);
+                if (index < 0)
+                    return;
+                parentNode.subNodes[index] = nodeNew;
+                nodeNew.parentNode = parentNode;
             }
             else
             {
-                for (int i = 0, icnt = model.curEntry.Count; i < icnt; i++)
-                {
-                    if (model.curEntry[i] == nodeNow)
-                    {
-                        model.curEntry[i] = nodeNew;
-                    }
-                }
+                var index = model.curEntry.IndexOf(nodeNow);
+                if (index < 0)
+                    return;
+                model.curEntry[index] = nodeNew;
+                nodeNew.parentNode = null;
             }
 
-            if (nodeNow == model.selItem)
-            {
+            if (nodeNow == itemNode)
                 model.selItem = nodeNew;
-            }
             if (nodeNow == model.selUnit)
-            {
                 model.selUnit = nodeNew;
-            }
-            foreach (var o in model.curEntry)
+
+            if (nodeNow == itemNode)
+                HideRenderedItems(nodeNow, false);
+            foreach (UiItemParam item in itemCon.paramLst)
             {
-                Debug.Log(o.Contains(nodeNew) + "!!!");
+                if (item.node != itemNode)
+                    continue;
+                if (nodeNow == itemNode)
+                    item.node = nodeNew;
+                var itemCtrl = (UiItemCtrl)itemCon.Get(item).ctrl;
+                itemCtrl.RefreshUnits();
+                UiManager.Rebuild(itemCtrl.gameObject, true);
+                break;
+            }
+            if (nodeNow == itemNode)
+                foreach (UiLineParam line in lineCon.paramLst)
+                    if (line.node == itemNode)
+                    {
+                        line.node = nodeNew;
+                        ((UiLineCtrl)lineCon.Get(line).ctrl).RefreshSelection();
+                        break;
+                    }
+            RefreshUnitDetail();
+        }
+
+        private void HideRenderedItems(SyntaxNode subtree, bool includeRoot)
+        {
+            if (subtree == null)
+                return;
+
+            var start = -1;
+            for (var i = 0; i < itemCon.paramLst.Count; i++)
+                if (((UiItemParam)itemCon.paramLst[i]).node == subtree)
+                {
+                    start = i;
+                    break;
+                }
+            if (start < 0)
+                return;
+
+            var depth = ((UiItemParam)itemCon.paramLst[start]).deepth;
+            for (var i = includeRoot ? start : start + 1; i < itemCon.paramLst.Count; i++)
+            {
+                var item = (UiItemParam)itemCon.paramLst[i];
+                if (i > start && item.deepth <= depth)
+                    break;
+                itemCon.Get(item).gameObject.SetActive(false);
+                lineCon.Get(lineCon.paramLst[i]).gameObject.SetActive(false);
             }
         }
         private List<SyntaxNode> FindParentList(List<SyntaxNode> o, SyntaxNode target)

@@ -79,6 +79,76 @@ namespace Z_Code.Tests
         }
 
         [Test]
+        public void DictionaryTimesScalar_ScalesEveryFieldInEitherOrderWithoutChangingTheSource()
+        {
+            const string source = @"
+v.x=1;
+v.y=-2;
+v.height=3;
+j=-2;
+scaled=v*j;
+reversed=j*v;
+zero=v*0;
+Return scaled;";
+
+            var result = Execute(source, out var data);
+            Assert.That(result.ret.dic.Keys, Is.EquivalentTo(new[] { "x", "y", "height" }));
+            Assert.That(result.ret.dic["x"].num, Is.EqualTo(-2f).Within(0.0001f));
+            Assert.That(result.ret.dic["y"].num, Is.EqualTo(4f).Within(0.0001f));
+            Assert.That(result.ret.dic["height"].num, Is.EqualTo(-6f).Within(0.0001f));
+            Assert.That(data.heap["reversed"].dic["x"].num, Is.EqualTo(-2f).Within(0.0001f));
+            Assert.That(data.heap["reversed"].dic["y"].num, Is.EqualTo(4f).Within(0.0001f));
+            Assert.That(data.heap["reversed"].dic["height"].num, Is.EqualTo(-6f).Within(0.0001f));
+            Assert.That(data.heap["zero"].dic.Keys, Is.EquivalentTo(new[] { "x", "y", "height" }));
+            Assert.That(data.heap["zero"].dic.Values.All(value => value.num == 0f), Is.True);
+            Assert.That(data.heap["v"].dic["x"].num, Is.EqualTo(1f));
+            Assert.That(data.heap["v"].dic["y"].num, Is.EqualTo(-2f));
+            Assert.That(data.heap["v"].dic["height"].num, Is.EqualTo(3f));
+            Assert.That(Execute("Return 2*3;").ret.num, Is.EqualTo(6f));
+        }
+
+        [TestCase("v+2", 10f, 6f, 0f)]
+        [TestCase("2+v", 10f, 6f, 0f)]
+        [TestCase("v-2", 6f, 2f, -4f)]
+        [TestCase("2-v", -6f, -2f, 4f)]
+        [TestCase("v*2", 16f, 8f, -4f)]
+        [TestCase("2*v", 16f, 8f, -4f)]
+        [TestCase("v/2", 4f, 2f, -1f)]
+        [TestCase("2/v", 0.25f, 0.5f, -1f)]
+        public void DictionaryScalarArithmetic_AppliesToEveryField(string expression, float x, float y, float height)
+        {
+            var result = Execute($"v.x=8;v.y=4;v.height=-2;Return {expression};", out var data);
+            Assert.That(result.ret.dic.Keys, Is.EquivalentTo(new[] { "x", "y", "height" }));
+            Assert.That(result.ret.dic["x"].num, Is.EqualTo(x).Within(0.0001f));
+            Assert.That(result.ret.dic["y"].num, Is.EqualTo(y).Within(0.0001f));
+            Assert.That(result.ret.dic["height"].num, Is.EqualTo(height).Within(0.0001f));
+            Assert.That(data.heap["v"].dic["x"].num, Is.EqualTo(8f));
+            Assert.That(data.heap["v"].dic["y"].num, Is.EqualTo(4f));
+            Assert.That(data.heap["v"].dic["height"].num, Is.EqualTo(-2f));
+        }
+
+        [TestCase("a+b", 10f, 3f)]
+        [TestCase("a-b", 6f, 5f)]
+        [TestCase("a*b", 16f, -4f)]
+        [TestCase("a/b", 4f, -4f)]
+        public void DictionaryDictionaryArithmetic_UsesMatchingFields(string expression, float x, float y)
+        {
+            var result = Execute($"a.x=8;a.y=4;a.height=-2;b.x=2;b.y=-1;b.extra=9;Return {expression};");
+            Assert.That(result.ret.dic.Keys, Is.EquivalentTo(new[] { "x", "y" }));
+            Assert.That(result.ret.dic["x"].num, Is.EqualTo(x).Within(0.0001f));
+            Assert.That(result.ret.dic["y"].num, Is.EqualTo(y).Within(0.0001f));
+        }
+
+        [TestCase("2+3", 5f)]
+        [TestCase("5-3", 2f)]
+        [TestCase("2*3", 6f)]
+        [TestCase("6/2", 3f)]
+        public void ScalarArithmetic_RemainsNumeric(string expression, float expected)
+        {
+            Assert.That(Execute($"Return {expression};").ret.num, Is.EqualTo(expected).Within(0.0001f));
+        }
+
+        [Test]
         public void LogicalAndOr_ShortCircuitUnknownRightHandCall()
         {
             var missing = $"Missing_{Guid.NewGuid():N}";

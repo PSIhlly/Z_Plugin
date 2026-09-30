@@ -70,7 +70,9 @@ namespace Z_DataSystem
             public override void Run(AudioController ctrl)
             {
                 base.Run(ctrl);
-                NativeGallery.GetAudioFromGallery((path) => OnImportComplete(string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path), Path.GetFileNameWithoutExtension(path)));
+                AssetFilePicker.GetAudio(path => OnImportComplete(
+                    string.IsNullOrEmpty(path) ? null : File.ReadAllBytes(path),
+                    Path.GetFileNameWithoutExtension(path)));
             }
             public override void OnImportComplete(byte[] data,string name)
             {

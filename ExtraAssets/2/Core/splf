@@ -1,42 +1,11 @@
 [
   {
-    "uid": 5,
-    "name": "魔符·星屑幻想",
-    "labId": 9,
-    "protoUid": 0,
-    "icon": 33,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 2
-      }
-    ],
-    "characterUid": 0,
-    "cd": 10.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 13
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 4,
-    "name": "星弹",
+    "uid": 9,
+    "name": "剑弹",
+    "desc": "发射飞剑弹攻击敌人",
     "labId": 10,
     "protoUid": 0,
-    "icon": 33,
+    "icon": 53,
     "paramDic": [],
     "skillTypes": [
       {
@@ -54,7 +23,40 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 6
+              "v": 19
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 17,
+    "name": "魔炮·最终火花",
+    "desc": "集中一个方向发射大量星弹的魔法",
+    "labId": 9,
+    "protoUid": 0,
+    "icon": 2,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 3
+      }
+    ],
+    "characterUid": 0,
+    "cd": 30.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 23
             }
           ],
           "type": 0
@@ -66,6 +68,7 @@
   {
     "uid": 3,
     "name": "札弹",
+    "desc": "发射追踪符弹攻击敌人",
     "labId": 10,
     "protoUid": 0,
     "icon": 46,
@@ -96,29 +99,12 @@
     "triggerConditionUid": 0
   },
   {
-    "uid": 17,
-    "name": "触击",
+    "uid": 4,
+    "name": "星弹",
+    "desc": "发射魔法弹攻击敌人",
     "labId": 10,
     "protoUid": 0,
-    "icon": 210000,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 1.0,
-    "lastUseTime": 0.0,
-    "events": [],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 9,
-    "name": "剑弹",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 53,
+    "icon": 33,
     "paramDic": [],
     "skillTypes": [
       {
@@ -136,13 +122,61 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 19
+              "v": 6
             }
           ],
           "type": 0
         }
       }
     ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 5,
+    "name": "魔符·星屑幻想",
+    "desc": "四面八方发出星弹的魔法",
+    "labId": 9,
+    "protoUid": 0,
+    "icon": 2,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 2
+      }
+    ],
+    "characterUid": 0,
+    "cd": 10.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 13
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 11,
+    "name": "触击",
+    "desc": "",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "paramDic": [],
+    "skillTypes": [],
+    "characterUid": 0,
+    "cd": 1.0,
+    "lastUseTime": 0.0,
+    "events": [],
     "triggerConditionUid": 0
   }
 ]

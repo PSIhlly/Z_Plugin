@@ -81,9 +81,9 @@ namespace Ui.ModStoryEventEditWindow
                             var form = CmdDataForm.DataByName[model.node.desc.code];
                             RenderDescription(form.desc);
                         }
-                        else if (int.TryParse(model.node.desc.code, out int evtId) && EventProgramDataForm.DataByUid.ContainsKey(evtId))
+                        else if (ProgramDataForm.DataByName.TryGetValue(model.node.desc.code, out var program)
+                                 && program is EventProgramDataForm.Data evtData)
                         {
-                            var evtData = EventProgramDataForm.DataByUid[evtId];
                             CreateTxt(evtData.name + "(");
                             bool hasVisibleArgument = false;
                             for (int i = 0; i < model.node.subNodes.Count; i++)

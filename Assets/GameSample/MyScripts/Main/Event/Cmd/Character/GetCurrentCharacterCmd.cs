@@ -25,7 +25,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetCurrentCharacterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString())) };
+            var player = PlayManager.instance.sceneCtrl.playerG;
+            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(player == null ? string.Empty : GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, player.uid.ToString())) };
             return true;
         }
     }

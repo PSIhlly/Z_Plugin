@@ -74,6 +74,8 @@ Preserve the semantic split:
 
 Built-in map content loads with `Resources.LoadAll("Z_Map/")` from `Assets/Z_Level3/Z_Map/Sample/Resources/Z_Map`.
 
+New maps use `MapMainForm.mapUnitSize = (1, 1, 1)`: adjacent logical Tile Y layers are one world unit apart. Saved `mapPos.y` remains the integer layer index; saved unit `pos.y`, character `destination.y`, progress `pos.y`, and mission `targetPos.y` are world heights. Use `scripts/migrate-tile-height.ps1` to divide those saved world heights and `mapUnitSize.y` by `1.5` when converting an old `(1, 1.5, 1)` story. Keep rotations, model scales/local offsets, and logical coordinates unchanged. The script backs up affected files and refuses mixed old/new scene heights to avoid double conversion.
+
 Preserve identifiers used as parsing and lookup protocols:
 
 - `MapPrefab$...` for built-in map prefabs.

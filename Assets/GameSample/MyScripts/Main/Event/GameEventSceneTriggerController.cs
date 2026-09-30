@@ -184,7 +184,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         if (evt.b is CharacterUnit chU)
                         {
                             mapUnit.ExecuteEvt("onCharacterTouchEvent", heap);
-                            if (!IsRemovedObject(mapUnit) && mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM.uid)
+                            if (!IsRemovedObject(mapUnit) && mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM?.uid)
                                 Z_EventHelper.Invoke(new SceneActionEvent() { unitUid = mapUnit.data.uid, type = SceneActionEventType.Add });
                         }
                         else if (evt.b is ObjectUnit)
@@ -202,7 +202,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         if (evt.b is CharacterUnit chU2)
                         {
                             mapUnit.ExecuteEvt("onCharacterLeaveEvent", heap);
-                            if (chU2.data.uid == PlayManager.instance.sceneCtrl.playerM.uid)
+                            if (chU2.data.uid == PlayManager.instance.sceneCtrl.playerM?.uid)
                                 Z_EventHelper.Invoke(new SceneActionEvent() { unitUid = mapUnit.data.uid, type = SceneActionEventType.Remove });
                         }
                         else if (evt.b is ObjectUnit)

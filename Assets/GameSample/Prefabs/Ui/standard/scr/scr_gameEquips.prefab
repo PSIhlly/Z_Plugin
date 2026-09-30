@@ -1,18 +1,19 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!1 &729924245917538715
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 566048105613654499}
   - component: {fileID: 8139882122852323359}
   - component: {fileID: 479401469956543932}
   - component: {fileID: 2550923896025154029}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: scr_gameEquips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,7 +34,6 @@ RectTransform:
   m_Children:
   - {fileID: 2154810980688928353}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -79,8 +79,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   dir: 0
-  viewPort: {fileID: 2154810980688928353}
-  spacing: 30
+  xSpacing: 0
+  ySpacing: 0
+  top: 0
+  left: 0
   cell: {fileID: 5806713461426591889}
   fiilType: 1
 --- !u!114 &2550923896025154029
@@ -121,13 +123,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 2154810980688928353}
   - component: {fileID: 2223008222718191025}
   - component: {fileID: 5065670318449768988}
   - component: {fileID: 3192156087047963563}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +151,6 @@ RectTransform:
   m_Children:
   - {fileID: 5062700973880992060}
   m_Father: {fileID: 566048105613654499}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -212,10 +214,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
+  serializedVersion: 7
   m_Component:
   - component: {fileID: 5062700973880992060}
   m_Layer: 5
+  m_HasEditorInfo: 1
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -236,7 +239,6 @@ RectTransform:
   m_Children:
   - {fileID: 5806713461426591889}
   m_Father: {fileID: 2154810980688928353}
-  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -248,12 +250,16 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 5062700973880992060}
     m_Modifications:
     - target: {fileID: 3420748914083503370, guid: 9e979da3173688348a20ca7750a33eaa, type: 3}
       propertyPath: m_Name
       value: go_gameEquip
+      objectReference: {fileID: 0}
+    - target: {fileID: 3813816209618267910, guid: 9e979da3173688348a20ca7750a33eaa, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.0000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 5634304835600598738, guid: 9e979da3173688348a20ca7750a33eaa, type: 3}
       propertyPath: m_Pivot.x
@@ -340,7 +346,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e979da3173688348a20ca7750a33eaa, type: 3}
 --- !u!224 &5806713461426591889 stripped
 RectTransform:

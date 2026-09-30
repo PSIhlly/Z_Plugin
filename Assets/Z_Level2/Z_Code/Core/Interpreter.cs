@@ -494,7 +494,7 @@ namespace Z_Code
                             }
 
                             var right = Pop();
-                            var value = AddValues(GetBox(target), right).DeepCopy();
+                            var value = ArithmeticValues(GetBox(target), right, Op.Plus).DeepCopy();
                             if (target.str != null)
                             {
                                 data.heap[target.valName].dic[target.str] = value;
@@ -511,7 +511,7 @@ namespace Z_Code
                         {
                             var left = GetBox(Pop());
                             var right = GetBox(Pop());
-                            Push(AddValues(left, right));
+                            Push(ArithmeticValues(left, right, Op.Plus));
 
                             data.p++;
                             break;
@@ -524,23 +524,7 @@ namespace Z_Code
                         {
                             var left = GetBox(Pop());
                             var right = GetBox(Pop());
-                            if (HasDictionary(left) && HasDictionary(right))
-                            {
-                                var result = CodeHelper.CreateBox();
-                                foreach (var pair in left.dic)
-                                {
-                                    if (right.dic.TryGetValue(pair.Key, out var rightValue))
-                                    {
-                                        result.dic[pair.Key] = ValueMinus(pair.Value, rightValue);
-                                    }
-                                }
-
-                                Push(result);
-                            }
-                            else
-                            {
-                                Push(ValueMinus(left, right));
-                            }
+                            Push(ArithmeticValues(left, right, Op.Minus));
 
                             data.p++;
                             break;
@@ -551,22 +535,17 @@ namespace Z_Code
                             break;
                         case Op.Mul:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            Push(CodeHelper.CreateBoxByNum(left * right));
+                            var left = GetBox(Pop());
+                            var right = GetBox(Pop());
+                            Push(ArithmeticValues(left, right, Op.Mul));
                             data.p++;
                             break;
                         }
                         case Op.Div:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            if (right == 0f)
-                            {
-                                throw new DivideByZeroException("除数不能为 0");
-                            }
-
-                            Push(CodeHelper.CreateBoxByNum(left / right));
+                            var left = GetBox(Pop());
+                            var right = GetBox(Pop());
+                            Push(ArithmeticValues(left, right, Op.Div));
                             data.p++;
                             break;
                         }
@@ -1174,23 +1153,59 @@ namespace Z_Code
             asyncTask.Cancel();
         }
 
-        private BoxDataForm.Data AddValues(BoxDataForm.Data left, BoxDataForm.Data right)
+        private BoxDataForm.Data ArithmeticValues(BoxDataForm.Data left, BoxDataForm.Data right, Op operation)
         {
             left = GetBox(left);
             right = GetBox(right);
-            if (HasDictionary(left) && HasDictionary(right))
+            bool leftIsDictionary = HasDictionary(left);
+            bool rightIsDictionary = HasDictionary(right);
+            if (leftIsDictionary && rightIsDictionary)
             {
                 var result = CodeHelper.CreateBox();
                 foreach (var pair in left.dic)
                 {
                     if (right.dic.TryGetValue(pair.Key, out var rightValue))
                     {
-                        result.dic[pair.Key] = ValuePlus(pair.Value, rightValue);
+                        result.dic[pair.Key] = ArithmeticValues(pair.Value, rightValue, operation);
                     }
                 }
                 return result;
             }
-            return ValuePlus(left, right);
+
+            if (leftIsDictionary != rightIsDictionary)
+            {
+                var source = leftIsDictionary ? left : right;
+                var result = CodeHelper.CreateBox();
+                foreach (var pair in source.dic)
+                {
+                    result.dic[pair.Key] = leftIsDictionary
+                        ? ArithmeticValues(pair.Value, right, operation)
+                        : ArithmeticValues(left, pair.Value, operation);
+                }
+                return result;
+            }
+
+            return ScalarArithmetic(left, right, operation);
+        }
+
+        private BoxDataForm.Data ScalarArithmetic(BoxDataForm.Data left, BoxDataForm.Data right, Op operation)
+        {
+            switch (operation)
+            {
+                case Op.Plus:
+                    return ValuePlus(left, right);
+                case Op.Minus:
+                    return ValueMinus(left, right);
+                case Op.Mul:
+                    return CodeHelper.CreateBoxByNum(GetNum(left) * GetNum(right));
+                case Op.Div:
+                    float divisor = GetNum(right);
+                    if (divisor == 0f)
+                        throw new DivideByZeroException("除数不能为 0");
+                    return CodeHelper.CreateBoxByNum(GetNum(left) / divisor);
+                default:
+                    throw new InvalidOperationException($"不支持的四则运算: {operation}");
+            }
         }
 
         private BoxDataForm.Data ValuePlus(BoxDataForm.Data left, BoxDataForm.Data right)

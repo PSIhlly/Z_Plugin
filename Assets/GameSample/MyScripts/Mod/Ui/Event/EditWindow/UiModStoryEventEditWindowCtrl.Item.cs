@@ -56,22 +56,12 @@ namespace Ui.ModStoryEventEditWindow
                         if (!parent.TryCompileSyntax(defaultCode, out var res))
                             return;
                         model.prm.targetNewList.AddRange(res);
-                        parent.ApplyEntry();
                     }
-                    else if (ProgramDataForm.DataByName.ContainsKey(item.content))
+                    else if (ProgramDataForm.DataByName.TryGetValue(item.content, out var program))
                     {
-                        var data = ProgramDataForm.DataByName[item.content];
-                        var paramCount = data.paramCount;
-                        var rawCode = item.content + "(";
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            rawCode += $"{(i == 0 ? "" : ",")}param{i + 1}";
-                        }
-                        rawCode += ");";
-                        if (!parent.TryCompileSyntax(rawCode, out var res))
+                        if (!parent.TryCompileSyntax(UiModStoryEventEditWindowCtrl.BuildProgramCallCode(program), out var res))
                             return;
                         model.prm.targetNewList.AddRange(res);
-                        parent.ApplyEntry();
                     }
                 });
             }
@@ -88,8 +78,6 @@ namespace Ui.ModStoryEventEditWindow
 
         public void Refresh()
         {
-            unitCon.Clear();
-            renderedUnits.Clear();
             deepthCon.Clear();
             for (int i = 0; i < model.prm.deepth; i++)
                 deepthCon.Add(new UiDeepthParam());
@@ -163,6 +151,19 @@ namespace Ui.ModStoryEventEditWindow
                     }, ++curRender);
                 }
 
+            }
+            RefreshUnits();
+        }
+
+        public void RefreshUnits()
+        {
+            foreach (var unit in renderedUnits)
+                if (unit.gameObject)
+                    unit.gameObject.SetActive(false);
+            unitCon.Clear();
+            renderedUnits.Clear();
+            if (model.prm.node != null)
+            {
                 unitCon.Add(new UiUnitParam()
                 {
                     con = unitCon,

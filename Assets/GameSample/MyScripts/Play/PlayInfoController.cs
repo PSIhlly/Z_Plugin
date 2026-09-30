@@ -636,7 +636,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
         switch (evt.type)
         {
             case CollideEventType.TriggerEnter:
-                if (evt.b == _super.sceneCtrl.playerM.unit && evt.a is ItemUnit obj)
+                if (_super.sceneCtrl.playerM != null && evt.b == _super.sceneCtrl.playerM.unit && evt.a is ItemUnit obj)
                 {
                     if (obj.productInfo.Item1 > 0)
                     {

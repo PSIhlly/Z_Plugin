@@ -35,19 +35,21 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
         }
         public override void OnShow()
         {
-            if (param != null)
-            {
-                model.data = param.data;
-            }
-            model.sel = model.hasSelection
-                ? SkillProductForm.DataByUid.GetDv(model.data.skill.GetDv(model.selSkill, 0), null)
-                : null;
+            model.data = param?.data;
             Refresh();
         }
         public void Refresh()
         {
-            view.txt_.text = model.selSkill != SkillType.LightAttack ? TextManager.instance.GetTxt(model.selSkill.ToString()) : "";
-            view.txt_name.text = model.sel?.name;
+            model.sel = null;
+            if (model.hasSelection && model.data?.skill != null &&
+                model.data.skill.TryGetValue(model.selSkill, out var selectedUid))
+                SkillProductForm.DataByUid.TryGetValue(selectedUid, out model.sel);
+            if (model.sel == null)
+                model.hasSelection = false;
+
+            view.txt_.text = model.hasSelection ? TextManager.instance.GetTxt(model.selSkill.ToString()) : string.Empty;
+            view.txt_name.text = model.sel?.name ?? string.Empty;
+            view.txt_desc.text = model.sel?.desc ?? string.Empty;
 
             gameArgsCon.Clear();
             if (model.sel != null)
@@ -63,12 +65,19 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
             gameArgsCon.Refresh();
 
             gameSkillCon.Clear();
-            foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
+            if (model.data?.skill != null)
             {
-                gameSkillCon.Add(new UiGameEquipParam()
+                foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
                 {
-                    part = type
-                });
+                    if (!model.data.skill.TryGetValue(type, out var uid) ||
+                        !SkillProductForm.DataByUid.TryGetValue(uid, out var skill))
+                        continue;
+                    gameSkillCon.Add(new UiGameEquipParam()
+                    {
+                        part = type,
+                        data = skill
+                    });
+                }
             }
             gameSkillCon.Refresh();
 
@@ -78,6 +87,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
     public partial class UiGameEquipParam
     {
         public SkillType part;
+        public SkillProductForm.Data data;
     }
     public partial class UiGameEquipModel
     {
@@ -93,7 +103,6 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
             view.btn_.onClick.AddListener(() =>
             {
                 parent.model.hasSelection = true;
-                parent.model.sel = model.data;
                 parent.model.selSkill = model.part;
                 parent.Refresh();
             });
@@ -102,7 +111,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
         public override void OnShow()
         {
             model.part = param.part;
-            model.data = SkillProductForm.DataByUid.GetDv(parent.model.data.skill.GetDv(model.part, 0), null);
+            model.data = param.data;
             Refresh();
         }
         public void Refresh()

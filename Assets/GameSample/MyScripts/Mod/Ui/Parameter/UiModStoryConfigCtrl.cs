@@ -41,6 +41,8 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             {
                 ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose main character"), (data) =>
                 {
+                    if (data == null)
+                        return;
                     var oldUid = GameManager.instance.curProgress.characterUid;
                     GameManager.instance.curProgress.team.Remove(oldUid);
                     GameManager.instance.curProgress.teamActive.Remove(oldUid);
@@ -170,7 +172,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             bagCon.Add(new UiItemParam() { uid = 0 });
             bagCon.Refresh();
 
-            view.txt_mainCharacter.text = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid].name;
+            view.txt_mainCharacter.text = CharacterProductForm.DataByUid.GetDv(GameManager.instance.curProgress.characterUid, null)?.name ?? string.Empty;
             view.txt_perspective.text = TextManager.instance.GetTxt(GameManager.instance.curProgress.cameraMode.ToString());
 
             view.go_teamerExist.SetActive(model.selTeamerUid != 0);
@@ -201,11 +203,19 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             {
                 ModManager.instance.assetCtrl.ChooseCharacter(TextManager.instance.GetTxt("Choose character"), (data) =>
                 {
-                    if (data != null && !GameManager.instance.curProgress.team.Contains(data.uid))
+                    if (data == null)
+                        return;
+
+                    var progress = GameManager.instance.curProgress;
+                    if (!progress.team.Contains(data.uid))
+                        progress.team.Add(data.uid);
+                    if (progress.characterUid == 0)
                     {
-                        GameManager.instance.curProgress.team.Add(data.uid);
-                        parent.Refresh();
+                        progress.characterUid = data.uid;
+                        if (!progress.teamActive.Contains(data.uid))
+                            progress.teamActive.Add(data.uid);
                     }
+                    parent.Refresh();
                 });
             });
             view.btn_.onClick.AddListener(() =>
@@ -251,11 +261,15 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             {
                 ModManager.instance.assetCtrl.ChooseActiveCharacter(TextManager.instance.GetTxt("Choose active character"), (data) =>
                 {
-                    if (data != null && !GameManager.instance.curProgress.teamActive.Contains(data.uid))
-                    {
-                        GameManager.instance.curProgress.teamActive.Add(data.uid);
-                        parent.Refresh();
-                    }
+                    if (data == null)
+                        return;
+
+                    var progress = GameManager.instance.curProgress;
+                    if (!progress.teamActive.Contains(data.uid))
+                        progress.teamActive.Add(data.uid);
+                    if (progress.characterUid == 0)
+                        progress.characterUid = data.uid;
+                    parent.Refresh();
                 });
             });
             view.btn_.onClick.AddListener(() =>

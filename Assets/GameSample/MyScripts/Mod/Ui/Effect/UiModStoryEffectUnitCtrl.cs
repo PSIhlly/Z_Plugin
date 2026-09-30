@@ -9,6 +9,7 @@ using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_Math;
 using Z_String;
+using Z_Time;
 using Z_Texture;
 using Z_Ui;
 using Z_Ui.Base;
@@ -93,6 +94,16 @@ namespace Ui.ModStory.ModStoryEffect.ModStoryEffectUnit
                 id = -1
             });
             clipsCon.Refresh();
+            RebuildClipsLayout();
+            TimeManager.instance.AddCurLateUpdateAction(RebuildClipsLayout, gameObject);
+        }
+
+        private void RebuildClipsLayout()
+        {
+            if (!active)
+                return;
+
+            UiManager.Rebuild(view.go_clips.transform.parent.gameObject, true);
             UiManager.Rebuild(view.go_content, true);
         }
     }

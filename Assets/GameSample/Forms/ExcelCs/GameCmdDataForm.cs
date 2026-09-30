@@ -469,6 +469,8 @@ namespace Form
 
                 {100108,new Data(100108,"Mission",null,null,new List<string>(){"mission",},new List<string>(){"mission",},"","\"$m$$m$\"",10001,EditorStyle.Rpg,"")},
 
+                {100109,new Data(100109,"SceneShake",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Shake scene for {0} seconds","SceneShake(1);",10013,EditorStyle.AvgAdvanced,"")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -689,6 +691,8 @@ namespace Form
                         {"GetCharacterName",_DataByUid[100107]},
     
                         {"Mission",_DataByUid[100108]},
+    
+                        {"SceneShake",_DataByUid[100109]},
     
                     
                     };
@@ -932,6 +936,8 @@ namespace Form
                     _DatasByLabid[10007].Add(_DataByUid[100107]);
 
                     _DatasByLabid[10001].Add(_DataByUid[100108]);
+
+                    _DatasByLabid[10013].Add(_DataByUid[100109]);
 
 
             childInitAction?.Invoke();

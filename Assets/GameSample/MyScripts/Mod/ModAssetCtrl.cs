@@ -822,7 +822,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             paramDic[prm.name] = prm.Copy();
         }
-        SkillProductForm.AddData(new SkillProductForm.Data(-1, name, labId, 0, GlobalDefaultHelper.DefaultTexId, paramDic, new List<SkillType>(), 0, 1, 0, new Dictionary<string, EventTriggerForm.Data>(), 0));
+        SkillProductForm.AddData(new SkillProductForm.Data(-1, name, string.Empty, labId, 0, GlobalDefaultHelper.DefaultTexId, paramDic, new List<SkillType>(), 0, 1, 0, new Dictionary<string, EventTriggerForm.Data>(), 0));
     }
     public void DeleteSkill(int uid)
     {

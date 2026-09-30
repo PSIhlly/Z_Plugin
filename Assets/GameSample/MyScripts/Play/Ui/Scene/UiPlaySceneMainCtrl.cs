@@ -180,39 +180,40 @@ namespace Ui.PlaySceneMain
             teamerCon.Clear();
             foreach (var uid in GameManager.instance.curProgress.teamActive)
             {
-                teamerCon.Add(new UiTeamerParam()
-                {
-                    data = CharacterProductForm.DataByUid[uid]
-                });
+                var teammate = CharacterProductForm.DataByUid.GetDv(uid, null);
+                if (teammate != null)
+                    teamerCon.Add(new UiTeamerParam() { data = teammate });
             }
             teamerCon.Refresh();
 
             int id = 0;
-            var cur = CharacterProductForm.DataByUid[GameManager.instance.curProgress.characterUid];
+            var cur = CharacterProductForm.DataByUid.GetDv(GameManager.instance.curProgress.characterUid, null);
             prmCon.Clear();
-            foreach (var prm in cur.paramDic.Values)
+            if (cur != null)
             {
-                var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name, null);
-                if (protoPrm != null)
+                foreach (var prm in cur.paramDic.Values)
                 {
-                    switch (protoPrm.showType)
+                    var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name, null);
+                    if (protoPrm != null)
                     {
-                        case ParamShowType.AlwaysWithPanel:
-                        case ParamShowType.AlwaysWithPanelAndScene:
-                        case ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer:
-                            var maxPrm = string.IsNullOrEmpty(prm.max) ? null : cur.paramDic.GetDv(prm.max, null);
-                            float max = maxPrm == null ? GlobalSettings.MAX : maxPrm.GetValue().num;
-                            var minPrm = string.IsNullOrEmpty(prm.min) ? null : cur.paramDic.GetDv(prm.min, null);
-                            float min = minPrm == null ? 0 : minPrm.GetValue().num;
-                            prmCon.Add(new UiParamShowParam() { max = max - min, value = prm.GetValue().num - min, color = colors[id] });
-                            if (id < colors.Length - 1)
-                            {
-                                id++;
-                            }
-                            break;
+                        switch (protoPrm.showType)
+                        {
+                            case ParamShowType.AlwaysWithPanel:
+                            case ParamShowType.AlwaysWithPanelAndScene:
+                            case ParamShowType.AlwaysWithPanelAndSceneWithoutPlayer:
+                                var maxPrm = string.IsNullOrEmpty(prm.max) ? null : cur.paramDic.GetDv(prm.max, null);
+                                float max = maxPrm == null ? GlobalSettings.MAX : maxPrm.GetValue().num;
+                                var minPrm = string.IsNullOrEmpty(prm.min) ? null : cur.paramDic.GetDv(prm.min, null);
+                                float min = minPrm == null ? 0 : minPrm.GetValue().num;
+                                prmCon.Add(new UiParamShowParam() { max = max - min, value = prm.GetValue().num - min, color = colors[id] });
+                                if (id < colors.Length - 1)
+                                {
+                                    id++;
+                                }
+                                break;
+                        }
                     }
                 }
-
             }
             prmCon.Refresh();
 
@@ -225,12 +226,15 @@ namespace Ui.PlaySceneMain
                 view.model_qStick.SetShow(!view.model_qStick.active, qParam);
 
             actCon.Clear();
-            foreach (var actUid in actionUnitUids)
+            if (cur != null)
             {
-                var data = UnitForm.DataByUid.GetDv(actUid, null);
-                if(data != null)
+                foreach (var actUid in actionUnitUids)
                 {
-                    actCon.Add(new UiActionParam() { data = data });
+                    var data = UnitForm.DataByUid.GetDv(actUid, null);
+                    if(data != null)
+                    {
+                        actCon.Add(new UiActionParam() { data = data });
+                    }
                 }
             }
             actCon.Refresh();
@@ -334,9 +338,12 @@ namespace Ui.PlaySceneMain
         {
            view.btn_.onClick.AddListener(() =>
            {
+               var player = PlayManager.instance.sceneCtrl.playerG;
+               if (player == null)
+                   return;
                var heap = new Dictionary<string, BoxDataForm.Data>();
                heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, model.data.uid.ToString()));
-               heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString()));
+               heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, player.uid.ToString()));
                ((MapUnit)model.data.unit).ExecuteEvt("onInteractEvent", heap);
            });
         }

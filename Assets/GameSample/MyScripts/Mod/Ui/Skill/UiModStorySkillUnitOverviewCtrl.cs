@@ -66,6 +66,10 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
                 model.data.cd = StringHelper.ToFloat(s, 1);
                 Refresh();
             };
+            view.ipt_introduction.onFinishInput += (s) =>
+            {
+                model.data.desc = s;
+            };
             view.btn_e.onClick.AddListener(() =>
             {
                 SetKillType(SkillType.E);
@@ -112,6 +116,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
         public void Refresh()
         {
             view.ipt_name.Set(model.data.name);
+            view.ipt_introduction.Set(model.data.desc ?? string.Empty);
             view.txt_label.text = UiLabRenderHelper.GetText(model.data.labId, false);
             view.ipt_cd.Set(model.data.cd.ToString());
             view.img_icon.BindTexData(TexAssetForm.DataById[model.data.icon]);

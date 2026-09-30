@@ -52,6 +52,19 @@ public partial class ModCmd
         form.key.SetValue(data, -1);
         form.name.SetValue(data, name);
         form.protoUid?.SetValue(data, 0);
+        if (data is EffectForm.Data effect)
+        {
+            // The generated default has null clips, while the Effect editor
+            // expects the same initial frame that its New button creates.
+            effect.clips = new List<List<EffectClipForm.Data>>
+            {
+                new List<EffectClipForm.Data>
+                {
+                    new EffectClipForm.Data(-1, GlobalDefaultHelper.DefaultTexId, 1,
+                        Vector3.zero, 0, Vector3.one, 1, true)
+                }
+            };
+        }
 
         var uid = (int)form.addData.Invoke(null, new object[] { data });
         if (uid < 0)
@@ -228,6 +241,7 @@ public partial class ModCmd
         }
 
         RegisterAlias("SceneObject", typeof(MapObjectForm));
+        RegisterAlias("Effect", typeof(EffectForm));
         RegisterAlias("Event", typeof(EventProgramDataForm));
         RegisterAlias("Mission", typeof(MissionForm));
         RegisterAlias("Tile", typeof(MapTextureForm));

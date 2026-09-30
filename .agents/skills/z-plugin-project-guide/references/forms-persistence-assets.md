@@ -138,7 +138,11 @@ Story folders are relative to `Application.persistentDataPath`. On Windows, Unit
 <story-id>/Cache/   logical scene working copies
 ```
 
+Tile Y spacing changed from `1.5` to `1` world unit. For old story folders, run `.agents/skills/z-plugin-project-guide/scripts/migrate-tile-height.ps1 -StoryDirectory <story-folder>` while the game is closed. It converts numeric scene files in `Core/Cache/Save` plus world-height positions in `pf` and `msf`, backs up affected originals under `Backups/`, and is a no-op after conversion. Never divide logical `mapPos.y`, `targetScene.item2`, rotations, or local model geometry by `1.5`.
+
 Play scene entry must keep `PlayManager.enable` false until the map-complete position callback and player creation finish. Capture first-entry status (`ProgressForm.sceneId == 0`) before asynchronous loading; first entry converts `targetScene.Item2` to world position, while resume retains saved `pos`. Reused player units must also be placed through `ApplyMove(..., teleport: true)` so data, transform and Tile indexes match the progress position before Enter events run.
+
+When loading a Play `Save/pf`, if its current `characterUid` is `0` or refers to a missing Character Product, choose the first valid active-team UID, otherwise the first valid team UID. Ensure that replacement belongs to both lists and rewrite only the repaired Save progress. Leave `Core/pf` and saves with no valid candidate unchanged; the Play scene can run without a current player character.
 
 `GameSaveController` is a manual allow-list. For a new persistent Form, handle all of:
 
@@ -196,10 +200,17 @@ AssetForm
 - Import through `GameSaveController.AddStoryTex/AddStoryAudio/AddStoryVideo` so data is converted to the concrete Story subtype, IDs and Lab ownership are normalized, and asset events are emitted.
 - Batch media selection goes through `TexController/AudioController/VideoController.SelectMultiple`. Windows Editor uses `AssetFilePicker`'s native multi-file dialog; supported Player platforms delegate to NativeGallery. Import every returned item through the matching `GameSaveController.AddStory*` method rather than registering the batch directly.
 - Texture import accepts PNG/JPG/BMP/GIF/WebP. WebP is detected by its RIFF/WEBP signature as saved story asset filenames have no original extension. `TexAssetForm.Data.GetTex()` returns the first decoded GIF frame (or the first composited WebP frame) for static consumers and correct image dimensions; `GetAnimationFrames/GetAnimationSprites` provides all frames to `Img` for timed playback. Keep the original animated bytes in story asset storage so reloading can rebuild frames and sprites. The single-image and batch Windows Editor pickers both include `.webp`.
-- Audio asset import recognizes `.mp3` and `.wav` files when scanning folders and in the Windows multi-file picker; Player platforms continue to use NativeGallery's audio MIME filter.
+- Audio asset import recognizes `.mp3` and `.wav` files when scanning folders and in both the Windows Editor single-file and multi-file pickers; Player platforms continue to use NativeGallery's audio MIME filter. The single-file picker is used when replacing an existing audio asset.
 - After a story's asset manifests load, repair missing character-animation `partTex` references through `GameSaveController.RepairMissingCharacterTextureReferences`. It creates one transparent Story texture per missing legacy ID and rewrites every affected `CharacterProductForm` entry so the repair persists on the next save.
 - Do not register base `TexAssetForm.Data` directly as Story data or reuse a base Form's Lab ID under a Story subtype.
 - Built-in map assets load through `Resources.LoadAll("Z_Map/")`; preserve their reserved names.
+
+## Offline texture split and join
+
+- `ExtraAssets/贴图/test/texture_tool.py` owns the numbered PNG workflow invoked by `拆分.bat` and `拼合.bat`; the adjacent `PNG用途说明.txt` documents each input/output. Split overwrites 1–29 and 50–51; avoid a full split when refreshing only one preview would preserve authored edits.
+- Split previews 14–17 crop the former full marked images into directional half-width/half-height regions: X/Y fractions are (1/6–2/3, 1/6–2/3), (1/3–5/6, 1/6–2/3), (1/6–2/3, 1/3–5/6), and (1/3–5/6, 1/3–5/6). Each preview's purple region becomes its middle third in both axes.
+- Join chooses the central base from 101's middle 3×3 tile, else 100's whole image, else 50's whole image, else 1's middle 3×3 tile. Read 1 only for that final fallback. Resize the selected tile to the source sheet's central region.
+- Optional authored 104–107 correspond to repaired 14–17. Crop their middle third proportionally, then overwrite the central tile's top-left, top-right, bottom-left, and bottom-right quadrants. These patches take precedence over 101 and affect only present quadrants. Using 101 or any of these patches saves the final central tile as 50 and places the same pixels into 0. Split must not generate or overwrite these optional inputs.
 
 ## Change workflow
 

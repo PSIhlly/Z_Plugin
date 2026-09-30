@@ -68,6 +68,8 @@ namespace Form
                 
         public static Action<Data,string,string> changeNameAction;
                 
+        public static Action<Data,string,string> changeDescAction;
+                
         public static Action<Data,int,int> changeLabidAction;
                 
         public static Action<Data,int,int> changeProtouidAction;
@@ -93,6 +95,24 @@ namespace Form
         public partial class Data : ProductForm.Data
         {
 
+                    private string  _desc;
+                    /// <summary>
+                    ///描述
+                    ///</summary>
+                    public string  desc{
+                                get{return _desc;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeDesc(this,_desc,value); 
+                    }
+        
+                _desc = value;
+                }
+                 
+                     }
+                    
                     private int  _icon;
                     /// <summary>
                     ///图标
@@ -241,11 +261,12 @@ namespace Form
             {
             }
             
-            public Data(int uid,string name,int labId,int protoUid,int icon,Dictionary<string,SkillParamForm.Data> paramDic,List<SkillType> skillTypes,int characterUid,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid):base(uid,name,labId,protoUid)
+            public Data(int uid,string name,string desc,int labId,int protoUid,int icon,Dictionary<string,SkillParamForm.Data> paramDic,List<SkillType> skillTypes,int characterUid,float cd,float lastUseTime,Dictionary<string,EventTriggerForm.Data> events,int triggerConditionUid):base(uid,name,labId,protoUid)
             {
 
              this.uid = uid;
              this.name = name;
+             this.desc = desc;
              this.labId = labId;
              this.protoUid = protoUid;
              this.icon = icon;
@@ -263,6 +284,7 @@ namespace Form
 
              this.uid = data.uid;
              this.name = data.name;
+             this.desc = data.desc;
              this.labId = data.labId;
              this.protoUid = data.protoUid;
              this.icon = data.icon;
@@ -277,7 +299,7 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,protoUid,icon,paramDic==null?new Dictionary<string,SkillParamForm.Data>():new Dictionary<string,SkillParamForm.Data>(paramDic),skillTypes==null?new List<SkillType>():new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
+        return new Data(sameId? uid:uidChain.GetId(),name,desc,labId,protoUid,icon,paramDic==null?new Dictionary<string,SkillParamForm.Data>():new Dictionary<string,SkillParamForm.Data>(paramDic),skillTypes==null?new List<SkillType>():new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
                 }
             
             public override  void BeforeGet()
@@ -287,7 +309,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,0,0,new Dictionary<string,SkillParamForm.Data>(){},new List<SkillType>(),0,0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
+                   private static Data _defaultData=new Data(0,"","",0,0,0,new Dictionary<string,SkillParamForm.Data>(){},new List<SkillType>(),0,0f,0f,new Dictionary<string,EventTriggerForm.Data>(){},0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -434,6 +456,8 @@ namespace Form
 
                 jo.SelectToken("name")==null?defaultData.name:jo.Get<string>("name"),
 
+                jo.SelectToken("desc")==null?defaultData.desc:jo.Get<string>("desc"),
+
                 jo.SelectToken("labId")==null?defaultData.labId:jo.Get<int>("labId"),
 
                 jo.SelectToken("protoUid")==null?defaultData.protoUid:jo.Get<int>("protoUid"),
@@ -468,6 +492,8 @@ namespace Form
             jo.Set<int>("uid",data.uid);
 
             jo.Set<string>("name",data.name);
+
+            jo.Set<string>("desc",data.desc);
 
             jo.Set<int>("labId",data.labId);
 
@@ -632,6 +658,16 @@ ProductForm.RemoveData(uid);
                     DataByNameProtouid[(newV,data.protoUid)]=data;
  
                 changeNameAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeDesc(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeDescAction?.Invoke(data,oldV,newV);
                 }
                     
             }

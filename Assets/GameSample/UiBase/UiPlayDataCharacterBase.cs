@@ -432,6 +432,7 @@ namespace PlayDataCharacterSkill
 
             public Txt txt_;
             public Txt txt_name;
+            public Txt txt_desc;
             public ScrView scr_gameArgs;
             public GameObject go_gameEquip;
             public UiGameEquipCtrl sub_gameEquip;
@@ -443,12 +444,13 @@ namespace PlayDataCharacterSkill
 
             txt_ = uiHolder.elementTrsLst[0].GetComponent<Txt>();
             txt_name = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            scr_gameArgs = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            go_gameEquip = uiHolder.elementTrsLst[3].gameObject;
-            sub_gameEquip = (UiGameEquipCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
-            go_gameArgs = uiHolder.elementTrsLst[5].gameObject;
-            sta_gameArgs = uiHolder.elementTrsLst[6].GetComponent<Sta>();
-            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
+            txt_desc = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            scr_gameArgs = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
+            go_gameEquip = uiHolder.elementTrsLst[4].gameObject;
+            sub_gameEquip = (UiGameEquipCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
+            go_gameArgs = uiHolder.elementTrsLst[6].gameObject;
+            sta_gameArgs = uiHolder.elementTrsLst[7].GetComponent<Sta>();
+            sub_gameArgs = (UiGameArgsCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
         }
 
     }

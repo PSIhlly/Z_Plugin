@@ -84,6 +84,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
             view.img_map.BindTexData(TexAssetForm.DataById[model.data.miniMap]);
             view.ipt_name.Set(model.data.name);
             view.sta_hideInLargeMap.ChangeState(model.data.hideInLargeMap?1:0);
+            view.btn_hideInLargeMap.transform.parent.gameObject.SetActive(GameManager.instance.curProgress.enableLargeMap);
             RefreshEvents();
         }
 

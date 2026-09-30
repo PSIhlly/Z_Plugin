@@ -282,9 +282,12 @@ namespace Ui.PlayMap
         {
             view.btn_mark.onClick.AddListener(() =>
             {
+                var player = PlayManager.instance.sceneCtrl.playerG;
+                if (player == null)
+                    return;
                 var heap = new Dictionary<string, BoxDataForm.Data>();
                 heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, (model.prm.unit).productInfo.Item1.ToString()));
-                heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, PlayManager.instance.sceneCtrl.playerG.uid.ToString()));
+                heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, player.uid.ToString()));
                 (model.prm.unit).ExecuteEvt("onClickMinimapEvent", heap);
             });
         }

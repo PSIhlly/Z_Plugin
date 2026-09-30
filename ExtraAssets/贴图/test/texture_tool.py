@@ -76,6 +76,12 @@ def crop_percentage(
     return image.crop(percentage_box(image, left, top, right, bottom))
 
 
+def quadrant_edit_crop(image: Image.Image, column: int, row: int) -> Image.Image:
+    return crop_percentage(
+        image, (1 + column) / 6, (1 + row) / 6, (4 + column) / 6, (4 + row) / 6
+    )
+
+
 def closed_percentage_box(
     image: Image.Image,
     left: float,
@@ -264,10 +270,12 @@ def split_image() -> None:
     save_png(image_13, "13.png")
     save_png(fill_percentage(image_13, 1 / 2, 1 / 2, 1, 1), "29.png")
 
-    save_png(fill_percentage(image_1, 1 / 3, 1 / 3, 1 / 2, 1 / 2), "14.png")
-    save_png(fill_percentage(image_1, 1 / 2, 1 / 3, 2 / 3, 1 / 2), "15.png")
-    save_png(fill_percentage(image_1, 1 / 3, 1 / 2, 1 / 2, 2 / 3), "16.png")
-    save_png(fill_percentage(image_1, 1 / 2, 1 / 2, 2 / 3, 2 / 3), "17.png")
+    for index in range(4):
+        column, row = index % 2, index // 2
+        marked = fill_percentage(
+            image_1, (2 + column) / 6, (2 + row) / 6, (3 + column) / 6, (3 + row) / 6
+        )
+        save_png(quadrant_edit_crop(marked, column, row), f"{14 + index}.png")
 
     top_strip = crop_closed(source, quarter + 1, three_quarters_x, third_y + 1, half_y)
     image_2 = tile(top_strip, 2, 1)
@@ -370,12 +378,9 @@ def split_image() -> None:
         crop_closed(source, three_quarters_x + 1, x, two_thirds_y + 1, five_sixths_y),
     )
     image_9 = complete_wang_corners(image_9, source, (2, 2))
+    image_9 = correct_image_9_upper_right(image_9, source)
     save_png(image_9, "9.png")
     image_25 = image_9.copy()
-    image_25.paste(
-        crop_half_open(source, 2 * quarter, 3 * sixth, 3 * quarter, 4 * sixth),
-        (2 * quarter, 0),
-    )
     save_png(fill_percentage(image_25, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "25.png")
 
 
@@ -421,6 +426,15 @@ def resize_to(image: Image.Image, size: tuple[int, int]) -> Image.Image:
     return image.resize(size, Image.Resampling.LANCZOS)
 
 
+def center_tile_3x3(image: Image.Image, target_size: tuple[int, int]) -> Image.Image:
+    if image.width % 3 or image.height % 3:
+        raise ValueError("101.png must contain a 3x3 tile grid with dimensions divisible by 3.")
+    tile_width = image.width // 3
+    tile_height = image.height // 3
+    tile = crop_half_open(image, tile_width, tile_height, 2 * tile_width, 2 * tile_height)
+    return resize_to(tile, target_size)
+
+
 def fill_missing_corner(
     image: Image.Image,
     tile_source: Image.Image,
@@ -435,6 +449,16 @@ def fill_missing_corner(
     tile = resize_to(tile_source.crop(tile_box), destination_size)
     result = image.copy()
     result.paste(tile, (destination_left, destination_top))
+    return result
+
+
+def correct_image_9_upper_right(image: Image.Image, source: Image.Image) -> Image.Image:
+    _, _, quarter, sixth = require_size(source)
+    result = image.copy()
+    result.paste(
+        crop_half_open(source, 2 * quarter, 3 * sixth, 3 * quarter, 4 * sixth),
+        (2 * quarter, 0),
+    )
     return result
 
 
@@ -558,14 +582,33 @@ def join_image() -> None:
     result = load_source()
     _, _, quarter, sixth = require_size(result)
     third_y = 2 * sixth
-    images = [None] + [open_required(f"{index}.png") for index in range(1, 10)]
+    images = [None, None] + [open_required(f"{index}.png") for index in range(2, 10)]
     corner_images = [None] + [open_required(f"{index}.png") for index in range(10, 14)]
 
-    image_1_for_join = resize_to(images[1], (6 * quarter, 6 * sixth))
-    center_tile = crop_half_open(image_1_for_join, 2 * quarter, 2 * sixth, 4 * quarter, 4 * sixth)
-    replacement_path = FOLDER / "100.png"
-    if replacement_path.is_file():
-        center_tile = resize_to(open_required("100.png"), center_tile.size)
+    center_size = (2 * quarter, 2 * sixth)
+    generated_50 = None
+    if (FOLDER / "101.png").is_file():
+        generated_50 = center_tile_3x3(open_required("101.png"), center_size)
+        center_tile = generated_50
+    elif (FOLDER / "100.png").is_file():
+        center_tile = resize_to(open_required("100.png"), center_size)
+    elif (FOLDER / "50.png").is_file():
+        center_tile = resize_to(open_required("50.png"), center_size)
+    else:
+        center_tile = center_part(open_required("1.png"), *center_size)
+
+    # Each repaired preview contains its original purple region in the middle third.
+    for index in range(4):
+        name = f"{104 + index}.png"
+        if not (FOLDER / name).is_file():
+            continue
+        repair = crop_percentage(open_required(name), 1 / 3, 1 / 3, 2 / 3, 2 / 3)
+        if repair.width == 0 or repair.height == 0:
+            raise ValueError(f"{name} is too small to extract its middle tile.")
+        column, row = index % 2, index // 2
+        center_tile.paste(resize_to(repair, (quarter, sixth)), (column * quarter, row * sixth))
+        generated_50 = center_tile
+
     result.paste(center_tile, (quarter, 3 * sixth))
     result.paste(
         join_horizontal_strip(images[2], (4 * quarter, sixth), (2 * quarter, sixth), False),
@@ -604,6 +647,8 @@ def join_image() -> None:
         corner_tile_2x2(corner_images[4], left=False, bottom=True, target_size=(quarter, sixth)),
         (3 * quarter, 5 * sixth),
     )
+    if generated_50 is not None:
+        save_png(generated_50, "50.png")
     save_png(result, "0.png")
 
 

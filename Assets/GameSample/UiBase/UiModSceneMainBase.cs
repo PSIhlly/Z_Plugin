@@ -294,6 +294,8 @@ namespace ModTool
             public ModTool.UiModToolCtrl page_ModTool;
             public Btn btn_view;
             public Btn btn_modCmd;
+            public Btn btn_redo;
+            public Btn btn_undo;
             public Btn btn_event;
             public Sta sta_event;
             public Btn btn_layer0;
@@ -313,17 +315,19 @@ namespace ModTool
             page_ModTool = (ModTool.UiModToolCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
             btn_view = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             btn_modCmd = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            btn_event = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            sta_event = uiHolder.elementTrsLst[6].GetComponent<Sta>();
-            btn_layer0 = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            sta_layer0 = uiHolder.elementTrsLst[8].GetComponent<Sta>();
-            btn_layer1 = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            sta_layer1 = uiHolder.elementTrsLst[10].GetComponent<Sta>();
-            btn_layer2 = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            sta_layer2 = uiHolder.elementTrsLst[12].GetComponent<Sta>();
-            ipt_viewPosSetX = uiHolder.elementTrsLst[13].GetComponent<Ipt>();
-            ipt_viewPosSetZ = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
-            ipt_viewPosSetY = uiHolder.elementTrsLst[15].GetComponent<Ipt>();
+            btn_redo = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            btn_undo = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            btn_event = uiHolder.elementTrsLst[7].GetComponent<Btn>();
+            sta_event = uiHolder.elementTrsLst[8].GetComponent<Sta>();
+            btn_layer0 = uiHolder.elementTrsLst[9].GetComponent<Btn>();
+            sta_layer0 = uiHolder.elementTrsLst[10].GetComponent<Sta>();
+            btn_layer1 = uiHolder.elementTrsLst[11].GetComponent<Btn>();
+            sta_layer1 = uiHolder.elementTrsLst[12].GetComponent<Sta>();
+            btn_layer2 = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            sta_layer2 = uiHolder.elementTrsLst[14].GetComponent<Sta>();
+            ipt_viewPosSetX = uiHolder.elementTrsLst[15].GetComponent<Ipt>();
+            ipt_viewPosSetZ = uiHolder.elementTrsLst[16].GetComponent<Ipt>();
+            ipt_viewPosSetY = uiHolder.elementTrsLst[17].GetComponent<Ipt>();
         }
 
     }

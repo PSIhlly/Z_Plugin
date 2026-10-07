@@ -86,6 +86,8 @@ namespace Ui.ModSceneMain
         public override void OnCreate()
         {
             this.Register<CameraMoveEvent>();
+            view.btn_undo.onClick.AddListener(() => ModManager.instance.sceneCtrl.Undo());
+            view.btn_redo.onClick.AddListener(() => ModManager.instance.sceneCtrl.Redo());
             view.btn_menu.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiModSceneMenuCtrl>();

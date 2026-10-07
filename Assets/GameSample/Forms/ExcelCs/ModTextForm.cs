@@ -863,6 +863,8 @@ namespace Form
 
                 {1000366,new Data(1000366,"frontIsWangTile","Front WangTile","前景 WangTile")},
 
+                {1000367,new Data(1000367,"noAvailableOperations","No available operations","没有可用的操作")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -1577,6 +1579,8 @@ namespace Form
                         {"cantUseInEventMod",_DataById[1000365]},
     
                         {"frontIsWangTile",_DataById[1000366]},
+    
+                        {"noAvailableOperations",_DataById[1000367]},
     
                     
                     };

@@ -1199,6 +1199,16 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public TileUnitForm.Data AddTile(Vector3Int mapPos)
     {
+        using (_super.sceneCtrl?.BeginOperation())
+        {
+            var result = AddTileInternal(mapPos);
+            _super.sceneCtrl?.TrackAdded(result);
+            return result;
+        }
+    }
+
+    private TileUnitForm.Data AddTileInternal(Vector3Int mapPos)
+    {
         var mapManager = MapManager.instance;
         if (mapManager.data == null
             || !mapManager.utilCtrl.InLimit(mapPos)
@@ -1211,6 +1221,16 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
 
     public ObjectUnitForm.Data AddObject(MapObjectForm.Data data, Vector3 position, float angle = 0)
+    {
+        using (_super.sceneCtrl?.BeginOperation())
+        {
+            var result = AddObjectInternal(data, position, angle);
+            _super.sceneCtrl?.TrackAdded(result);
+            return result;
+        }
+    }
+
+    private ObjectUnitForm.Data AddObjectInternal(MapObjectForm.Data data, Vector3 position, float angle)
     {
         if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
             return null;
@@ -1247,6 +1267,16 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
     public ItemUnitForm.Data AddItem(ItemProductForm.Data data, Vector3 position, float angle = 0)
     {
+        using (_super.sceneCtrl?.BeginOperation())
+        {
+            var result = AddItemInternal(data, position, angle);
+            _super.sceneCtrl?.TrackAdded(result);
+            return result;
+        }
+    }
+
+    private ItemUnitForm.Data AddItemInternal(ItemProductForm.Data data, Vector3 position, float angle)
+    {
         if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
             return null;
 
@@ -1270,11 +1300,26 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             return null;
 
         result.unit.productInfo = (data.uid, -1);
-        result.euler = new Vector3(result.euler.x, angle, result.euler.z);
+        mapManager.updateCtrl.ApplyMove(result.unit, result.pos,
+            new Vector3(result.euler.x, angle, result.euler.z), true);
+        // AddItem initially shows before its product metadata is assigned.
+        // Refresh only this item's appearance, not the entire map view.
+        if (result.unit.ins != null)
+            Z_EventHelper.Invoke(new ItemEvent { type = MapEventType.Show, unit = result.unit });
         return result;
     }
 
     public CharacterUnitForm.Data AddCharacter(CharacterProductForm.Data data, Vector3 position, float angle = 0)
+    {
+        using (_super.sceneCtrl?.BeginOperation())
+        {
+            var result = AddCharacterInternal(data, position, angle);
+            _super.sceneCtrl?.TrackAdded(result);
+            return result;
+        }
+    }
+
+    private CharacterUnitForm.Data AddCharacterInternal(CharacterProductForm.Data data, Vector3 position, float angle)
     {
         if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
             return null;
@@ -1300,7 +1345,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         if (result == null)
             return null;
 
-        result.euler = new Vector3(result.euler.x, angle, result.euler.z);
+        mapManager.updateCtrl.ApplyMove(result.unit, result.pos,
+            new Vector3(result.euler.x, angle, result.euler.z), true);
         return result;
     }
 

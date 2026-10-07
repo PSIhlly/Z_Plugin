@@ -250,6 +250,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), List<int>>
         objectWangTileAnimationTextures = new Dictionary<(int, AnimDirecton, int), List<int>>();
     private readonly Dictionary<ObjectUnit, Bounds> objectWangTileBounds = new Dictionary<ObjectUnit, Bounds>();
+    private readonly HashSet<MapUnit> objectWangTileNeighbourCandidates = new HashSet<MapUnit>();
+    private static readonly HashSet<MapUnit> objectWangTileMaskCandidates = new HashSet<MapUnit>();
+    private const float ObjectWangTileContactTolerance = 0.001f;
     private static readonly (int x, int z, int bit)[] wangTileNeighbours =
     {
         (-1, 1, 0), (0, 1, 1), (1, 1, 2),
@@ -259,9 +262,23 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public void Reset()
     {
         alphaTextureDic.Clear();
+        ResetSceneUnitCaches();
+        ClearWangTileAnimationTextures();
+    }
+
+    public void ResetSceneUnitCaches()
+    {
         animCurCache.Clear();
         objectWangTileBounds.Clear();
-        ClearWangTileAnimationTextures();
+        objectWangTileNeighbourCandidates.Clear();
+        objectWangTileMaskCandidates.Clear();
+    }
+
+    public void ForgetSceneUnitCache(UnitForm.Data data)
+    {
+        animCurCache.Remove(data);
+        if (data.unit is ObjectUnit unit)
+            objectWangTileBounds.Remove(unit);
     }
 
     internal static void ClearWangTileAnimationTextures()
@@ -511,7 +528,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     // Visual bounds include the root scale and the model's actual footprint.
     internal static int GetObjectNeighbourBits(Bounds center, Bounds other)
     {
-        const float tolerance = 0.001f;
+        const float tolerance = ObjectWangTileContactTolerance;
         if (Mathf.Min(center.max.y, other.max.y) - Mathf.Max(center.min.y, other.min.y) <= tolerance)
             return 0;
 
@@ -539,18 +556,43 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         return MapManager.instance.utilCtrl.TryGetVisionBounds(unit.data, out bounds);
     }
 
+    private static void CollectObjectWangTileCandidates(Bounds bounds, HashSet<MapUnit> candidates)
+    {
+        var map = MapManager.instance;
+        Vector3 padding = new Vector3(ObjectWangTileContactTolerance, 0f, ObjectWangTileContactTolerance);
+        Vector3 low = map.utilCtrl.RealPos2MapPos(bounds.min - padding);
+        Vector3 high = map.utilCtrl.RealPos2MapPos(bounds.max + padding);
+        int minX = Mathf.CeilToInt(low.x - 0.5f) - 1;
+        int maxX = Mathf.FloorToInt(high.x + 0.5f) + 1;
+        int minZ = Mathf.CeilToInt(low.z - 0.5f) - 1;
+        int maxZ = Mathf.FloorToInt(high.z + 0.5f) + 1;
+        // Columns include visual coverage at every height, even where no Tile exists.
+        // The exact product/height/edge contact checks remain in the caller.
+        for (int x = minX; x <= maxX; x++)
+        for (int z = minZ; z <= maxZ; z++)
+            map.updateCtrl.CollectHistoryColumn(new Vector3Int(x, 0, z), candidates);
+    }
+
     private static int GetObjectWangTileMask(ObjectUnit unit, int mapObjectId, Bounds bounds)
     {
-        int mask = 0;
-        foreach (ObjectUnitForm.Data otherData in ObjectUnitForm.DataByUid.Values)
+        objectWangTileMaskCandidates.Clear();
+        CollectObjectWangTileCandidates(bounds, objectWangTileMaskCandidates);
+        try
         {
-            ObjectUnit other = otherData.unit;
-            if (other == unit || other.productInfo.Item1 != mapObjectId
-                || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
-                continue;
-            mask |= GetObjectNeighbourBits(bounds, otherBounds);
+            int mask = 0;
+            foreach (MapUnit candidate in objectWangTileMaskCandidates)
+            {
+                if (!(candidate is ObjectUnit other) || other == unit || other.productInfo.Item1 != mapObjectId
+                    || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
+                    continue;
+                mask |= GetObjectNeighbourBits(bounds, otherBounds);
+            }
+            return mask;
         }
-        return mask;
+        finally
+        {
+            objectWangTileMaskCandidates.Clear();
+        }
     }
 
     private void UpdateObjectWangTileNeighbours(ObjectUnit unit, MapObjectForm.Data data)
@@ -565,15 +607,26 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         else
             objectWangTileBounds.Remove(unit);
 
-        foreach (ObjectUnitForm.Data otherData in ObjectUnitForm.DataByUid.Values)
+        objectWangTileNeighbourCandidates.Clear();
+        if (hadOldBounds)
+            CollectObjectWangTileCandidates(oldBounds, objectWangTileNeighbourCandidates);
+        if (hasNewBounds)
+            CollectObjectWangTileCandidates(newBounds, objectWangTileNeighbourCandidates);
+        try
         {
-            ObjectUnit other = otherData.unit;
-            if (other == unit || other.productInfo.Item1 != data.id || !other.isShowing
-                || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
-                continue;
-            if ((hadOldBounds && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
-                || (hasNewBounds && GetObjectNeighbourBits(otherBounds, newBounds) != 0))
-                RefreshObjectAppearance(other, data);
+            foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
+            {
+                if (!(candidate is ObjectUnit other) || other == unit || other.productInfo.Item1 != data.id || !other.isShowing
+                    || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
+                    continue;
+                if ((hadOldBounds && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
+                    || (hasNewBounds && GetObjectNeighbourBits(otherBounds, newBounds) != 0))
+                    RefreshObjectAppearance(other, data);
+            }
+        }
+        finally
+        {
+            objectWangTileNeighbourCandidates.Clear();
         }
 
     }
@@ -586,13 +639,21 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         if (!data.isWangTile || !hadBounds)
             return;
 
-        foreach (ObjectUnitForm.Data otherData in ObjectUnitForm.DataByUid.Values)
+        objectWangTileNeighbourCandidates.Clear();
+        CollectObjectWangTileCandidates(oldBounds, objectWangTileNeighbourCandidates);
+        try
         {
-            ObjectUnit other = otherData.unit;
-            if (other.productInfo.Item1 == data.id && other.isShowing
-                && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
-                && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
-                RefreshObjectAppearance(other, data);
+            foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
+            {
+                if (candidate is ObjectUnit other && other != unit && other.productInfo.Item1 == data.id && other.isShowing
+                    && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
+                    && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
+                    RefreshObjectAppearance(other, data);
+            }
+        }
+        finally
+        {
+            objectWangTileNeighbourCandidates.Clear();
         }
     }
     private static int GetWangTileMask(TileUnitForm.Data tileData, int layer, int mapTextureId)

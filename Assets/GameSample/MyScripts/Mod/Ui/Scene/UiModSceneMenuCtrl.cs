@@ -60,6 +60,7 @@ namespace Ui.ModSceneMenu
         }
         public void Save()
         {
+            ModManager.instance.sceneCtrl.CommitPendingOperation();
             model.lastSaveTime = Time.time;
             MapManager.instance.ClearEnteredScene();
             GameManager.instance.saveCtrl.SaveSceneMap(ModManager.instance.GetSceneCoreFileName());

@@ -17,6 +17,7 @@ using Z_Text;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 public enum DesignType
 {
     MapObject,
@@ -48,6 +49,12 @@ public interface ExternalModSceneController
     public void SetCamera(float x, float y, float z);
 
     public void ForceUpdate();
+    public IDisposable BeginOperation();
+    public void Track(UnitForm.Data data);
+    public void TrackAdded(UnitForm.Data data);
+    public void CommitPendingOperation();
+    public void Undo();
+    public void Redo();
 }
 public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>
 {
@@ -66,6 +73,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     bool enable = false;
     bool waitForActive = false;
     Vector2 downPos;
+    bool pointerDown;
+    private ModSceneHistory history;
+    private IDisposable brushOperation;
+    private int brushRevision;
     bool eventLayerBrushTipShown;
     #region internal Var
     private string _fileName;
@@ -132,6 +143,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     public void Begin(int id)
     {
+        CommitPendingOperation();
+        history?.Clear();
+        history = new ModSceneHistory(mapMgr, id);
+        pointerDown = false;
         downPos = Vector2.zero;
         _cntX = 1;
         _cntY = 1;
@@ -167,6 +182,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     }
     public void End()
     {
+        CommitPendingOperation();
+        history?.Clear();
+        history = null;
+        pointerDown = false;
         enable = false;
         NotifyObjectMarkVisibility();
         NotifyManager.instance.ClearAll();
@@ -190,9 +209,14 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     }
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
-
         if (waitForActive || !enable)
             return;
+        using (curData != null ? BeginOperation() : null)
+            ApplyMouse(click, pos, dir);
+    }
+
+    private void ApplyMouse(bool click, Vector3 pos, Vector3 dir)
+    {
         // 通过射线与地平面求交，确保不同相机视角下位置计算正确
         Ray ray = CameraInstance.instance.cam.ScreenPointToRay(pos);
         // 只检测trigger的collider，避免非trigger的物理碰撞体干扰射线检测
@@ -284,6 +308,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             case DesignType.MapObject:
                 if (curData != null)
                 {
+                    int revisionBefore = brushRevision;
                     if (curData is MapTerrainForm.Data terrainData)
                     {
 
@@ -293,7 +318,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                 {
                                     var newMapPos = new Vector3Int(x, hitPos.y, z);
-                                    _super.assetCtrl.AddTile(newMapPos);
+                                    if (_super.assetCtrl.AddTile(newMapPos) != null)
+                                        brushRevision++;
                                 }
                                 if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                     continue;
@@ -301,8 +327,14 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                                 if (terrainData.step == 0)
                                 {
-                                    mapData.prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
-                                    mapData.pos = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), mapMgr.data.mainData.mapUnitSize);
+                                    var prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
+                                    var position = Z_Math.Graph.ElementwiseMultiply(new Vector3(mapData.pos.x, mapData.mapPos.y, mapData.pos.z), mapMgr.data.mainData.mapUnitSize);
+                                    if (mapData.prefabName == prefabName && mapData.pos == position)
+                                        continue;
+                                    Track(mapData);
+                                    brushRevision++;
+                                    mapData.prefabName = prefabName;
+                                    mapData.pos = position;
                                     mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
 
                                 }
@@ -331,28 +363,37 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                         if (!mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                         {
                                             var newMapPos = new Vector3Int(stepX, mapData.mapPos.y, stepZ);
-                                            _super.assetCtrl.AddTile(newMapPos);
+                                            if (_super.assetCtrl.AddTile(newMapPos) != null)
+                                                brushRevision++;
                                         }
                                         if (!mapMgr.data.maps.ContainsKey((stepX, mapData.mapPos.y, stepZ)))
                                             continue;
                                         var cur = mapMgr.data.maps[(stepX, mapData.mapPos.y, stepZ)];
-                                        cur.prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
+                                        var prefabName = GameManager.instance.innerAssetDic[terrainData.innerPrefabName].name;
+                                        var euler = Vector3.zero;
                                         switch (Z_Math.Graph.GetFourDirByEuler(angle))
                                         {
                                             case Z_Math.Graph.FourDir.Up:
-                                                cur.euler = Vector3.zero;
+                                                euler = Vector3.zero;
                                                 break;
                                             case Z_Math.Graph.FourDir.Right:
-                                                cur.euler = new Vector3(0, 90, 0);
+                                                euler = new Vector3(0, 90, 0);
                                                 break;
                                             case Z_Math.Graph.FourDir.Down:
-                                                cur.euler = new Vector3(0, 180, 0);
+                                                euler = new Vector3(0, 180, 0);
                                                 break;
                                             case Z_Math.Graph.FourDir.Left:
-                                                cur.euler = new Vector3(0, 270, 0);
+                                                euler = new Vector3(0, 270, 0);
                                                 break;
                                         }
-                                        cur.pos = new Vector3(cur.pos.x, cur.mapPos.y * MapManager.instance.data.mainData.mapUnitSize.y + MapManager.instance.data.mainData.mapUnitSize.y * (i) / terrainData.step, cur.pos.z);
+                                        var position = new Vector3(cur.pos.x, cur.mapPos.y * MapManager.instance.data.mainData.mapUnitSize.y + MapManager.instance.data.mainData.mapUnitSize.y * (i) / terrainData.step, cur.pos.z);
+                                        if (cur.prefabName == prefabName && cur.pos == position && cur.euler == euler)
+                                            continue;
+                                        Track(cur);
+                                        brushRevision++;
+                                        cur.prefabName = prefabName;
+                                        cur.pos = position;
+                                        cur.euler = euler;
                                         mapMgr.updateCtrl.UpdateSingleOne(cur.unit);
 
 
@@ -370,7 +411,12 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                 if (!mapMgr.data.maps.ContainsKey((x, hitPos.y, z)))
                                     continue;
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
+                                if (mapData.texDic.TryGetValue(layer, out int previous) && previous == textureData.id)
+                                    continue;
+                                Track(mapData);
+                                brushRevision++;
                                 mapData.texDic[layer] = textureData.id;
+                                GameMapData.ApplyTilePassTypes(mapData);
                                 mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
                             }
                     }
@@ -383,6 +429,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                                     continue;
 
                                 var mapData = mapMgr.data.maps[(x, hitPos.y, z)];
+                                if (mapData.texDic.TryGetValue(GlobalSettings.TERRAIN_LAYER_MAX + layer, out int previous) && previous == maskData.id)
+                                    continue;
+                                Track(mapData);
+                                brushRevision++;
                                 mapData.texDic[GlobalSettings.TERRAIN_LAYER_MAX + layer] = maskData.id;
                                 mapMgr.updateCtrl.UpdateSingleOne(mapData.unit);
                             }
@@ -391,7 +441,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     {
                         ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            _super.assetCtrl.AddObject(objectData, finalPos, angle);
+                            if (_super.assetCtrl.AddObject(objectData, finalPos, angle) != null)
+                                brushRevision++;
                         });
 
                     }
@@ -401,7 +452,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                         ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            _super.assetCtrl.AddItem(data, finalPos, angle);
+                            if (_super.assetCtrl.AddItem(data, finalPos, angle) != null)
+                                brushRevision++;
                         });
                     }
                     else if (curData is MapCharacterForm.Data characterData)
@@ -410,14 +462,16 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
                         ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            _super.assetCtrl.AddCharacter(data, finalPos, angle);
+                            if (_super.assetCtrl.AddCharacter(data, finalPos, angle) != null)
+                                brushRevision++;
                         });
                     }
                     else if (curData is MapEraseForm.Data eraseData)
                     {
                         ForeachPos(hitPos, worldPosition, (mapData, _) => EraseTile(mapData, eraseData));
                     }
-                    ForceUpdate();
+                    if (brushRevision != revisionBefore)
+                        ForceUpdate();
                 }
                 else
                 {
@@ -501,6 +555,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
         foreach (var unit in ownedUnits)
         {
+            Track(unit.data);
+            brushRevision++;
             if (unit is ObjectUnit obj)
                 mapMgr.RemoveObject(obj.data);
             else if (unit is CharacterUnit character)
@@ -513,11 +569,19 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         // have a valid Tile during entity removal. Never refresh a removed Tile.
         if (eraseData.terrain)
         {
+            Track(mapData);
+            brushRevision++;
             mapMgr.RemoveTile(mapData);
             return;
         }
-        if (eraseData.texture && mapData.texDic.Remove(layer))
+        if (eraseData.texture && mapData.texDic.ContainsKey(layer))
+        {
+            Track(mapData);
+            mapData.texDic.Remove(layer);
+            GameMapData.ApplyTilePassTypes(mapData);
+            brushRevision++;
             update.UpdateSingleOne(tile);
+        }
     }
 
     private void ForeachPos(Vector3Int mapCenterPos, Vector3 realPos, Action<TileUnitForm.Data, Vector3> onFind)
@@ -538,8 +602,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     }
     public void ForceUpdate()
     {
-
-        mapMgr.updateCtrl.ResetView();
+        // Writers already refresh their changed unit/Tile neighbourhood. Do not
+        // rescan the view or serialize/update unrelated units after every edit.
         if (waitForActive)
             return;
 
@@ -547,8 +611,48 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         TimeManager.instance.AddNextBigFrameAction(() =>
         {
             waitForActive = false;
-            RefreshTileLayerDisplay();
         }, _super.gameObject);
+    }
+
+    public IDisposable BeginOperation() => enable ? history?.BeginOperation() : null;
+    public void Track(UnitForm.Data data)
+    {
+        if (enable)
+            history?.Track(data);
+    }
+    public void TrackAdded(UnitForm.Data data)
+    {
+        if (enable)
+            history?.TrackAdded(data);
+    }
+
+    public void CommitPendingOperation()
+    {
+        var operation = brushOperation;
+        brushOperation = null;
+        operation?.Dispose();
+    }
+
+    public void Undo() => RestoreOperation(false);
+    public void Redo() => RestoreOperation(true);
+
+    private void RestoreOperation(bool redo)
+    {
+        CommitPendingOperation();
+        pointerDown = false;
+        // These models reference old Unit Data. Main/Tool remain open and retain
+        // their current mode, brush, layer, offsets and camera selections.
+        UiManager.instance.CloseUi<UiModSceneUnitCtrl>();
+        UiManager.instance.CloseUi<UiModSceneBehaviourUnitCtrl>();
+        if (history != null && mapMgr.data != null)
+            mapMgr.SetPos(CameraInstance.instance.tarTrs.position);
+        bool restored = history != null && (redo ? history.TryRedo() : history.TryUndo());
+        if (!restored)
+        {
+            NotifyManager.instance.AddTip(TextManager.instance.GetTxt("noAvailableOperations"));
+            return;
+        }
+        waitForActive = false;
     }
 
     /// <summary>
@@ -653,7 +757,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     {
         if (!enable)
             return;
-        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero)//&& (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude > dragDis2
+        if (evt.id == 0 && evt.ui == null && pointerDown)
         {
             ModManager.instance.OnMouse(false, evt.pos, evt.delta);
         }
@@ -663,10 +767,19 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     {
         if (!enable)
             return;
-        if (evt.ui == null)
+        if (evt.id != 0)
+            return;
+        CommitPendingOperation();
+        pointerDown = evt.ui == null;
+        if (pointerDown)
         {
             downPos = evt.pos;
             eventLayerBrushTipShown = false;
+            if (curData != null)
+            {
+                int revision = brushRevision;
+                brushOperation = history?.BeginOperation(() => brushRevision != revision);
+            }
         }
         else
         {
@@ -676,13 +789,20 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     public void OnEvent(InputMouseUpEvent evt)
     {
-        if (!enable)
+        if (!enable || evt.id != 0)
             return;
-        if (evt.id == 0 && evt.ui == null && downPos != Vector2.zero && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
+        try
         {
-            OnMouse(true, evt.pos, Vector3.zero);
+            if (evt.ui == null && pointerDown && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
+                OnMouse(true, evt.pos, Vector3.zero);
         }
-        downPos = Vector2.zero;
+        finally
+        {
+            // Releasing over UI must still finish the whole brush stroke.
+            pointerDown = false;
+            downPos = Vector2.zero;
+            CommitPendingOperation();
+        }
     }
 
     public void OnEvent(InputMouseScrollEvent evt)

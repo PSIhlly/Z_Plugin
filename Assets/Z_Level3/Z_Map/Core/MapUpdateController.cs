@@ -32,6 +32,131 @@ namespace Z_Map
         public DoubleDictionary<CharacterUnit, TileUnit> characterTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<CharacterUnit, TileUnit> characterOverlapTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
+        private readonly DoubleDictionary<MapUnit, (int, int)> unitColumns = new DoubleDictionary<MapUnit, (int, int)>();
+
+        public void ForgetUnitColumns(MapUnit unit) => unitColumns.Del(unit);
+
+        public void CollectHistoryColumn(Vector3Int pos, HashSet<MapUnit> units)
+        {
+            if (unitColumns.TryGet((pos.x, pos.z), out var candidates))
+                foreach (var unit in candidates)
+                    if (UnitForm.DataByUid.TryGetValue(unit.data.uid, out var current)
+                        && ReferenceEquals(current, unit.data))
+                        units.Add(unit);
+        }
+
+        private void RefreshUnitColumns(MapUnit unit)
+        {
+            var anchor = _super.utilCtrl.RealPos2MapPosInt(unit.data.pos);
+            if (unit is ItemUnit)
+            {
+                unitColumns.Move(unit, (anchor.x, anchor.z));
+                return;
+            }
+            var bounds = new Bounds(unit.data.pos, Vector3.zero);
+            if (unit is ObjectUnit obj)
+                _super.utilCtrl.TryGetVisionBounds(obj.data, out bounds);
+            foreach (var mesh in unit.GetMeshes(unit is CharacterUnit ? CollideType.All : CollideType.CollideOnly))
+                foreach (var point in mesh.positions)
+                    bounds.Encapsulate(point);
+            var low = _super.utilCtrl.RealPos2MapPos(bounds.min);
+            var high = _super.utilCtrl.RealPos2MapPos(bounds.max);
+            unitColumns.Del(unit);
+            unitColumns.Add(unit, (anchor.x, anchor.z));
+            for (int x = Mathf.CeilToInt(low.x - 0.5f); x <= Mathf.FloorToInt(high.x + 0.5f); x++)
+            for (int z = Mathf.CeilToInt(low.z - 0.5f); z <= Mathf.FloorToInt(high.z + 0.5f); z++)
+                unitColumns.Add(unit, (x, z));
+        }
+
+        public void DetachHistoryTile(TileUnit tile)
+        {
+            characterTileDic.Del(tile);
+            characterOverlapTileDic.Del(tile);
+            itemTileDic.Del(tile);
+            objectTileDic.Del(tile);
+            objectPassTypeTileDic.Del(tile);
+            objectNavigationTileDic.Del(tile);
+            curTileLst.Remove(tile.data);
+        }
+
+        // Rebind only an affected unit, without movement/clamping or global view
+        // refresh. Candidate columns remain populated even when a Tile is absent.
+        public void RefreshHistoryUnit(MapUnit unit)
+        {
+            if (unit is ObjectUnit obj)
+            {
+                RefreshObjectOverlap(obj);
+                RefreshHistoryVisibility(obj, objectTileDic, curObjectLst, obj.data);
+                Z_EventHelper.Invoke(new ObjectEvent { type = MapEventType.Refresh, unit = obj });
+                return;
+            }
+            var pos = _super.utilCtrl.RealPos2MapPosInt(unit.data.pos);
+            var owner = _super.utilCtrl.GetTile(pos.x, pos.y, pos.z);
+            if (unit is CharacterUnit character)
+            {
+                characterTileDic.Del(character);
+                if (owner != null) characterTileDic.Add(character, owner);
+                RefreshCharacterOverlap(character);
+                RefreshHistoryVisibility(character, characterTileDic, curCharacterLst, character.data);
+            }
+            else if (unit is ItemUnit item)
+            {
+                itemTileDic.Del(item);
+                if (owner != null) itemTileDic.Add(item, owner);
+                RefreshUnitColumns(item);
+                RefreshHistoryVisibility(item, itemTileDic, curItemLst, item.data);
+            }
+        }
+
+        private void RefreshHistoryVisibility<T, TData>(T unit, DoubleDictionary<T, TileUnit> index,
+            HashSet<TData> visible, TData data) where T : MapUnit
+        {
+            if (HasShowingTile(unit, index))
+            {
+                unit.Show();
+                visible.Add(data);
+                var owner = unit.belongTile;
+                float degree = !DynamicGlobalSettings.playing && GlobalSettings.MOD_HIGH_LAYER_HALF_TRANSPARENT
+                    && owner != null && owner.data.mapPos.y > _super.utilCtrl.RealPos2MapPosInt(curCenterPos).y ? 0.5f : 1f;
+                ApplyUnitVision(unit, degree);
+            }
+            else
+            {
+                unit.Hide();
+                visible.Remove(data);
+            }
+        }
+
+        public void RefreshHistoryTiles(IEnumerable<Vector3Int> positions)
+        {
+            var refreshed = new HashSet<Vector3Int>();
+            foreach (var pos in positions)
+                for (int x = pos.x - 1; x <= pos.x + 1; x++)
+                for (int z = pos.z - 1; z <= pos.z + 1; z++)
+                {
+                    var p = new Vector3Int(x, pos.y, z);
+                    if (!refreshed.Add(p) || !_super.data.maps.TryGetValue((x, pos.y, z), out var tile))
+                        continue;
+                    var bounds = GetLayerView(lastView, p.y, DynamicGlobalSettings.cameraMode == CameraMode.Isometric);
+                    bool inView = hasView && p.y >= lastView.Item3 && p.y < lastView.Item4
+                        && p.x >= bounds.minX && p.x < bounds.maxX && p.z >= bounds.minZ && p.z < bounds.maxZ;
+                    if (inView)
+                    {
+                        bool showing = tile.unit.isShowing;
+                        tile.unit.Show();
+                        curTileLst.Add(tile);
+                        if (showing) Z_EventHelper.Invoke(new TileEvent { type = MapEventType.Show, unit = tile.unit });
+                        float degree = !DynamicGlobalSettings.playing && GlobalSettings.MOD_HIGH_LAYER_HALF_TRANSPARENT
+                            && p.y > _super.utilCtrl.RealPos2MapPosInt(curCenterPos).y ? 0.5f : 1f;
+                        ApplyUnitVision(tile.unit, degree);
+                    }
+                    else
+                    {
+                        tile.unit.Hide();
+                        curTileLst.Remove(tile);
+                    }
+                }
+        }
         public HashSet<TileUnitForm.Data> curTileLst
         {
             get;
@@ -244,6 +369,10 @@ namespace Z_Map
             unit.InvalidateCollisionGeometry();
             if (unit is TileUnit tl)
             {
+                // Only the edited Tile may have switched prefab. Neighbouring
+                // WangTile appearance refreshes retain their live instances.
+                tl.Hide();
+                _super.navigationCtrl?.RefreshTerrainTiles(new[] { tl.data.mapPos });
                 UpdateTileNeighbours(tl.data.mapPos);
                       
             }
@@ -260,6 +389,7 @@ namespace Z_Map
             }
             else if (unit is ItemUnit it)
             {
+                RefreshUnitColumns(it);
                 foreach (var tile in itemTileDic.Get(it))
                 {
                     if (tile.isShowing)
@@ -291,18 +421,10 @@ namespace Z_Map
 
         public void UpdateTileNeighbours(Vector3Int mapPos)
         {
-            for (int x = mapPos.x - 1; x <= mapPos.x + 1; x++)
-            for (int z = mapPos.z - 1; z <= mapPos.z + 1; z++)
-            {
-                var cur = _super.data.maps.GetDv((x, mapPos.y, z), null);
-                if (cur == null)
-                    continue;
-
-                cur.unit.Hide();
-                curTileLst.Add(cur);
-                cur.unit.Show();
-                UpdateRelatedUnit(cur.unit);
-            }
+            RefreshHistoryTiles(new[] { mapPos });
+            var units = new HashSet<MapUnit>();
+            CollectHistoryColumn(mapPos, units);
+            foreach (var unit in units) RefreshHistoryUnit(unit);
         }
 
         private void UpdateMapInfo()
@@ -654,6 +776,8 @@ namespace Z_Map
             if (unit == null)
                 return;
 
+            RefreshUnitColumns(unit);
+
             TileUnit owner = characterTileDic.GetFirst(unit);
             if (owner == null)
             {
@@ -684,6 +808,8 @@ namespace Z_Map
             if (unit == null)
                 return;
 
+            RefreshUnitColumns(unit);
+
             var affectedTiles = new HashSet<TileUnit>(objectTileDic.Get(unit));
             if (objectPassTypeTileDic.TryGet(unit, out var oldPassTiles))
                 affectedTiles.UnionWith(oldPassTiles);
@@ -712,6 +838,7 @@ namespace Z_Map
 
         public void RemoveObjectOverlap(ObjectUnit unit)
         {
+            ForgetUnitColumns(unit);
             var affectedTiles = new HashSet<TileUnit>(objectTileDic.Get(unit));
             if (objectPassTypeTileDic.TryGet(unit, out var oldPassTiles))
                 affectedTiles.UnionWith(oldPassTiles);
@@ -746,6 +873,18 @@ namespace Z_Map
         public void UpdateInfo(bool forceFresh = false)
         {
             UpdateMapInfo();
+            UpdateView(forceFresh);
+        }
+
+        // History/load restoration must not move Characters through navigation or
+        // gravity while refreshing the newly restored instances in the same frame.
+        public void RefreshView()
+        {
+            UpdateView(true);
+        }
+
+        private void UpdateView(bool forceFresh)
+        {
             if (forceFresh || (curCenterPos - lastCenterPos).sqrMagnitude >= 1f
                 || lastViewIsometric != (DynamicGlobalSettings.cameraMode == CameraMode.Isometric))
             {
@@ -880,6 +1019,7 @@ namespace Z_Map
             }
             unit.data.pos = newPos;
             unit.data.euler = euler;
+            if (unit is ItemUnit) RefreshUnitColumns(unit);
             if (movingCharacter != null)
                 RefreshCharacterOverlap(movingCharacter);
             else if (unit is ObjectUnit movingObject && (oldPos != newPos || oldEuler != euler))
@@ -1028,6 +1168,7 @@ namespace Z_Map
             var failList = new List<int>();
             foreach (var itemData in ItemUnitForm.DataByUid.Values)
             {
+                RefreshUnitColumns(itemData.unit);
                 if (_super.data.CheckItemUnit(itemData))
                 {
                     var mapPos = _super.utilCtrl.RealPos2MapPosInt(itemData.pos);
@@ -1103,6 +1244,7 @@ namespace Z_Map
             characterTileDic.Clear();
             characterOverlapTileDic.Clear();
             itemTileDic.Clear();
+            unitColumns.Clear();
             previousVision.Clear();
             nextVision.Clear();
             frontVisionOverrides.Clear();

@@ -216,11 +216,8 @@ public class MapManager : Z_MonoManager<MapManager>
         var mapPos = form.mapPos;
         data.RemoveTile(form);
 
-        updateCtrl.characterTileDic.Del(form.unit);
-        updateCtrl.characterOverlapTileDic.Del(form.unit);
-        updateCtrl.itemTileDic.Del(form.unit);
-        updateCtrl.objectTileDic.Del(form.unit);
-        updateCtrl.curTileLst.Remove(form);
+        updateCtrl.DetachHistoryTile(form.unit);
+        navigationCtrl?.RefreshTerrainTiles(new[] { mapPos });
         updateCtrl.UpdateTileNeighbours(mapPos);
     }
     public void RemoveCharacter(CharacterUnitForm.Data form)
@@ -229,6 +226,7 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.characterTileDic.Del(form.unit);
         updateCtrl.characterOverlapTileDic.Del(form.unit);
         updateCtrl.curCharacterLst.Remove(form);
+        updateCtrl.ForgetUnitColumns(form.unit);
 
     }
     public void RemoveItem(ItemUnitForm.Data form)
@@ -236,6 +234,7 @@ public class MapManager : Z_MonoManager<MapManager>
         data.RemoveItem(form);
         updateCtrl.itemTileDic.Del(form.unit);
         updateCtrl.curItemLst.Remove(form);
+        updateCtrl.ForgetUnitColumns(form.unit);
 
     }
     public void RemoveObject(ObjectUnitForm.Data form)

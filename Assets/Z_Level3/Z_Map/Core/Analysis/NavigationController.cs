@@ -100,6 +100,7 @@ namespace Z_Map.Analysis
             public Vector3 scale;
             public Vector3 cellSize;
             public readonly List<(int, int, int)> coveredNavUnits = new List<(int, int, int)>();
+            public readonly HashSet<(int, int, int)> candidateNavUnits = new HashSet<(int, int, int)>();
 
             public bool Matches(TileUnitForm.Data map, GameObject currentPrefab, Vector3 currentCellSize)
             {
@@ -120,6 +121,8 @@ namespace Z_Map.Analysis
         public float step;
         private readonly Dictionary<int, MapGroundCoverageCache> mapGroundCoverageCaches =
             new Dictionary<int, MapGroundCoverageCache>();
+        private readonly Dictionary<(int, int, int), HashSet<int>> mapGroundCandidateSources =
+            new Dictionary<(int, int, int), HashSet<int>>();
         private readonly HashSet<(int, int, int)> mapGroundBlocked = new HashSet<(int, int, int)>();
         private readonly Dictionary<(int, int, int), NavUnit> objectRefreshUnits = new Dictionary<(int, int, int), NavUnit>();
         private readonly HashSet<ObjectUnit> objectRefreshCandidates = new HashSet<ObjectUnit>();
@@ -135,6 +138,7 @@ namespace Z_Map.Analysis
             step = _super.data.mainData.mapUnitSize.y * 1 / 3;
             navUnits = new Dictionary<(int, int, int), NavUnit>(_super.data.maps.Count);
             mapGroundCoverageCaches.Clear();
+            mapGroundCandidateSources.Clear();
             navCellLayoutInitialized = false;
             RebuildNow();
             bfs = new Bfs(this);
@@ -236,6 +240,7 @@ namespace Z_Map.Analysis
                 || navCellLayoutHash != currentNavCellLayoutHash)
             {
                 mapGroundCoverageCaches.Clear();
+                mapGroundCandidateSources.Clear();
                 navCellLayoutInitialized = true;
                 navCellLayoutCount = currentNavCellLayoutCount;
                 navCellLayoutHash = currentNavCellLayoutHash;
@@ -404,6 +409,102 @@ namespace Z_Map.Analysis
             affected.Clear();
             objects.Clear();
             linkSources.Clear();
+        }
+
+        // Edit/undo only resamples changed terrain and the solid volumes whose
+        // conservative footprints contain it, including previously empty cells.
+        public void RefreshTerrainTiles(IEnumerable<Vector3Int> positions)
+        {
+            if (navUnits == null || !_super.enable)
+                return;
+            var keys = new HashSet<(int, int, int)>();
+            var sources = new HashSet<int>();
+            foreach (var pos in positions)
+            {
+                var key = (pos.x, pos.y, pos.z);
+                keys.Add(key);
+                if (mapGroundCandidateSources.TryGetValue(key, out var candidates))
+                    sources.UnionWith(candidates);
+                if (!_super.data.maps.TryGetValue(key, out var tile))
+                {
+                    navUnits.Remove(key);
+                    continue;
+                }
+                sources.Add(tile.uid);
+                if (!navUnits.TryGetValue(key, out var unit))
+                {
+                    unit = new NavUnit { links = new List<NavUnit>(), passTypes = new HashSet<int>(),
+                        dirGroundY = new float[4], dirMaxY = new float[4] };
+                    navUnits.Add(key, unit);
+                }
+                unit.pos = tile.mapPos;
+                unit.realPos = tile.pos;
+                unit.isNull = tile.scale == Vector3.zero;
+                for (int i = 0; i < offset.Length; i++)
+                    unit.dirGroundY[i] = unit.dirMaxY[i] = tile.unit.GetYByPoint(offset[i]);
+            }
+            if (keys.Count == 0)
+                return;
+            foreach (int uid in sources)
+            {
+                if (mapGroundCoverageCaches.TryGetValue(uid, out var previous))
+                {
+                    keys.UnionWith(previous.coveredNavUnits);
+                    RemoveGroundCoverage(uid, previous);
+                }
+                if (TileUnitForm.DataByUid.TryGetValue(uid, out var tile)
+                    && tile.prefabName == MapGroundPrefabName && tile.scale != Vector3.zero)
+                {
+                    var coverage = BuildMapGroundCoverage(tile, tile.unit.prefab, _super.data.mainData.mapUnitSize);
+                    mapGroundCoverageCaches[uid] = coverage;
+                    keys.UnionWith(coverage.coveredNavUnits);
+                    RegisterGroundCandidates(uid, coverage);
+                }
+            }
+            var tiles = new List<TileUnit>();
+            foreach (var key in keys)
+            {
+                bool blocked = false;
+                if (mapGroundCandidateSources.TryGetValue(key, out var candidates))
+                    foreach (int uid in candidates)
+                        if (mapGroundCoverageCaches.TryGetValue(uid, out var source)
+                            && source.coveredNavUnits.Contains(key))
+                        { blocked = true; break; }
+                if (blocked) mapGroundBlocked.Add(key);
+                else mapGroundBlocked.Remove(key);
+                if (_super.data.maps.TryGetValue(key, out var tile))
+                    tiles.Add(tile.unit);
+            }
+            RefreshObjectTiles(tiles);
+            // Deleted cells have no Tile to pass to RefreshObjectTiles, but their
+            // surviving neighbours must immediately drop incoming links.
+            foreach (var key in keys)
+                for (int dy = -1; dy <= 1; dy++)
+                    foreach (var dir in tryDir)
+                        if (navUnits.TryGetValue((key.Item1 + dir.x, key.Item2 + dy, key.Item3 + dir.z), out var source))
+                            RebuildLinks(source, mapGroundBlocked);
+            navCellLayoutInitialized = false;
+        }
+
+        private void RegisterGroundCandidates(int uid, MapGroundCoverageCache coverage)
+        {
+            foreach (var key in coverage.candidateNavUnits)
+            {
+                if (!mapGroundCandidateSources.TryGetValue(key, out var sources))
+                    mapGroundCandidateSources.Add(key, sources = new HashSet<int>());
+                sources.Add(uid);
+            }
+        }
+
+        private void RemoveGroundCoverage(int uid, MapGroundCoverageCache coverage)
+        {
+            foreach (var key in coverage.candidateNavUnits)
+                if (mapGroundCandidateSources.TryGetValue(key, out var sources))
+                {
+                    sources.Remove(uid);
+                    if (sources.Count == 0) mapGroundCandidateSources.Remove(key);
+                }
+            mapGroundCoverageCaches.Remove(uid);
         }
 
         private void ApplyObjectObstacle(ObjectUnitForm.Data obs, Dictionary<(int, int, int), NavUnit> targetUnits)
@@ -589,8 +690,11 @@ namespace Z_Map.Analysis
             if (!mapGroundCoverageCaches.TryGetValue(map.uid, out var coverage)
                 || !coverage.Matches(map, prefab, cellSize))
             {
+                if (coverage != null)
+                    RemoveGroundCoverage(map.uid, coverage);
                 coverage = BuildMapGroundCoverage(map, prefab, cellSize);
                 mapGroundCoverageCaches[map.uid] = coverage;
+                RegisterGroundCandidates(map.uid, coverage);
             }
 
             for (int i = 0; i < coverage.coveredNavUnits.Count; i++)
@@ -614,6 +718,9 @@ namespace Z_Map.Analysis
             };
             const float overlapEpsilon = 0.0001f;
             Vector3 halfCell = new Vector3(cellSize.x * 0.5f, 0f, cellSize.z * 0.5f);
+            // Retain the owner key even when the prefab has no physical meshes,
+            // so removing/replacing this Tile always discards its UID cache.
+            coverage.candidateNavUnits.Add((map.mapPos.x, map.mapPos.y, map.mapPos.z));
 
             foreach (var mesh in map.unit.GetMeshes(CollideType.CollideOnly))
             {
@@ -637,6 +744,7 @@ namespace Z_Map.Analysis
                 for (int z = map.mapPos.z - radiusZ; z <= map.mapPos.z + radiusZ; z++)
                 {
                     var key = (x, y, z);
+                    coverage.candidateNavUnits.Add(key);
                     if (key == (map.mapPos.x, map.mapPos.y, map.mapPos.z) ||
                         !navUnits.TryGetValue(key, out var navUnit))
                     {

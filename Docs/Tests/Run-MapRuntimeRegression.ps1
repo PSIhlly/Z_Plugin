@@ -1,7 +1,7 @@
 param(
     [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path,
     [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe",
-    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression')]
+    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'ModSceneHistoryRuntimeRegression')]
     [string]$Fixture = 'MapRuntimeRegression'
 )
 $ErrorActionPreference = "Stop"
@@ -77,6 +77,7 @@ $successMarker = switch ($Fixture) {
     'MissionRuntimeRegression' { 'MISSION_RUNTIME_REGRESSION_PASS' }
     'MinimapRuntimeRegression' { 'MINIMAP_RUNTIME_REGRESSION_PASS' }
     'MapTextureRuntimeRegression' { 'MAP_TEXTURE_RUNTIME_REGRESSION_PASS' }
+    'ModSceneHistoryRuntimeRegression' { 'MOD_SCENE_HISTORY_RUNTIME_REGRESSION_PASS' }
     default { 'MAP_RUNTIME_REGRESSION_PASS' }
 }
 $passed = Select-String -LiteralPath $logPath -Pattern $successMarker

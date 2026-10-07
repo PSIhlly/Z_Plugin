@@ -1,4 +1,5 @@
 using Form;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,19 +25,18 @@ namespace Ui.ModSceneUnit
     public partial class UiModSceneUnitModel
     {
         public UnitForm.Data data;
-
-
+        public System.Action beforeDataChange;
         public string posX
         {
             set
             {
-                float.TryParse(value, out float v);
+                if (!float.TryParse(value, out float v))
+                    return;
                 var x = MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)).x;
                 var newPos = new Vector3(x, data.pos.y, data.pos.z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
-                    MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, newPos, data.euler, true);
-                    ModManager.instance.sceneCtrl.ForceUpdate();
+                    ApplyMove(newPos, data.euler);
                 }
             }
             get
@@ -48,7 +48,8 @@ namespace Ui.ModSceneUnit
         {
             set
             {
-                float.TryParse(value, out float v);
+                if (!float.TryParse(value, out float v))
+                    return;
 
                 TileUnitForm.Data belongMap = ((MapUnit)data.unit).belongTile.data;
 
@@ -70,8 +71,7 @@ namespace Ui.ModSceneUnit
 
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
-                    MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, newPos, data.euler, true);
-                    ModManager.instance.sceneCtrl.ForceUpdate();
+                    ApplyMove(newPos, data.euler);
                 }
             }
             get
@@ -83,14 +83,14 @@ namespace Ui.ModSceneUnit
         {
             set
             {
-                float.TryParse(value, out float v);
+                if (!float.TryParse(value, out float v))
+                    return;
                 var z = MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)).z;
 
                 var newPos = new Vector3(data.pos.x, data.pos.y, z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
-                    MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, newPos, data.euler, true);
-                    ModManager.instance.sceneCtrl.ForceUpdate();
+                    ApplyMove(newPos, data.euler);
                 }
             }
             get
@@ -102,28 +102,33 @@ namespace Ui.ModSceneUnit
         {
             set
             {
-                int.TryParse(value, out int v);
+                if (!int.TryParse(value, out int v))
+                    return;
                 v = (v % 360 + 360) % 360;
-                MapManager.instance.updateCtrl.ApplyMove(
-                    (MapUnit)data.unit,
-                    data.pos,
-                    new Vector3(data.euler.x, v, data.euler.z),
-                    true);
-                if (data.unit is ObjectUnit objectUnit)
-                {
-                    Z_EventHelper.Invoke(new ObjectEvent()
-                    {
-                        type = MapEventType.Move,
-                        unit = objectUnit
-                    });
-                }
-                ModManager.instance.sceneCtrl.ForceUpdate();
+                if (Mathf.Approximately(data.euler.y, v))
+                    return;
+                ApplyMove(data.pos, new Vector3(data.euler.x, v, data.euler.z));
             }
             get
             {
                 return data.euler.y.ToString();
             }
         }
+        private void ApplyMove(Vector3 pos, Vector3 euler)
+        {
+            if (data.pos == pos && data.euler == euler)
+                return;
+            beforeDataChange?.Invoke();
+            using (ModManager.instance.sceneCtrl.BeginOperation())
+            {
+                ModManager.instance.sceneCtrl.Track(data);
+                MapManager.instance.updateCtrl.ApplyMove((MapUnit)data.unit, pos, euler, true);
+                if (data.unit is ObjectUnit objectUnit)
+                    Z_EventHelper.Invoke(new ObjectEvent { type = MapEventType.Refresh, unit = objectUnit });
+                ModManager.instance.sceneCtrl.ForceUpdate();
+            }
+        }
+
         public bool posing
         {
             set
@@ -140,9 +145,41 @@ namespace Ui.ModSceneUnit
 
     public partial class UiModSceneUnitCtrl
     {
+        private IDisposable textOperation;
+        private Ipt editingInput;
+
+        private void FinishTextOperation()
+        {
+            var operation = textOperation;
+            textOperation = null;
+            operation?.Dispose();
+        }
+
+        private void BindTextOperation(Ipt input)
+        {
+            input.onSelect.AddListener(_ =>
+            {
+                FinishTextOperation();
+                editingInput = input;
+            });
+            input.onDeselect.AddListener(_ =>
+            {
+                FinishTextOperation();
+                editingInput = null;
+            });
+            input.onSubmit.AddListener(_ =>
+            {
+                FinishTextOperation();
+            });
+        }
 
         public override void OnCreate()
         {
+            model.beforeDataChange = () =>
+            {
+                if (editingInput != null && textOperation == null)
+                    textOperation = ModManager.instance.sceneCtrl.BeginOperation();
+            };
             view.btn_bbg.onClick.AddListener(() =>
             {
                 Close();
@@ -153,27 +190,34 @@ namespace Ui.ModSceneUnit
             });
             view.btn_delete.onClick.AddListener(() =>
             {
-                if (model.data is ItemUnitForm.Data itemData)
+                FinishTextOperation();
+                editingInput = null;
+                using (ModManager.instance.sceneCtrl.BeginOperation())
                 {
-                    MapManager.instance.RemoveItem(itemData);
-                }
-                else if (model.data is ObjectUnitForm.Data objData)
-                {
-                    MapManager.instance.RemoveObject(objData);
-                }
-                else if (model.data is CharacterUnitForm.Data characterData)
-                {
-                    MapManager.instance.RemoveCharacter(characterData);
+                    ModManager.instance.sceneCtrl.Track(model.data);
+                    if (model.data is ItemUnitForm.Data itemData)
+                        MapManager.instance.RemoveItem(itemData);
+                    else if (model.data is ObjectUnitForm.Data objData)
+                        MapManager.instance.RemoveObject(objData);
+                    else if (model.data is CharacterUnitForm.Data characterData)
+                        MapManager.instance.RemoveCharacter(characterData);
                 }
                 Close();
             });
 
             view.btn_aligh.onClick.AddListener(() =>
             {
-                TileUnitForm.Data mapData = (TileUnitForm.Data)model.data.unit.superUnit.data;
-                model.posX = GameManager.MapPosToPlayerPos(mapData.mapPos.x).ToString();
-                model.posY = GameManager.MapPosToPlayerPos(mapData.mapPos.y).ToString();
-                model.posZ = GameManager.MapPosToPlayerPos(mapData.mapPos.z).ToString();
+                FinishTextOperation();
+                editingInput = null;
+                var tile = ((MapUnit)model.data.unit).belongTile;
+                if (tile == null)
+                    return;
+                using (ModManager.instance.sceneCtrl.BeginOperation())
+                {
+                    model.posX = GameManager.MapPosToPlayerPos(tile.data.mapPos.x).ToString();
+                    model.posY = GameManager.MapPosToPlayerPos(tile.data.mapPos.y).ToString();
+                    model.posZ = GameManager.MapPosToPlayerPos(tile.data.mapPos.z).ToString();
+                }
                 Refresh();
 
             });
@@ -203,12 +247,23 @@ namespace Ui.ModSceneUnit
                 model.angle = v;
                 Refresh();
             });
+            BindTextOperation(view.ipt_posSetX);
+            BindTextOperation(view.ipt_posSetY);
+            BindTextOperation(view.ipt_posSetZ);
+            BindTextOperation(view.ipt_rotateSet);
         }
         public override void OnShow()
         {
+            FinishTextOperation();
+            editingInput = null;
             model.data = param.data;
             Refresh();
 
+        }
+        public override void OnHide()
+        {
+            FinishTextOperation();
+            editingInput = null;
         }
         public void Refresh()
         {

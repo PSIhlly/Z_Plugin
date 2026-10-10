@@ -49,7 +49,7 @@ namespace Ui.PlayAsset
         public void Refresh()
         {
             imageCon.Clear();
-            foreach (var data in ImageUiItemForm.DataByUid.Values)
+            foreach (var data in ImageUiItemForm.DataByUid.Values.OrderBy(data => data.uid))
             {
                 imageCon.Add(new UiImageParam()
                 {

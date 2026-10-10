@@ -1,16 +1,7 @@
 [
   {
-    "uid": 4,
-    "name": "Speed",
-    "valueType": 0,
-    "min": "",
-    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
-    "max": "",
-    "showType": 5
-  },
-  {
-    "uid": 1,
-    "name": "HpMax",
+    "uid": 7,
+    "name": "防御",
     "valueType": 0,
     "min": "",
     "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
@@ -18,8 +9,17 @@
     "showType": 0
   },
   {
-    "uid": 2,
-    "name": "Team",
+    "uid": 6,
+    "name": "攻击",
+    "valueType": 0,
+    "min": "",
+    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+    "max": "",
+    "showType": 0
+  },
+  {
+    "uid": 5,
+    "name": "射程",
     "valueType": 0,
     "min": "",
     "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
@@ -36,8 +36,8 @@
     "showType": 3
   },
   {
-    "uid": 5,
-    "name": "射程",
+    "uid": 2,
+    "name": "Team",
     "valueType": 0,
     "min": "",
     "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
@@ -45,21 +45,21 @@
     "showType": 5
   },
   {
-    "uid": 6,
-    "name": "攻击",
-    "valueType": 0,
-    "min": "",
-    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
-    "max": "",
-    "showType": 0
-  },
-  {
-    "uid": 7,
-    "name": "防御",
+    "uid": 1,
+    "name": "HpMax",
     "valueType": 0,
     "min": "",
     "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
     "max": "",
     "showType": 0
+  },
+  {
+    "uid": 4,
+    "name": "Speed",
+    "valueType": 0,
+    "min": "",
+    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+    "max": "",
+    "showType": 5
   }
 ]

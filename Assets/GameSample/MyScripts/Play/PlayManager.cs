@@ -38,6 +38,12 @@ public class PlayManager : Z_MonoManager<PlayManager>
     private const string ScenePresentationLoadItem = "playSceneStart";
     private bool scenePresentationPending;
 
+#if UNITY_EDITOR
+    [UnityEngine.SerializeField]
+    [UnityEngine.Tooltip("在 Play 运行时绘制当前玩家 nav 可通行的 Tile（Scene 视图需开启 Gizmos）。")]
+    private bool showWalkableNavTiles = true;
+#endif
+
     #region life
 
     private InternalPlaySceneController _sceneCtrl;
@@ -78,6 +84,19 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public void FixedUpdate()
     {
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (!UnityEngine.Application.isPlaying || !enable || !showWalkableNavTiles || sceneCtrl == null)
+            return;
+
+        var map = MapManager.instance;
+        if (map.enable)
+            map.navigationCtrl?.DrawWalkableTilesDebug(sceneCtrl.playerM?.unit);
+    }
+#endif
+
     public void Update()
     {
         if (!enable)

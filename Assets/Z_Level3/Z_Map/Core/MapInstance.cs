@@ -14,6 +14,7 @@ namespace Z_Map
         }
         private float degree = 0;
         private static readonly int ShowProperty = Shader.PropertyToID("_Show");
+        private static readonly int FadeCenterProperty = Shader.PropertyToID("_FadeCenter");
         private MaterialPropertyBlock visionBlock;
         private bool visionApplied;
         private float appliedSecondaryDegree;
@@ -99,10 +100,15 @@ namespace Z_Map
             {
                 var render = renderers[i];
                 // Texture/animation code shares this block. Read before modifying
-                // _Show so a reused block never overwrites another renderer's values.
+                // visibility so a reused block never overwrites another renderer's values.
                 render.GetPropertyBlock(visionBlock);
                 float rendererValue = GetRendererVisionDegree(i, value, secondaryValue);
-                visionBlock.SetFloat(ShowProperty, IsRendererVisibleInDisplayLayer(i) ? rendererValue : 0f);
+                bool displayed = IsRendererVisibleInDisplayLayer(i);
+                // 0.5 remains the logical occlusion state, not a fixed shader opacity.
+                // Submit/reset both fields, including independently visible Tile fronts.
+                bool fadeCenter = displayed && rendererValue == 0.5f;
+                visionBlock.SetFloat(ShowProperty, displayed ? (fadeCenter ? 1f : rendererValue) : 0f);
+                visionBlock.SetFloat(FadeCenterProperty, fadeCenter ? 1f : 0f);
                 ApplyRendererDisplayLayerProperties(render, i, visionBlock);
                 render.SetPropertyBlock(visionBlock);
             }

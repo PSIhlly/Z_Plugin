@@ -1,5 +1,6 @@
 using Form;
 using System;
+using System.Linq;
 using Z_Code;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -60,7 +61,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterEquip
                 view.btn_unequip.gameObject.SetActive(model.sel != null);
                 if (model.sel != null)
                 {
-                    foreach (var pair in model.sel.paramDic)
+                    foreach (var pair in model.sel.paramDic.OrderBy(pair => pair.Value.uid))
                     {
                         if (model.data.CanShow(pair.Key))
                             gameArgsCon.Add(new UiGameArgsParam()

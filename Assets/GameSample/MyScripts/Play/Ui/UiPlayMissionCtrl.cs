@@ -81,7 +81,7 @@ namespace Ui.PlayMission
         {
             con.Clear();
 
-            foreach (var o in MissionForm.DataById.Values)
+            foreach (var o in MissionForm.DataById.Values.OrderBy(data => data.id))
             {
                 if (o.show && o.received && !o.fail && !o.done)
                 {

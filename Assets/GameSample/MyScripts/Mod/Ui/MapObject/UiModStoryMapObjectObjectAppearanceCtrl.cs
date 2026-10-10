@@ -31,6 +31,32 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public MapObjectForm.Data data;
         public AnimDirecton dir;
         public int id;
+
+        public float height
+        {
+            get => data.model.subPrefabUnitScale[0].y;
+            set
+            {
+                float bottomHeight = posHeight;
+                data.model.subPrefabUnitScale[0] = data.model.subPrefabUnitScale[0].NewSetY(value);
+                posHeight = bottomHeight;
+            }
+        }
+
+        // Combined models retain their saved center offset plus the legacy 0.5
+        // pivot. Only the editor converts that offset to a bottom-relative height.
+        public float posHeight
+        {
+            get => data.model.subPrefabUnitPos[0].y - (Mathf.Abs(height) - 1) / 2;
+            set => data.model.subPrefabUnitPos[0] = data.model.subPrefabUnitPos[0]
+                .NewSetY(value + (Mathf.Abs(height) - 1) / 2);
+        }
+
+        public void SetHorizontalPosition(Vector2 position)
+        {
+            data.model.subPrefabUnitPos[0] = new Vector3(position.x,
+                data.model.subPrefabUnitPos[0].y, position.y);
+        }
     }
     public partial class UiModStoryMapObjectObjectAppearanceCtrl:IZ_Listener<AssetEvent>
     {
@@ -86,13 +112,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             });
             view.ipt_posHeight.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitPos[0] = model.data.model.subPrefabUnitPos[0].NewSetY(StringHelper.ToFloat(s, 0, false));
+                model.posHeight = StringHelper.ToFloat(s, 0, false);
                 Refresh();
             };
             view.ipt_height.onFinishInput += (s) =>
             {
-
-                model.data.model.subPrefabUnitScale[0]=model.data.model.subPrefabUnitScale[0].NewSetY(StringHelper.ToFloat(s, 1, true));
+                model.height = StringHelper.ToFloat(s, 1, true);
                 Refresh();
             };
             view.ipt_length.onFinishInput += (s) =>
@@ -113,11 +138,6 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.ipt_interval.onFinishInput += (s) =>
             {
                 model.data.model.animTimeInterval = StringHelper.ToFloat(s, 0, true);
-                Refresh();
-            };
-            view.ipt_colliderScale.onFinishInput += (s) =>
-            {
-                model.data.model.colliderScale = StringHelper.ToFloat(s, 1, true);
                 Refresh();
             };
         }
@@ -157,7 +177,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 pos = new Vector2((model.data.model.subPrefabUnitPos[0].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[0].z + rate / 2) / rate),
                 limitRtf = view.rtf_image,
                 onTrsChange = (tp) => {
-                    model.data.model.subPrefabUnitPos[0] = new Vector3((tp.Item1.x * 2 - 1) * rate / 2, 0, (tp.Item1.y * 2 - 1) * rate / 2);
+                    model.SetHorizontalPosition(new Vector2((tp.Item1.x * 2 - 1) * rate / 2,
+                        (tp.Item1.y * 2 - 1) * rate / 2));
                     RefreshView();
                 }
             });
@@ -165,13 +186,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
             if (model.id != -1)
             {
-                view.ipt_posHeight.Set(model.data.model.subPrefabUnitPos[0].y.ToString("0.##"));
-                view.ipt_height.Set(model.data.model.subPrefabUnitScale[0].y.ToString("0.##"));
+                view.ipt_posHeight.Set(model.posHeight.ToString("0.##"));
+                view.ipt_height.Set(model.height.ToString("0.##"));
                 view.ipt_length.Set(model.data.model.subPrefabUnitScale[0].z.ToString("0.##"));
                 view.ipt_width.Set(model.data.model.subPrefabUnitScale[0].x.ToString("0.##"));
             }
             view.ipt_interval.Set(model.data.model.animTimeInterval.ToString("0.##"));
-            view.ipt_colliderScale.Set(model.data.model.colliderScale.ToString("0.##"));
 
             dirCon.Clear();
             switch (model.data.faceType)
@@ -213,7 +233,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             DisplayCameraAreaManager.instance.Clear();
             model.data.SyncLegacyAnimClip(model.dir);
-            var showGo = GameManager.instance.utilCtrl.CombineNewObjectByPrefabs("fakeObj", model.data.model, false);
+            var showGo = GameManager.instance.utilCtrl.CombineNewObjectByPrefabs("fakeObj", model.data, false,
+                previewDirection: model.dir);
             showGo.SetActive(true);
             DisplayCameraAreaManager.instance.Add(showGo, Vector3.zero);
         }
@@ -296,17 +317,17 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public void Refresh()
         {
             view.sta_exist.ChangeState(model.id >= 0 ? 1 : 0);
+            TexAssetForm.Data tex = null;
             if (model.id >= 0)
             {
                 var texs = parent.model.data.GetAnimClip(parent.model.dir);
-                var tex = TexAssetForm.DataById.GetDv(texs != null && texs.Count > model.id ? texs[model.id] : -1,null);
-                view.txt_.text = "";
-                if (tex != null)
-                {
-                    view.img_.BindTexData(tex);
-                }
-                view.sta_.ChangeState(model.id == parent.model.id ? 1 : 0);
+                int texId = texs != null && texs.Count > model.id ? texs[model.id] : 0;
+                if (texId != 0 && texId != GlobalDefaultHelper.DefaultTexId)
+                    tex = TexAssetForm.DataById.GetDv(texId, null);
             }
+            view.txt_.text = string.Empty;
+            view.img_.BindTexDataOrHide(tex);
+            view.sta_.ChangeState(model.id >= 0 && model.id == parent.model.id ? 1 : 0);
         }
     }
 }

@@ -24,6 +24,7 @@ public static class MapTextureRuntimeRegression
     {
         try
         {
+            PerspectiveImageScaleAfterRotation();
             // RuntimeInitializeOnLoadMethod registration does not run in EditMode.
             TexAssetForm.InitInternal();
             MapTextureForm.InitInternal();
@@ -51,7 +52,8 @@ public static class MapTextureRuntimeRegression
             tile.unit.ins = ins;
             ins.unit = tile.unit;
             var renderer = ins.renderers[0];
-            readBlock.SetFloat("_Show", .5f);
+            readBlock.SetFloat("_Show", 1f);
+            readBlock.SetFloat("_FadeCenter", 1f);
             readBlock.SetFloat("_LightSensitivity", .3f);
             renderer.SetPropertyBlock(readBlock);
 
@@ -73,8 +75,9 @@ public static class MapTextureRuntimeRegression
             Check(Texture(ins.renderers[3], "_Tex") == b, "front has its independent texture");
             Check(!ins.renderers[1].enabled && !ins.renderers[4].enabled, "empty base/front disabled");
             renderer.GetPropertyBlock(readBlock);
-            Check(readBlock.GetFloat("_Show") == .5f && readBlock.GetFloat("_LightSensitivity") == .3f,
-                "texture writes preserve visibility and lighting");
+            Check(readBlock.GetFloat("_Show") == 1f && readBlock.GetFloat("_FadeCenter") == 1f
+                && readBlock.GetFloat("_LightSensitivity") == .3f,
+                "texture writes preserve camera-center fade, visibility and lighting");
             var blockField = typeof(GameMapController).GetField("textureBlock", PrivateInstance);
             var scratch = blockField.GetValue(ctrl);
             ctrl.OnEvent(evt);
@@ -158,8 +161,9 @@ public static class MapTextureRuntimeRegression
             Check(Texture(renderer, "_Tex") == b && Texture(renderer, "_AlphaTex") == mask,
                 "animation selects shared-clock frame and preserves mask");
             renderer.GetPropertyBlock(readBlock);
-            Check(readBlock.GetFloat("_Show") == .5f && ReferenceEquals(scratch, blockField.GetValue(ctrl)),
-                "animation reuses block and preserves visibility");
+            Check(readBlock.GetFloat("_Show") == 1f && readBlock.GetFloat("_FadeCenter") == 1f
+                && ReferenceEquals(scratch, blockField.GetValue(ctrl)),
+                "animation reuses block and preserves camera-center fade");
             animation[1] = 81001;
             tick.Invoke(ctrl, new object[] { ins, tile.unit, renderer, 0, frames, .5f, frameIndices });
             Check(Texture(renderer, "_Tex") == a, "animation observes edits even at the same clock frame");
@@ -203,6 +207,121 @@ public static class MapTextureRuntimeRegression
         return new TileUnitForm.Data(uid, "", new Dictionary<int, int>(), Vector3Int.zero,
             "", Vector3.zero, Vector3.zero, Vector3.one, UpdateType.ShowOnly,
             new List<int>(), "", false, false, new List<int>());
+    }
+
+    private static void PerspectiveImageScaleAfterRotation()
+    {
+        var previousMode = DynamicGlobalSettings.cameraMode;
+        var root = new GameObject("perspective-object-instance");
+        try
+        {
+            var primitive = new GameObject("MapPrefab$cube");
+            primitive.transform.SetParent(root.transform, false);
+            var body = new GameObject("Collider");
+            body.transform.SetParent(primitive.transform, false);
+            var collider = body.AddComponent<BoxCollider>();
+            var holder = new GameObject("rotateHolder");
+            holder.transform.SetParent(primitive.transform, false);
+            var image = new GameObject("img");
+            image.transform.SetParent(holder.transform, false);
+            var authoredScale = new Vector3(.8f, 1.2f, 1f);
+            image.transform.localScale = authoredScale;
+            var keeper = image.AddComponent<PerspectiveKeeper>();
+            keeper.rotateHolder = holder.transform;
+            keeper.enableFixedXRotationDefault = true;
+            keeper.deepth = .07f;
+
+            foreach (var rootScale in new[] { Vector3.one, new Vector3(2, 3, .5f) })
+            foreach (var modelScale in new[] { Vector3.one, new Vector3(1, 10, 1), new Vector3(2, 1, 8), new Vector3(3, .25f, .1f) })
+            foreach (float yaw in new[] { 0f, 37f, 90f, 180f, 270f })
+            foreach (var mode in new[] { CameraMode.Isometric, CameraMode.Overhead, CameraMode.Isometric })
+            {
+                root.transform.localScale = rootScale;
+                root.transform.rotation = Quaternion.Euler(8, yaw, 7);
+                primitive.transform.localScale = modelScale;
+                DynamicGlobalSettings.cameraMode = mode;
+                Vector3 size = primitive.transform.lossyScale;
+                var rotation = Quaternion.Euler(mode == CameraMode.Isometric ? 45f : 90f, 0, 0)
+                    * Quaternion.AngleAxis(-primitive.transform.eulerAngles.y, Vector3.forward);
+                float imageHeight = mode == CameraMode.Isometric
+                    ? Mathf.Sqrt(size.y * size.y + size.z * size.z) : Mathf.Abs(size.z);
+                for (int repeat = 0; repeat < 2; repeat++)
+                {
+                    keeper.RefreshNow();
+                    Check(image.transform.localRotation == Quaternion.identity && holder.transform.localScale == Vector3.one,
+                        "outer rotateHolder owns rotation, inner img owns scale");
+                    Check(holder.transform.parent.name == "imageScaleCompensator" && primitive.transform.childCount == 2,
+                        "one owned scale compensator is reused without changing model/Collider hierarchy");
+                    var expectedPosition = mode == CameraMode.Isometric
+                        ? primitive.transform.position + new Vector3(0, 1, -1) * keeper.deepth
+                        : primitive.transform.position + Vector3.up * primitive.transform.localScale.y / 2 + Vector3.down * keeper.deepth;
+                    Check((holder.transform.position - expectedPosition).sqrMagnitude < .000001f,
+                        "scale compensation never rescales the authored world depth/height offset");
+                    Vector3 actualRight = image.transform.TransformVector(Vector3.right);
+                    Vector3 actualUp = image.transform.TransformVector(Vector3.up);
+                    Check(Vector3.Angle(actualRight, rotation * Vector3.right) < .05f,
+                        "model/holder scale must not change the actual image right direction");
+                    Check(Vector3.Angle(actualUp, rotation * Vector3.up) < .05f,
+                        "model/holder scale must not change the actual image up direction or pitch");
+                    Check(Mathf.Abs(Vector3.Dot(actualRight.normalized, actualUp.normalized)) < .0001f,
+                        "the rendered image plane remains rectangular rather than sheared");
+                    Check(Mathf.Abs(actualRight.magnitude - Mathf.Abs(size.x) * authoredScale.x) < .0001f
+                        && Mathf.Abs(actualUp.magnitude - imageHeight * authoredScale.y) < .0001f,
+                        "scale applies along rotated image axes and preserves width/diagonal height without accumulation");
+                    Check(body.transform.localPosition == Vector3.zero && body.transform.localScale == Vector3.one
+                        && collider.center == Vector3.zero && collider.size == Vector3.one,
+                        "image transform correction never modifies the physical Collider");
+                }
+            }
+            var compensator = holder.transform.parent;
+            root.SetActive(false);
+            root.SetActive(true);
+            keeper.LateUpdate();
+            Check(holder.transform.parent == compensator && primitive.transform.childCount == 2,
+                "pool re-enable reuses the same neutral carrier");
+            var refreshedScale = image.transform.localScale;
+            var clone = UnityEngine.Object.Instantiate(root);
+            try
+            {
+                var clonedKeeper = clone.GetComponentInChildren<PerspectiveKeeper>();
+                clonedKeeper.RefreshNow();
+                Check((clonedKeeper.transform.localScale - refreshedScale).sqrMagnitude < .000001f
+                    && clonedKeeper.rotateHolder.parent.parent.childCount == 2,
+                    "cloning a refreshed hierarchy retains the authored image scale and existing carrier");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(clone); }
+
+            // Characters share this helper through the sphere prefab. Their
+            // diameter-sized square and direction must remain unchanged.
+            var sphereRoot = new GameObject("MapPrefab$sphere");
+            sphereRoot.transform.SetParent(root.transform, false);
+            root.transform.localScale = Vector3.one * 2;
+            root.transform.rotation = Quaternion.Euler(0, 37, 0);
+            sphereRoot.transform.localScale = new Vector3(1, 2, 1);
+            var sphereCollider = sphereRoot.AddComponent<SphereCollider>();
+            sphereCollider.radius = .4f;
+            var sphereHolder = new GameObject("rotateHolder");
+            sphereHolder.transform.SetParent(sphereRoot.transform, false);
+            var sphereImage = new GameObject("img");
+            sphereImage.transform.SetParent(sphereHolder.transform, false);
+            var sphereKeeper = sphereImage.AddComponent<PerspectiveKeeper>();
+            sphereKeeper.rotateHolder = sphereHolder.transform;
+            sphereKeeper.RefreshNow();
+            Vector3 sphereRight = sphereImage.transform.TransformVector(Vector3.right);
+            Vector3 sphereUp = sphereImage.transform.TransformVector(Vector3.up);
+            var sphereRotation = Quaternion.Euler(45, 0, 0) * Quaternion.AngleAxis(-37, Vector3.forward);
+            Check(Vector3.Angle(sphereRight, sphereRotation * Vector3.right) < .05f
+                && Vector3.Angle(sphereUp, sphereRotation * Vector3.up) < .05f
+                && Mathf.Abs(sphereRight.magnitude - 4) < .0001f && Mathf.Abs(sphereUp.magnitude - 4) < .0001f,
+                "sphere/character keeps its original diameter square and image-plane direction");
+            Check(sphereCollider.radius == .4f && sphereRoot.transform.localScale == new Vector3(1, 2, 1),
+                "sphere visual correction never resizes the gameplay body or authored model");
+        }
+        finally
+        {
+            DynamicGlobalSettings.cameraMode = previousMode;
+            UnityEngine.Object.DestroyImmediate(root);
+        }
     }
 
     private static Texture Texture(Renderer renderer, string property)

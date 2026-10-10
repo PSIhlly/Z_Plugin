@@ -180,7 +180,7 @@ namespace Ui.PlayDataBackpack
                 view.txt_desc.text = model.sel.desc;
                 view.txt_name.text = model.sel.name;
                 view.txt_amount.text = TextManager.instance.GetTxt("count") + ":" + model.sel.amount.ToString();
-                foreach (var arg in model.sel.paramDic)
+                foreach (var arg in model.sel.paramDic.OrderBy(pair => pair.Value.uid))
                 {
                     if (model.sel.CanShow(arg.Key))
                         gameArgCon.Add(new UiGameArgsParam()

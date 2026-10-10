@@ -1,6 +1,7 @@
 using Form;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Z_Code;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -54,7 +55,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterSkill
             gameArgsCon.Clear();
             if (model.sel != null)
             {
-                foreach (var pair in model.sel.paramDic)
+                foreach (var pair in model.sel.paramDic.OrderBy(pair => pair.Value.uid))
                 {
                     gameArgsCon.Add(new UiGameArgsParam()
                     {

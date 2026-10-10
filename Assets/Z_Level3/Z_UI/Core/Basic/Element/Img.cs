@@ -22,6 +22,16 @@ namespace Z_Ui.Base
         private IReadOnlyList<AnimatedFrameData> _animationFrames;
         private IReadOnlyList<Sprite> _animationSprites;
 
+        // Opt-in for dynamic thumbnails: a missing image is blank, not the
+        // Image component's white fallback or a previous pooled binding.
+        public void BindTexDataOrHide(TexAssetForm.Data data)
+        {
+            enabled = data != null;
+            overrideSprite = null;
+            BindTexData(data);
+            enabled = data != null && sprite != null;
+        }
+
         public void BindTexData(TexAssetForm.Data data)
         {
             UnbindTexData();

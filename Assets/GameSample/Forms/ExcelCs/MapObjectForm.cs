@@ -88,6 +88,10 @@ namespace Form
                 
         public static Action<Data,bool,bool> changeIswangtileAction;
                 
+        public static Action<Data,bool,bool> changeBoundscollisionAction;
+                
+        public static Action<Data,bool,bool> changeCentercolliderAction;
+                
 
 
         public partial class Data : MapBaseForm.Data
@@ -237,11 +241,47 @@ namespace Form
                  
                      }
                     
+                    private bool  _boundsCollision;
+                    /// <summary>
+                    ///贴图边界碰撞
+                    ///</summary>
+                    public bool  boundsCollision{
+                                get{return _boundsCollision;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeBoundscollision(this,_boundsCollision,value); 
+                    }
+        
+                _boundsCollision = value;
+                }
+                 
+                     }
+                    
+                    private bool  _centerCollider;
+                    /// <summary>
+                    ///碰撞体居中
+                    ///</summary>
+                    public bool  centerCollider{
+                                get{return _centerCollider;}
+ set{
+
+                    if(_DataById!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeCentercollider(this,_centerCollider,value); 
+                    }
+        
+                _centerCollider = value;
+                }
+                 
+                     }
+                    
             public Data(MapBaseForm.Data data):base(data.id,data.name,data.icon,data.labId)
             {
             }
             
-            public Data(int id,string name,int icon,MapModelForm.Data model,int labId,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon,FaceType faceType,Dictionary<AnimDirecton,List<int>> animClip,bool isWangTile):base(id,name,icon,labId)
+            public Data(int id,string name,int icon,MapModelForm.Data model,int labId,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon,FaceType faceType,Dictionary<AnimDirecton,List<int>> animClip,bool isWangTile,bool boundsCollision,bool centerCollider):base(id,name,icon,labId)
             {
 
              this.id = id;
@@ -256,6 +296,8 @@ namespace Form
              this.faceType = faceType;
              this.animClip = animClip;
              this.isWangTile = isWangTile;
+             this.boundsCollision = boundsCollision;
+             this.centerCollider = centerCollider;
 
             }
             public void Reset(Data data)
@@ -273,11 +315,13 @@ namespace Form
              this.faceType = data.faceType;
              this.animClip = data.animClip;
              this.isWangTile = data.isWangTile;
+             this.boundsCollision = data.boundsCollision;
+             this.centerCollider = data.centerCollider;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,labId,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip),isWangTile);
+        return new Data(sameId? id:idChain.GetId(),name,icon,model,labId,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip),isWangTile,boundsCollision,centerCollider);
                 }
             
             public override  void BeforeGet()
@@ -287,7 +331,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,0,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0,FaceType.Fixed,new Dictionary<AnimDirecton,List<int>>(){},false);
+                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,0,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0,FaceType.Fixed,new Dictionary<AnimDirecton,List<int>>(){},false,false,true);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -424,7 +468,11 @@ namespace Form
 
                 jo.SelectToken("animClip")==null?defaultData.animClip:jo.Get<Dictionary<AnimDirecton,List<int>>>("animClip"),
 
-                jo.SelectToken("isWangTile")==null?defaultData.isWangTile:jo.Get<bool>("isWangTile")
+                jo.SelectToken("isWangTile")==null?defaultData.isWangTile:jo.Get<bool>("isWangTile"),
+
+                jo.SelectToken("boundsCollision")==null?defaultData.boundsCollision:jo.Get<bool>("boundsCollision"),
+
+                jo.SelectToken("centerCollider")==null?defaultData.centerCollider:jo.Get<bool>("centerCollider")
                     );
 
             return data;
@@ -460,6 +508,10 @@ namespace Form
             jo.Set<Dictionary<AnimDirecton,List<int>>>("animClip",data.animClip);
 
             jo.Set<bool>("isWangTile",data.isWangTile);
+
+            jo.Set<bool>("boundsCollision",data.boundsCollision);
+
+            jo.Set<bool>("centerCollider",data.centerCollider);
 
             return jo;
         }
@@ -687,6 +739,26 @@ MapBaseForm.RemoveData(id);
                 {
 
                 changeIswangtileAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeBoundscollision(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeBoundscollisionAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeCentercollider(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeCentercolliderAction?.Invoke(data,oldV,newV);
                 }
                     
             }

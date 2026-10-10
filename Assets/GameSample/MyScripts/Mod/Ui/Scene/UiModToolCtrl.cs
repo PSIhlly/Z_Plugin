@@ -75,17 +75,11 @@ namespace Ui.ModSceneMain.ModTool
             {
                 float.TryParse(value, out float v);
                 float minV = 0;
-                float maxV = 0.9f;
 
                 if (v < minV)
                 {
                     v = minV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("minYTip"));
-                }
-                if (v > maxV)
-                {
-                    v = maxV;
-                    NotifyManager.instance.AddTip(TextManager.instance.GetTxt("maxYTip"));
                 }
                 ModManager.instance.sceneCtrl.posY = v * MapManager.instance.data.mainData.mapUnitSize.y;
             }
@@ -254,7 +248,7 @@ namespace Ui.ModSceneMain.ModTool
             RefreshLabs();
             conType.Clear();
 
-            foreach (var data in MapTypeForm.DataById.Values)
+            foreach (var data in MapTypeForm.DataById.Values.OrderBy(data => data.id))
             {
                 if (data.id == 3)
                     continue;
@@ -491,12 +485,20 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            int iconId = model.data.icon;
-            if (model.data is MapObjectForm.Data objData && objData.model != null
-                && objData.model.subUnitTexsName != null && objData.model.subUnitTexsName.Count > 0
-                && objData.model.subUnitTexsName[0] != null && objData.model.subUnitTexsName[0].Count > 0)
-                iconId = objData.model.subUnitTexsName[0][0];
-            view.img_.BindTexData(TexAssetForm.DataById.GetDv(iconId, TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]));
+            if (model.data is MapObjectForm.Data objData)
+            {
+                var clip = objData.GetAnimClip(objData.GetDefaultAnimDirection());
+                int texId = clip.Count > 0 ? clip[0] : 0;
+                var tex = texId != 0 && texId != GlobalDefaultHelper.DefaultTexId
+                    ? TexAssetForm.DataById.GetDv(texId, null) : null;
+                view.img_.BindTexDataOrHide(tex);
+            }
+            else
+            {
+                view.img_.enabled = true;
+                view.img_.BindTexData(TexAssetForm.DataById.GetDv(model.data.icon,
+                    TexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]));
+            }
 
             view.sta_.ChangeState(parent.model.curData == model.data ? 1 : 0);
 

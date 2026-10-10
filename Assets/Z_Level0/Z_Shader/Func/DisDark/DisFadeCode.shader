@@ -7,6 +7,7 @@ Shader "DisFadeCode"
         [NoScaleOffset]_AlphaTex("_AlphaTex", 2D) = "white" {}
         _UseCloseHide("_UseCloseHide", Float) = 0
         _Show("_Show", Float) = 0
+        [Toggle] _FadeCenter("fadeCenter", Float) = 0
         _Alpha("_Alpha", Float) = 0
         _LightSensitivity("Light Sensitivity", Range(0.1, 10)) = 1
         _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
@@ -31,11 +32,11 @@ Shader "DisFadeCode"
                 "LightMode" = "UniversalForward"
             }
 
-            // Screen-space dithering represents opacity through pixel coverage.
-            // With depth writes enabled, the nearest surface wins without stacked alpha.
-            Blend One Zero
+            // Continuous premultiplied transparency avoids opaque dither specks.
+            // Transparent surfaces must not block later draws by writing depth.
+            Blend One OneMinusSrcAlpha
             ZTest LEqual
-            ZWrite On
+            ZWrite Off
 
             HLSLPROGRAM
 
@@ -49,7 +50,6 @@ Shader "DisFadeCode"
             #define _ALPHATEST_ON 1
 
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
-        #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Random.hlsl"
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Texture.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -60,8 +60,41 @@ Shader "DisFadeCode"
                 float _Cutoff;
                 float _Alpha;
                 float _Show;
+                float _FadeCenter;
                 float _LightSensitivity;
             CBUFFER_END
+
+            // Set by the active map. These are shared globals, not material overrides.
+            float4 _MapFadeCenterPosition;
+
+            half CameraCenterVisibility(float3 positionWS)
+            {
+                // Camera-local XY is centered on the actual view axis. Normalize
+                // perspective positions at the map center's depth, when applicable.
+                float3 positionVS = TransformWorldToView(positionWS);
+                float2 viewOffset = positionVS.xy;
+                if (unity_OrthoParams.w < 0.5)
+                {
+                    float centerDepth = abs(TransformWorldToView(_MapFadeCenterPosition.xyz).z);
+                    viewOffset *= max(centerDepth, 0.0001) / max(abs(positionVS.z), 0.0001);
+                }
+
+                // Undo the camera's ground-plane projection so distances remain
+                // world units regardless of camera tilt, zoom or map cell size.
+                float2 rightXZ = UNITY_MATRIX_V[0].xz;
+                float2 upXZ = UNITY_MATRIX_V[1].xz;
+                float determinant = rightXZ.x * upXZ.y - rightXZ.y * upXZ.x;
+                float2 groundOffset = viewOffset;
+                if (abs(determinant) > 0.0001)
+                    groundOffset = float2(
+                        viewOffset.x * upXZ.y - viewOffset.y * rightXZ.y,
+                        viewOffset.y * rightXZ.x - viewOffset.x * upXZ.x) / determinant;
+
+                // Twenty-percent opacity through 1.5 world units, then a two-unit fade
+                // ring reaching ordinary opacity at 3.5. Keep the quadratic curve.
+                float visibility = saturate((length(groundOffset) - 1.5) / (3.5 - 1.5));
+                return 0.2 + 0.8 * visibility * visibility;
+            }
 
             struct Attributes
             {
@@ -104,9 +137,10 @@ Shader "DisFadeCode"
                     clip(baseColor.a - _Cutoff);
                 #endif
 
-                half finalAlpha = saturate(_Alpha * _Show);
-                half ditherThreshold = InterleavedGradientNoise(input.positionHCS.xy, 0);
-                clip(finalAlpha - ditherThreshold - 0.001h);
+                half centerVisibility = _FadeCenter > 0.5 ? CameraCenterVisibility(input.positionWS) : 1.0h;
+                half finalAlpha = saturate(_Alpha * _Show * centerVisibility);
+                // Discard only invisible fragments, never randomly retain opaque pixels.
+                clip(finalAlpha - 0.0001h);
 
                 // ���ģ�������Ӱ���꣨URP���ߺ�����
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
@@ -124,7 +158,7 @@ Shader "DisFadeCode"
                 // 3. 计算阴影强度衰减后的漫反射（降低模型被遮挡时的亮度）
                 half3 diffuse = mainLight.color * lightAmount * baseColor.rgb * shadowStrength * input.dark;
                 
-                return half4(diffuse.rgb, 1.0h);
+                return half4(diffuse.rgb * finalAlpha, finalAlpha);
             }
             ENDHLSL
         }

@@ -161,7 +161,7 @@ namespace Ui.PlayMap
                 view.img_largeMap.BindTexData(StoryTexAssetForm.DataById.GetDv(GameManager.instance.curProgress.largeMap, StoryTexAssetForm.DataById[GlobalDefaultHelper.DefaultTexId]));
                 sceneCon.Clear();
                 var scenes = SceneForm.DataByUid.Values;
-                foreach (var scene in scenes)
+                foreach (var scene in scenes.OrderBy(data => data.uid))
                 {
                     if (scene.unlock&&!scene.hideInLargeMap)
                     {

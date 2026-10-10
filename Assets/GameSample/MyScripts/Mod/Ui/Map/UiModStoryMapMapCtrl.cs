@@ -79,7 +79,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapMap
         private void RefreshScenes()
         {
             con.Clear();
-            foreach (var data in SceneForm.DataByUid.Values)
+            foreach (var data in SceneForm.DataByUid.Values.OrderBy(data => data.uid))
             {
                 if (data.hideInLargeMap)
                     continue;

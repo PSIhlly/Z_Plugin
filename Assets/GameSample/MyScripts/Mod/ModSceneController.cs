@@ -207,6 +207,50 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         }
         return default(T);
     }
+
+    private static bool CanSelectObject(MapInstance ins, Collider hitCollider, float tileHeight)
+    {
+        if (!(ins is ObjectInstance obj))
+            return true;
+
+        const float heightTolerance = 0.0001f;
+        if (obj.unit.belongTile != null && obj.unit.belongTile.data.pos.y > tileHeight + heightTolerance)
+            return false;
+
+        // Ownership may remain on a lower Tile after raising the root/model.
+        // Use live physical bounds (including fitted/rotated child Colliders),
+        // not the padded picking Trigger or the Object root position.
+        bool hasBody = false;
+        foreach (var collider in obj.GetComponentsInChildren<Collider>())
+        {
+            if (!collider.enabled || collider.isTrigger)
+                continue;
+            hasBody = true;
+            if (collider.bounds.min.y <= tileHeight + heightTolerance)
+                return true;
+        }
+        // Trigger-only prefabs still use their actual picking bounds.
+        return !hasBody && hitCollider.bounds.min.y <= tileHeight + heightTolerance;
+    }
+
+    private static MapInstance GetClickedInstance(List<RaycastHit> hits, float tileHeight, bool includeTiles)
+    {
+        MapInstance fallback = null;
+        // Hits are sorted near-to-far: keep the original top-down picking order
+        // as a fallback, but prefer any target allowed at the editing height.
+        foreach (var hit in hits)
+        {
+            var ins = hit.transform.GetComponentInParent<MapInstance>();
+            if (ins == null || (!includeTiles && !(ins is ObjectInstance || ins is ItemInstance || ins is CharacterInstance)))
+                continue;
+            if (CanSelectObject(ins, hit.collider, tileHeight))
+                return ins;
+            if (fallback == null)
+                fallback = ins;
+        }
+        return fallback;
+    }
+
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
     {
         if (waitForActive || !enable)
@@ -468,7 +512,12 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     }
                     else if (curData is MapEraseForm.Data eraseData)
                     {
-                        ForeachPos(hitPos, worldPosition, (mapData, _) => EraseTile(mapData, eraseData));
+                        // Erase is a Tile-grid brush, not model placement. Offsets
+                        // retained after scene reentry must not shift its target.
+                        for (int x = hitPos.x - cntX / 2; x < hitPos.x + cntX / 2 + (cntX % 2 == 1 ? 1 : 0); x++)
+                            for (int z = hitPos.z - cntY / 2; z < hitPos.z + cntY / 2 + (cntY % 2 == 1 ? 1 : 0); z++)
+                                if (mapMgr.data.maps.TryGetValue((x, hitPos.y, z), out var mapData))
+                                    EraseTile(mapData, eraseData);
                     }
                     if (brushRevision != revisionBefore)
                         ForceUpdate();
@@ -478,18 +527,13 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     //click
                     if (click)
                     {
-                        foreach (var hit in hits)
+                        var ins = GetClickedInstance(hits, CameraInstance.instance.tarTrs.position.y, false);
+                        if (ins != null)
                         {
-
-                            var ins = hit.transform.GetComponentInParent<MapInstance>();
-                            if (ins != null && (ins is ObjectInstance || ins is ItemInstance || ins is CharacterInstance))
+                            UiManager.instance.ShowUi<UiModSceneUnitCtrl>(new UiModSceneUnitParam()
                             {
-                                UiManager.instance.ShowUi<UiModSceneUnitCtrl>(new UiModSceneUnitParam()
-                                {
-                                    data = ins.unit.data
-                                });
-                                break;
-                            }
+                                data = ins.unit.data
+                            });
                         }
 
 
@@ -508,17 +552,13 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 //click
                 if (click)
                 {
-                    foreach (var hit in hits)
+                    var ins = GetClickedInstance(hits, CameraInstance.instance.tarTrs.position.y, true);
+                    if (ins != null)
                     {
-                        var ins = hit.transform.GetComponentInParent<Instance>();
-                        if (ins != null && ins is MapInstance mapIns)
+                        UiManager.instance.ShowUi<UiModSceneBehaviourUnitCtrl>(new UiModSceneBehaviourUnitParam()
                         {
-                            UiManager.instance.ShowUi<UiModSceneBehaviourUnitCtrl>(new UiModSceneBehaviourUnitParam()
-                            {
-                                data = mapIns.unit.data
-                            });
-                            break;
-                        }
+                            data = ins.unit.data
+                        });
                     }
                 }//move
                 else
@@ -593,11 +633,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 var finalZ = posZ + z;
                 var finalY = posY + realPos.y;
                 var finalPos = new Vector3(finalX, finalY, finalZ);
-                var mapPos = mapMgr.utilCtrl.RealPos2MapPosInt(finalPos);
-                if (mapMgr.data.maps.ContainsKey((mapPos.x, mapPos.y, mapPos.z)))
-                {
-                    onFind?.Invoke(mapMgr.data.maps[(mapPos.x, mapPos.y, mapPos.z)], finalPos);
-                }
+                var owner = mapMgr.utilCtrl.GetPlacementTile(finalPos);
+                if (owner != null)
+                    onFind?.Invoke(owner.data, finalPos);
             }
     }
     public void ForceUpdate()
@@ -710,7 +748,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
             return;
 
         {
-            mapMgr.updateCtrl.UpdateInfo();
+            // Keep authored coordinates stable: gameplay gravity/navigation would
+            // move a placed Character before the next brush duplicate check.
+            mapMgr.updateCtrl.UpdateInfo(simulateCharacters: false);
             {
                 mapMgr.SetPos(CameraInstance.instance.tarTrs.position);
             }

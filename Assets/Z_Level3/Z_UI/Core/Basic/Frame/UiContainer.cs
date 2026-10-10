@@ -119,6 +119,9 @@ namespace Z_Ui.Base
             belongCtrl.uiHolder.subUiHolderLst.Add(holder);
 
             ctrl.SetParam(param);
+            // Pool reuse after filtering/count changes must retain render order,
+            // not the GameObject's sibling index from a previous list.
+            holder.transform.SetAsLastSibling();
             holder.gameObject.SetActive(true);
 
 

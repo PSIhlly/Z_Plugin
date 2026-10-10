@@ -1213,7 +1213,7 @@ public class GameSaveController : Z_Controller<GameManager>
         }
         foreach (var form in MapObjectForm.DataById.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.id), form.model, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.id), form, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }

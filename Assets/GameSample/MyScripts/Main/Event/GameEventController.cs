@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using Ui.ModStoryEventTrigger;
 using Unity.VisualScripting;
@@ -571,7 +572,7 @@ public class GameEventController : Z_Controller<GameManager>
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {
         var res = new EntryItem();
-        foreach (var data in EventProgramDataForm.DataByUid.Values)
+        foreach (var data in EventProgramDataForm.DataByUid.Values.OrderBy(data => data.labId).ThenBy(data => data.uid))
         {
             if (!IsCorrect(retType, data.returnValue))
                 continue;
@@ -586,12 +587,12 @@ public class GameEventController : Z_Controller<GameManager>
                 name = $"{name} ({data.uid})";
             res.subs[cat].Add(name, null, data.uid);
         }
-        return res;
+        return SortFormEntryChildren(res);
     }
     public EntryItem GetTriggerConditionEntry()
     {
         var res = new EntryItem();
-        foreach (var data in EventTriggerForm.DataByName.Values)
+        foreach (var data in EventTriggerForm.DataByName.Values.OrderBy(data => data.uid))
         {
             res.Add(TextManager.instance.GetTxt(data.name.Split("$")[0]), id: data.uid);
 
@@ -602,7 +603,7 @@ public class GameEventController : Z_Controller<GameManager>
     {
         defaultItem = null;
         var res = new EntryItem();
-        foreach (var data in GameCmdDataForm.DataByName.Values)
+        foreach (var data in GameCmdDataForm.DataByName.Values.OrderBy(data => data.labId).ThenBy(data => data.uid))
         {
             if (data.lowestEditorStyle > GameManager.instance.curProgress.editorStyle)
             {
@@ -635,7 +636,17 @@ public class GameEventController : Z_Controller<GameManager>
             if (defaultItem == null)
                 defaultItem = res.subs[category].subs[name];
         }
-        return res;
+        return SortFormEntryChildren(res);
+    }
+
+    private static EntryItem SortFormEntryChildren(EntryItem entries)
+    {
+        // Legacy aliases can merge several Lab IDs into one displayed category.
+        // Keep category order by Lab ID, but sort its combined rows by Data UID.
+        foreach (var category in entries.subs.Values)
+            category.subs = category.subs.OrderBy(pair => pair.Value.id)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+        return entries;
     }
 
     public static EventTriggerForm.Data CreateTrigger(string key)

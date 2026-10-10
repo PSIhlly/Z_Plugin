@@ -249,6 +249,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         wangTileAnimationTextures = new Dictionary<(int, bool, int), List<int>>();
     private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), List<int>>
         objectWangTileAnimationTextures = new Dictionary<(int, AnimDirecton, int), List<int>>();
+    // Mask -1 denotes an ordinary clip; WangTile masks are 0..255.
+    private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), Rect> objectWangTileCollisionBounds
+        = new Dictionary<(int, AnimDirecton, int), Rect>();
+    private static readonly Dictionary<Texture2D, Rect> objectWangTileTextureBounds = new Dictionary<Texture2D, Rect>();
+    private readonly HashSet<ObjectUnit> objectCollisionBoundsUnits = new HashSet<ObjectUnit>();
     private readonly Dictionary<ObjectUnit, Bounds> objectWangTileBounds = new Dictionary<ObjectUnit, Bounds>();
     private readonly HashSet<MapUnit> objectWangTileNeighbourCandidates = new HashSet<MapUnit>();
     private static readonly HashSet<MapUnit> objectWangTileMaskCandidates = new HashSet<MapUnit>();
@@ -269,6 +274,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public void ResetSceneUnitCaches()
     {
         animCurCache.Clear();
+        foreach (var unit in objectCollisionBoundsUnits)
+            unit.SetFirstPartCollisionBounds(null, 1f);
+        objectCollisionBoundsUnits.Clear();
         objectWangTileBounds.Clear();
         objectWangTileNeighbourCandidates.Clear();
         objectWangTileMaskCandidates.Clear();
@@ -278,7 +286,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         animCurCache.Remove(data);
         if (data.unit is ObjectUnit unit)
+        {
             objectWangTileBounds.Remove(unit);
+            objectCollisionBoundsUnits.Remove(unit);
+            unit.SetFirstPartCollisionBounds(null, 1f);
+        }
     }
 
     internal static void ClearWangTileAnimationTextures()
@@ -286,6 +298,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         validatedTextureFrames.Clear();
         wangTileAnimationTextures.Clear();
         objectWangTileAnimationTextures.Clear();
+        objectWangTileCollisionBounds.Clear();
+        objectWangTileTextureBounds.Clear();
     }
 
     internal static void RegisterWangTileAnimationTexture(
@@ -317,10 +331,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             objectWangTileAnimationTextures.Add(key, textures);
         }
         textures.Add(textureId);
+        objectWangTileCollisionBounds.Remove(key);
     }
 
     internal static void ClearObjectWangTileAnimationTextures(int mapObjectId)
     {
+        foreach (var key in objectWangTileCollisionBounds.Keys.Where(key => key.mapObjectId == mapObjectId).ToList())
+            objectWangTileCollisionBounds.Remove(key);
+        // Generated textures are about to be destroyed/replaced under new IDs.
+        objectWangTileTextureBounds.Clear();
         foreach (var key in objectWangTileAnimationTextures.Keys
                      .Where(key => key.mapObjectId == mapObjectId).ToList())
         {
@@ -347,10 +366,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 objectWangTileBounds.Remove(unit);
 
             if (unit.isShowing)
-            {
                 ConfigureObjectKeepers(unit, data);
-                RefreshObjectAppearance(unit, data);
-            }
+            RefreshObjectAppearance(unit, data, forceCollisionRefresh: true);
         }
     }
 
@@ -521,7 +538,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
         newObjectData.isObstacle = objectData.collision;
         if (objectData.isWangTile)
+        {
             UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
+        }
+        if (objectData.isWangTile || objectData.boundsCollision || !objectData.centerCollider)
+            RefreshObjectAppearance(newObjectData.unit, objectData);
     }
 
     // Bits match TileHelper's 3x3 mask: NW,N,NE,W,E,SW,S,SE.
@@ -616,7 +637,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
-                if (!(candidate is ObjectUnit other) || other == unit || other.productInfo.Item1 != data.id || !other.isShowing
+                if (!(candidate is ObjectUnit other) || other == unit || other.productInfo.Item1 != data.id
+                    || (!other.isShowing && !data.boundsCollision)
                     || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
                     continue;
                 if ((hadOldBounds && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
@@ -645,7 +667,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
-                if (candidate is ObjectUnit other && other != unit && other.productInfo.Item1 == data.id && other.isShowing
+                if (candidate is ObjectUnit other && other != unit && other.productInfo.Item1 == data.id
+                    && (other.isShowing || data.boundsCollision)
                     && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
                     && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
                     RefreshObjectAppearance(other, data);
@@ -757,7 +780,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     {
                         data.EnsureDirectionData();
                         ConfigureObjectKeepers(evt.unit, data);
-                        RefreshObjectAppearance(evt.unit, data);
+                        RefreshObjectAppearance(evt.unit, data, restoreCollisionBaseline: true);
                         if (data.isWangTile)
                             UpdateObjectWangTileNeighbours(evt.unit, data);
                     }
@@ -772,7 +795,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     {
                         if (data.isWangTile)
                             UpdateObjectWangTileNeighbours(evt.unit, data);
-                        RefreshObjectAppearance(evt.unit, data);
+                        RefreshObjectAppearance(evt.unit, data, restoreCollisionBaseline: evt.type == MapEventType.Refresh);
                     }
                     break;
                 }
@@ -783,6 +806,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                         RemoveObjectWangTileNeighbours(evt.unit, data);
                     else
                         objectWangTileBounds.Remove(evt.unit);
+                    objectCollisionBoundsUnits.Remove(evt.unit);
+                    evt.unit.SetFirstPartCollisionBounds(null, 1f);
                     break;
                 }
         }
@@ -800,10 +825,34 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
     }
 
-    private void RefreshObjectAppearance(ObjectUnit unit, MapObjectForm.Data data)
+    private void RefreshObjectAppearance(ObjectUnit unit, MapObjectForm.Data data, bool forceCollisionRefresh = false,
+        bool restoreCollisionBaseline = false)
     {
+        var direction = data.GetAnimDirection(unit.data.euler.y);
+        int mask = data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds)
+            ? GetObjectWangTileMask(unit, data.id, bounds) : 0;
+        bool fit = data.boundsCollision;
+        Rect? collisionBounds = fit ? GetObjectCollisionBounds(data, direction, mask) : (Rect?)null;
+        if (fit)
+            objectCollisionBoundsUnits.Add(unit);
+        else
+            objectCollisionBoundsUnits.Remove(unit);
+        // ModScene intentionally resets all pool Collider scales to one.
+        float colliderScale = fit && DynamicGlobalSettings.playing ? data.model.colliderScale : 1f;
+        bool changed = unit.SetFirstPartCollisionBounds(collisionBounds, colliderScale, data.centerCollider);
+        if (changed || (fit && forceCollisionRefresh))
+        {
+            unit.InvalidateCollisionGeometry();
+            MapManager.instance.updateCtrl.RefreshObjectOverlap(unit);
+        }
+
         if (unit.ins == null)
             return;
+        // Always restore from the pool baseline on Show, even when this Unit's
+        // facing/mask is unchanged: a reused Instance may have different bounds.
+        if (fit || changed || restoreCollisionBaseline)
+            GameUtilController.ApplyFirstPartCollisionBounds(unit.ins.gameObject, unit.prefab,
+                collisionBounds ?? new Rect(0, 0, 1, 1), colliderScale, data.centerCollider);
 
         // Keep this independent from renderer availability: pooled/custom
         // prefabs may start with their renderer GameObject disabled, while the
@@ -814,10 +863,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         if (unit.ins.renderers == null || unit.ins.renderers.Length == 0)
             return;
 
-        var direction = data.GetAnimDirection(unit.data.euler.y);
-        if (data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds)
-            && objectWangTileAnimationTextures.TryGetValue(
-                (data.id, direction, GetObjectWangTileMask(unit, data.id, bounds)), out List<int> textures)
+        if (data.isWangTile && objectWangTileAnimationTextures.TryGetValue(
+                (data.id, direction, mask), out List<int> textures)
             && textures.Count > 0)
         {
             ShowFinalMat(unit.ins, 0, textures, textures.Count > 1 ? data.model.animTimeInterval : 0, false);
@@ -826,6 +873,24 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             ShowFinalMat(unit.ins, 0, data.GetAnimClip(direction), data.model.animTimeInterval, false);
         }
+    }
+
+    private static Rect GetObjectCollisionBounds(MapObjectForm.Data data, AnimDirecton direction, int mask)
+    {
+        var key = (data.id, direction, data.isWangTile ? mask : -1);
+        if (objectWangTileCollisionBounds.TryGetValue(key, out var bounds))
+            return bounds;
+
+        // Union animation frames only within the active facing. WangTile bounds
+        // come from its assembled mask, never from the source quarter atlas.
+        List<int> frames;
+        if (data.isWangTile)
+            objectWangTileAnimationTextures.TryGetValue((data.id, direction, mask), out frames);
+        else
+            frames = data.GetAnimClip(direction);
+        bounds = GameUtilController.GetOpaqueTextureBounds(frames, objectWangTileTextureBounds);
+        objectWangTileCollisionBounds.Add(key, bounds);
+        return bounds;
     }
     public void OnEvent(ItemEvent evt)
     {

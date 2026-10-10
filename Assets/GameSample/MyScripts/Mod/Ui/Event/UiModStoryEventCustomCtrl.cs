@@ -104,10 +104,10 @@ namespace Ui.ModStory.ModStoryEvent.ModStoryEventCustom
         internal static List<string> GetCategories()
         {
             return GetEventLabs()
-                .Select(lab => lab.lv1Lab ?? string.Empty)
-                .Where(category => !string.IsNullOrEmpty(category))
-                .Distinct()
-                .OrderBy(category => category, StringComparer.Ordinal)
+                .Where(lab => !string.IsNullOrEmpty(lab.lv1Lab))
+                .GroupBy(lab => lab.lv1Lab)
+                .OrderBy(group => group.Min(lab => lab.id))
+                .Select(group => group.Key)
                 .ToList();
         }
         private static bool HasUnclassifiedCategory()

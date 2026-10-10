@@ -242,15 +242,13 @@ namespace Z_Map.Analysis
             return delta.sqrMagnitude <= 0.05f * 0.05f;
         }
 
-        private bool IsWalkable(NavUnit unit, IReadOnlyList<Vector2Int> offsets,
+        internal bool IsWalkable(NavUnit unit, IReadOnlyList<Vector2Int> offsets,
             IReadOnlyCollection<int> passTypes)
         {
-            if (unit == null || unit.isNull || unit.objectBlocked || unit.links == null
-                || unit.links.Count == 0 || !HasAllPassTypes(unit, passTypes))
+            if (!nc.IsBaseWalkable(unit) || !HasAllPassTypes(unit, passTypes))
                 return false;
             foreach (var offset in offsets)
-                if (!nc.TryGetOffsetUnit(unit, offset, out var footprint) || footprint.isNull
-                    || footprint.objectBlocked || footprint.links == null || footprint.links.Count == 0)
+                if (!nc.TryGetOffsetUnit(unit, offset, out var footprint) || !nc.IsBaseWalkable(footprint))
                     return false;
             return true;
         }
@@ -284,7 +282,7 @@ namespace Z_Map.Analysis
         /// </summary>
         public bool CanPass(NavUnit tar)
         {
-            return !tar.objectBlocked && !steps.ContainsKey(tar);
+            return nc.IsBaseWalkable(tar) && !steps.ContainsKey(tar);
         }
         /// <summary>
         /// 判断从from到tar是否可通行
@@ -292,14 +290,15 @@ namespace Z_Map.Analysis
         public bool CanPass(NavUnit from, NavUnit tar, IReadOnlyList<Vector2Int> clearanceOffsets,
             IReadOnlyCollection<int> passTypes)
         {
-            if (from.isNull || tar.isNull || from.objectBlocked || tar.objectBlocked
-                || steps.ContainsKey(tar) || !HasAllPassTypes(tar, passTypes))
+            if (!nc.IsBaseWalkable(from) || !nc.IsBaseWalkable(tar)
+                || !from.links.Contains(tar) || steps.ContainsKey(tar) || !HasAllPassTypes(tar, passTypes))
                 return false;
 
             foreach (var offset in clearanceOffsets)
             {
                 if (!nc.TryGetOffsetUnit(from, offset, out var fromUnit) ||
                     !nc.TryGetOffsetUnit(tar, offset, out var toUnit) ||
+                    !nc.IsBaseWalkable(fromUnit) || !nc.IsBaseWalkable(toUnit) ||
                     !fromUnit.links.Contains(toUnit))
                 {
                     return false;
@@ -320,10 +319,19 @@ namespace Z_Map.Analysis
                     if (!nc.navUnits.ContainsKey((i, mapY, k)))
                         return false;
                     var unit = nc.navUnits[(i, mapY, k)];
-                    if (unit.links.Count == 0 || Mathf.Abs(unit.realPos.y - realY) > nc.step)
+                    if (!nc.IsBaseWalkable(unit) || Mathf.Abs(unit.realPos.y - realY) > nc.step)
                     {
                         return false;
                     }
+                    // This conservative smoothing rectangle must be internally
+                    // connected. Standable centers alone cannot shortcut a wall
+                    // on a shared edge; include the agent's expanded footprint.
+                    if (i < endX && (!nc.navUnits.TryGetValue((i + 1, mapY, k), out var right)
+                        || !nc.IsBaseWalkable(right) || !unit.links.Contains(right) || !right.links.Contains(unit)))
+                        return false;
+                    if (k < endZ && (!nc.navUnits.TryGetValue((i, mapY, k + 1), out var forward)
+                        || !nc.IsBaseWalkable(forward) || !unit.links.Contains(forward) || !forward.links.Contains(unit)))
+                        return false;
                 }
 
             return true;

@@ -363,13 +363,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         public void Refresh()
         {
             view.sta_exist.ChangeState(model.data == null ? 0 : 1);
-            if (model.data != null)
-            {
-                view.txt_.text = model.data.name;
-                int texId = GetFirstAnimTexId(model.data);
-                if (texId != 0 && TexAssetForm.DataById.ContainsKey(texId))
-                    view.img_.BindTexData(TexAssetForm.DataById[texId]);
-            }
+            view.txt_.text = model.data?.name ?? string.Empty;
+            int texId = GetFirstAnimTexId(model.data);
+            TexAssetForm.Data tex = null;
+            if (texId != 0)
+                TexAssetForm.DataById.TryGetValue(texId, out tex);
+            view.img_.BindTexDataOrHide(tex);
         }
         /// <summary>
         /// 获取data动画帧的第一张贴图id，替代icon字段
@@ -383,7 +382,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
             if (data is MapObjectForm.Data objData)
             {
                 var clip = objData.GetAnimClip(objData.GetDefaultAnimDirection());
-                if (clip.Count > 0)
+                if (clip.Count > 0 && clip[0] != GlobalDefaultHelper.DefaultTexId)
                     return clip[0];
             }
             return 0;

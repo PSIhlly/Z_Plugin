@@ -58,7 +58,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var wall = new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id,
                 new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true, 1),
                 defaultObjectLabId, true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
-                GlobalDefaultHelper.DefaultTexId, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false);
+                GlobalDefaultHelper.DefaultTexId, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false, false, true);
             wall.EnsureDirectionData();
             wall.SyncLegacyAnimClip(AnimDirecton.Fixed);
             MapObjectForm.AddData(wall);
@@ -339,6 +339,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 }
             }
         }
+        foreach (var product in MapObjectForm.DataById.Values)
+            if (product.boundsCollision || !product.centerCollider)
+                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(product.id);
         ModManager.instance.BeginScene(sceneId);
     }
     public async void StartLoadScenePlay(int sceneId, Action onMapComplete = null)
@@ -387,6 +390,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 5, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
 
         MapManager.instance.Begin(data);
+        // All visual candidate columns must exist before resolving WangTile
+        // collision masks, including off-screen Objects loaded from the save.
+        foreach (var product in MapObjectForm.DataById.Values)
+            if (product.boundsCollision || !product.centerCollider)
+                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(product.id);
         onMapComplete?.Invoke();
 
 

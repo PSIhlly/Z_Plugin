@@ -55,17 +55,11 @@ namespace Ui.ModSceneUnit
 
 
                 float minV = GameManager.MapPosToPlayerPos(belongMap.mapPos.y);
-                float maxV = GameManager.MapPosToPlayerPos(belongMap.mapPos.y+ 0.9f);
 
                 if (v < minV)
                 {
                     v = minV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("minYTip"));
-                }
-                if (v > maxV)
-                {
-                    v = maxV;
-                    NotifyManager.instance.AddTip(TextManager.instance.GetTxt("maxYTip"));
                 }
                 var newPos = new Vector3(data.pos.x,MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)) .y, data.pos.z);
 

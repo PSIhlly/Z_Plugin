@@ -23,6 +23,8 @@ namespace Z_Map.Analysis
     {
         public bool isNull;
         public bool objectBlocked;
+        // Right/Left/Forward/Back bits; separate from central standability.
+        public int objectBlockedDirections;
         public Vector3Int pos;
         public Vector3 realPos;
         public List<NavUnit> links;
@@ -81,6 +83,7 @@ namespace Z_Map.Analysis
         private const string MapGroundPrefabName = "MapPrefab$mapground";
         private const float PassableObstacleHeight = 0.2f;
         private const float ObjectBlockHeight = 0.3f;
+        public const float ObjectNavigationHalfWidth = 0.4f;
         private const float GeometryEpsilon = 0.0001f;
         private readonly Vector3[] objectClipA = new Vector3[16];
         private readonly Vector3[] objectClipB = new Vector3[16];
@@ -222,6 +225,7 @@ namespace Z_Map.Analysis
                 navUnit.pos = map.mapPos;
                 navUnit.isNull = map.scale == Vector3.zero;
                 navUnit.objectBlocked = false;
+                navUnit.objectBlockedDirections = 0;
                 navUnit.passTypes = new HashSet<int>(map.unit.passTypes);
                 navUnit.dirMaxY = new float[4]
                 {
@@ -373,6 +377,7 @@ namespace Z_Map.Analysis
 
                 affected[key] = navUnit;
                 navUnit.objectBlocked = false;
+                navUnit.objectBlockedDirections = 0;
                 navUnit.passTypes.Clear();
                 foreach (int passType in tile.passTypes)
                     navUnit.passTypes.Add(passType);
@@ -526,20 +531,53 @@ namespace Z_Map.Analysis
                         continue;
                     if (!unit.objectBlocked && IsObjectMeshBlocking(mesh, unit))
                         unit.objectBlocked = true;
+                    // Accumulate all bodies/Objects; one clear edge cannot undo
+                    // another obstacle, and both cells are checked when linking.
+                    unit.objectBlockedDirections |= GetObjectBlockingDirections(mesh, unit);
                 }
             }
         }
 
-        // Ground samples still describe the Tile's plane for slope links. Object
-        // bodies never become a directional step/surface: a hit blocks the whole
-        // cell, including incoming links. Clip actual bodies, not their AABB or
-        // a larger Trigger, and reuse scratch storage during local refreshes.
+        // Central 0.8-square standability and four 0.4-deep edge strips share the
+        // same exact physical-body clipping and relative-ground height test.
         private bool IsObjectMeshBlocking(Z_Mesh.MeshInfo mesh, NavUnit unit)
+        {
+            float radius = ObjectNavigationHalfWidth;
+            return IsObjectMeshBlockingInRect(mesh, unit, unit.realPos.x - radius, unit.realPos.x + radius,
+                unit.realPos.z - radius, unit.realPos.z + radius);
+        }
+
+        private int GetObjectBlockingDirections(Z_Mesh.MeshInfo mesh, NavUnit unit)
+        {
+            Vector3 size = _super.data.mainData.mapUnitSize;
+            float halfX = Mathf.Abs(size.x) * .5f, halfZ = Mathf.Abs(size.z) * .5f;
+            float radius = ObjectNavigationHalfWidth;
+            int blocked = 0;
+            for (int dir = 0; dir < 4; dir++)
+            {
+                // The long side spans the whole Tile edge, including corners.
+                float minX = unit.realPos.x - halfX, maxX = unit.realPos.x + halfX;
+                float minZ = unit.realPos.z - halfZ, maxZ = unit.realPos.z + halfZ;
+                switch ((Dir)dir)
+                {
+                    case Dir.Right: maxX = unit.realPos.x + halfX; minX = maxX - radius; break;
+                    case Dir.Left: minX = unit.realPos.x - halfX; maxX = minX + radius; break;
+                    case Dir.Forward: maxZ = unit.realPos.z + halfZ; minZ = maxZ - radius; break;
+                    case Dir.Back: minZ = unit.realPos.z - halfZ; maxZ = minZ + radius; break;
+                }
+                if (IsObjectMeshBlockingInRect(mesh, unit, minX, maxX, minZ, maxZ))
+                    blocked |= 1 << dir;
+            }
+            return blocked;
+        }
+
+        // Ground samples remain the Tile's plane, never the obstacle top.
+        // Buffers are reused for central/edge checks and local/full rebuilds.
+        private bool IsObjectMeshBlockingInRect(Z_Mesh.MeshInfo mesh, NavUnit unit,
+            float minX, float maxX, float minZ, float maxZ)
         {
             Vector3 size = _super.data.mainData.mapUnitSize;
             float halfX = Mathf.Abs(size.x) * 0.5f, halfZ = Mathf.Abs(size.z) * 0.5f;
-            float minX = unit.realPos.x - halfX, maxX = unit.realPos.x + halfX;
-            float minZ = unit.realPos.z - halfZ, maxZ = unit.realPos.z + halfZ;
             float ground = unit.realPos.y, slopeX = 0f, slopeZ = 0f;
             if (unit.dirGroundY != null && unit.dirGroundY.Length >= 4)
             {
@@ -674,6 +712,9 @@ namespace Z_Map.Analysis
                     // the height-column lookup or fetch Tile data for every edge.
                     if (blocked.Contains(key) || !_super.data.maps.ContainsKey(key)
                         || !navUnits.TryGetValue(key, out var linkNavUnit) || linkNavUnit.objectBlocked)
+                        continue;
+                    if ((navUnit.objectBlockedDirections & (1 << dir)) != 0
+                        || (linkNavUnit.objectBlockedDirections & (1 << (dir ^ 1))) != 0)
                         continue;
                     if (linkNavUnit.dirMaxY[dir ^ 1] - navUnit.dirMaxY[dir] < step)
                         navUnit.links.Add(linkNavUnit);
@@ -828,11 +869,68 @@ namespace Z_Map.Analysis
         {
             return navUnits != null
                 && navUnits.TryGetValue((x, y, z), out var unit)
-                && !unit.isNull
-                && !unit.objectBlocked
-                && unit.links != null
-                && unit.links.Count > 0;
+                && IsBaseWalkable(unit);
         }
+
+        internal bool IsBaseWalkable(NavUnit unit)
+        {
+            // An isolated but unobstructed center is standable; missing edges
+            // are connectivity, not a blocked-start/blocked-target exception.
+            return unit != null && !unit.isNull && !unit.objectBlocked && unit.links != null
+                && !mapGroundBlocked.Contains((unit.pos.x, unit.pos.y, unit.pos.z));
+        }
+
+#if UNITY_EDITOR
+        /// <summary>读取现有导航图；有玩家时复用 BFS 的体型和 passType 判断。</summary>
+        public void DrawWalkableTilesDebug(CharacterUnit character)
+        {
+            if (!_super.enable || _super.data == null || navUnits == null || !(bfs is Bfs search))
+                return;
+
+            var offsets = GetClearanceOffsets(character == null ? 0f : character.GetNavigationRadius());
+            var halfSize = _super.data.mainData.mapUnitSize * 0.5f;
+            float halfX = Mathf.Abs(halfSize.x), halfZ = Mathf.Abs(halfSize.z);
+            var previousColor = Gizmos.color;
+            var previousMatrix = Gizmos.matrix;
+            try
+            {
+                Gizmos.color = Color.green;
+                Gizmos.matrix = Matrix4x4.identity;
+                foreach (var unit in navUnits.Values)
+                {
+                    bool walkable = character == null
+                        ? IsBaseWalkable(unit.pos.x, unit.pos.y, unit.pos.z)
+                        : search.IsWalkable(unit, offsets, character.passTypes);
+                    if (!walkable)
+                        continue;
+
+                    float ground = unit.realPos.y, slopeX = 0f, slopeZ = 0f;
+                    if (unit.dirGroundY != null && unit.dirGroundY.Length >= 4)
+                    {
+                        ground = (unit.dirGroundY[0] + unit.dirGroundY[1]) * 0.5f;
+                        slopeX = (unit.dirGroundY[0] - unit.dirGroundY[1]) / (offset[0].x - offset[1].x);
+                        slopeZ = (unit.dirGroundY[2] - unit.dirGroundY[3]) / (offset[2].y - offset[3].y);
+                    }
+                    var center = new Vector3(unit.realPos.x, ground + 0.1f, unit.realPos.z);
+                    var xSide = new Vector3(halfX, slopeX * halfX, 0f);
+                    var zSide = new Vector3(0f, slopeZ * halfZ, halfZ);
+                    var a = center - xSide - zSide;
+                    var b = center + xSide - zSide;
+                    var c = center + xSide + zSide;
+                    var d = center - xSide + zSide;
+                    Gizmos.DrawLine(a, b);
+                    Gizmos.DrawLine(b, c);
+                    Gizmos.DrawLine(c, d);
+                    Gizmos.DrawLine(d, a);
+                }
+            }
+            finally
+            {
+                Gizmos.color = previousColor;
+                Gizmos.matrix = previousMatrix;
+            }
+        }
+#endif
 
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
             IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null)

@@ -45,6 +45,21 @@ namespace Z_Map
         private Vector3 lastScale;
         // Bake geometry around the origin; translation reuses the world arrays.
         private readonly List<MeshInfo> collisionOffsets = new List<MeshInfo>();
+        private Rect? firstPartCollisionBounds;
+        private float boundsColliderScale = 1f;
+        private bool centerCollider = true;
+
+        // Appearance-dependent geometry must also work without a shown Instance.
+        public bool SetFirstPartCollisionBounds(Rect? bounds, float colliderScale, bool centered = true)
+        {
+            if (firstPartCollisionBounds == bounds && boundsColliderScale == colliderScale && centerCollider == centered)
+                return false;
+            firstPartCollisionBounds = bounds;
+            boundsColliderScale = colliderScale;
+            centerCollider = centered;
+            InvalidateCollisionGeometry();
+            return true;
+        }
 
         public Dictionary<CollideType,List<MeshInfo>> _zMeshes;
         public void InvalidateCollisionGeometry()
@@ -92,7 +107,8 @@ namespace Z_Map
         private void CacheCollisionGeometry(GameObject sourcePrefab, CollideType type)
         {
             var offsets = manager.utilCtrl.GetCollidersMesh(
-                sourcePrefab, Vector3.zero, lastEuler, lastScale, type);
+                sourcePrefab, Vector3.zero, lastEuler, lastScale, type,
+                firstPartCollisionBounds, boundsColliderScale, centerCollider);
             collisionOffsets.AddRange(offsets);
             var meshes = new List<MeshInfo>(offsets.Count);
             foreach (var offset in offsets)

@@ -45,7 +45,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                         model.data.EnsureDirectionData();
                         model.data.faceType = (FaceType)item.id;
                         model.data.SyncLegacyAnimClip(model.data.GetDefaultAnimDirection());
-                        if (model.data.isWangTile)
+                        if (model.data.isWangTile || model.data.boundsCollision)
                             Main2StoryManager.instance.RefreshObjectWangTileTextures(model.data);
                         Refresh();
                         return true;
@@ -57,6 +57,22 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 model.data.collision = !model.data.collision;
                 Refresh();
             });
+            view.btn_boundsCollision.onClick.AddListener(() =>
+            {
+                model.data.boundsCollision = !model.data.boundsCollision;
+                Refresh();
+            });
+            view.btn_centerCollider.onClick.AddListener(() =>
+            {
+                model.data.centerCollider = !model.data.centerCollider;
+                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(model.data.id);
+                Refresh();
+            });
+            view.ipt_colliderScale.onFinishInput += s =>
+            {
+                model.data.model.colliderScale = StringHelper.ToFloat(s, 1, true);
+                Refresh();
+            };
             view.btn_isWangTile.onClick.AddListener(() =>
             {
                 model.data.isWangTile = !model.data.isWangTile;
@@ -79,6 +95,9 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             view.txt_faceType.oriText = model.data.faceType.ToString();
             view.sta_collision.ChangeState(model.data.collision?1:0);
+            view.sta_boundsCollision.ChangeState(model.data.boundsCollision ? 1 : 0);
+            view.sta_centerCollider.ChangeState(model.data.centerCollider ? 1 : 0);
+            view.ipt_colliderScale.Set(model.data.model.colliderScale.ToString("0.##"));
             view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
 
             view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
@@ -98,6 +117,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
             view.img_minimapIcon.BindTexData(TexAssetForm.DataById.GetDv(model.data.minimapIcon, TexAssetForm.DataById[GlobalDefaultHelper.DefaultStoryTexId]));
+
+            Z_Ui.UiManager.Rebuild(gameObject, true);
 
         }
     }

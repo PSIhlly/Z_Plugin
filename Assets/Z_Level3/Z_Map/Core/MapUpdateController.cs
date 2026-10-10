@@ -427,7 +427,7 @@ namespace Z_Map
             foreach (var unit in units) RefreshHistoryUnit(unit);
         }
 
-        private void UpdateMapInfo()
+        private void UpdateMapInfo(bool simulateCharacters)
         {
             //return;
             //update
@@ -476,14 +476,14 @@ namespace Z_Map
                 case GlobalSettings.UpdateType.ShowOnly:
                     foreach (var obj in curCharacterLst)
                     {
-                        obj.unit.UpdateInfo();
+                        obj.unit.UpdateInfo(simulateCharacters);
                     }
                     break;
                 case GlobalSettings.UpdateType.All:
                     var lst = characterTileDic.GetDicT1().Keys.ToList();
                     foreach (var cUnit in lst)
                     {
-                        cUnit.UpdateInfo();
+                        cUnit.UpdateInfo(simulateCharacters);
                     }
                     break;
                 case GlobalSettings.UpdateType.None:
@@ -493,7 +493,7 @@ namespace Z_Map
 
         }
 
-        private HashSet<(int, int)> bfsVisited = new HashSet<(int, int)>();
+        private HashSet<(int, int, int)> bfsVisited = new HashSet<(int, int, int)>();
         private Queue<(int, int)> bfsQueue = new Queue<(int, int)>();
         private const float FullHighLayerOcclusionDegree = 0f;
         private const float HalfHighLayerOcclusionDegree = 0.5f;
@@ -501,12 +501,29 @@ namespace Z_Map
         private const int HalfHighLayerOcclusionRadiusSqr =
             HalfHighLayerOcclusionRadius * HalfHighLayerOcclusionRadius;
         private const float CurrentLayerObjectOcclusionDegree = 0.5f;
+        private const int ObjectOcclusionHalfWidth = 3;
+        private const int OcclusionBackwardDistance = 5;
+        private const int OcclusionHeight = 5;
+        private const float ProjectedUpperTileColliderHeight = 0.5f;
+        private static readonly int FadeCenterRangeProperty = Shader.PropertyToID("_MapFadeCenterRange");
+        private static readonly int FadeCenterPositionProperty = Shader.PropertyToID("_MapFadeCenterPosition");
         private Dictionary<MapUnit, float> previousVision = new Dictionary<MapUnit, float>();
         private Dictionary<MapUnit, float> nextVision = new Dictionary<MapUnit, float>();
         private readonly Dictionary<TileUnit, float> frontVisionOverrides = new Dictionary<TileUnit, float>();
-        private readonly HashSet<ObjectUnit> occlusionObjects = new HashSet<ObjectUnit>();
+        private readonly HashSet<ObjectUnit> nearbyOccludingObjects = new HashSet<ObjectUnit>();
         private readonly Dictionary<ObjectUnit, float> highLayerOcclusionObjects = new Dictionary<ObjectUnit, float>();
+        private readonly Dictionary<ObjectUnit, Vector2> objectProjectionRanges = new Dictionary<ObjectUnit, Vector2>();
+        private readonly Dictionary<ObjectUnit, bool> objectHalfOcclusionEligibility = new Dictionary<ObjectUnit, bool>();
+        private readonly Dictionary<(int, int), bool> projectedUpperTileChecks = new Dictionary<(int, int), bool>();
         private readonly HashSet<TileUnit> characterOverlapBuffer = new HashSet<TileUnit>();
+
+        private static bool IsWithinHalfOcclusionRange(int x, int z, Vector3Int center)
+        {
+            // BFS passes the source footprint; direct-hit fallback passes its player-layer projection.
+            int offsetX = x - center.x;
+            int offsetZ = z - center.z;
+            return offsetX * offsetX + offsetZ * offsetZ <= HalfHighLayerOcclusionRadiusSqr;
+        }
 
         /// <summary>
         /// 在当前视野内广搜起点相连的高层 Tile；半透明只应用到玩家周围的圆形范围。
@@ -522,62 +539,90 @@ namespace Z_Map
                 return;
 
             var viewSize = _super.data.mainData.viewSize;
-            var start = (centerX, centerZ);
+            var start = (centerX, layerY, centerZ);
             if (bfsVisited.Contains(start))
                 return;
             bfsVisited.Add(start);
-            bfsQueue.Enqueue(start);
+            bfsQueue.Enqueue((centerX, centerZ));
 
             while (bfsQueue.Count > 0)
             {
                 var cur = bfsQueue.Dequeue();
                 var map = _super.utilCtrl.GetTileData(cur.Item1, layerY, cur.Item2);
-                int offsetX = cur.Item1 - playerMapPos.x;
-                int offsetZ = cur.Item2 - playerMapPos.z;
-                bool withinHalfTransparentRange =
-                    offsetX * offsetX + offsetZ * offsetZ <= HalfHighLayerOcclusionRadiusSqr;
-                int projectedZ = cur.Item2 + layerY - playerMapPos.y;
-                bool projectedTileWalkable = _super.navigationCtrl != null
-                    && _super.navigationCtrl.IsBaseWalkable(cur.Item1, playerMapPos.y, projectedZ);
-                if (!projectedTileWalkable)
+                bool withinHalfTransparentRange = IsWithinHalfOcclusionRange(cur.Item1, cur.Item2, playerMapPos);
+                if (degree == FullHighLayerOcclusionDegree || withinHalfTransparentRange)
                 {
-                    nextVision[map.unit] = 1f;
-                }
-                else if (degree == FullHighLayerOcclusionDegree || withinHalfTransparentRange)
-                {
-                    nextVision[map.unit] = degree;
-                    // The authored front part projects one cell nearer to the player
-                    // than the Tile body. Keep only renderer slots 3..5 opaque when
-                    // that separate projected navigation cell is blocked.
-                    bool frontProjectedTileWalkable = _super.navigationCtrl != null
-                        && _super.navigationCtrl.IsBaseWalkable(
-                            cur.Item1,
-                            playerMapPos.y,
-                            projectedZ - 1);
-                    if (!frontProjectedTileWalkable)
-                        frontVisionOverrides[map.unit] = 1f;
-                    CollectHighLayerObjectCandidates(map.unit, degree);
+                    CollectHighTileVision(map.unit, degree, playerMapPos);
                 }
 
                 for (int x = cur.Item1 - 1; x <= cur.Item1 + 1; x += 2)
                 {
                     if (x < viewCenter.x - viewSize.x || x >= viewCenter.x + viewSize.x) continue;
-                    if (!bfsVisited.Contains((x, cur.Item2)) && _super.utilCtrl.ContainsTile(x, layerY, cur.Item2))
+                    if (!bfsVisited.Contains((x, layerY, cur.Item2)) && _super.utilCtrl.ContainsTile(x, layerY, cur.Item2))
                     {
-                        bfsVisited.Add((x, cur.Item2));
+                        bfsVisited.Add((x, layerY, cur.Item2));
                         bfsQueue.Enqueue((x, cur.Item2));
                     }
                 }
                 for (int z = cur.Item2 - 1; z <= cur.Item2 + 1; z += 2)
                 {
                     if (z < viewCenter.z - viewSize.z || z >= viewCenter.z + viewSize.z) continue;
-                    if (!bfsVisited.Contains((cur.Item1, z)) && _super.utilCtrl.ContainsTile(cur.Item1, layerY, z))
+                    if (!bfsVisited.Contains((cur.Item1, layerY, z)) && _super.utilCtrl.ContainsTile(cur.Item1, layerY, z))
                     {
-                        bfsVisited.Add((cur.Item1, z));
+                        bfsVisited.Add((cur.Item1, layerY, z));
                         bfsQueue.Enqueue((cur.Item1, z));
                     }
                 }
             }
+        }
+
+        private bool HasTallProjectedUpperTile(int x, int playerLayer, int z)
+        {
+            // All callers share the same player layer during this visibility pass.
+            var key = (x, z);
+            if (!projectedUpperTileChecks.TryGetValue(key, out bool tall))
+            {
+                tall = CheckTallProjectedUpperTile(x, playerLayer, z);
+                projectedUpperTileChecks[key] = tall;
+            }
+            return tall;
+        }
+
+        private bool CheckTallProjectedUpperTile(int x, int playerLayer, int z)
+        {
+            // Check exactly the layer above the player-layer projection, not
+            // the original high Tile's layer or a nearest/fallback ground Tile.
+            var upperTile = _super.utilCtrl.GetTileData(x, playerLayer + 1, z);
+            if (upperTile == null)
+                return false;
+
+            foreach (var body in upperTile.unit.GetMeshes(CollideType.CollideOnly))
+            {
+                var points = body.positions;
+                if (points == null || points.Length == 0)
+                    continue;
+                // Sphere collision uses the Right/Left diameter regardless of
+                // rotation; its six samples are not the world's Y extrema.
+                if (body.type == MeshType.Sphere && points.Length >= 6)
+                {
+                    float diameter = (points[(int)SphereSixPoint.Right] - points[(int)SphereSixPoint.Left]).magnitude;
+                    if (diameter > ProjectedUpperTileColliderHeight + 0.0001f)
+                        return true;
+                    continue;
+                }
+                float minY = points[0].y;
+                float maxY = minY;
+                for (int i = 1; i < points.Length; i++)
+                {
+                    minY = Mathf.Min(minY, points[i].y);
+                    maxY = Mathf.Max(maxY, points[i].y);
+                }
+                // Cached world geometry includes root/child scale and rotation.
+                // A small tolerance keeps exactly .5 tall bodies from roundoff.
+                if (maxY - minY > ProjectedUpperTileColliderHeight + 0.0001f)
+                    return true;
+            }
+            return false;
         }
 
         private void CollectHighLayerObjectCandidates(TileUnit tile, float degree)
@@ -588,11 +633,106 @@ namespace Z_Map
                         highLayerOcclusionObjects[unit] = degree;
         }
 
-        private void CollectHighLayerObjectOcclusion(int currentLayer)
+        private void CollectHighTileVision(TileUnit tile, float degree, Vector3Int center)
+        {
+            int projectedZ = tile.data.mapPos.z + tile.data.mapPos.y - center.y;
+            // Collider exceptions win over both direct hits and connected-component hiding.
+            if (HasTallProjectedUpperTile(tile.data.mapPos.x, center.y, projectedZ))
+            {
+                nextVision[tile] = 1f;
+                return;
+            }
+            if (nextVision.TryGetValue(tile, out float oldDegree))
+                degree = Mathf.Min(degree, oldDegree);
+            nextVision[tile] = degree;
+            if (HasTallProjectedUpperTile(tile.data.mapPos.x, center.y, projectedZ - 1))
+                frontVisionOverrides[tile] = 1f;
+            CollectHighLayerObjectCandidates(tile, degree);
+        }
+
+        private bool CanHalfOccludeObject(ObjectUnit unit, int currentLayer)
+        {
+            if (!objectHalfOcclusionEligibility.TryGetValue(unit, out bool eligible))
+            {
+                eligible = CheckObjectHalfOcclusionEligibility(unit, currentLayer);
+                objectHalfOcclusionEligibility[unit] = eligible;
+            }
+            return eligible;
+        }
+
+        private bool CheckObjectHalfOcclusionEligibility(ObjectUnit unit, int currentLayer)
+        {
+            // Classify the root, not an upper Tile overlapped by a current/lower Object.
+            int layer = _super.utilCtrl.RealPos2MapPosInt(unit.data.pos).y;
+            if (layer != currentLayer)
+                return layer > currentLayer;
+            // Collider meshes already include colliderScale and any fitted texture bounds.
+            foreach (var body in unit.GetMeshes(CollideType.CollideOnly))
+            {
+                var points = body.positions;
+                // Physical Spheres use one radius, so Y equals Z and never passes strict Y > Z.
+                if (body.type != MeshType.Cube || points == null || points.Length < 8)
+                    continue;
+                // colliderScale=0 leaves Y intact but collapses X/Z. Such a
+                // body has no footprint and must not qualify merely because Y > 0.
+                // Check its own edges: rotation can give a collapsed box a nonzero AABB.
+                if ((points[1] - points[0]).sqrMagnitude == 0f
+                    || (points[4] - points[0]).sqrMagnitude == 0f)
+                    continue;
+                float minY = points[0].y, maxY = minY;
+                float minZ = points[0].z, maxZ = minZ;
+                for (int i = 1; i < points.Length; i++)
+                {
+                    minY = Mathf.Min(minY, points[i].y);
+                    maxY = Mathf.Max(maxY, points[i].y);
+                    minZ = Mathf.Min(minZ, points[i].z);
+                    maxZ = Mathf.Max(maxZ, points[i].z);
+                }
+                // Compare each actual body, not a union inflated by gaps or Triggers.
+                if (maxY - minY > maxZ - minZ + .0001f)
+                    return true;
+            }
+            return false;
+        }
+
+        private bool ProjectsForNearbyOcclusion(ObjectUnit unit, TileUnit tile, float halfDepth, Vector3Int center)
+        {
+            if (!CanHalfOccludeObject(unit, center.y))
+                return false;
+            if (!objectProjectionRanges.TryGetValue(unit, out var projectedZ))
+            {
+                projectedZ = _super.utilCtrl.GetVisionProjectionZRange(unit.data);
+                objectProjectionRanges[unit] = projectedZ;
+            }
+            // Higher Objects retain the original player-plane projection rule.
+            // Classify the Object itself, not a higher Tile overlapped by a current-layer Object.
+            if (_super.utilCtrl.RealPos2MapPosInt(unit.data.pos).y > center.y)
+                return projectedZ.y > curCenterPos.z + curCenterPos.y + .0001f;
+
+            // Only current-layer Objects use the enumerated Tile's front edge.
+            return projectedZ.y > tile.data.pos.z + tile.data.pos.y + halfDepth + .0001f;
+        }
+
+        private float GetObjectOcclusionDegree(ObjectUnit unit, float degree, int currentLayer,
+            bool isSideView, bool modHighLayerHalfTransparent)
+        {
+            // All automatic half-opacity paths share this gate; full hiding is unchanged.
+            if (degree == CurrentLayerObjectOcclusionDegree && !CanHalfOccludeObject(unit, currentLayer))
+                return 1f;
+            if (isSideView && !modHighLayerHalfTransparent && degree == CurrentLayerObjectOcclusionDegree
+                && !nearbyOccludingObjects.Contains(unit))
+                return 1f;
+            return degree;
+        }
+
+        private void CollectHighLayerObjectOcclusion(int currentLayer, bool isSideView, bool modHighLayerHalfTransparent)
         {
             foreach (var occlusion in highLayerOcclusionObjects)
             {
                 var unit = occlusion.Key;
+                // Independent nearby occlusion takes priority, even over a fully hidden owner.
+                if (nearbyOccludingObjects.Contains(unit))
+                    continue;
                 float degree = occlusion.Value;
                 if (objectTileDic.TryGet(unit, out var tiles))
                 {
@@ -605,42 +745,135 @@ namespace Z_Map
                         break;
                     }
                 }
-                nextVision[unit] = degree;
+                nextVision[unit] = GetObjectOcclusionDegree(unit, degree, currentLayer, isSideView, modHighLayerHalfTransparent);
             }
         }
 
-        private bool HasHighLayerOnFourSides(int layerY, Vector3Int center)
+        private bool IsOccludingHighTile(int x, int layerY, int z, Vector3Int center)
         {
-            return _super.utilCtrl.ContainsTile(center.x - 1, layerY, center.z)
-                && _super.utilCtrl.ContainsTile(center.x + 1, layerY, center.z)
-                && _super.utilCtrl.ContainsTile(center.x, layerY, center.z - 1)
-                && _super.utilCtrl.ContainsTile(center.x, layerY, center.z + 1);
+            return _super.utilCtrl.ContainsTile(x, layerY, z)
+                && !HasTallProjectedUpperTile(x, center.y, z + layerY - center.y);
         }
 
-        private void UpdateCurrentLayerObjectOcclusion(Vector3Int center, bool isSideView)
+        private bool ShouldFullyOccludeHighLayer(int layerY, Vector3Int center)
         {
-            occlusionObjects.Clear();
-            if (!isSideView)
-                return;
+            return IsOccludingHighTile(center.x, layerY, center.z, center);
+        }
 
-            int maxCellsBelow = _super.data.mainData.viewSize.y;
-            for (int cellsBelow = 1; cellsBelow <= maxCellsBelow; cellsBelow++)
+        private static bool IsObjectAboveTile(ObjectUnit unit, TileUnit tile)
+        {
+            // The current layer occupies the first world unit above the Tile.
+            // A raised body still inside that layer must not count as a roof.
+            float layerUpperY = tile.data.pos.y + 1f;
+            var bodies = unit.GetMeshes(CollideType.CollideOnly);
+            if (bodies.Count == 0)
+                bodies = unit.GetMeshes(CollideType.TriggerOnly);
+
+            bool hasBounds = false;
+            foreach (var body in bodies)
             {
-                var tileData = _super.utilCtrl.GetTileData(
-                    center.x,
-                    center.y,
-                    center.z - cellsBelow);
-                if (tileData == null || !objectTileDic.TryGet(tileData.unit, out var objects))
+                var points = body.positions;
+                if (points == null || points.Length == 0)
                     continue;
+                float minY;
+                if (body.type == MeshType.Sphere && points.Length >= 6)
+                {
+                    // Match physical collision radius; rotated sphere samples
+                    // are not the world's lower bound.
+                    float radius = (points[(int)SphereSixPoint.Right]
+                        - points[(int)SphereSixPoint.Left]).magnitude * .5f;
+                    minY = body.center.y - radius;
+                }
+                else
+                {
+                    minY = points[0].y;
+                    for (int i = 1; i < points.Length; i++)
+                        minY = Mathf.Min(minY, points[i].y);
+                }
+                hasBounds = true;
+                if (minY <= layerUpperY + .0001f)
+                    return false;
+            }
+            return hasBounds;
+        }
 
+        private void QueueElevatedObjectTile(int x, int layerY, int z)
+        {
+            var viewSize = _super.data.mainData.viewSize;
+            if (x < viewCenter.x - viewSize.x || x >= viewCenter.x + viewSize.x
+                || z < viewCenter.z - viewSize.z || z >= viewCenter.z + viewSize.z)
+                return;
+            if (bfsVisited.Add((x, layerY, z)))
+                bfsQueue.Enqueue((x, z));
+        }
+
+        private void CollectElevatedObjectVision(Vector3Int center)
+        {
+            // Same-layer connectivity is determined by real ownership, not
+            // visual overlap. Only the elevated Objects hide, never their ground.
+            bfsVisited.Add((center.x, center.y, center.z));
+            bfsQueue.Enqueue((center.x, center.z));
+            while (bfsQueue.Count > 0)
+            {
+                var cur = bfsQueue.Dequeue();
+                var tile = _super.utilCtrl.GetTileData(cur.Item1, center.y, cur.Item2)?.unit;
+                if (tile == null || !objectTileDic.TryGet(tile, out var objects))
+                    continue;
+                bool connects = false;
                 foreach (var unit in objects)
                 {
-                    if (!occlusionObjects.Add(unit)
-                        || _super.utilCtrl.GetVisionHeightInTiles(unit.data, center.y) <= cellsBelow)
+                    if (!objectTileDic.TryGetFirst(unit, out var owner) || owner != tile
+                        || !IsObjectAboveTile(unit, tile))
                         continue;
-
-                    nextVision[unit] = CurrentLayerObjectOcclusionDegree;
+                    connects = true;
+                    nextVision[unit] = FullHighLayerOcclusionDegree;
                 }
+                if (!connects)
+                    continue;
+                QueueElevatedObjectTile(cur.Item1 - 1, center.y, cur.Item2);
+                QueueElevatedObjectTile(cur.Item1 + 1, center.y, cur.Item2);
+                QueueElevatedObjectTile(cur.Item1, center.y, cur.Item2 - 1);
+                QueueElevatedObjectTile(cur.Item1, center.y, cur.Item2 + 1);
+            }
+        }
+
+        private void CollectNearbyOcclusion(Vector3Int center, bool collectTiles)
+        {
+            float halfDepth = Mathf.Abs(_super.data.mainData.mapUnitSize.z) * .5f;
+            // Reuse the visual footprint index: an elevated Object can belong to
+            // a lower Tile, and missing intermediate layers must not stop the scan.
+            for (int x = center.x - ObjectOcclusionHalfWidth; x <= center.x + ObjectOcclusionHalfWidth; x++)
+            for (int depth = 0; depth <= OcclusionBackwardDistance; depth++)
+            for (int height = 0; height <= OcclusionHeight; height++)
+            {
+                int z = center.z - depth;
+                int y = center.y + height;
+                var tileData = _super.utilCtrl.GetTileData(x, y, z);
+                if (tileData == null)
+                    continue;
+
+                // Height >= depth is a fast hit, not the only hit: a lower Tile
+                // can still project into the nearby fade region (e.g. depth 3 / height 2).
+                // Test the projected position rather than the distant source Tile anchor.
+                if (collectTiles && height > 0 && (height >= depth
+                    || IsWithinHalfOcclusionRange(x, z + height, center)))
+                {
+                    CollectHighTileVision(tileData.unit, HalfHighLayerOcclusionDegree, center);
+                    // Retain the existing connected-component behavior after a direct hit.
+                    BfsLayerVision(y, x, z, HalfHighLayerOcclusionDegree, center);
+                }
+
+                if (objectTileDic.TryGet(tileData.unit, out var objects))
+                    foreach (var unit in objects)
+                    {
+                        // A failed Tile boundary must not exclude another, lower boundary.
+                        if (nearbyOccludingObjects.Contains(unit)
+                            || !ProjectsForNearbyOcclusion(unit, tileData.unit, halfDepth, center))
+                            continue;
+
+                        nearbyOccludingObjects.Add(unit);
+                        nextVision[unit] = CurrentLayerObjectOcclusionDegree;
+                    }
             }
         }
 
@@ -649,6 +882,13 @@ namespace Z_Map
         /// </summary>
         private void UpdateVision()
         {
+            // The shader uses the rendering camera's center, not each unit's anchor.
+            // Share the existing three-cell X/Z range; camera zoom needs no MPB resubmission.
+            Vector3 cellSize = _super.data.mainData.mapUnitSize;
+            Shader.SetGlobalVector(FadeCenterRangeProperty, new Vector4(
+                Mathf.Max(Mathf.Abs(cellSize.x) * HalfHighLayerOcclusionRadius, 0.0001f),
+                Mathf.Max(Mathf.Abs(cellSize.z) * HalfHighLayerOcclusionRadius, 0.0001f), 0f, 0f));
+            Shader.SetGlobalVector(FadeCenterPositionProperty, curCenterPos);
             nextVision.Clear();
             frontVisionOverrides.Clear();
             CollectVision();
@@ -679,6 +919,12 @@ namespace Z_Map
             var viewSize = _super.data.mainData.viewSize;
             var realViewCenter = _super.utilCtrl.RealPos2MapPosInt(curCenterPos);
             highLayerOcclusionObjects.Clear();
+            objectProjectionRanges.Clear();
+            objectHalfOcclusionEligibility.Clear();
+            projectedUpperTileChecks.Clear();
+            nearbyOccludingObjects.Clear();
+            bfsVisited.Clear();
+            bfsQueue.Clear();
             bool overlayHide = GlobalSettings.OVERLAY_HIDE;
             // 侧视模式：相机角度让前方(z更小方向)的高层会遮挡视线，需要扩展z检测范围
             bool isSideView = DynamicGlobalSettings.cameraMode == CameraMode.Isometric;
@@ -698,33 +944,21 @@ namespace Z_Map
             // Mod 编辑时高层统一半透明，不再应用 Play 的高层遮挡 BFS。
             if (!modHighLayerHalfTransparent)
             {
-                // 侧视模式按层高差向前扩展，并保留 1 格误差；命中后直接全透明。
+                // Keep the existing overhead/full-component rules; side-view half hits use the shared scan.
                 int range = overlayHide ? 1 : 0;
 
                 for (int i = realViewCenter.y + 1; i < realViewCenter.y + viewSize.y; i++)
                 {
-                    bfsVisited.Clear();
-                    bfsQueue.Clear();
-                    int layerOffset = i - realViewCenter.y;
-                    bool surroundedByHighLayer = HasHighLayerOnFourSides(i, realViewCenter);
-                    float degree = surroundedByHighLayer
-                        ? FullHighLayerOcclusionDegree
-                        : HalfHighLayerOcclusionDegree;
+                    // 玩家正上方有可遮挡 Tile 时，该层的中心连通块全透，无需四邻格。
+                    // 仍保留投影上层 Collider 的可见例外；其他连通块仍半透。
+                    if (ShouldFullyOccludeHighLayer(i, realViewCenter))
+                        BfsLayerVision(i, realViewCenter.x, realViewCenter.z,
+                            FullHighLayerOcclusionDegree, realViewCenter);
 
-                    // 四邻格都存在时从四边开始；玩家正上方的中心格允许为空。
-                    if (surroundedByHighLayer)
-                    {
-                        BfsLayerVision(i, realViewCenter.x - 1, realViewCenter.z, degree, realViewCenter);
-                        BfsLayerVision(i, realViewCenter.x + 1, realViewCenter.z, degree, realViewCenter);
-                        BfsLayerVision(i, realViewCenter.x, realViewCenter.z - 1, degree, realViewCenter);
-                        BfsLayerVision(i, realViewCenter.x, realViewCenter.z + 1, degree, realViewCenter);
-                    }
+                    if (isSideView)
+                        continue; // Side-view Tile/Object candidates share the bounded scan below.
 
-                    // Isometric occlusion comes from smaller Z. Allow one extra cell
-                    // beyond the layer gap as the fixed trigger tolerance.
-                    int startDz = -range - (isSideView
-                        ? layerOffset + 1
-                        : 0);
+                    int startDz = -range;
 
                     for (int dx = -range; dx <= range; dx++)
                     {
@@ -732,19 +966,24 @@ namespace Z_Map
                         {
                             int checkX = realViewCenter.x + dx;
                             int checkZ = realViewCenter.z + dz;
-                            BfsLayerVision(i, checkX, checkZ, degree, realViewCenter);
+                            BfsLayerVision(i, checkX, checkZ, HalfHighLayerOcclusionDegree, realViewCenter);
                         }
                     }
                 }
             }
 
-            CollectHighLayerObjectOcclusion(realViewCenter.y);
-            // Apply this last so a current-layer occluder can never be overwritten as fully hidden.
-            UpdateCurrentLayerObjectOcclusion(realViewCenter, isSideView);
-            CollectAttachedVision();
+            // X +/-3, then Z 0..-5, then Y 0..+5; one Tile lookup feeds both kinds.
+            if (isSideView)
+                CollectNearbyOcclusion(realViewCenter, !modHighLayerHalfTransparent);
+            CollectHighLayerObjectOcclusion(realViewCenter.y, isSideView, modHighLayerHalfTransparent);
+            // A raised Object can still belong to this layer. Its center-connected
+            // roof component overrides nearby/mixed half-opacity, but not Tile state.
+            if (!modHighLayerHalfTransparent)
+                CollectElevatedObjectVision(realViewCenter);
+            CollectAttachedVision(realViewCenter.y, isSideView, modHighLayerHalfTransparent);
         }
 
-        private void CollectAttachedVision()
+        private void CollectAttachedVision(int currentLayer, bool isSideView, bool modHighLayerHalfTransparent)
         {
             // Tiles are final now. Visit displayed units once, not the three
             // reverse indexes for every Tile during both reset and BFS.
@@ -755,6 +994,7 @@ namespace Z_Map
                 // including Objects whose owner lies outside the current view.
                 if (!nextVision.ContainsKey(unit))
                     CollectUnitVision(unit, objectTileDic);
+                nextVision[unit] = GetObjectOcclusionDegree(unit, nextVision[unit], currentLayer, isSideView, modHighLayerHalfTransparent);
             }
             foreach (var data in curItemLst)
                 CollectUnitVision(data.unit, itemTileDic);
@@ -870,9 +1110,9 @@ namespace Z_Map
         {
             UpdateInfo(true);
         }
-        public void UpdateInfo(bool forceFresh = false)
+        public void UpdateInfo(bool forceFresh = false, bool simulateCharacters = true)
         {
-            UpdateMapInfo();
+            UpdateMapInfo(simulateCharacters);
             UpdateView(forceFresh);
         }
 
@@ -1248,8 +1488,13 @@ namespace Z_Map
             previousVision.Clear();
             nextVision.Clear();
             frontVisionOverrides.Clear();
-            occlusionObjects.Clear();
+            nearbyOccludingObjects.Clear();
             highLayerOcclusionObjects.Clear();
+            objectProjectionRanges.Clear();
+            objectHalfOcclusionEligibility.Clear();
+            projectedUpperTileChecks.Clear();
+            bfsVisited.Clear();
+            bfsQueue.Clear();
             characterOverlapBuffer.Clear();
         }
         public void DebugShow()

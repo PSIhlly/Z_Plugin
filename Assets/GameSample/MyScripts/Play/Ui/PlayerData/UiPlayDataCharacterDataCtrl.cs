@@ -41,7 +41,7 @@ namespace Ui.PlayDataCharacter.PlayDataCharacterData
             view.txt_desc.text = model.data.desc;
             view.txt_name.text= model.data.name;
             gameArgsCon.Clear();
-            foreach (var pair in model.data.paramDic)
+            foreach (var pair in model.data.paramDic.OrderBy(pair => pair.Value.uid))
             {
                 if (model.data.CanShow(pair.Key))
                     gameArgsCon.Add(new UiGameArgsParam()

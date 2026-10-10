@@ -262,9 +262,7 @@ namespace Ui.ModAssetSelectWindow
             labCon.Add(new UiLabParam() { labId = null });
             if (hasUnclassified)
                 labCon.Add(new UiLabParam() { labId = LabForm.NoneId });
-            foreach (var labId in labIds
-                         .OrderBy(id => LabForm.GetDisplayName(id), StringComparer.Ordinal)
-                         .ThenBy(id => id))
+            foreach (var labId in labIds.OrderBy(id => id))
             {
                 labCon.Add(new UiLabParam() { labId = labId });
             }
@@ -466,9 +464,7 @@ namespace Ui.ModAssetSelectWindow
             items.Add(unclassifiedText, null, LabForm.NoneId);
 
             var displayNames = new HashSet<string>(StringComparer.Ordinal) { unclassifiedText };
-            foreach (var labId in GetVisibleLabIds()
-                         .OrderBy(id => LabForm.GetDisplayName(id), StringComparer.Ordinal)
-                         .ThenBy(id => id))
+            foreach (var labId in GetVisibleLabIds().OrderBy(id => id))
             {
                 var displayName = LabForm.GetDisplayName(labId);
                 if (string.IsNullOrWhiteSpace(displayName) || !displayNames.Add(displayName))

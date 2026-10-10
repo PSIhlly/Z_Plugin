@@ -35,8 +35,7 @@ namespace Ui
                 .Where(lab => !string.IsNullOrWhiteSpace(lab.displayName))
                 .GroupBy(lab => (lab.lv1Lab, lab.lv2Lab, lab.lv3Lab))
                 .Select(group => group.OrderBy(lab => lab.id).First())
-                .OrderBy(lab => lab.displayName, StringComparer.Ordinal)
-                .ThenBy(lab => lab.id)
+                .OrderBy(lab => lab.id)
                 .Select(lab => lab.id)
                 .ToList();
         }

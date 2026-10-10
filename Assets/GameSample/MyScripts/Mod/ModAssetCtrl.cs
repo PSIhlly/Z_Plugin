@@ -405,7 +405,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         var items = new EntryItem();
 
-        foreach (var form in MapPrefabForm.DataById.Values)
+        foreach (var form in MapPrefabForm.DataById.Values.OrderBy(data => data.id))
         {
             items.Add(form.name, null,GameManager.instance.innerAssetDic[form.innerPrefabName].id);
         }
@@ -436,7 +436,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         modelData.subUnitTexsName = new List<List<int>>() { new List<int>() };
         var objectData = new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, labId, false,
             new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId,
-            FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false);
+            FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false, false, true);
         objectData.EnsureDirectionData();
         MapObjectForm.AddData(objectData);
     }
@@ -447,13 +447,13 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         if (texId >= 0 && texId < clip.Count)
             clip.RemoveAt(texId);
         data.SyncLegacyAnimClip(direction);
-        if (data.isWangTile)
+        if (data.isWangTile || data.boundsCollision)
             Main2StoryManager.instance.RefreshObjectWangTileTextures(data);
     }
     public void CreateObjectUnitTex(int uid, AnimDirecton direction)
     {
         var data = MapObjectForm.DataById[uid];
-        data.GetAnimClip(direction).Add(GlobalDefaultHelper.DefaultTexId);
+        data.GetAnimClip(direction).Add(0);
         data.SyncLegacyAnimClip(direction);
     }
     public void ImportObjectUnitTex(int uid, AnimDirecton direction, int texId)
@@ -473,7 +473,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     clip.Add(assetData.id);
                 }
                 objectData.SyncLegacyAnimClip(direction);
-                if (objectData.isWangTile)
+                if (objectData.isWangTile || objectData.boundsCollision)
                     Main2StoryManager.instance.RefreshObjectWangTileTextures(objectData);
             }
         });
@@ -487,7 +487,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(addItem);
         }
-        foreach (var data in MapObjectParamForm.DataByName.Values)
+        foreach (var data in MapObjectParamForm.DataByName.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name);
         }
@@ -519,7 +519,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(addItem);
         }
-        foreach (var data in CharacterParamForm.DataByName.Values)
+        foreach (var data in CharacterParamForm.DataByName.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name);
         }
@@ -533,9 +533,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void ChooseCharacterAnim(Dictionary<string, CharacterAnimForm.Data> animDic, string title, Action<EntryItem> act)
     {
         var items = new EntryItem();
-        foreach (var key in animDic.Keys)
+        foreach (var pair in animDic.OrderBy(pair => pair.Value.uid))
         {
-            items.Add(key);
+            items.Add(pair.Key);
         }
         NotifyManager.instance.AddChoose(title,
             true, (item) =>
@@ -553,7 +553,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 items.Add(addItem);
             }
-            foreach (var data in CharacterProductForm.DatasByProtouid[0])
+            foreach (var data in CharacterProductForm.DatasByProtouid[0].OrderBy(data => data.uid))
             {
                 items.Add(data.name, TexAssetForm.DataById[data.avatarTex].GetSprite());
             }
@@ -580,7 +580,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             items.Add(addItem);
         }
 
-        foreach (var uid in GameManager.instance.curProgress.team)
+        foreach (var uid in GameManager.instance.curProgress.team.OrderBy(uid => uid))
         {
             var data = CharacterProductForm.DataByUid.GetDv(uid, null);
             if (data != null)
@@ -798,7 +798,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         var items = new EntryItem();
 
-        foreach (var data in EffectForm.DataByUid.Values)
+        foreach (var data in EffectForm.DataByUid.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name, TexAssetForm.DataById[data.clips[0][0].tex].GetSprite(), data.uid);
         }
@@ -843,7 +843,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         var items = new EntryItem();
 
-        foreach (var data in SkillProductForm.DataByUid.Values)
+        foreach (var data in SkillProductForm.DataByUid.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name, TexAssetForm.DataById[data.icon].GetSprite(), data.uid);
         }
@@ -861,7 +861,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(addItem);
         }
-        foreach (var data in SkillParamForm.DataByName.Values)
+        foreach (var data in SkillParamForm.DataByName.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name);
         }
@@ -1121,7 +1121,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             {
                 items.Add(addItem);
             }
-            foreach (var data in ItemProductForm.DatasByProtouid[0])
+            foreach (var data in ItemProductForm.DatasByProtouid[0].OrderBy(data => data.uid))
             {
                 items.Add(data.name, TexAssetForm.DataById[data.iconTexName].GetSprite());
             }
@@ -1145,7 +1145,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         var items = new EntryItem();
         var addedIds = new HashSet<int>();
 
-        foreach (var data in MapObjectForm.DataById.Values)
+        foreach (var data in MapObjectForm.DataById.Values.Where(data => data != null).OrderBy(data => data.id))
         {
             if (data == null || !addedIds.Add(data.id))
                 continue;
@@ -1165,7 +1165,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             items.Add(addItem);
         }
-        foreach (var data in ItemParamForm.DataByName.Values)
+        foreach (var data in ItemParamForm.DataByName.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name);
         }
@@ -1327,9 +1327,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         var mapManager = MapManager.instance;
         foreach (CharacterUnit current in mapManager.updateCtrl.characterTileDic.Get(tile.unit))
         {
-            if (current.data.name == data.name
-                && (current.data.pos - position).sqrMagnitude < 0.001f
-                && Mathf.Abs(current.data.euler.y - angle) < 1f)
+            if (current.productInfo.Item1 == data.uid
+                && (current.data.pos - position).sqrMagnitude < 0.001f)
             {
                 return null;
             }
@@ -1357,8 +1356,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         if (mapManager.data == null)
             return false;
 
-        Vector3Int mapPos = mapManager.utilCtrl.RealPos2MapPosInt(position);
-        return mapManager.data.maps.TryGetValue((mapPos.x, mapPos.y, mapPos.z), out tile);
+        tile = mapManager.utilCtrl.GetPlacementTile(position)?.data;
+        return tile != null;
     }
     #endregion
 
@@ -1405,7 +1404,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         var items = new EntryItem();
 
-        foreach (var data in SceneForm.DataByUid.Values)
+        foreach (var data in SceneForm.DataByUid.Values.OrderBy(data => data.uid))
         {
             items.Add(data.name, StoryTexAssetForm.DataById.GetDv(data.miniMap, StoryTexAssetForm.DataById[GlobalDefaultHelper.ExternDefaultTexId]).GetSprite(), data.uid);
         }

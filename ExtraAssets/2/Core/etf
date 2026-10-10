@@ -1,7 +1,7 @@
 [
   {
-    "uid": 2,
-    "name": "魔符·星屑幻想",
+    "uid": 3,
+    "name": "魔炮·最终火花",
     "labId": 12,
     "clips": [
       {
@@ -9,11 +9,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": 48,
-              "time": 1.0,
+              "tex": 1155,
+              "time": 0.3,
               "pos": "0|0.1|0",
               "rot": 0.0,
-              "scale": "3|3|3",
+              "scale": "0|0|0",
               "opacity": 0.0,
               "transition": true
             }
@@ -21,8 +21,8 @@
           {
             "v": {
               "uid": -1,
-              "tex": 48,
-              "time": 1.0,
+              "tex": 1155,
+              "time": 1.7,
               "pos": "0|0.1|0",
               "rot": 179.0,
               "scale": "3|3|3",
@@ -33,12 +33,24 @@
           {
             "v": {
               "uid": -1,
-              "tex": 48,
-              "time": 1.0,
+              "tex": 1155,
+              "time": 0.3,
               "pos": "0|0.1|0",
               "rot": 359.0,
               "scale": "3|3|3",
-              "opacity": 0.0,
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 1155,
+              "time": 0.1,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 1.0,
               "transition": false
             }
           }
@@ -194,5 +206,53 @@
       }
     ],
     "ground": false
+  },
+  {
+    "uid": 2,
+    "name": "魔符·星屑幻想",
+    "labId": 12,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 48,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "3|3|3",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 48,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 179.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 48,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 359.0,
+              "scale": "3|3|3",
+              "opacity": 0.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": true
   }
 ]

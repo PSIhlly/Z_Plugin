@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Z_Map;
-using Z_Math;
 [DefaultExecutionOrder(10000)]
 public class PerspectiveKeeper : MonoBehaviour
 {
@@ -18,8 +14,16 @@ public class PerspectiveKeeper : MonoBehaviour
     private bool needsInitialUpdate = true;
     private bool hasResolvedSphere;
     private bool isSphere;
+    // Preserve the authored baseline if an already refreshed hierarchy is cloned.
+    [SerializeField, HideInInspector]
+    private bool hasImageBaseScale;
+    [SerializeField, HideInInspector]
+    private Vector3 imageBaseScale;
     private CameraMode lastCameraMode;
-    public Transform scaleHolder;
+    [FormerlySerializedAs("scaleHolder")]
+    public Transform rotateHolder;
+    [SerializeField, HideInInspector]
+    private Transform scaleCompensator;
     public bool enableFixedYRotation;
     public bool applyYRotationToLocalZ = true;
     public float fixedYRotation;
@@ -43,7 +47,7 @@ public class PerspectiveKeeper : MonoBehaviour
             _deepth = value;
             if (ins != null)
             {
-                UpdateModel();
+                RefreshNow();
             }
         }
     }
@@ -62,10 +66,9 @@ public class PerspectiveKeeper : MonoBehaviour
     /// </summary>
     public void RefreshNow()
     {
-        if (transform.parent == null || transform.parent.parent == null)
+        if (!ResolveHierarchy())
             return;
 
-        ins = transform.parent.parent;
         UpdateModel();
         insLastRot = ins.eulerAngles;
         insLastScale = ins.lossyScale;
@@ -76,20 +79,8 @@ public class PerspectiveKeeper : MonoBehaviour
 
     public void LateUpdate()
     {
-        if (ins == null)
-        {
-            ins = transform.parent.parent;
-            if (ins != null)
-            {
-                UpdateModel();
-                insLastRot = ins.eulerAngles;
-                insLastScale = ins.lossyScale;
-                lastCameraMode = DynamicGlobalSettings.cameraMode;
-                ApplyRotation();
-                needsInitialUpdate = false;
-            }
+        if (!ResolveHierarchy())
             return;
-        }
 
         if (needsInitialUpdate
             || ins.eulerAngles != insLastRot
@@ -105,14 +96,35 @@ public class PerspectiveKeeper : MonoBehaviour
         }
     }
 
+    private bool ResolveHierarchy()
+    {
+        if (rotateHolder == null || rotateHolder.parent == null)
+            return false;
+        if (scaleCompensator == null)
+        {
+            // Model scale must be canceled BEFORE rotation. Keep this neutral
+            // carrier outside rotateHolder and owned by the same pooled model;
+            // create it only once, including for old/custom prefab hierarchies.
+            ins = rotateHolder.parent;
+            int siblingIndex = rotateHolder.GetSiblingIndex();
+            scaleCompensator = new GameObject("imageScaleCompensator").transform;
+            scaleCompensator.SetParent(ins, false);
+            scaleCompensator.SetSiblingIndex(siblingIndex);
+            rotateHolder.SetParent(scaleCompensator, false);
+            rotateHolder.name = "rotateHolder";
+        }
+        ins = scaleCompensator.parent;
+        return ins != null;
+    }
+
     private void ApplyRotation()
     {
         float pitch = enableFixedXRotationDefault
             ? GetBasePitch()
-            : transform.eulerAngles.x;
+            : rotateHolder.eulerAngles.x;
         float yaw = applyYRotationToLocalZ || enableFixedYRotation
             ? fixedYRotation
-            : transform.eulerAngles.y;
+            : rotateHolder.eulerAngles.y;
         float roll = applyYRotationToLocalZ && !enableFixedZRotation0
             ? -ins.eulerAngles.y
             : 0f;
@@ -121,53 +133,70 @@ public class PerspectiveKeeper : MonoBehaviour
         // already tilted image plane. Mutating local Euler Z after setting a
         // world-space pitch mixes the carrier's Y rotation into the plane normal.
         Quaternion surfaceRotation = Quaternion.Euler(pitch, yaw, 0f);
-        transform.rotation = surfaceRotation * Quaternion.AngleAxis(roll, Vector3.forward);
+        rotateHolder.rotation = surfaceRotation * Quaternion.AngleAxis(roll, Vector3.forward);
     }
     public void UpdateModel()
     {
+        if (!ResolveHierarchy())
+            return;
+        if (!hasImageBaseScale)
+        {
+            imageBaseScale = transform.localScale;
+            hasImageBaseScale = true;
+        }
+        // Refresh and camera switches must start from the authored image size,
+        // not the diagonal stretch submitted by the previous owner/frame.
+        transform.localScale = imageBaseScale;
+        transform.localRotation = Quaternion.identity;
+        rotateHolder.localScale = Vector3.one;
         switch (DynamicGlobalSettings.cameraMode)
         {
             case CameraMode.Overhead:
-                scaleHolder.position = ins.position + Vector3.up * ins.localScale.y / 2 + Vector3.down * deepth;
-                scaleHolder.localScale = Vector3.one;
-                transform.eulerAngles = Vector3.right * 90;
+                scaleCompensator.localScale = Vector3.one;
+                if (!IsSphere())
+                    ApplyCubeRendererScale(false);
+                rotateHolder.position = ins.position + Vector3.up * ins.localScale.y / 2 + Vector3.down * deepth;
+                rotateHolder.eulerAngles = Vector3.right * 90;
                 break;
             case CameraMode.Isometric:
                 // Cubes use the Y-Z diagonal; spheres use a diameter-sized square.
-                scaleHolder.position = ins.position + new Vector3(0, 1, -1) * deepth;
-                transform.eulerAngles = Vector3.right * GetIsometricPitch();
-                scaleHolder.localScale = IsSphere()
-                    ? GetSphereRendererScale()
-                    : GetDiagonalRendererScale();
+                rotateHolder.eulerAngles = Vector3.right * GetIsometricPitch();
+                if (IsSphere())
+                    scaleCompensator.localScale = GetSphereRendererScale();
+                else
+                    ApplyCubeRendererScale(true);
+                // Position after changing the neutral carrier's scale, otherwise
+                // its depth offset would be scaled again along the model axes.
+                rotateHolder.position = ins.position + new Vector3(0, 1, -1) * deepth;
                 break;
         }
     }
 
-    private Vector3 GetDiagonalRendererScale()
+    private void ApplyCubeRendererScale(bool isometric)
     {
         Vector3 cubeSize = ins.lossyScale;
         float height = Mathf.Abs(cubeSize.y);
         float depth = Mathf.Abs(cubeSize.z);
-        float diagonal = Mathf.Sqrt(height * height + depth * depth);
+        // A parent's nonuniform scale acts AFTER a child's rotation and bends
+        // its rendered axes. Neutralize that scale before orienting the image,
+        // then put the final dimensions on img's own (rotated) local axes.
+        // This changes visual transforms only; the sibling Collider is untouched.
+        scaleCompensator.localScale = new Vector3(
+            InverseDimension(cubeSize.x), InverseDimension(cubeSize.y), InverseDimension(cubeSize.z));
+        float imageHeight = isometric ? Mathf.Sqrt(height * height + depth * depth) : depth;
+        transform.localScale = Vector3.Scale(imageBaseScale,
+            new Vector3(Mathf.Abs(cubeSize.x), imageHeight, 1f));
+    }
 
-        float heightScale = height > MinimumCubeSize
-            ? diagonal / height
-            : 1f;
-        return new Vector3(1f, heightScale, 1f);
+    private static float InverseDimension(float size)
+    {
+        return Mathf.Abs(size) > MinimumCubeSize ? 1f / size : 1f;
     }
 
     private float GetIsometricPitch()
     {
-        if (IsSphere())
-            return SquareDiagonalPitch;
-
-        Vector3 cubeSize = ins.lossyScale;
-        float height = Mathf.Abs(cubeSize.y);
-        float depth = Mathf.Abs(cubeSize.z);
-        if (height <= MinimumCubeSize && depth <= MinimumCubeSize)
-            return SquareDiagonalPitch;
-
-        return Mathf.Atan2(depth, height) * Mathf.Rad2Deg;
+        // Resizing affects img's local Y length, never the image-plane pitch.
+        return SquareDiagonalPitch;
     }
 
     private Vector3 GetSphereRendererScale()

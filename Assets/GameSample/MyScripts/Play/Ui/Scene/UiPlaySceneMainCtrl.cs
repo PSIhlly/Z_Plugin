@@ -1,5 +1,6 @@
 using Form;
 using System.Collections.Generic;
+using System.Linq;
 using Ui.ParamShow;
 using Ui.PlaySceneMenu;
 using Ui.Stick;
@@ -178,7 +179,7 @@ namespace Ui.PlaySceneMain
         public void Refresh()
         {
             teamerCon.Clear();
-            foreach (var uid in GameManager.instance.curProgress.teamActive)
+            foreach (var uid in GameManager.instance.curProgress.teamActive.OrderBy(uid => uid))
             {
                 var teammate = CharacterProductForm.DataByUid.GetDv(uid, null);
                 if (teammate != null)
@@ -191,7 +192,7 @@ namespace Ui.PlaySceneMain
             prmCon.Clear();
             if (cur != null)
             {
-                foreach (var prm in cur.paramDic.Values)
+                foreach (var prm in cur.paramDic.Values.OrderBy(data => data.uid))
                 {
                     var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name, null);
                     if (protoPrm != null)
@@ -228,7 +229,7 @@ namespace Ui.PlaySceneMain
             actCon.Clear();
             if (cur != null)
             {
-                foreach (var actUid in actionUnitUids)
+                foreach (var actUid in actionUnitUids.OrderBy(uid => uid))
                 {
                     var data = UnitForm.DataByUid.GetDv(actUid, null);
                     if(data != null)
@@ -294,7 +295,7 @@ namespace Ui.PlaySceneMain
 
             con.Clear();
             int id = 0;
-            foreach (var prm in model.data.paramDic.Values)
+            foreach (var prm in model.data.paramDic.Values.OrderBy(data => data.uid))
             {
                 var protoPrm = CharacterParamForm.DataByName.GetDv(prm.name, null);
                 if (protoPrm != null)

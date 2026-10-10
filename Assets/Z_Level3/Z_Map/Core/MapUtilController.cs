@@ -104,6 +104,15 @@ namespace Z_Map
             return null;
         }
         /// <summary>
+        /// 放置归属沿用地图坐标换算，从目标层向下查找最近Tile。
+        /// 只确定belong，不改变单位实际放置高度。
+        /// </summary>
+        public TileUnit GetPlacementTile(Vector3 position)
+        {
+            Vector3Int mapPos = RealPos2MapPosInt(position);
+            return GetTile(mapPos.x, mapPos.y, mapPos.z);
+        }
+        /// <summary>
         /// 获取指定位置的地图数据，仅当前y层有tile时返回（不自动往下取）
         /// </summary>
         public TileUnitForm.Data GetTileData(int x, int y, int z)
@@ -442,7 +451,49 @@ namespace Z_Map
                 return false;
             return true;
         }
-        public List<MeshInfo> GetCollidersMesh(GameObject root, Vector3 rootPos, Vector3 rootEuler, Vector3 rootScale, CollideType type = CollideType.All)
+        // Read the original pool body every time; never shrink an already fitted
+        // live Collider when a WangTile mask changes or a pooled Instance returns.
+        public static void GetHorizontalBoundsBox(BoxCollider box, Rect bounds, float colliderScale,
+            out Vector3 size, out Vector3 center)
+        {
+            var basis = box;
+            if (box.isTrigger)
+                foreach (var body in box.GetComponents<BoxCollider>())
+                    if (body.enabled && !body.isTrigger && body.center == box.center)
+                    {
+                        basis = body;
+                        break;
+                    }
+            GetTextureBoundsBox(basis.size, box.size, box.center, bounds, colliderScale,
+                box.transform.localScale.y, out size, out center);
+        }
+
+        public static void GetTextureBoundsBox(Vector3 bodySize, Vector3 originalSize, Vector3 originalCenter,
+            Rect bounds, float colliderScale, float colliderYScale, out Vector3 size, out Vector3 center)
+        {
+            // The image's vertical axis spans the cube's Y/Z diagonal. A fraction
+            // h of that diagonal spans Y*h and Z*h, retaining the authored aspect
+            // ratio after model/root scaling, without weighting that ratio twice.
+            // Automatic Triggers keep their original padding on all three axes.
+            size.x = bounds.width > 0 ? bodySize.x * bounds.width + (originalSize.x - bodySize.x) : 0;
+            size.y = bounds.height > 0 ? bodySize.y * bounds.height + (originalSize.y - bodySize.y) : 0;
+            size.z = bounds.height > 0 ? bodySize.z * bounds.height + (originalSize.z - bodySize.z) : 0;
+            center = originalCenter;
+            float verticalOffset = bounds.center.y - .5f;
+            if (Mathf.Abs(colliderScale) > .000001f)
+            {
+                center.x += bodySize.x * (bounds.center.x - .5f) / colliderScale;
+                center.z += bodySize.z * verticalOffset / colliderScale;
+            }
+            // Boxes leave Collider Y scale at one; converted Spheres may shrink
+            // it too. In both cases move the center in the unshrunk image space.
+            if (Mathf.Abs(colliderYScale) > .000001f)
+                center.y += bodySize.y * verticalOffset / colliderYScale;
+        }
+
+        public List<MeshInfo> GetCollidersMesh(GameObject root, Vector3 rootPos, Vector3 rootEuler, Vector3 rootScale,
+            CollideType type = CollideType.All, Rect? firstPartBounds = null, float boundsColliderScale = 1f,
+            bool centerCollider = true)
         {
             // Runtime combined prefab roots are inactive pool templates. Ignore
             // that root state, but retain authored inactive-child exclusions.
@@ -454,8 +505,13 @@ namespace Z_Map
             //prefab根的lossyScale，用于把collider的lossyScale换算成“相对root的局部scale”，
             //避免与rootScale相乘时重复计入prefab根的缩放
             Vector3 rootLossyScale = root.transform.lossyScale;
+            Vector3 rearOffset = centerCollider ? Vector3.zero
+                : rootRotFinal * GetObjectBackColliderOffset(root, firstPartBounds, boundsColliderScale, rootScale);
             foreach (var c in cs)
             {
+                // Bounds-fitted Sphere components can await deferred destruction.
+                if (!c.enabled)
+                    continue;
                 bool childActive = true;
                 for (var t = c.transform; t != root.transform; t = t.parent)
                     if (!t.gameObject.activeSelf)
@@ -474,7 +530,7 @@ namespace Z_Map
                 //旧实现直接用rootRotInv*(pos-rootPos)得到的是世界单位偏移，未按rootScale重新缩放，
                 //当rootScale!=(1,1,1)且有嵌套collider时位置会偏。
                 Vector3 localPosInRoot = root.transform.InverseTransformPoint(c.transform.position);
-                Vector3 finalPos = rootPos + rootRotFinal * Graph.ElementwiseMultiply(localPosInRoot, rootScale);
+                Vector3 finalPos = rootPos + rootRotFinal * Graph.ElementwiseMultiply(localPosInRoot, rootScale) + rearOffset;
                 //旋转变换：把子物体世界旋转转换到root局部空间，再用rootEuler旋转
                 Quaternion childLocalRot = rootRotInv * c.transform.rotation;
                 Vector3 finalEuler = (rootRotFinal * childLocalRot).eulerAngles;
@@ -483,7 +539,16 @@ namespace Z_Map
                 Vector3 finalScale = Graph.ElementwiseMultiply(Graph.ElementwiseDivide(c.transform.lossyScale, rootLossyScale), rootScale);
                 if (c is BoxCollider box)
                 {
-                    res.Add(Mesh.GetMesh(box, finalPos, finalEuler, finalScale));
+                    if (firstPartBounds.HasValue && root.transform.childCount > 0 &&
+                        box.transform.IsChildOf(root.transform.GetChild(0)))
+                    {
+                        GetHorizontalBoundsBox(box, firstPartBounds.Value, boundsColliderScale, out var size, out var center);
+                        res.Add(Mesh.GetMesh(finalPos + Quaternion.Euler(finalEuler) *
+                            Graph.ElementwiseMultiply(center, finalScale), finalEuler,
+                            Graph.ElementwiseMultiply(size, finalScale)));
+                    }
+                    else
+                        res.Add(Mesh.GetMesh(box, finalPos, finalEuler, finalScale));
                 }
                 else if (c is SphereCollider sp)
                 {
@@ -491,6 +556,54 @@ namespace Z_Map
                 }
             }
             return res;
+        }
+
+        /// <summary>将最终本体的局部 -Z 边界贴合组合模型的后边界；Trigger 共用本体偏移。</summary>
+        public Vector3 GetObjectBackColliderOffset(GameObject root, Rect? firstPartBounds = null,
+            float boundsColliderScale = 1f, Vector3? rootScale = null)
+        {
+            if (root.transform.childCount == 0)
+                return Vector3.zero;
+            var scale = rootScale ?? Vector3.one;
+            float zSign = scale.z < 0f ? -1f : 1f;
+            var bodies = GetCollidersMesh(root, Vector3.zero, Vector3.zero, scale,
+                CollideType.CollideOnly, firstPartBounds, boundsColliderScale);
+            if (bodies.Count == 0)
+                bodies = GetCollidersMesh(root, Vector3.zero, Vector3.zero, scale,
+                    CollideType.TriggerOnly, firstPartBounds, boundsColliderScale);
+            if (bodies.Count == 0)
+                return Vector3.zero;
+
+            float colliderBack = float.PositiveInfinity;
+            foreach (var body in bodies)
+            {
+                if (body.type == MeshType.Sphere)
+                {
+                    float radius = (body.positions[(int)Graph.SphereSixPoint.Right]
+                        - body.positions[(int)Graph.SphereSixPoint.Left]).magnitude * .5f;
+                    colliderBack = Mathf.Min(colliderBack, body.center.z * zSign - radius);
+                }
+                else
+                    foreach (var point in body.positions)
+                        colliderBack = Mathf.Min(colliderBack, point.z * zSign);
+            }
+            float modelBack = float.PositiveInfinity;
+            foreach (Transform part in root.transform)
+            {
+                // Combined parts use the same unit-cube footprint as the visual
+                // ownership/WangTile index, independently of the Collider scale.
+                var half = part.localScale * .5f;
+                var rotation = part.localRotation;
+                float depth = Mathf.Abs((rotation * new Vector3(half.x, 0, 0)).z)
+                    + Mathf.Abs((rotation * new Vector3(0, half.y, 0)).z)
+                    + Mathf.Abs((rotation * new Vector3(0, 0, half.z)).z);
+                modelBack = Mathf.Min(modelBack, part.localPosition.z - depth);
+            }
+            // Translate by the difference of the two rear EDGES, not by the
+            // difference of their centers. For a unit Box with scale s this
+            // keeps rear=-0.5 and center=-0.5+s/2, rather than center=-0.5.
+            float rearBoundaryDelta = modelBack * Mathf.Abs(scale.z) - colliderBack;
+            return Vector3.forward * (zSign * rearBoundaryDelta);
         }
         public List<MapUnit> CaptureCast(Vector3 from, Vector3 to, float radius)
         {
@@ -637,8 +750,9 @@ namespace Z_Map
             Vector3 max = RealPos2MapPos(visionBounds.max);
 
             // 先加入锚点，使 ObjectUnit.belongTile 的 GetFirst 语义保持稳定。
-            Vector3Int anchor = RealPos2MapPosInt(oData.pos);
-            AddVisionOverlapTile(anchor.x, anchor.y, anchor.z, added, result);
+            TileUnit owner = GetPlacementTile(oData.pos);
+            if (owner != null && added.Add(owner))
+                result.Add(owner);
 
             int minX = Mathf.FloorToInt(min.x - 0.5f) + 1;
             int maxX = Mathf.CeilToInt(max.x + 0.5f) - 1;
@@ -664,13 +778,16 @@ namespace Z_Map
             Vector3 low = bounds.min, high = bounds.max;
             low = RealPos2MapPos(low);
             high = RealPos2MapPos(high);
-            // Include cells intersecting the actual body, even at a cell boundary.
-            // Whole-cell physical-body clipping narrows this conservative range.
+            // Include central 0.8-square probes even when a cell is narrower.
+            // Central/edge physical-body clipping narrows this conservative range.
             const float epsilon = 0.0001f;
-            min = new Vector3Int(Mathf.CeilToInt(low.x - 0.5f - epsilon),
-                Mathf.CeilToInt(low.y - 0.5f - epsilon), Mathf.CeilToInt(low.z - 0.5f - epsilon));
-            max = new Vector3Int(Mathf.FloorToInt(high.x + 0.5f + epsilon),
-                Mathf.FloorToInt(high.y + 0.5f + epsilon), Mathf.FloorToInt(high.z + 0.5f + epsilon));
+            var cellSize = _super.data.mainData.mapUnitSize;
+            float probeX = Mathf.Max(.5f, Analysis.NavigationController.ObjectNavigationHalfWidth / Mathf.Max(Mathf.Abs(cellSize.x), epsilon));
+            float probeZ = Mathf.Max(.5f, Analysis.NavigationController.ObjectNavigationHalfWidth / Mathf.Max(Mathf.Abs(cellSize.z), epsilon));
+            min = new Vector3Int(Mathf.CeilToInt(low.x - probeX - epsilon),
+                Mathf.CeilToInt(low.y - 0.5f - epsilon), Mathf.CeilToInt(low.z - probeZ - epsilon));
+            max = new Vector3Int(Mathf.FloorToInt(high.x + probeX + epsilon),
+                Mathf.FloorToInt(high.y + 0.5f + epsilon), Mathf.FloorToInt(high.z + probeZ + epsilon));
             return true;
         }
 
@@ -920,7 +1037,40 @@ namespace Z_Map
 
         private bool TryGetObjectBounds(ObjectUnitForm.Data oData, out Bounds visionBounds, bool useBodyCenter)
         {
+            return TryGetObjectBounds(oData, out visionBounds, useBodyCenter, out _);
+        }
+
+        // The fixed 45-degree side view projects a world point to ground Z as
+        // z + y - groundY. Accumulate actual corners, not unrelated AABB extrema.
+        public Vector2 GetVisionProjectionZRange(ObjectUnitForm.Data oData)
+        {
+            TryGetObjectBounds(oData, out _, false, out Vector2 projectedZ);
+            return projectedZ;
+        }
+
+        private static void EncapsulateObjectCorner(
+            Vector3 corner, ref Bounds bounds, ref Vector2 projectedZ, ref bool hasBounds)
+        {
+            float projection = corner.z + corner.y;
+            if (hasBounds)
+            {
+                bounds.Encapsulate(corner);
+                projectedZ.x = Mathf.Min(projectedZ.x, projection);
+                projectedZ.y = Mathf.Max(projectedZ.y, projection);
+            }
+            else
+            {
+                bounds = new Bounds(corner, Vector3.zero);
+                projectedZ = new Vector2(projection, projection);
+                hasBounds = true;
+            }
+        }
+
+        private bool TryGetObjectBounds(
+            ObjectUnitForm.Data oData, out Bounds visionBounds, bool useBodyCenter, out Vector2 projectedZ)
+        {
             visionBounds = default;
+            projectedZ = default;
             bool hasBounds = false;
             GameObject root = oData.unit.prefab;
             if (root != null)
@@ -958,13 +1108,7 @@ namespace Z_Map
                                 x == 0 ? -0.5f : 0.5f,
                                 y == 0 ? -0.5f : 0.5f,
                                 z == 0 ? -0.5f : 0.5f));
-                            if (hasBounds)
-                                visionBounds.Encapsulate(worldCorner);
-                            else
-                            {
-                                visionBounds = new Bounds(worldCorner, Vector3.zero);
-                                hasBounds = true;
-                            }
+                            EncapsulateObjectCorner(worldCorner, ref visionBounds, ref projectedZ, ref hasBounds);
                         }
                     }
 
@@ -996,13 +1140,7 @@ namespace Z_Map
                             y == 0 ? localMin.y : localMax.y,
                             z == 0 ? localMin.z : localMax.z);
                         Vector3 worldCorner = rendererToRuntime.MultiplyPoint3x4(localCorner);
-                        if (hasBounds)
-                            visionBounds.Encapsulate(worldCorner);
-                        else
-                        {
-                            visionBounds = new Bounds(worldCorner, Vector3.zero);
-                            hasBounds = true;
-                        }
+                        EncapsulateObjectCorner(worldCorner, ref visionBounds, ref projectedZ, ref hasBounds);
                     }
                 }
             }
@@ -1017,10 +1155,14 @@ namespace Z_Map
                 Mathf.Abs(oData.scale.z));
             Quaternion rotation = Quaternion.Euler(oData.euler);
             Vector3 center = oData.pos + rotation * new Vector3(0f, scale.y * 0.5f, 0f);
-            Vector3[] corners = Graph.GetCubeEightPoint(center, scale, oData.euler);
-            visionBounds = new Bounds(corners[0], Vector3.zero);
-            for (int i = 1; i < corners.Length; i++)
-                visionBounds.Encapsulate(corners[i]);
+            for (int x = 0; x < 2; x++)
+            for (int y = 0; y < 2; y++)
+            for (int z = 0; z < 2; z++)
+            {
+                Vector3 corner = center + rotation * Vector3.Scale(scale, new Vector3(
+                    x == 0 ? -.5f : .5f, y == 0 ? -.5f : .5f, z == 0 ? -.5f : .5f));
+                EncapsulateObjectCorner(corner, ref visionBounds, ref projectedZ, ref hasBounds);
+            }
             return false;
         }
 

@@ -178,7 +178,9 @@ public class MapManager : Z_MonoManager<MapManager>
     }
     public ItemUnitForm.Data AddItem(string name, Vector3 realPos, string prefabName, object[] prms = null)
     {
-        var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
+        var owner = utilCtrl.GetPlacementTile(realPos);
+        if (owner == null)
+            return null;
 
         var iData = this.data.AddItem(prefabName, prms);
         if (iData == null)
@@ -187,14 +189,23 @@ public class MapManager : Z_MonoManager<MapManager>
         }
         iData.name = name; ;
         iData.pos = realPos;
-        updateCtrl.itemTileDic.Add(iData.unit, this.data.maps[(mapPos.x, mapPos.y, mapPos.z)].unit);
+        updateCtrl.itemTileDic.Add(iData.unit, owner);
         iData.unit.Create();
         updateCtrl.UpdateSingleOne(iData.unit);
         return iData;
     }
     public CharacterUnitForm.Data AddCharacter(string name, Vector3 realPos, string prefabName, bool isMine = false, string extra = "", int size = 1)
     {
-        var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
+        var owner = utilCtrl.GetPlacementTile(realPos);
+        if (owner == null)
+        {
+            // Preserve the runtime nearest-area fallback; Mod placement has
+            // already rejected columns with no Tile at/below the target layer.
+            var tilePos = utilCtrl.GetClosestExistInArea(utilCtrl.RealPos2MapPosInt(realPos));
+            owner = utilCtrl.GetTile(tilePos.x, tilePos.y, tilePos.z);
+            if (owner == null)
+                return null;
+        }
 
         var cData = this.data.AddCharacter(prefabName, isMine, extra);
         if (cData == null)
@@ -203,8 +214,7 @@ public class MapManager : Z_MonoManager<MapManager>
         }
         cData.pos = realPos;
         cData.scale = Vector3.one * Mathf.Max(1, size);
-        var tilePos = utilCtrl.GetClosestExistInArea(mapPos);
-        updateCtrl.characterTileDic.Add(cData.unit, this.data.maps[(tilePos.x, tilePos.y, tilePos.z)].unit);
+        updateCtrl.characterTileDic.Add(cData.unit, owner);
         updateCtrl.RefreshCharacterOverlap(cData.unit);
         cData.name = name;
         cData.unit.Create();

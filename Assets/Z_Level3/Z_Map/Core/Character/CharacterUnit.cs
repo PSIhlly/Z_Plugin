@@ -102,6 +102,13 @@ namespace Z_Map
         }
         public override void UpdateInfo()
         {
+            UpdateInfo(true);
+        }
+
+        // The scene editor needs appearance callbacks without gameplay moving
+        // authored coordinates between consecutive brush placement checks.
+        public void UpdateInfo(bool simulateMovement)
+        {
             if (lastUpdateFrame == Time.frameCount)
                 return;
             lastUpdateFrame = Time.frameCount;
@@ -110,7 +117,7 @@ namespace Z_Map
                 MapManager.instance.updateCtrl.UpdateSingleOne(this);
             }
 
-            if (data.updateType == UpdateType.Always || isShowing)
+            if (simulateMovement && (data.updateType == UpdateType.Always || isShowing))
             {
                 //nav: 通过BFS导航获取移动方向，乘以速度和距离的较小值作为本帧移动量
                 if (data.navEnabled && !DynamicGlobalSettings.pauseNav)
@@ -176,7 +183,7 @@ namespace Z_Map
                 //fix: 同步实例位置
                 ins?.UpdatePos();
             }
-            if (forceEuler != null)
+            if (simulateMovement && forceEuler != null)
             {
                 data.euler = (Vector3)forceEuler;
                 if (ins != null)
@@ -201,7 +208,7 @@ namespace Z_Map
         ///    c. 若有避障方向且在同一半球内，计算滑行方向入队
         ///    d. 按最短碰撞距离截断移动并应用位置
         /// </summary>
-        private float GetNavigationRadius()
+        internal float GetNavigationRadius()
         {
             bool hasPoint = false;
             float minX = 0f;

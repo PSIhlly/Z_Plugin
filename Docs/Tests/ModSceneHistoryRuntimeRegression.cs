@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Form;
 using Newtonsoft.Json.Linq;
+using Ui.ModSceneBehaviourUnit;
 using Ui.ModSceneUnit;
 using UnityEditor;
 using UnityEngine;
@@ -15,6 +16,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Text;
 using Z_Ui;
+using Z_Ui.Base;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 using Object = UnityEngine.Object;
@@ -53,11 +55,14 @@ public static class ModSceneHistoryRuntimeRegression
             ControllerPointerTransactions();
             DeepMutableDataAndSceneScope();
             OwnedEraseAndEntityRecovery();
+            EraseIgnoresRetainedPlacementOffsets();
             MovementAndNonDataState();
             AddedAndDeletedRows();
             TerrainFootprintAndLayerRecovery();
             TextureEraseUpdatesPassTypesImmediately();
             PlacementRotationAndImmediateAppearance();
+            RaisedObjectPlacementUsesLowerOwner();
+            ObjectSelectionRespectsColliderHeight();
             ObjectWangTileHistoryNeighbours();
             LargeMapIncrementalHistory();
             ClearAndSceneReplacement();
@@ -76,6 +81,18 @@ public static class ModSceneHistoryRuntimeRegression
     {
         if (!value) throw new InvalidOperationException(message);
         checks++;
+    }
+
+    private sealed class CharacterUpdateProbe : IZ_Listener<CharacterEvent>
+    {
+        public CharacterUnit unit;
+        public int count;
+
+        public void OnEvent(CharacterEvent evt)
+        {
+            if (evt.unit == unit && evt.type == MapEventType.AfterUpdate)
+                count++;
+        }
     }
 
     private static T CreateManager<T>() where T : Z_MonoSingleton<T>
@@ -111,7 +128,8 @@ public static class ModSceneHistoryRuntimeRegression
         foreach (var form in new[] { typeof(MapMainForm), typeof(TileUnitForm), typeof(ObjectUnitForm),
                      typeof(CharacterUnitForm), typeof(ItemUnitForm), typeof(SceneForm), typeof(EventTriggerForm),
                      typeof(GameParamForm), typeof(CharacterProductForm), typeof(ItemProductForm),
-                     typeof(MapObjectForm), typeof(MapTextureForm), typeof(PassTypeForm), typeof(MapEraseForm),
+                     typeof(MapObjectForm), typeof(MapItemForm), typeof(MapCharacterForm),
+                     typeof(MapTextureForm), typeof(PassTypeForm), typeof(MapEraseForm),
                      typeof(ModTextForm), typeof(TexAssetForm), typeof(MapModelForm) })
             RegisterForm(form);
 
@@ -247,6 +265,243 @@ public static class ModSceneHistoryRuntimeRegression
         child.transform.localPosition = position;
         child.transform.localScale = scale;
         child.AddComponent<BoxCollider>().size = Vector3.one;
+    }
+
+    private sealed class SelectionProbe : UiCtrl
+    {
+        public UnitForm.Data selected;
+        public override void SetParam(UiParam param)
+        {
+            selected = param is UiModSceneUnitParam unit ? unit.data
+                : ((UiModSceneBehaviourUnitParam)param).data;
+        }
+    }
+
+    private static void ObjectSelectionRespectsColliderHeight()
+    {
+        var mod = ModManager.instance;
+        var previousController = mod.sceneCtrl;
+        var controller = new ModSceneController(mod);
+        mod.sceneCtrl = controller;
+        typeof(ModSceneController).GetField("enable", PrivateInstance).SetValue(controller, true);
+        var camera = CameraInstance.instance;
+        var cam = camera.cam;
+        Vector3 previousCameraPosition = cam.transform.position;
+        Quaternion previousCameraRotation = cam.transform.rotation;
+        Vector3 previousTarget = camera.tarTrs.position;
+        var ui = UiManager.instance;
+        var probes = new Dictionary<DesignType, SelectionProbe>();
+        foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
+        {
+            string key = mode == DesignType.MapObject ? nameof(UiModSceneUnitCtrl) : nameof(UiModSceneBehaviourUnitCtrl);
+            var go = new GameObject("selection-probe-" + key);
+            go.SetActive(false);
+            var holder = go.AddComponent<UiHolder>();
+            var probe = new SelectionProbe { uiHolder = holder, inited = true };
+            holder.ctrl = probe;
+            probes.Add(mode, probe);
+            ui.uiCtrlName2Uis.Add(key, new List<UiHolder> { holder });
+        }
+        var elevatedPrefab = Prefab<ObjectInstance>("selection-elevated-object");
+        AddBody(elevatedPrefab, Vector3.up * 2, Vector3.one);
+        var pick = elevatedPrefab.AddComponent<BoxCollider>();
+        pick.isTrigger = true;
+        pick.center = Vector3.up;
+        pick.size = new Vector3(.8f, 4, .8f);
+        pool.AddPool(elevatedPrefab);
+        var lowerPrefab = Prefab<ObjectInstance>("selection-lower-object");
+        AddBody(lowerPrefab, Vector3.up * .5f, Vector3.one);
+        var lowerPick = lowerPrefab.AddComponent<BoxCollider>();
+        lowerPick.isTrigger = true;
+        lowerPick.center = Vector3.up * .5f;
+        lowerPick.size = new Vector3(.8f, 1, .8f);
+        pool.AddPool(lowerPrefab);
+        var lower = map.AddObject("selectable lower object", new Vector3(10, 0, 10), lowerPrefab.name);
+        var elevated = map.AddObject("raised collider, lower owner", new Vector3(10, 0, 10), elevatedPrefab.name);
+        lower.unit.Show();
+        elevated.unit.Show();
+        // Fixture managers are intentionally inactive. Expose only these live
+        // instances so this test really exercises Physics.RaycastAll.
+        lower.unit.ins.transform.SetParent(map.mainGo.transform, true);
+        elevated.unit.ins.transform.SetParent(map.mainGo.transform, true);
+        // The root is the picking Trigger; the physical body is its child.
+        var body = elevated.unit.ins.transform.GetChild(0).GetComponent<BoxCollider>();
+        var livePick = elevated.unit.ins.GetComponent<BoxCollider>();
+        GameObject secondBody = null;
+        SphereCollider sphere = null;
+        TileUnitForm.Data upper = null;
+        ObjectUnitForm.Data higher = null;
+        BoxCollider tilePick = null;
+        UnitForm.Data Click(float height, DesignType mode, float pitch = 90)
+        {
+            controller.designType = mode;
+            camera.tarTrs.position = new Vector3(10, height, 10);
+            cam.transform.eulerAngles = Vector3.right * pitch;
+            cam.transform.position = camera.tarTrs.position - cam.transform.forward * 10;
+            Physics.SyncTransforms();
+            Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, height, 10));
+            probes[mode].selected = null;
+            controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screen });
+            controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screen });
+            return probes[mode].selected;
+        }
+        string HitDetails()
+        {
+            Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, camera.tarTrs.position.y, 10));
+            return string.Join("; ", Physics.RaycastAll(cam.ScreenPointToRay(screen), 100,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide)
+                .Select(hit => hit.collider.name + ":" + hit.collider.isTrigger + ":" + hit.collider.bounds.min.y))
+                + "; lower active=" + lower.unit.ins.gameObject.activeInHierarchy
+                + "; body min=" + body.bounds.min.y + "; selected=" + probes[controller.designType].selected?.name;
+        }
+        try
+        {
+            Check(elevated.unit.belongTile == Tile(10, 10).unit && elevated.pos.y == 0,
+                "selection fixture has a current-layer root/owner but an elevated physical body");
+            foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
+            {
+                Check(Click(0, mode) == lower, "raised physical body is skipped despite padded Trigger reaching current layer: " + mode + "; " + HitDetails());
+                Check(Click(1.5f, mode) == elevated, "Collider bottom touching current editing plane remains selectable: " + mode);
+                Check(Click(2, mode) == elevated, "raising editing plane permits an Object still owned by a lower Tile: " + mode);
+                body.center = Vector3.down * 1.5f;
+                Check(Click(0, mode) == elevated, "actual Collider center offset reaching current layer remains selectable: " + mode);
+                body.center = Vector3.zero;
+                body.transform.localPosition = Vector3.up * .5f;
+                Check(Click(0, mode) == elevated, "lowering child model without changing root/owner updates selection immediately: " + mode);
+                body.transform.localPosition = Vector3.up * 2;
+                body.transform.localScale = new Vector3(1, 3, 1);
+                Check(Click(0, mode) == lower, "scaled physical bottom above plane is still excluded: " + mode);
+                body.transform.localScale = new Vector3(1, 1, 4);
+                body.transform.localEulerAngles = Vector3.right * 90;
+                Check(Click(0, mode) == elevated, "rotation brings actual body bottom to plane: " + mode);
+                body.transform.localEulerAngles = Vector3.zero;
+                body.transform.localScale = Vector3.one;
+            }
+
+            higher = map.AddObject("highest fallback object", new Vector3(10, 3, 10), elevatedPrefab.name);
+            higher.unit.Show();
+            higher.unit.ins.transform.SetParent(map.mainGo.transform, true);
+            var highestPick = higher.unit.ins.GetComponent<BoxCollider>();
+            var liveLowerPick = lower.unit.ins.GetComponent<BoxCollider>();
+            // Broad picking Triggers keep all three Objects on the same ray in
+            // both overhead and side view; physical heights still decide priority.
+            livePick.size = new Vector3(.8f, 4, 14);
+            highestPick.size = new Vector3(.8f, 4, 14);
+            liveLowerPick.size = new Vector3(.8f, 1, 14);
+            foreach (float pitch in new[] { 90f, 45f })
+                foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
+                {
+                    Check(Click(0, mode, pitch) == lower, "current-height target wins over multiple higher hits: " + mode + "/" + pitch);
+                    lower.unit.ins.gameObject.SetActive(false);
+                    Check(Click(0, mode, pitch) == higher, "no current-height target falls back to highest ray hit: " + mode + "/" + pitch);
+                    higher.unit.ins.gameObject.SetActive(false);
+                    Check(Click(0, mode, pitch) == elevated, "next lower elevated hit remains selectable as fallback: " + mode + "/" + pitch);
+                    elevated.unit.ins.gameObject.SetActive(false);
+                    Check(Click(0, mode, pitch) == null, "empty click stays empty rather than reusing previous selection: " + mode + "/" + pitch);
+                    elevated.unit.ins.gameObject.SetActive(true);
+                    higher.unit.ins.gameObject.SetActive(true);
+                    lower.unit.ins.gameObject.SetActive(true);
+                }
+
+            // Event mode still permits Tile selection: a valid Tile means the
+            // click is not empty and must not trigger the higher-Object fallback.
+            var ground = Tile(10, 10).unit;
+            bool groundWasShowing = ground.isVising;
+            ground.Show();
+            var groundParent = ground.ins.transform.parent;
+            ground.ins.transform.SetParent(map.mainGo.transform, true);
+            tilePick = ground.ins.gameObject.AddComponent<BoxCollider>();
+            tilePick.isTrigger = true;
+            tilePick.center = Vector3.up * .05f;
+            tilePick.size = new Vector3(.9f, .1f, .9f);
+            lower.unit.ins.gameObject.SetActive(false);
+            Check(Click(0, DesignType.Event) == ground.data, "Event Tile selection prevents higher-Object fallback");
+            Check(Click(0, DesignType.MapObject) == higher, "normal mode ignores Tiles before selecting the high fallback");
+            Object.DestroyImmediate(tilePick);
+            tilePick = null;
+            ground.ins.transform.SetParent(groundParent, true);
+            if (!groundWasShowing) ground.Hide();
+            lower.unit.ins.gameObject.SetActive(true);
+            map.RemoveObject(higher);
+            higher = null;
+            livePick.size = new Vector3(.8f, 4, .8f);
+            liveLowerPick.size = new Vector3(.8f, 1, .8f);
+
+            secondBody = new GameObject("second-selection-body");
+            secondBody.transform.SetParent(elevated.unit.ins.transform, false);
+            secondBody.transform.localPosition = Vector3.up * .25f;
+            var second = secondBody.AddComponent<BoxCollider>();
+            second.size = Vector3.one * .5f;
+            Check(Click(0, DesignType.MapObject) == elevated, "one lower physical body keeps a multipart Object selectable");
+            second.enabled = false;
+            Check(Click(0, DesignType.MapObject) == lower, "disabled lower body cannot bypass elevated-body filtering");
+            second.enabled = true;
+            secondBody.SetActive(false);
+            Check(Click(0, DesignType.Event) == lower, "inactive lower body cannot bypass elevated-body filtering");
+            secondBody.SetActive(true);
+            second.isTrigger = true;
+            Check(Click(0, DesignType.Event) == lower, "additional lower Trigger cannot bypass a physical body above the plane");
+            secondBody.SetActive(false);
+
+            body.enabled = false;
+            livePick.center = Vector3.up * 2;
+            livePick.size = new Vector3(.8f, 1, .8f);
+            Check(Click(0, DesignType.MapObject) == lower, "Trigger-only Object above editing plane is excluded");
+            lower.unit.ins.gameObject.SetActive(false);
+            Check(Click(0, DesignType.MapObject) == elevated, "Trigger-only Object is a fallback when nothing lower is selected");
+            lower.unit.ins.gameObject.SetActive(true);
+            livePick.center = Vector3.up;
+            livePick.size = new Vector3(.8f, 4, .8f);
+            Check(Click(0, DesignType.Event) == elevated, "Trigger-only prefab touching editing plane remains selectable");
+            sphere = body.gameObject.AddComponent<SphereCollider>();
+            sphere.radius = 1;
+            body.transform.localEulerAngles = new Vector3(35, 20, 15);
+            Check(Click(0, DesignType.MapObject) == lower, "rotated Sphere actual lower bound above plane is excluded");
+            body.transform.localScale = Vector3.one * 2;
+            Check(Click(0, DesignType.Event) == elevated, "scaled Sphere touches plane and remains selectable");
+            sphere.enabled = false;
+            body.enabled = true;
+            body.transform.localScale = Vector3.one;
+            body.transform.localEulerAngles = Vector3.zero;
+
+            upper = map.AddTile(new Vector3Int(10, 2, 10));
+            map.updateCtrl.ApplyMove(elevated.unit, new Vector3(10, 2, 10), Vector3.zero, true);
+            body.transform.localPosition = Vector3.down * 1.5f;
+            Check(elevated.unit.belongTile == upper.unit, "upper-owner fixture actually belongs to a higher Tile");
+            Check(Click(0, DesignType.MapObject) == lower, "higher owner is excluded even when child Collider extends down");
+            lower.unit.ins.gameObject.SetActive(false);
+            Check(Click(0, DesignType.MapObject) == elevated, "higher owner remains selectable as an empty-click fallback");
+            lower.unit.ins.gameObject.SetActive(true);
+            Check(Click(2, DesignType.Event) == elevated, "higher Object is selectable after switching editing height");
+            Check(history.undoCount == 0 && history.redoCount == 0, "selection does not create history operations");
+        }
+        finally
+        {
+            controller.CommitPendingOperation();
+            controller.Unregister<InputKeyEvent>();
+            controller.Unregister<InputMouseEvent>();
+            controller.Unregister<InputMouseDownEvent>();
+            controller.Unregister<InputMouseUpEvent>();
+            controller.Unregister<InputMouseScrollEvent>();
+            controller.Unregister<TileEvent>();
+            controller.Unregister<ObjectEvent>();
+            if (secondBody != null) Object.DestroyImmediate(secondBody);
+            if (sphere != null) Object.DestroyImmediate(sphere);
+            if (tilePick != null) Object.DestroyImmediate(tilePick);
+            if (higher != null) map.RemoveObject(higher);
+            map.RemoveObject(elevated);
+            map.RemoveObject(lower);
+            if (upper != null) map.RemoveTile(upper);
+            foreach (var pair in probes)
+            {
+                string key = pair.Key == DesignType.MapObject ? nameof(UiModSceneUnitCtrl) : nameof(UiModSceneBehaviourUnitCtrl);
+                ui.uiCtrlName2Uis.Remove(key);
+                Object.DestroyImmediate(pair.Value.gameObject);
+            }
+            camera.tarTrs.position = previousTarget;
+            cam.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
+            mod.sceneCtrl = previousController;
+        }
     }
 
     private static TileUnitForm.Data Tile(int x = 12, int z = 12) => map.data.maps[(x, 0, z)];
@@ -559,6 +814,87 @@ public static class ModSceneHistoryRuntimeRegression
         history.Clear();
     }
 
+    private static void EraseIgnoresRetainedPlacementOffsets()
+    {
+        var mod = CreateManager<ModManager>();
+        var controller = new ModSceneController(mod);
+        mod.sceneCtrl = controller;
+        var input = CreateManager<InputManager>();
+        input.screenSize = new Vector2(640, 480);
+        var camera = CameraInstance.instance;
+        var cam = camera.GetComponentInChildren<Camera>(true);
+        typeof(CameraInstance).GetField("_cam", PrivateInstance).SetValue(camera, cam);
+        cam.transform.position = new Vector3(12, 10, 12);
+        cam.transform.eulerAngles = Vector3.right * 90;
+        camera.tarTrs.position = new Vector3(12, 0, 12);
+        // Reposition the child Camera after moving its target parent.
+        cam.transform.position = new Vector3(12, 10, 12);
+        var enableField = typeof(ModSceneController).GetField("enable", PrivateInstance);
+        var waitField = typeof(ModSceneController).GetField("waitForActive", PrivateInstance);
+        var historyField = typeof(ModSceneController).GetField("history", PrivateInstance);
+        var screenPosition = cam.WorldToScreenPoint(new Vector3(12, 0, 12));
+        var probeRay = cam.ScreenPointToRay(screenPosition);
+        var probePlane = new Plane(Vector3.up, -camera.tarTrs.position.y);
+        Check(probePlane.Raycast(probeRay, out float probeEnter)
+            && (probeRay.GetPoint(probeEnter) - new Vector3(12, 0, 12)).sqrMagnitude < .0001f,
+            "actual erase-click ray resolves the intended Tile center");
+        var farTile = Tile(14, 14);
+        try
+        {
+            // These offsets are deliberately retained by the scene Controller
+            // across entry, just as after placing a raised/freely positioned model.
+            controller.posX = 1.2f;
+            controller.posY = .9f;
+            controller.posZ = -1.3f;
+            controller.cntX = controller.cntY = 1;
+            TileUnitForm.Data placementTarget = null;
+            Action<TileUnitForm.Data, Vector3> collectOldTarget = (tile, _) => placementTarget = tile;
+            typeof(ModSceneController).GetMethod("ForeachPos", PrivateInstance).Invoke(controller,
+                new object[] { new Vector3Int(12, 0, 12), new Vector3(12, 0, 12), collectOldTarget });
+            Check(placementTarget != null && placementTarget != Tile(),
+                "model-placement targeting is offset from the clicked erase Tile with retained offsets");
+            foreach (string brushName in new[] { "remain terrain", "all erase", "remain terrain" })
+            {
+                history.Clear();
+                enableField.SetValue(controller, false);
+                controller.curData = null;
+                enableField.SetValue(controller, true);
+                waitField.SetValue(controller, false);
+                historyField.SetValue(controller, history);
+                controller.curData = MapEraseForm.DataByName[brushName];
+                controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screenPosition });
+                controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screenPosition });
+                Check(!ObjectUnitForm.DataByUid.ContainsKey(ObjectUid)
+                    && !CharacterUnitForm.DataByUid.ContainsKey(CharacterUid)
+                    && !ItemUnitForm.DataByUid.ContainsKey(ItemUid),
+                    "actual erase click still removes clicked owners after reentry with retained placement offsets: " + brushName
+                    + "; pointer=" + typeof(ModSceneController).GetField("pointerDown", PrivateInstance).GetValue(controller)
+                    + "; revision=" + typeof(ModSceneController).GetField("brushRevision", PrivateInstance).GetValue(controller)
+                    + "; wait=" + waitField.GetValue(controller));
+                Check(map.data.maps.ContainsKey((12, 0, 12)) == (brushName == "remain terrain"),
+                    "actual erase click targets the clicked Tile layer, not the retained Y placement offset");
+                Check(ReferenceEquals(farTile, Tile(14, 14)) && ObjectUnitForm.DataByUid.ContainsKey(ForeignObjectUid),
+                    "actual erase click leaves neighbouring/distant owners and terrain unchanged");
+                Check(history.undoCount == 1 && history.TryUndo(), "actual click erase remains one undoable stroke");
+                CheckRegisteredEntities();
+                Check(controller.posX == 1.2f && controller.posY == .9f && controller.posZ == -1.3f,
+                    "erase does not reset authored placement controls to work around the bad target");
+            }
+            history.Clear();
+        }
+        finally
+        {
+            controller.CommitPendingOperation();
+            controller.Unregister<InputKeyEvent>();
+            controller.Unregister<InputMouseEvent>();
+            controller.Unregister<InputMouseDownEvent>();
+            controller.Unregister<InputMouseUpEvent>();
+            controller.Unregister<InputMouseScrollEvent>();
+            controller.Unregister<TileEvent>();
+            controller.Unregister<ObjectEvent>();
+        }
+    }
+
     private static void MovementAndNonDataState()
     {
         var editor = (ModSceneController)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(ModSceneController));
@@ -867,14 +1203,16 @@ public static class ModSceneHistoryRuntimeRegression
         var characterPrefab = Prefab<CharacterInstance>(GlobalDefaultHelper.GetRuntimePrefabName("character"));
         var collider = characterPrefab.AddComponent<SphereCollider>();
         collider.center = Vector3.up * .5f;
-        collider.radius = .5f;
+        collider.radius = .4f;
         pool.AddPool(characterPrefab);
         map.SetPos(new Vector3(12, 0, 12));
         // EditMode has no Update loop; establish the production visibility
         // rectangle before measuring individual placement operations.
         map.updateCtrl.RefreshView();
-        Vector3 position = new Vector3(13, 0, 13);
-        Check(Tile(13, 13).unit.isShowing, "real placement fixture uses a Tile inside the current visible rectangle");
+        // Stay away from the pre-existing large Character, whose side contact
+        // would hide the ground gap introduced by the .4 physical radius.
+        Vector3 position = new Vector3(10, 0, 10);
+        Check(Tile(10, 10).unit.isShowing, "real placement fixture uses a Tile inside the current visible rectangle");
         var addedItem = asset.AddItem(product, position, 35);
         Check(addedItem != null && history.undoCount == 1 && history.lastCapturedRowCount == 1,
             "real ModAsset AddItem records only its completed row");
@@ -900,8 +1238,43 @@ public static class ModSceneHistoryRuntimeRegression
             && Mathf.Abs(Mathf.DeltaAngle(addedCharacter.unit.ins.transform.eulerAngles.y, 137)) < .001f,
             "ModAsset Character placement immediately applies nonzero rotation without a full-view refresh");
         Check(addedCharacter.scale == Vector3.one * 2 && addedCharacter.unit.passTypes.Contains(passTypeId)
-            && addedCharacter.unit.belongTile == Tile(13, 13).unit,
+            && addedCharacter.unit.belongTile == Tile(10, 10).unit,
             "real Character placement registers product size, capabilities and owner immediately");
+        Check(!(bool)typeof(CharacterUnit).GetMethod("HasGroundContact", PrivateInstance).Invoke(addedCharacter.unit, null),
+            "radius .4 Character has a ground gap at its authored position, reproducing the gravity drift condition");
+        Vector3 pendingRotation = new Vector3(0, 221, 0);
+        addedCharacter.unit.forceEuler = pendingRotation;
+        var updateFrame = typeof(Unit).GetField("lastUpdateFrame", PrivateInstance);
+        var updateProbe = new CharacterUpdateProbe { unit = addedCharacter.unit };
+        updateProbe.Register();
+        try
+        {
+            for (int frame = 0; frame < 3; frame++)
+            {
+                // The synchronous EditMode fixture cannot advance Time.frameCount.
+                updateFrame.SetValue(addedCharacter.unit, -1);
+                controller.Update();
+            }
+        }
+        finally { updateProbe.Unregister(); }
+        Check(addedCharacter.pos == position && addedCharacter.euler.y == 137
+            && addedCharacter.unit.forceEuler == pendingRotation,
+            "ModScene frame refresh leaves authored position and pending gameplay rotation unchanged");
+        Check(updateProbe.count == 3, "ModScene frames preserve Character AfterUpdate appearance callbacks");
+        updateFrame.SetValue(addedCharacter.unit, -1);
+        addedCharacter.unit.UpdateInfo();
+        Check(addedCharacter.unit.forceEuler == null && addedCharacter.euler.y == 221,
+            "normal runtime Character update still consumes gameplay rotation after an editor refresh");
+        map.updateCtrl.ApplyMove(addedCharacter.unit, position, new Vector3(0, 137, 0), true);
+        Check(asset.AddCharacter(characterProduct, position, 137) == null && history.undoCount == 1,
+            "repeated Character placement after editor frames creates no duplicate or history operation");
+        Check(asset.AddCharacter(characterProduct, position, 221) == null && history.undoCount == 1,
+            "same product at the same position is a duplicate regardless of placement angle");
+        string originalCharacterName = addedCharacter.name;
+        addedCharacter.name = "renamed scene instance";
+        Check(asset.AddCharacter(characterProduct, position, 137) == null,
+            "Character placement deduplicates by product identity rather than an editable instance name");
+        addedCharacter.name = originalCharacterName;
         int characterUid = addedCharacter.uid;
         Check(history.TryUndo() && !CharacterUnitForm.DataByUid.ContainsKey(characterUid), "real Character placement undo removes its row");
         Check(history.TryRedo() && CharacterUnitForm.DataByUid[characterUid].euler.y == 137
@@ -910,6 +1283,232 @@ public static class ModSceneHistoryRuntimeRegression
             "real Character placement redo restores its angle and pooled instance immediately");
         Check(history.TryUndo(), "Character placement fixture cleans up through history");
         history.Clear();
+    }
+
+    private static void RaisedObjectPlacementUsesLowerOwner()
+    {
+        history.Clear();
+        var mod = ModManager.instance;
+        var previousController = mod.sceneCtrl;
+        var previousAsset = mod.assetCtrl;
+        var controller = new ModSceneController(mod);
+        mod.sceneCtrl = controller;
+        mod.assetCtrl = new ModAssetCtrl(mod);
+        typeof(ModSceneController).GetField("enable", PrivateInstance).SetValue(controller, true);
+        typeof(ModSceneController).GetField("history", PrivateInstance).SetValue(controller, history);
+        var waitField = typeof(ModSceneController).GetField("waitForActive", PrivateInstance);
+        var product = new MapObjectForm.Data(-1, "raised placement object", 0, StaticModel(98001), 0, false,
+            new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
+            0, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>
+                { [AnimDirecton.Fixed] = new List<int> { 98001 } }, false, false, true);
+        MapObjectForm.AddData(product);
+        var prefab = Prefab<ObjectInstance>(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(product.id));
+        AddBody(prefab, Vector3.up * .5f, Vector3.one);
+        prefab.transform.GetChild(0).gameObject.AddComponent<MeshRenderer>();
+        pool.AddPool(prefab);
+        Vector3Int previousViewSize = map.data.mainData.viewSize;
+        // Include both candidate owner layers in the fixture's visible range;
+        // ordinary pooled entities correctly stay hidden for offscreen owners.
+        map.data.mainData.viewSize = new Vector3Int(previousViewSize.x, 3, previousViewSize.z);
+        map.SetPos(new Vector3(12, 0, 12));
+        map.updateCtrl.RefreshView();
+        var upper = map.AddTile(new Vector3Int(10, 2, 10));
+        var aboveOnly = map.AddTile(new Vector3Int(16, 2, 10));
+        Check(upper.unit.isShowing && Tile(10, 10).unit.isShowing,
+            "raised-placement fixture includes both exact/lower owners in the visible range");
+        var camera = CameraInstance.instance;
+        var cam = camera.cam;
+        Vector3 previousCameraPosition = cam.transform.position;
+        Quaternion previousCameraRotation = cam.transform.rotation;
+        Vector3 previousTarget = camera.tarTrs.position;
+        Vector3 previousCellSize = map.data.mainData.mapUnitSize;
+        try
+        {
+            controller.curData = product;
+            controller.cntX = controller.cntY = 1;
+            controller.angle = 73;
+            var tool = new Ui.ModSceneMain.ModTool.UiModToolModel();
+            tool.posY = "6.25";
+            Check(controller.posY == 6.25f && tool.posY == "6.25",
+                "Object height input no longer clamps at .9 or the highest map layer");
+            foreach (float height in new[] { 6.25f, 3.25f, 2f, 1.75f, 1f, .9f, 0f })
+            {
+                Vector3 position = new Vector3(10, height, 10);
+                TileUnit expectedOwner = map.utilCtrl.RealPos2MapPosInt(position).y >= 2 ? upper.unit : Tile(10, 10).unit;
+                var added = mod.assetCtrl.AddObject(product, position, 73);
+                Check(added != null && added.pos == position && added.euler.y == 73,
+                    "raised Object preserves requested position and rotation at height " + height);
+                Check(added.unit.belongTile == expectedOwner
+                    && map.updateCtrl.objectTileDic.Get(added.unit)[0] == expectedOwner
+                    && map.updateCtrl.objectTileDic.Get(expectedOwner).Contains(added.unit),
+                    "Object uses nearest lower owner first in both index directions at height " + height);
+                Check(added.unit.ins != null && added.unit.ins.transform.position == position,
+                    "raised Object is shown through its lower owner without snapping downward");
+                Check(history.undoCount == 1 && mod.assetCtrl.AddObject(product, position, 73) == null
+                    && history.undoCount == 1,
+                    "raised placement remains one operation and rejects duplicates");
+                int uid = added.uid;
+                Check(history.TryUndo() && !ObjectUnitForm.DataByUid.ContainsKey(uid),
+                    "raised Object placement undo removes its original row");
+                Check(history.TryRedo() && ObjectUnitForm.DataByUid[uid].pos == position
+                    && ObjectUnitForm.DataByUid[uid].unit.belongTile == expectedOwner,
+                    "raised Object placement redo preserves height and reconstructs lower owner");
+                var restored = ObjectUnitForm.DataByUid[uid];
+                map.updateCtrl.RefreshHistoryUnit(restored.unit);
+                Check(restored.pos == position && restored.unit.belongTile == expectedOwner,
+                    "entity rebind keeps the same requested height and lower owner");
+                var editor = new UiModSceneUnitModel { data = restored };
+                editor.posY = GameManager.MapPosToPlayerPos(8.25f).ToString();
+                Check(restored.pos.y == 8.25f && restored.unit.belongTile == upper.unit,
+                    "Object coordinate editor also allows height above its owner and the highest Tile");
+                Check(history.TryUndo() && ObjectUnitForm.DataByUid[uid].pos == position
+                    && ObjectUnitForm.DataByUid[uid].unit.belongTile == expectedOwner,
+                    "Object height edit undo restores requested position and lower owner");
+                Check(history.TryUndo(), "raised Object fixture removes the completed placement");
+                int rowCount = ObjectUnitForm.DataByUid.Count;
+                int redoCount = history.redoCount;
+                Check(mod.assetCtrl.AddObject(product, new Vector3(16, 1, 10)) == null
+                    && mod.assetCtrl.AddObject(product, new Vector3(17, 6, 10)) == null,
+                    "Object placement rejects an above-only column or a completely empty column");
+                Check(ObjectUnitForm.DataByUid.Count == rowCount && history.undoCount == 0
+                    && history.redoCount == redoCount,
+                    "unsupported placements create no row/history and preserve the existing redo branch");
+                history.Clear();
+            }
+
+            var itemProduct = ItemProductForm.DataByUid.Values.Single(row => row.name == "real ModAsset placement item");
+            var itemBrush = new MapItemForm.Data(-1, "raised Item brush", 0, itemProduct.model, 0, itemProduct.uid);
+            MapItemForm.AddData(itemBrush);
+            var characterProduct = CharacterProductForm.DataByUid[characterProductUid];
+            var characterBrush = new MapCharacterForm.Data(-1, "raised Character brush", 0, 0, characterProductUid);
+            MapCharacterForm.AddData(characterBrush);
+            void VerifyOtherPlacement(MapBaseForm.Data brush, Func<Vector3, UnitForm.Data> place)
+            {
+                controller.curData = brush;
+                tool.posY = "6.25";
+                Check(controller.posY == 6.25f, brush.name + " removes the same height input limit");
+                foreach (float height in new[] { 6.25f, 3.25f, 2f, 1f, .9f, 0f })
+                {
+                    Vector3 position = new Vector3(10, height, 10);
+                    TileUnit expectedOwner = map.utilCtrl.RealPos2MapPosInt(position).y >= 2 ? upper.unit : Tile(10, 10).unit;
+                    UnitForm.Data added = place(position);
+                    Check(added != null && added.pos == position && added.euler.y == 73
+                        && ((MapUnit)added.unit).belongTile == expectedOwner,
+                        brush.name + " keeps requested height/rotation and nearest lower owner: " + height);
+                    Check(added.unit.ins != null && added.unit.ins.transform.position == position,
+                        brush.name + " shows immediately through its lower owner: height=" + height
+                        + "; ownerShown=" + expectedOwner.isShowing + "; instance=" + added.unit.ins
+                        + "; instancePos=" + (added.unit.ins == null ? "null" : added.unit.ins.transform.position.ToString()));
+                    Check(place(position) == null && history.undoCount == 1,
+                        brush.name + " repeated placement is a history-free no-op");
+                    int uid = added.uid;
+                    Check(history.TryUndo() && !UnitForm.DataByUid.ContainsKey(uid),
+                        brush.name + " raised placement undo removes its row");
+                    Check(history.TryRedo() && UnitForm.DataByUid[uid].pos == position
+                        && ((MapUnit)UnitForm.DataByUid[uid].unit).belongTile == expectedOwner,
+                        brush.name + " redo reconstructs requested position and lower owner");
+                    var editor = new UiModSceneUnitModel { data = UnitForm.DataByUid[uid] };
+                    editor.posY = GameManager.MapPosToPlayerPos(8.25f).ToString();
+                    Check(UnitForm.DataByUid[uid].pos.y == 8.25f
+                        && ((MapUnit)UnitForm.DataByUid[uid].unit).belongTile == upper.unit,
+                        brush.name + " coordinate editor also removes its owner-relative upper height cap");
+                    Check(history.TryUndo() && UnitForm.DataByUid[uid].pos == position,
+                        brush.name + " height edit remains independently undoable");
+                    Check(history.TryUndo(), brush.name + " fixture removes its completed placement");
+                    int rows = UnitForm.DataByUid.Count;
+                    int redo = history.redoCount;
+                    Check(place(new Vector3(16, 1, 10)) == null && place(new Vector3(17, 6, 10)) == null
+                        && UnitForm.DataByUid.Count == rows && history.undoCount == 0 && history.redoCount == redo,
+                        brush.name + " rejects above-only/empty columns without a row or history mutation");
+                    history.Clear();
+                }
+                camera.tarTrs.position = new Vector3(10, 1, 10);
+                cam.transform.position = new Vector3(10, 10, 10);
+                cam.transform.eulerAngles = Vector3.right * 90;
+                controller.posY = 0;
+                Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, 1, 10));
+                waitField.SetValue(controller, false);
+                controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screen });
+                controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screen });
+                Check(history.undoCount == 1 && history.TryUndo(),
+                    brush.name + " actual click accepts and undoes an empty camera layer with lower support");
+                history.Clear();
+            }
+            VerifyOtherPlacement(itemBrush, position => mod.assetCtrl.AddItem(itemProduct, position, 73));
+            VerifyOtherPlacement(characterBrush, position => mod.assetCtrl.AddCharacter(characterProduct, position, 73));
+            controller.curData = product;
+
+            // The camera's current layer has a hole, while ground exists below.
+            // Exercise actual clicks, not just the direct AddScene/asset API.
+            camera.tarTrs.position = new Vector3(10, 1, 10);
+            cam.transform.position = new Vector3(10, 10, 10);
+            cam.transform.eulerAngles = Vector3.right * 90;
+            controller.posY = 0;
+            Vector3 screenPosition = cam.WorldToScreenPoint(new Vector3(10, 1, 10));
+            int initialCount = ObjectUnitForm.DataByUid.Count;
+            waitField.SetValue(controller, false);
+            controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screenPosition });
+            controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screenPosition });
+            Check(ObjectUnitForm.DataByUid.Count == initialCount + 1 && history.undoCount == 1,
+                "actual Object click in an empty camera layer accepts a lower Tile");
+            var clicked = ObjectUnitForm.DataByUid.Values.Single(row => row.unit.productInfo.Item1 == product.id);
+            Check(Mathf.Abs(clicked.pos.y - 1) < .001f && clicked.unit.belongTile == Tile(10, 10).unit,
+                "camera-layer hole placement retains camera height rather than lower owner height");
+            Check(history.TryUndo(), "camera-layer hole click is undoable");
+            history.Clear();
+            controller.posY = 4.25f;
+            waitField.SetValue(controller, false);
+            controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screenPosition });
+            controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screenPosition });
+            clicked = ObjectUnitForm.DataByUid.Values.Single(row => row.unit.productInfo.Item1 == product.id);
+            Check(Mathf.Abs(clicked.pos.y - 5.25f) < .001f && clicked.unit.belongTile == upper.unit,
+                "actual raised click finds the nearest lower Tile across empty layers");
+            map.updateCtrl.ApplyMove(clicked.unit, new Vector3(10, .9f, 10), clicked.euler, true);
+            Check(clicked.unit.belongTile == Tile(10, 10).unit && clicked.pos.y == .9f,
+                "Object movement recomputes nearest lower owner without changing requested height");
+            Check(history.TryUndo(), "raised-click fixture removes its row");
+            history.Clear();
+            camera.tarTrs.position = new Vector3(16, 1, 10);
+            cam.transform.position = new Vector3(16, 10, 10);
+            controller.posY = 0;
+            screenPosition = cam.WorldToScreenPoint(new Vector3(16, 1, 10));
+            waitField.SetValue(controller, false);
+            controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screenPosition });
+            controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screenPosition });
+            Check(ObjectUnitForm.DataByUid.Count == initialCount && history.undoCount == 0,
+                "actual click rejects a hole without lower support even when a Tile exists above");
+
+            map.data.mainData.mapUnitSize = new Vector3(2, 1.5f, 3);
+            tool.posY = "2.5";
+            Check(controller.posY == 3.75f && tool.posY == "2.5",
+                "unbounded Object height input still converts logical layers to world height");
+            Check(map.utilCtrl.GetPlacementTile(new Vector3(20, 1.5f, 30)) == Tile(10, 10).unit
+                && map.utilCtrl.GetPlacementTile(new Vector3(20, 4.875f, 30)) == upper.unit,
+                "nearest-lower Object ownership uses the existing map cell coordinate conversion");
+        }
+        finally
+        {
+            map.data.mainData.mapUnitSize = previousCellSize;
+            controller.CommitPendingOperation();
+            controller.Unregister<InputKeyEvent>();
+            controller.Unregister<InputMouseEvent>();
+            controller.Unregister<InputMouseDownEvent>();
+            controller.Unregister<InputMouseUpEvent>();
+            controller.Unregister<InputMouseScrollEvent>();
+            controller.Unregister<TileEvent>();
+            controller.Unregister<ObjectEvent>();
+            foreach (var row in ObjectUnitForm.DataByUid.Values.Where(row => row.unit.productInfo.Item1 == product.id).ToArray())
+                map.RemoveObject(row);
+            map.RemoveTile(upper);
+            map.RemoveTile(aboveOnly);
+            history.Clear();
+            map.data.mainData.viewSize = previousViewSize;
+            map.updateCtrl.RefreshView();
+            camera.tarTrs.position = previousTarget;
+            cam.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
+            mod.sceneCtrl = previousController;
+            mod.assetCtrl = previousAsset;
+        }
     }
 
     private static void ObjectWangTileHistoryNeighbours()
@@ -921,7 +1520,7 @@ public static class ModSceneHistoryRuntimeRegression
         var connected = AddStaticTexture(connectedId);
         var product = new MapObjectForm.Data(-1, "history Wang Object", 0, StaticModel(disconnectedId), 0, false,
             new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
-            0, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>> { [AnimDirecton.Fixed] = new List<int> { disconnectedId } }, true);
+            0, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>> { [AnimDirecton.Fixed] = new List<int> { disconnectedId } }, true, false, true);
         MapObjectForm.AddData(product);
         var prefab = Prefab<ObjectInstance>("history-Wang-object");
         AddBody(prefab, Vector3.up * .5f, Vector3.one);

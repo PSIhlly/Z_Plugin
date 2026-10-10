@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da480e1452d61a64d96fff9c2d7f5ff6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleHolder: {fileID: 0}
+  rotateHolder: {fileID: 0}
   enableFixedYRotation: 0
   applyYRotationToLocalZ: 1
   fixedYRotation: 0

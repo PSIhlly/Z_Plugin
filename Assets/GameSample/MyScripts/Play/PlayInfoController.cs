@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -517,7 +518,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void ChooseEquipItems(string title, Action<ItemProductForm.Data> act, EquipPartType part)
     {
         var items = new EntryItem();
-        foreach (var uid in GameManager.instance.curProgress.bag)
+        foreach (var uid in GameManager.instance.curProgress.bag.OrderBy(uid => uid))
         {
             var it = ItemProductForm.DataByUid[uid];
             if (it.canEquipe && it.equip == part)
@@ -614,7 +615,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
     public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act)
     {
         var items = new EntryItem();
-        foreach (var uid in GameManager.instance.curProgress.team)
+        foreach (var uid in GameManager.instance.curProgress.team.OrderBy(uid => uid))
         {
             var ch = CharacterProductForm.DataByUid[uid];
             items.Add(ch.name, StoryTexAssetForm.DataById.GetDv(ch.avatarTex, StoryTexAssetForm.defaultData).GetSprite(), uid);

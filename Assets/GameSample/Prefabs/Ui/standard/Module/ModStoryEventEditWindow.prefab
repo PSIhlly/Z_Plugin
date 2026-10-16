@@ -1449,6 +1449,7 @@ GameObject:
   - component: {fileID: 553183385021114069}
   - component: {fileID: 3536667366330506771}
   - component: {fileID: 3766026709285048241}
+  - component: {fileID: 8638913070731811192}
   m_Layer: 5
   m_HasEditorInfo: 1
   m_Name: ipt_code
@@ -1650,6 +1651,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &8638913070731811192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3921591316215898568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 100
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &3960105794712525029
 GameObject:
   m_ObjectHideFlags: 0

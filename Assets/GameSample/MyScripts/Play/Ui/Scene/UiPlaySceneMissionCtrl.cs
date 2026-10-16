@@ -20,6 +20,11 @@ using Z_Ui.Base;
 // Convert them once at the runtime boundary; player positions are already world positions.
 public static class MissionGuide
 {
+    public static bool IsActive(MissionForm.Data data)
+    {
+        return data != null && data.show && data.received && !data.fail && !data.done;
+    }
+
     public static Vector3 GetTargetWorldPosition(MissionForm.Data data)
     {
         return MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(data.targetPos));
@@ -60,8 +65,7 @@ namespace Ui.PlaySceneMain.PlaySceneMission
         public void Refresh()
         {
             var data = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-            var hasMission = GameManager.instance.curProgress.enableMission &&
-                             data != null && data.show && data.received && !data.fail && !data.done;
+            var hasMission = GameManager.instance.curProgress.enableMission && MissionGuide.IsActive(data);
             gameObject.SetActive(hasMission);
             if (!hasMission)
                 return;

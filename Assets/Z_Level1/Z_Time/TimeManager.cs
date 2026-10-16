@@ -10,6 +10,19 @@ namespace Z_Time
     [DefaultExecutionOrder(1000)]
     public class TimeManager : Z_MonoManager<TimeManager>
     {
+        public const float MAX_DELTA_TIME = 0.02f;
+
+        /// <summary>Discard stall time; use unscaled time only for pause-independent UI.</summary>
+        public static float GetDeltaTime(bool unscaled = false)
+        {
+            return ClampDeltaTime(unscaled ? Time.unscaledDeltaTime : Time.deltaTime);
+        }
+
+        public static float ClampDeltaTime(float deltaTime)
+        {
+            return float.IsNaN(deltaTime) ? 0f : Mathf.Clamp(deltaTime, 0f, MAX_DELTA_TIME);
+        }
+
         // Higher-level runtimes can provide a persistent gameplay clock without
         // making this assembly depend on their save/progress data types.
         public static Func<float> animationTimeGetter;
@@ -71,6 +84,24 @@ namespace Z_Time
             if (timer == null)
                 return;
             timer.cancel = true;
+        }
+
+        // Variable-duration GIF frames cannot use the fixed-interval scheduler.
+        public Timer StartFrameTimer(Func<bool> func, MonoBehaviour bind = null)
+        {
+            var timer = new Timer { bind = bind == null ? this : bind };
+            StartCoroutine(WorkFrameTimer(timer, func));
+            return timer;
+        }
+
+        private IEnumerator WorkFrameTimer(Timer timer, Func<bool> func)
+        {
+            while (true)
+            {
+                yield return null;
+                if (timer.cancel || timer.bind == null || !timer.bind.gameObject.activeInHierarchy || func())
+                    yield break;
+            }
         }
 
         private IEnumerator Work(int id, Timer timer, float delay, float interval, Func<bool> func)

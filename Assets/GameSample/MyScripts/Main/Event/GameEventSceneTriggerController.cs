@@ -153,8 +153,8 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     {
         evts += () =>
         {
-            // A queued trigger can outlive either Object involved in it.
-            if (IsRemovedObject(evt.a) || IsRemovedObject(evt.b))
+            // A queued trigger can outlive either scene entity involved in it.
+            if (IsRemovedSceneUnit(evt.a) || IsRemovedSceneUnit(evt.b))
                 return;
 
             if (evt.a is MapUnit mapUnit)
@@ -184,7 +184,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                         if (evt.b is CharacterUnit chU)
                         {
                             mapUnit.ExecuteEvt("onCharacterTouchEvent", heap);
-                            if (!IsRemovedObject(mapUnit) && mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM?.uid)
+                            if (!IsRemovedSceneUnit(mapUnit) && mapUnit.GetEvt(interActKey) != null && chU.data.uid == PlayManager.instance.sceneCtrl.playerM?.uid)
                                 Z_EventHelper.Invoke(new SceneActionEvent() { unitUid = mapUnit.data.uid, type = SceneActionEventType.Add });
                         }
                         else if (evt.b is ObjectUnit)
@@ -214,8 +214,11 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
             }
         };
     }
-    private static bool IsRemovedObject(Z_UnitSystem.Unit unit)
+    private static bool IsRemovedSceneUnit(Z_UnitSystem.Unit unit)
     {
+        if (unit is CharacterUnit character)
+            return !CharacterUnitForm.DataByUid.TryGetValue(character.data.uid, out var registeredCharacter)
+                || !ReferenceEquals(registeredCharacter, character.data);
         return unit is ObjectUnit obj &&
                (!ObjectUnitForm.DataByUid.TryGetValue(obj.data.uid, out var registered) ||
                 !ReferenceEquals(registered, obj.data));
@@ -287,6 +290,11 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
     public void OnEvent(CharacterEvent evt)
     {
+        if (evt.type == MapEventType.Remove)
+        {
+            HandleUnitRemoval(evt.unit);
+            return;
+        }
         QueueUnitEvent(evt.unit, evt.type, allowBoundaryTouch: true, characterOnCreate: true);
     }
 
@@ -299,20 +307,23 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     {
         if (evt.type == MapEventType.Remove)
         {
-            // Stop other scene events owned by this exact unit before its uid can be
-            // reused. The event currently performing removal finishes its current pass.
-            GameManager.instance.evtCtrl.CompleteUnitEvents(evt.unit.data);
-
-            // Removal does not guarantee TriggerExit; clear the option immediately.
-            Z_EventHelper.Invoke(new SceneActionEvent()
-            {
-                unitUid = evt.unit.data.uid,
-                type = SceneActionEventType.Remove
-            });
+            HandleUnitRemoval(evt.unit);
             return;
         }
 
         QueueUnitEvent(evt.unit, evt.type, allowBoundaryTouch: true);
+    }
+
+    private static void HandleUnitRemoval(MapUnit unit)
+    {
+        // The removing event may finish its current pass; other owned work stops now.
+        GameManager.instance.evtCtrl.CompleteUnitEvents(unit.data);
+        // Removal need not emit TriggerExit, so clear interaction options immediately.
+        Z_EventHelper.Invoke(new SceneActionEvent()
+        {
+            unitUid = unit.data.uid,
+            type = SceneActionEventType.Remove
+        });
     }
 
     public void OnEvent(StoryLifeEvent evt)

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Z_Time;
 
 namespace Z_ObjectAnimator.Base
 {
@@ -28,7 +29,10 @@ namespace Z_ObjectAnimator.Base
         protected int _times = 0;
         public Event(float duration = 0)
         {
-            _maxTimes = ((int)(duration / Time.deltaTime)) + 1;
+            float deltaTime = TimeManager.GetDeltaTime();
+            // Construction while paused must not divide by zero.
+            if (deltaTime <= 0f) deltaTime = TimeManager.MAX_DELTA_TIME;
+            _maxTimes = ((int)(duration / deltaTime)) + 1;
         }
         public virtual ReturnValue Excute()
         {

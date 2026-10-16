@@ -15,6 +15,14 @@ namespace Z_Map
     {
         private readonly HashSet<int> _passTypes = new HashSet<int>();
         private bool _objectCoversCenter;
+        private bool heightPlaneValid;
+        private string heightPrefabName;
+        private GameObject heightPrefab;
+        private float heightYaw;
+        private Vector3 heightNormal;
+        private float heightPlaneDot;
+        private bool heightHasPlane;
+        private int heightPlaneVersion;
 
         /// <summary>
         /// 此地块要求角色具备的全部通行类型。0 表示无限制，不进入该集合。
@@ -53,6 +61,14 @@ namespace Z_Map
             _objectCoversCenter = covered;
         }
 
+        internal void CopyPassTypesTo(HashSet<int> target)
+        {
+            target.Clear();
+            if (!_objectCoversCenter)
+                foreach (int value in _passTypes)
+                    target.Add(value);
+        }
+
         public override void Show()
         {
             if (isShowing)
@@ -77,25 +93,59 @@ namespace Z_Map
         {
             if (data.scale == Vector3.zero)
                 return -999;//直接坠落
-            var collider=prefab.GetComponentInChildren<BoxCollider>();
-            if(collider != null)
-            {
-                var euler = collider.transform.eulerAngles;
-                euler.y += +data.euler.y;
-                Vector3 normal = Quaternion.Euler(euler) * Vector3.back;
-                if (Mathf.Abs(normal.y) < 1e-6f)
-                    return data.pos.y;//平面接近竖直，y 不确定，退化返回 tile 中心高度
+            if (!heightPlaneValid || heightPrefabName != data.prefabName || heightYaw != data.euler.y)
+                GetHeightPlaneVersion(prefab);
+            // Keep the original plane equation/order, but do no prefab lookup,
+            // Collider traversal, Euler conversion or trigonometry on warm reads.
+            return heightHasPlane
+                ? data.pos.y + (heightPlaneDot - (heightNormal.x * selfPos.x + heightNormal.z * selfPos.y)) / heightNormal.y
+                : data.pos.y;
+        }
 
-                //必经过点 (0, 1/tan(euler.x)/2, 0)
-                //euler.x 接近 0 时 tan→0，1/tan 趋于无穷会产生 Infinity/NaN，需提前拦截
-                float tan = Mathf.Tan(collider.transform.eulerAngles.x * Mathf.PI / 180f);
-                if (Mathf.Abs(tan) < 1e-6f)
-                    return data.pos.y;
+        internal int GetHeightPlaneVersion(GameObject currentPrefab)
+        {
+            if (heightPlaneValid && heightPrefabName == data.prefabName
+                && ReferenceEquals(heightPrefab, currentPrefab) && heightYaw == data.euler.y)
+                return heightPlaneVersion;
 
-                Vector3 planePoint = new Vector3(0, 1f / tan / 2f, 0);
-                return data.pos.y + Z_Math.Graph.CalculateYAtPointInPlane(planePoint, normal, selfPos.x, selfPos.y);
-            }
-            return data.pos.y;
+            heightPlaneValid = true;
+            heightPrefabName = data.prefabName;
+            heightPrefab = currentPrefab;
+            heightYaw = data.euler.y;
+            unchecked { heightPlaneVersion++; }
+            heightHasPlane = false;
+            var collider = currentPrefab != null ? currentPrefab.GetComponentInChildren<BoxCollider>() : null;
+            if (collider == null)
+                return heightPlaneVersion;
+
+            var euler = collider.transform.eulerAngles;
+            float pitch = euler.x;
+            euler.y += heightYaw;
+            var normal = Quaternion.Euler(euler) * Vector3.back;
+            if (Mathf.Abs(normal.y) < 1e-6f)
+                return heightPlaneVersion;
+            float tan = Mathf.Tan(pitch * Mathf.PI / 180f);
+            if (Mathf.Abs(tan) < 1e-6f)
+                return heightPlaneVersion;
+
+            heightNormal = normal.normalized;
+            if (Mathf.Abs(heightNormal.y) < 1e-6f)
+                return heightPlaneVersion;
+            heightPlaneDot = Vector3.Dot(heightNormal, new Vector3(0, 1f / tan / 2f, 0));
+            heightHasPlane = true;
+            return heightPlaneVersion;
+        }
+
+        public override void InvalidateCollisionGeometry()
+        {
+            base.InvalidateCollisionGeometry();
+            // UpdateSingleOne also covers same-name/in-place prefab edits.
+            InvalidateHeightPlane();
+        }
+
+        internal void InvalidateHeightPlane()
+        {
+            heightPlaneValid = false;
         }
 
 

@@ -219,15 +219,17 @@ namespace Z_Texture
 
         public static byte[] GetPNGWithExtraInfo(Texture2D tex,byte[] info)
 {
-    byte[] pngData = GetTextureByte(tex);
-    return InsertTextChunk(pngData, "ZEXTRA", Convert.ToBase64String(info));
+    // New packages live in lossless RGB image pixels, not PNG text metadata.
+    return PngPixelPackage.Encode(tex, info);
 }
         public static byte[] GetExtraInfoByPNG(byte[] texByte)
 {
+    // Read old exports without passing their non-standard chunk order through
+    // a native image decoder. New exports never write this legacy text chunk.
     string infoBase64 = ExtractTextChunk(texByte, "ZEXTRA");
-    if (string.IsNullOrEmpty(infoBase64))
-        return null;
-    return Convert.FromBase64String(infoBase64);
+    if (!string.IsNullOrEmpty(infoBase64))
+        return Convert.FromBase64String(infoBase64);
+    return PngPixelPackage.Decode(texByte);
 }
 
         private static byte[] InsertTextChunk(byte[] pngData, string keyword, string text)
@@ -258,36 +260,40 @@ namespace Z_Texture
 
         private static string ExtractTextChunk(byte[] pngData, string keyword)
 {
+    byte[] signature = { 137, 80, 78, 71, 13, 10, 26, 10 };
+    if (pngData == null || pngData.Length < 20 || !signature.SequenceEqual(pngData.Take(8)))
+        throw new InvalidDataException("Not a valid PNG package.");
     int offset = 8;
-    while (offset < pngData.Length)
+    string result = null;
+    while (offset <= pngData.Length - 12)
     {
-        int chunkLength = BitConverter.ToInt32(pngData, offset);
-        if (BitConverter.IsLittleEndian)
-            chunkLength = ReverseBytes(chunkLength);
-        
-        offset += 4;
-        string chunkType = Encoding.ASCII.GetString(pngData, offset, 4);
-        offset += 4;
-        
+        uint length = ((uint)pngData[offset] << 24) | ((uint)pngData[offset + 1] << 16) |
+                      ((uint)pngData[offset + 2] << 8) | pngData[offset + 3];
+        if (length > pngData.Length - offset - 12)
+            throw new InvalidDataException("Truncated PNG package.");
+        int chunkLength = (int)length;
+        string chunkType = Encoding.ASCII.GetString(pngData, offset + 4, 4);
+        int dataOffset = offset + 8;
         if (chunkType == "tEXt")
         {
-            byte[] chunkData = new byte[chunkLength];
-            Array.Copy(pngData, offset, chunkData, 0, chunkLength);
-            
-            int nullIndex = Array.IndexOf(chunkData, (byte)0);
-            if (nullIndex != -1)
+            int nullIndex = Array.IndexOf(pngData, (byte)0, dataOffset, chunkLength);
+            if (nullIndex >= dataOffset && nullIndex - dataOffset == keyword.Length &&
+                Encoding.ASCII.GetString(pngData, dataOffset, keyword.Length) == keyword)
             {
-                string chunkKeyword = Encoding.ASCII.GetString(chunkData, 0, nullIndex);
-                if (chunkKeyword == keyword)
-                {
-                    return Encoding.ASCII.GetString(chunkData, nullIndex + 1, chunkLength - nullIndex - 1);
-                }
+                if (result != null)
+                    throw new InvalidDataException("Duplicate legacy package data.");
+                result = Encoding.ASCII.GetString(pngData, nullIndex + 1, chunkLength - keyword.Length - 1);
             }
         }
-        
-        offset += chunkLength + 4;
+        offset += chunkLength + 12;
+        if (chunkType == "IEND")
+        {
+            if (chunkLength != 0 || offset != pngData.Length)
+                throw new InvalidDataException("Incomplete PNG package.");
+            return result;
+        }
     }
-    return null;
+    throw new InvalidDataException("Incomplete PNG package.");
         }
 
         private static byte[] CreateTextChunk(string keyword, string text)

@@ -11,6 +11,7 @@ using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Math;
 using Z_Texture;
+using Z_Time;
 using Z_Ui.Base;
 
 
@@ -92,7 +93,7 @@ namespace Ui.PlayAsset
         }
         public override void OnUpdate()
         {
-            model.prm.data.posProgress += Time.deltaTime;
+            model.prm.data.posProgress += TimeManager.GetDeltaTime();
             Refresh();
         }
         public void Refresh()
@@ -107,7 +108,7 @@ namespace Ui.PlayAsset
             {
                 rect.position = Vector3.Lerp(data.oldPos, data.tarPos, data.posProgress / data.posTime);
             }
-            data.eulerProgress += Time.deltaTime;
+            data.eulerProgress += TimeManager.GetDeltaTime();
             if (data.eulerTime == 0)
             {
                 rect.eulerAngles = rect.eulerAngles.NewSetZ(data.tarEuler);
@@ -117,7 +118,7 @@ namespace Ui.PlayAsset
                 rect.eulerAngles = rect.eulerAngles.NewSetZ(data.oldEuler + (data.tarEuler - data.oldEuler) * Math.Min(1f, data.eulerProgress / data.eulerTime));
             }
 
-            data.opacityProgress += Time.deltaTime;
+            data.opacityProgress += TimeManager.GetDeltaTime();
             if (data.opacityTime == 0)
             {
                 view.img_.color.NewSetA(data.tarOpacity);
@@ -128,7 +129,7 @@ namespace Ui.PlayAsset
             }
             if (data.removeTime < int.MaxValue)
             {
-                data.removeTime -= Time.deltaTime;
+                data.removeTime -= TimeManager.GetDeltaTime();
                 if (data.removeTime <= 0)
                 {
                     PlayManager.instance.assetCtrl.Remove(data.uid);

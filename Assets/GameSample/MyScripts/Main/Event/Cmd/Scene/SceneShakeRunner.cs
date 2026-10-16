@@ -1,5 +1,6 @@
 using Ui.DialogBg;
 using UnityEngine;
+using Z_Time;
 using Z_Ui;
 
 public class SceneShakeRunner : MonoBehaviour
@@ -48,7 +49,7 @@ public class SceneShakeRunner : MonoBehaviour
             return;
         }
 
-        elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+        elapsed = Mathf.Min(duration, elapsed + TimeManager.GetDeltaTime());
         float phase = elapsed / duration * 4f * Mathf.PI;
         float offset = Mathf.Sin(phase);
         if (cameraTransform != null)

@@ -7,6 +7,7 @@ using Z_ByteSerialize;
 using Z_Debug;
 using Z_Fight.Form;
 using Z_Map;
+using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
@@ -104,7 +105,7 @@ namespace Z_Fight
                 data.euler = superUnit.data.euler;
             }
             if (data.cdRemain > 0)
-                data.cdRemain -= Time.deltaTime;
+                data.cdRemain -= TimeManager.GetDeltaTime();
 
 
 

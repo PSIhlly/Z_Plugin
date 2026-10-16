@@ -7,7 +7,6 @@ using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using Z_DataSystem;
@@ -21,7 +20,6 @@ using Z_Time;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
-using static UnityEditor.PlayerSettings;
 
 public interface InternalPlaySceneController
 {
@@ -48,6 +46,7 @@ public interface ExternalPlaySceneController
     public void SetCurOptSkill(SkillType? type);
 
     public CharacterUnitForm.Data GetCharacterUnit(int productUid);
+    public bool RemoveCharacter(CharacterUnitForm.Data data);
 }
 public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputKeyUpEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
 {
@@ -323,7 +322,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             _playerM.unit.forceEuler = ((Quaternion)setPlayerRot).eulerAngles;
 
 #if PLATFORM_ANDROID
-            rotHoldingSeconds -= Time.deltaTime;
+            rotHoldingSeconds -= TimeManager.GetDeltaTime();
             if (rotHoldingSeconds < 0)
             {
                 setPlayerRot = null;
@@ -344,7 +343,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         if (updateNavFrame < Time.frameCount)
         {
-            MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count * 3 + ObjectUnitForm.DataByUid.Count) / 50, 10));
+            MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count * 3 + ObjectUnitForm.DataByUid.Count) / 100, 5));
             updateNavFrame = Time.frameCount + 60;
         }
     }
@@ -357,9 +356,37 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     public CharacterUnitForm.Data GetCharacterUnit(int productUid)
     {
         var data = CharacterProductForm.DataByUid.GetDv(productUid, null);
-        if (data == null || !_characterDic.ContainsKey(data))
+        if (data == null || _characterDic == null || !_characterDic.TryGetValue(data, out var unitData))
             return null;
-        return _characterDic[data];
+        if (!CharacterUnitForm.DataByUid.TryGetValue(unitData.uid, out var registered)
+            || !ReferenceEquals(registered, unitData))
+        {
+            _characterDic.Remove(data);
+            return null;
+        }
+        return unitData;
+    }
+
+    public bool RemoveCharacter(CharacterUnitForm.Data data)
+    {
+        if (data == null || !CharacterUnitForm.DataByUid.TryGetValue(data.uid, out var registered)
+            || !ReferenceEquals(registered, data))
+            return false;
+
+        MapManager.instance.RemoveCharacter(data);
+        var product = CharacterProductForm.DataByUid.GetDv(data.unit.productInfo.Item1, null);
+        if (product != null && _characterDic != null
+            && _characterDic.TryGetValue(product, out var cached) && ReferenceEquals(cached, data))
+            _characterDic.Remove(product);
+        if (ReferenceEquals(_playerM, data))
+        {
+            lastPlayerPos = data.pos;
+            _playerM = null;
+            _playerG = null;
+            setPlayerMove = Vector3.zero;
+            setPlayerRot = null;
+        }
+        return true;
     }
 
     public CharacterUnitForm.Data GetOrNewCharacter(CharacterProductForm.Data data)
@@ -415,7 +442,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return;
         dir.y = 0;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-        setPlayerRot = Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * Time.deltaTime);
+        setPlayerRot = Quaternion.Slerp(Quaternion.Euler(_playerM.euler), targetRotation, speed * MapUtilController.MovementDeltaTime);
 
 
     }
@@ -465,7 +492,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                     break;
             }
         }
-        SetPlayerMove(step.normalized * 0.02f);
+        SetPlayerMove(step.normalized * MapUtilController.MovementDeltaTime);
     }
     public void OnEvent(InputKeyUpEvent evt)
     {

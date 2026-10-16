@@ -26,20 +26,24 @@ namespace Z_Code
         public override CmdBase GetNew() => new DestroyCharacterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER));
-            if (data != null)
-            {
-                var unit = data.unit;
-                if (unit is CharacterUnit c)
-                {
-                    var form = CharacterProductForm.DataByUid.GetDv(c.productInfo.Item1, null);
-                    if (form != null && !form.unique)
-                    {
-                        CharacterProductForm.RemoveData(form.uid);
-                        MapManager.instance.RemoveCharacter(c.data);
-                    }
+            var reference = prm[0].str;
+            if (string.IsNullOrEmpty(reference))
+                return true;
 
-                }
+            // Interaction/BoundaryTouch pass the scene instance; other character
+            // events and commands pass the owning Character Product.
+            var data = GlobalEventHelper.IsAsset(reference, GlobalEventHelper.SCENEOBJECT)
+                ? UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(reference, GlobalEventHelper.SCENEOBJECT), null)
+                    as Z_Map.Form.CharacterUnitForm.Data
+                : PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(reference, GlobalEventHelper.CHARACTER));
+            if (data?.unit is CharacterUnit character)
+            {
+                var product = CharacterProductForm.DataByUid.GetDv(character.productInfo.Item1, null);
+                if (!PlayManager.instance.sceneCtrl.RemoveCharacter(data))
+                    return true;
+                // Uniqueness protects the Product, not its instance in this scene.
+                if (product != null && !product.unique)
+                    CharacterProductForm.RemoveData(product.uid);
             }
             return true;
         }

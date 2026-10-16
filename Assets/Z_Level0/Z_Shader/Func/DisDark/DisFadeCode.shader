@@ -4,7 +4,6 @@ Shader "DisFadeCode"
     Properties
     {
         [NoScaleOffset]_Tex("_Tex", 2D) = "white" {}
-        [NoScaleOffset]_AlphaTex("_AlphaTex", 2D) = "white" {}
         _UseCloseHide("_UseCloseHide", Float) = 0
         _Show("_Show", Float) = 0
         [Toggle] _FadeCenter("fadeCenter", Float) = 0
@@ -24,6 +23,57 @@ Shader "DisFadeCode"
             "ShaderGraphShader"="true"
         }
 
+        HLSLINCLUDE
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+        // Textures belong to shared materials; only numeric per-renderer values
+        // enter the MPB. The non-instanced variant retains UnityPerMaterial.
+        sampler2D _Tex;
+        UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
+            UNITY_DEFINE_INSTANCED_PROP(float, _Cutoff)
+            UNITY_DEFINE_INSTANCED_PROP(float, _Alpha)
+            UNITY_DEFINE_INSTANCED_PROP(float, _Show)
+            UNITY_DEFINE_INSTANCED_PROP(float, _FadeCenter)
+            UNITY_DEFINE_INSTANCED_PROP(float, _LightSensitivity)
+        UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
+
+        float4 _MapFadeCenterPosition;
+        // Camera-scoped by DisFadeOpaqueFeature, never a material/MPB setting.
+        float _DisFadeSplitEnabled;
+
+        float CameraCenterVisibility(float3 positionWS)
+        {
+            float3 positionVS = TransformWorldToView(positionWS);
+            float2 viewOffset = positionVS.xy;
+            if (unity_OrthoParams.w < 0.5)
+            {
+                float centerDepth = abs(TransformWorldToView(_MapFadeCenterPosition.xyz).z);
+                viewOffset *= max(centerDepth, 0.0001) / max(abs(positionVS.z), 0.0001);
+            }
+
+            float2 rightXZ = UNITY_MATRIX_V[0].xz;
+            float2 upXZ = UNITY_MATRIX_V[1].xz;
+            float determinant = rightXZ.x * upXZ.y - rightXZ.y * upXZ.x;
+            float2 groundOffset = viewOffset;
+            if (abs(determinant) > 0.0001)
+                groundOffset = float2(
+                    viewOffset.x * upXZ.y - viewOffset.y * rightXZ.y,
+                    viewOffset.y * rightXZ.x - viewOffset.x * upXZ.x) / determinant;
+
+            float visibility = saturate((length(groundOffset) - 1.5) / (3.5 - 1.5));
+            return 0.2 + 0.8 * visibility * visibility;
+        }
+
+        float DisFadeOpacity(float3 positionWS)
+        {
+            float fadeCenter = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _FadeCenter);
+            float alpha = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Alpha);
+            float show = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Show);
+            float visibility = fadeCenter > 0.5 ? CameraCenterVisibility(positionWS) : 1.0;
+            return saturate(alpha * show * visibility);
+        }
+        ENDHLSL
+
         Pass
         {
             Name "Universal Forward"
@@ -33,7 +83,8 @@ Shader "DisFadeCode"
             }
 
             // Continuous premultiplied transparency avoids opaque dither specks.
-            // Transparent surfaces must not block later draws by writing depth.
+            // Fully opaque pixels are drawn by DisFadeOpaque before this pass.
+            // Only partially transparent surfaces reach this no-depth-write pass.
             Blend One OneMinusSrcAlpha
             ZTest LEqual
             ZWrite Off
@@ -42,6 +93,7 @@ Shader "DisFadeCode"
 
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
             // ����������Ӱ��ص�multi_compile��������Ӱ����ʧЧ
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
@@ -54,53 +106,12 @@ Shader "DisFadeCode"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            CBUFFER_START(UnityPerMaterial)
-                sampler2D _Tex;
-                sampler2D _AlphaTex;
-                float _Cutoff;
-                float _Alpha;
-                float _Show;
-                float _FadeCenter;
-                float _LightSensitivity;
-            CBUFFER_END
-
-            // Set by the active map. These are shared globals, not material overrides.
-            float4 _MapFadeCenterPosition;
-
-            half CameraCenterVisibility(float3 positionWS)
-            {
-                // Camera-local XY is centered on the actual view axis. Normalize
-                // perspective positions at the map center's depth, when applicable.
-                float3 positionVS = TransformWorldToView(positionWS);
-                float2 viewOffset = positionVS.xy;
-                if (unity_OrthoParams.w < 0.5)
-                {
-                    float centerDepth = abs(TransformWorldToView(_MapFadeCenterPosition.xyz).z);
-                    viewOffset *= max(centerDepth, 0.0001) / max(abs(positionVS.z), 0.0001);
-                }
-
-                // Undo the camera's ground-plane projection so distances remain
-                // world units regardless of camera tilt, zoom or map cell size.
-                float2 rightXZ = UNITY_MATRIX_V[0].xz;
-                float2 upXZ = UNITY_MATRIX_V[1].xz;
-                float determinant = rightXZ.x * upXZ.y - rightXZ.y * upXZ.x;
-                float2 groundOffset = viewOffset;
-                if (abs(determinant) > 0.0001)
-                    groundOffset = float2(
-                        viewOffset.x * upXZ.y - viewOffset.y * rightXZ.y,
-                        viewOffset.y * rightXZ.x - viewOffset.x * upXZ.x) / determinant;
-
-                // Twenty-percent opacity through 1.5 world units, then a two-unit fade
-                // ring reaching ordinary opacity at 3.5. Keep the quadratic curve.
-                float visibility = saturate((length(groundOffset) - 1.5) / (3.5 - 1.5));
-                return 0.2 + 0.8 * visibility * visibility;
-            }
-
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normalOS : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
@@ -110,11 +121,14 @@ Shader "DisFadeCode"
                 float3 normalWS : TEXCOORD1;
                 float3 positionWS : TEXCOORD2;
                 half dark: TEXCOORD3;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             Varyings vert(Attributes input)
             {
                 Varyings output;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
                 output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
                 output.positionHCS = TransformWorldToHClip(output.positionWS);
                 output.uv = input.uv;
@@ -129,18 +143,18 @@ Shader "DisFadeCode"
 
             half4 frag(Varyings input) : SV_Target
             {
+                UNITY_SETUP_INSTANCE_ID(input);
                 half4 baseColor = tex2D(_Tex, input.uv);
-                half4 alphaColor = tex2D(_AlphaTex, input.uv);
 
                 #if _ALPHATEST_ON
-                    clip(alphaColor.r- _Cutoff);
-                    clip(baseColor.a - _Cutoff);
+                    clip(baseColor.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
                 #endif
 
-                half centerVisibility = _FadeCenter > 0.5 ? CameraCenterVisibility(input.positionWS) : 1.0h;
-                half finalAlpha = saturate(_Alpha * _Show * centerVisibility);
+                float finalAlpha = DisFadeOpacity(input.positionWS);
                 // Discard only invisible fragments, never randomly retain opaque pixels.
                 clip(finalAlpha - 0.0001h);
+                if (_DisFadeSplitEnabled > 0.5 && finalAlpha >= 1.0)
+                    discard;
 
                 // ���ģ�������Ӱ���꣨URP���ߺ�����
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
@@ -154,7 +168,7 @@ Shader "DisFadeCode"
                 half3 normalWS = normalize(input.normalWS);
                 half NdotL = saturate(dot(normalWS, mainLight.direction));
                 // 光敏感性：_LightSensitivity越大，弱光下整体越亮
-                half lightAmount = pow(NdotL, 1.0 / _LightSensitivity);
+                half lightAmount = pow(NdotL, 1.0 / UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _LightSensitivity));
                 // 3. 计算阴影强度衰减后的漫反射（降低模型被遮挡时的亮度）
                 half3 diffuse = mainLight.color * lightAmount * baseColor.rgb * shadowStrength * input.dark;
                 
@@ -175,33 +189,32 @@ Shader "DisFadeCode"
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
             #pragma multi_compile _ _ALPHATEST_ON
             
             #define _ALPHATEST_ON 1
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            CBUFFER_START(UnityPerMaterial)
-                sampler2D _Tex;
-                sampler2D _AlphaTex;
-                float _Cutoff;
-            CBUFFER_END
-
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
                 float2 uv : TEXCOORD0;
                 float4 positionHCS : SV_POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             Varyings vert(Attributes input)
             {
                 Varyings output;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
                 output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
                 output.uv = input.uv;
                 return output;
@@ -209,15 +222,87 @@ Shader "DisFadeCode"
 
             half4 frag(Varyings input) : SV_Target
             {
+                UNITY_SETUP_INSTANCE_ID(input);
                 half4 baseColor = tex2D(_Tex, input.uv);
-                half4 alphaColor = tex2D(_AlphaTex, input.uv);
                 #if _ALPHATEST_ON
                     // Visibility fading must not remove the caster. Keep only the
-                    // authored texture/mask cutouts in the shadow silhouette.
-                    clip(alphaColor.r - _Cutoff);
-                    clip(baseColor.a - _Cutoff);
+                    // authored texture cutouts in the shadow silhouette.
+                    clip(baseColor.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
                 #endif
                 return 0;
+            }
+            ENDHLSL
+        }
+
+        // Executed by the active URP Render Objects feature after the skybox,
+        // before any transparent color draws. Writing COLOR as well as depth
+        // prevents a late opaque draw from overwriting translucent foreground.
+        Pass
+        {
+            Name "DisFadeOpaque"
+            Tags { "LightMode" = "DisFadeOpaque" }
+            Blend Off
+            ZWrite On
+            ZTest LEqual
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _SHADOWS_SOFT
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+                float3 normalOS : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float2 uv : TEXCOORD0;
+                float4 positionHCS : SV_POSITION;
+                float3 normalWS : TEXCOORD1;
+                float3 positionWS : TEXCOORD2;
+                half dark : TEXCOORD3;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            Varyings vert(Attributes input)
+            {
+                Varyings output;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                output.positionHCS = TransformWorldToHClip(output.positionWS);
+                output.uv = input.uv;
+                output.normalWS = TransformObjectToWorldNormal(input.normalOS);
+                output.dark = 1;
+                output.dark -= (_WorldSpaceCameraPos.y - output.positionWS.y - 8) / 10;
+                return output;
+            }
+
+            half4 frag(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                half4 baseColor = tex2D(_Tex, input.uv);
+                clip(baseColor.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
+                // Exact split: even 0.9999 remains translucent and cannot write
+                // depth. Fully hidden/fading and texture-cutout pixels skip it.
+                clip(DisFadeOpacity(input.positionWS) - 1.0);
+
+                float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+                Light mainLight = GetMainLight(shadowCoord);
+                half NdotL = saturate(dot(normalize(input.normalWS), mainLight.direction));
+                half lightAmount = pow(NdotL, 1.0 / UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _LightSensitivity));
+                half3 diffuse = mainLight.color * lightAmount * baseColor.rgb
+                    * mainLight.shadowAttenuation * input.dark;
+                return half4(diffuse, 1.0h);
             }
             ENDHLSL
         }

@@ -65,8 +65,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             view.btn_centerCollider.onClick.AddListener(() =>
             {
                 model.data.centerCollider = !model.data.centerCollider;
-                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(model.data.id);
                 Refresh();
+                // ModStory retains scene rows after unloading the map. Update
+                // the config immediately; only refresh spatial indexes in a loaded map.
+                if (MapManager.instance.data != null)
+                    GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(model.data.id);
             });
             view.ipt_colliderScale.onFinishInput += s =>
             {

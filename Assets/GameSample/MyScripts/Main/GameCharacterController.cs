@@ -4,8 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using Z_DataSystem;
@@ -15,6 +13,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_Texture;
 using Z_Time;
+using Z_UnitSystem;
 public static partial class GlobalSettings
 {
     public const int CHARACTER_AVATA_MAX = 10;
@@ -198,6 +197,7 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
         public Dictionary<BodyPartType, int> stateCd = new Dictionary<BodyPartType, int>();
         public Dictionary<BodyPartType, string> animCurCache = new Dictionary<BodyPartType, string>();
         public Dictionary<BodyPartType, Timer> animTimer = new Dictionary<BodyPartType, Timer>();
+        private readonly Dictionary<BodyPartType, AnimDirecton> animDirectionCache = new Dictionary<BodyPartType, AnimDirecton>();
 
         public AnimDirecton dirCur = AnimDirecton.Fixed;
         public CharacterAnimForm.Data GetAnim(State state, string extraAnimName)
@@ -245,6 +245,9 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
         public void Reset()
         {
+            CancelTimers();
+            stateCur.Clear();
+            dirCur = AnimDirecton.Fixed;
             foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
             {
                 animCur[part] = "";
@@ -252,6 +255,15 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 stateCd[part] = 0;
                 animCurCache[part] = "";
                 animTimer[part] = null;
+                animDirectionCache[part] = AnimDirecton.Fixed;
+            }
+        }
+        public void CancelTimers()
+        {
+            foreach (var timer in animTimer.Values)
+            {
+                if (timer != null)
+                    timer.cancel = true;
             }
         }
         public void CloseHideRenderer()
@@ -261,14 +273,12 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
                 if (part == BodyPartType.None)
                     continue;
                 var anim = productData.animDic.GetDv(animCur[part], null);
-                if (anim != null && anim.partEnable.ContainsKey(part) && anim.partEnable[part])
-                {
-                    data.unit.ins.renderers[(int)part - 1].enabled = true;
-                }
-                else
-                {
-                    data.unit.ins.renderers[(int)part - 1].enabled = false;
-                }
+                bool enabled = anim != null && anim.partEnable.ContainsKey(part) && anim.partEnable[part];
+                // Runtime templates start disabled; animation owns part enablement,
+                // while map visibility remains in the renderer's _Show override.
+                var renderer = data.unit.ins.renderers[(int)part - 1];
+                if (renderer != null && renderer.enabled != enabled)
+                    renderer.enabled = enabled;
             }
         }
         public void ChangeState(State tar, BodyPartType part, bool forceReplay = false, string extraAnimName = "")
@@ -350,95 +360,119 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
             {
                 return;
             }
+            var newDir = GetDir();
             if (animCurCache.ContainsKey(part) && animCurCache[part] == anim.name)
             {
-                var newDir = GetDir();
-                if (newDir == dirCur)
+                if (newDir == animDirectionCache[part])
                 {
                     return;
                 }
-                dirCur = newDir;
             }
-            MaterialPropertyBlock propBlock;
-            if (anim != null && anim.animClip.Count > 0 && anim.animClip[dirCur].Count > 0)
+            dirCur = newDir;
+            animDirectionCache[part] = newDir;
+            TimeManager.instance.CancelTimer(animTimer[part]);
+            animTimer[part] = null;
+            animCurCache[part] = anim.name;
+            if (anim.animClip.TryGetValue(dirCur, out var clip) && clip.Count > 0)
             {
-
-                propBlock = new MaterialPropertyBlock();
-                render.GetPropertyBlock(propBlock);
-                TimeManager.instance.CancelTimer(animTimer[part]);
-
-
-                if (anim.animTimeInterval > 0)
+                var texIds = new int[clip.Count];
+                for (int i = 0; i < clip.Count; i++)
+                    clip[i].partTex.TryGetValue(part, out texIds[i]);
+                var first = TextureAnimation.GetSample(texIds, anim.animTimeInterval, 0);
+                ApplyAnimationTexture(data.unit.ins, render, (int)part - 1, first.texture);
+                if (first.animated || anim.animTimeInterval > 0)
                 {
-                    float all = anim.animTimeInterval * anim.animClip[dirCur].Count;
-                    int cur = 0;//(int)((Time.time % all) / anim.animTimeInterval-0.0001f);
-
-                    float timeProgress = 0;// (Time.time % anim.animTimeInterval);
-
-                    animCurCache[part] = anim.name;
-
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[anim.animClip[dirCur][cur].partTex[part]].GetTex());
-                    var renderPart = part;
-                    animTimer[part] = TimeManager.instance.StartTimer(timeProgress, anim.animTimeInterval, () =>
+                    double elapsed = 0;
+                    var owner = data.unit.ins;
+                    bool internalAnimation = false;
+                    foreach (int id in texIds)
+                        internalAnimation |= TexAssetForm.DataById.TryGetValue(id, out var texData)
+                            && texData.GetAnimationDuration() > 0;
+                    Func<bool> update = () =>
                     {
-                        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                        render.GetPropertyBlock(propBlock);
-
-                        if (cur + 1 >= anim.animClip[dirCur].Count)
-                        {
-
-                            if (stateCur[part] == State.Special)
-                            {
-                                ChangeState(State.Idle, part);
-                                return true;
-                            }
-                            if (stateCur[part] == State.Die)
-                            {
-                                return true;
-                            }
-
-                        }
-                        cur = (cur + 1) % anim.animClip[dirCur].Count;
-                        propBlock.SetTexture("_Tex", TexAssetForm.DataById[anim.animClip[dirCur][cur].partTex[renderPart]].GetTex());
-                        render.SetPropertyBlock(propBlock);
-                        return false;
-                    }, data.unit.ins);
+                        if (data.unit.ins != owner || owner.unit != data.unit || render == null)
+                            return true;
+                        return AdvanceTextureAnimation(part, render, texIds, anim.animTimeInterval,
+                            ref elapsed, internalAnimation ? TimeManager.GetDeltaTime() : anim.animTimeInterval);
+                    };
+                    animTimer[part] = internalAnimation
+                        ? TimeManager.instance.StartFrameTimer(update, owner)
+                        : TimeManager.instance.StartTimer(0, anim.animTimeInterval, update, owner);
                 }
-                else
-                {
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[anim.animClip[dirCur][0].partTex[part]].GetTex());
-                }
-                render.SetPropertyBlock(propBlock);
             }
+            else
+                ApplyAnimationTexture(data.unit.ins, render, (int)part - 1, null);
+        }
+
+        private bool AdvanceTextureAnimation(BodyPartType part, Renderer render, int[] texIds,
+            float interval, ref double elapsed, float delta)
+        {
+            elapsed += delta;
+            bool loop = stateCur[part] != State.Special && stateCur[part] != State.Die;
+            var sample = TextureAnimation.GetSample(texIds, interval, elapsed, loop);
+            ApplyAnimationTexture(data.unit.ins, render, (int)part - 1, sample.texture);
+            if (!sample.completed)
+                return false;
+            if (stateCur[part] == State.Special)
+                ChangeState(State.Idle, part);
+            // Die retains the last GIF frame; Special resumes Idle only after its hold.
+            return true;
+        }
+
+        private static void ApplyAnimationTexture(CharacterInstance ins, Renderer render, int rendererId, Texture texture)
+        {
+            texture = texture != null ? texture : Texture2D.whiteTexture;
+            DisFadeRenderRouting.SetTexture(render, texture, ins.GetRendererRoute(rendererId));
 
         }
     }
 
     public void RegisterAnim(CharacterUnitForm.Data data)
     {
-        if (animControllerDic.ContainsKey(data))
+        if (!TryGetVisibleCharacter(data, out var productData) || animControllerDic.ContainsKey(data))
         {
             return;
         }
-        var productData = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
         CharacterAnimForm.Data idleAnim = productData.animDic.GetDv(productData.defaultAnimName.GetDv("idle", null), null);
         CharacterAnimForm.Data moveAnim = productData.animDic.GetDv(productData.defaultAnimName.GetDv("move", null), null);
 
-        GameManager.instance.characterCtrl.CreateAnim(data, idleAnim, moveAnim);
+        CreateAnim(data, idleAnim, moveAnim);
+    }
+    private static bool TryGetVisibleCharacter(CharacterUnitForm.Data data, out CharacterProductForm.Data product)
+    {
+        product = null;
+        if (data == null || !CharacterUnitForm.DataByUid.TryGetValue(data.uid, out var registered)
+            || !ReferenceEquals(registered, data))
+            return false;
+        var unit = data.unit;
+        if (unit == null || !unit.isShowing || !ReferenceEquals(unit.ins.unit, unit))
+            return false;
+        return CharacterProductForm.DataByUid.TryGetValue(unit.productInfo.Item1, out product) && product != null;
+    }
+    private bool TryGetAnimController(CharacterUnitForm.Data data, out AnimController controller)
+    {
+        controller = null;
+        if (!TryGetVisibleCharacter(data, out _))
+            return false;
+        if (!animControllerDic.TryGetValue(data, out controller))
+        {
+            // Scene data may exist before its first Show, or survive a controller reset.
+            RegisterAnim(data);
+            animControllerDic.TryGetValue(data, out controller);
+        }
+        return controller != null;
     }
     public void UnregisterAnim(CharacterUnitForm.Data data)
     {
-        var ctrl = animControllerDic.GetDv(data, null);
-        if (ctrl != null)
-        {
-            foreach (var timer in ctrl.animTimer)
-            {
-                TimeManager.instance.CancelTimer(timer.Value);
-            }
-        }
+        if (data == null || !animControllerDic.TryGetValue(data, out var ctrl))
+            return;
+        ctrl.CancelTimers();
+        animControllerDic.Remove(data);
     }
     public void Reset()
     {
+        foreach (var ctrl in animControllerDic.Values)
+            ctrl.CancelTimers();
         animControllerDic.Clear();
     }
     public void CreateAnim(CharacterUnitForm.Data key, CharacterAnimForm.Data idleAnim, CharacterAnimForm.Data moveAnim)
@@ -453,15 +487,13 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
     public void LoadModel(CharacterInstance ins)
     {
-        var data = ins.unit.data;
-        var form = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
-        if (form == null)
-        {
-            Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);
+        if (ins == null || ins.unit == null)
             return;
-        }
-
-        animControllerDic[data].Reset();
+        var data = ins.unit.data;
+        if (!TryGetAnimController(data, out var status))
+            return;
+        var form = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
+        status.Reset();
 
         foreach (var keeper in ins.keepers)
         {
@@ -473,7 +505,8 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
     public void PlaySpecialAnim(CharacterUnitForm.Data ch, string animName)
     {
-        var status = animControllerDic[ch];
+        if (!TryGetAnimController(ch, out var status))
+            return;
 
         foreach (BodyPartType part in Enum.GetValues(typeof(BodyPartType)))
         {
@@ -483,22 +516,13 @@ public class GameCharacterController : Z_Controller<GameManager>, IZ_Listener<Ch
 
     public void CheckAnim(CharacterInstance ins)
     {
-        if (ins == null)
+        if (ins == null || ins.unit == null)
         {
             return;
         }
         var data = ins.unit.data;
-        if (!animControllerDic.ContainsKey(ins.unit.data))
-        {
+        if (!TryGetAnimController(data, out var status))
             return;
-        }
-        var form = CharacterProductForm.DataByUid[ins.unit.productInfo.Item1];
-        if (form == null)
-        {
-            Debug.LogError("No CharacterProductForm Find! " + ins.gameObject.name);
-            return;
-        }
-        var status = animControllerDic[data];
 
         if (ins.step != Vector3.zero)
         {

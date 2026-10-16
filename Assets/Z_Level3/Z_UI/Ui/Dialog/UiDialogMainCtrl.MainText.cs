@@ -43,6 +43,11 @@ namespace Ui.DialogMain
             }
             public override void OnShow()
             {
+                TimeManager.instance.CancelTimer(model.wordTimer);
+                TimeManager.instance.CancelTimer(model.overTimer);
+                model.isDisplaying = false;
+                model.nowWord = 0;
+                view.txt_.text = "";
                 model.prm = param;
                 view.go_bg.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
 
@@ -55,17 +60,34 @@ namespace Ui.DialogMain
                 if (!string.IsNullOrEmpty(model.prm.clip.mainText))
                 {
                     model.isDisplaying = true;
-                    model.nowWord = 0;
-                    view.txt_.text = "";
-
                     Display();
 
                 }
             }
+            public override void OnHide()
+            {
+                TimeManager.instance.CancelTimer(model.wordTimer);
+                TimeManager.instance.CancelTimer(model.overTimer);
+                model.isDisplaying = false;
+            }
             private void Display()
             {
-                var interval = Mathf.Max(0.1f, 1f / DialogManager.instance.settings.textDisplaySpeed);
                 TimeManager.instance.CancelTimer(model.wordTimer);
+                TimeManager.instance.CancelTimer(model.overTimer);
+                var settings = DialogManager.instance.settings;
+                if (settings.skipping)
+                {
+                    // Skip completes this sentence immediately, including new
+                    // sentences shown while the same press is still held.
+                    view.txt_.text = model.prm.clip.mainText;
+                    model.nowWord = model.prm.clip.mainText.Length;
+                    model.isDisplaying = false;
+                    if (settings.autoPlaySpeed > 0)
+                        DelayForOver(model.autoPlaydelay / settings.autoPlaySpeed);
+                    return;
+                }
+
+                var interval = Mathf.Max(0.1f, 1f / settings.textDisplaySpeed);
                 model.wordTimer = TimeManager.instance.StartTimer(0, interval, Write, uiHolder);
             }
 
@@ -107,16 +129,19 @@ namespace Ui.DialogMain
             }
             public void OnEvent(ClipPlayEvent e)
             {
+                if (!active)
+                    return;
                 switch (e.playType)
                 {
                     case PlayType.ClipSettingChange:
-                        if (model.wordTimer == null || model.wordTimer.cancel)
-                        {
-                            DelayForOver(model.autoPlaydelay / DialogManager.instance.settings.autoPlaySpeed);
-                        }
-                        else
+                        TimeManager.instance.CancelTimer(model.overTimer);
+                        if (DialogManager.instance.settings.skipping || model.isDisplaying)
                         {
                             Display();
+                        }
+                        else if (DialogManager.instance.settings.autoPlaySpeed > 0)
+                        {
+                            DelayForOver(model.autoPlaydelay / DialogManager.instance.settings.autoPlaySpeed);
                         }
                         break;
                     case PlayType.ClipMainTextOver:

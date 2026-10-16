@@ -145,7 +145,9 @@ namespace Z_UnitSystem
         }
         public static string GetRealPath(string key)
         {
-            return Path.GetFullPath((key.Contains("HlZy") ? "" : (perPath + "/")) + key);
+            // Absolute Core/asset paths must not be prefixed a second time;
+            // neither the install path nor the filename is a product-name test.
+            return Path.GetFullPath(Path.IsPathRooted(key) ? key : Path.Combine(perPath, key));
         }
         public static void Copy(string from, string to)
         {

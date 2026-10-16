@@ -147,7 +147,7 @@ namespace Z_Ui.Base
         private static float ScrollStep(float overflow)
         {
             return Mathf.Sign(overflow) * Mathf.Min(Mathf.Abs(overflow) * DragScrollSpeed,
-                MaxDragScrollSpeed) * Time.unscaledDeltaTime;
+                MaxDragScrollSpeed) * Z_Time.TimeManager.GetDeltaTime(unscaled: true);
         }
 
         private void StopParentDragScroll()

@@ -46,6 +46,7 @@ namespace Z_Map
         public const UpdateType UPDATE_OBJECT_TYPE = UpdateType.None;
 
         public const bool ENABLE_GRAVITY = true;
+        public const float MAX_MOVEMENT_DELTA_TIME = TimeManager.MAX_DELTA_TIME;
     }
     public static class DynamicGlobalSettings
     {

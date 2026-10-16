@@ -358,13 +358,14 @@ public class GameUtilController : Z_Controller<GameManager>
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             var render = go.GetComponentInChildren<Renderer>();
             render.GetPropertyBlock(propBlock);
+            Texture texture = Texture2D.whiteTexture;
+            var route = DisFadeRenderRouting.Route.Opaque;
             if (texRealId[i] != 0 && !TexAssetForm.DataById.ContainsKey(texRealId[i]))
             {
                 Debug.LogError(name + " miss tex " + texRealId[i]);
             }
             if (texRealId[i] == 0 || texRealId[i] == emptyTexId || !TexAssetForm.DataById.ContainsKey(texRealId[i]))
             {
-                propBlock.SetTexture("_Tex", Texture2D.whiteTexture);
                 if (showShadow[i])
                 {
                     render.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
@@ -372,15 +373,16 @@ public class GameUtilController : Z_Controller<GameManager>
                 else
                 {
                     propBlock.SetFloat("_Show", 0);
+                    route = DisFadeRenderRouting.Route.Hidden;
                 }
             }
             else
             {
-                var tex = TexAssetForm.DataById[texRealId[i]].GetTex();
+                texture = TexAssetForm.DataById[texRealId[i]].GetTex();
                 render.shadowCastingMode = showShadow[i] ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
-                propBlock.SetTexture("_Tex", tex);
             }
             render.SetPropertyBlock(propBlock);
+            DisFadeRenderRouting.SetTexture(render, texture, route);
 
             foreach (var com in go.GetComponentsInChildren<Collider>())
             {

@@ -4,7 +4,6 @@ using System.Linq;
 using Ui.ParamShow;
 using Ui.PlaySceneMenu;
 using Ui.Stick;
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using Z_Code;
 using Z_Code.Form;
@@ -37,15 +36,23 @@ namespace Ui.PlaySceneMain
             actionUnitUids = new List<int>();
             void Drag(Vector3 dir, SkillType type)
             {
-                PlayManager.instance.sceneCtrl.SetPlayerRotation(dir, 360);
-                PlayManager.instance.sceneCtrl.SetCurOptSkill(SkillType.Q);
+                if (!CanContinueSkill(type))
+                    return;
+                PlayManager.instance.sceneCtrl.SetCurOptSkill(type);
+                dir = GetSkillDirection(dir);
+                if (dir != Vector3.zero)
+                    PlayManager.instance.sceneCtrl.SetPlayerRotation(dir, 360);
             }
             void Up(Vector3 dir, SkillType type)
             {
+                bool canUse = CanContinueSkill(type);
+                // Release our aim before UseSkill's synchronous UI refresh.
+                Hide(type);
+                if (!canUse)
+                    return;
                 var character = CharacterProductForm.DataByUid.GetDv(GameManager.instance.curProgress.characterUid, null);
                 if (character != null && character.skill.ContainsKey(type))
                     PlayManager.instance.infoCtrl.UseSkill(character.uid, character.skill[type], false);
-                PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
             }
             void Hide(SkillType type)
             {
@@ -72,8 +79,9 @@ namespace Ui.PlaySceneMain
 #if UNITY_STANDALONE_WIN
             return false;
 #endif
-                    return PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.E);
-                }
+                    return CanContinueSkill(SkillType.E) && PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.E);
+                },
+                canContinueFunc = () => CanContinueSkill(SkillType.E)
             };
             qParam = new UiStickParam()
             {
@@ -94,8 +102,9 @@ namespace Ui.PlaySceneMain
 #if UNITY_STANDALONE_WIN
             return false;
 #endif
-                    return PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.Q);
-                }
+                    return CanContinueSkill(SkillType.Q) && PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.Q);
+                },
+                canContinueFunc = () => CanContinueSkill(SkillType.Q)
             };
 
 #if UNITY_STANDALONE_WIN
@@ -130,6 +139,33 @@ namespace Ui.PlaySceneMain
             actCon = new UiContainer<UiActionCtrl>(this, view.go_action);
             teamerCon = new UiContainer<UiTeamerCtrl>(this, view.go_teamer);
             prmCon = new UiContainer<UiParamShowCtrl>(this, view.model_ParamShow.gameObject);
+        }
+
+        private bool CanContinueSkill(SkillType type)
+        {
+            var progress = GameManager.instance.curProgress;
+            if (progress == null || !progress.enableSkill || progress.blockProgramUid != 0)
+                return false;
+            var current = PlayManager.instance.sceneCtrl.GetCurOptSkill();
+            return current == null || current == type;
+        }
+
+        private static Vector3 GetSkillDirection(Vector3 dir)
+        {
+            if (dir.magnitude < 0.25f)
+                return Vector3.zero;
+            dir = dir.normalized;
+            return new Vector3(dir.x, 0, dir.y);
+        }
+
+        private void RefreshSkillStick(UiStickCtrl stick, UiStickParam stickParam, SkillType type)
+        {
+            bool keepCaptured = stick.model.curId != -1 && stickParam.canContinueFunc != null && stickParam.canContinueFunc();
+            var progress = GameManager.instance.curProgress;
+            bool show = keepCaptured || (progress != null && progress.enableSkill && progress.blockProgramUid == 0 &&
+                PlayManager.instance.infoCtrl.CanUseSkill(progress.characterUid, type));
+            if (stick.active != show)
+                stick.SetShow(show, stickParam);
         }
 
         public void OnEvent(StoryCharacterEvent evt)
@@ -220,11 +256,8 @@ namespace Ui.PlaySceneMain
 
             view.go_noScene.SetActive((int)GameManager.instance.curProgress.editorStyle < 2);
 
-            if (view.model_eStick.active != PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.E))
-                view.model_eStick.SetShow(!view.model_eStick.active, eParam);
-
-            if (view.model_qStick.active != PlayManager.instance.infoCtrl.CanUseSkill(GameManager.instance.curProgress.characterUid, SkillType.Q))
-                view.model_qStick.SetShow(!view.model_qStick.active, qParam);
+            RefreshSkillStick(view.model_eStick, eParam, SkillType.E);
+            RefreshSkillStick(view.model_qStick, qParam, SkillType.Q);
 
             actCon.Clear();
             if (cur != null)
@@ -342,10 +375,16 @@ namespace Ui.PlaySceneMain
                var player = PlayManager.instance.sceneCtrl.playerG;
                if (player == null)
                    return;
+               var unit = model.data?.unit as MapUnit;
+               if (unit == null)
+                   return;
+               string self = unit is CharacterUnit character
+                   ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, character.productInfo.Item1.ToString())
+                   : GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, unit.data.uid.ToString());
                var heap = new Dictionary<string, BoxDataForm.Data>();
-               heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, model.data.uid.ToString()));
+               heap["param1"] = CodeHelper.CreateBoxByStr(self);
                heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, player.uid.ToString()));
-               ((MapUnit)model.data.unit).ExecuteEvt("onInteractEvent", heap);
+               unit.ExecuteEvt("onInteractEvent", heap);
            });
         }
         public override void OnShow()

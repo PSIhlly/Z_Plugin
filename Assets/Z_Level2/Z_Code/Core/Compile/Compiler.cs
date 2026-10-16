@@ -51,7 +51,7 @@ namespace Z_Code
         public string Message;
 
         /// <summary>
-        /// 错误阶段（词法分析/语法分析/代码生成）
+        /// 错误阶段（词法分析/语法分析/方法检查/代码生成）
         /// </summary>
         public string Stage;
 
@@ -179,6 +179,17 @@ namespace Z_Code
                 return zl;
             }
 
+            // Only validate complete syntax, so parser recovery does not produce misleading call errors.
+            if (errors.Count == 0)
+            {
+                ValidateCalls(syntaxs, errors);
+                if (errors.Count > 0)
+                {
+                    NormalizeErrorLocations(errors);
+                    return zl;
+                }
+            }
+
             // Z语言分析（代码生成）
             try
             {
@@ -256,6 +267,29 @@ namespace Z_Code
             zCode = new List<string>();
             zCodeMap = new List<int>();
             return false;
+        }
+
+        private void ValidateCalls(List<SyntaxNode> syntaxs, List<CompileError> errors)
+        {
+            foreach (var root in syntaxs)
+            {
+                DfsNode(node =>
+                {
+                    var desc = node.desc;
+                    if (desc == null || desc.type != CodeType.FuncName)
+                        return;
+
+                    // Match the interpreter's lookup, including registered command aliases.
+                    if ((BaseData.cmdDic.TryGetValue(desc.code, out var cmd) && cmd != null) ||
+                        (ProgramDataForm.DataByName.TryGetValue(desc.code, out var program) && program != null))
+                        return;
+
+                    errors.Add(CreateError(desc.codeIndex, desc.codeIndex + desc.code.Length - 1,
+                        "方法检查", $"方法 '{desc.code}' 不存在（未找到对应的 Cmd 或自定义方法）"));
+                }, root);
+            }
+            // Binary expression children are stored right-first; present errors in source order.
+            errors.Sort((left, right) => left.StartIndex.CompareTo(right.StartIndex));
         }
 
         private string InferType(SyntaxNode node)

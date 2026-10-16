@@ -81,7 +81,11 @@ namespace Ui.ModStoryEventEditWindow
                     }, gameObject);
                 }
             });
-            view.btn_apply.onClick.AddListener(() => { ApplyCurrentMode(); });
+            view.btn_apply.onClick.AddListener(() =>
+            {
+                if (ApplyCurrentMode())
+                    NotifyManager.instance.AddTip(TextManager.instance.GetTxt("eventApplied"));
+            });
             view.btn_close.onClick.AddListener(() =>
             {
                 if (ApplyCurrentMode())
@@ -92,9 +96,8 @@ namespace Ui.ModStoryEventEditWindow
                 var tp = GlobalEventHelper.GetGameRetType(model.selUnit.desc);
                 if (model.selUnit.parentNode != null && model.selUnit.parentNode.desc.type == CodeType.FuncName)
                 {
-                    if (CmdDataForm.DataByName.ContainsKey(model.selUnit.parentNode.desc.code))
+                    if (CmdBase.TryGetForm(model.selUnit.parentNode.desc.code, out var data))
                     {
-                        var data = CmdDataForm.DataByName[model.selUnit.parentNode.desc.code];
                         var prmId = model.selUnit.parentNode.subNodes.IndexOf(model.selUnit);
                         tp = data.prmTypes[prmId];
                     }
@@ -165,7 +168,9 @@ namespace Ui.ModStoryEventEditWindow
 
                         if (!TryCompileSyntax(defaultCode, out var res))
                             return;
-                        var parentLst=FindParentList(model.curEntry, model.selItem);
+                        var parentLst = FindParentList(model.curEntry, model.selItem);
+                        if (parentLst == null)
+                            return;
                         int id = parentLst.IndexOf(model.selItem);
                         foreach (var r in res)
                         {
@@ -175,7 +180,8 @@ namespace Ui.ModStoryEventEditWindow
                         }
                         model.selItem = null;
                         model.selUnit = null;
-                        RefreshUnitDetail();
+                        // Structural edits need new Item/Line rows, but remain an unapplied draft.
+                        Refresh();
                     }
 
                 });
@@ -255,7 +261,7 @@ namespace Ui.ModStoryEventEditWindow
                     var message = error?.ToString() ?? "编译失败";
                     if (errors != null && errors.Count > 1)
                         message += $"\n……另有 {errors.Count - 1} 个错误";
-                    NotifyManager.instance.AddComment(message, position);
+                    NotifyManager.instance.AddComment(message, position, 5f);
                 }, gameObject);
             }, gameObject);
         }

@@ -46,6 +46,8 @@ namespace Ui.ModStoryEventEditWindow
             {
                 ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "void", (item) =>
                 {
+                    if (item == null)
+                        return;
                     if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
                     {
                         var data = GameCmdDataForm.DataByUid[item.id];
@@ -63,6 +65,12 @@ namespace Ui.ModStoryEventEditWindow
                             return;
                         model.prm.targetNewList.AddRange(res);
                     }
+                    else
+                    {
+                        return;
+                    }
+                    // The chooser has closed; render the new rows without applying/saving the event.
+                    parent.Refresh();
                 });
             }
             else

@@ -118,9 +118,9 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             img.trs.position = pos;
             img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-rot);
             img.trs.localScale = GetEffectScale(Vector3.one, isIsometricVerticalEffect);
+            var propBlock = new MaterialPropertyBlock();
             img.animTimer = TimeManager.instance.StartTimerImmediate(0, 0.0001f, () =>
             {
-                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 float progress = Time.time - startTime;
                 var clip = cur == -1 ? null : eft[cur];
                 if (cur == -1 || progress > eft[cur].time)
@@ -135,10 +135,9 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
                     clip = eft[cur];
                     img.render.GetPropertyBlock(propBlock);
-                    propBlock.SetTexture("_Tex", TexAssetForm.DataById[clip.tex].GetTex());
-
                     propBlock.SetFloat("_Alpha", clip.opacity);
                     img.render.SetPropertyBlock(propBlock);
+                    DisFadeRenderRouting.SetTexture(img.render, TexAssetForm.DataById[clip.tex].GetTex(), GetEffectRoute(clip.opacity));
 
 
                     beforeUpdate?.Invoke(img);
@@ -157,7 +156,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     var clipNxt = eft[cur + 1];
                     float rate = Mathf.Min(1, progress / eft[cur].time);
                     propBlock.SetFloat("_Alpha", clip.opacity + (clipNxt.opacity - clip.opacity) * rate);
-                    img.render.SetPropertyBlock(propBlock);
+                    DisFadeRenderRouting.Apply(img.render, propBlock, GetEffectRoute(propBlock.GetFloat("_Alpha")));
 
                     beforeUpdate?.Invoke(img);
                     img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
@@ -174,6 +173,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             }, img);
         }
 
+    }
+
+    private static DisFadeRenderRouting.Route GetEffectRoute(float opacity)
+    {
+        return opacity <= 0f ? DisFadeRenderRouting.Route.Hidden
+            : opacity < 1f ? DisFadeRenderRouting.Route.Transparent : DisFadeRenderRouting.Route.Opaque;
     }
 
     private static Vector3 GetEffectScale(Vector3 scale, bool isIsometricVerticalEffect)

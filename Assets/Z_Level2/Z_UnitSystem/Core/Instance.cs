@@ -22,6 +22,20 @@ namespace Z_UnitSystem
         private CapsuleCollider[] _capsuleColliders;
         public bool vising;
 
+        // Opt-in only: implementations must explicitly replace all instance-owned
+        // OnDisable/OnEnable cleanup before skipping those callbacks on handoff.
+        public virtual bool SupportsViewRefreshReuse => false;
+
+        public virtual void PrepareForViewRefreshReuse()
+        {
+            PrepareForHide();
+        }
+
+        public virtual void PrepareForHide() { vising = false; }
+
+        /// <summary>Restore deferred pool state before renderer slots are refreshed/activated.</summary>
+        public virtual void PrepareForShow() { }
+
         /// <summary>
         /// 显示层级上限（0=仅显示第0层Renderer, 1=显示0和1层, int.MaxValue=显示全部）
         /// </summary>
@@ -45,16 +59,7 @@ namespace Z_UnitSystem
                 return _capsuleColliders;
             }
         }
-        private Renderer[] _renderers;
-        public virtual Renderer[] renderers
-        {
-            get
-            {
-                if (_renderers == null)
-                    _renderers = GetComponentsInChildren<Renderer>();
-                return _renderers;
-            }
-        }
+
 
         private Rigidbody _rigidbody;
         public Rigidbody rigidbody
@@ -64,6 +69,26 @@ namespace Z_UnitSystem
                 if (_rigidbody == null)
                     _rigidbody = GetComponentInChildren<Rigidbody>();
                 return _rigidbody;
+            }
+        }
+        private Renderer[] _renderers;
+        public Renderer[] renderers
+        {
+            get
+            {
+                if (_renderers == null)
+                    _renderers = GetComponentsInChildren<Renderer>(true);
+                return _renderers;
+            }
+        }
+        public Material _sourceMaterial;
+        public Material sourceMaterial
+        {
+            get
+            {
+                if (_sourceMaterial == null && renderers.Length > 0)
+                    _sourceMaterial = renderers[0].material;
+                return _sourceMaterial;
             }
         }
         public virtual void VisOff()
@@ -91,7 +116,6 @@ namespace Z_UnitSystem
                 render.enabled = true;
             }
         }
-
        
     }
 }

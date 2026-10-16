@@ -56,7 +56,7 @@ public interface ExternalModSceneController
     public void Undo();
     public void Redo();
 }
-public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>
+public class ModSceneController : Z_Controller<ModManager>, InternalModSceneController, ExternalModSceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseScrollEvent>, IZ_Listener<InputPointEvent>, IZ_Listener<InputPointDownEvent>, IZ_Listener<InputPointUpEvent>, IZ_Listener<TileEvent>, IZ_Listener<ObjectEvent>
 {
     MapManager mapMgr => MapManager.instance;
     public ModSceneController(ModManager super) : base(super)
@@ -66,6 +66,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         this.Register<InputMouseDownEvent>();
         this.Register<InputMouseUpEvent>();
         this.Register<InputMouseScrollEvent>();
+        this.Register<InputPointEvent>();
+        this.Register<InputPointDownEvent>();
+        this.Register<InputPointUpEvent>();
         this.Register<TileEvent>();
         this.Register<ObjectEvent>();
     }
@@ -74,6 +77,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     bool waitForActive = false;
     Vector2 downPos;
     bool pointerDown;
+    bool pointerIsTouch;
+    int pointerId;
     private ModSceneHistory history;
     private IDisposable brushOperation;
     private int brushRevision;
@@ -101,6 +106,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         get => _designType;
         set
         {
+            if (_designType != value)
+                FinishTouchGesture();
             _designType = value;
             eventLayerBrushTipShown = false;
             RefreshTileLayerDisplay();
@@ -115,7 +122,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         get => _layer;
         set
         {
-            _layer = Mathf.Clamp(value, 0, GlobalSettings.TERRAIN_LAYER_MAX - 1);
+            int nextLayer = Mathf.Clamp(value, 0, GlobalSettings.TERRAIN_LAYER_MAX - 1);
+            if (_layer != nextLayer)
+                FinishTouchGesture();
+            _layer = nextLayer;
             // Layer buttons also leave Event mode, including a reselected layer.
             designType = DesignType.MapObject;
         }
@@ -132,6 +142,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         get => _curData;
         set
         {
+            if (_curData != value)
+                FinishTouchGesture();
             _curData = value;
             eventLayerBrushTipShown = false;
         }
@@ -146,8 +158,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         CommitPendingOperation();
         history?.Clear();
         history = new ModSceneHistory(mapMgr, id);
-        pointerDown = false;
-        downPos = Vector2.zero;
+        ResetPointer();
         _cntX = 1;
         _cntY = 1;
 
@@ -185,7 +196,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         CommitPendingOperation();
         history?.Clear();
         history = null;
-        pointerDown = false;
+        ResetPointer();
         enable = false;
         NotifyObjectMarkVisibility();
         NotifyManager.instance.ClearAll();
@@ -677,7 +688,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     private void RestoreOperation(bool redo)
     {
         CommitPendingOperation();
-        pointerDown = false;
+        ResetPointer();
         // These models reference old Unit Data. Main/Tool remain open and retain
         // their current mode, brush, layer, offsets and camera selections.
         UiManager.instance.CloseUi<UiModSceneUnitCtrl>();
@@ -795,52 +806,102 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     public void OnEvent(InputMouseEvent evt)
     {
-        if (!enable)
-            return;
-        if (evt.id == 0 && evt.ui == null && pointerDown)
-        {
-            ModManager.instance.OnMouse(false, evt.pos, evt.delta);
-        }
+        if (evt.id == 0)
+            MovePointer(false, evt.id, evt.pos, evt.delta, evt.ui);
     }
 
     public void OnEvent(InputMouseDownEvent evt)
     {
-        if (!enable)
-            return;
-        if (evt.id != 0)
-            return;
-        CommitPendingOperation();
-        pointerDown = evt.ui == null;
-        if (pointerDown)
-        {
-            downPos = evt.pos;
-            eventLayerBrushTipShown = false;
-            if (curData != null)
-            {
-                int revision = brushRevision;
-                brushOperation = history?.BeginOperation(() => brushRevision != revision);
-            }
-        }
-        else
-        {
-            downPos = Vector2.zero;
-        }
+        if (evt.id == 0)
+            BeginPointer(false, evt.id, evt.pos, evt.ui);
     }
 
     public void OnEvent(InputMouseUpEvent evt)
     {
-        if (!enable || evt.id != 0)
+        if (evt.id == 0)
+            EndPointer(false, evt.id, evt.pos, evt.ui);
+    }
+
+    public void OnEvent(InputPointEvent evt)
+    {
+        MovePointer(true, evt.id, evt.pos, evt.delta, evt.ui);
+    }
+
+    public void OnEvent(InputPointDownEvent evt)
+    {
+        BeginPointer(true, evt.id, evt.pos, evt.ui);
+    }
+
+    public void OnEvent(InputPointUpEvent evt)
+    {
+        EndPointer(true, evt.id, evt.pos, evt.ui, evt.canceled);
+    }
+
+    private bool OwnsPointer(bool isTouch, int id)
+    {
+        return pointerDown && pointerIsTouch == isTouch && pointerId == id;
+    }
+
+    private void ResetPointer()
+    {
+        pointerDown = false;
+        pointerIsTouch = false;
+        pointerId = 0;
+        downPos = Vector2.zero;
+    }
+
+    private void FinishTouchGesture()
+    {
+        if (!pointerDown || !pointerIsTouch)
             return;
         try
         {
-            if (evt.ui == null && pointerDown && (downPos - new Vector2(evt.pos.x, evt.pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
-                OnMouse(true, evt.pos, Vector3.zero);
+            CommitPendingOperation();
         }
         finally
         {
-            // Releasing over UI must still finish the whole brush stroke.
-            pointerDown = false;
-            downPos = Vector2.zero;
+            ResetPointer();
+        }
+    }
+
+    private void BeginPointer(bool isTouch, int id, Vector3 pos, GameObject ui)
+    {
+        // Capture only a press that starts in the scene. A second finger or a
+        // synthetic mouse event must not steal an ongoing touch/brush stroke.
+        if (!enable || pointerDown || ui != null)
+            return;
+        CommitPendingOperation();
+        pointerDown = true;
+        pointerIsTouch = isTouch;
+        pointerId = id;
+        downPos = pos;
+        eventLayerBrushTipShown = false;
+        if (curData != null)
+        {
+            int revision = brushRevision;
+            brushOperation = history?.BeginOperation(() => brushRevision != revision);
+        }
+    }
+
+    private void MovePointer(bool isTouch, int id, Vector3 pos, Vector3 delta, GameObject ui)
+    {
+        if (enable && ui == null && OwnsPointer(isTouch, id))
+            ModManager.instance.OnMouse(false, pos, delta);
+    }
+
+    private void EndPointer(bool isTouch, int id, Vector3 pos, GameObject ui, bool canceled = false)
+    {
+        if (!OwnsPointer(isTouch, id))
+            return;
+        try
+        {
+            if (enable && !canceled && ui == null && (downPos - new Vector2(pos.x, pos.y)).sqrMagnitude < GlobalSettings.DRAG_DIS2)
+                OnMouse(true, pos, Vector3.zero);
+        }
+        finally
+        {
+            // Release/cancellation over UI still finishes the whole stroke.
+            ResetPointer();
             CommitPendingOperation();
         }
     }

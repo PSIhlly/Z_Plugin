@@ -14,6 +14,68 @@ using Ui.ParamShow;
 
 
 
+namespace PlayerTouchOpt
+
+{
+
+
+
+
+    public partial class UiPlayerTouchOptParam:UiParam
+    {
+    }
+
+    public partial class UiPlayerTouchOptView:UiView
+    {
+
+            public GameObject go_moveStick;
+            public UiStickCtrl model_moveStick;
+            public GameObject go_attackStick;
+            public UiStickCtrl model_attackStick;
+        public UiPlayerTouchOptView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_moveStick = uiHolder.elementTrsLst[0].gameObject;
+            model_moveStick = (UiStickCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            go_attackStick = uiHolder.elementTrsLst[2].gameObject;
+            model_attackStick = (UiStickCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiPlayerTouchOptCtrl:UiCtrl
+    {
+        public UiPlayerTouchOptView view;
+        public UiPlayerTouchOptModel model;
+        public UiPlayerTouchOptParam param;
+        public UiPlaySceneMainCtrl parent=>(UiPlaySceneMainCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiPlayerTouchOptParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiPlayerTouchOptView(uiHolder);
+            model=new UiPlayerTouchOptModel();
+
+
+            view.model_moveStick = new UiStickCtrl();
+            view.model_moveStick.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.model_attackStick = new UiStickCtrl();
+            view.model_attackStick.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+        }
+
+    }
+    public partial class UiPlayerTouchOptModel:UiModel
+    {
+        
+    }
+}
+
 namespace PlaySceneMessage
 
 {
@@ -171,68 +233,6 @@ namespace PlaySceneMission
 
     }
     public partial class UiPlaySceneMissionModel:UiModel
-    {
-        
-    }
-}
-
-namespace PlayerTouchOpt
-
-{
-
-
-
-
-    public partial class UiPlayerTouchOptParam:UiParam
-    {
-    }
-
-    public partial class UiPlayerTouchOptView:UiView
-    {
-
-            public GameObject go_moveStick;
-            public UiStickCtrl model_moveStick;
-            public GameObject go_attackStick;
-            public UiStickCtrl model_attackStick;
-        public UiPlayerTouchOptView(UiHolder uiHolder):base(uiHolder)
-        {
-
-            go_moveStick = uiHolder.elementTrsLst[0].gameObject;
-            model_moveStick = (UiStickCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            go_attackStick = uiHolder.elementTrsLst[2].gameObject;
-            model_attackStick = (UiStickCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-        }
-
-    }
-    public partial class UiPlayerTouchOptCtrl:UiCtrl
-    {
-        public UiPlayerTouchOptView view;
-        public UiPlayerTouchOptModel model;
-        public UiPlayerTouchOptParam param;
-        public UiPlaySceneMainCtrl parent=>(UiPlaySceneMainCtrl)uiHolder.parent.ctrl;
-
-        public override void SetParam(UiParam param)
-        {
-            this.param = (UiPlayerTouchOptParam)param;
-        }
-
-        public override void BindHolderRecursively(UiHolder uiHolder)
-        {
-
-            base.BindHolderRecursively(uiHolder);
-
-            view = new UiPlayerTouchOptView(uiHolder);
-            model=new UiPlayerTouchOptModel();
-
-
-            view.model_moveStick = new UiStickCtrl();
-            view.model_moveStick.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.model_attackStick = new UiStickCtrl();
-            view.model_attackStick.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
-        }
-
-    }
-    public partial class UiPlayerTouchOptModel:UiModel
     {
         
     }
@@ -531,13 +531,13 @@ namespace PlaySceneMinimap
     public partial class UiPlaySceneMainView:UiView
     {
 
+            public PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt;
             public PlaySceneMessage.UiPlaySceneMessageCtrl page_PlaySceneMessage;
             public PlaySceneMission.UiPlaySceneMissionCtrl page_PlaySceneMission;
             public GameObject go_eStick;
             public UiStickCtrl model_eStick;
             public GameObject go_qStick;
             public UiStickCtrl model_qStick;
-            public PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt;
             public GameObject go_noScene;
             public PlaySceneMinimap.UiPlaySceneMinimapCtrl page_PlaySceneMinimap;
             public GameObject go_menu;
@@ -554,13 +554,13 @@ namespace PlaySceneMinimap
         public UiPlaySceneMainView(UiHolder uiHolder):base(uiHolder)
         {
 
-            page_PlaySceneMessage = (PlaySceneMessage.UiPlaySceneMessageCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
-            page_PlaySceneMission = (PlaySceneMission.UiPlaySceneMissionCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            go_eStick = uiHolder.elementTrsLst[2].gameObject;
-            model_eStick = (UiStickCtrl) uiHolder.elementTrsLst[3].GetComponent<UiHolder>().ctrl;
-            go_qStick = uiHolder.elementTrsLst[4].gameObject;
-            model_qStick = (UiStickCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
-            page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
+            page_PlayerTouchOpt = (PlayerTouchOpt.UiPlayerTouchOptCtrl) uiHolder.elementTrsLst[0].GetComponent<UiHolder>().ctrl;
+            page_PlaySceneMessage = (PlaySceneMessage.UiPlaySceneMessageCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
+            page_PlaySceneMission = (PlaySceneMission.UiPlaySceneMissionCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            go_eStick = uiHolder.elementTrsLst[3].gameObject;
+            model_eStick = (UiStickCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            go_qStick = uiHolder.elementTrsLst[5].gameObject;
+            model_qStick = (UiStickCtrl) uiHolder.elementTrsLst[6].GetComponent<UiHolder>().ctrl;
             go_noScene = uiHolder.elementTrsLst[7].gameObject;
             page_PlaySceneMinimap = (PlaySceneMinimap.UiPlaySceneMinimapCtrl) uiHolder.elementTrsLst[8].GetComponent<UiHolder>().ctrl;
             go_menu = uiHolder.elementTrsLst[9].gameObject;
@@ -598,16 +598,16 @@ namespace PlaySceneMinimap
             model=new UiPlaySceneMainModel();
 
 
-            view.page_PlaySceneMessage = new PlaySceneMessage.UiPlaySceneMessageCtrl();
-            view.page_PlaySceneMessage.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
-            view.page_PlaySceneMission = new PlaySceneMission.UiPlaySceneMissionCtrl();
-            view.page_PlaySceneMission.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
-            view.model_eStick = new UiStickCtrl();
-            view.model_eStick.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
-            view.model_qStick = new UiStickCtrl();
-            view.model_qStick.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.page_PlayerTouchOpt = new PlayerTouchOpt.UiPlayerTouchOptCtrl();
-            view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.page_PlayerTouchOpt.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_PlaySceneMessage = new PlaySceneMessage.UiPlaySceneMessageCtrl();
+            view.page_PlaySceneMessage.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
+            view.page_PlaySceneMission = new PlaySceneMission.UiPlaySceneMissionCtrl();
+            view.page_PlaySceneMission.BindHolderRecursively(uiHolder.subUiHolderLst[2]);
+            view.model_eStick = new UiStickCtrl();
+            view.model_eStick.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
+            view.model_qStick = new UiStickCtrl();
+            view.model_qStick.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
             view.page_PlaySceneMinimap = new PlaySceneMinimap.UiPlaySceneMinimapCtrl();
             view.page_PlaySceneMinimap.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
             view.model_ParamShow = new UiParamShowCtrl();

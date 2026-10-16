@@ -177,12 +177,12 @@ namespace Ui.PlayMap
 
             public Btn btn_bg;
             public Sta sta_type;
-            public Txt txt_curHeight;
-            public Btn btn_world;
-            public Btn btn_up;
-            public Btn btn_down;
             public Btn btn_area;
             public RectTransform rtf_area;
+            public Btn btn_down;
+            public Btn btn_up;
+            public Txt txt_curHeight;
+            public Btn btn_world;
             public RectTransform rtf_world;
             public RImg rimg_unlock;
             public GameObject go_mark;
@@ -193,6 +193,8 @@ namespace Ui.PlayMap
             public Img img_mission;
             public Btn btn_mission;
             public UiMissionCtrl sub_mission;
+            public GameObject go_self;
+            public RectTransform rtf_self;
             public Img img_largeMap;
             public GameObject go_scene;
             public Img img_scene;
@@ -203,12 +205,12 @@ namespace Ui.PlayMap
 
             btn_bg = uiHolder.elementTrsLst[0].GetComponent<Btn>();
             sta_type = uiHolder.elementTrsLst[1].GetComponent<Sta>();
-            txt_curHeight = uiHolder.elementTrsLst[2].GetComponent<Txt>();
-            btn_world = uiHolder.elementTrsLst[3].GetComponent<Btn>();
-            btn_up = uiHolder.elementTrsLst[4].GetComponent<Btn>();
-            btn_down = uiHolder.elementTrsLst[5].GetComponent<Btn>();
-            btn_area = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            rtf_area = uiHolder.elementTrsLst[7].GetComponent<RectTransform>();
+            btn_area = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            rtf_area = uiHolder.elementTrsLst[3].GetComponent<RectTransform>();
+            btn_down = uiHolder.elementTrsLst[4].GetComponent<Btn>();
+            btn_up = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            txt_curHeight = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+            btn_world = uiHolder.elementTrsLst[7].GetComponent<Btn>();
             rtf_world = uiHolder.elementTrsLst[8].GetComponent<RectTransform>();
             rimg_unlock = uiHolder.elementTrsLst[9].GetComponent<RImg>();
             go_mark = uiHolder.elementTrsLst[10].gameObject;
@@ -219,11 +221,13 @@ namespace Ui.PlayMap
             img_mission = uiHolder.elementTrsLst[15].GetComponent<Img>();
             btn_mission = uiHolder.elementTrsLst[16].GetComponent<Btn>();
             sub_mission = (UiMissionCtrl) uiHolder.elementTrsLst[17].GetComponent<UiHolder>().ctrl;
-            img_largeMap = uiHolder.elementTrsLst[18].GetComponent<Img>();
-            go_scene = uiHolder.elementTrsLst[19].gameObject;
-            img_scene = uiHolder.elementTrsLst[20].GetComponent<Img>();
-            sub_scene = (UiSceneCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
-            img_real = uiHolder.elementTrsLst[22].GetComponent<Img>();
+            go_self = uiHolder.elementTrsLst[18].gameObject;
+            rtf_self = uiHolder.elementTrsLst[19].GetComponent<RectTransform>();
+            img_largeMap = uiHolder.elementTrsLst[20].GetComponent<Img>();
+            go_scene = uiHolder.elementTrsLst[21].gameObject;
+            img_scene = uiHolder.elementTrsLst[22].GetComponent<Img>();
+            sub_scene = (UiSceneCtrl) uiHolder.elementTrsLst[23].GetComponent<UiHolder>().ctrl;
+            img_real = uiHolder.elementTrsLst[24].GetComponent<Img>();
         }
 
     }

@@ -15,15 +15,26 @@ using Z_DesignStyle;
 using Z_DataSystem;
 using System;
 using System.Linq;
+using System.IO;
+using System.Threading;
+using Z_Ui.Notify;
+using Z_Ui.Loading;
 
 namespace Ui.Mod
 {
+    public partial class UiModModel
+    {
+        public bool importing;
+        public int importVersion;
+    }
     public partial class UiModCtrl
     {
         UiScrViewContainer<UiItemCtrl> con;
+        private CancellationTokenSource importCancellation;
         public override void OnCreate()
         {
             con = new UiScrViewContainer<UiItemCtrl>(this, view.go_item, view.scr_items);
+            view.btn_import.onClick.AddListener(ImportStoryPackage);
             view.btn_back.onClick.AddListener(() =>
             {
                 UiManager.instance.ShowUi<UiEnterMainCtrl>();
@@ -35,6 +46,61 @@ namespace Ui.Mod
         public override void OnShow()
         {
             Refresh();
+        }
+        public override void OnHide()
+        {
+            ++model.importVersion;
+            importCancellation?.Cancel();
+            model.importing = false;
+        }
+
+        private async void ImportStoryPackage()
+        {
+            if (model.importing)
+                return;
+            model.importing = true;
+            var version = ++model.importVersion;
+            var cancellation = new CancellationTokenSource();
+            importCancellation = cancellation;
+            try
+            {
+                await LoadingManager.instance.RunAsync("modImport", async () =>
+                {
+                    var path = await AssetFilePicker.GetModPackageAsync(TextManager.instance.GetTxt("import"), cancellation.Token);
+                    if (!active || version != model.importVersion || !model.importing)
+                        return;
+                    if (string.IsNullOrEmpty(path))
+                        return;
+                    var story = await GameManager.instance.saveCtrl.ImportPackageAsync(path, cancellation.Token);
+                    if (active && version == model.importVersion)
+                    {
+                        Refresh();
+                        NotifyManager.instance.AddTip(TextManager.instance.GetTxt("import") + ": " + story.name);
+                    }
+                }, cancellation.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Closing the panel or canceling the picker is not an error.
+            }
+            catch (Exception exception)
+            {
+                if (active && version == model.importVersion)
+                    ShowImportError(exception.Message);
+            }
+            finally
+            {
+                if (version == model.importVersion)
+                    model.importing = false;
+                if (ReferenceEquals(importCancellation, cancellation))
+                    importCancellation = null;
+                cancellation.Dispose();
+            }
+        }
+
+        private static void ShowImportError(string error)
+        {
+            NotifyManager.instance.AddPopup(TextManager.instance.GetTxt("import"), error, true, enableScr: true);
         }
         public void Refresh()
         {

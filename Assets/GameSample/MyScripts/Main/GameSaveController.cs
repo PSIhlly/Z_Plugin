@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.WSA;
 using Z_ByteSerialize;
 using Z_DataSystem;
 using Z_DataSystem.Form;
@@ -66,13 +67,289 @@ public class GameSaveController : Z_Controller<GameManager>
         return TextureHelper.GetPNGWithExtraInfo(icon, System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(Main2StoryManager.GetStoryCoreFolder(storyId))));
     }
 
+    // Enter on the Unity thread: capture the cover and absolute path before any
+    // worker touches files. No Texture, Form, or Unity API is used by the worker.
+    public Task<byte[]> PackageAsync(int storyId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var cover = CapturePackageCover(storyId);
+        var core = SaveAndLoad.GetRealPath(Main2StoryManager.GetStoryCoreFolder(storyId));
+        return Task.Run(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var payload = System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(core));
+            cancellationToken.ThrowIfCancellationRequested();
+            var png = PngPixelPackage.EncodeWithCover(cover, payload);
+            cancellationToken.ThrowIfCancellationRequested();
+            return png;
+        }, cancellationToken);
+    }
+
+    private static PngPixelPackage.CoverSnapshot CapturePackageCover(int storyId)
+    {
+        Texture2D ownedTexture = null;
+        List<GifFrameData> ownedFrames = null;
+        Texture2D icon = Texture2D.whiteTexture;
+        try
+        {
+            try
+            {
+                var bytes = Convert.FromBase64String(StoryForm.DataById[storyId].icon);
+                if (bytes.Length >= 3 && bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F')
+                {
+                    ownedFrames = TextureHelper.GetGifFramesByByte(bytes);
+                    icon = ownedFrames != null && ownedFrames.Count > 0
+                        ? ownedFrames[0].texture : TextureHelper.transparentTexture;
+                }
+                else
+                    icon = ownedTexture = (Texture2D)TextureHelper.GetTextureByByte(bytes);
+            }
+            catch
+            {
+                icon = Texture2D.whiteTexture;
+            }
+            return PngPixelPackage.CaptureCover(icon);
+        }
+        finally
+        {
+            // Only our private decoded cover/frames are owned here. Shared
+            // white/transparent fallback textures and registered assets survive.
+            if (ownedFrames != null)
+                foreach (var frame in ownedFrames)
+                    DestroyPackageCover(frame.texture);
+            DestroyPackageCover(ownedTexture);
+        }
+    }
+
+    private static void DestroyPackageCover(Texture2D texture)
+    {
+        if (texture == null)
+            return;
+        if (Application.isPlaying)
+            UnityEngine.Object.Destroy(texture);
+        else
+            UnityEngine.Object.DestroyImmediate(texture);
+    }
+
     #endregion
 
     #region unpackage
 
     public void Unpackage(byte[] content, int storyId)
     {
-        SaveAndLoad.Unpackage(System.Text.Encoding.UTF8.GetString(TextureHelper.GetExtraInfoByPNG(content)), Main2StoryManager.GetStoryCoreFolder(storyId));
+        SaveAndLoad.Unpackage(ReadPackage(content).ToString(), Main2StoryManager.GetStoryCoreFolder(storyId));
+    }
+
+    // New .png exports store data in RGB pixels; legacy ZEXTRA PNGs remain
+    // readable. Register one overview, never reload/clear global Forms.
+    public StoryForm.Data ImportPackage(byte[] content)
+    {
+        var files = ReadPackage(content);
+        var overview = ReadPackageOverview(files);
+        var story = StoryForm.GetDataByJo(overview);
+        var id = 1;
+        for (; id < StoryForm.autoIdCnt; id++)
+            if (!StoryForm.DataById.ContainsKey(id) && !SaveAndLoad.Exist(Main2StoryManager.GetStoryFolderNameById(id)))
+                break;
+        if (id >= StoryForm.autoIdCnt)
+            throw new InvalidOperationException("No free local story ID is available.");
+        story.id = id;
+        overview["id"] = id;
+
+        // Stage away from numeric story directories so failed imports are never
+        // discovered as stories. Publish the complete Core in one directory move.
+        var stageName = ".mod-import-" + Guid.NewGuid().ToString("N");
+        var stageRoot = SaveAndLoad.GetRealPath(stageName);
+        var stageCore = stageName + "/Core/";
+        var targetRoot = SaveAndLoad.GetRealPath(Main2StoryManager.GetStoryFolderNameById(id));
+        var moved = false;
+        try
+        {
+            Directory.CreateDirectory(stageRoot);
+            SaveAndLoad.Unpackage(files.ToString(), stageCore);
+            SaveAndLoad.Save(stageCore + storyFormFileName, overview.ToString());
+            Directory.Move(stageRoot, targetRoot); // Does not overwrite a raced/existing directory.
+            moved = true;
+            StoryForm.AddData(story);
+            return story;
+        }
+        catch
+        {
+            if (StoryForm.DataById.TryGetValue(id, out var registered) && ReferenceEquals(registered, story))
+                StoryForm.RemoveData(id);
+            // These exact roots were newly created by this request, never an
+            // existing story. Do not delete targetRoot when the move failed.
+            var ownedRoot = moved ? targetRoot : stageRoot;
+            if (Directory.Exists(ownedRoot))
+                Directory.Delete(ownedRoot, true);
+            throw;
+        }
+    }
+
+    public async Task<StoryForm.Data> ImportPackageAsync(string path, CancellationToken cancellationToken = default)
+    {
+        // Force SaveAndLoad's Unity-backed static initialization on the caller
+        // thread and keep workers independent of later perPath changes.
+        var root = SaveAndLoad.GetRealPath(".");
+        var prepared = await Task.Run(() => PreparePackageImport(path, root, cancellationToken), cancellationToken);
+        StoryForm.Data story = null;
+        string targetRoot = null;
+        var moved = false;
+        var committed = false;
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // Generated Form parsing, IDs and registration belong to Unity's
+            // thread, never to the decoder/extraction worker.
+            story = StoryForm.GetDataByJo(prepared.overview);
+            var id = 1;
+            for (; id < StoryForm.autoIdCnt; id++)
+            {
+                targetRoot = Path.Combine(root, Main2StoryManager.GetStoryFolderNameById(id));
+                if (!StoryForm.DataById.ContainsKey(id) && !Directory.Exists(targetRoot) && !File.Exists(targetRoot))
+                    break;
+            }
+            if (id >= StoryForm.autoIdCnt)
+                throw new InvalidOperationException("No free local story ID is available.");
+            story.id = id;
+            prepared.overview["id"] = id;
+            var overviewContent = prepared.overview.ToString();
+            await Task.Run(() => File.WriteAllText(Path.Combine(prepared.stageRoot, "Core", storyFormFileName),
+                overviewContent), cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (StoryForm.DataById.ContainsKey(id))
+                throw new InvalidOperationException("The local story ID became unavailable. Please retry importing.");
+            // Directory.Move rejects an existing/raced directory. Commit without
+            // an await/cancellation point between publishing Core and its row.
+            Directory.Move(prepared.stageRoot, targetRoot);
+            moved = true;
+            StoryForm.AddData(story);
+            committed = true;
+            return story;
+        }
+        catch
+        {
+            if (story != null && StoryForm.DataById.TryGetValue(story.id, out var registered) && ReferenceEquals(registered, story))
+                StoryForm.RemoveData(story.id);
+            throw;
+        }
+        finally
+        {
+            if (!committed)
+            {
+                var ownedRoot = moved ? targetRoot : prepared.stageRoot;
+                // Wait for every writer before cleanup, even when canceled.
+                await Task.Run(() => DeleteImportStage(ownedRoot));
+            }
+        }
+    }
+
+    private sealed class PreparedPackageImport
+    {
+        public string stageRoot;
+        public JObject overview;
+    }
+
+    private PreparedPackageImport PreparePackageImport(string path, string root, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var files = ReadPackage(File.ReadAllBytes(path));
+        var overview = ReadPackageOverview(files);
+        cancellationToken.ThrowIfCancellationRequested();
+        var stageRoot = Path.Combine(root, ".mod-import-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var core = Path.Combine(stageRoot, "Core");
+            Directory.CreateDirectory(core);
+            foreach (var file in files)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                SaveAndLoad.Save(Path.Combine(core, file.Key), (byte[])file.Value);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            return new PreparedPackageImport { stageRoot = stageRoot, overview = overview };
+        }
+        catch
+        {
+            DeleteImportStage(stageRoot);
+            throw;
+        }
+    }
+
+    private JObject ReadPackageOverview(JObject files)
+    {
+        var overviewBytes = (byte[])files[storyFormFileName];
+        if (overviewBytes == null)
+            throw new InvalidDataException("The Mod package has no story overview (sf).");
+        var overview = JObject.Parse(new System.Text.UTF8Encoding(false, true).GetString(overviewBytes));
+        if (overview["name"]?.Type != JTokenType.String ||
+            (overview["icon"] != null && overview["icon"].Type != JTokenType.String))
+            throw new InvalidDataException("Invalid story overview. Legacy cover data requires migration.");
+        return overview;
+    }
+
+    private static void DeleteImportStage(string ownedRoot)
+    {
+        if (Directory.Exists(ownedRoot))
+            Directory.Delete(ownedRoot, true);
+    }
+
+    private static JObject ReadPackage(byte[] content)
+    {
+        var signature = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 };
+        if (content == null || content.Length < 20 || !signature.SequenceEqual(content.Take(8)))
+            throw new InvalidDataException("Not a valid Mod package.");
+        // Check chunk bounds before extraction. Old ZEXTRA exports precede
+        // IHDR; new pixel packages use standard PNG chunk order.
+        var offset = 8;
+        var ended = false;
+        while (offset <= content.Length - 12)
+        {
+            uint length = ((uint)content[offset] << 24) | ((uint)content[offset + 1] << 16) |
+                          ((uint)content[offset + 2] << 8) | content[offset + 3];
+            if (length > content.Length - offset - 12)
+                throw new InvalidDataException("Truncated Mod package.");
+            var type = System.Text.Encoding.ASCII.GetString(content, offset + 4, 4);
+            offset += (int)length + 12;
+            if (type == "IEND")
+            {
+                ended = length == 0 && offset == content.Length;
+                break;
+            }
+        }
+        if (!ended)
+            throw new InvalidDataException("Incomplete Mod package.");
+        var extra = TextureHelper.GetExtraInfoByPNG(content);
+        if (extra == null)
+            throw new InvalidDataException("This file contains no Mod package data.");
+        var root = JObject.Parse(new System.Text.UTF8Encoding(false, true).GetString(extra));
+        var files = new JObject();
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var queue = new Queue<JObject>();
+        queue.Enqueue(root);
+        while (queue.Count > 0)
+        {
+            foreach (var entry in queue.Dequeue())
+            {
+                // Existing Package emits /directory objects plus flat file keys.
+                if (entry.Key.StartsWith("/") && entry.Value is JObject directory)
+                {
+                    queue.Enqueue(directory);
+                    continue;
+                }
+                var path = entry.Key.Replace('\\', '/');
+                if (string.IsNullOrEmpty(path) || path.Split('/').Any(part =>
+                    string.IsNullOrEmpty(part) || part == "." || part == ".." ||
+                    part.EndsWith(".") || part.EndsWith(" ") ||
+                    part.Any(c => c < ' ' || "<>:\"|?*".IndexOf(c) >= 0)) ||
+                    entry.Value?.Type != JTokenType.String || !names.Add(path))
+                    throw new InvalidDataException("Invalid or duplicate file path in Mod package: " + entry.Key);
+                // Validate Base64 for every file before any extraction/write.
+                files[path] = (byte[])entry.Value;
+            }
+        }
+        return files;
     }
 
     #endregion
@@ -155,7 +432,13 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveLab(string storyFolder)
     {
-        SaveAndLoad.Save(storyFolder + "/" + labFormFileName, LabForm.GetJaByDatas().ToString());
+        // CmdLab is built-in command metadata, not story-authored labels.
+        CmdLabForm.Init();
+        var labs = new JArray();
+        foreach (var lab in LabForm.DataById.Values)
+            if (!(lab is CmdLabForm.Data) && lab.belong != nameof(GameCmdDataForm))
+                labs.Add(LabForm.GetJoByData(lab));
+        SaveAndLoad.Save(storyFolder + "/" + labFormFileName, labs.ToString());
     }
 
     public void SavePassType(string storyFolder)
@@ -500,6 +783,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void LoadLab(string folder)
     {
+        CmdLabForm.Init();
         LabForm.ClearAuto();
         if (folder == null)
             return;
@@ -509,6 +793,9 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             foreach (var form in LabForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
             {
+                // Older lf files included static command labels as base Lab rows.
+                if (form.belong == nameof(GameCmdDataForm) || CmdLabForm.DataById.ContainsKey(form.id))
+                    continue;
                 LabForm.AddData(form);
             }
         }

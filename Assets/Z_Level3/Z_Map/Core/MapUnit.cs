@@ -62,7 +62,7 @@ namespace Z_Map
         }
 
         public Dictionary<CollideType,List<MeshInfo>> _zMeshes;
-        public void InvalidateCollisionGeometry()
+        public virtual void InvalidateCollisionGeometry()
         {
             _zMeshes = null;
             collisionOffsets.Clear();

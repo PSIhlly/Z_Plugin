@@ -65,6 +65,8 @@ namespace Z_Ui.Notify
         public string content;
         public Vector2 screenPosition;
         public int id;
+        // Zero preserves the normal, manually dismissed Comment behavior.
+        public float expiresAt;
     }
     public class ChooseInfo
     {
@@ -155,13 +157,14 @@ namespace Z_Ui.Notify
             }
         }
 
-        public int AddComment(string content, Vector2 screenPosition)
+        public int AddComment(string content, Vector2 screenPosition, float duration = 0)
         {
             var info = new CommentInfo()
             {
                 content = WrapTipContent(content),
                 screenPosition = screenPosition,
-                id = commentIdCnt++
+                id = commentIdCnt++,
+                expiresAt = duration > 0 ? Time.unscaledTime + duration : 0
             };
             var ctrl = UiManager.instance.GetUi<UiNotifyCtrl>();
             if (ctrl != null && ctrl.active)

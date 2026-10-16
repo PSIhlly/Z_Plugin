@@ -89,6 +89,7 @@ namespace Ui.DialogMain
                 });
                 view.btn_skip.onClickDown = () =>
                 {
+                    DialogManager.instance.settings.skipping = true;
                     view.sta_autoPlay.ChangeState(0);
                     view.sta_skip.ChangeState(1);
                     autoPlayDelay = 0.1f;
@@ -103,11 +104,15 @@ namespace Ui.DialogMain
                 };
                 view.btn_skip.onClickUp = () =>
                 {
+                    DialogManager.instance.settings.skipping = false;
                     view.sta_skip.ChangeState(0);
                     autoPlaySpeed = view.sta_autoPlay.state;
                     textDisplaySpeed = 5;
                     autoPlayDelay = 5f;
-
+                    Z_EventHelper.Invoke(new ClipPlayEvent()
+                    {
+                        playType = PlayType.ClipSettingChange
+                    });
                 };
                 view.btn_hide.onClick.AddListener(() =>
                 {
@@ -134,6 +139,7 @@ namespace Ui.DialogMain
                     {
                         if (view.sta_skip.state == 1)
                         {
+                            DialogManager.instance.settings.skipping = false;
                             view.sta_skip.ChangeState(0);
                             autoPlaySpeed = 0;
                             textDisplaySpeed = 5;
@@ -147,7 +153,7 @@ namespace Ui.DialogMain
             {
                 model.prm = param;
                 view.go_func.SetActive(!string.IsNullOrEmpty(model.prm.clip.mainText));
-                view.sta_autoPlay.ChangeState((int)DialogManager.instance.settings.autoPlaySpeed > 0 ? 1 : 0);
+                view.sta_autoPlay.ChangeState(!DialogManager.instance.settings.skipping && autoPlaySpeed > 0 ? 1 : 0);
                 view.btn_skipVideo.gameObject.SetActive(model.prm.clip.mainVideo > 0);
             }
         }

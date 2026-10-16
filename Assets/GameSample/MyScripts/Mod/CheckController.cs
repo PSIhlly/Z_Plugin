@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Z_DesignStyle;
 using Z_Code;
+using Form;
 using Z_DataSystem.Form;
 
 /// <summary>
@@ -207,6 +208,7 @@ public class CheckController : Z_Controller<ModManager>
 
     private static void CheckLabReferences(StringBuilder sb)
     {
+        CmdLabForm.Init();
         var issues = new List<string>();
         var checkedCount = 0;
         foreach (var formName in LabReferenceFormNames)
@@ -246,6 +248,10 @@ public class CheckController : Z_Controller<ModManager>
                 else if (lab.belong != formName)
                 {
                     issues.Add($"{formName}[{displayValue}].labId={labId} 的 belong 为 {lab.belong}，应为 {formName}");
+                }
+                else if (formName == nameof(GameCmdDataForm) && !(lab is CmdLabForm.Data))
+                {
+                    issues.Add($"{formName}[{displayValue}].labId={labId} 不属于 CmdLabForm");
                 }
             }
         }

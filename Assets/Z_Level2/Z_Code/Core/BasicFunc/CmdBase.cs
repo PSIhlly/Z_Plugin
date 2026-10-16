@@ -11,6 +11,15 @@ namespace Z_Code
 
     public abstract class CmdBase
     {
+        public static bool TryGetForm(string name, out CmdDataForm.Data form)
+        {
+            form = null;
+            if (string.IsNullOrEmpty(name)) return false;
+            if (CmdDataForm.DataByName.TryGetValue(name, out form)) return true;
+            return BaseData.cmdDic.TryGetValue(name, out var command)
+                && CmdDataForm.DataByName.TryGetValue(command.GetName(), out form);
+        }
+
         protected static void Register(CmdBase cmd)
         {
             BaseData.cmdDic[cmd.GetName()] = cmd;
@@ -65,6 +74,9 @@ namespace Z_Code
                         }
                         prm[i] = value;
                     }
+                    // Keep the command API's writable root dictionary available,
+                    // without allocating dictionaries during scalar interpretation.
+                    prm[i].GetOrCreateDictionary();
                 }
 
                 Array.Reverse(prm);

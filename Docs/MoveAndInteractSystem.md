@@ -130,9 +130,15 @@ Up, Down, Left, Right, Forward, Back
 2. **重力**：若 `ENABLE_GRAVITY` 且 `!HasGroundContact()`，调用 `Move(Vector3.down * deltaTime * 2f)`
 3. **同步实例位置**：`ins?.UpdatePos()`
 
+帧时间统一由 `Z_Time.TimeManager.GetDeltaTime(bool unscaled = false)` 提供：`clamp(Time.deltaTime, 0, MAX_DELTA_TIME)`，每帧最多 `0.02` 秒；`MapUtilController.MovementDeltaTime` 转发到它，`MAX_MOVEMENT_DELTA_TIME` 也引用同一个常量。WASD、移动摇杆、人物寻路/脱困/重力，以及 Object/Character 的移动和渐变转向指令共用；正常高帧率使用真实 scaled delta，低于 50 FPS 时各类移动一起变慢，不扩大单帧位移，也不累积卡顿时间在后续追赶。移动/转向指令的剩余时间必须用同一个步长扣减，不能仍按真实 delta 提前到期。游戏秒数、技能/武器冷却、子弹、图片动画/移除、震动、解释器 Wait、聊天/飘字与 ObjectAnimator 的时长换算同样使用该上限，保留各自的暂停/阻塞条件。输入框拖动滚动使用 `GetDeltaTime(unscaled: true)`，暂停时可用但也限制为 `0.02` 秒。显式帧等待保留原帧数语义；显式传送、直接位移 API、绝对时间定时器、第三方和 Sample 不改，不修改 Unity 全局时间配置。
+
 ### 3.2 Move 核心流程
 
-导航端点使用每个人物独立的 `NavigationEndpointState`：起点格不可通行（Object 阻断、缺格、空格、通行类型或人物 footprint 不满足）时，先直线移动到距离起点最近的可走格中心，再恢复 BFS。目标格不可通行时，在 BFS 可达格中选择距离目标世界坐标最近的一格，到达格中心后再直线接近原目标坐标。末段状态不会因为人物进入目标阻断格而重新触发脱离；目标换格、体型/能力变化、停用导航和传送均重置状态。同格内的移动目标沿用当前阶段，但始终朝最新坐标移动；半径比较使用 `0.0001` 容差，避免平移的浮点误差重置阶段。搜索步数耗尽不能当成已到达末段起点。直线端点段仅放宽导航/地形通行类型限制，仍经过 `CharacterUnit.Move` 的实体碰撞、边界限制与 Trigger 扫掠，不是传送或穿墙。每帧移动距离同时受当前路点距离约束，避免越过路点后反复折返；普通手动移动的 passType 限制保持不变。
+导航使用每个人物独立的 `NavigationEndpointState` 保存搜索进度和上次完成的路点。`Bfs.CellsPerFrame=10` 是每个人物每个真实帧的工作格上限，BFS 展开、不可走起点的最近格扫描、路径回溯和平滑共同使用该预算；同帧重复调用或重置不额外补预算。`maxStep` 仍单独限制图搜索深度。只有一轮完成才替换路点，下一帧开始新一轮；未完成时从人物最新位置朝上次路点移动，不复用旧的方向向量。首轮没有结果时等待，不触发卡住侧移；已到旧路点但更新未完成时也等待。完成路径会对齐人物最新所在路径格，已经偏离该路径则丢弃本轮候选、继续保留旧结果。普通目标换格不重启在途搜索，以免移动目标令搜索永远无法完成；本轮按目标快照完成，下轮使用最新目标。旧的目标直达路点仅能在原目标格内跟随坐标，不可跨格直接转向。
+
+导航端点处理：起点格不可通行（Object 阻断、缺格、空格、通行类型或人物 footprint 不满足）时，先直线移动到距离起点最近的可走格中心，再恢复 BFS；最近格扫描也分帧，已选定且仍有效的起点锚点直接复用。目标格不可通行时，在 BFS 可达格中选择距离目标世界坐标最近的一格，到达格中心后再直线接近原目标坐标。末段状态不会因为人物进入目标阻断格而重新触发脱离；目标换格清除旧末段及其直线结果，旧目标快照不能再发布末段。同格内的移动目标沿用当前阶段并使用最新坐标。体型/能力变化、停用导航、切换控制器和传送会完全重置状态；半径比较使用 `0.0001` 容差，相同通行能力（忽略顺序、重复和 0）不重置。分帧预算未完成或搜索深度耗尽都不能当成已到末段起点。直线端点段仅放宽导航/地形通行类型限制，仍经过 `CharacterUnit.Move` 的实体碰撞、边界限制与 Trigger 扫掠，不是传送或穿墙。每帧移动距离同时受当前路点距离约束，避免越过路点后反复折返；普通手动移动的 passType 限制保持不变。
+
+`CanPass` 优化：先排除已访问节点，每次展开只准备一次出发格 footprint；遍历该格的已知 links 时不重复检查出发格和中心连接，公开的任意两格检查仍保留完整校验。中心检查后跳过零偏移，用下标循环避免接口枚举器装箱；搜索容器按人物复用，调试路径逐段画线而不分配坐标数组。平滑仍校验扩展矩形中的物理通行和方向连接，通行类型只限制中心线；已检查矩形全部满足能力时不重复扫描每条中心线，否则回退原中心线判定，不能因为邻格类型不符而拒绝路线。Nav 字典实际增删格时递增 `LayoutVersion`，下次推进前重启在途轮次；周期更新仅刷新数值/links 时不重启。
 
 [CharacterUnit.cs:103-269](file:///d:/Works/Game/Z_Plugin/Assets/Z_Level3/Z_Map/Core/Character/CharacterUnit.cs#L103-L269)
 
@@ -179,7 +185,7 @@ Move(dir):
     ── 应用移动 ──
     firstTry = false
     dir *= res / mag
-    if res > 0.01:
+    if res > 0.01 || (res > 0.000001 && res >= mag - 0.000001):
       ApplyMove(this, pos + dir, euler)
       moved = true
 
@@ -194,6 +200,7 @@ Move(dir):
 **关键设计**：
 - **移动队列**：初始方向被墙阻挡后，计算滑行方向重新入队，支持多次重试
 - **首次尝试标记**：`firstTry=true` 时即使 `res=0` 也计算避障；后续迭代要求 `res>0.001` 才滑行，防止无限循环
+- **小步移动**：碰撞截断仍保留 `0.01` 的贴边死区；没有碰撞缩短的完整位移允许小于 `0.01`，只排除不超过 `0.000001` 的近零步，避免高帧率/低速度输入和寻路停止。
 - **邻域遍历**：只检测 `GetNineTile` 返回的有界邻域，且跳过低于当前层的 tile。候选不能再按 Tile 锚点的三维距离排除，跨层 Collider 由 Mesh 的 AABB/SAT 判定实际是否接触
 - **通行类型**：只检查人物中心所属的逻辑 Tile，不读取 Collider/Trigger，也不因人物尺寸或相邻 Tile 受限而提前拦截。普通手动移动的目标中心落入不满足 `passType` 的 Tile 时，通过带通行类型过滤的最近有效位置搜索，把中心放到距离目标最近的合法 Tile 内；导航端点的直线段使用本节开头的定向例外，正常 BFS 路段仍要求通行类型匹配。
 - **Object 覆盖**：从 `tile.data.pos` 向上探测 `0~1` 世界单位（包含两端），这条竖直线段与 Object 本体相交时，该 Tile 的运行时通行类型暂按 default（无要求）；纹理派生的原始要求保留，最后一个覆盖 Object 离开后恢复。不是单点检测、无限向上射线或仅 X/Z 投影。优先使用 `GetMeshes(CollideOnly)` 的实际 Box/Sphere 本体，考虑 `MapModel.colliderScale`、嵌套变换及 Collider.center，排除放大的 Trigger；Sphere 半径遵循现有物理碰撞换算。池模板根节点 inactive 不影响 Collider 提取，但模板中的 inactive 子节点仍排除。没有支持的物理本体时才回退原有模型/Renderer/锚点盒；组合回退模型中心使用实际 `localPosition`（含拼装 +0.5Y），不能扣掉偏移。精确探测结果单独维护在 `objectPassTypeTileDic`，仅枚举每个本体包围盒向下扩展 1 后的附近 Tile，并用线段/旋转盒 SAT 或线段/球距离确认相交；显示/owner 索引仍不受 colliderScale 影响。Object 增删、移动、旋转或显式尺寸刷新时只更新旧/新视觉、探测及物理导航覆盖 Tile 的并集：复用缓存地形高度，重算附近障碍和通行类型，再更新这些格的出向连接及四邻格（Y 偏移 -1..1）的入向连接。不触发全图重建或重新采样所有 Tile；原有周期重建完成后只补刷其期间发生 Object 变化的覆盖格。
@@ -426,7 +433,7 @@ IsVectorsInHemisphere(vectors, out hemisphereNormal):
 ```csharp
 if (GlobalSettings.ENABLE_GRAVITY && !HasGroundContact())
 {
-    Move(Vector3.down * Time.deltaTime * 2f);
+    Move(Vector3.down * MapUtilController.MovementDeltaTime * 2f);
 }
 ```
 
@@ -581,7 +588,7 @@ ObjectUnit.Move(dir):
 5. **OBB 最近点**：用 `GetClosestPointOnCube`，不能用 AABB 最近点（斜面等非轴对齐 cube 会出错）
 6. **角色 Y 轴吸附**：仅当 `deltaY ≤ 0.0001f`（非爬升状态）时吸附到 tile 高度，保留 slideDir 的 +Y 爬升分量
 7. **重力施加条件**：`HasGroundContact()` 返回 false 时才施加重力，接触点高度阈值 0.4 倍半径
-8. **相机 Isometric 模式**：角度固定 45 度，不使用动态计算
+8. **相机 Isometric 模式**：相机角度固定 45 度，不使用动态计算；这不代表 Object 图片面固定 45 度。`PerspectiveKeeper` 的 cube 图片面按缩放后模型尺寸计算 X 倾角 `atan2(abs(Z), abs(Y))`，与图片的 Y/Z 对角线长度 `sqrt(Y*Y+Z*Z)` 使用同一组尺寸。例如 `1×0.1×1` 的桥为约 `84.29°`，图片纵轴沿 `(0,0.1,1)`；模型/root 尺寸变化立即刷新，原有方向/roll、视觉缩放补偿及碰撞体保持不变。Sphere/人物仍用 45 度，俯视图片仍用 90 度。
 9. **人物自动朝向**：非玩家人物按实际水平位移累计，累计距离严格超过 `abs(speed) / 3` 时才更新到最近一次实际移动方向；`forceEuler` 会清空累计距离
 
 ### 性能优化
@@ -589,21 +596,26 @@ ObjectUnit.Move(dir):
 1. **AABB 快速排除**：`SphereIntersectCube` 开头用 AABB 最近点距离 > `radius + mag` 直接返回 None
 2. **SAT 轴去重**：`AddAxisCheckSphere` 检查轴是否已存在（含反向），避免重复检测
 3. **Mesh 与 mapground 覆盖缓存**：平移只更新已有顶点；预制、旋转或缩放变化才重建几何。周期导航刷新复用每个 `mapground` 已覆盖的 NavUnit 坐标，不再重复扫描 Collider 顶点和三维候选格；仅在该 Tile 的 prefab、mapPos、pos、euler、scale、地图格尺寸变化，或导航 Tile 新增/删除/中心移动时失效。
+   **Tile 地面采样缓存**：`GetYByPoint` 缓存原有 Collider 高度平面，稳定调用只计算平面方程加当前 Tile Y，不再查询预制、查找组件、转换 Euler 或计算三角函数。完整导航每轮按预制名称复用一次查询，只在 Tile 身份、平面版本、中心 Y 或零缩放状态变化时重算四向高度；复用 `dirGroundY/dirMaxY/passTypes`，每轮恢复地面高度并更新通行要求。预制名称/引用、Tile yaw 变化自动更新；同名 Collider 编辑通过 `InvalidateCollisionGeometry` 失效，局部 `RefreshTerrainTiles` 显式重算被编辑地块。保留原斜坡公式、退化回退、零缩放 `-999`、方向连接与 Object 局部刷新规则。隔离回归 `TerrainHeightCaching` 检查数值等价、稳定采样零分配、周期刷新不重复采样与编辑失效；实际帧耗时需 Play/Player Profiler 复测。
 4. **existUnit 去重**：Move 中用 `HashSet<MapUnit>` 避免同一帧重复检测同一 Unit
+   **导航分帧/障碍判断**：Play 周期重建批量改为 `max((Tile数*3+Object数)/100,5)`，为原 `/50、最低10` 的一半；初始化/显式同步重建不改。一次全量协程尚未完成时忽略新的 `UpdateMap` 请求，避免跨越 60 帧更新间隔后重入共享工作缓冲。每个身体/格子的地面平面、包围范围/最大相对高度或 Sphere 半径仅准备一次，供中央与四边复用；已阻断方向不再裁剪，但仍累积其余方向。平地的严格轴对齐 Box 使用等价矩形交叠、原高度/面积阈值快速路径；旋转、斜坡和近轴对齐仍精确裁剪。局部 Object 刷新继续同步，不跨帧保存实时 Mesh 快照。`RunNavigationOptimization` 验证原算法等价、重建不重入与小批量结果；真正帧耗时仍需 Profiler 复测。
 5. **覆盖关联增量更新**：每次仍查询完整范围（含上层），仅修改新旧覆盖格的差集；owner 索引与实际覆盖索引继续分离。
 6. **遮挡最终状态提交**：先完成地块初始化、直接命中和 BFS，只记录地块最终透明度；再各遍历一次 `curObjectLst/curItemLst/curCharacterLst`，按所属地块取最终值（无 owner 或不在本帧地块集合时为 1）。Object 自动半透须先满足第 12 条 `高层 || (本层 && 非零水平碰撞体 && 最终 Collider.Y > Collider.Z)` 资格（全透与显式 `SetGroupVision` 不受此门槛影响），视觉覆盖遮挡优先，并保留列表外候选的遮挡与恢复；Play 侧视下 Object 的半透必须通过第 12 条的统一范围及按 Object 本层/高层区分的投影检查，不能由半透 owner 或混合高层覆盖绕过该条件。附属列表沿用 `UpdateSingleOne`、视野刷新和删除流程维护；公开 `SetGroupVision` 仍立即作用于一组单位。最后按实例的上次提交状态决定是否写入，复用 MaterialPropertyBlock，保留其它材质属性；绑定子单位、对象池复用、显示层和 owner 变化仍需正确刷新。ModScene 的 Tile 显示仍使用层级上限；低于当前选择层的 normal/front Renderer 对将各自记录的初始 `_LightSensitivity` 减半，当前层保持初始值，Event、退出 Mod 和对象池复用时恢复初始值且不重复折半。
 7. **只读字典查询**：`DoubleDictionary.Get/GetFirst` 命中时合并为一次查找，保留缺失时建空列表的兼容行为。渲染查询使用 `TryGet/TryGetFirst`，空地块和缺失 owner 不会为查询创建空列表或污染关联索引。
 8. **Play 侧视 Tile/Object 统一遮挡扫描**：先枚举人物左右及自身 7 列（`dx=-3..3`），再枚举小 Z 方向后方 `0..5` 格，最后枚举本层及高 `0..5` 格，端点包含，空 Tile 只跳过不停止。一次精确 Tile 查询同时供 Tile 与 Object 使用。仅高层 Tile 可直接半透；`高度差 >= 后方距离` 是快速命中，不是唯一必要条件。不满足时继续判断 `(x, playerY, z + 高度差)` 的投影是否落在人物周围逻辑 X/Z 欧几里得半径 3 内。例如左 1、后 3、高 2 的 Tile 投影为左 1、后 1，仍必须半透；不能用原 Tile 锚点距离排除它。本层 Tile 仍不半透，范围外投影不命中兜底分支。直接命中不再受源 Tile 锚点的 3 格半径限制。保留已有 BFS 连通扩展：扩展的普通半透仍限定逻辑 X/Z 欧几里得半径 3；配置显示范围内的头顶中心 Tile 仍先触发连通块全透，不要求四邻数量，随后半透不能覆盖全透。俯视起点及 `OVERLAY_HIDE` 容差不变。Collider 高度不透明规则最高优先级：高层 `(x,highY,z)` 对应精确 `(x,playerY+1,z+highY-playerY)`，任一缓存 `CollideOnly` 身体的世界 Y 长度超过 `0.5 + 0.0001` 就保持 Tile 身体不透明、不收集该 Tile 的高层 Object 候选；不检查 Nav/passType，不计 Trigger，也不拼接分离 Collider 的高度。根/子节点旋转缩放均计入，缺失或无实体几何不保留可见。front（Renderer `3..5`）独立检查投影 Z 减一，同样位于 `playerY+1`；仅 front 命中只保留 front，不改变身体/附属状态。同帧相同 `(x,z)` 的 Collider 查询复用结果，下帧/End 清空。Object 独立遮挡仍能覆盖 Tile 的不透明例外，具体按第 12 条。全透继承、混合高层/本层的本层优先、Mod 预览及恢复清理规则保留。`DisFadeCode` 阴影不读取 `_Show`/`_FadeCenter`，仍按贴图/遮罩 Alpha 裁切。
 9. **Mod 高层统一半透明**：`GlobalSettings.MOD_HIGH_LAYER_HALF_TRANSPARENT` 默认开启。`DynamicGlobalSettings.playing == false` 时，以相机目标所在 map 层为本层，当前视野内全部更高层 Tile 及其附属 Item/Character 统一使用 `_Show=1, _FadeCenter=1`，并跳过 Play 高层遮挡 BFS。Object 按视觉覆盖高层收集，因此 owner 在视野外也能半透明，高层不再受绝对高度/Collider 尺寸限制；本层须满足第 12 条最终 Collider.Y>Z，低层不自动半透；本层和低层 Tile 不受影响，本层 Object 的既有遮挡规则继续生效。进入 Play 后恢复第 8 条的普通遮挡逻辑。
-10. **删除 Tile 后保持高度索引稀疏一致**：`MapInfo.UnRegisterMap` 删除某个高度后，若该 X/Z 已无任何 Tile，会一并删除空的 `mapXZ2Y` 键。视野刷新只枚举 `mapXZ2Y` 中真实登记的高度，并跳过找不到精确 Tile 数据的陈旧项，不再把 `Min..Max` 之间的空层当成 Tile；因此 Mod 的 all erase/delete all 删除整列或中间层后，下一帧 `FreshMap` 不会读取空数据。
+10. **删除 Tile 后保持高度索引稀疏一致**：`MapInfo.UnRegisterMap` 删除某个高度后，若该 X/Z 已无任何 Tile，会一并删除空的 `mapXZ2Y` 键。`ShowAndAddLst` 单层范围直接精确查询 `maps`（目前所有视野调用均为单层），避免 `SortedSet` 枚举器的栈分配；多层回退仍只枚举真实登记高度并跳过陈旧项，不把 `Min..Max` 之间的空层当 Tile。因此 Mod 的 all erase/delete all 删除整列或中间层后，下一帧 `FreshMap` 不会读取空数据。
 11. **视野集合直接增量维护**：`curTileLst/newMapLst/delMapLst` 与可见 Object/Item/Character 均为无序 `HashSet`。视野边界未变化时 `FreshMap` 直接返回；普通跨格移动只枚举进入视野的非重叠薄片，`ShowAndAddLst` 仅对 `HashSet.Add` 成功的新 Tile 调用 `Show`，离开 Tile 在一次可见集合扫描中直接记录并批量移除。首次、强制刷新或新旧视野完全不重叠时才完整扫描当前视野，不再复制整个集合后用多次 `List.Remove` 求差集。附属单位根据“任一关联 Tile 仍在显示”决定最终显示状态，不依赖进入/离开集合的枚举顺序。
+    **本次刷新内活跃复用**：`FreshMap` 在早退之后开启 `BeginExistingViewRefreshReuse` 同步作用域（没有已初始化 manager 时不创建），离开 Tile 立即双向解除旧归属、取消实例贴图动画、释放材质路由和阴影/显隐基准、失效视觉/倾角缓存并暂禁 Collider；同 prefab 优先复用这些仍 active 的实例，恢复 Collider 和 prefab Renderer 槽，不经历 root false→true。作用域结束/异常只关闭未复用的剩余实例，绝不拖到下一帧；嵌套、重复 Dispose、Clear/Destroy/Unregister 和场景重建都需安全收尾。仅 exact `TileInstance` 且完整层级只有已审查的 Transform/MeshFilter/MeshRenderer/BoxCollider/PerspectiveKeeper/DisFadeMaterialBinding 时启用；每次用复用列表检查后来新增组件。人物、Object/Item/Canvas、派生类和未知脚本/行为仍走原生命周期。不取消 Unit 自身的游戏事件/task。附属列表查询统一 `TryGet`，不为缺失关联生成空列表。
 12. **Object 按当前枚举 Tile 前边界判定半透**：Object 自动半透资格为 `高层 || (本层 && 非零水平碰撞体 && 最终 Collider.Y > Collider.Z)`，按根位置经 `RealPos2MapPosInt` 分类，不看关联 Tile；高层不受尺寸限制，低层不合格。本层先排除自身 X 或 Z 边长为零的退化 Box（旋转/纹理拟合后也按身体自身边检查，不按 AABB 猜测）；`colliderScale=0` 的草4 虽保留 Y 高度，但没有水平碰撞面积，不能因 Z=0 被判为高瘦遮挡物。再按每个缓存 `GetMeshes(CollideOnly)` 实际身体的世界 Y/Z 长度比较 Box（`Y > Z + 0.0001`，相等不合格），计入根/模型/Collider 旋转缩放、`colliderScale` 和逐单位纹理拟合；不合并分离身体，不计 Trigger，缺失物理身体不回退视觉尺寸。物理 Sphere 各轴直径相同，不能通过严格 Y>Z。删除绝对高度门槛和单独的 `colliderScale<=0.8` 分支。此资格用于独立遮挡、半透 owner/混合覆盖继承、俯视半透和 Mod 高层预览；不合格自动半透改为不透明，原有全透继承与显式 `SetGroupVision` 不变。复用第 8 条 `X +/-3 → Z 0..-5 → Y 0..+5` 的精确 Tile 查询和 `objectTileDic` 视觉反向索引，不再使用逐列收窄半菱形或向下查层。45° 侧视对每个实际变换后的视觉顶点计算世界 `z+y`，不能组合不同顶点的 AABB 最高 Y/最大 Z。仅本层 Object 投影到当前枚举 Tile 的高度平面，严格超过其前边界才半透：`max(z+y) > tile.pos.y + tile.pos.z + abs(mapUnitSize.z)/2 + 0.0001`，刚好相等不遮挡，本层不再比较人物位置。高层 Object 保留原来的 `max(z+y) > curCenterPos.z + curCenterPos.y + 0.0001` 人物平面投影判断及高层 Tile/全透继承，不施加新增 Tile 前边界门槛。根据 Object 根位置经 `RealPos2MapPosInt` 得到的逻辑 Y 判断本层/高层，不能因为本层 Object 关联了高层 Tile 就绕过新增条件。每 Object 的视觉投影和物理尺寸资格各缓存一次/帧，物理尺寸复用现有身体 Mesh，不重新枚举 Collider 组件；仅已命中的 Object 可跳过，首次 Tile 边界不满足时仍检查之后的关联 Tile，避免枚举顺序影响结果。先解析独立合格对象，再处理高层/owner 继承，合格独立半透优先于 owner 全透；Play 侧视的半透 owner 和混合高/本层覆盖必须通过同一范围及对应本层/高层的投影条件。范围外原有全透继承、俯视继承和 Mod 高层预览的其它规则仍保留（自动半透统一受层级/Collider 资格限制）。Item/Character 继续继承 Tile；列表外对象也能查询并恢复。移动、旋转、缩放、模型位移、关联 Tile 变化会在下帧生效。查询不创建空索引键，视觉投影/Collider 资格缓存及合格集合每帧与 End 清理，组合预制稳定帧无临时几何分配。
 
 13. **相机中心逐像素渐变**：`DisFadeCode` 新增 `_FadeCenter`（Inspector 为 `fadeCenter`，默认 0）。CPU 的 `0.5` 仅保留为半透状态分类，不再传给 `_Show`；本帧需要半透的已显示 Renderer 提交 `_Show=1, _FadeCenter=1`，普通显示清为 `_FadeCenter=0`，全透/未显示提交 `_Show=0, _FadeCenter=0`。普通部分与 front 独立，附属/绑定单位沿用各自最终状态；离开遮挡、显示层切换和对象池复用都重置标记。Shader 逐像素从实际相机视轴中心反解地面 X/Z 投影，按欧几里得世界距离 `d` 使用 `visibility=0.2+0.8*saturate((d-1.5)/(3.5-1.5))^2`：距中心 1.5 以内保持可见度 0.2，仅 1.5～3.5 的两世界单位环带平方渐变，3.5 及以外完全不透明（距 2.5 时可见度为 0.4）。中心保留 0.2 下限；地图半径减一逻辑仍取消。固定世界半径不随格尺寸改变，缩放、宽高比和相机倾角反解仍保留；CPU 遮挡搜索/BFS 范围不改，共享 `_MapFadeCenterRange.xy=3*abs(mapUnitSize.xz)` 仍按原协议写入，但 Shader 不再读取它计算半径，无地图全局值的预览采用相同 1.5～3.5 范围。透视模式以 `_MapFadeCenterPosition=curCenterPos` 的深度作为范围参照。Tile/Object 候选复用第 8 条统一扫描，普通 Tile 连通扩展保留 X/Z 半径，Object 使用第 12 条按本层/高层区分的投影判定，碰撞/导航不变；显式非半透值如 `0.25` 仍走原 `_Show`，阴影不读取 `_Show` 或 `_FadeCenter`。 为消除半透杂点，Forward 不再使用屏幕空间随机抖动裁剪，改为预乘 Alpha 的连续混合（`Blend One OneMinusSrcAlpha`、`ZWrite Off`、`ZTest LEqual`），输出 `diffuse*finalAlpha` 与 `finalAlpha`；只有不可见像素被裁掉，贴图/遮罩本身的 Alpha Cutoff 保留。多层重叠按普通透明排序叠加（两个 0.25 层为 0.4375），不再采用旧点阵最大覆盖规则；ShadowCaster 的深度写入与轮廓不变。
 
-14. **本层 owner 的高处 Object 连通全隐藏**：Play 从人物中心的精确本层 Tile 出发，沿本层四邻格在已有 view 矩形内 BFS；仅当该 Tile 真正拥有一个高处 Object 才继续扩展。使用 `objectTileDic.TryGetFirst(object) == tile` 排除其它 owner 的视觉覆盖。高处定义为全部有效物理 Collider 的世界下界严格大于所属本层的上界：`minY > tile.data.pos.y + 1 + 0.0001`；即相对 Tile 高度超过 1 世界单位，不是只离开地面，也不是固定世界坐标 Y>1。计入子模型偏移、旋转缩放与纹理拟合，不依赖 root 的逻辑层。复用 `GetMeshes(CollideOnly)`，仅无物理本体时回退 `TriggerOnly`；任一本体仍在本层内/穿过本层、下界等于上界或缺失几何均不符合，Sphere 使用物理半径求真实下界。只把该连通块中符合条件的 Objects 设为 degree=0，本层 Tile/front、层内 Object、Item 和 Character 不受此路径影响。该状态在独立/混合半透之后、owner 继承之前写入，不能被半透重新覆盖；列表外对象也能隐藏和恢复。空格、缺格、只有层内对象的格子阻断，斜对角和非 owner 覆盖不连通；全隐藏不受半透半径限制。人物离开、对象降回本层/迁移 owner、连接断开后下一帧沿既有最终状态流程恢复。复用已有 BFS 队列和 visited，查询不创建索引键，不扫全图，稳定帧不分配临时几何；Mod 高层预览不运行此 Play 路径，普通半透、ModScene 点击筛选及原有 Tile Collider 不透明例外不变。
+14. **本层覆盖的高处 Object 连通全隐藏**：Play 从人物中心的精确本层 Tile 出发，沿本层四邻格在已有 view 矩形内 BFS；只要存在覆盖该 Tile 的高处 Object 就继续扩展。直接读取 `objectTileDic` 已有视觉覆盖反向索引，不再要求 `TryGetFirst(object) == tile` 或 `belongTile` 相等；其它 owner（包括视野外 owner）的 Object 覆盖也能作为起点或桥接，归属关系本身不变。高处定义为全部有效物理 Collider 的世界下界严格大于当前枚举 Tile 的本层上界：`minY > tile.data.pos.y + 1 + 0.0001`；即相对 Tile 高度超过 1 世界单位，不是只离开地面，也不是固定世界坐标 Y>1。计入子模型偏移、旋转缩放与纹理拟合，不依赖 root 的逻辑层。复用 `GetMeshes(CollideOnly)`，仅无物理本体时回退 `TriggerOnly`；任一本体仍在本层内/穿过本层、下界等于上界或缺失几何均不符合，Sphere 使用物理半径求真实下界。只把该连通块中符合条件的 Objects 设为 degree=0，本层 Tile/front、层内 Object、Item 和 Character 不受此路径影响。该状态在独立/混合半透之后、owner 继承之前写入，不能被半透重新覆盖；列表外对象也能隐藏和恢复。空格、缺格、仅有层内 Object 覆盖的格子阻断，单纯斜对角不连通，非 owner 的高处覆盖可以连通；全隐藏不受半透半径限制。人物离开、对象降回本层、覆盖移出或连接断开后下一帧沿既有最终状态流程恢复，仅改变 owner 而保留覆盖不能使隐藏失效。复用已有 BFS 队列和 visited，查询不创建索引键，不扫全图，稳定帧不分配临时几何；Mod 高层预览不运行此 Play 路径，普通半透、ModScene 点击筛选及原有 Tile Collider 不透明例外不变。
 
-隔离回归入口：`Docs/Tests/Run-MapRuntimeRegression.ps1`。它编译真实生产程序集，并在 Temp 下的独立 Unity 工程验证几何等价、双向覆盖关联、通行类型移动边界、遮挡提交和事件过滤；`-Fixture MapFadeShaderRegression` 使用实际 Shader 的 GPU 像素验证渐变和阴影，不加载当前故事或玩家存档。实际移动、完整 Play 画面和目标设备性能仍需 Play/Player 复测。
+15. **不透明像素先绘制颜色和深度**：`DisFadeOpaqueFeature` 接入 GraphicsSettings 默认 URP 的 `SamplesForwardRenderer`，复用 Render Objects，在天空盒之后（400）、透明物体之前（450）执行 `LightMode=DisFadeOpaque`。逐像素复用同一 float 精度最终透明度计算，只有最终 Alpha 恰为 1 的像素以 `Blend Off / ZWrite On / ZTest LEqual` 绘制；所有物体的不透明颜色和深度都先完成，不能只写深度后让不透明颜色混在透明队列里，也不能逐物体交错两阶段。之后原 Forward 仅绘制半透明像素，保持预乘 Alpha 连续混合、不写深度及正常透明排序；0.9999 仍属半透。倾斜面交叉和不同材质队列的不透明区域按实际逐像素深度遮挡。透明中心/环带不写深度，外围 Alpha=1 则写深度，贴图/遮罩裁切和隐藏像素仍不写深度。相机作用域 `_DisFadeSplitEnabled` 在前阶段开启，在相机清理/Feature 释放时重置；预览、纯深度相机跳过 Feature，其它未接入的 Renderer 保留原单阶段回退，不会变空白。其它项目 Renderer 若也需要此效果，应添加该 Feature。ShadowCaster 仍忽略可见度并保留轮廓；CPU 遮挡、碰撞、导航、MPB 和原渐变半径不变，纯半透明面交叉仍有普通透明排序的限制。
+
+隔离回归入口：`Docs/Tests/Run-MapRuntimeRegression.ps1`。它编译真实生产程序集，并在 Temp 下的独立 Unity 工程验证几何等价、双向覆盖关联、通行类型移动边界、遮挡提交和事件过滤；`-Fixture MapFadeShaderRegression` 使用实际 Shader 的 GPU 像素验证渐变、阴影和不透明/半透明分阶段绘制，并编译验证 Renderer Feature，不加载当前故事或玩家存档。实际移动、完整 Play 画面和目标设备性能仍需 Play/Player 复测。
 
 ---
 
@@ -680,6 +692,8 @@ Tile 使用的三层 MapTexture ID 已保存在 `TileUnitForm.texDic` 的地表�
 开启 `isWangTile` 或 `frontIsWangTile` 后，每一张配置的源动画帧都要按同一个 8 邻接 mask 拆成 WangTile 变体。相同 mask 的生成贴图按源列表顺序组成动画，并继续使用 `MapTextureForm.animTimeInterval` 切换；普通层和前景层分别维护序列。`WangTileDic` 与 `FrontWangTileDic` 保留第一张有效变体用于兼容和静态采样，完整动画缓存随场景生成、卸载和重载一起清理。
 
 Tile（含 WangTile 的普通层与前景层）、Object、Item 的贴图动画不以实例出现时间起拍。Play 中统一用 `ProgressForm.seconds` 计算当前帧，新进入视野或从对象池恢复的实例会直接加入已有动画相位，游戏时长暂停时画面也保持当前帧。底层 `Z_Time` 通过 `animationTimeGetter` 获取该时钟，避免反向依赖存档程序集；UGC 编辑预览继续使用 `Time.time`。人物动画不使用这套全局相位。
+
+动画列表中的每个 tex 也可以是 GIF/WebP：先按动图各帧自带延时播放一轮，再停留在末帧等待 `animTimeInterval`，之后进入下一个 tex。静态 tex 仍只占用间隔时间；只有一张 GIF 时也会循环播放，间隔为 0 时直接开始下一轮。人物使用动作/朝向局部时间，特殊动作和死亡动作的结束时间包含动图总时长及最后一次间隔。WangTile 对 GIF 的每个内部帧都生成对应 mask 的变体，并在同一生成 tex 内保留帧延时，不能把 GIF 内部帧误当成需要额外 interval 的外层动画项。内部帧播放不触发碰撞体或导航刷新。
 
 ### 6.11 桥模型偏移被导航忽略（已修复）
 

@@ -31,6 +31,10 @@ namespace Z_Map.Analysis
         public float[] dirMaxY;
         public float[] dirGroundY;
         public HashSet<int> passTypes;
+        internal TileUnit groundTile;
+        internal int groundPlaneVersion;
+        internal float groundCenterY;
+        internal bool groundIsNull;
     }
     public interface NaviComponent
     {
@@ -38,7 +42,7 @@ namespace Z_Map.Analysis
             IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null);
     }
 
-    /// <summary>每个角色独立保存端点直线段，不能放在共享 BFS 中。</summary>
+    /// <summary>每个角色独立保存搜索进度、已完成路点与端点直线段。</summary>
     public sealed class NavigationEndpointState
     {
         internal NavigationController controller;
@@ -47,11 +51,19 @@ namespace Z_Map.Analysis
         internal readonly HashSet<int> passTypes = new HashSet<int>();
         internal NavUnit escapeAnchor;
         internal bool finalApproach;
+        internal Bfs.SearchState searchState;
+        public bool isSearching { get; internal set; }
+        public bool hasResult { get; internal set; }
+        public int completedSearchCount { get; internal set; }
+        public int searchedCellsThisFrame => searchState?.work ?? 0;
         public Vector3 moveTarget { get; internal set; }
         public bool directEndpoint { get; internal set; }
 
         public void Reset()
         {
+            searchState?.Reset();
+            isSearching = false;
+            hasResult = false;
             controller = null;
             escapeAnchor = null;
             finalApproach = false;
@@ -64,7 +76,7 @@ namespace Z_Map.Analysis
         {
             bool changedCell = controller == current && !destination.Equals(target)
                 && current.RealPos2MapPosInt(destination) != current.RealPos2MapPosInt(target);
-            if (controller != current || changedCell || Mathf.Abs(radius - agentRadius) > 0.0001f
+            if (controller != current || Mathf.Abs(radius - agentRadius) > 0.0001f
                 || (allowedTypes == null ? passTypes.Count != 0 : !passTypes.SetEquals(allowedTypes)))
             {
                 Reset();
@@ -73,7 +85,15 @@ namespace Z_Map.Analysis
                 if (allowedTypes != null)
                     passTypes.UnionWith(allowedTypes);
             }
-            // 索敌目标在同一格内移动时继续当前末段，但始终朝最新坐标移动。
+            else if (changedCell)
+            {
+                // Moving targets must not starve a multi-frame round. Retain
+                // its snapshot and ordinary waypoint, but never extend an old
+                // blocked-target direct leg into another cell.
+                finalApproach = false;
+                if (searchState != null && searchState.resultDirect && searchState.resultFollowsTarget)
+                    hasResult = false;
+            }
             destination = target;
             directEndpoint = false;
         }
@@ -121,6 +141,9 @@ namespace Z_Map.Analysis
         { }
         NaviComponent bfs;
         public Dictionary<(int, int, int), NavUnit> navUnits;
+        // Membership edits retire cross-frame enumerators. Unchanged periodic
+        // refreshes must not restart long searches every time they finish.
+        internal int LayoutVersion { get; private set; }
         public float step;
         private readonly Dictionary<int, MapGroundCoverageCache> mapGroundCoverageCaches =
             new Dictionary<int, MapGroundCoverageCache>();
@@ -135,6 +158,8 @@ namespace Z_Map.Analysis
         private bool navCellLayoutInitialized;
         private int navCellLayoutCount;
         private int navCellLayoutHash;
+        // Resolve each prefab name once per full pass, not four times per Tile.
+        private readonly Dictionary<string, GameObject> groundPrefabs = new Dictionary<string, GameObject>();
 
         public void Build()
         {
@@ -153,7 +178,10 @@ namespace Z_Map.Analysis
         int curUpdateCount = 0;
         public void UpdateMap(int step)
         {
-            _super.StartCoroutine(UpdateInternal(step));
+            // Smaller batches can span more than the periodic update interval.
+            // Rebuilds share work buffers, so never restart one while it is active.
+            if (activeFullRebuilds == 0)
+                _super.StartCoroutine(UpdateInternal(step));
         }
         public void RebuildNow()
         {
@@ -189,6 +217,7 @@ namespace Z_Map.Analysis
             //build single unit
             curUpdateTileList.Clear();
             curUpdateTileList.AddRange(_super.data.maps.Values);
+            groundPrefabs.Clear();
             for (; curUpdateCount < curUpdateTileList.Count; curUpdateCount++)
             {
                 times++;
@@ -212,29 +241,30 @@ namespace Z_Map.Analysis
                     currentNavCellLayoutHash = currentNavCellLayoutHash * 31 + map.pos.GetHashCode();
                 }
                 (int, int, int) pos = (map.mapPos.x, map.mapPos.y, map.mapPos.z);
-                if (!navUnits.ContainsKey(pos))
+                if (!navUnits.TryGetValue(pos, out var navUnit))
                 {
-                    navUnits[pos] = new NavUnit
+                    navUnit = new NavUnit
                     {
                         links = new List<NavUnit>()
                     };
+                    navUnits.Add(pos, navUnit);
+                    LayoutVersion++;
                 }
 
-                var navUnit = navUnits[pos];
                 navUnit.realPos = map.pos;
                 navUnit.pos = map.mapPos;
                 navUnit.isNull = map.scale == Vector3.zero;
                 navUnit.objectBlocked = false;
                 navUnit.objectBlockedDirections = 0;
-                navUnit.passTypes = new HashSet<int>(map.unit.passTypes);
-                navUnit.dirMaxY = new float[4]
+                var tile = map.unit;
+                if (!groundPrefabs.TryGetValue(map.prefabName, out var groundPrefab))
                 {
-                    map.unit.GetYByPoint(offset[0]),
-                    map.unit.GetYByPoint(offset[1]),
-                    map.unit.GetYByPoint(offset[2]),
-                    map.unit.GetYByPoint(offset[3])
-                };
-                navUnit.dirGroundY = (float[])navUnit.dirMaxY.Clone();
+                    groundPrefab = tile.prefab;
+                    groundPrefabs.Add(map.prefabName, groundPrefab);
+                }
+                navUnit.passTypes = navUnit.passTypes ?? new HashSet<int>();
+                tile.CopyPassTypesTo(navUnit.passTypes);
+                RefreshGroundSamples(navUnit, tile, groundPrefab);
             }
 
             // Adding/removing a NavUnit, or moving its cell center, can change
@@ -378,9 +408,7 @@ namespace Z_Map.Analysis
                 affected[key] = navUnit;
                 navUnit.objectBlocked = false;
                 navUnit.objectBlockedDirections = 0;
-                navUnit.passTypes.Clear();
-                foreach (int passType in tile.passTypes)
-                    navUnit.passTypes.Add(passType);
+                tile.CopyPassTypesTo(navUnit.passTypes);
                 Array.Copy(navUnit.dirGroundY, navUnit.dirMaxY, navUnit.dirGroundY.Length);
 
                 if (_super.updateCtrl.objectNavigationTileDic.TryGet(tile, out var overlapping))
@@ -432,7 +460,7 @@ namespace Z_Map.Analysis
                     sources.UnionWith(candidates);
                 if (!_super.data.maps.TryGetValue(key, out var tile))
                 {
-                    navUnits.Remove(key);
+                    if (navUnits.Remove(key)) LayoutVersion++;
                     continue;
                 }
                 sources.Add(tile.uid);
@@ -441,12 +469,16 @@ namespace Z_Map.Analysis
                     unit = new NavUnit { links = new List<NavUnit>(), passTypes = new HashSet<int>(),
                         dirGroundY = new float[4], dirMaxY = new float[4] };
                     navUnits.Add(key, unit);
+                    LayoutVersion++;
                 }
                 unit.pos = tile.mapPos;
                 unit.realPos = tile.pos;
                 unit.isNull = tile.scale == Vector3.zero;
-                for (int i = 0; i < offset.Length; i++)
-                    unit.dirGroundY[i] = unit.dirMaxY[i] = tile.unit.GetYByPoint(offset[i]);
+                // Explicit terrain refresh must observe in-place Collider edits,
+                // even when all serialized Tile fields are unchanged.
+                tile.unit.InvalidateHeightPlane();
+                groundPrefabs.Remove(tile.prefabName);
+                RefreshGroundSamples(unit, tile.unit, tile.unit.prefab);
             }
             if (keys.Count == 0)
                 return;
@@ -491,6 +523,30 @@ namespace Z_Map.Analysis
             navCellLayoutInitialized = false;
         }
 
+        private void RefreshGroundSamples(NavUnit unit, TileUnit tile, GameObject sourcePrefab)
+        {
+            int version = tile.GetHeightPlaneVersion(sourcePrefab);
+            bool resample = unit.groundTile != tile || unit.groundPlaneVersion != version
+                || unit.groundCenterY != tile.data.pos.y || unit.groundIsNull != unit.isNull;
+            if (unit.dirGroundY == null || unit.dirGroundY.Length != offset.Length)
+            {
+                unit.dirGroundY = new float[offset.Length];
+                resample = true;
+            }
+            if (unit.dirMaxY == null || unit.dirMaxY.Length != offset.Length)
+                unit.dirMaxY = new float[offset.Length];
+            if (resample)
+            {
+                for (int i = 0; i < offset.Length; i++)
+                    unit.dirGroundY[i] = tile.GetYByPoint(offset[i]);
+                unit.groundTile = tile;
+                unit.groundPlaneVersion = version;
+                unit.groundCenterY = tile.data.pos.y;
+                unit.groundIsNull = unit.isNull;
+            }
+            Array.Copy(unit.dirGroundY, unit.dirMaxY, offset.Length);
+        }
+
         private void RegisterGroundCandidates(int uid, MapGroundCoverageCache coverage)
         {
             foreach (var key in coverage.candidateNavUnits)
@@ -529,11 +585,17 @@ namespace Z_Map.Analysis
                 {
                     if (!targetUnits.TryGetValue((x, y, z), out var unit))
                         continue;
-                    if (!unit.objectBlocked && IsObjectMeshBlocking(mesh, unit))
+                    if ((unit.objectBlocked && unit.objectBlockedDirections == 15)
+                        || !TryPrepareObjectMeshTest(mesh, unit, out var test))
+                        continue;
+                    float radius = ObjectNavigationHalfWidth;
+                    if (!unit.objectBlocked && IsObjectMeshBlockingInRect(test,
+                        unit.realPos.x - radius, unit.realPos.x + radius,
+                        unit.realPos.z - radius, unit.realPos.z + radius))
                         unit.objectBlocked = true;
                     // Accumulate all bodies/Objects; one clear edge cannot undo
                     // another obstacle, and both cells are checked when linking.
-                    unit.objectBlockedDirections |= GetObjectBlockingDirections(mesh, unit);
+                    unit.objectBlockedDirections |= GetBlockingDirections(test, unit.objectBlockedDirections);
                 }
             }
         }
@@ -542,12 +604,18 @@ namespace Z_Map.Analysis
         // same exact physical-body clipping and relative-ground height test.
         private bool IsObjectMeshBlocking(Z_Mesh.MeshInfo mesh, NavUnit unit)
         {
+            if (!TryPrepareObjectMeshTest(mesh, unit, out var test)) return false;
             float radius = ObjectNavigationHalfWidth;
-            return IsObjectMeshBlockingInRect(mesh, unit, unit.realPos.x - radius, unit.realPos.x + radius,
+            return IsObjectMeshBlockingInRect(test, unit.realPos.x - radius, unit.realPos.x + radius,
                 unit.realPos.z - radius, unit.realPos.z + radius);
         }
 
         private int GetObjectBlockingDirections(Z_Mesh.MeshInfo mesh, NavUnit unit)
+        {
+            return TryPrepareObjectMeshTest(mesh, unit, out var test) ? GetBlockingDirections(test, 0) : 0;
+        }
+
+        private int GetBlockingDirections(ObjectMeshTest test, int alreadyBlocked)
         {
             Vector3 size = _super.data.mainData.mapUnitSize;
             float halfX = Mathf.Abs(size.x) * .5f, halfZ = Mathf.Abs(size.z) * .5f;
@@ -555,17 +623,18 @@ namespace Z_Map.Analysis
             int blocked = 0;
             for (int dir = 0; dir < 4; dir++)
             {
+                if ((alreadyBlocked & (1 << dir)) != 0) continue;
                 // The long side spans the whole Tile edge, including corners.
-                float minX = unit.realPos.x - halfX, maxX = unit.realPos.x + halfX;
-                float minZ = unit.realPos.z - halfZ, maxZ = unit.realPos.z + halfZ;
+                float minX = test.center.x - halfX, maxX = test.center.x + halfX;
+                float minZ = test.center.z - halfZ, maxZ = test.center.z + halfZ;
                 switch ((Dir)dir)
                 {
-                    case Dir.Right: maxX = unit.realPos.x + halfX; minX = maxX - radius; break;
-                    case Dir.Left: minX = unit.realPos.x - halfX; maxX = minX + radius; break;
-                    case Dir.Forward: maxZ = unit.realPos.z + halfZ; minZ = maxZ - radius; break;
-                    case Dir.Back: minZ = unit.realPos.z - halfZ; maxZ = minZ + radius; break;
+                    case Dir.Right: minX = maxX - radius; break;
+                    case Dir.Left: maxX = minX + radius; break;
+                    case Dir.Forward: minZ = maxZ - radius; break;
+                    case Dir.Back: maxZ = minZ + radius; break;
                 }
-                if (IsObjectMeshBlockingInRect(mesh, unit, minX, maxX, minZ, maxZ))
+                if (IsObjectMeshBlockingInRect(test, minX, maxX, minZ, maxZ))
                     blocked |= 1 << dir;
             }
             return blocked;
@@ -573,20 +642,35 @@ namespace Z_Map.Analysis
 
         // Ground samples remain the Tile's plane, never the obstacle top.
         // Buffers are reused for central/edge checks and local/full rebuilds.
-        private bool IsObjectMeshBlockingInRect(Z_Mesh.MeshInfo mesh, NavUnit unit,
-            float minX, float maxX, float minZ, float maxZ)
+        private struct ObjectMeshTest
         {
+            public Z_Mesh.MeshInfo mesh;
+            public Vector3 center;
+            public float ground, slopeX, slopeZ, sphereRadius;
+            public float minX, maxX, minZ, maxZ;
+            public bool flatAxisAlignedBox;
+        }
+
+        // One preparation for the center and all four edges; no persistent
+        // geometry snapshots, since the MapUnit mesh cache is live/mutable.
+        private bool TryPrepareObjectMeshTest(Z_Mesh.MeshInfo mesh, NavUnit unit, out ObjectMeshTest test)
+        {
+            test = new ObjectMeshTest { mesh = mesh, center = unit.realPos, ground = unit.realPos.y };
             Vector3 size = _super.data.mainData.mapUnitSize;
             float halfX = Mathf.Abs(size.x) * 0.5f, halfZ = Mathf.Abs(size.z) * 0.5f;
-            float ground = unit.realPos.y, slopeX = 0f, slopeZ = 0f;
             if (unit.dirGroundY != null && unit.dirGroundY.Length >= 4)
             {
-                ground = (unit.dirGroundY[0] + unit.dirGroundY[1]) * 0.5f;
-                slopeX = (unit.dirGroundY[0] - unit.dirGroundY[1]) / Mathf.Max(halfX, GeometryEpsilon);
-                slopeZ = (unit.dirGroundY[2] - unit.dirGroundY[3]) / Mathf.Max(halfZ, GeometryEpsilon);
+                test.ground = (unit.dirGroundY[0] + unit.dirGroundY[1]) * 0.5f;
+                test.slopeX = (unit.dirGroundY[0] - unit.dirGroundY[1]) / Mathf.Max(halfX, GeometryEpsilon);
+                test.slopeZ = (unit.dirGroundY[2] - unit.dirGroundY[3]) / Mathf.Max(halfZ, GeometryEpsilon);
             }
             if (mesh.type == Z_Mesh.MeshType.Sphere)
-                return IsSphereBlocking(mesh, unit.realPos, ground, slopeX, slopeZ, minX, maxX, minZ, maxZ);
+            {
+                if (mesh.positions == null || mesh.positions.Length < 6) return false;
+                test.sphereRadius = (mesh.positions[(int)Graph.SphereSixPoint.Right]
+                    - mesh.positions[(int)Graph.SphereSixPoint.Left]).magnitude * 0.5f;
+                return test.sphereRadius > 0f;
+            }
             if (mesh.type != Z_Mesh.MeshType.Cube || mesh.positions == null || mesh.positions.Length < 8)
                 return false;
             var vertices = mesh.positions;
@@ -596,21 +680,50 @@ namespace Z_Map.Analysis
             // Cheap conservative rejection before clipping, especially for low
             // bridges and neighbouring floors in the physical coverage index.
             float highestRise = float.NegativeInfinity;
-            float bodyMinX = float.PositiveInfinity, bodyMaxX = float.NegativeInfinity;
-            float bodyMinZ = float.PositiveInfinity, bodyMaxZ = float.NegativeInfinity;
+            test.minX = test.minZ = float.PositiveInfinity;
+            test.maxX = test.maxZ = float.NegativeInfinity;
             for (int i = 0; i < 8; i++)
             {
                 var point = vertices[i];
-                float floor = ground + slopeX * (point.x - unit.realPos.x) + slopeZ * (point.z - unit.realPos.z);
+                float floor = test.ground + test.slopeX * (point.x - unit.realPos.x) + test.slopeZ * (point.z - unit.realPos.z);
                 highestRise = Mathf.Max(highestRise, point.y - floor);
-                bodyMinX = Mathf.Min(bodyMinX, point.x);
-                bodyMaxX = Mathf.Max(bodyMaxX, point.x);
-                bodyMinZ = Mathf.Min(bodyMinZ, point.z);
-                bodyMaxZ = Mathf.Max(bodyMaxZ, point.z);
+                test.minX = Mathf.Min(test.minX, point.x);
+                test.maxX = Mathf.Max(test.maxX, point.x);
+                test.minZ = Mathf.Min(test.minZ, point.z);
+                test.maxZ = Mathf.Max(test.maxZ, point.z);
             }
-            if (highestRise <= ObjectBlockHeight + GeometryEpsilon
-                || bodyMaxX <= minX || bodyMinX >= maxX || bodyMaxZ <= minZ || bodyMinZ >= maxZ)
+            if (highestRise <= ObjectBlockHeight + GeometryEpsilon) return false;
+            // Exact zero components only: near-axis rotated boxes must retain
+            // clipping, not acquire a slightly larger AABB footprint.
+            test.flatAxisAlignedBox = test.slopeX == 0f && test.slopeZ == 0f
+                && IsAxisAlignedEdge(vertices[1] - vertices[0])
+                && IsAxisAlignedEdge(vertices[2] - vertices[0])
+                && IsAxisAlignedEdge(vertices[4] - vertices[0]);
+            return true;
+        }
+
+        private static bool IsAxisAlignedEdge(Vector3 edge)
+        {
+            return (edge.x == 0f && edge.y == 0f) || (edge.x == 0f && edge.z == 0f)
+                || (edge.y == 0f && edge.z == 0f);
+        }
+
+        private bool IsObjectMeshBlockingInRect(ObjectMeshTest test,
+            float minX, float maxX, float minZ, float maxZ)
+        {
+            var mesh = test.mesh;
+            if (mesh.type == Z_Mesh.MeshType.Sphere)
+                return IsSphereBlocking(mesh, test.sphereRadius, test.center, test.ground,
+                    test.slopeX, test.slopeZ, minX, maxX, minZ, maxZ);
+            if (test.maxX <= minX || test.minX >= maxX || test.maxZ <= minZ || test.minZ >= maxZ)
                 return false;
+            // This Box really occupies its AABB and the ground is flat, so the
+            // prepared height + strict rectangle overlap are the exact result.
+            // Preserve the original near-zero projected-area rejection too.
+            if (test.flatAxisAlignedBox)
+                return 2f * (Mathf.Min(test.maxX, maxX) - Mathf.Max(test.minX, minX))
+                    * (Mathf.Min(test.maxZ, maxZ) - Mathf.Max(test.minZ, minZ)) > GeometryEpsilon * GeometryEpsilon;
+            var vertices = mesh.positions;
             for (int face = 0; face < 6; face++)
             {
                 for (int i = 0; i < 4; i++) objectClipA[i] = vertices[objectBoxFaces[face, i]];
@@ -624,15 +737,15 @@ namespace Z_Map.Analysis
                 float area = 0f;
                 for (int i = 0; i < count; i++)
                 {
-                    var a = objectClipA[i] - unit.realPos;
-                    var b = objectClipA[(i + 1) % count] - unit.realPos;
+                    var a = objectClipA[i] - test.center;
+                    var b = objectClipA[(i + 1) % count] - test.center;
                     area += a.x * b.z - b.x * a.z;
                 }
                 if (Mathf.Abs(area) <= GeometryEpsilon * GeometryEpsilon) continue;
                 for (int i = 0; i < count; i++)
                 {
                     var point = objectClipA[i];
-                    float floor = ground + slopeX * (point.x - unit.realPos.x) + slopeZ * (point.z - unit.realPos.z);
+                    float floor = test.ground + test.slopeX * (point.x - test.center.x) + test.slopeZ * (point.z - test.center.z);
                     if (point.y - floor > ObjectBlockHeight + GeometryEpsilon) return true;
                 }
             }
@@ -662,14 +775,9 @@ namespace Z_Map.Analysis
             return written;
         }
 
-        private static bool IsSphereBlocking(Z_Mesh.MeshInfo mesh, Vector3 center, float ground,
+        private static bool IsSphereBlocking(Z_Mesh.MeshInfo mesh, float radius, Vector3 center, float ground,
             float slopeX, float slopeZ, float minX, float maxX, float minZ, float maxZ)
         {
-            if (mesh.positions == null || mesh.positions.Length < 6) return false;
-            // Same radius as physical collision, including collisionScale.
-            float radius = (mesh.positions[(int)Graph.SphereSixPoint.Right]
-                - mesh.positions[(int)Graph.SphereSixPoint.Left]).magnitude * 0.5f;
-            if (radius <= 0f) return false;
             float dx = Mathf.Clamp(mesh.center.x, minX, maxX) - mesh.center.x;
             float dz = Mathf.Clamp(mesh.center.z, minZ, maxZ) - mesh.center.z;
             if (dx * dx + dz * dz >= radius * radius) return false;

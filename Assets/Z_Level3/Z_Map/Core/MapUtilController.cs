@@ -19,6 +19,15 @@ namespace Z_Map
     {
         private const float ObjectTileProbeHeight = 1f;
 
+        // Share one bounded, scaled frame step across input, navigation and
+        // movement commands. Discard stall time instead of catching up later.
+        public static float MovementDeltaTime => Z_Time.TimeManager.GetDeltaTime();
+
+        public static float ClampMovementDeltaTime(float frameDeltaTime)
+        {
+            return Z_Time.TimeManager.ClampDeltaTime(frameDeltaTime);
+        }
+
         public MapUtilController(MapManager super) : base(super)
         {
         }

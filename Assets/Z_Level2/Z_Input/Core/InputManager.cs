@@ -32,6 +32,7 @@ namespace Z_Input
         public int id;
         public Vector3 pos;
         public GameObject ui;
+        public bool canceled;
     }
     public class InputPointEvent : Z_Event
     {
@@ -87,10 +88,10 @@ namespace Z_Input
         public Dictionary<int, Vector2> id2Pos = new Dictionary<int, Vector2>();
         public Dictionary<int, Vector2> id2OldPos = new Dictionary<int, Vector2>();
 
-        private Dictionary<int, int> touchId2id = new Dictionary<int, int>();
         private List<int> tmpList = new List<int>();
         private HashSet<int> tmpHash = new HashSet<int>();
-        private int pointCnt;
+        private bool hasFocus = true;
+        private bool paused;
 
         public override void Init()
         {
@@ -109,93 +110,107 @@ namespace Z_Input
         {
             id2OldPos.Clear();
             foreach (var point in id2Pos)
-            {
                 id2OldPos[point.Key] = point.Value;
-            }
-
-
-            touchId2id.Clear();
             tmpHash.Clear();
             for (int i = 0; i < Input.touchCount; i++)
-            {
-                var closetId = -1;
-                var min = float.MaxValue;
-                //find Closet
-                foreach (var point in id2Pos)
-                {
-                    if (tmpHash.Contains(point.Key))
-                        continue;
+                ProcessTouch(Input.GetTouch(i));
 
-                    var length2 = (Input.touches[i].position - point.Value).sqrMagnitude;
-                    if (length2 < min)
-                    {
-                        closetId = point.Key;
-                        min = length2;
-                    }
-
-                }
-                touchId2id[i] = closetId;
-                tmpHash.Add(closetId);
-            }
-
-
+            // A device can lose a touch without an Ended/Canceled sample.
             tmpList.Clear();
-            //less
             foreach (var point in id2Pos)
-            {
-                if (!touchId2id.ContainsValue(point.Key))
-                {
+                if (!tmpHash.Contains(point.Key))
                     tmpList.Add(point.Key);
-                }
-            }
-            foreach (var k in tmpList)
+            foreach (var id in tmpList)
+                ReleaseTouch(id, id2Pos[id], true);
+        }
+
+        private void ProcessTouch(Touch touch)
+        {
+            int id = touch.fingerId;
+            Vector2 pos = touch.position;
+            if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
             {
-                Z_EventHelper.Invoke(new InputPointUpEvent()
+                ReleaseTouch(id, pos, touch.phase == TouchPhase.Canceled);
+                return;
+            }
+
+            tmpHash.Add(id);
+            if (touch.phase == TouchPhase.Began)
+            {
+                if (id2Pos.TryGetValue(id, out var canceledPos))
+                    ReleaseTouch(id, canceledPos, true);
+                id2Pos[id] = pos;
+                id2OldPos[id] = pos;
+                Z_EventHelper.Invoke(new InputPointDownEvent
                 {
-                    id = k,
-                    pos = id2Pos[k],
-                    ui = UICheck(id2Pos[k])
+                    id = id,
+                    pos = pos,
+                    ui = UICheck(pos)
                 });
-                id2Pos.Remove(k);
             }
-
-
-
-            for (int i = 0; i < Input.touchCount; i++)
+            else if (id2Pos.TryGetValue(id, out var previous))
             {
-                //more
-                int id = touchId2id[i];
-                if (id == -1)
+                // Unity fingerId, unlike nearest-position matching, stays
+                // attached to the same finger when two sticks cross/swap.
+                id2Pos[id] = pos;
+                Z_EventHelper.Invoke(new InputPointEvent
                 {
-                    pointCnt = (pointCnt + 1) % 100;
-                    id2Pos[pointCnt] = Input.touches[i].position;
-                    Z_EventHelper.Invoke(new InputPointDownEvent()
-                    {
-                        id = pointCnt,
-                        pos = Input.touches[i].position,
-                        ui = UICheck(Input.touches[i].position)
-                    });
-                }
+                    id = id,
+                    pos = pos,
+                    delta = pos - (id2OldPos.TryGetValue(id, out var old) ? old : previous),
+                    ui = UICheck(pos)
+                });
             }
+            // After focus loss, ignore a still-held finger until a fresh Began.
+        }
 
-
-            //keep
-            for (int i = 0; i < Input.touchCount; i++)
+        private void ReleaseTouch(int id, Vector2 pos, bool canceled)
+        {
+            if (!id2Pos.Remove(id))
+                return;
+            id2OldPos.Remove(id);
+            Z_EventHelper.Invoke(new InputPointUpEvent
             {
-                int id = touchId2id[i];
-                if (id != -1)
-                {
-                    id2Pos[id] = Input.touches[i].position;
-                    Z_EventHelper.Invoke(new InputPointEvent()
-                    {
-                        id = id,
-                        pos = id2Pos[id],
-                        delta = id2Pos[id] - id2OldPos[id],
-                        ui = UICheck(Input.touches[i].position)
-                    });
-                }
-            }
+                id = id,
+                pos = pos,
+                ui = UICheck(pos),
+                canceled = canceled
+            });
+        }
 
+        private void ClearTouchState()
+        {
+            tmpList.Clear();
+            tmpList.AddRange(id2Pos.Keys);
+            foreach (var id in tmpList)
+                if (id2Pos.TryGetValue(id, out var pos))
+                    ReleaseTouch(id, pos, true);
+            id2OldPos.Clear();
+        }
+
+        private void OnApplicationFocus(bool focus)
+        {
+            hasFocus = focus;
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if (!focus)
+                ClearTouchState();
+#endif
+        }
+
+        private void OnApplicationPause(bool pause)
+        {
+            paused = pause;
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if (pause)
+                ClearTouchState();
+#endif
+        }
+
+        private void OnDisable()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            ClearTouchState();
+#endif
         }
         private void ManageMouse()
         {
@@ -284,6 +299,8 @@ namespace Z_Input
         /// <returns></returns>
         private GameObject UICheck(Vector2 point)
         {
+            if (EventSystem.current == null)
+                return null;
             PointerEventData pointerData = new PointerEventData(EventSystem.current)
             {
                 position = point
@@ -321,10 +338,16 @@ namespace Z_Input
         public void Update()
         {
             if (!enabled)
+            {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                ClearTouchState();
+#endif
                 return;
+            }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-
+            if (!hasFocus || paused)
+                return;
             ManageTouch();
 #else
 

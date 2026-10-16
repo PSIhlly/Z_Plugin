@@ -39,6 +39,8 @@ There is currently no `Z_Level5`.
 - `Z_UI`: UiHolder framework, generated bindings, dialog/loading/notification modules.
 - `Z_Text`: localization and text Forms; despite its Level2 location, it has no asmdef.
 
+`InstancePoolManager.pools` is a `Dictionary<string, InstancePool>` keyed by the registered prefab name with `StringComparer.Ordinal`. Names are unique and must remain stable while registered; unregister before renaming or replacing a prefab. Register rejects duplicate names rather than overwriting a live pool. GetPrefab/CreateInstance/DeleteInstance use dictionary lookup; refresh scopes enumerate Values. Unregister removes a name only when it still refers to that exact pool. Clear detaches a snapshot of Values before destroying pools, retaining scope-generation invalidation and callback-safe cleanup. The authored `prefabs` field remains a serialized List.
+
 ## Actual assembly boundaries
 
 Treat `.asmdef` as authoritative; do not infer an assembly from folder level or namespace.
@@ -67,11 +69,11 @@ Z_Debug, Z_Time              → Z_DesignStyle
 Z_Mesh                       → Z_Math
 Z_Audio                      → Z_DesignStyle + AVProVideo
 Z_Client                     → Z_Serialize + Z_DesignStyle
-Z_Code                       → Z_Debug + Z_Serialize + Z_DesignStyle
+Z_Code                       → Z_Debug + Z_Serialize + Z_DesignStyle + Z_Time
 Z_DataSystem                 → Z_Serialize + Z_DesignStyle + Z_Texture
                                + Z_Time + AVProVideo + NativeGallery
 Z_Input                      → Z_DesignStyle + Z_Debug
-Z_ObjectAnimator             → Z_Time + Z_Debug
+Z_ObjectAnimator             → Z_Time + Z_Debug + Z_DesignStyle
 Z_Trick                      → Z_Serialize + Z_DesignStyle
 Z_UnitSystem                 → Z_Serialize + Z_DesignStyle + Z_Mesh
 ```
@@ -83,6 +85,8 @@ Rules:
 - Remember that partial types cannot span assemblies.
 - Avoid introducing new Level3/4 asmdefs without first resolving existing cross-module cycles.
 - Do not trust namespace ownership alone. For example, `Z_DataSystem/Core/SaveAndLoad.cs` declares a `Z_UnitSystem` namespace.
+
+`Z_Time.TimeManager.GetDeltaTime(bool unscaled = false)` is the shared bounded frame clock: clamp scaled Unity delta to `[0, MAX_DELTA_TIME]`, with `MAX_DELTA_TIME = 0.02f`; use `unscaled: true` only for pause-independent UI drag scrolling. `ClampDeltaTime(float)` provides the same rule for explicit/test inputs, including zero for NaN. These static helpers do not require a live manager and never accumulate discarded stall time or change Unity's global time settings. Map movement keeps its `MapUtilController.MovementDeltaTime` / `ClampMovementDeltaTime` compatibility entry points, which forward to this helper. Progress seconds, cooldowns, bullets, interpreter Wait, image animation/removal, scene shake, Canvas chat/toast timers and ObjectAnimator's duration-to-frame conversion use the same cap. Explicit ObjectAnimator frame waits remain frame counts. Absolute-time scheduling, third-party plugins and Sample scripts are not automatically converted. Lower callers reference `Z_Time` and its `Z_DesignStyle` base directly in their real asmdefs.
 
 ## Product entry and modes
 

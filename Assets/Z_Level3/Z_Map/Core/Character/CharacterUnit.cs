@@ -14,6 +14,7 @@ namespace Z_Map
     public partial class CharacterUnit : MapUnit
     {
         private readonly HashSet<int> _passTypes = new HashSet<int>();
+        private readonly HashSet<int> passTypeBuffer = new HashSet<int>();
         private readonly NavigationEndpointState navigationEndpointState = new NavigationEndpointState();
         internal bool isNavEndpointMove { get; private set; }
 
@@ -50,16 +51,32 @@ namespace Z_Map
 
         public void SetPassTypes(IEnumerable<int> values)
         {
-            navigationEndpointState.Reset();
-            _passTypes.Clear();
-            if (values == null)
+            // Appearance/product updates repeat this every frame. Only a real
+            // capability change may discard an in-progress navigation search.
+            passTypeBuffer.Clear();
+            if (values is IReadOnlyList<int> list)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i] != 0)
+                        passTypeBuffer.Add(list[i]);
+                }
+            }
+            else if (values != null)
+            {
+                foreach (int value in values)
+                {
+                    if (value != 0)
+                        passTypeBuffer.Add(value);
+                }
+            }
+
+            if (_passTypes.SetEquals(passTypeBuffer))
                 return;
 
-            foreach (int value in values)
-            {
-                if (value != 0)
-                    _passTypes.Add(value);
-            }
+            _passTypes.Clear();
+            _passTypes.UnionWith(passTypeBuffer);
+            navigationEndpointState.Reset();
         }
 
         public bool CanPass(TileUnit tile)
@@ -119,6 +136,7 @@ namespace Z_Map
 
             if (simulateMovement && (data.updateType == UpdateType.Always || isShowing))
             {
+                float deltaTime = MapUtilController.MovementDeltaTime;
                 //nav: 通过BFS导航获取移动方向，乘以速度和距离的较小值作为本帧移动量
                 if (data.navEnabled && !DynamicGlobalSettings.pauseNav)
                 {
@@ -127,23 +145,31 @@ namespace Z_Map
                         lastNavMoveTime = Time.time;
                     Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis,
                         GetNavigationRadius(), passTypes, navigationEndpointState);
+                    bool waitingForSearch = navigationEndpointState.isSearching && dir.sqrMagnitude <= 1e-8f;
                     bool movedThisFrame = false;
-                    if(avoidPos<=0)
+                    if (avoidPos <= 0 && dir.sqrMagnitude > 1e-8f)
                     {
                         if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
                     {
                         Vector3 posBefore = data.pos;
                         Vector3 targetDelta = navigationEndpointState.moveTarget - data.pos;
                         targetDelta.y = 0f;
-                        MoveForNavigation(dir * Mathf.Min(Time.deltaTime * data.speed, targetDelta.magnitude),
+                        MoveForNavigation(dir * Mathf.Min(deltaTime * data.speed, targetDelta.magnitude),
                             navigationEndpointState.directEndpoint);
-                    //检测本次nav是否实际产生了位移（Move仅在res>0.01时应用位置，故阈值取1e-6足够区分）
+                    //检测本次nav是否实际产生了位移，排除零位移与碰撞阻断。
                        if ((data.pos - posBefore).sqrMagnitude > 1e-6f)
                             movedThisFrame = true;
                     }                
                     }
 
-                    if (movedThisFrame)
+                    if (waitingForSearch)
+                    {
+                        // Waiting for the first/next search result is not a
+                        // collision stall and must not start a sidestep escape.
+                        lastNavMoveTime = Time.time;
+                        avoidPos = -1f;
+                    }
+                    else if (movedThisFrame)
                     {
                         lastNavMoveTime = Time.time;
                     }
@@ -156,9 +182,9 @@ namespace Z_Map
                     if(avoidPos>0)
                     {
                         Vector3 right = Quaternion.Euler(0,90,0)*dir.normalized;
-                        MoveForNavigation(right * Time.deltaTime * data.speed, navigationEndpointState.directEndpoint);
+                        MoveForNavigation(right * deltaTime * data.speed, navigationEndpointState.directEndpoint);
                         lastNavMoveTime = Time.time;
-                        avoidPos-=Time.deltaTime * data.speed;
+                        avoidPos-=deltaTime * data.speed;
                     }
                 }
                 else
@@ -174,7 +200,7 @@ namespace Z_Map
 #if DEBUG_CHARACTER
                     Debug.Log($"[move]{Time.frameCount}before gravity:" + (data.pos.ToString("F10") ));
 #endif
-                    MoveForNavigation(Vector3.down * Time.deltaTime * 2f,
+                    MoveForNavigation(Vector3.down * deltaTime * 2f,
                         data.navEnabled && !DynamicGlobalSettings.pauseNav && navigationEndpointState.directEndpoint);
 #if DEBUG_CHARACTER
                     Debug.Log($"[move]{Time.frameCount}after gravity:" + (data.pos.ToString("F10")));
@@ -383,8 +409,9 @@ namespace Z_Map
                 firstTry = false;
                 //按最短碰撞距离截断当前移动方向
                 dir *= (res) / mag;
-                //有可移动距离时应用位置更新
-                if (res > 0.01f)
+                // Keep the contact dead zone, but do not discard an unobstructed
+                // small step at high FPS (keyboard now shares scaled frame time).
+                if (res > 0.01f || (res > 0.000001f && res >= mag - 0.000001f))
                 {
 #if DEBUG_CHARACTER
                     Debug.Log($"[move]{Time.frameCount}character applyMove:" + (data.pos + dir).ToString("F10"));
@@ -534,6 +561,11 @@ namespace Z_Map
             });
             CharacterUnitForm.RemoveData(data.uid);
             base.Remove();
+            Z_EventHelper.Invoke(new CharacterEvent()
+            {
+                type = MapEventType.Remove,
+                unit = this
+            });
         }
 
     }

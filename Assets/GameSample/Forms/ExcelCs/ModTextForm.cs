@@ -823,7 +823,7 @@ namespace Form
 
                 {1000346,new Data(1000346,"SetObjectPosition","Set object position","设置物体位置")},
 
-                {1000347,new Data(1000347,"SetObjectRotation","Set object rotation","设置物体旋转角")},
+                {1000347,new Data(1000347,"SetRotation","Set rotation","设置旋转角")},
 
                 {1000348,new Data(1000348,"SetSceneObjectParameter","Set scene object parameter","设置场景物体参数")},
 
@@ -868,6 +868,20 @@ namespace Form
                 {1000368,new Data(1000368,"boundsCollision","Texture bounds collision","贴图边界碰撞")},
 
                 {1000369,new Data(1000369,"centerCollider","Center collider","碰撞体居中")},
+
+                {1000370,new Data(1000370,"eventApplied","Applied","已应用")},
+
+                {1000371,new Data(1000371,"GetPosition","Get position","获取位置")},
+
+                {1000372,new Data(1000372,"SetPosition","Set position","设置位置")},
+
+                {1000373,new Data(1000373,"GetPositionRelative","Get relative position","获取相对位置")},
+
+                {1000374,new Data(1000374,"SetPositionRelative","Set relative position","设置相对位置")},
+
+                {1000375,new Data(1000375,"Move","Move","移动")},
+
+                {1000376,new Data(1000376,"MoveRelative","Move relatively","相对移动")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -1544,7 +1558,7 @@ namespace Form
     
                         {"SetObjectPosition",_DataById[1000346]},
     
-                        {"SetObjectRotation",_DataById[1000347]},
+                        {"SetRotation",_DataById[1000347]},
     
                         {"SetSceneObjectParameter",_DataById[1000348]},
     
@@ -1589,6 +1603,20 @@ namespace Form
                         {"boundsCollision",_DataById[1000368]},
     
                         {"centerCollider",_DataById[1000369]},
+    
+                        {"eventApplied",_DataById[1000370]},
+    
+                        {"GetPosition",_DataById[1000371]},
+    
+                        {"SetPosition",_DataById[1000372]},
+    
+                        {"GetPositionRelative",_DataById[1000373]},
+    
+                        {"SetPositionRelative",_DataById[1000374]},
+    
+                        {"Move",_DataById[1000375]},
+    
+                        {"MoveRelative",_DataById[1000376]},
     
                     
                     };

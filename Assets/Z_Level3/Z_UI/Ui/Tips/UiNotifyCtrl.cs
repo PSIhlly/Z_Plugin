@@ -78,8 +78,28 @@ namespace Ui.Notify
 
             }
         }
+        public override void OnUpdate()
+        {
+            if (RemoveExpiredComments(model.commentInfos, Time.unscaledTime))
+                Refresh();
+        }
+
+        internal static bool RemoveExpiredComments(List<CommentInfo> comments, float now)
+        {
+            bool changed = false;
+            for (int i = comments.Count - 1; i >= 0; i--)
+            {
+                if (comments[i].expiresAt <= 0 || now < comments[i].expiresAt)
+                    continue;
+                comments.RemoveAt(i);
+                changed = true;
+            }
+            return changed;
+        }
+
         public void Refresh()
         {
+            RemoveExpiredComments(model.commentInfos, Time.unscaledTime);
             view.btn_back.gameObject.SetActive(false);
             //tip:
 
@@ -97,7 +117,7 @@ namespace Ui.Notify
                 });
             }
             tipCon.Refresh();
-            // Comments remain visible until their own back buttons are clicked.
+            // Normal Comments persist; timed diagnostics expire without pooled timers.
             commentCon.Clear();
             foreach (var comment in model.commentInfos)
                 commentCon.Add(new UiCommentParam() { info = comment });

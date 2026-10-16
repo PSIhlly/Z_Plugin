@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using Ui.ModStoryEventTrigger;
 using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_Code;
@@ -21,7 +20,6 @@ using Z_Text;
 using Z_Ui.Notify;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
-using static UnityEditor.PlayerSettings;
 using static Z_Code.Form.InterpretDataForm;
 public class EventModifyEvent : Z_Event
 {
@@ -220,11 +218,21 @@ public static partial class GlobalSettings
 }
 public class GameEventController : Z_Controller<GameManager>
 {
+    private sealed class IdentityComparer<T> : IEqualityComparer<T> where T : class
+    {
+        public static readonly IdentityComparer<T> Instance = new IdentityComparer<T>();
+        public bool Equals(T x, T y) => ReferenceEquals(x, y);
+        public int GetHashCode(T obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
+    }
+
     private sealed class EventTask
     {
         private readonly InterpretAsyncTask asyncTask;
         private readonly InterpretDataForm.Data interpretOwner;
-        private readonly EventInterpretDataForm.Data eventOwner;
+        public readonly EventInterpretDataForm.Data eventOwner;
+        public readonly UnitForm.Data sceneOwner;
+        public EventTask eventPrevious, eventNext;
+        public EventTask scenePrevious, sceneNext;
         private readonly Func<bool> update;
         private bool isCancelled;
 
@@ -234,17 +242,8 @@ public class GameEventController : Z_Controller<GameManager>
             this.asyncTask = asyncTask;
             this.interpretOwner = interpretOwner;
             this.eventOwner = eventOwner;
+            sceneOwner = eventOwner?.sceneOwner;
             this.update = update;
-        }
-
-        public bool IsOwnedBy(UnitForm.Data unitData)
-        {
-            return eventOwner != null && ReferenceEquals(eventOwner.sceneOwner, unitData);
-        }
-
-        public bool IsOwnedBy(EventInterpretDataForm.Data data)
-        {
-            return ReferenceEquals(eventOwner, data);
         }
 
         public void Cancel()
@@ -258,13 +257,18 @@ public class GameEventController : Z_Controller<GameManager>
             if (isCancelled || interpretOwner.IsCancelled || asyncTask.IsCancelled())
                 return true;
 
-            if (eventOwner != null && !IsSceneEventOwnerAlive(eventOwner))
+            if (eventOwner != null && (!IsRegisteredEvent(eventOwner) || !IsSceneEventOwnerAlive(eventOwner)))
             {
                 Cancel();
                 return true;
             }
 
             bool complete = update();
+            if (eventOwner != null && (!IsRegisteredEvent(eventOwner) || !IsSceneEventOwnerAlive(eventOwner)))
+            {
+                Cancel();
+                return true;
+            }
             return complete || isCancelled || interpretOwner.IsCancelled || asyncTask.IsCancelled();
         }
     }
@@ -272,8 +276,15 @@ public class GameEventController : Z_Controller<GameManager>
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
     List<EventTask> tasks;
+    readonly Dictionary<EventInterpretDataForm.Data, EventTask> tasksByEvent =
+        new Dictionary<EventInterpretDataForm.Data, EventTask>(IdentityComparer<EventInterpretDataForm.Data>.Instance);
+    readonly Dictionary<UnitForm.Data, EventTask> tasksBySceneOwner =
+        new Dictionary<UnitForm.Data, EventTask>(IdentityComparer<UnitForm.Data>.Instance);
+    readonly List<EventInterpretDataForm.Data> eventSnapshot = new List<EventInterpretDataForm.Data>();
     HashSet<(int, string)> releaseTriggerTuple;
     EventInterpretDataForm.Data currentEventData;
+    int taskVersion;
+    bool isManagingEvents;
     public GameEventController(GameManager super) : base(super)
     {
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
@@ -317,44 +328,107 @@ public class GameEventController : Z_Controller<GameManager>
         var eventOwner = interpretData as EventInterpretDataForm.Data;
         if (eventOwner == null && interpretData.rootUid > 0)
         {
-            EventInterpretDataForm.DataByUid.TryGetValue(interpretData.rootUid, out eventOwner);
+            if (!EventInterpretDataForm.DataByUid.TryGetValue(interpretData.rootUid, out eventOwner))
+            {
+                asyncTask.Cancel();
+                return;
+            }
         }
         InterpretDataForm.Data taskOwner = eventOwner ?? interpretData;
         var task = new EventTask(asyncTask, taskOwner, eventOwner, func);
-
-        if (!task.Update())
+        int version = taskVersion;
+        bool complete = task.Update();
+        // An immediate task callback may unload the scene and create new work.
+        // Never append an old-lifetime task into that new queue.
+        if (version != taskVersion)
+        {
+            task.Cancel();
+            return;
+        }
+        if (!complete)
         {
             tasks.Add(task);
+            TrackTask(task);
+        }
+    }
+    private void TrackTask(EventTask task)
+    {
+        if (task.eventOwner != null)
+        {
+            tasksByEvent.TryGetValue(task.eventOwner, out var head);
+            task.eventNext = head;
+            if (head != null)
+                head.eventPrevious = task;
+            tasksByEvent[task.eventOwner] = task;
+        }
+        if (task.sceneOwner != null)
+        {
+            tasksBySceneOwner.TryGetValue(task.sceneOwner, out var head);
+            task.sceneNext = head;
+            if (head != null)
+                head.scenePrevious = task;
+            tasksBySceneOwner[task.sceneOwner] = task;
+        }
+    }
+    private void UntrackTask(EventTask task)
+    {
+        if (task.eventOwner != null)
+        {
+            if (task.eventPrevious != null)
+                task.eventPrevious.eventNext = task.eventNext;
+            else if (task.eventNext != null)
+                tasksByEvent[task.eventOwner] = task.eventNext;
+            else
+                tasksByEvent.Remove(task.eventOwner);
+            if (task.eventNext != null)
+                task.eventNext.eventPrevious = task.eventPrevious;
+            task.eventPrevious = task.eventNext = null;
+        }
+        if (task.sceneOwner != null)
+        {
+            if (task.scenePrevious != null)
+                task.scenePrevious.sceneNext = task.sceneNext;
+            else if (task.sceneNext != null)
+                tasksBySceneOwner[task.sceneOwner] = task.sceneNext;
+            else
+                tasksBySceneOwner.Remove(task.sceneOwner);
+            if (task.sceneNext != null)
+                task.sceneNext.scenePrevious = task.scenePrevious;
+            task.scenePrevious = task.sceneNext = null;
         }
     }
     private void CancelEventTasks(EventInterpretDataForm.Data eventData)
     {
-        foreach (var task in tasks)
+        if (tasksByEvent.TryGetValue(eventData, out var task))
         {
-            if (task.IsOwnedBy(eventData))
+            for (; task != null; task = task.eventNext)
                 task.Cancel();
         }
     }
     private void CancelAllTasks()
     {
+        taskVersion++;
         foreach (var task in tasks)
         {
             task.Cancel();
         }
         tasks.Clear();
+        tasksByEvent.Clear();
+        tasksBySceneOwner.Clear();
     }
     public void CompleteUnitEvents(UnitForm.Data unitData)
     {
         if (unitData == null)
             return;
 
-        foreach (var task in tasks)
+        if (tasksBySceneOwner.TryGetValue(unitData, out var task))
         {
-            if (task.IsOwnedBy(unitData))
+            for (; task != null; task = task.sceneNext)
                 task.Cancel();
         }
 
-        foreach (var data in new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values))
+        // Cancellation does not add/remove Form rows, so no extra snapshot is needed here.
+        foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
             if (!ReferenceEquals(data.sceneOwner, unitData)
                 || !GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user)
@@ -368,6 +442,11 @@ public class GameEventController : Z_Controller<GameManager>
             if (GameManager.instance.curProgress.blockProgramUid == data.uid)
                 GameManager.instance.curProgress.blockProgramUid = 0;
         }
+    }
+    private static bool IsRegisteredEvent(EventInterpretDataForm.Data data)
+    {
+        return EventInterpretDataForm.DataByUid.TryGetValue(data.uid, out var registered)
+            && ReferenceEquals(registered, data);
     }
     private static bool IsSceneEventOwnerAlive(EventInterpretDataForm.Data data)
     {
@@ -398,21 +477,38 @@ public class GameEventController : Z_Controller<GameManager>
         CancelAllTasks();
         EventInterpretDataForm.DataByUid.Clear();
         GameManager.instance.curScene.triggeringOnceDuringEvts.Clear();
+        releaseTriggerTuple.Clear();
         currentEventData = null;
     }
 
     public void LateUpdate()
     {
-
-        var lst = new List<EventInterpretDataForm.Data>(EventInterpretDataForm.DataByUid.Values);
-        ManageEventDatas(lst);
-
+        // Keep additions deferred until the next scheduler pass, without allocating
+        // a fresh list each frame. Reentrant calls must not mutate the live snapshot.
+        if (isManagingEvents)
+            return;
+        isManagingEvents = true;
+        try
+        {
+            eventSnapshot.AddRange(EventInterpretDataForm.DataByUid.Values);
+            ManageEventDatas(eventSnapshot);
+        }
+        finally
+        {
+            eventSnapshot.Clear();
+            isManagingEvents = false;
+        }
     }
     private void ManageEventDatas(List<EventInterpretDataForm.Data> lst)
     {
         releaseTriggerTuple.Clear();
         foreach (var data in lst)
         {
+            if (!IsRegisteredEvent(data))
+            {
+                CancelEventTasks(data);
+                continue;
+            }
             bool complete = data.IsCancelled;
             if (!complete && GameManager.instance.curProgress.blockProgramUid != 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
             {
@@ -434,6 +530,11 @@ public class GameEventController : Z_Controller<GameManager>
                 finally
                 {
                     currentEventData = null;
+                }
+                if (!IsRegisteredEvent(data))
+                {
+                    CancelEventTasks(data);
+                    continue;
                 }
                 complete = retInfo.complete;
 
@@ -473,14 +574,7 @@ public class GameEventController : Z_Controller<GameManager>
                 }
             }
         }
-        for (int i = 0; i < tasks.Count; i++)
-        {
-            if (tasks[i].Update())
-            {
-                tasks.RemoveAt(i);
-                i--;
-            }
-        }
+        UpdateTasks();
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
             if (releaseTriggerTuple.Contains((data.user, data.releaseTrigger)))
@@ -492,6 +586,42 @@ public class GameEventController : Z_Controller<GameManager>
         {
             if (GameManager.instance.curScene.triggeringOnceDuringEvts.ContainsKey(trigger.Item1))
                 GameManager.instance.curScene.triggeringOnceDuringEvts[trigger.Item1].Remove(trigger.Item2);
+        }
+    }
+
+    private void UpdateTasks()
+    {
+        int version = taskVersion;
+        int read = 0;
+        int write = 0;
+        try
+        {
+            // The count intentionally stays live: tasks appended by a callback keep
+            // their existing same-pass polling order. Survivors are compacted stably.
+            while (read < tasks.Count)
+            {
+                var task = tasks[read];
+                bool complete = task.Update();
+                if (version != taskVersion)
+                    return;
+                read++;
+                if (complete)
+                    UntrackTask(task);
+                else
+                    tasks[write++] = task;
+            }
+        }
+        finally
+        {
+            if (version == taskVersion)
+            {
+                // Preserve unpolled work if a callback throws. A scene/reset callback
+                // owns its replacement queue, so it must never be compacted here.
+                while (read < tasks.Count)
+                    tasks[write++] = tasks[read++];
+                if (write < tasks.Count)
+                    tasks.RemoveRange(write, tasks.Count - write);
+            }
         }
     }
 
@@ -560,7 +690,7 @@ public class GameEventController : Z_Controller<GameManager>
             return;
         if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent" && releaseTrigger != "onLeaveEvent")
             return;
-        var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.Copy(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
+        var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.CreateRuntimeSnapshot(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;
         if (GlobalEventHelper.IsSceneTrigger(releaseTrigger, user))
         {
@@ -621,7 +751,7 @@ public class GameEventController : Z_Controller<GameManager>
                     continue;
                 }
             }
-            LabForm.TryGetData(data.labId, out var lab);
+            CmdLabForm.DataById.TryGetValue(data.labId, out var lab);
             string category = TextManager.instance.GetTxt(lab?.lv1Lab ?? string.Empty);
             if (!res.subs.ContainsKey(category))
             {

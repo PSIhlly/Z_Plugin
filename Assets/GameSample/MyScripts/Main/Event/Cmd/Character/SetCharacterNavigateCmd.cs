@@ -13,7 +13,6 @@ using Z_Time;
 using Z_Ui.Dialog;
 using Z_Ui.Notify;
 using Z_UnitSystem.Form;
-using static UnityEditor.PlayerSettings;
 
 namespace Z_Code
 {
@@ -32,7 +31,7 @@ namespace Z_Code
             var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
             if (data != null)
             {
-                data.speed = productData.paramDic[productData.speedParamName].GetValue().num;
+                data.speed = GetNavigationSpeed(productData, data.speed);
                 data.pathDis = 999;
                 data.alertDis = 999;
                 data.destination = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)));
@@ -40,6 +39,17 @@ namespace Z_Code
                 productData.enableNav = true;
             }
             return true;
+        }
+
+        internal static float GetNavigationSpeed(CharacterProductForm.Data productData, float currentSpeed)
+        {
+            // A character may have no speed parameter binding, or the bound parameter may have been removed.
+            if (string.IsNullOrEmpty(productData.speedParamName) || productData.paramDic == null
+                || !productData.paramDic.TryGetValue(productData.speedParamName, out var speedParam)
+                || speedParam == null)
+                return currentSpeed;
+
+            return speedParam.GetValue().num;
         }
     }
 }

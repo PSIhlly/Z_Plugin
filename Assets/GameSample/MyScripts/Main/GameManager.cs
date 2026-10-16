@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using TreeEditor;
 using Ui;
 using Ui.EnterMain;
 using Ui.ModStory.ModStoryEffect.ModStoryEffectUnit;

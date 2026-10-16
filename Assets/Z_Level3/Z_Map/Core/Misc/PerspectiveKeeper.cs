@@ -59,6 +59,13 @@ public class PerspectiveKeeper : MonoBehaviour
         needsInitialUpdate = true;
     }
 
+    internal void PrepareForViewRefreshReuse()
+    {
+        // Pool handoff may keep the hierarchy enabled for the whole refresh.
+        // Match OnEnable without applying the previous owner's transform.
+        needsInitialUpdate = true;
+    }
+
     /// <summary>
     /// Applies the current instance transform immediately. This is used when a
     /// command changes an object's rotation during LateUpdate, after this
@@ -195,8 +202,17 @@ public class PerspectiveKeeper : MonoBehaviour
 
     private float GetIsometricPitch()
     {
-        // Resizing affects img's local Y length, never the image-plane pitch.
-        return SquareDiagonalPitch;
+        if (IsSphere())
+            return SquareDiagonalPitch;
+
+        // img's local Y spans the cube's Y/Z diagonal. Its length AND pitch
+        // must use the same dimensions, including model and instance scaling.
+        Vector3 cubeSize = ins.lossyScale;
+        float height = Mathf.Abs(cubeSize.y);
+        float depth = Mathf.Abs(cubeSize.z);
+        return height == 0f && depth == 0f
+            ? SquareDiagonalPitch
+            : Mathf.Atan2(depth, height) * Mathf.Rad2Deg;
     }
 
     private Vector3 GetSphereRendererScale()

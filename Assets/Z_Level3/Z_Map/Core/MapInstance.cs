@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Z_Time;
 using Z_UnitSystem;
@@ -13,24 +14,97 @@ namespace Z_Map
             get { return (MapUnit)base.unit; }
         }
         private float degree = 0;
-        private static readonly int ShowProperty = Shader.PropertyToID("_Show");
-        private static readonly int FadeCenterProperty = Shader.PropertyToID("_FadeCenter");
+        private DisFadeRenderRouting.Route[] rendererRoutes;
+
+        /// <summary>Reads the last visibility result without inspecting materials or property blocks.</summary>
+        public DisFadeRenderRouting.Route GetRendererRoute(int rendererIndex)
+        {
+            return vising && rendererRoutes != null && (uint)rendererIndex < (uint)rendererRoutes.Length
+                ? rendererRoutes[rendererIndex] : DisFadeRenderRouting.Route.Hidden;
+        }
+
         private MaterialPropertyBlock visionBlock;
         private bool visionApplied;
         private float appliedSecondaryDegree;
         private int appliedDisplayLayer;
         private Unit visionOwner;
+        private bool resetOnShow;
+        private PerspectiveKeeper[] _viewRefreshKeepers;
+        public virtual IReadOnlyList<PerspectiveKeeper> viewRefreshKeepers
+        {
+            get
+            {
+                if (_viewRefreshKeepers == null)
+                {
+                    _viewRefreshKeepers = GetComponentsInChildren<PerspectiveKeeper>(true);
+                }
+                return _viewRefreshKeepers;
+            }
+        }
+
+
+
+        public override bool SupportsViewRefreshReuse
+        {
+            get
+            {
+                // Only the audited terrain implementation opts in. Subclasses,
+                // Characters, decorations and arbitrary scripts retain the full
+                // disable/enable lifecycle. Recheck the hierarchy so adding a
+                // component after first use cannot silently bypass that policy.
+                if (GetType() != typeof(TileInstance))
+                    return false;
+                return true;
+            }
+        }
+
+        public override void PrepareForViewRefreshReuse()
+        {
+            PrepareForHide();
+        }
+
+        public override void PrepareForHide()
+        {
+            base.PrepareForHide();
+            if (resetOnShow) return;
+            resetOnShow = true;
+            visionApplied = false;
+
+        }
+
+        public override void PrepareForShow()
+        {
+            if (!resetOnShow) return;
+            resetOnShow = false;
+            visionApplied = false;
+            visionOwner = null;
+            degree = 0f;
+            appliedSecondaryDegree = 0f;
+            vising = false;
+            if (rendererRoutes != null)
+                System.Array.Clear(rendererRoutes, 0, rendererRoutes.Length);
+            for (int i = 0; i < viewRefreshKeepers.Count; i++)
+                viewRefreshKeepers[i].PrepareForViewRefreshReuse();
+        }
+
+
 
         protected virtual void OnEnable()
         {
+            PrepareForShow();
             // Pool refresh restores the prefab's property blocks before reuse.
             visionApplied = false;
         }
 
         protected virtual void OnDisable()
         {
-            visionApplied = false;
+            PrepareForHide();
         }
+
+        protected virtual void OnDestroy()
+        {
+        }
+
 
         public Timer[] animTimer = new Timer[6];
         private PerspectiveKeeper[] _keepers;
@@ -96,21 +170,36 @@ namespace Z_Map
 
             if (visionBlock == null)
                 visionBlock = new MaterialPropertyBlock();
+            if (rendererRoutes == null || rendererRoutes.Length != renderers.Length)
+            {
+                rendererRoutes = new DisFadeRenderRouting.Route[renderers.Length];
+            }
             for (int i = 0; i < renderers.Length; i++)
             {
                 var render = renderers[i];
+                if (renderers[i] == null)
+                    continue;
+                float rendererValue = GetRendererVisionDegree(i, value, secondaryValue);
+                bool displayed = IsRendererVisibleInDisplayLayer(i);
+                rendererRoutes[i] = !displayed || rendererValue <= 0f ? DisFadeRenderRouting.Route.Hidden
+                    : rendererValue < 1f ? DisFadeRenderRouting.Route.Transparent : DisFadeRenderRouting.Route.Opaque;
+                if (!displayed || rendererValue <= 0f)
+                {
+                    render.GetPropertyBlock(visionBlock);
+                    visionBlock.SetFloat("_Show", 0f);
+                    visionBlock.SetFloat("_FadeCenter", 0f);
+                    DisFadeRenderRouting.Apply(render, visionBlock, rendererRoutes[i]);
+                    continue;
+                }
                 // Texture/animation code shares this block. Read before modifying
                 // visibility so a reused block never overwrites another renderer's values.
                 render.GetPropertyBlock(visionBlock);
-                float rendererValue = GetRendererVisionDegree(i, value, secondaryValue);
-                bool displayed = IsRendererVisibleInDisplayLayer(i);
-                // 0.5 remains the logical occlusion state, not a fixed shader opacity.
-                // Submit/reset both fields, including independently visible Tile fronts.
-                bool fadeCenter = displayed && rendererValue == 0.5f;
-                visionBlock.SetFloat(ShowProperty, displayed ? (fadeCenter ? 1f : rendererValue) : 0f);
-                visionBlock.SetFloat(FadeCenterProperty, fadeCenter ? 1f : 0f);
+                // Occlusion uses uniform opacity, including independently visible Tile fronts.
+                // Reset an earlier authored/pooled center fade when applying map visibility.
+                visionBlock.SetFloat("_Show", rendererValue);
+                visionBlock.SetFloat("_FadeCenter", 0f);
                 ApplyRendererDisplayLayerProperties(render, i, visionBlock);
-                render.SetPropertyBlock(visionBlock);
+                DisFadeRenderRouting.Apply(render, visionBlock, rendererRoutes[i]);
             }
             degree = value;
             vising = visible;

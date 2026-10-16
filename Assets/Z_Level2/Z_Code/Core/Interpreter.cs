@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Debug;
+using Z_Time;
 using static Z_Code.Form.InterpretDataForm;
 
 namespace Z_Code
@@ -91,8 +93,16 @@ namespace Z_Code
             public class RetInfo
             {
                 public bool complete;
-                public BoxDataForm.Data ret = CodeHelper.CreateBox();
+                public BoxDataForm.Data ret;
                 public List<InterpretError> errors = new List<InterpretError>();
+
+                public RetInfo() { ret = CodeHelper.CreateBox(); }
+
+                internal RetInfo(bool complete, BoxDataForm.Data ret)
+                {
+                    this.complete = complete;
+                    this.ret = ret ?? CodeHelper.CreateBox();
+                }
             }
 
             public partial class Data
@@ -268,9 +278,59 @@ namespace Z_Code
         public InterpretDataForm.Data data;
         private Op? opCode;
         private readonly InterpretAsyncTask asyncTask;
+        private bool hasPendingCommand;
+        private int pendingCommandPc, pendingParameterCount, pendingReturnCount;
+        private string pendingCommandName;
+        private bool pendingDiscardReturn;
 
+        // Only interpreter-created scalar/reference stack values are pooled.
+        // Heap/dictionary values and values exported to commands/RetInfo are owned
+        // by their recipients and must never return to this pool.
+        private sealed class TemporaryBox : BoxDataForm.Data
+        {
+            internal Interpreter owner;
+            internal TemporaryBox next;
+            internal int stackReferences;
+            internal bool consumed;
+
+            internal TemporaryBox() : base(-1, null, null, 0f, null) { }
+        }
+
+        private const int MaxPooledTemporaryBoxes = 128;
+        // Interpreters execute on Unity's main thread. Share only free Boxes;
+        // in-use ownership and deferred recycling remain interpreter-local.
+        private static TemporaryBox freeTemporaryBoxes;
+        private static int pooledTemporaryBoxCount;
+        private TemporaryBox consumedTemporaryBoxes;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetTemporaryBoxPool()
+        {
+            freeTemporaryBoxes = null;
+            pooledTemporaryBoxCount = 0;
+        }
+
+        // Weak keys release all parse buffers when the program/version is no
+        // longer referenced. Only primitive parse results are shared, not Box,
+        // PC, stack, heap, return values or asynchronous command state.
+        // Published compiled lists are immutable; new revisions use new lists.
+        private sealed class ParseCache
+        {
+            internal readonly Op[] opcodes;
+            internal readonly float[] numbers;
+            internal readonly int[] integers;
+            internal readonly bool[] opcodeValid, numberValid, integerValid;
+            internal ParseCache(int count)
+            {
+                opcodes = new Op[count]; numbers = new float[count]; integers = new int[count];
+                opcodeValid = new bool[count]; numberValid = new bool[count]; integerValid = new bool[count];
+            }
+        }
+        private static readonly ConditionalWeakTable<List<string>, ParseCache> parseCaches =
+            new ConditionalWeakTable<List<string>, ParseCache>();
+        private static readonly ConditionalWeakTable<List<string>, ParseCache>.CreateValueCallback createParseCache =
+            code => new ParseCache(code.Count);
         private List<string> cachedZCode;
-        private int cachedZCodeCount = -1;
         private Op[] opcodeCache;
         private bool[] opcodeCacheValid;
         private float[] numberCache;
@@ -342,7 +402,7 @@ namespace Z_Code
                 Z_Log.Log("{Current Stacks:}");
                 for (int i = 0; i < data.stack.Count; i++)
                 {
-                    Z_Log.Log("{" + i + " val:" + data.stack[i].valName + " num:" + data.stack[i].num + " str:" + data.stack[i].str + " dic:" + data.stack[i].dic.Count + "}");
+                    Z_Log.Log("{" + i + " val:" + data.stack[i].valName + " num:" + data.stack[i].num + " str:" + data.stack[i].str + " dic:" + (data.stack[i].dic?.Count ?? 0) + "}");
                 }
 #endif
 
@@ -358,21 +418,21 @@ namespace Z_Code
                                 throw new FormatException(parseError);
                             }
 
-                            Push(CodeHelper.CreateBoxByNum(number));
+                            Push(RentTemporaryBox(num: number));
                             data.p += 2;
                             break;
                         }
                         case Op.PushStr:
                         {
                             int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
-                            Push(CodeHelper.CreateBoxByStr(zCode[operandIndex]));
+                            Push(RentTemporaryBox(str: zCode[operandIndex]));
                             data.p += 2;
                             break;
                         }
                         case Op.Get:
                         {
                             int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
-                            Push(CodeHelper.CreateBoxByVal(zCode[operandIndex]));
+                            Push(RentTemporaryBox(valName: zCode[operandIndex]));
                             data.p += 2;
                             break;
                         }
@@ -391,15 +451,16 @@ namespace Z_Code
                         }
                         case Op.Equal:
                         {
-                            var left = GetBox(Pop());
-                            var right = GetBox(Pop());
+                            Pop2(out var left, out var right);
+                            left = GetBox(left);
+                            right = GetBox(right);
                             if (left.str == null && right.str == null)
                             {
-                                Push(CodeHelper.CreateBoxByNum(GetNum(left) == GetNum(right) ? 1 : 0));
+                                PushResult(RentTemporaryBox(num: left.num == right.num ? 1 : 0));
                             }
                             else
                             {
-                                Push(CodeHelper.CreateBoxByNum(GetStr(left) == GetStr(right) ? 1 : 0));
+                                PushResult(RentTemporaryBox(num: GetResolvedString(left) == GetResolvedString(right) ? 1 : 0));
                             }
 
                             data.p++;
@@ -407,47 +468,44 @@ namespace Z_Code
                         }
                         case Op.Greater:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            Push(CodeHelper.CreateBoxByNum(left > right ? 1 : 0));
+                            Pop2(out var left, out var right);
+                            PushResult(RentTemporaryBox(num: GetNum(left) > GetNum(right) ? 1 : 0));
                             data.p++;
                             break;
                         }
                         case Op.Less:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            Push(CodeHelper.CreateBoxByNum(left < right ? 1 : 0));
+                            Pop2(out var left, out var right);
+                            PushResult(RentTemporaryBox(num: GetNum(left) < GetNum(right) ? 1 : 0));
                             data.p++;
                             break;
                         }
                         case Op.NotGreater:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            Push(CodeHelper.CreateBoxByNum(left <= right ? 1 : 0));
+                            Pop2(out var left, out var right);
+                            PushResult(RentTemporaryBox(num: GetNum(left) <= GetNum(right) ? 1 : 0));
                             data.p++;
                             break;
                         }
                         case Op.NotLess:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            Push(CodeHelper.CreateBoxByNum(left >= right ? 1 : 0));
+                            Pop2(out var left, out var right);
+                            PushResult(RentTemporaryBox(num: GetNum(left) >= GetNum(right) ? 1 : 0));
                             data.p++;
                             break;
                         }
                         case Op.NotEqual:
                         {
-                            var left = GetBox(Pop());
-                            var right = GetBox(Pop());
+                            Pop2(out var left, out var right);
+                            left = GetBox(left);
+                            right = GetBox(right);
                             if (left.str == null && right.str == null)
                             {
-                                Push(CodeHelper.CreateBoxByNum(GetNum(left) != GetNum(right) ? 1 : 0));
+                                PushResult(RentTemporaryBox(num: left.num != right.num ? 1 : 0));
                             }
                             else
                             {
-                                Push(CodeHelper.CreateBoxByNum(GetStr(left) != GetStr(right) ? 1 : 0));
+                                PushResult(RentTemporaryBox(num: GetResolvedString(left) != GetResolvedString(right) ? 1 : 0));
                             }
 
                             data.p++;
@@ -455,23 +513,22 @@ namespace Z_Code
                         }
                         case Op.Take:
                         {
-                            var owner = Pop();
-                            string key = GetStr(Pop());
-                            var reference = CodeHelper.CreateBoxByVal(owner.valName);
-                            reference.str = key;
-                            Push(reference);
+                            Pop2(out var owner, out var member);
+                            string key = GetStr(member);
+                            var reference = RentTemporaryBox(str: key, valName: owner.valName);
+                            PushResult(reference);
                             data.p++;
                             break;
                         }
                         case Op.Assign:
                         {
-                            var target = Pop();
+                            Pop2(out var target, out var source);
                             if (string.IsNullOrEmpty(target.valName))
                             {
                                 throw new InvalidOperationException("赋值目标不是变量或成员");
                             }
 
-                            var value = GetBox(Pop()).DeepCopy();
+                            var value = GetBox(source).DeepCopy();
                             if (target.str != null)
                             {
                                 GetBox(target);
@@ -487,14 +544,15 @@ namespace Z_Code
                         }
                         case Op.AddAssign:
                         {
-                            var target = Pop();
+                            Pop2(out var target, out var right);
                             if (string.IsNullOrEmpty(target.valName))
                             {
                                 throw new InvalidOperationException("赋值目标不是变量或成员");
                             }
 
-                            var right = Pop();
-                            var value = ArithmeticValues(GetBox(target), right, Op.Plus).DeepCopy();
+                            // ArithmeticValues already creates a fully independent
+                            // result, including every dictionary child.
+                            var value = ArithmeticValues(target, right, Op.Plus, temporaryResult: false);
                             if (target.str != null)
                             {
                                 data.heap[target.valName].dic[target.str] = value;
@@ -509,61 +567,58 @@ namespace Z_Code
                         }
                         case Op.Plus:
                         {
-                            var left = GetBox(Pop());
-                            var right = GetBox(Pop());
-                            Push(ArithmeticValues(left, right, Op.Plus));
+                            Pop2(out var left, out var right);
+                            PushResult(ArithmeticValues(left, right, Op.Plus));
 
                             data.p++;
                             break;
                         }
                         case Op.Positive:
-                            Push(CodeHelper.CreateBoxByNum(GetNum(Pop())));
+                            PushResult(RentTemporaryBox(num: GetNum(Pop())));
                             data.p++;
                             break;
                         case Op.Minus:
                         {
-                            var left = GetBox(Pop());
-                            var right = GetBox(Pop());
-                            Push(ArithmeticValues(left, right, Op.Minus));
+                            Pop2(out var left, out var right);
+                            PushResult(ArithmeticValues(left, right, Op.Minus));
 
                             data.p++;
                             break;
                         }
                         case Op.Negative:
-                            Push(CodeHelper.CreateBoxByNum(-GetNum(Pop())));
+                            PushResult(RentTemporaryBox(num: -GetNum(Pop())));
                             data.p++;
                             break;
                         case Op.Mul:
                         {
-                            var left = GetBox(Pop());
-                            var right = GetBox(Pop());
-                            Push(ArithmeticValues(left, right, Op.Mul));
+                            Pop2(out var left, out var right);
+                            PushResult(ArithmeticValues(left, right, Op.Mul));
                             data.p++;
                             break;
                         }
                         case Op.Div:
                         {
-                            var left = GetBox(Pop());
-                            var right = GetBox(Pop());
-                            Push(ArithmeticValues(left, right, Op.Div));
+                            Pop2(out var left, out var right);
+                            PushResult(ArithmeticValues(left, right, Op.Div));
                             data.p++;
                             break;
                         }
                         case Op.Mod:
                         {
-                            float left = GetNum(Pop());
-                            float right = GetNum(Pop());
-                            if (right == 0f)
+                            Pop2(out var left, out var right);
+                            float leftValue = GetNum(left);
+                            float rightValue = GetNum(right);
+                            if (rightValue == 0f)
                             {
                                 throw new DivideByZeroException("取模除数不能为 0");
                             }
 
-                            Push(CodeHelper.CreateBoxByNum(left % right));
+                            PushResult(RentTemporaryBox(num: leftValue % rightValue));
                             data.p++;
                             break;
                         }
                         case Op.Not:
-                            Push(CodeHelper.CreateBoxByNum(GetNum(Pop()) == 0f ? 1 : 0));
+                            PushResult(RentTemporaryBox(num: GetNum(Pop()) == 0f ? 1 : 0));
                             data.p++;
                             break;
                         case Op.Discard:
@@ -585,16 +640,14 @@ namespace Z_Code
                         }
                         case Op.Sub:
                         {
-                            var owner = Pop();
-                            var member = Pop();
+                            Pop2(out var owner, out var member);
                             if (string.IsNullOrEmpty(owner.valName) || string.IsNullOrEmpty(member.valName))
                             {
                                 throw new InvalidOperationException("成员访问必须使用变量名");
                             }
 
-                            var reference = CodeHelper.CreateBoxByVal(owner.valName);
-                            reference.str = member.valName;
-                            Push(reference);
+                            var reference = RentTemporaryBox(str: member.valName, valName: owner.valName);
+                            PushResult(reference);
                             data.p++;
                             break;
                         }
@@ -606,7 +659,7 @@ namespace Z_Code
                                 waitValue.num = GetBox(waitValue).num;
                             }
 
-                            waitValue.num -= Time.deltaTime;
+                            waitValue.num -= TimeManager.GetDeltaTime();
                             if (waitValue.num > 0f)
                             {
                                 Push(waitValue);
@@ -633,6 +686,7 @@ namespace Z_Code
                 }
                 finally
                 {
+                    if (consumedTemporaryBoxes != null) ReleaseConsumedTemporaries();
                     opCode = null;
                 }
             }
@@ -651,8 +705,17 @@ namespace Z_Code
                 throw new InvalidOperationException("函数名为空");
             }
 
-            int parameterCount = GetParameterCount();
-            if (BaseData.cmdDic.TryGetValue(funcName, out var cmdTemplate))
+            if (hasPendingCommand)
+            {
+                if (pendingCommandPc != instructionPc || pendingCommandName != funcName)
+                    throw new InvalidOperationException("挂起命令与当前调用位置不一致");
+                return ResumeCommand(instructionPc);
+            }
+
+            // A suspended subprogram owns its original signature and version;
+            // new registry entries/edits cannot redirect an existing call.
+            int parameterCount = data.subInterpret == null ? GetParameterCount() : data.subInterpret.program.paramCount;
+            if (data.subInterpret == null && BaseData.cmdDic.TryGetValue(funcName, out var cmdTemplate))
             {
                 var cmd = cmdTemplate.GetNew();
                 var form = cmd.GetForm();
@@ -672,68 +735,21 @@ namespace Z_Code
                 }
                 for (int i = 0; i < parameterCount; i++)
                 {
-                    parameters[missingParameterCount + i] = GetBox(data.stack[data.top - i - 1]);
+                    parameters[missingParameterCount + i] = ExportBox(GetBox(data.stack[data.top - i - 1]));
                 }
 
-                if (!asyncTask.IsRuning() && !asyncTask.IsComplete())
-                {
-                    cmd.Execute(parameters, data.heap, asyncTask);
-                }
-
-                if (data.IsCancelled)
-                {
-                    return MakeRetInfo(true);
-                }
-
-                if (!asyncTask.IsComplete())
-                {
-                    return MakeRetInfo(false);
-                }
-
-                if (!string.IsNullOrEmpty(asyncTask.error))
-                {
-                    string commandError = asyncTask.error;
-                    asyncTask.Reset();
-                    AddError(instructionPc, commandError);
-                    return MakeRetInfo(true);
-                }
-
-                var returnNames = form.retNames;
-                int returnCount = returnNames == null ? 0 : returnNames.Count;
-                if (returnCount > 0 && (asyncTask.res == null || asyncTask.res.Length < returnCount))
-                {
-                    string resultError = $"命令 {funcName} 声明 {returnCount} 个返回值，但实际未返回足够结果";
-                    asyncTask.Reset();
-                    AddError(instructionPc, resultError);
-                    return MakeRetInfo(true);
-                }
-
-                for (int i = 0; i < returnCount; i++)
-                {
-                    if (asyncTask.res[i] == null)
-                    {
-                        string resultError = $"命令 {funcName} 的第 {i + 1} 个返回值为空";
-                        asyncTask.Reset();
-                        AddError(instructionPc, resultError);
-                        return MakeRetInfo(true);
-                    }
-                }
-
-                PopMany(parameterCount + 1);
-                if (!discardReturn)
-                {
-                    for (int i = 0; i < returnCount; i++)
-                    {
-                        Push(asyncTask.res[i]);
-                    }
-                }
-
-                asyncTask.Reset();
-                data.p += 2;
-                return null;
+                pendingCommandPc = instructionPc;
+                pendingCommandName = funcName;
+                pendingParameterCount = parameterCount;
+                pendingReturnCount = form.retNames == null ? 0 : form.retNames.Count;
+                pendingDiscardReturn = discardReturn;
+                hasPendingCommand = true;
+                cmd.Execute(parameters, data.heap, asyncTask);
+                return ResumeCommand(instructionPc);
             }
 
-            if (!ProgramDataForm.DataByName.TryGetValue(funcName, out var func))
+            var func = data.subInterpret?.program;
+            if (func == null && !ProgramDataForm.DataByName.TryGetValue(funcName, out func))
             {
                 throw new InvalidOperationException($"找不到函数或命令 {funcName}");
             }
@@ -756,7 +772,7 @@ namespace Z_Code
                     -1,
                     new List<BoxDataForm.Data>(),
                     subHeap,
-                    func,
+                    func.CreateRuntimeSnapshot(),
                     0,
                     -1,
                     0,
@@ -821,6 +837,48 @@ namespace Z_Code
             return null;
         }
 
+        private RetInfo ResumeCommand(int instructionPc)
+        {
+            if (data.IsCancelled) return MakeRetInfo(true);
+            if (!asyncTask.IsComplete()) return MakeRetInfo(false);
+            if (!string.IsNullOrEmpty(asyncTask.error))
+            {
+                string commandError = asyncTask.error;
+                ResetCommand();
+                AddError(instructionPc, commandError);
+                return MakeRetInfo(true);
+            }
+            int returnCount = pendingReturnCount;
+            if (returnCount > 0 && (asyncTask.res == null || asyncTask.res.Length < returnCount))
+            {
+                string resultError = $"命令 {pendingCommandName} 声明 {returnCount} 个返回值，但实际未返回足够结果";
+                ResetCommand();
+                AddError(instructionPc, resultError);
+                return MakeRetInfo(true);
+            }
+            for (int i = 0; i < returnCount; i++)
+            {
+                if (asyncTask.res[i] != null) continue;
+                string resultError = $"命令 {pendingCommandName} 的第 {i + 1} 个返回值为空";
+                ResetCommand();
+                AddError(instructionPc, resultError);
+                return MakeRetInfo(true);
+            }
+            PopMany(pendingParameterCount + 1);
+            if (!pendingDiscardReturn)
+                for (int i = 0; i < returnCount; i++) Push(asyncTask.res[i]);
+            ResetCommand();
+            data.p += 2;
+            return null;
+        }
+
+        private void ResetCommand()
+        {
+            hasPendingCommand = false;
+            pendingCommandName = null;
+            asyncTask.Reset();
+        }
+
         private bool TryPrepare(out List<string> zCode)
         {
             zCode = null;
@@ -873,19 +931,16 @@ namespace Z_Code
 
         private void EnsureParseCache(List<string> zCode)
         {
-            if (ReferenceEquals(cachedZCode, zCode) && cachedZCodeCount == zCode.Count)
+            if (ReferenceEquals(cachedZCode, zCode))
             {
                 return;
             }
 
             cachedZCode = zCode;
-            cachedZCodeCount = zCode.Count;
-            opcodeCache = new Op[zCode.Count];
-            opcodeCacheValid = new bool[zCode.Count];
-            numberCache = new float[zCode.Count];
-            numberCacheValid = new bool[zCode.Count];
-            integerCache = new int[zCode.Count];
-            integerCacheValid = new bool[zCode.Count];
+            var shared = parseCaches.GetValue(zCode, createParseCache);
+            opcodeCache = shared.opcodes; opcodeCacheValid = shared.opcodeValid;
+            numberCache = shared.numbers; numberCacheValid = shared.numberValid;
+            integerCache = shared.integers; integerCacheValid = shared.integerValid;
         }
 
         private bool TryReadOpcode(List<string> zCode, int index, out Op value, out string error)
@@ -1044,6 +1099,74 @@ namespace Z_Code
             }
         }
 
+        private BoxDataForm.Data RentTemporaryBox(float num = 0f, string str = null, string valName = null)
+        {
+            var box = freeTemporaryBoxes;
+            if (box == null)
+                box = new TemporaryBox();
+            else
+            {
+                freeTemporaryBoxes = box.next;
+                pooledTemporaryBoxCount--;
+            }
+
+            box.owner = this;
+            box.next = null;
+            box.InitializeTemporaryValue(num, str, valName);
+            return box;
+        }
+
+        private void ConsumeTemporary(BoxDataForm.Data box)
+        {
+            if (!(box is TemporaryBox temporary) || temporary.owner != this) return;
+            temporary.stackReferences--;
+            if (temporary.consumed) return;
+            temporary.consumed = true;
+            temporary.next = consumedTemporaryBoxes;
+            consumedTemporaryBoxes = temporary;
+        }
+
+        private void ReleaseConsumedTemporaries()
+        {
+            while (consumedTemporaryBoxes != null)
+            {
+                var box = consumedTemporaryBoxes;
+                consumedTemporaryBoxes = box.next;
+                box.next = null;
+                box.consumed = false;
+                // Wait pushes its countdown back, and Ret/command arguments may
+                // transfer ownership. Both must survive this instruction.
+                if (box.owner != this || box.stackReferences > 0) continue;
+                box.ClearTemporaryValue();
+                // A global free list must not retain the previous interpreter,
+                // its heap, pending commands or scene-owned data.
+                box.owner = null;
+                if (pooledTemporaryBoxCount < MaxPooledTemporaryBoxes)
+                {
+                    box.next = freeTemporaryBoxes;
+                    freeTemporaryBoxes = box;
+                    pooledTemporaryBoxCount++;
+                }
+            }
+        }
+
+        private static BoxDataForm.Data ExportBox(BoxDataForm.Data box)
+        {
+            if (box is TemporaryBox temporary)
+                temporary.owner = null;
+            return box;
+        }
+
+        private void DetachStackTemporaries()
+        {
+            // Reset/Cancel may run inside a command callback. Keep stack values
+            // intact until its caller has finished; detached values are GC-owned.
+            if (data?.stack == null) return;
+            foreach (var box in data.stack)
+                if (box is TemporaryBox temporary && temporary.owner == this)
+                    temporary.owner = null;
+        }
+
         private BoxDataForm.Data Pop()
         {
             RequireStack(1);
@@ -1056,6 +1179,7 @@ namespace Z_Code
 
             data.stack.RemoveAt(index);
             data.top--;
+            ConsumeTemporary(result);
             return result;
         }
 
@@ -1067,20 +1191,50 @@ namespace Z_Code
                 return;
             }
 
+            for (int i = data.stack.Count - count; i < data.stack.Count; i++)
+                ConsumeTemporary(data.stack[i]);
             data.stack.RemoveRange(data.stack.Count - count, count);
             data.top -= count;
         }
 
+        private void Pop2(out BoxDataForm.Data first, out BoxDataForm.Data second)
+        {
+            RequireStack(2);
+            var stack = data.stack;
+            int top = data.top;
+            first = stack[top];
+            second = stack[top - 1];
+            if (first == null || second == null)
+            {
+                int emptyIndex = first == null ? top : top - 1;
+                throw new InvalidOperationException($"栈位置 {emptyIndex} 的值为空");
+            }
+
+            stack.RemoveRange(top - 1, 2);
+            data.top = top - 2;
+            ConsumeTemporary(first);
+            ConsumeTemporary(second);
+        }
+
         private void Push(BoxDataForm.Data box)
+        {
+            ValidateStackState();
+            PushResult(box);
+        }
+
+        // Used after Pop/Pop2 has already validated this instruction's stack.
+        // No external command/callback may run between that pop and this push.
+        private void PushResult(BoxDataForm.Data box)
         {
             if (box == null)
             {
                 throw new InvalidOperationException("不能向运行栈压入空值");
             }
 
-            ValidateStackState();
             data.stack.Add(box);
             data.top++;
+            if (box is TemporaryBox temporary && temporary.owner == this)
+                temporary.stackReferences++;
         }
 
         private BoxDataForm.Data GetBox(BoxDataForm.Data box)
@@ -1093,17 +1247,15 @@ namespace Z_Code
             string valueName = box.valName;
             if (string.IsNullOrEmpty(valueName))
             {
-                EnsureDictionary(box);
                 return box;
             }
 
             if (!data.heap.TryGetValue(valueName, out var heapBox) || heapBox == null)
             {
-                heapBox = CodeHelper.CreateBox();
+                heapBox = CodeHelper.CreateBoxByNum(0f);
                 data.heap[valueName] = heapBox;
             }
 
-            EnsureDictionary(heapBox);
             if (box.str == null)
             {
 #if INTERPRETER_DEBUG
@@ -1112,13 +1264,13 @@ namespace Z_Code
                 return heapBox;
             }
 
-            if (!heapBox.dic.TryGetValue(box.str, out var dictionaryBox) || dictionaryBox == null)
+            var dictionary = heapBox.GetOrCreateDictionary();
+            if (!dictionary.TryGetValue(box.str, out var dictionaryBox) || dictionaryBox == null)
             {
-                dictionaryBox = CodeHelper.CreateBox();
-                heapBox.dic[box.str] = dictionaryBox;
+                dictionaryBox = CodeHelper.CreateBoxByNum(0f);
+                dictionary[box.str] = dictionaryBox;
             }
 
-            EnsureDictionary(dictionaryBox);
             return dictionaryBox;
         }
 
@@ -1129,17 +1281,21 @@ namespace Z_Code
 
         private string GetStr(BoxDataForm.Data box)
         {
-            box = GetBox(box);
+            return GetResolvedString(GetBox(box));
+        }
+
+        private static string GetResolvedString(BoxDataForm.Data box)
+        {
             return box.str ?? box.num.ToString(CultureInfo.InvariantCulture);
         }
 
         public void Reset()
         {
-            asyncTask.Reset();
+            DetachStackTemporaries();
+            ResetCommand();
             errors.Clear();
             opCode = null;
             cachedZCode = null;
-            cachedZCodeCount = -1;
             opcodeCache = null;
             opcodeCacheValid = null;
             numberCache = null;
@@ -1150,13 +1306,21 @@ namespace Z_Code
 
         public void Cancel()
         {
+            DetachStackTemporaries();
             asyncTask.Cancel();
         }
 
-        private BoxDataForm.Data ArithmeticValues(BoxDataForm.Data left, BoxDataForm.Data right, Op operation)
+        private BoxDataForm.Data ArithmeticValues(BoxDataForm.Data left, BoxDataForm.Data right, Op operation,
+            bool temporaryResult = true)
         {
-            left = GetBox(left);
-            right = GetBox(right);
+            return ArithmeticResolved(GetBox(left), GetBox(right), operation, temporaryResult);
+        }
+
+        // Resolve each input once, including dictionary children. Broadcast
+        // scalars and scalar helpers below already receive resolved values.
+        private BoxDataForm.Data ArithmeticResolved(BoxDataForm.Data left, BoxDataForm.Data right, Op operation,
+            bool temporaryResult)
+        {
             bool leftIsDictionary = HasDictionary(left);
             bool rightIsDictionary = HasDictionary(right);
             if (leftIsDictionary && rightIsDictionary)
@@ -1166,7 +1330,8 @@ namespace Z_Code
                 {
                     if (right.dic.TryGetValue(pair.Key, out var rightValue))
                     {
-                        result.dic[pair.Key] = ArithmeticValues(pair.Value, rightValue, operation);
+                        result.dic[pair.Key] = ArithmeticResolved(GetBox(pair.Value), GetBox(rightValue), operation,
+                            temporaryResult: false);
                     }
                 }
                 return result;
@@ -1179,64 +1344,67 @@ namespace Z_Code
                 foreach (var pair in source.dic)
                 {
                     result.dic[pair.Key] = leftIsDictionary
-                        ? ArithmeticValues(pair.Value, right, operation)
-                        : ArithmeticValues(left, pair.Value, operation);
+                        ? ArithmeticResolved(GetBox(pair.Value), right, operation, temporaryResult: false)
+                        : ArithmeticResolved(left, GetBox(pair.Value), operation, temporaryResult: false);
                 }
                 return result;
             }
 
-            return ScalarArithmetic(left, right, operation);
+            return ScalarArithmetic(left, right, operation, temporaryResult);
         }
 
-        private BoxDataForm.Data ScalarArithmetic(BoxDataForm.Data left, BoxDataForm.Data right, Op operation)
+        private BoxDataForm.Data ScalarArithmetic(BoxDataForm.Data left, BoxDataForm.Data right, Op operation,
+            bool temporaryResult)
         {
             switch (operation)
             {
                 case Op.Plus:
-                    return ValuePlus(left, right);
+                    return ValuePlus(left, right, temporaryResult);
                 case Op.Minus:
-                    return ValueMinus(left, right);
+                    return ValueMinus(left, right, temporaryResult);
                 case Op.Mul:
-                    return CodeHelper.CreateBoxByNum(GetNum(left) * GetNum(right));
+                    return NumberResult(left.num * right.num, temporaryResult);
                 case Op.Div:
-                    float divisor = GetNum(right);
+                    float divisor = right.num;
                     if (divisor == 0f)
                         throw new DivideByZeroException("除数不能为 0");
-                    return CodeHelper.CreateBoxByNum(GetNum(left) / divisor);
+                    return NumberResult(left.num / divisor, temporaryResult);
                 default:
                     throw new InvalidOperationException($"不支持的四则运算: {operation}");
             }
         }
 
-        private BoxDataForm.Data ValuePlus(BoxDataForm.Data left, BoxDataForm.Data right)
+        private BoxDataForm.Data NumberResult(float num, bool temporary) =>
+            temporary ? RentTemporaryBox(num: num) : CodeHelper.CreateBoxByNum(num);
+
+        private BoxDataForm.Data StringResult(string str, bool temporary) =>
+            temporary ? RentTemporaryBox(str: str) : CodeHelper.CreateBoxByStr(str);
+
+        private BoxDataForm.Data ValuePlus(BoxDataForm.Data left, BoxDataForm.Data right, bool temporaryResult)
         {
-            left = GetBox(left);
-            right = GetBox(right);
             if (left.str == null && right.str == null)
             {
-                return CodeHelper.CreateBoxByNum(left.num + right.num);
+                return NumberResult(left.num + right.num, temporaryResult);
             }
 
             if (left.str != null && right.str == null)
             {
-                return CodeHelper.CreateBoxByStr(left.str + right.ToString());
+                return StringResult(left.str + right.ToString(), temporaryResult);
             }
 
             if (left.str == null)
             {
-                return CodeHelper.CreateBoxByStr(left.ToString() + right.str);
+                return StringResult(left.ToString() + right.str, temporaryResult);
             }
 
-            return CodeHelper.CreateBoxByStr(left.str + right.str);
+            return StringResult(left.str + right.str, temporaryResult);
         }
 
-        private BoxDataForm.Data ValueMinus(BoxDataForm.Data left, BoxDataForm.Data right)
+        private BoxDataForm.Data ValueMinus(BoxDataForm.Data left, BoxDataForm.Data right, bool temporaryResult)
         {
-            left = GetBox(left);
-            right = GetBox(right);
             if (left.str == null && right.str == null)
             {
-                return CodeHelper.CreateBoxByNum(left.num - right.num);
+                return NumberResult(left.num - right.num, temporaryResult);
             }
 
             throw new InvalidOperationException("字符串不支持减法");
@@ -1245,14 +1413,6 @@ namespace Z_Code
         private static bool HasDictionary(BoxDataForm.Data box)
         {
             return box?.dic != null && box.dic.Count > 0;
-        }
-
-        private static void EnsureDictionary(BoxDataForm.Data box)
-        {
-            if (box.dic == null)
-            {
-                box.dic = new Dictionary<string, BoxDataForm.Data>();
-            }
         }
 
         /// <summary>
@@ -1323,11 +1483,7 @@ namespace Z_Code
 
         private RetInfo MakeRetInfo(bool complete, BoxDataForm.Data ret = null)
         {
-            var info = new RetInfo
-            {
-                complete = complete,
-                ret = ret ?? CodeHelper.CreateBox()
-            };
+            var info = new RetInfo(complete, ExportBox(ret));
             info.errors.AddRange(errors);
             return info;
         }

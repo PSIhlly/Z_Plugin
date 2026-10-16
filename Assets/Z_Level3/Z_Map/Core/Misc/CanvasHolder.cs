@@ -100,7 +100,7 @@ namespace Z_Map
             TimeManager.instance.CancelTimer(chatTimer);
             chatTimer = TimeManager.instance.StartTimer(0, 0.0001f, () =>
             {
-                timeCur += Time.deltaTime;
+                timeCur += TimeManager.GetDeltaTime();
                 if (timeCur > lastTime)
                 {
                     chat.SetActive(false);
@@ -151,7 +151,7 @@ namespace Z_Map
             float timeCur = 0;
             TimeManager.instance.StartTimer(0, 0.0001f, () =>
             {
-                timeCur += Time.deltaTime;
+                timeCur += TimeManager.GetDeltaTime();
 
                 // 出现：2 倍缩放到 1 倍（缩放时长长于渐显，显形后仍能看到缩小过程）
                 float scaleIn = toastScaleInTime > 0 ? Mathf.Clamp01(timeCur / toastScaleInTime) : 1f;

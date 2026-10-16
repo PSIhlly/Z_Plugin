@@ -78,6 +78,7 @@ namespace Ui.Mod
     {
 
             public Btn btn_back;
+            public Btn btn_import;
             public Txt txt_title;
             public ScrView scr_items;
             public GameObject go_item;
@@ -86,10 +87,11 @@ namespace Ui.Mod
         {
 
             btn_back = uiHolder.elementTrsLst[0].GetComponent<Btn>();
-            txt_title = uiHolder.elementTrsLst[1].GetComponent<Txt>();
-            scr_items = uiHolder.elementTrsLst[2].GetComponent<ScrView>();
-            go_item = uiHolder.elementTrsLst[3].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
+            btn_import = uiHolder.elementTrsLst[1].GetComponent<Btn>();
+            txt_title = uiHolder.elementTrsLst[2].GetComponent<Txt>();
+            scr_items = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
+            go_item = uiHolder.elementTrsLst[4].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[5].GetComponent<UiHolder>().ctrl;
         }
 
     }

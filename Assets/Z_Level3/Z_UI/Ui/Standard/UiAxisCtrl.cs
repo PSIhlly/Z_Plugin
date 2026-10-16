@@ -47,7 +47,8 @@ namespace Ui.Axis
             {
                 OnClickDown(() =>
                 {
-                    var cur = InputManager.instance.id2Pos[model.oriId];
+                    if (!TryGetPointerPosition(out var cur))
+                        return;
                     view.rtf_axis.Translate((cur - model.oriPos).x, 0, 0);
 
                     Vector3[] corners = new Vector3[4];
@@ -66,7 +67,8 @@ namespace Ui.Axis
             {
                 OnClickDown(() =>
                 {
-                    var cur = InputManager.instance.id2Pos[model.oriId];
+                    if (!TryGetPointerPosition(out var cur))
+                        return;
                     view.rtf_axis.Translate(0, (cur - model.oriPos).y, 0);
 
                     Vector3[] corners = new Vector3[4];
@@ -84,7 +86,8 @@ namespace Ui.Axis
             {
                 OnClickDown(() =>
                 {
-                    var cur = InputManager.instance.id2Pos[model.oriId];
+                    if (!TryGetPointerPosition(out var cur))
+                        return;
                     var vectorA = new Vector3(0, 1, 0);
                     var vectorB = cur - (Vector2)view.rtf_axis.position;
                     view.rtf_axis.eulerAngles = new Vector3(0, 0, Vector2.Angle(vectorA, vectorB) - model.startAngle);
@@ -112,7 +115,8 @@ namespace Ui.Axis
         private void OnClickDown(Action act)
         {
             model.oriId = InputManager.instance.GetClosedId(view.rtf_axis.position);
-            model.oriPos = InputManager.instance.id2Pos[model.oriId];
+            if (!TryGetPointerPosition(out model.oriPos))
+                return;
             model.timer = TimeManager.instance.StartTimer(0, 0.1f, () =>
             {
                 act?.Invoke();
@@ -121,6 +125,13 @@ namespace Ui.Axis
                 model.onTrsChange?.Invoke((new Vector2((view.rtf_axis.position.x - corners[0].x) / (corners[2].x - corners[0].x), (view.rtf_axis.position.y-corners[0].y) /(corners[1].y- corners[0].y)), view.rtf_axis.eulerAngles.z));
                 return false;
             });
+        }
+        private bool TryGetPointerPosition(out Vector2 pos)
+        {
+            if (InputManager.instance.id2Pos.TryGetValue(model.oriId, out pos))
+                return true;
+            TimeManager.instance.CancelTimer(model.timer);
+            return false;
         }
         public override void OnHide()
         {

@@ -11,20 +11,9 @@ namespace Z_Map
         private const int LayerRendererCount = 3;
         private const float LowerLayerLightSensitivityScale = 0.5f;
         private static readonly int LightSensitivityProperty = Shader.PropertyToID("_LightSensitivity");
-        private Renderer[] _layerRenderers;
         private float[] _initialLightSensitivities;
         private bool[] _lightSensitivityCaptured;
         private bool[] _hasLightSensitivity;
-
-        public override Renderer[] renderers
-        {
-            get
-            {
-                if (_layerRenderers == null)
-                    _layerRenderers = GetComponentsInChildren<Renderer>(true);
-                return _layerRenderers;
-            }
-        }
 
         public TileUnit unit
         {
@@ -110,12 +99,13 @@ namespace Z_Map
 
         private void EnsureLightSensitivityCache()
         {
-            if (_initialLightSensitivities != null && _initialLightSensitivities.Length == renderers.Length)
+            int count = renderers.Length;
+            if (_initialLightSensitivities != null && _initialLightSensitivities.Length == count)
                 return;
 
-            _initialLightSensitivities = new float[renderers.Length];
-            _lightSensitivityCaptured = new bool[renderers.Length];
-            _hasLightSensitivity = new bool[renderers.Length];
+            _initialLightSensitivities = new float[count];
+            _lightSensitivityCaptured = new bool[count];
+            _hasLightSensitivity = new bool[count];
         }
 
         private static int GetLogicalLayer(int rendererIndex)

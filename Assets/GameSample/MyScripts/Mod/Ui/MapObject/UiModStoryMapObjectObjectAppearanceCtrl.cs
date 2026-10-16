@@ -153,6 +153,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             DisplayCameraAreaManager.instance.Show();
             Refresh();
         }
+        public override void OnHide()
+        {
+            DisplayCameraAreaManager.instance.Hide();
+        }
 
         public void Refresh()
         {

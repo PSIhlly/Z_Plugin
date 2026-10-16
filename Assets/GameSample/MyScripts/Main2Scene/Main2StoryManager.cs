@@ -173,14 +173,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameMapController.ClearObjectWangTileAnimationTextures(mapObject.id);
         if (objectWangTileGameTexIds.TryGetValue(mapObject.id, out List<int> ids))
         {
-            foreach (int texId in ids)
-            {
-                if (!GameTexAssetForm.DataById.TryGetValue(texId, out GameTexAssetForm.Data data))
-                    continue;
-                if (data.asset is Texture texture)
-                    Destroy(texture);
-                GameTexAssetForm.RemoveData(texId);
-            }
+            DestroyGeneratedWangTileTextures(ids);
             var obsolete = new HashSet<int>(ids);
             wangTileGameTexIds.RemoveAll(obsolete.Contains);
             objectWangTileGameTexIds.Remove(mapObject.id);
@@ -228,6 +221,37 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         for (int frameIndex = 0; frameIndex < textures.Count; frameIndex++)
         {
             TexAssetForm.Data sourceData = TexAssetForm.DataById.GetDv(textures[frameIndex], null);
+            var animationFrames = sourceData?.GetAnimationFrames();
+            if (animationFrames != null && animationFrames.Count > 0)
+            {
+                Dictionary<int, List<AnimatedFrameData>> animatedVariants;
+                try { animatedVariants = CreateAnimatedWangTileFrames(animationFrames); }
+                catch (Exception exception)
+                {
+                    Debug.LogError($"Failed to create {variantName} frame {frameIndex}: {exception.Message}");
+                    continue;
+                }
+                var idsByTexture = new Dictionary<Texture2D, int>();
+                foreach (var pair in animatedVariants)
+                {
+                    var firstTexture = pair.Value[0].texture;
+                    if (!idsByTexture.TryGetValue(firstTexture, out int texId))
+                    {
+                        var generatedData = new TexAssetForm.Data(-1,
+                            $"{variantName}_{frameIndex}_{idsByTexture.Count}", string.Empty,
+                            null, string.Empty, firstTexture, LabForm.NoneId);
+                        GameManager.instance.saveCtrl.AddGameTex(ref generatedData);
+                        // AddGameTex wraps the row in its concrete subtype; attach runtime frames afterwards.
+                        generatedData.SetRuntimeAnimationFrames(pair.Value);
+                        texId = generatedData.id;
+                        idsByTexture.Add(firstTexture, texId);
+                        wangTileGameTexIds.Add(texId);
+                        registerGeneratedTexture?.Invoke(texId);
+                    }
+                    registerVariant(pair.Key, texId);
+                }
+                continue;
+            }
             if (!(sourceData?.GetTex() is Texture2D sourceTexture))
             {
                 Debug.LogError($"{variantName} frame {frameIndex} has no Texture2D source.");
@@ -275,18 +299,66 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         }
     }
 
-    private void DestroyWangTileTextures()
+    internal static Dictionary<int, List<AnimatedFrameData>> CreateAnimatedWangTileFrames(
+        IReadOnlyList<AnimatedFrameData> frames)
     {
-        GameMapController.ClearWangTileAnimationTextures();
-        foreach (int texId in wangTileGameTexIds)
+        var result = new Dictionary<int, List<AnimatedFrameData>>(256);
+        try
         {
-            if (!GameTexAssetForm.DataById.TryGetValue(texId, out GameTexAssetForm.Data data))
-                continue;
+            foreach (var frame in frames)
+            {
+                var sprites = TileHelper.GetAutoTileSprites(frame.texture);
+                try
+                {
+                    foreach (var pair in sprites)
+                    {
+                        if (!result.TryGetValue(pair.Key, out var clip))
+                        {
+                            clip = new List<AnimatedFrameData>(frames.Count);
+                            result.Add(pair.Key, clip);
+                        }
+                        clip.Add(new AnimatedFrameData { texture = pair.Value.texture, delaySeconds = frame.delaySeconds });
+                    }
+                }
+                finally
+                {
+                    foreach (var sprite in new HashSet<Sprite>(sprites.Values))
+                        Destroy(sprite);
+                }
+            }
+            return result;
+        }
+        catch
+        {
+            var textures = new HashSet<Texture>();
+            foreach (var clip in result.Values)
+                foreach (var frame in clip)
+                    if (textures.Add(frame.texture)) Destroy(frame.texture);
+            throw;
+        }
+    }
 
-            if (data.asset is Texture texture)
+    private static void DestroyGeneratedWangTileTextures(IEnumerable<int> ids)
+    {
+        var destroyed = new HashSet<Texture>();
+        foreach (int texId in ids)
+        {
+            if (!GameTexAssetForm.DataById.TryGetValue(texId, out var data))
+                continue;
+            var frames = data.GetAnimationFrames();
+            if (frames != null)
+                foreach (var frame in frames)
+                    if (destroyed.Add(frame.texture)) Destroy(frame.texture);
+            if (data.asset is Texture texture && destroyed.Add(texture))
                 Destroy(texture);
             GameTexAssetForm.RemoveData(texId);
         }
+    }
+
+    private void DestroyWangTileTextures()
+    {
+        GameMapController.ClearWangTileAnimationTextures();
+        DestroyGeneratedWangTileTextures(wangTileGameTexIds);
         wangTileGameTexIds.Clear();
         objectWangTileGameTexIds.Clear();
 

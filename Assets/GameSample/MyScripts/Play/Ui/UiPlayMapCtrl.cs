@@ -8,6 +8,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using Z_Code;
 using Z_Code.Form;
 using Z_DataSystem.Form;
@@ -34,12 +35,14 @@ namespace Ui.PlayMap
         public int y = 0;
         public bool isArea;
     }
-    public partial class UiPlayMapCtrl
+    public partial class UiPlayMapCtrl : IZ_Listener<MissionEvent>
     {
         private const float AreaEdgePadding = 200f;
         public PlayMapController mapCtrl;
         private float lastRefreshTime;
         private bool forceAreaContentRefresh;
+        private bool missionRefreshPending;
+        private bool centerOnNextRefresh;
         private int displayedSceneUid;
         private int displayedHeight = int.MinValue;
         UiContainer<UiMarkCtrl> markCon;
@@ -75,11 +78,31 @@ namespace Ui.PlayMap
             model.y = 0;
             lastRefreshTime = 0;
             forceAreaContentRefresh = true;
+            missionRefreshPending = true;
             displayedSceneUid = 0;
             displayedHeight = int.MinValue;
+            view.go_self.SetActive(false);
+        }
+        public override void OnShow()
+        {
+            this.Register<MissionEvent>();
+            missionRefreshPending = true;
+            centerOnNextRefresh = true;
+            Refresh();
+        }
+        public override void OnHide()
+        {
+            this.Unregister<MissionEvent>();
+        }
+        public void OnEvent(MissionEvent evt)
+        {
+            if (active)
+                missionRefreshPending = true;
         }
         public override void OnDisable()
         {
+            centerOnNextRefresh = false;
+            view.go_self.SetActive(false);
         }
         public override void OnUpdate()
         {
@@ -88,10 +111,14 @@ namespace Ui.PlayMap
         public void Refresh()
         {
             if (!PlayManager.instance.enable || mapCtrl == null || !mapCtrl.isReady)
+            {
+                view.go_self.SetActive(false);
                 return;
+            }
             view.sta_type.ChangeState(model.isArea ? 0 : 1);
             if (!GameManager.instance.curProgress.enableMinimap || PlayManager.instance.sceneCtrl.playerM == null || PlayManager.instance.sceneCtrl.playerM.unit.belongTile == null)
             {
+                view.go_self.SetActive(false);
                 Close();
                 return;
             }
@@ -117,25 +144,12 @@ namespace Ui.PlayMap
                     RefreshHeightView(hasMinimap);
                 }
 
-                if (forceAreaContentRefresh || lastRefreshTime < GameManager.instance.curProgress.seconds)
+                bool refreshContent = forceAreaContentRefresh || lastRefreshTime < GameManager.instance.curProgress.seconds;
+                RefreshMissionIfNeeded(refreshContent);
+                if (refreshContent)
                 {
                     lastRefreshTime = GameManager.instance.curProgress.seconds + 0.3f;
                     forceAreaContentRefresh = false;
-
-                    missionCon.Clear();
-                    var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                    if (missionData != null && missionData.targetSceneId == mapCtrl.curScene.uid
-                        && GetPositionHeight(MissionGuide.GetTargetWorldPosition(missionData)) == model.y)
-                    {
-                        missionCon.Add(new UiMissionParam()
-                        {
-                            data = missionData
-                        });
-                    }
-                    missionCon.Refresh();
-
-
-
 
                     markCon.Clear();
                     var marks = PlayManager.instance.mapCtrl.dic;
@@ -173,7 +187,79 @@ namespace Ui.PlayMap
                 }
                 sceneCon.Refresh();
             }
+            RefreshSelfMarker();
+            CenterOnPlayerIfPending();
             view.btn_world.gameObject.SetActive(GameManager.instance.curProgress.enableLargeMap);
+        }
+
+        private void RefreshMissionIfNeeded(bool periodicRefresh)
+        {
+            if (!missionRefreshPending && !periodicRefresh)
+                return;
+            missionRefreshPending = false;
+            missionCon.Clear();
+            var mission = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
+            if (GameManager.instance.curProgress.enableMission && MissionGuide.IsActive(mission)
+                && mapCtrl.curScene != null && mission.targetSceneId == mapCtrl.curScene.uid
+                && GetPositionHeight(MissionGuide.GetTargetWorldPosition(mission)) == model.y)
+                missionCon.Add(new UiMissionParam { data = mission });
+            missionCon.Refresh();
+        }
+
+        private void CenterOnPlayerIfPending()
+        {
+            if (!centerOnNextRefresh || !view.go_self.activeSelf)
+                return;
+
+            var scroll = view.rtf_area.GetComponentInParent<ScrollRect>();
+            if (scroll == null || scroll.content != view.rtf_area)
+            {
+                centerOnNextRefresh = false;
+                return;
+            }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)scroll.transform);
+            var viewport = scroll.viewport != null ? scroll.viewport : (RectTransform)scroll.transform;
+            if (viewport.rect.width <= 0 || viewport.rect.height <= 0)
+                return;
+
+            // Allow even an edge Tile to reach the viewport center without elastic rebound.
+            var horizontal = view.rtf_area.InverseTransformVector(viewport.TransformVector(
+                new Vector3(viewport.rect.width, 0, 0)));
+            var vertical = view.rtf_area.InverseTransformVector(viewport.TransformVector(
+                new Vector3(0, viewport.rect.height, 0)));
+            var padding = new Vector2(
+                Mathf.Max(AreaEdgePadding, (Mathf.Abs(horizontal.x) + Mathf.Abs(vertical.x)) * .5f),
+                Mathf.Max(AreaEdgePadding, (Mathf.Abs(horizontal.y) + Mathf.Abs(vertical.y)) * .5f));
+            view.rtf_area.sizeDelta = new Vector2(mapCtrl.cols * mapCtrl.tileSize,
+                mapCtrl.rows * mapCtrl.tileSize) + padding * 2;
+            view.rimg_unlock.rectTransform.offsetMin = padding;
+            view.rimg_unlock.rectTransform.offsetMax = -padding;
+            RefreshSelfMarker();
+
+            scroll.StopMovement();
+            view.rtf_area.position += viewport.TransformPoint(viewport.rect.center) - view.rtf_self.position;
+            centerOnNextRefresh = false;
+        }
+
+        private void RefreshSelfMarker()
+        {
+            var player = PlayManager.instance.sceneCtrl?.playerM;
+            bool visible = model.isArea && mapCtrl != null && mapCtrl.curScene != null
+                && player != null && player.unit.belongTile != null
+                && player.unit.belongTile.data.mapPos.y == model.y;
+            if (visible && mapCtrl.TryGetRelativePosition(player.pos, out var relativePos))
+            {
+                // Use the inner map rectangle, not the ScrollRect content's 200-pixel margins.
+                var area = view.rimg_unlock.rectTransform;
+                var bounds = area.rect;
+                view.rtf_self.position = area.TransformPoint(new Vector3(
+                    bounds.xMin + bounds.width * relativePos.x,
+                    bounds.yMin + bounds.height * relativePos.y, 0));
+            }
+            else
+                visible = false;
+            view.go_self.SetActive(visible);
         }
 
         private List<int> GetHeights()

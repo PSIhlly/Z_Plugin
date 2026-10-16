@@ -10,6 +10,7 @@ namespace Z_Ui.Dialog
 {
     public class Settings
     {
+        public bool skipping;
         public float autoPlaySpeed;//0~2
         public float textDisplaySpeed;//1~50
         public int historyMax;//1~10

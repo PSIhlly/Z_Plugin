@@ -214,7 +214,7 @@ namespace Z_Fight
                 else
                 //装填中
                 {
-                    data.reloadTime += Time.deltaTime;
+                    data.reloadTime += Z_Time.TimeManager.GetDeltaTime();
                 }
             }
             else

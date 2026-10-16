@@ -209,7 +209,7 @@ namespace Z_Map
             return (view.Item1, view.Item2, view.Item5 + offsetZ, view.Item6 + offsetZ);
         }
 
-        private void FreshMap(bool forceFullScan)
+        private void RefreshMap(bool forceFullScan)
         {
             var viewSize = _super.data.mainData.viewSize;
             var curView = (viewCenter.x - viewSize.x, viewCenter.x + viewSize.x, viewCenter.y - viewSize.y, viewCenter.y + viewSize.y, viewCenter.z - viewSize.z, viewCenter.z + viewSize.z);
@@ -219,67 +219,72 @@ namespace Z_Map
             if (!forceFullScan && hasView && curView.Equals(lastView) && isometric == lastViewIsometric)
                 return;
 
-            // Remove only Tiles that actually left this view (or were replaced in-place).
-            foreach (var map in curTileLst)
+            // Only this synchronous visibility transaction may reuse a returned
+            // live instance without an unnecessary disable/enable cycle.
+            using (var batch = InstancePoolManager.BeginExistingViewRefreshReuse())
             {
-                var layerView = GetLayerView(curView, map.mapPos.y, isometric);
-                if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
-                    || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
-                    || map.mapPos.z >= layerView.maxZ || map.mapPos.z < layerView.minZ
-                    || !_super.data.maps.TryGetValue((map.mapPos.x, map.mapPos.y, map.mapPos.z), out var current)
-                    || !ReferenceEquals(current, map))
+                // Remove only Tiles that actually left this view (or were replaced in-place).
+                foreach (var map in curTileLst)
                 {
-                    map.unit.Hide();
-                    delMapLst.Add(map);
+                    var layerView = GetLayerView(curView, map.mapPos.y, isometric);
+                    if (map.mapPos.x >= curView.Item2 || map.mapPos.x < curView.Item1
+                        || map.mapPos.y >= curView.Item4 || map.mapPos.y < curView.Item3
+                        || map.mapPos.z >= layerView.maxZ || map.mapPos.z < layerView.minZ
+                        || !_super.data.maps.TryGetValue((map.mapPos.x, map.mapPos.y, map.mapPos.z), out var current)
+                        || !ReferenceEquals(current, map))
+                    {
+                        map.unit.Hide();
+                        delMapLst.Add(map);
+                    }
                 }
-            }
-            curTileLst.ExceptWith(delMapLst);
+                curTileLst.ExceptWith(delMapLst);
 
-            // Each lower layer has its own projected rectangle. Compare it with
-            // that same layer's previous rectangle, including camera height changes.
-            for (int y = curView.Item3; y < curView.Item4; y++)
-            {
-                var current = GetLayerView(curView, y, isometric);
-                var previous = GetLayerView(lastView, y, lastViewIsometric);
-                bool overlaps = hasView && y >= lastView.Item3 && y < lastView.Item4
-                    && current.minX < previous.maxX && current.maxX > previous.minX
-                    && current.minZ < previous.maxZ && current.maxZ > previous.minZ;
-                if (forceFullScan || !overlaps)
+                // Each lower layer has its own projected rectangle. Compare it with
+                // that same layer's previous rectangle, including camera height changes.
+                for (int y = curView.Item3; y < curView.Item4; y++)
                 {
-                    ShowAndAddLst(curTileLst, current.minX, current.maxX, y, y + 1, current.minZ, current.maxZ);
-                    continue;
+                    var current = GetLayerView(curView, y, isometric);
+                    var previous = GetLayerView(lastView, y, lastViewIsometric);
+                    bool overlaps = hasView && y >= lastView.Item3 && y < lastView.Item4
+                        && current.minX < previous.maxX && current.maxX > previous.minX
+                        && current.minZ < previous.maxZ && current.maxZ > previous.minZ;
+                    if (forceFullScan || !overlaps)
+                    {
+                        ShowAndAddLst(curTileLst, current.minX, current.maxX, y, y + 1, current.minZ, current.maxZ);
+                        continue;
+                    }
+
+                    // Four non-overlapping entering strips; unchanged layers do no queries.
+                    int commonMinX = Mathf.Max(current.minX, previous.minX);
+                    int commonMaxX = Mathf.Min(current.maxX, previous.maxX);
+                    if (current.minX < previous.minX)
+                        ShowAndAddLst(curTileLst, current.minX, previous.minX, y, y + 1, current.minZ, current.maxZ);
+                    if (current.maxX > previous.maxX)
+                        ShowAndAddLst(curTileLst, previous.maxX, current.maxX, y, y + 1, current.minZ, current.maxZ);
+                    if (current.minZ < previous.minZ)
+                        ShowAndAddLst(curTileLst, commonMinX, commonMaxX, y, y + 1, current.minZ, previous.minZ);
+                    if (current.maxZ > previous.maxZ)
+                        ShowAndAddLst(curTileLst, commonMinX, commonMaxX, y, y + 1, previous.maxZ, current.maxZ);
                 }
 
-                // Four non-overlapping entering strips; unchanged layers do no queries.
-                int commonMinX = Mathf.Max(current.minX, previous.minX);
-                int commonMaxX = Mathf.Min(current.maxX, previous.maxX);
-                if (current.minX < previous.minX)
-                    ShowAndAddLst(curTileLst, current.minX, previous.minX, y, y + 1, current.minZ, current.maxZ);
-                if (current.maxX > previous.maxX)
-                    ShowAndAddLst(curTileLst, previous.maxX, current.maxX, y, y + 1, current.minZ, current.maxZ);
-                if (current.minZ < previous.minZ)
-                    ShowAndAddLst(curTileLst, commonMinX, commonMaxX, y, y + 1, current.minZ, previous.minZ);
-                if (current.maxZ > previous.maxZ)
-                    ShowAndAddLst(curTileLst, commonMinX, commonMaxX, y, y + 1, previous.maxZ, current.maxZ);
-            }
+                foreach (var newMap in newMapLst)
+                {
+                    UpdateRelatedUnit(newMap.unit);
+                }
+                foreach (var delMap in delMapLst)
+                {
+                    UpdateRelatedUnit(delMap.unit);
+                }
 
-            foreach (var newMap in newMapLst)
-            {
-                UpdateRelatedUnit(newMap.unit);
-
+                lastView = curView;
+                lastViewIsometric = isometric;
+                hasView = true;
             }
-            foreach (var delMap in delMapLst)
-            {
-                UpdateRelatedUnit(delMap.unit);
-
-            }
-            lastView = curView;
-            lastViewIsometric = isometric;
-            hasView = true;
         }
         private void UpdateRelatedUnit(TileUnit tile)
         {
-            foreach (var ch in characterTileDic.Get(tile))
+            if (characterTileDic.TryGet(tile, out var characters))
+            foreach (var ch in characters)
             {
                 if (HasShowingTile(ch, characterTileDic))
                 {
@@ -292,7 +297,8 @@ namespace Z_Map
                     curCharacterLst.Remove(ch.data);
                 }
             }
-            foreach (var item in itemTileDic.Get(tile))
+            if (itemTileDic.TryGet(tile, out var items))
+            foreach (var item in items)
             {
                 if (HasShowingTile(item, itemTileDic))
                 {
@@ -306,7 +312,8 @@ namespace Z_Map
                 }
             }
 
-            foreach (var obj in objectTileDic.Get(tile))
+            if (objectTileDic.TryGet(tile, out var objects))
+            foreach (var obj in objects)
             {
                 if (HasShowingTile(obj, objectTileDic))
                 {
@@ -337,6 +344,19 @@ namespace Z_Map
 
                 for (int k = minZ; k < maxZ; k++)
                 {
+                    // View refresh scans one layer at a time. An exact lookup
+                    // avoids traversing (and allocating for) each SortedSet.
+                    if (maxY - minY == 1)
+                    {
+                        if (_super.data.maps.TryGetValue((i, minY, k), out var singleMap)
+                            && singleMap != null && lst.Add(singleMap))
+                        {
+                            singleMap.unit.Show();
+                            newMapLst.Add(singleMap);
+                        }
+                        continue;
+                    }
+
                     if (!_super.data.mapXZ2Y.TryGetValue((i, k), out var yLevels)
                         || yLevels.Count == 0)
                         continue;
@@ -809,8 +829,8 @@ namespace Z_Map
 
         private void CollectElevatedObjectVision(Vector3Int center)
         {
-            // Same-layer connectivity is determined by real ownership, not
-            // visual overlap. Only the elevated Objects hide, never their ground.
+            // Any elevated Object covering this Tile connects the component,
+            // regardless of its owner. Only the Objects hide, never their ground.
             bfsVisited.Add((center.x, center.y, center.z));
             bfsQueue.Enqueue((center.x, center.z));
             while (bfsQueue.Count > 0)
@@ -822,8 +842,7 @@ namespace Z_Map
                 bool connects = false;
                 foreach (var unit in objects)
                 {
-                    if (!objectTileDic.TryGetFirst(unit, out var owner) || owner != tile
-                        || !IsObjectAboveTile(unit, tile))
+                    if (!IsObjectAboveTile(unit, tile))
                         continue;
                     connects = true;
                     nextVision[unit] = FullHighLayerOcclusionDegree;
@@ -976,8 +995,8 @@ namespace Z_Map
             if (isSideView)
                 CollectNearbyOcclusion(realViewCenter, !modHighLayerHalfTransparent);
             CollectHighLayerObjectOcclusion(realViewCenter.y, isSideView, modHighLayerHalfTransparent);
-            // A raised Object can still belong to this layer. Its center-connected
-            // roof component overrides nearby/mixed half-opacity, but not Tile state.
+            // Elevated Object coverage connects the current-layer roof component,
+            // overriding nearby/mixed half-opacity, but not Tile state.
             if (!modHighLayerHalfTransparent)
                 CollectElevatedObjectVision(realViewCenter);
             CollectAttachedVision(realViewCenter.y, isSideView, modHighLayerHalfTransparent);
@@ -1134,7 +1153,7 @@ namespace Z_Map
                 {
                     Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:" + viewCenter);
                 }
-                FreshMap(forceFresh);
+                RefreshMap(forceFresh);
                 lastCenterPos = curCenterPos;
             }
             UpdateVision();

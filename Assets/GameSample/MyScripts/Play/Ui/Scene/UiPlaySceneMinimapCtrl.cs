@@ -33,10 +33,11 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
         public int cur = 0;
         public int y = 0;
     }
-    public partial class UiPlaySceneMinimapCtrl
+    public partial class UiPlaySceneMinimapCtrl : IZ_Listener<MissionEvent>
     {
         public PlayMapController mapCtrl;
         private float lastRefreshTime;
+        private bool missionRefreshPending;
         UiContainer<UiMarkCtrl> con;
         UiContainer<UiMissionCtrl> missionCon;
         public override void OnCreate()
@@ -53,9 +54,26 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
             mapCtrl = PlayManager.instance.mapCtrl;
             model.cur = 0;
             model.y = 0;
+            lastRefreshTime = 0;
+            missionRefreshPending = true;
         }
         public override void OnDisable()
         {
+        }
+        public override void OnShow()
+        {
+            this.Register<MissionEvent>();
+            missionRefreshPending = true;
+            Refresh();
+        }
+        public override void OnHide()
+        {
+            this.Unregister<MissionEvent>();
+        }
+        public void OnEvent(MissionEvent evt)
+        {
+            if (active)
+                missionRefreshPending = true;
         }
         public override void OnUpdate()
         {
@@ -110,21 +128,11 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
             relativePos -= Vector2.one * 0.5f;
             view.rtf_area.localPosition = -new Vector3(relativePos.x * mapCtrl.cols * mapCtrl.tileSize, relativePos.y * mapCtrl.rows * mapCtrl.tileSize, 0);
 
-            if (lastRefreshTime < GameManager.instance.curProgress.seconds)
+            bool refreshContent = lastRefreshTime < GameManager.instance.curProgress.seconds;
+            RefreshMissionIfNeeded(refreshContent);
+            if (refreshContent)
             {
                 lastRefreshTime = GameManager.instance.curProgress.seconds + 0.3f;
-                missionCon.Clear();
-                view.rtf_guide.gameObject.SetActive(false);
-                var missionData = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
-                if (missionData != null && missionData.targetSceneId == mapCtrl.curScene.uid)
-                {
-                    missionCon.Add(new UiMissionParam()
-                    {
-                        data = missionData
-                    });
-                }
-                missionCon.Refresh();
-
                 con.Clear();
                 var marks = PlayManager.instance.mapCtrl.dic.Values;
                 foreach (var mark in marks)
@@ -144,6 +152,20 @@ namespace Ui.PlaySceneMain.PlaySceneMinimap
 
 
 
+        }
+
+        private void RefreshMissionIfNeeded(bool periodicRefresh)
+        {
+            if (!missionRefreshPending && !periodicRefresh)
+                return;
+            missionRefreshPending = false;
+            missionCon.Clear();
+            view.rtf_guide.gameObject.SetActive(false);
+            var mission = MissionForm.DataById.GetDv(GameManager.instance.curProgress.curMissionId, null);
+            if (GameManager.instance.curProgress.enableMission && MissionGuide.IsActive(mission)
+                && mapCtrl.curScene != null && mission.targetSceneId == mapCtrl.curScene.uid)
+                missionCon.Add(new UiMissionParam { data = mission });
+            missionCon.Refresh();
         }
 
     }

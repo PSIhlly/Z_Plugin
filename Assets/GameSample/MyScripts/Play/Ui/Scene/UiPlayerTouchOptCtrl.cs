@@ -20,6 +20,7 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
 {
     public partial class UiPlayerTouchOptModel
     {
+        public float lastAttackStickTime = float.NegativeInfinity;
     }
     public partial class UiPlayerTouchOptCtrl
     {
@@ -30,20 +31,33 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
         }
         public override void OnShow()
         {
+            model.lastAttackStickTime = float.NegativeInfinity;
             view.model_moveStick.SetShow(true, new UiStickParam()
             {
+                floating = true,
                 dragAct = (dir) =>
                 {
                     dir = GetDirection(dir);
-                    PlayManager.instance.sceneCtrl.SetPlayerMove(Time.deltaTime * dir);
+#if UNITY_ANDROID
+                    if (dir != Vector3.zero && view.model_attackStick.model.curId == -1 &&
+                        PlayManager.instance.sceneCtrl.GetCurOptSkill() == null &&
+                        Time.unscaledTime - model.lastAttackStickTime >= 1f)
+                        PlayManager.instance.sceneCtrl.SetPlayerRotation(dir, 360);
+#endif
+                    PlayManager.instance.sceneCtrl.SetPlayerMove(MapUtilController.MovementDeltaTime * dir);
                 },
-                canStartFunc = () => GameManager.instance.curProgress.blockProgramUid != 0
+                canStartFunc = () => GameManager.instance.curProgress != null && GameManager.instance.curProgress.blockProgramUid == 0,
+                canContinueFunc = () => GameManager.instance.curProgress != null && GameManager.instance.curProgress.blockProgramUid == 0
 
             });
             view.model_attackStick.SetShow(true, new UiStickParam()
             {
+                floating = true,
                 dragAct = (dir) =>
                 {
+#if UNITY_ANDROID
+                    model.lastAttackStickTime = Time.unscaledTime;
+#endif
                     PlayManager.instance.sceneCtrl.SetCurOptSkill(SkillType.LightAttack);
                     dir = GetDirection(dir);
                     if (dir != Vector3.zero)
@@ -57,14 +71,22 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
                 },
                 upAct = (dir) =>
                 {
+#if UNITY_ANDROID
+                    model.lastAttackStickTime = Time.unscaledTime;
+#endif
                     PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
                 },
                 hideAct = () =>
                 {
+#if UNITY_ANDROID
+                    model.lastAttackStickTime = Time.unscaledTime;
+#endif
                     if (PlayManager.instance.sceneCtrl.GetCurOptSkill()== SkillType.LightAttack)
                         PlayManager.instance.sceneCtrl.SetCurOptSkill(null);
                 },
-                canStartFunc = () => GameManager.instance.curProgress.blockProgramUid != 0 && PlayManager.instance.sceneCtrl.GetCurOptSkill() == null
+                canStartFunc = () => GameManager.instance.curProgress != null && GameManager.instance.curProgress.blockProgramUid == 0 && PlayManager.instance.sceneCtrl.GetCurOptSkill() == null,
+                canContinueFunc = () => GameManager.instance.curProgress != null && GameManager.instance.curProgress.blockProgramUid == 0 &&
+                    (PlayManager.instance.sceneCtrl.GetCurOptSkill() == null || PlayManager.instance.sceneCtrl.GetCurOptSkill() == SkillType.LightAttack)
 
             });
         }

@@ -14,7 +14,6 @@ using UnityEngine;
 using Z_DataSystem.Form;
 using Z_DataSystem;
 using Ui.Axis;
-using TuanjieMuse.Chat.Model;
 using Z_Ui;
 
 namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterUnitAppearance.ModStoryCharacterUnitAppearanceUnit

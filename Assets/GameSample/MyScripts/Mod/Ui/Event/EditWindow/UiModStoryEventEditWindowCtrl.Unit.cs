@@ -76,10 +76,13 @@ namespace Ui.ModStoryEventEditWindow
                         break;
                     case CodeType.FuncName:
                     case CodeType.Reserved:
-                        if (CmdDataForm.DataByName.ContainsKey(model.node.desc.code))
+                        if (CmdBase.TryGetForm(model.node.desc.code, out var form))
                         {
-                            var form = CmdDataForm.DataByName[model.node.desc.code];
-                            RenderDescription(form.desc);
+                            // Old movement aliases still take seconds, not the new speed argument.
+                            bool legacyMove = model.node.desc.code == "MoveCharacter"
+                                || model.node.desc.code == "MoveObject" || model.node.desc.code == "MoveCharacterRelative"
+                                || model.node.desc.code == "MoveObjectRelative";
+                            RenderDescription(legacyMove ? form.desc.Replace("at {2} tiles/second", "last {2} seconds") : form.desc);
                         }
                         else if (ProgramDataForm.DataByName.TryGetValue(model.node.desc.code, out var program)
                                  && program is EventProgramDataForm.Data evtData)

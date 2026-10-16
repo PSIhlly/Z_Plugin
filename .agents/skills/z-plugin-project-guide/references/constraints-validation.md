@@ -16,7 +16,10 @@ Use this reference before final verification, package or platform work, third-pa
 Re-read the source files instead of assuming this snapshot remains current:
 
 - Editor: Unity/Tuanjie `2022.3.61t4` from `ProjectSettings/ProjectVersion.txt`.
+- Android's custom main manifest is `Assets/Plugins/Android/AndroidManifest.xml`. Its player activity uses `@style/TuanjieThemeSelector`, matching the installed Tuanjie Android template/resources. Do not restore Unity's `UnityThemeSelector` name: this editor does not generate that style, so Android resource linking fails. Fix the source manifest, not only the generated `Library/Bee` Gradle copy.
 - Render pipeline: URP 14.1.0 from `Packages/manifest.json`.
+- Mobile rendering: `QualitySettings` level `Medium` (index `2`, the Android/iPhone/tvOS default) overrides the global pipeline with `Assets/GameSample/Settings/Rendering/MobilePipelineAsset.asset`. Its independent `MobileForwardRenderer.asset` retains the active `DisFadeOpaqueFeature`; the global `SamplesPipelineAsset`/`SamplesForwardRenderer` and Standalone's `Ultra` default remain separate. Medium also uses this mobile pipeline if selected explicitly on another platform.
+- The mobile starting profile uses render scale `0.8`, 2x MSAA, main-light shadows at `1024` with two cascades, shadow distance `30`, and hard shadows (`m_SoftShadowsSupported=0`; the stored soft-shadow quality is inactive). HDR, Depth Texture, Opaque Texture, additional-light shadows, Terrain Holes and LOD cross-fade are disabled; the Renderer uses Intermediate Texture `Auto`. Disabling Depth Texture does not disable the depth attachment required by `DisFadeOpaque`. Validate Mod/Play, camera-center fading, opaque/transparent intersections, shadows and the appearance-preview camera in both Medium and Ultra; asset/reference checks alone do not establish mobile GPU performance or Player compatibility.
 - UI: UGUI and TextMeshPro.
 - Input: Legacy Input Manager (`activeInputHandler: 0`).
 - Scripting: IL2CPP configured for Android and Standalone; code/engine stripping is enabled.
@@ -76,6 +79,7 @@ Do not overstate evidence:
 
 - A root `.csproj` can omit a newly created source file until Unity regenerates it.
 - Editor compilation can resolve `UnityEditor` references that fail Player compilation.
+- Calibrate `GC.GetAllocatedBytesForCurrentThread()` with a retained explicit allocation before making allocation claims. The installed Tuanjie Mono batch environment can report zero even for new Boxes/arrays, including with the profiler enabled. In that case log/skip allocation-only assertions, retain functional/cache/call-count tests, and measure real GC in the Unity Profiler; an observed zero alone is not evidence of allocation-free execution.
 - A package is installed for Unity Test Framework, but the repository currently has no formal NUnit/UnityTest suite; `Assets/Scenes/Test.cs` is an ordinary script.
 - `ProjectSettings/EditorBuildSettings.asset` currently has no valid enabled scene, so configure or explicitly pass scenes before release-build automation.
 

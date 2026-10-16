@@ -166,7 +166,7 @@ public static class ModSceneHistoryRuntimeRegression
         map.mainGo = new GameObject("history-map-root");
         map.Init();
         pool = CreateManager<InstancePoolManager>();
-        pool.pools = new List<InstancePool>();
+        pool.pools = new Dictionary<string, InstancePool>(StringComparer.Ordinal);
         pool.defaultRoot = pool.transform;
         // No real scene or UI prefab is loaded; empty UI dictionaries also allow
         // production restoration to close stale entity panels normally.
@@ -1175,7 +1175,7 @@ public static class ModSceneHistoryRuntimeRegression
     private static Texture ShownTexture(MapInstance instance)
     {
         var block = new MaterialPropertyBlock();
-        instance.renderers[0].GetPropertyBlock(block);
+        instance.viewRefreshBindings[0].Target.GetPropertyBlock(block);
         return block.GetTexture("_Tex");
     }
 

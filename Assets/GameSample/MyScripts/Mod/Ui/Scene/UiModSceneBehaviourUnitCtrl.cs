@@ -41,6 +41,15 @@ namespace Ui.ModSceneBehaviourUnit
             {
                 Close();
             });
+            // The new prefab button is not in the generated View yet. Resolve it
+            // once here; regenerating UiBase later does not add another listener.
+            var deleteButton = System.Array.Find(gameObject.GetComponentsInChildren<Btn>(true),
+                button => button.name == "btn_delete");
+            if (deleteButton != null)
+                deleteButton.onClick.AddListener(DeleteUnit);
+            else
+                Debug.LogError("ModSceneBehaviourUnit is missing btn_delete.", gameObject);
+
             view.btn_evt.onClick.AddListener(() =>
             {
                 var unit = (MapUnit)model.data.unit;
@@ -58,14 +67,38 @@ namespace Ui.ModSceneBehaviourUnit
         }
         public override void OnShow()
         {
-            model.data = param.data;
-            if(!(model.data.unit is MapUnit))
+            model.data = param?.data;
+            if(!(model.data?.unit is MapUnit))
             {
                 Close();
                 return;
             }
             Refresh();
 
+        }
+        private void DeleteUnit()
+        {
+            var data = model.data;
+            if (!(data?.unit is MapUnit))
+            {
+                Close();
+                return;
+            }
+
+            using (ModManager.instance.sceneCtrl.BeginOperation())
+            {
+                ModManager.instance.sceneCtrl.Track(data);
+                if (data is ItemUnitForm.Data itemData)
+                    MapManager.instance.RemoveItem(itemData);
+                else if (data is ObjectUnitForm.Data objectData)
+                    MapManager.instance.RemoveObject(objectData);
+                else if (data is CharacterUnitForm.Data characterData)
+                    MapManager.instance.RemoveCharacter(characterData);
+                else if (data is TileUnitForm.Data tileData)
+                    MapManager.instance.RemoveTile(tileData);
+            }
+            model.data = null;
+            Close();
         }
         public void Refresh()
         {

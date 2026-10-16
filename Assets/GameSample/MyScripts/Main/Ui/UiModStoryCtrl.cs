@@ -3,6 +3,8 @@ using Item;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using Ui.Loading;
 using Ui.Mod;
 using Ui.CmdInputArea;
@@ -24,10 +26,13 @@ namespace Ui.ModStory
     {
         public UiCtrl curUi;
         public bool startingTest;
+        public bool exporting;
+        public int exportVersion;
     }
     public partial class UiModStoryCtrl
     {
         private const string TestLoadingItem = "modStoryTest";
+        private CancellationTokenSource exportCancellation;
 
         public override void OnCreate()
         {
@@ -108,13 +113,7 @@ namespace Ui.ModStory
             {
                 NotifyManager.instance.AddPopup(TextManager.instance.GetTxt("check"), ModManager.instance.checkCtrl.Check(), true, enableScr: true);
             });
-            view.btn_outPut.onClick.AddListener(() =>
-            {
-                NativeGallery.SaveImageToGallery(GameManager.instance.saveCtrl.Package(GameManager.instance.curStory.id), "GameMod", GameManager.instance.curStory.name + ".png", (su, p) =>
-                {
-                    NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
-                });
-            });
+            view.btn_outPut.onClick.AddListener(ExportStoryPackage);
 
             view.btn_overview.onClick.AddListener(() =>
             {
@@ -177,6 +176,56 @@ namespace Ui.ModStory
                     }
                 });
             });
+        }
+
+        public override void OnHide()
+        {
+            ++model.exportVersion;
+            exportCancellation?.Cancel();
+            model.exporting = false;
+        }
+
+        private async void ExportStoryPackage()
+        {
+            if (model.exporting || model.startingTest)
+                return;
+            var story = GameManager.instance.curStory;
+            if (story == null)
+                return;
+            model.exporting = true;
+            var version = ++model.exportVersion;
+            var cancellation = new CancellationTokenSource();
+            exportCancellation = cancellation;
+            try
+            {
+                await LoadingManager.instance.RunAsync("modExport", async () =>
+                {
+                    var success = await AssetFilePicker.ExportModPackageAsync(
+                        () => GameManager.instance.saveCtrl.PackageAsync(story.id, cancellation.Token),
+                        story.name, TextManager.instance.GetTxt("outPut"), cancellation.Token);
+                    if (success && active && version == model.exportVersion)
+                    {
+                        NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
+                    }
+                }, cancellation.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                if (active && version == model.exportVersion)
+                    NotifyManager.instance.AddPopup(TextManager.instance.GetTxt("outPut"), exception.Message, true, enableScr: true);
+            }
+            finally
+            {
+                if (version == model.exportVersion)
+                    model.exporting = false;
+                if (ReferenceEquals(exportCancellation, cancellation))
+                    exportCancellation = null;
+                cancellation.Dispose();
+            }
         }
 
         public override void OnShow()

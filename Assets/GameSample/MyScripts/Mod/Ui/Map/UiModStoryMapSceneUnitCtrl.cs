@@ -51,6 +51,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
             });
             view.btn_edit.onClick.AddListener(() =>
             {
+                GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
                 Main2StoryManager.instance.StartLoadSceneUgc(model.data.uid);
                 UiManager.instance.CloseUi<UiModStoryCtrl>();
             });

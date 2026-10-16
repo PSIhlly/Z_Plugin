@@ -19,10 +19,58 @@ public class GameMapData : MapInfo
         if (productData == null)
             CharacterProductForm.DataByUid.TryGetValue(unitData.unit.productInfo.Item1, out productData);
 
-        unitData.passType = productData?.passType == null
-            ? new List<int>()
-            : productData.passType.Where(id => id != 0).Distinct().OrderBy(id => id).ToList();
+        List<int> source = productData?.passType;
+        List<int> normalized = unitData.passType;
+        if (!CharacterPassTypesMatch(source, normalized))
+        {
+            // Keep the per-unit list independent of the product, but reuse it
+            // across repeated AfterUpdate callbacks when possible.
+            if (normalized == null || ReferenceEquals(normalized, source))
+                normalized = new List<int>();
+            else
+                normalized.Clear();
+
+            if (source != null)
+                normalized.AddRange(source);
+            normalized.Sort();
+            int count = 0;
+            for (int i = 0; i < normalized.Count; i++)
+            {
+                int value = normalized[i];
+                if (value != 0 && (count == 0 || normalized[count - 1] != value))
+                    normalized[count++] = value;
+            }
+            if (count < normalized.Count)
+                normalized.RemoveRange(count, normalized.Count - count);
+            unitData.passType = normalized;
+        }
         unitData.unit.SetPassTypes(unitData.passType);
+    }
+
+    private static bool CharacterPassTypesMatch(List<int> source, List<int> normalized)
+    {
+        if (normalized == null || ReferenceEquals(normalized, source))
+            return false;
+
+        // The saved runtime list remains sorted, unique and zero-free even if
+        // the authored product list has duplicates or a different ordering.
+        for (int i = 0; i < normalized.Count; i++)
+        {
+            int value = normalized[i];
+            if (value == 0 || (i > 0 && normalized[i - 1] >= value) ||
+                source == null || !source.Contains(value))
+                return false;
+        }
+        if (source != null)
+        {
+            for (int i = 0; i < source.Count; i++)
+            {
+                int value = source[i];
+                if (value != 0 && normalized.BinarySearch(value) < 0)
+                    return false;
+            }
+        }
+        return true;
     }
 
     public static void ApplyTilePassTypes(TileUnitForm.Data unitData)

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_ByteSerialize;
 using Z_Fight.Form;
+using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
 
@@ -32,7 +33,7 @@ namespace Z_Fight
 
         public override void UpdateInfo()
         {
-            float dis = weaponBullet.speed * Time.deltaTime;
+            float dis = weaponBullet.speed * TimeManager.GetDeltaTime();
             if (Physics.Raycast(data.pos, dir, out var hit))
             {
                 if (hit.distance < dis * 1.5f)

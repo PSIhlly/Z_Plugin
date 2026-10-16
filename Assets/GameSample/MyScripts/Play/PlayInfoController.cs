@@ -7,13 +7,10 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Security.Policy;
-using TuanjieMuse.Chat.ViewModel;
 using Ui;
 using Ui.ModSceneUnit;
 using Ui.PlaySceneMain;
 using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using Z_Code;
@@ -30,7 +27,6 @@ using Z_Time;
 using Z_Ui;
 using Z_Ui.Notify;
 using Z_UnitSystem;
-using static UnityEditor.Progress;
 public enum MissionEventType
 {
     Add,
@@ -149,12 +145,13 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             return;
         }
         int oldSecond = (int)GameManager.instance.curProgress.seconds;
-        GameManager.instance.curProgress.seconds += Time.deltaTime;
+        float deltaTime = TimeManager.GetDeltaTime();
+        GameManager.instance.curProgress.seconds += deltaTime;
         if (oldSecond < (int)GameManager.instance.curProgress.seconds)
         {
             Z_EventHelper.Invoke(new StoryLifeEvent() { type = StoryLifeEventType.EverySecond });
         }
-        CalcTeamSkill();
+        CalcTeamSkill(deltaTime);
     }
 
     #region param
@@ -201,7 +198,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
     #region skill
 
-    private void CalcTeamSkill()
+    private void CalcTeamSkill(float deltaTime)
     {
         foreach (var uid in GameManager.instance.curProgress.team)
         {
@@ -211,7 +208,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
                 foreach (var kvp in ch.skill)
                 {
                     var skill = SkillProductForm.DataByUid.GetDv(kvp.Value, null);
-                    if (skill != null && skill.cd + skill.lastUseTime > GameManager.instance.curProgress.seconds - Time.deltaTime && skill.cd + skill.lastUseTime < GameManager.instance.curProgress.seconds)
+                    if (skill != null && skill.cd + skill.lastUseTime > GameManager.instance.curProgress.seconds - deltaTime && skill.cd + skill.lastUseTime < GameManager.instance.curProgress.seconds)
                     {
                         Z_EventHelper.Invoke(new CharacterSkillEvent()
                         {
@@ -665,6 +662,7 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
             case MissionEventType.Fail:
                 if (GameManager.instance.curProgress.curMissionId == evt.data.id)
                 {
+                    GameManager.instance.curProgress.curMissionId = 0;
                     foreach (var mission in MissionForm.DataById.Values)
                     {
                         if (mission.received && !mission.fail && !mission.done)

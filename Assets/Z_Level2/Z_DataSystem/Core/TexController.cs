@@ -26,6 +26,9 @@ namespace Z_DataSystem.Form
             private List<Sprite> _gifSprites;
             private List<AnimatedFrameData> _webPFrames;
             private List<Sprite> _webPSprites;
+            private bool animationFramesResolved;
+            private IReadOnlyList<AnimatedFrameData> animationFrames;
+            private double[] animationFrameEnds;
             Z_MultiTask<Texture> texTask = new Z_MultiTask<Texture>();
             Z_MultiTask<Sprite> spriteTask = new Z_MultiTask<Sprite>();
 
@@ -37,6 +40,9 @@ namespace Z_DataSystem.Form
                 _gifSprites = null;
                 _webPFrames = null;
                 _webPSprites = null;
+                animationFramesResolved = false;
+                animationFrames = null;
+                animationFrameEnds = null;
             }
 
             public bool isGif
@@ -100,15 +106,64 @@ namespace Z_DataSystem.Form
 
             public IReadOnlyList<AnimatedFrameData> GetAnimationFrames()
             {
+                if (animationFramesResolved)
+                    return animationFrames;
                 if (isGif)
-                    return GetGifFrames();
-                if (!isWebP)
-                    return null;
-                if (_webPFrames == null)
-                    _webPFrames = bytes != null
-                        ? TextureHelper.GetWebPFramesByByte(bytes)
-                        : TextureHelper.GetWebPFramesByPath(path);
-                return _webPFrames;
+                    animationFrames = GetGifFrames();
+                else if (isWebP)
+                {
+                    if (_webPFrames == null)
+                        _webPFrames = bytes != null
+                            ? TextureHelper.GetWebPFramesByByte(bytes)
+                            : TextureHelper.GetWebPFramesByPath(path);
+                    animationFrames = _webPFrames;
+                }
+                // Cache static assets too: material animation must not open a file every frame.
+                animationFramesResolved = true;
+                return animationFrames;
+            }
+
+            public void SetRuntimeAnimationFrames(IReadOnlyList<AnimatedFrameData> frames)
+            {
+                ClearRuntimeCache();
+                animationFrames = frames;
+                animationFramesResolved = true;
+                if (frames != null && frames.Count > 0)
+                    asset = frames[0].texture;
+            }
+
+            public double GetAnimationDuration()
+            {
+                var frames = GetAnimationFrames();
+                if (frames == null || frames.Count == 0)
+                    return 0;
+                if (animationFrameEnds == null)
+                {
+                    animationFrameEnds = new double[frames.Count];
+                    double end = 0;
+                    for (int i = 0; i < frames.Count; i++)
+                    {
+                        float delay = frames[i].delaySeconds;
+                        end += delay > 0 && !float.IsInfinity(delay) ? delay : .1f;
+                        animationFrameEnds[i] = end;
+                    }
+                }
+                return animationFrameEnds[animationFrameEnds.Length - 1];
+            }
+
+            public Texture GetAnimationTexture(double seconds)
+            {
+                if (GetAnimationDuration() <= 0)
+                    return GetTex();
+                // Past the internal cycle, hold its last frame for the clip interval.
+                int lo = 0, hi = animationFrameEnds.Length - 1;
+                while (lo < hi)
+                {
+                    int mid = (lo + hi) / 2;
+                    if (seconds < animationFrameEnds[mid]) hi = mid;
+                    else lo = mid + 1;
+                }
+                return animationFrames[lo].texture;
             }
 
             public IReadOnlyList<Sprite> GetAnimationSprites()
@@ -199,6 +254,59 @@ namespace Z_DataSystem.Form
 }
 namespace Z_DataSystem
 {
+    /// <summary>Each asset plays once, holds its last frame for interval, then advances.</summary>
+    public static class TextureAnimation
+    {
+        public readonly struct Sample
+        {
+            public readonly Texture texture;
+            public readonly int index;
+            public readonly bool animated;
+            public readonly bool completed;
+            public Sample(Texture texture, int index, bool animated, bool completed)
+            {
+                this.texture = texture;
+                this.index = index;
+                this.animated = animated;
+                this.completed = completed;
+            }
+        }
+
+        public static Sample GetSample(IReadOnlyList<int> ids, float interval, double seconds, bool loop = true)
+            => GetSample(ids, 0, ids == null ? 0 : ids.Count, interval, seconds, loop);
+
+        public static Sample GetSample(int id, float interval, double seconds, bool loop = true)
+            => GetSample(null, id, 1, interval, seconds, loop);
+
+        private static Sample GetSample(IReadOnlyList<int> ids, int singleId, int count,
+            float interval, double seconds, bool loop)
+        {
+            double hold = interval > 0 && !float.IsInfinity(interval) ? interval : 0;
+            double duration = 0;
+            bool internalAnimation = false;
+            for (int i = 0; i < count; i++)
+            {
+                double assetDuration = TexAssetForm.DataById.TryGetValue(ids == null ? singleId : ids[i], out var data)
+                    ? data.GetAnimationDuration() : 0;
+                duration += assetDuration + hold;
+                internalAnimation |= assetDuration > 0;
+            }
+            bool animated = duration > 0 && (internalAnimation || count > 1);
+            seconds = double.IsNaN(seconds) || double.IsInfinity(seconds) ? 0 : Math.Max(0, seconds);
+            bool completed = !loop && duration > 0 && seconds >= duration;
+            if (loop && duration > 0) seconds %= duration;
+            for (int i = 0; i < count; i++)
+            {
+                TexAssetForm.DataById.TryGetValue(ids == null ? singleId : ids[i], out var data);
+                double span = (data == null ? 0 : data.GetAnimationDuration()) + hold;
+                if (duration <= 0 || seconds < span || i == count - 1)
+                    return new Sample(data?.GetAnimationTexture(seconds), i, animated, completed);
+                seconds -= span;
+            }
+            return new Sample(null, 0, false, false);
+        }
+    }
+
     public class TexController : Z_Controller<AssetManager>, IAssetController
     {
 

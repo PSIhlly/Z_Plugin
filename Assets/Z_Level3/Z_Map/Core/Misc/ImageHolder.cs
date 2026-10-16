@@ -36,5 +36,7 @@ namespace Z_Map
             }
         }
         public Timer animTimer;
+
+        // DisFadeMaterialBinding owns deferred disable/re-enable restoration.
     }
 }

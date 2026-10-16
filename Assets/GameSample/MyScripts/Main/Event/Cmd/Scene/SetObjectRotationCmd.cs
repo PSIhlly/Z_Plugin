@@ -1,58 +1,49 @@
-using Form;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Z_Code.Form;
-using Z_DataSystem;
 using Z_Map;
-using Z_Map.Form;
-using Z_Math;
-using Z_Text;
-using Z_Time;
-using Z_Ui.Dialog;
-using Z_Ui.Notify;
-using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class SetObjectRotationCmd : CmdBase
+    public class SetRotationCmd : CmdBase
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
-            Register(new SetObjectRotationCmd());
+            Register(new SetRotationCmd());
+            RegisterAlias("SetCharacterRotation", new SetRotationCmd());
+            RegisterAlias("SetObjectRotation", new SetRotationCmd());
         }
-        public override string GetName() => "SetObjectRotation";
-        public override CmdBase GetNew() => new SetObjectRotationCmd();
+        public override string GetName() => "SetRotation";
+        public override CmdBase GetNew() => new SetRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
+            var unit = SceneUnitCommand.Resolve(prm[0].str);
+            if (!SceneUnitCommand.CanMove(unit))
+                return true;
+            float angle = prm[1].num;
+            float duration = prm[2].num;
+            if (float.IsNaN(angle) || float.IsInfinity(angle)
+                || float.IsNaN(duration) || float.IsInfinity(duration))
+                return true;
+            float targetYaw = Mathf.Repeat(angle, 360f);
+            if (duration <= 0)
+            {
+                SetYaw(unit, targetYaw);
+                return true;
+            }
 
+            float startYaw = unit.data.euler.y;
+            float elapsed = 0;
+            // Capture the live instance and scalar arguments, not a reusable UID/shared heap.
             GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
-                var euler = prm[1].num;
-                var time = Mathf.Max(0.0001f, prm[2].num);
-
-
-                if (data != null && data is ObjectUnitForm.Data oData)
+                if (!SceneUnitCommand.IsLive(unit))
                 {
-                    var step = Mathf.Min(1, Time.deltaTime / time) * (euler - oData.euler.y);
-                    var nextEuler = oData.euler.NewSetY(oData.euler.y + step);
-                    MapManager.instance.updateCtrl.ApplyMove(
-                        oData.unit,
-                        oData.pos,
-                        nextEuler,
-                        true);
-                    Z_EventHelper.Invoke(new ObjectEvent()
-                    {
-                        type = MapEventType.Move,
-                        unit = oData.unit
-                    });
+                    asyncTask.Complete();
+                    return true;
                 }
-                prm[2].num -= Time.deltaTime;
-                if (prm[2].num <= 0)
+                if (AdvanceRotation(unit, startYaw, targetYaw, duration, ref elapsed,
+                    MapUtilController.MovementDeltaTime))
                 {
                     asyncTask.Complete();
                     return true;
@@ -60,8 +51,38 @@ namespace Z_Code
                 return false;
             });
 
+            return false;
+        }
 
-            return true;
+        internal static bool AdvanceRotation(MapUnit unit, float startYaw, float targetYaw,
+            float duration, ref float elapsed, float deltaTime)
+        {
+            elapsed = Mathf.Min(duration, elapsed + MapUtilController.ClampMovementDeltaTime(deltaTime));
+            bool finished = elapsed >= duration;
+            SetYaw(unit, finished ? targetYaw : Mathf.LerpAngle(startYaw, targetYaw, elapsed / duration));
+            return finished;
+        }
+
+        private static void SetYaw(MapUnit unit, float yaw)
+        {
+            var euler = unit.data.euler;
+            euler.y = Mathf.Repeat(yaw, 360f);
+            if (unit is CharacterUnit character)
+            {
+                character.forceEuler = euler;
+                unit.data.euler = euler;
+                if (unit.ins != null)
+                    unit.ins.transform.eulerAngles = euler;
+                MapManager.instance.updateCtrl.RefreshCharacterOverlap(character);
+            }
+            else if (unit is ObjectUnit obj)
+            {
+                MapManager.instance.updateCtrl.ApplyMove(obj, obj.data.pos, euler, teleport: true);
+                Z_EventHelper.Invoke(new ObjectEvent { type = MapEventType.Move, unit = obj });
+            }
         }
     }
+
+    // Source compatibility only; registration and metadata use the shared Scene command.
+    public class SetObjectRotationCmd : SetRotationCmd { }
 }

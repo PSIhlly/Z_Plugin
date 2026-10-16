@@ -88,14 +88,13 @@ namespace Z_UnitSystem
         {
             if (ins == null || ins.gameObject == null)
                 return false;
-            VisOff();
-            foreach (var renderer in ins.renderers)
-            {
-                renderer.SetPropertyBlock(null);
-            }
-            ins.unit = null;
-            InstancePoolManager.instance.DeleteInstance(ins.gameObject, ins.gameObject);
+            // Pool Fresh restores renderer properties on acquisition. Do not
+            // submit invisible MPBs and immediately clear them on return.
+            ins.PrepareForHide();
+            var hiddenInstance = ins;
             ins = null;
+            hiddenInstance.unit = null;
+            InstancePoolManager.instance.DeleteInstance(hiddenInstance.gameObject, hiddenInstance.gameObject);
             foreach (var unit in subUnits)
             {
                 unit.Hide();

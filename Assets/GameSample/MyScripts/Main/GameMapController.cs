@@ -9,6 +9,7 @@ using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Z_ByteSerialize;
+using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
@@ -17,6 +18,7 @@ using Z_Texture;
 using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
+using static DisFadeRenderRouting;
 using static UnityEngine.Rendering.DebugUI;
 
 
@@ -171,11 +173,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         };
     }
 
-    public Dictionary<(int, int), Texture2D> alphaTextureDic = new Dictionary<(int, int), Texture2D>();
     public Dictionary<UnitForm.Data, Dictionary<int, int>> animCurCache = new Dictionary<UnitForm.Data, Dictionary<int, int>>();
-    private static readonly int TextureProperty = Shader.PropertyToID("_Tex");
-    private static readonly int AlphaTextureProperty = Shader.PropertyToID("_AlphaTex");
-    private MaterialPropertyBlock textureBlock;
 
     // A borrowed sequence or one inline ID. Never mutate an authored/cached frame list.
     private readonly struct TextureFrames
@@ -266,7 +264,6 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     };
     public void Reset()
     {
-        alphaTextureDic.Clear();
         ResetSceneUnitCaches();
         ClearWangTileAnimationTextures();
     }
@@ -416,41 +413,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     public void ShowFinalMat(MapInstance ins, int rendererId, List<int> animTexs, float interval, bool isMask = false)
     {
-        if (isMask)
-        {
-            // Compatibility path: a mask must never replace the base image,
-            // enable an empty layer, or cancel its animation.
-            var renderer = ins.renderers[rendererId];
-            ApplyTextures(renderer, null, renderer.enabled
-                ? ResolveMaskTexture(ins, rendererId, animTexs) : Texture2D.blackTexture);
-            return;
-        }
-        ShowFinalTextures(ins, rendererId, new TextureFrames(animTexs), interval, Texture2D.whiteTexture);
+        // Deprecated masks no longer affect the DisFade shader or base animation.
+        if (isMask) return;
+        ShowFinalTextures(ins, rendererId, new TextureFrames(animTexs), interval);
     }
 
-    private Texture ResolveMaskTexture(MapInstance ins, int layer, List<int> maskTextures)
-    {
-        var frames = GetValidTextureFrames(new TextureFrames(maskTextures));
-        if (frames.Count == 0)
-            return Texture2D.whiteTexture;
-
-        int linkDesc = 0;
-        var mapPos = MapManager.instance.utilCtrl.RealPos2MapPos(ins.unit.data.pos);
-        var maps = MapManager.instance.data.maps;
-        for (int x = -1; x <= 1; x++)
-        for (int z = -1; z <= 1; z++)
-        {
-            if (x == 0 && z == 0) continue;
-            var pos = ((int)(x + mapPos.x), (int)mapPos.y, (int)(z + mapPos.z));
-            if (maps.TryGetValue(pos, out var neighbour)
-                && neighbour.texDic.TryGetValue(layer, out int textureId) && textureId == frames[0])
-                linkDesc |= 1 << ((z + 1) * 3 + (x + 2));
-        }
-        return alphaTextureDic.TryGetValue((frames[0], linkDesc), out var alpha) && alpha != null
-            ? alpha : Texture2D.whiteTexture;
-    }
-
-    private void ShowFinalTextures(MapInstance ins, int rendererId, TextureFrames frames, float interval, Texture alpha)
+    private void ShowFinalTextures(MapInstance ins, int rendererId, TextureFrames frames, float interval)
     {
         Renderer renderer = ins.renderers[rendererId];
         if (ins.animTimer[rendererId] != null)
@@ -465,17 +433,21 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             renderer.enabled = configured;
         if (!configured)
         {
-            ApplyTextures(renderer, null, Texture2D.blackTexture);
             return;
         }
 
         var validFrames = GetValidTextureFrames(frames);
-        bool animated = interval > 0 && validFrames.Count > 1;
-        int current = animated ? GetAnimationFrameIndex(TimeManager.GetAnimationTime(), interval, validFrames.Count) : 0;
-        Texture texture = validFrames.Count > 0 ? GetTextureOrDefault(validFrames[current]) : GetDefaultTexture();
-        ApplyTextures(renderer, texture, alpha);
-        if (animated)
-            StartTextureAnimation(ins, rendererId, frames, interval, current);
+        var sample = SampleTextureAnimation(validFrames, interval);
+        ApplyTextures(ins, rendererId, sample.texture != null ? sample.texture : GetDefaultTexture());
+        if (sample.animated)
+            StartTextureAnimation(ins, rendererId, frames, interval, sample.index);
+    }
+
+    private static TextureAnimation.Sample SampleTextureAnimation(TextureFrames frames, float interval)
+    {
+        return frames.source != null
+            ? TextureAnimation.GetSample(frames.source, interval, TimeManager.GetAnimationTime())
+            : frames.Count > 0 ? TextureAnimation.GetSample(frames[0], interval, TimeManager.GetAnimationTime()) : default;
     }
 
     // Keep the closure out of the static-texture path: it is allocated only for animations.
@@ -489,8 +461,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
         frameIndices[rendererId] = current;
         var renderer = ins.renderers[rendererId];
-        ins.animTimer[rendererId] = TimeManager.instance.StartAnimationTimer(interval,
-            () => UpdateTextureAnimation(ins, owner, renderer, rendererId, frames, interval, frameIndices), ins);
+        // Poll animated assets per rendered frame; static clips retain their cheap boundary timer.
+        bool internalAnimation = false;
+        var validFrames = GetValidTextureFrames(frames);
+        for (int i = 0; i < validFrames.Count; i++)
+            internalAnimation |= TexAssetForm.DataById[validFrames[i]].GetAnimationDuration() > 0;
+        Func<bool> update = () => UpdateTextureAnimation(ins, owner, renderer, rendererId, frames, interval, frameIndices);
+        ins.animTimer[rendererId] = internalAnimation
+            ? TimeManager.instance.StartFrameTimer(update, ins)
+            : TimeManager.instance.StartAnimationTimer(interval, update, ins);
     }
 
     private bool UpdateTextureAnimation(MapInstance ins, MapUnit owner, Renderer renderer, int rendererId,
@@ -501,33 +480,15 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         // Lists can be edited in place and asset IDs removed/replaced in Mod.
         // Cache only validated IDs, never Texture objects or mutable renderer state.
         var validFrames = GetValidTextureFrames(frames);
-        int next = GetAnimationFrameIndex(TimeManager.GetAnimationTime(), interval, validFrames.Count);
-        frameIndices[rendererId] = next;
-        var texture = validFrames.Count > 0 ? GetTextureOrDefault(validFrames[next]) : GetDefaultTexture();
-        ApplyTextures(renderer, texture, null);
+        var sample = SampleTextureAnimation(validFrames, interval);
+        frameIndices[rendererId] = sample.index;
+        ApplyTextures(ins, rendererId, sample.texture != null ? sample.texture : GetDefaultTexture());
         return false;
     }
 
-    private void ApplyTextures(Renderer renderer, Texture texture, Texture alpha)
+    private void ApplyTextures(MapInstance ins, int rendererId, Texture texture)
     {
-        if (textureBlock == null)
-            textureBlock = new MaterialPropertyBlock();
-        // Read the live renderer, including after pool reuse and visibility changes.
-        // The shared scratch block is used only in synchronous main-thread calls.
-        renderer.GetPropertyBlock(textureBlock);
-        bool changed = false;
-        if (texture != null && textureBlock.GetTexture(TextureProperty) != texture)
-        {
-            textureBlock.SetTexture(TextureProperty, texture);
-            changed = true;
-        }
-        if (alpha != null && textureBlock.GetTexture(AlphaTextureProperty) != alpha)
-        {
-            textureBlock.SetTexture(AlphaTextureProperty, alpha);
-            changed = true;
-        }
-        if (changed)
-            renderer.SetPropertyBlock(textureBlock);
+        DisFadeRenderRouting.SetTexture(ins.renderers[rendererId], texture, ins.GetRendererRoute(rendererId));
     }
     public void RegisterObject(ObjectUnitForm.Data newObjectData, MapObjectForm.Data objectData)
     {
@@ -714,7 +675,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             int mask = GetWangTileMask(tileData, layer, mapTextureId);
             if (TryGetWangTileAnimationTextures(mapTextureId, frontPart, mask, out List<int> animationTextures))
             {
-                return (new TextureFrames(animationTextures), animationTextures.Count > 1 ? data.animTimeInterval : 0);
+                return (new TextureFrames(animationTextures), data.animTimeInterval);
             }
             if (variants != null && variants.TryGetValue(mask, out int textureId))
                 return (new TextureFrames(textureId), 0);
@@ -744,22 +705,26 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         switch (evt.type)
         {
             case MapEventType.Show:
+                // Play terrain is static. The front lies on the -Z edge; an
+                // exact-layer neighbour of the same prefab makes it internal.
+                var tilePos = evt.unit.data.mapPos;
+                bool hideFront = DynamicGlobalSettings.playing
+                    && MapManager.instance.data.maps.TryGetValue(
+                        (tilePos.x, tilePos.y, tilePos.z - 1), out var rearTile)
+                    && rearTile.prefabName == evt.unit.data.prefabName;
                 int baseRendererCount = Mathf.Min(GlobalSettings.TERRAIN_LAYER_MAX, evt.unit.ins.renderers.Length);
                 for (int layer = 0; layer < baseRendererCount; layer++)
                 {
                     var (textures, interval) = GetTileLayerTextures(evt.unit.data, layer);
-                    Texture alpha = Texture2D.whiteTexture;
-                    if (textures.Count > 0 && evt.unit.data.texDic.TryGetValue(
-                            GlobalSettings.TERRAIN_LAYER_MAX + layer, out int maskId)
-                        && MapMaskForm.DataById.TryGetValue(maskId, out var mask))
-                        alpha = ResolveMaskTexture(evt.unit.ins, layer, mask.texsName);
-                    ShowFinalTextures(evt.unit.ins, layer, textures, interval, alpha);
+                    ShowFinalTextures(evt.unit.ins, layer, textures, interval);
 
                     int frontRendererId = GlobalSettings.TERRAIN_LAYER_MAX + layer;
                     if (frontRendererId < evt.unit.ins.renderers.Length)
                     {
-                        var (frontTextures, frontInterval) = GetTileLayerTextures(evt.unit.data, layer, true);
-                        ShowFinalTextures(evt.unit.ins, frontRendererId, frontTextures, frontInterval, Texture2D.whiteTexture);
+                        var (frontTextures, frontInterval) = hideFront
+                            ? (default(TextureFrames), 0f)
+                            : GetTileLayerTextures(evt.unit.data, layer, true);
+                        ShowFinalTextures(evt.unit.ins, frontRendererId, frontTextures, frontInterval);
                     }
                 }
 
@@ -860,14 +825,14 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         foreach (var keeper in unit.ins.keepers)
             keeper.RefreshNow();
 
-        if (unit.ins.renderers == null || unit.ins.renderers.Length == 0)
+        if (unit.ins.renderers.Length == 0)
             return;
 
         if (data.isWangTile && objectWangTileAnimationTextures.TryGetValue(
                 (data.id, direction, mask), out List<int> textures)
             && textures.Count > 0)
         {
-            ShowFinalMat(unit.ins, 0, textures, textures.Count > 1 ? data.model.animTimeInterval : 0, false);
+            ShowFinalMat(unit.ins, 0, textures, data.model.animTimeInterval, false);
         }
         else
         {

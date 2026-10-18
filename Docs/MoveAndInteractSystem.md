@@ -491,6 +491,8 @@ MapObject 的 `boundsCollision` 默认关闭；开启后按贴图 alpha ≥ 0.3 
 
 ### 4.2 Trigger 事件触发流程
 
+`GameUtilController.CombineNewGoByPrefabs` 为模型自动生成 Trigger：Box 的每轴完整边长增加 `0.1 / 对应lossyScale`，Sphere 的半径增加 `0.1 * max(lossyScale)`。内置 Cube/Sphere 在模型缩放为 1、未应用额外 Collider 缩放及贴图拟合时，分别得到边长 `1.1` 的 Box Trigger、半径 `0.6` 的 Sphere Trigger。Character 的本体球半径随后单独改为 `0.4`，Trigger 保持 `0.6` 并随人物 size 整体缩放。单位间事件检测比较双方的 `TriggerOnly` 几何，因此最终触发中心距离还包含另一单位的 Trigger 尺寸。
+
 Object 的 `centerCollider` 默认开启，旧存档缺字段时仍居中；关闭时，最终碰撞本体在局部 -Z 方向的后边界固定贴合组合模型后边界。先完成 `colliderScale` 和可选贴图边界拟合，再统一平移所有 Collider/Trigger；X/Y、模型 Renderer、视觉 owner/WangTile 边界保持不变，Trigger 原有余量保留。池预制仍保存居中基准，MapUnit 保存逐单位开关，屏幕外 Mesh 和显示实例使用同一偏移计算；实例 Show/显式刷新先恢复基准，避免对象池复用累积偏移。零尺寸、放大、根旋转缩放也走同一流程。ModScene 既有 Collider scale=1 规则不变，重置后重新解析后边界贴合。
 
 贴合的是两者的后边界，不是碰撞体中心。轴向 Box 满足 `Collider中心Z = Object后边界Z + 最终Collider深度/2`；单位深度模型在 `colliderScale=0.2` 时，后边界为 `-0.5`，碰撞体中心为 `-0.4`。回归除 Mesh 等价外，还独立用实际 BoxCollider 变换后的八顶点检查该关系。
@@ -614,6 +616,10 @@ ObjectUnit.Move(dir):
 14. **本层覆盖的高处 Object 连通全隐藏**：Play 从人物中心的精确本层 Tile 出发，沿本层四邻格在已有 view 矩形内 BFS；只要存在覆盖该 Tile 的高处 Object 就继续扩展。直接读取 `objectTileDic` 已有视觉覆盖反向索引，不再要求 `TryGetFirst(object) == tile` 或 `belongTile` 相等；其它 owner（包括视野外 owner）的 Object 覆盖也能作为起点或桥接，归属关系本身不变。高处定义为全部有效物理 Collider 的世界下界严格大于当前枚举 Tile 的本层上界：`minY > tile.data.pos.y + 1 + 0.0001`；即相对 Tile 高度超过 1 世界单位，不是只离开地面，也不是固定世界坐标 Y>1。计入子模型偏移、旋转缩放与纹理拟合，不依赖 root 的逻辑层。复用 `GetMeshes(CollideOnly)`，仅无物理本体时回退 `TriggerOnly`；任一本体仍在本层内/穿过本层、下界等于上界或缺失几何均不符合，Sphere 使用物理半径求真实下界。只把该连通块中符合条件的 Objects 设为 degree=0，本层 Tile/front、层内 Object、Item 和 Character 不受此路径影响。该状态在独立/混合半透之后、owner 继承之前写入，不能被半透重新覆盖；列表外对象也能隐藏和恢复。空格、缺格、仅有层内 Object 覆盖的格子阻断，单纯斜对角不连通，非 owner 的高处覆盖可以连通；全隐藏不受半透半径限制。人物离开、对象降回本层、覆盖移出或连接断开后下一帧沿既有最终状态流程恢复，仅改变 owner 而保留覆盖不能使隐藏失效。复用已有 BFS 队列和 visited，查询不创建索引键，不扫全图，稳定帧不分配临时几何；Mod 高层预览不运行此 Play 路径，普通半透、ModScene 点击筛选及原有 Tile Collider 不透明例外不变。
 
 15. **不透明像素先绘制颜色和深度**：`DisFadeOpaqueFeature` 接入 GraphicsSettings 默认 URP 的 `SamplesForwardRenderer`，复用 Render Objects，在天空盒之后（400）、透明物体之前（450）执行 `LightMode=DisFadeOpaque`。逐像素复用同一 float 精度最终透明度计算，只有最终 Alpha 恰为 1 的像素以 `Blend Off / ZWrite On / ZTest LEqual` 绘制；所有物体的不透明颜色和深度都先完成，不能只写深度后让不透明颜色混在透明队列里，也不能逐物体交错两阶段。之后原 Forward 仅绘制半透明像素，保持预乘 Alpha 连续混合、不写深度及正常透明排序；0.9999 仍属半透。倾斜面交叉和不同材质队列的不透明区域按实际逐像素深度遮挡。透明中心/环带不写深度，外围 Alpha=1 则写深度，贴图/遮罩裁切和隐藏像素仍不写深度。相机作用域 `_DisFadeSplitEnabled` 在前阶段开启，在相机清理/Feature 释放时重置；预览、纯深度相机跳过 Feature，其它未接入的 Renderer 保留原单阶段回退，不会变空白。其它项目 Renderer 若也需要此效果，应添加该 Feature。ShadowCaster 仍忽略可见度并保留轮廓；CPU 遮挡、碰撞、导航、MPB 和原渐变半径不变，纯半透明面交叉仍有普通透明排序的限制。
+
+`DisFadeOpaque` 的队列筛选与绘制排序独立：保留 `RenderQueueRange.transparent` 以覆盖现有 DisFade 材质，但使用 `SortingCriteria.CommonOpaque` 提交最终 Alpha 为 1 的像素，避免 WangTile 变体被远到近排序交错切成逐 Tile 绘制。仍继承 Render Objects 的 URP/RenderGraph 接入，正常渲染不调用其透明排序的 `Execute`；Editor/Development 的 Rendering Debugger 视图沿用父类路径，保留线框和 Overdraw 状态覆盖。原 Forward 半透明阶段继续透明排序。`-Fixture DisFadeBatchingRegression` 用真实 WangTile 生成器和生产 Feature 的 `Execute` 验证同变体 32 Tile 合为 1 批、两个交错变体从 32 批恢复为 2 批，并检查相机清理。
+
+材质 Pass 开关按 `LightMode` 设置和读取：`Material.SetShaderPassEnabled` / `GetShaderPassEnabled` 必须使用 `UniversalForward`；`Material.FindPass` 则按 ShaderLab `Name` 查找，使用 `Universal Forward`。误把 Name 传给开关时，同一错误键的设置/读取仍可相互吻合，但 URP 的透明 Forward 绘制不会被关闭，导致 Opaque Tile 在 `DrawTransparentObjects` 仍有提交。应以原生 GPU 绘制验证 Pass 已被排除，不能只检查材质开关返回值。
 
 隔离回归入口：`Docs/Tests/Run-MapRuntimeRegression.ps1`。它编译真实生产程序集，并在 Temp 下的独立 Unity 工程验证几何等价、双向覆盖关联、通行类型移动边界、遮挡提交和事件过滤；`-Fixture MapFadeShaderRegression` 使用实际 Shader 的 GPU 像素验证渐变、阴影和不透明/半透明分阶段绘制，并编译验证 Renderer Feature，不加载当前故事或玩家存档。实际移动、完整 Play 画面和目标设备性能仍需 Play/Player 复测。
 

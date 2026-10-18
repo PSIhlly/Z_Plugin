@@ -38,8 +38,24 @@ namespace Z_Map
                 return _trs;
             }
         }
+        public Transform dirTrs;
+
+        public void SetDirection(Vector3 position, float yaw)
+        {
+            if (dirTrs == null)
+                return;
+            dirTrs.SetPositionAndRotation(position + Vector3.up * 0.5f, Quaternion.Euler(90, yaw, 0));
+            if (!dirTrs.gameObject.activeSelf)
+                dirTrs.gameObject.SetActive(true);
+        }
+
         public void Reset()
         {
+            if (dirTrs != null)
+            {
+                dirTrs.gameObject.SetActive(false);
+                dirTrs.localRotation = Quaternion.identity;
+            }
             if (chatTimer != null)
                 TimeManager.instance.CancelTimer(chatTimer);
             chatTimer = null;

@@ -1,0 +1,3161 @@
+{
+  "source": "斯大林制地砖.png",
+  "source_size": [
+    336,
+    224
+  ],
+  "sha256": "1fb7ad561cf94e36578350f9183d240cdc6a864641b17a24d4e934e8f4c5ef1d",
+  "coordinate_system": "top-left, x/y, right/bottom exclusive",
+  "items": [
+    {
+      "category": "01_floor",
+      "name": "floor_01_01",
+      "region": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "bounds": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/001_floor_01_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_01_02",
+      "region": [
+        16,
+        0,
+        32,
+        16
+      ],
+      "bounds": [
+        16,
+        0,
+        32,
+        16
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/002_floor_01_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_01_03",
+      "region": [
+        32,
+        0,
+        48,
+        16
+      ],
+      "bounds": [
+        32,
+        0,
+        48,
+        16
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/003_floor_01_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_01_04",
+      "region": [
+        48,
+        0,
+        64,
+        16
+      ],
+      "bounds": [
+        48,
+        0,
+        64,
+        16
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/004_floor_01_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_01_05",
+      "region": [
+        64,
+        0,
+        80,
+        16
+      ],
+      "bounds": [
+        64,
+        0,
+        80,
+        16
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/005_floor_01_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_01_06",
+      "region": [
+        80,
+        0,
+        96,
+        16
+      ],
+      "bounds": [
+        80,
+        0,
+        96,
+        16
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/006_floor_01_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_02_01",
+      "region": [
+        0,
+        16,
+        16,
+        32
+      ],
+      "bounds": [
+        0,
+        16,
+        16,
+        32
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/007_floor_02_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_02_02",
+      "region": [
+        16,
+        16,
+        32,
+        32
+      ],
+      "bounds": [
+        16,
+        16,
+        32,
+        32
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/008_floor_02_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_02_03",
+      "region": [
+        32,
+        16,
+        48,
+        32
+      ],
+      "bounds": [
+        32,
+        16,
+        48,
+        32
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/009_floor_02_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_02_04",
+      "region": [
+        48,
+        16,
+        64,
+        32
+      ],
+      "bounds": [
+        48,
+        16,
+        64,
+        32
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/010_floor_02_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_02_05",
+      "region": [
+        64,
+        16,
+        80,
+        32
+      ],
+      "bounds": [
+        64,
+        16,
+        80,
+        32
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/011_floor_02_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_02_06",
+      "region": [
+        80,
+        16,
+        96,
+        32
+      ],
+      "bounds": [
+        80,
+        16,
+        96,
+        32
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/012_floor_02_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_03_01",
+      "region": [
+        0,
+        32,
+        16,
+        48
+      ],
+      "bounds": [
+        0,
+        32,
+        16,
+        48
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/013_floor_03_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_03_02",
+      "region": [
+        16,
+        32,
+        32,
+        48
+      ],
+      "bounds": [
+        16,
+        32,
+        32,
+        48
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/014_floor_03_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_03_03",
+      "region": [
+        32,
+        32,
+        48,
+        48
+      ],
+      "bounds": [
+        32,
+        32,
+        48,
+        48
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/015_floor_03_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_03_04",
+      "region": [
+        48,
+        32,
+        64,
+        48
+      ],
+      "bounds": [
+        48,
+        32,
+        64,
+        48
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/016_floor_03_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_03_05",
+      "region": [
+        64,
+        32,
+        80,
+        48
+      ],
+      "bounds": [
+        64,
+        32,
+        80,
+        48
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/017_floor_03_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_03_06",
+      "region": [
+        80,
+        32,
+        96,
+        48
+      ],
+      "bounds": [
+        80,
+        32,
+        96,
+        48
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/018_floor_03_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_04_01",
+      "region": [
+        0,
+        48,
+        16,
+        64
+      ],
+      "bounds": [
+        0,
+        48,
+        16,
+        64
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/019_floor_04_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_04_02",
+      "region": [
+        16,
+        48,
+        32,
+        64
+      ],
+      "bounds": [
+        16,
+        48,
+        32,
+        64
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/020_floor_04_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_04_03",
+      "region": [
+        32,
+        48,
+        48,
+        64
+      ],
+      "bounds": [
+        32,
+        48,
+        48,
+        64
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/021_floor_04_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_04_04",
+      "region": [
+        48,
+        48,
+        64,
+        64
+      ],
+      "bounds": [
+        48,
+        48,
+        64,
+        64
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/022_floor_04_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_04_05",
+      "region": [
+        64,
+        48,
+        80,
+        64
+      ],
+      "bounds": [
+        64,
+        48,
+        80,
+        64
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/023_floor_04_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_04_06",
+      "region": [
+        80,
+        48,
+        96,
+        64
+      ],
+      "bounds": [
+        80,
+        48,
+        96,
+        64
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/024_floor_04_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_05_01",
+      "region": [
+        0,
+        64,
+        16,
+        80
+      ],
+      "bounds": [
+        0,
+        64,
+        16,
+        80
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/025_floor_05_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_05_02",
+      "region": [
+        16,
+        64,
+        32,
+        80
+      ],
+      "bounds": [
+        16,
+        64,
+        32,
+        80
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/026_floor_05_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_05_03",
+      "region": [
+        32,
+        64,
+        48,
+        80
+      ],
+      "bounds": [
+        32,
+        64,
+        48,
+        80
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/027_floor_05_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_05_04",
+      "region": [
+        48,
+        64,
+        64,
+        80
+      ],
+      "bounds": [
+        48,
+        64,
+        64,
+        80
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/028_floor_05_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_05_05",
+      "region": [
+        64,
+        64,
+        80,
+        80
+      ],
+      "bounds": [
+        64,
+        64,
+        80,
+        80
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/029_floor_05_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_05_06",
+      "region": [
+        80,
+        64,
+        96,
+        80
+      ],
+      "bounds": [
+        80,
+        64,
+        96,
+        80
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/030_floor_05_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_06_01",
+      "region": [
+        0,
+        80,
+        16,
+        96
+      ],
+      "bounds": [
+        0,
+        80,
+        16,
+        96
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/031_floor_06_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_06_02",
+      "region": [
+        16,
+        80,
+        32,
+        96
+      ],
+      "bounds": [
+        16,
+        80,
+        32,
+        96
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/032_floor_06_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_06_03",
+      "region": [
+        32,
+        80,
+        48,
+        96
+      ],
+      "bounds": [
+        32,
+        80,
+        48,
+        96
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/033_floor_06_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_06_04",
+      "region": [
+        48,
+        80,
+        64,
+        96
+      ],
+      "bounds": [
+        48,
+        80,
+        64,
+        96
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/034_floor_06_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_06_05",
+      "region": [
+        64,
+        80,
+        80,
+        96
+      ],
+      "bounds": [
+        64,
+        80,
+        80,
+        96
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/035_floor_06_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_06_06",
+      "region": [
+        80,
+        80,
+        96,
+        96
+      ],
+      "bounds": [
+        80,
+        80,
+        96,
+        96
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/036_floor_06_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_07_01",
+      "region": [
+        0,
+        96,
+        16,
+        112
+      ],
+      "bounds": [
+        0,
+        96,
+        16,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/037_floor_07_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_07_02",
+      "region": [
+        16,
+        96,
+        32,
+        112
+      ],
+      "bounds": [
+        16,
+        96,
+        32,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/038_floor_07_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_07_03",
+      "region": [
+        32,
+        96,
+        48,
+        112
+      ],
+      "bounds": [
+        32,
+        96,
+        48,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/039_floor_07_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_07_04",
+      "region": [
+        48,
+        96,
+        64,
+        112
+      ],
+      "bounds": [
+        48,
+        96,
+        64,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/040_floor_07_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_07_05",
+      "region": [
+        64,
+        96,
+        80,
+        112
+      ],
+      "bounds": [
+        64,
+        96,
+        80,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/041_floor_07_05.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_07_06",
+      "region": [
+        80,
+        96,
+        96,
+        112
+      ],
+      "bounds": [
+        80,
+        96,
+        96,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/042_floor_07_06.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_08_01",
+      "region": [
+        0,
+        112,
+        16,
+        128
+      ],
+      "bounds": [
+        0,
+        112,
+        16,
+        128
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/043_floor_08_01.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_08_02",
+      "region": [
+        16,
+        112,
+        32,
+        128
+      ],
+      "bounds": [
+        16,
+        112,
+        32,
+        128
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/044_floor_08_02.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_08_03",
+      "region": [
+        32,
+        112,
+        48,
+        128
+      ],
+      "bounds": [
+        32,
+        112,
+        48,
+        128
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/045_floor_08_03.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_08_04",
+      "region": [
+        48,
+        112,
+        64,
+        128
+      ],
+      "bounds": [
+        48,
+        112,
+        64,
+        128
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "01_floor/046_floor_08_04.png"
+    },
+    {
+      "category": "01_floor",
+      "name": "floor_lava",
+      "region": [
+        79,
+        112,
+        96,
+        129
+      ],
+      "bounds": [
+        79,
+        112,
+        96,
+        129
+      ],
+      "size": [
+        17,
+        17
+      ],
+      "file": "01_floor/047_floor_lava.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_01",
+      "region": [
+        96,
+        0,
+        112,
+        24
+      ],
+      "bounds": [
+        96,
+        0,
+        112,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/048_wall_01_01.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_02",
+      "region": [
+        112,
+        0,
+        128,
+        24
+      ],
+      "bounds": [
+        112,
+        0,
+        128,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/049_wall_01_02.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_03",
+      "region": [
+        128,
+        0,
+        144,
+        24
+      ],
+      "bounds": [
+        128,
+        0,
+        144,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/050_wall_01_03.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_04",
+      "region": [
+        144,
+        0,
+        160,
+        24
+      ],
+      "bounds": [
+        144,
+        0,
+        160,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/051_wall_01_04.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_05",
+      "region": [
+        160,
+        0,
+        176,
+        24
+      ],
+      "bounds": [
+        160,
+        0,
+        176,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/052_wall_01_05.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_06",
+      "region": [
+        176,
+        0,
+        192,
+        24
+      ],
+      "bounds": [
+        176,
+        0,
+        192,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/053_wall_01_06.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_07",
+      "region": [
+        192,
+        0,
+        208,
+        24
+      ],
+      "bounds": [
+        192,
+        0,
+        208,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/054_wall_01_07.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_08",
+      "region": [
+        208,
+        0,
+        224,
+        24
+      ],
+      "bounds": [
+        208,
+        0,
+        224,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/055_wall_01_08.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_09",
+      "region": [
+        224,
+        0,
+        240,
+        24
+      ],
+      "bounds": [
+        224,
+        0,
+        240,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/056_wall_01_09.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_01_10",
+      "region": [
+        240,
+        0,
+        256,
+        24
+      ],
+      "bounds": [
+        240,
+        0,
+        256,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/057_wall_01_10.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_01",
+      "region": [
+        96,
+        24,
+        112,
+        48
+      ],
+      "bounds": [
+        96,
+        24,
+        112,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/058_wall_02_01.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_02",
+      "region": [
+        112,
+        24,
+        128,
+        48
+      ],
+      "bounds": [
+        112,
+        24,
+        128,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/059_wall_02_02.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_03",
+      "region": [
+        128,
+        24,
+        144,
+        48
+      ],
+      "bounds": [
+        128,
+        24,
+        144,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/060_wall_02_03.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_04",
+      "region": [
+        144,
+        24,
+        160,
+        48
+      ],
+      "bounds": [
+        144,
+        24,
+        160,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/061_wall_02_04.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_05",
+      "region": [
+        160,
+        24,
+        176,
+        48
+      ],
+      "bounds": [
+        160,
+        24,
+        176,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/062_wall_02_05.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_06",
+      "region": [
+        176,
+        24,
+        192,
+        48
+      ],
+      "bounds": [
+        176,
+        24,
+        192,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/063_wall_02_06.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_07",
+      "region": [
+        192,
+        24,
+        208,
+        48
+      ],
+      "bounds": [
+        192,
+        24,
+        208,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/064_wall_02_07.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_08",
+      "region": [
+        208,
+        24,
+        224,
+        48
+      ],
+      "bounds": [
+        208,
+        24,
+        224,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/065_wall_02_08.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_09",
+      "region": [
+        224,
+        24,
+        240,
+        48
+      ],
+      "bounds": [
+        224,
+        24,
+        240,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/066_wall_02_09.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "wall_02_10",
+      "region": [
+        240,
+        24,
+        256,
+        48
+      ],
+      "bounds": [
+        240,
+        24,
+        256,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/067_wall_02_10.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "block_01",
+      "region": [
+        160,
+        48,
+        176,
+        76
+      ],
+      "bounds": [
+        160,
+        51,
+        176,
+        76
+      ],
+      "size": [
+        16,
+        25
+      ],
+      "file": "02_walls/068_block_01.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "block_02",
+      "region": [
+        176,
+        48,
+        192,
+        76
+      ],
+      "bounds": [
+        176,
+        51,
+        192,
+        76
+      ],
+      "size": [
+        16,
+        25
+      ],
+      "file": "02_walls/069_block_02.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "block_03",
+      "region": [
+        192,
+        48,
+        208,
+        76
+      ],
+      "bounds": [
+        192,
+        51,
+        208,
+        75
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "02_walls/070_block_03.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "block_04",
+      "region": [
+        208,
+        48,
+        224,
+        76
+      ],
+      "bounds": [
+        208,
+        50,
+        224,
+        75
+      ],
+      "size": [
+        16,
+        25
+      ],
+      "file": "02_walls/071_block_04.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "block_05",
+      "region": [
+        224,
+        48,
+        240,
+        76
+      ],
+      "bounds": [
+        224,
+        48,
+        240,
+        76
+      ],
+      "size": [
+        16,
+        28
+      ],
+      "file": "02_walls/072_block_05.png"
+    },
+    {
+      "category": "02_walls",
+      "name": "block_06",
+      "region": [
+        240,
+        48,
+        256,
+        76
+      ],
+      "bounds": [
+        240,
+        48,
+        256,
+        76
+      ],
+      "size": [
+        16,
+        28
+      ],
+      "file": "02_walls/073_block_06.png"
+    },
+    {
+      "category": "03_props",
+      "name": "crate_top_01",
+      "region": [
+        256,
+        0,
+        272,
+        24
+      ],
+      "bounds": [
+        256,
+        0,
+        272,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/074_crate_top_01.png"
+    },
+    {
+      "category": "03_props",
+      "name": "crate_top_02",
+      "region": [
+        272,
+        0,
+        288,
+        24
+      ],
+      "bounds": [
+        272,
+        0,
+        288,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/075_crate_top_02.png"
+    },
+    {
+      "category": "03_props",
+      "name": "crate_top_03",
+      "region": [
+        288,
+        0,
+        304,
+        24
+      ],
+      "bounds": [
+        288,
+        0,
+        304,
+        24
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/076_crate_top_03.png"
+    },
+    {
+      "category": "03_props",
+      "name": "crate_top_04",
+      "region": [
+        304,
+        0,
+        321,
+        24
+      ],
+      "bounds": [
+        304,
+        0,
+        321,
+        24
+      ],
+      "size": [
+        17,
+        24
+      ],
+      "file": "03_props/077_crate_top_04.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barrel_a_01",
+      "region": [
+        256,
+        24,
+        272,
+        48
+      ],
+      "bounds": [
+        256,
+        24,
+        272,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/078_barrel_a_01.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barrel_a_02",
+      "region": [
+        272,
+        24,
+        288,
+        48
+      ],
+      "bounds": [
+        272,
+        24,
+        288,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/079_barrel_a_02.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barrel_a_03",
+      "region": [
+        288,
+        24,
+        304,
+        48
+      ],
+      "bounds": [
+        288,
+        24,
+        304,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/080_barrel_a_03.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barrel_a_04",
+      "region": [
+        304,
+        24,
+        320,
+        48
+      ],
+      "bounds": [
+        304,
+        24,
+        320,
+        48
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/081_barrel_a_04.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barrel_a_05",
+      "region": [
+        320,
+        24,
+        336,
+        48
+      ],
+      "bounds": [
+        320,
+        25,
+        336,
+        48
+      ],
+      "size": [
+        16,
+        23
+      ],
+      "file": "03_props/082_barrel_a_05.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_b_01",
+      "region": [
+        256,
+        48,
+        272,
+        72
+      ],
+      "bounds": [
+        256,
+        48,
+        272,
+        72
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/083_container_b_01.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_b_02",
+      "region": [
+        272,
+        48,
+        288,
+        72
+      ],
+      "bounds": [
+        272,
+        48,
+        288,
+        72
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/084_container_b_02.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_b_03",
+      "region": [
+        288,
+        48,
+        304,
+        72
+      ],
+      "bounds": [
+        288,
+        48,
+        304,
+        72
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/085_container_b_03.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_b_04",
+      "region": [
+        304,
+        48,
+        320,
+        72
+      ],
+      "bounds": [
+        304,
+        48,
+        320,
+        72
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/086_container_b_04.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_b_05",
+      "region": [
+        320,
+        48,
+        336,
+        72
+      ],
+      "bounds": [
+        320,
+        48,
+        336,
+        72
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/087_container_b_05.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_c_01",
+      "region": [
+        256,
+        72,
+        272,
+        96
+      ],
+      "bounds": [
+        256,
+        72,
+        272,
+        96
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/088_container_c_01.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_c_02",
+      "region": [
+        272,
+        72,
+        288,
+        96
+      ],
+      "bounds": [
+        272,
+        72,
+        288,
+        96
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/089_container_c_02.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_c_03",
+      "region": [
+        288,
+        72,
+        304,
+        96
+      ],
+      "bounds": [
+        288,
+        72,
+        304,
+        96
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/090_container_c_03.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_c_04",
+      "region": [
+        304,
+        72,
+        320,
+        96
+      ],
+      "bounds": [
+        304,
+        72,
+        320,
+        96
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/091_container_c_04.png"
+    },
+    {
+      "category": "03_props",
+      "name": "container_c_05",
+      "region": [
+        320,
+        72,
+        336,
+        96
+      ],
+      "bounds": [
+        320,
+        72,
+        336,
+        96
+      ],
+      "size": [
+        16,
+        24
+      ],
+      "file": "03_props/092_container_c_05.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "color_01",
+      "region": [
+        256,
+        96,
+        272,
+        112
+      ],
+      "bounds": [
+        256,
+        96,
+        272,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/093_color_01.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "color_02",
+      "region": [
+        272,
+        96,
+        288,
+        112
+      ],
+      "bounds": [
+        272,
+        96,
+        288,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/094_color_02.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "color_03",
+      "region": [
+        288,
+        96,
+        304,
+        112
+      ],
+      "bounds": [
+        288,
+        96,
+        304,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/095_color_03.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "color_04",
+      "region": [
+        304,
+        96,
+        320,
+        112
+      ],
+      "bounds": [
+        304,
+        96,
+        320,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/096_color_04.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "color_05",
+      "region": [
+        320,
+        96,
+        336,
+        112
+      ],
+      "bounds": [
+        320,
+        96,
+        336,
+        112
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/097_color_05.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "gray_yellow_0_0",
+      "region": [
+        288,
+        112,
+        304,
+        128
+      ],
+      "bounds": [
+        288,
+        112,
+        304,
+        121
+      ],
+      "size": [
+        16,
+        9
+      ],
+      "file": "06_swatches/098_gray_yellow_0_0.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "gray_yellow_0_1",
+      "region": [
+        304,
+        112,
+        320,
+        128
+      ],
+      "bounds": [
+        304,
+        112,
+        320,
+        128
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/099_gray_yellow_0_1.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "gray_yellow_0_2",
+      "region": [
+        320,
+        112,
+        336,
+        128
+      ],
+      "bounds": [
+        320,
+        112,
+        336,
+        128
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "06_swatches/100_gray_yellow_0_2.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "gray_yellow_1_0",
+      "region": [
+        288,
+        128,
+        304,
+        145
+      ],
+      "bounds": [
+        288,
+        138,
+        290,
+        145
+      ],
+      "size": [
+        2,
+        7
+      ],
+      "file": "06_swatches/101_gray_yellow_1_0.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "gray_yellow_1_1",
+      "region": [
+        304,
+        128,
+        320,
+        145
+      ],
+      "bounds": [
+        304,
+        128,
+        320,
+        145
+      ],
+      "size": [
+        16,
+        17
+      ],
+      "file": "06_swatches/102_gray_yellow_1_1.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "gray_yellow_1_2",
+      "region": [
+        320,
+        128,
+        336,
+        145
+      ],
+      "bounds": [
+        320,
+        128,
+        336,
+        145
+      ],
+      "size": [
+        16,
+        17
+      ],
+      "file": "06_swatches/103_gray_yellow_1_2.png"
+    },
+    {
+      "category": "03_props",
+      "name": "tree_green",
+      "region": [
+        96,
+        48,
+        112,
+        76
+      ],
+      "bounds": [
+        96,
+        48,
+        112,
+        76
+      ],
+      "size": [
+        16,
+        28
+      ],
+      "file": "03_props/104_tree_green.png"
+    },
+    {
+      "category": "03_props",
+      "name": "stump",
+      "region": [
+        112,
+        48,
+        129,
+        76
+      ],
+      "bounds": [
+        112,
+        54,
+        129,
+        75
+      ],
+      "size": [
+        17,
+        21
+      ],
+      "file": "03_props/105_stump.png"
+    },
+    {
+      "category": "03_props",
+      "name": "training_dummy",
+      "region": [
+        129,
+        48,
+        160,
+        76
+      ],
+      "bounds": [
+        129,
+        51,
+        156,
+        76
+      ],
+      "size": [
+        27,
+        25
+      ],
+      "file": "03_props/106_training_dummy.png"
+    },
+    {
+      "category": "03_props",
+      "name": "tree_snow",
+      "region": [
+        96,
+        76,
+        128,
+        114
+      ],
+      "bounds": [
+        96,
+        76,
+        126,
+        114
+      ],
+      "size": [
+        30,
+        38
+      ],
+      "file": "03_props/107_tree_snow.png"
+    },
+    {
+      "category": "03_props",
+      "name": "ice_rock",
+      "region": [
+        128,
+        76,
+        145,
+        98
+      ],
+      "bounds": [
+        129,
+        76,
+        145,
+        98
+      ],
+      "size": [
+        16,
+        22
+      ],
+      "file": "03_props/108_ice_rock.png"
+    },
+    {
+      "category": "03_props",
+      "name": "rail_curve",
+      "region": [
+        142,
+        96,
+        160,
+        146
+      ],
+      "bounds": [
+        142,
+        96,
+        160,
+        146
+      ],
+      "size": [
+        18,
+        50
+      ],
+      "file": "03_props/109_rail_curve.png"
+    },
+    {
+      "category": "03_props",
+      "name": "minecart_a",
+      "region": [
+        159,
+        74,
+        192,
+        114
+      ],
+      "bounds": [
+        159,
+        74,
+        192,
+        114
+      ],
+      "size": [
+        33,
+        40
+      ],
+      "file": "03_props/110_minecart_a.png"
+    },
+    {
+      "category": "03_props",
+      "name": "minecart_b",
+      "region": [
+        192,
+        80,
+        224,
+        114
+      ],
+      "bounds": [
+        192,
+        81,
+        224,
+        113
+      ],
+      "size": [
+        32,
+        32
+      ],
+      "file": "03_props/111_minecart_b.png"
+    },
+    {
+      "category": "03_props",
+      "name": "ice_lantern_cluster",
+      "region": [
+        224,
+        74,
+        252,
+        114
+      ],
+      "bounds": [
+        224,
+        74,
+        252,
+        114
+      ],
+      "size": [
+        28,
+        40
+      ],
+      "file": "03_props/112_ice_lantern_cluster.png"
+    },
+    {
+      "category": "03_props",
+      "name": "brazier_small",
+      "region": [
+        160,
+        122,
+        176,
+        145
+      ],
+      "bounds": [
+        161,
+        123,
+        176,
+        145
+      ],
+      "size": [
+        15,
+        22
+      ],
+      "file": "03_props/113_brazier_small.png"
+    },
+    {
+      "category": "03_props",
+      "name": "brazier_wide",
+      "region": [
+        176,
+        120,
+        194,
+        145
+      ],
+      "bounds": [
+        176,
+        121,
+        194,
+        145
+      ],
+      "size": [
+        18,
+        24
+      ],
+      "file": "03_props/114_brazier_wide.png"
+    },
+    {
+      "category": "03_props",
+      "name": "blue_flame",
+      "region": [
+        194,
+        118,
+        208,
+        145
+      ],
+      "bounds": [
+        194,
+        119,
+        208,
+        145
+      ],
+      "size": [
+        14,
+        26
+      ],
+      "file": "03_props/115_blue_flame.png"
+    },
+    {
+      "category": "03_props",
+      "name": "torch",
+      "region": [
+        208,
+        115,
+        225,
+        145
+      ],
+      "bounds": [
+        208,
+        117,
+        225,
+        145
+      ],
+      "size": [
+        17,
+        28
+      ],
+      "file": "03_props/116_torch.png"
+    },
+    {
+      "category": "03_props",
+      "name": "audio_crate",
+      "region": [
+        225,
+        112,
+        263,
+        146
+      ],
+      "bounds": [
+        227,
+        112,
+        262,
+        146
+      ],
+      "size": [
+        35,
+        34
+      ],
+      "file": "03_props/117_audio_crate.png"
+    },
+    {
+      "category": "03_props",
+      "name": "crate_wood",
+      "region": [
+        256,
+        138,
+        273,
+        154
+      ],
+      "bounds": [
+        256,
+        138,
+        273,
+        154
+      ],
+      "size": [
+        17,
+        16
+      ],
+      "file": "03_props/118_crate_wood.png"
+    },
+    {
+      "category": "03_props",
+      "name": "gate_spike",
+      "region": [
+        273,
+        120,
+        289,
+        154
+      ],
+      "bounds": [
+        273,
+        120,
+        289,
+        154
+      ],
+      "size": [
+        16,
+        34
+      ],
+      "file": "03_props/119_gate_spike.png"
+    },
+    {
+      "category": "03_props",
+      "name": "machine_blue",
+      "region": [
+        225,
+        146,
+        257,
+        179
+      ],
+      "bounds": [
+        226,
+        146,
+        257,
+        179
+      ],
+      "size": [
+        31,
+        33
+      ],
+      "file": "03_props/120_machine_blue.png"
+    },
+    {
+      "category": "03_props",
+      "name": "machine_lava",
+      "region": [
+        132,
+        146,
+        161,
+        179
+      ],
+      "bounds": [
+        132,
+        146,
+        161,
+        179
+      ],
+      "size": [
+        29,
+        33
+      ],
+      "file": "03_props/121_machine_lava.png"
+    },
+    {
+      "category": "03_props",
+      "name": "machine_small",
+      "region": [
+        161,
+        146,
+        179,
+        179
+      ],
+      "bounds": [
+        161,
+        149,
+        178,
+        179
+      ],
+      "size": [
+        17,
+        30
+      ],
+      "file": "03_props/122_machine_small.png"
+    },
+    {
+      "category": "03_props",
+      "name": "altar",
+      "region": [
+        88,
+        114,
+        132,
+        176
+      ],
+      "bounds": [
+        88,
+        114,
+        132,
+        173
+      ],
+      "size": [
+        44,
+        59
+      ],
+      "file": "03_props/123_altar.png"
+    },
+    {
+      "category": "03_props",
+      "name": "statue_dark",
+      "region": [
+        53,
+        169,
+        90,
+        224
+      ],
+      "bounds": [
+        53,
+        169,
+        90,
+        224
+      ],
+      "size": [
+        37,
+        55
+      ],
+      "file": "03_props/124_statue_dark.png"
+    },
+    {
+      "category": "03_props",
+      "name": "dead_tree",
+      "region": [
+        90,
+        176,
+        145,
+        224
+      ],
+      "bounds": [
+        90,
+        176,
+        145,
+        223
+      ],
+      "size": [
+        55,
+        47
+      ],
+      "file": "03_props/125_dead_tree.png"
+    },
+    {
+      "category": "03_props",
+      "name": "statues_stone",
+      "region": [
+        145,
+        190,
+        189,
+        224
+      ],
+      "bounds": [
+        145,
+        190,
+        189,
+        223
+      ],
+      "size": [
+        44,
+        33
+      ],
+      "file": "03_props/126_statues_stone.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barricade",
+      "region": [
+        189,
+        192,
+        221,
+        212
+      ],
+      "bounds": [
+        189,
+        192,
+        220,
+        212
+      ],
+      "size": [
+        31,
+        20
+      ],
+      "file": "03_props/127_barricade.png"
+    },
+    {
+      "category": "03_props",
+      "name": "barrel_blue",
+      "region": [
+        222,
+        181,
+        240,
+        212
+      ],
+      "bounds": [
+        222,
+        181,
+        240,
+        212
+      ],
+      "size": [
+        18,
+        31
+      ],
+      "file": "03_props/128_barrel_blue.png"
+    },
+    {
+      "category": "03_props",
+      "name": "mushrooms",
+      "region": [
+        240,
+        181,
+        261,
+        212
+      ],
+      "bounds": [
+        240,
+        182,
+        261,
+        211
+      ],
+      "size": [
+        21,
+        29
+      ],
+      "file": "03_props/129_mushrooms.png"
+    },
+    {
+      "category": "03_props",
+      "name": "pumpkin_candles",
+      "region": [
+        179,
+        145,
+        225,
+        192
+      ],
+      "bounds": [
+        179,
+        146,
+        225,
+        192
+      ],
+      "size": [
+        46,
+        46
+      ],
+      "file": "03_props/130_pumpkin_candles.png"
+    },
+    {
+      "category": "03_props",
+      "name": "log",
+      "region": [
+        267,
+        171,
+        284,
+        192
+      ],
+      "bounds": [
+        268,
+        171,
+        284,
+        192
+      ],
+      "size": [
+        16,
+        21
+      ],
+      "file": "03_props/131_log.png"
+    },
+    {
+      "category": "03_props",
+      "name": "cactus_small",
+      "region": [
+        289,
+        148,
+        315,
+        168
+      ],
+      "bounds": [
+        289,
+        149,
+        315,
+        168
+      ],
+      "size": [
+        26,
+        19
+      ],
+      "file": "03_props/132_cactus_small.png"
+    },
+    {
+      "category": "03_props",
+      "name": "cactus_large",
+      "region": [
+        283,
+        166,
+        315,
+        192
+      ],
+      "bounds": [
+        283,
+        166,
+        315,
+        192
+      ],
+      "size": [
+        32,
+        26
+      ],
+      "file": "03_props/133_cactus_large.png"
+    },
+    {
+      "category": "03_props",
+      "name": "pine_tree",
+      "region": [
+        315,
+        159,
+        336,
+        192
+      ],
+      "bounds": [
+        315,
+        159,
+        336,
+        192
+      ],
+      "size": [
+        21,
+        33
+      ],
+      "file": "03_props/134_pine_tree.png"
+    },
+    {
+      "category": "03_props",
+      "name": "grass_patch_a",
+      "region": [
+        261,
+        192,
+        294,
+        208
+      ],
+      "bounds": [
+        261,
+        192,
+        294,
+        208
+      ],
+      "size": [
+        33,
+        16
+      ],
+      "file": "03_props/135_grass_patch_a.png"
+    },
+    {
+      "category": "03_props",
+      "name": "grass_patch_b",
+      "region": [
+        261,
+        208,
+        294,
+        224
+      ],
+      "bounds": [
+        261,
+        208,
+        294,
+        224
+      ],
+      "size": [
+        33,
+        16
+      ],
+      "file": "03_props/136_grass_patch_b.png"
+    },
+    {
+      "category": "03_props",
+      "name": "grass_sprig",
+      "region": [
+        294,
+        203,
+        307,
+        214
+      ],
+      "bounds": [
+        296,
+        205,
+        304,
+        212
+      ],
+      "size": [
+        8,
+        7
+      ],
+      "file": "03_props/137_grass_sprig.png"
+    },
+    {
+      "category": "03_props",
+      "name": "fence",
+      "region": [
+        307,
+        201,
+        336,
+        214
+      ],
+      "bounds": [
+        308,
+        203,
+        332,
+        212
+      ],
+      "size": [
+        24,
+        9
+      ],
+      "file": "03_props/138_fence.png"
+    },
+    {
+      "category": "03_props",
+      "name": "carpet",
+      "region": [
+        0,
+        160,
+        52,
+        192
+      ],
+      "bounds": [
+        0,
+        160,
+        52,
+        192
+      ],
+      "size": [
+        52,
+        32
+      ],
+      "file": "03_props/139_carpet.png"
+    },
+    {
+      "category": "03_props",
+      "name": "banner",
+      "region": [
+        0,
+        192,
+        16,
+        224
+      ],
+      "bounds": [
+        0,
+        192,
+        16,
+        224
+      ],
+      "size": [
+        16,
+        32
+      ],
+      "file": "03_props/140_banner.png"
+    },
+    {
+      "category": "03_props",
+      "name": "bookshelf",
+      "region": [
+        16,
+        192,
+        53,
+        224
+      ],
+      "bounds": [
+        16,
+        192,
+        53,
+        224
+      ],
+      "size": [
+        37,
+        32
+      ],
+      "file": "03_props/141_bookshelf.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "arrow_blue",
+      "region": [
+        0,
+        128,
+        16,
+        144
+      ],
+      "bounds": [
+        0,
+        128,
+        16,
+        144
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/142_arrow_blue.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "arrow_green",
+      "region": [
+        16,
+        128,
+        32,
+        144
+      ],
+      "bounds": [
+        16,
+        128,
+        32,
+        144
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/143_arrow_green.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "arrow_yellow",
+      "region": [
+        0,
+        144,
+        16,
+        160
+      ],
+      "bounds": [
+        0,
+        144,
+        16,
+        160
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/144_arrow_yellow.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "arrow_red",
+      "region": [
+        16,
+        144,
+        32,
+        160
+      ],
+      "bounds": [
+        16,
+        144,
+        32,
+        160
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/145_arrow_red.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "floor_holes",
+      "region": [
+        48,
+        128,
+        64,
+        144
+      ],
+      "bounds": [
+        48,
+        128,
+        64,
+        144
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/146_floor_holes.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "spikes_up",
+      "region": [
+        64,
+        128,
+        80,
+        144
+      ],
+      "bounds": [
+        64,
+        128,
+        80,
+        144
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/147_spikes_up.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "trap_eyes",
+      "region": [
+        48,
+        144,
+        64,
+        160
+      ],
+      "bounds": [
+        48,
+        144,
+        64,
+        160
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/148_trap_eyes.png"
+    },
+    {
+      "category": "04_traps",
+      "name": "spikes_single",
+      "region": [
+        64,
+        144,
+        80,
+        160
+      ],
+      "bounds": [
+        64,
+        144,
+        80,
+        160
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "file": "04_traps/149_spikes_single.png"
+    },
+    {
+      "category": "06_swatches",
+      "name": "swatch_dark_visible",
+      "region": [
+        256,
+        112,
+        288,
+        121
+      ],
+      "bounds": [
+        256,
+        112,
+        288,
+        121
+      ],
+      "size": [
+        32,
+        9
+      ],
+      "file": "06_swatches/150_swatch_dark_visible.png"
+    }
+  ]
+}

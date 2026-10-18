@@ -225,7 +225,7 @@ public static class MobileInputRegression
     static InputPointUpEvent PU(int id,bool canceled=false) => new InputPointUpEvent{id=id,pos=new Vector3(100,100),canceled=canceled};
     public static int Run()
     {
-        checks=0; TouchRouting(); StickRouting(); FloatingSticks(); PlayerGates(); PlayerFacing(); SkillButtons(); ModPointers(); return checks;
+        checks=0; TouchRouting(); StickRouting(); FloatingSticks(); PlayerFixedSticks(); PlayerGates(); PlayerFacing(); SkillButtons(); ModPointers(); return checks;
     }
     static void TouchRouting()
     {
@@ -343,18 +343,44 @@ public static class MobileInputRegression
         left.OnEvent(new InputMouseUpEvent{id=0});Check(!left.view.rtf_stick.gameObject.activeSelf,"Mouse release also hides the floating stick.");
         left.OnHide();right.OnHide();
     }
+    static void PlayerFixedSticks()
+    {
+        Reset();GameManager.instance=new GameManager();PlayManager.instance=new PlayManager();
+        var ctrl=new Ui.PlaySceneMain.PlayerTouchOpt.UiPlayerTouchOptCtrl();var move=Stick(100);var attack=Stick(300);
+        move.view.rtf_area.graphic.enabled=attack.view.rtf_area.graphic.enabled=false;
+        ctrl.view.model_moveStick.Ctrl=move;ctrl.view.model_attackStick.Ctrl=attack;ctrl.OnShow();
+        Check(!move.param.floating && !attack.param.floating && move.view.rtf_stick.gameObject.activeSelf && attack.view.rtf_stick.gameObject.activeSelf,"Play movement and LightAttack must show fixed knobs while idle.");
+        Check(!move.view.rtf_area.graphic.enabled && !attack.view.rtf_area.graphic.enabled,"Fixed Play sticks preserve authored disabled area Graphics rather than enabling floating input regions.");
+        Z_EventHelper.Invoke(PD(21,100,move.view.rtf_stick.gameObject));Z_EventHelper.Invoke(PD(73,300,attack.view.rtf_stick.gameObject));
+        Check(move.model.curId==21 && attack.model.curId==73 && move.model.lastPos==Vector3.zero && attack.model.lastPos==Vector3.zero,"Both fixed centers must independently capture neutral presses.");
+        Z_EventHelper.Invoke(PM(21,140));Z_EventHelper.Invoke(PM(73,260));move.OnUpdate();attack.OnUpdate();
+        Check(Math.Abs(move.model.lastPos.x-0.4f)<0.00001 && Math.Abs(attack.model.lastPos.x+0.4f)<0.00001 && move.view.rtf_stick.position==new Vector3(140,100) && attack.view.rtf_stick.position==new Vector3(260,100),"Fixed drag offsets and visual travel must remain relative to each authored center.");
+        Z_EventHelper.Invoke(PM(21,320));Z_EventHelper.Invoke(PM(73,80));
+        Check(move.model.curId==21 && attack.model.curId==73 && move.model.lastPos.x>2 && attack.model.lastPos.x < -2,"Crossing fingers cannot steal or change either fixed stick's center.");
+        Z_EventHelper.Invoke(PU(21));move.OnUpdate();
+        Check(move.model.curId==-1 && attack.model.curId==73 && move.view.rtf_stick.gameObject.activeSelf && attack.view.rtf_stick.gameObject.activeSelf && move.view.rtf_stick.position==move.view.rtf_area.position,"Releasing movement recenters its visible knob without hiding or releasing attack.");
+        Z_EventHelper.Invoke(PU(73,true));attack.OnUpdate();
+        Check(attack.model.curId==-1 && attack.view.rtf_stick.gameObject.activeSelf && attack.view.rtf_stick.position==attack.view.rtf_area.position && PlayManager.instance.sceneCtrl.Opt==null,"Canceled attack resets its direction and option while keeping its fixed knob visible.");
+        move.OnEvent(PD(22,140,move.view.rtf_stick.gameObject));move.OnUpdate();
+        Check(move.model.lastPos.x>0 && move.model.downPos==Vector3.zero && move.view.rtf_stick.position==new Vector3(140,100),"An edge press sets a direction from the fixed center rather than establishing a new neutral origin.");
+        move.OnEvent(PU(22));move.OnUpdate();move.OnEvent(PD(23,60,move.view.rtf_stick.gameObject));move.OnUpdate();
+        Check(move.model.lastPos.x<0 && move.view.rtf_stick.position==new Vector3(60,100),"A later opposite edge press still uses the original authored center.");
+        move.OnHide();attack.OnHide();ctrl.OnShow();move.OnUpdate();attack.OnUpdate();
+        Check(move.model.curId==-1 && attack.model.curId==-1 && move.view.rtf_stick.gameObject.activeSelf && attack.view.rtf_stick.gameObject.activeSelf && move.view.rtf_stick.position==move.view.rtf_area.position && attack.view.rtf_stick.position==attack.view.rtf_area.position,"Hide/reopen clears ownership and restores both visible fixed centers.");
+        move.OnHide();attack.OnHide();
+    }
     static void PlayerGates()
     {
         Reset();GameManager.instance=new GameManager();PlayManager.instance=new PlayManager();CharacterProductForm.DataByUid.Clear();
         var character=new CharacterProductForm.Data{uid=1};character.skill[SkillType.LightAttack]=12;CharacterProductForm.DataByUid[1]=character;GameManager.instance.curProgress.characterUid=1;
         var ctrl=new Ui.PlaySceneMain.PlayerTouchOpt.UiPlayerTouchOptCtrl();var move=Stick(100);var attack=Stick(300);ctrl.view.model_moveStick.Ctrl=move;ctrl.view.model_attackStick.Ctrl=attack;ctrl.OnShow();
         Check(move.param.canStartFunc() && attack.param.canStartFunc(),"Unblocked gameplay must allow both sticks.");
-        Check(move.param.floating && attack.param.floating && !move.view.rtf_stick.gameObject.activeSelf && !attack.view.rtf_stick.gameObject.activeSelf,"Play opts both move and LightAttack into idle-hidden floating mode.");
+        Check(!move.param.floating && !attack.param.floating && move.view.rtf_stick.gameObject.activeSelf && attack.view.rtf_stick.gameObject.activeSelf,"Play uses visible fixed move and LightAttack sticks.");
         GameManager.instance.curProgress.blockProgramUid=4;Check(!move.param.canStartFunc() && !attack.param.canStartFunc() && !move.param.canContinueFunc() && !attack.param.canContinueFunc(),"Blocked gameplay must reject starting/continuing both sticks.");
         GameManager.instance.curProgress.blockProgramUid=0;attack.OnEvent(PD(7,340,attack.view.rtf_area.gameObject));attack.OnUpdate();
-        Check(PlayManager.instance.infoCtrl.Uses==0 && PlayManager.instance.sceneCtrl.Rotations==0,"An off-center attack press must not cast or rotate before dragging.");
+        Check(PlayManager.instance.infoCtrl.Uses==1 && PlayManager.instance.sceneCtrl.Rotations==1,"An off-center fixed attack press immediately aims and attacks relative to its authored center.");
         attack.OnEvent(PM(7,380));attack.OnUpdate();attack.OnUpdate();
-        Check(attack.model.curId==7 && PlayManager.instance.sceneCtrl.Opt==SkillType.LightAttack && PlayManager.instance.infoCtrl.Uses==2,"LightAttack continuation must not cancel itself once its option is set.");
+        Check(attack.model.curId==7 && PlayManager.instance.sceneCtrl.Opt==SkillType.LightAttack && PlayManager.instance.infoCtrl.Uses==3,"LightAttack continuation must not cancel itself once its option is set.");
         move.OnEvent(PD(8,140,move.view.rtf_area.gameObject));move.OnEvent(PM(8,180));move.OnUpdate();Check(PlayManager.instance.sceneCtrl.Moves==1 && Math.Abs(PlayManager.instance.sceneCtrl.LastMove.x-0.02f)<0.00001,"Movement stick must use the bounded frame delta.");
         GameManager.instance.curProgress.blockProgramUid=5;move.OnUpdate();attack.OnUpdate();Check(move.model.curId==-1 && attack.model.curId==-1 && PlayManager.instance.sceneCtrl.Opt==null && PlayManager.instance.sceneCtrl.Moves==1,"Blocking during drag must stop movement and clear LightAttack.");
         GameManager.instance.curProgress.blockProgramUid=0;PlayManager.instance.sceneCtrl.Opt=SkillType.Other;Check(!attack.param.canStartFunc() && !attack.param.canContinueFunc() && move.param.canStartFunc(),"Another skill must prevent attack capture, without blocking movement.");
@@ -368,26 +394,26 @@ public static class MobileInputRegression
         move.OnEvent(PD(21,140,move.view.rtf_area.gameObject));move.OnEvent(PM(21,180));move.OnUpdate();
 #if UNITY_ANDROID
         Check(scene.Rotations==1 && scene.LastRotation==new Vector3(1,0,0),"Android movement faces its direction immediately when attack has never been used.");
-        move.OnEvent(new InputPointEvent{id=21,pos=new Vector3(140,60)});move.OnUpdate();
+        move.OnEvent(new InputPointEvent{id=21,pos=new Vector3(100,60)});move.OnUpdate();
         Check(scene.LastRotation==new Vector3(0,0,-1),"Movement facing uses world XZ direction, not screen XY.");
         int rotations=scene.Rotations;
-        Time.unscaledTime=2;attack.OnEvent(PD(73,340,attack.view.rtf_area.gameObject));move.OnUpdate();
+        Time.unscaledTime=2;attack.OnEvent(PD(73,300,attack.view.rtf_stick.gameObject));move.OnUpdate();
         Check(scene.Rotations==rotations,"A newly captured attack pointer blocks movement facing before the attack's first Update.");
         attack.OnUpdate();move.OnUpdate();Check(scene.Rotations==rotations,"Holding the neutral attack center preserves facing too.");
         attack.OnEvent(PM(73,380));attack.OnUpdate();rotations=scene.Rotations;
         Check(scene.LastRotation==new Vector3(1,0,0),"Dragging attack still sets its aiming direction.");
-        Time.unscaledTime=8;move.OnUpdate();Check(scene.Rotations==rotations,"An attack held longer than one second still owns facing even with reversed Update order.");
-        Time.unscaledTime=10;attack.OnEvent(PU(73));move.OnUpdate();Check(scene.Rotations==rotations,"Attack release starts the one-second grace period instead of immediately following movement.");
-        Time.unscaledTime=10.99f;move.OnUpdate();Check(scene.Rotations==rotations,"Less than one real second after release must retain attack facing.");
-        Time.unscaledTime=11;move.OnUpdate();Check(scene.Rotations==rotations+1 && scene.LastRotation==new Vector3(0,0,-1),"At one second after release movement facing resumes.");
-        rotations=scene.Rotations;move.OnEvent(PM(21,140));move.OnUpdate();Check(scene.Rotations==rotations,"Zero movement never invokes a zero-direction rotation.");
-        move.OnEvent(new InputPointEvent{id=21,pos=new Vector3(140,140)});
-        Time.unscaledTime=12;attack.OnEvent(PD(74,340,attack.view.rtf_area.gameObject));attack.OnUpdate();attack.OnEvent(PU(74));
-        Time.unscaledTime=12.99f;move.OnUpdate();Check(scene.Rotations==rotations,"A new neutral attack interaction restarts the grace period.");
-        Time.unscaledTime=13;move.OnUpdate();Check(scene.LastRotation==new Vector3(0,0,1) && scene.Rotations==rotations+1,"Facing follows the current movement vector after renewed timeout.");
-        rotations=scene.Rotations;Time.unscaledTime=14;attack.OnEvent(PD(75,340,attack.view.rtf_area.gameObject));attack.OnEvent(PU(75,true));
-        Time.unscaledTime=14.99f;move.OnUpdate();Check(scene.Rotations==rotations,"Canceled attack interaction also retains the last facing for one second.");
-        Time.unscaledTime=15;move.OnUpdate();Check(scene.Rotations==rotations+1,"Canceled attack does not leave movement facing permanently blocked.");
+        Time.unscaledTime=8;move.OnUpdate();Check(scene.Rotations==rotations,"A long-held attack still owns facing even with reversed Update order.");
+        Time.unscaledTime=10;attack.OnEvent(PU(73));move.OnUpdate();Check(scene.Rotations==rotations,"Attack release starts the 0.1-second grace period instead of immediately following movement.");
+        Time.unscaledTime=10.099f;move.OnUpdate();Check(scene.Rotations==rotations,"Less than 0.1 real seconds after release must retain attack facing.");
+        Time.unscaledTime=10.1f;move.OnUpdate();Check(scene.Rotations==rotations+1 && scene.LastRotation==new Vector3(0,0,-1),"At the 0.1-second release boundary movement facing resumes.");
+        rotations=scene.Rotations;move.OnEvent(PM(21,100));move.OnUpdate();Check(scene.Rotations==rotations,"Zero movement never invokes a zero-direction rotation.");
+        move.OnEvent(new InputPointEvent{id=21,pos=new Vector3(100,140)});
+        Time.unscaledTime=12;attack.OnEvent(PD(74,300,attack.view.rtf_stick.gameObject));attack.OnUpdate();attack.OnEvent(PU(74));
+        Time.unscaledTime=12.099f;move.OnUpdate();Check(scene.Rotations==rotations,"A new neutral attack interaction restarts the 0.1-second grace period.");
+        Time.unscaledTime=12.101f;move.OnUpdate();Check(scene.LastRotation==new Vector3(0,0,1) && scene.Rotations==rotations+1,"Facing follows the current movement vector after renewed 0.1-second timeout.");
+        rotations=scene.Rotations;Time.unscaledTime=14;attack.OnEvent(PD(75,300,attack.view.rtf_stick.gameObject));attack.OnEvent(PU(75,true));
+        Time.unscaledTime=14.099f;move.OnUpdate();Check(scene.Rotations==rotations,"Canceled attack interaction also retains the last facing for 0.1 seconds.");
+        Time.unscaledTime=14.101f;move.OnUpdate();Check(scene.Rotations==rotations+1,"Canceled attack does not leave movement facing permanently blocked.");
         rotations=scene.Rotations;Time.unscaledTime=100;scene.Opt=SkillType.Q;move.OnUpdate();scene.Opt=SkillType.E;move.OnUpdate();
         Check(scene.Rotations==rotations,"Movement never overrides an active Q/E aim after attack timeout.");
         scene.Opt=null;move.OnUpdate();Check(scene.Rotations==rotations+1,"Clearing skill aim restores ordinary movement facing.");

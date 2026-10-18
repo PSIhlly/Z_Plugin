@@ -6,7 +6,8 @@ using UnityEngine;
 public static class DisFadeRenderRouting
 {
     public enum Route { Hidden, Opaque, Transparent, Mixed }
-    private const string ForwardPass = "Universal Forward", OpaquePass = "DisFadeOpaque";
+    // Material pass switches match LightMode tags; FindPass uses the shader's Name instead.
+    private const string ForwardPass = "UniversalForward", OpaquePass = "DisFadeOpaque";
     private static readonly int Alpha = Shader.PropertyToID("_Alpha"), Show = Shader.PropertyToID("_Show"),
         FadeCenter = Shader.PropertyToID("_FadeCenter"), Cutoff = Shader.PropertyToID("_Cutoff"),
         LightSensitivity = Shader.PropertyToID("_LightSensitivity"), MainTexture = Shader.PropertyToID("_Tex");

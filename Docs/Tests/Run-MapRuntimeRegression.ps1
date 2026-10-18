@@ -135,13 +135,22 @@ if ($Fixture -in @('MapFadeShaderRegression', 'MapTextureRuntimeRegression', 'Ti
     # from a precompiled plugin. Rename only the isolated binary's assembly identity.
     if ($Fixture -ne 'MapFadeShaderRegression') {
         [Reflection.Assembly]::LoadFrom((Join-Path $burstPackage.FullName "Unity.Burst.CodeGen/Unity.Burst.Cecil.dll")) | Out-Null
-        $runtimeAssembly = [Mono.Cecil.AssemblyDefinition]::ReadAssembly((Join-Path $ProjectRoot "Temp/bin/Debug/Assembly-CSharp.dll"))
+        $resolver = New-Object Mono.Cecil.DefaultAssemblyResolver
+        $resolver.AddSearchDirectory((Join-Path (Split-Path -Parent $UnityEditor) 'Data/Managed/UnityEngine'))
+        $resolver.AddSearchDirectory((Join-Path (Split-Path -Parent $UnityEditor) 'Data/Managed'))
+        $resolver.AddSearchDirectory((Join-Path $ProjectRoot 'Library/ScriptAssemblies'))
+        $resolver.AddSearchDirectory((Join-Path $ProjectRoot 'Temp/bin/Debug'))
+        $resolver.AddSearchDirectory((Join-Path $testProject 'Assets/Plugins'))
+        $readerParameters = New-Object Mono.Cecil.ReaderParameters
+        $readerParameters.AssemblyResolver = $resolver
+        $runtimeAssembly = [Mono.Cecil.AssemblyDefinition]::ReadAssembly(
+            (Join-Path $ProjectRoot "Temp/bin/Debug/Assembly-CSharp.dll"), $readerParameters)
         try {
             $runtimeAssembly.Name.Name = "MapRegressionRuntime"
             $runtimeAssembly.MainModule.Name = "MapRegressionRuntime.dll"
             $runtimeAssembly.Write((Join-Path $testProject "Assets/Plugins/MapRegressionRuntime.dll"))
         }
-        finally { $runtimeAssembly.Dispose() }
+        finally { $runtimeAssembly.Dispose(); $resolver.Dispose() }
     }
 }
 $logPath = Join-Path $testProject "regression.log"

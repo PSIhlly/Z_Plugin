@@ -34,14 +34,14 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
             model.lastAttackStickTime = float.NegativeInfinity;
             view.model_moveStick.SetShow(true, new UiStickParam()
             {
-                floating = true,
+                floating = false,
                 dragAct = (dir) =>
                 {
                     dir = GetDirection(dir);
 #if UNITY_ANDROID
                     if (dir != Vector3.zero && view.model_attackStick.model.curId == -1 &&
                         PlayManager.instance.sceneCtrl.GetCurOptSkill() == null &&
-                        Time.unscaledTime - model.lastAttackStickTime >= 1f)
+                        Time.unscaledTime - model.lastAttackStickTime >= 0.1f)
                         PlayManager.instance.sceneCtrl.SetPlayerRotation(dir, 360);
 #endif
                     PlayManager.instance.sceneCtrl.SetPlayerMove(MapUtilController.MovementDeltaTime * dir);
@@ -52,7 +52,7 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
             });
             view.model_attackStick.SetShow(true, new UiStickParam()
             {
-                floating = true,
+                floating = false,
                 dragAct = (dir) =>
                 {
 #if UNITY_ANDROID

@@ -241,13 +241,14 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             {
                 case CameraMode.Overhead:
                     canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f + Vector3.forward * 0.5f;
-                    canvas.transform.eulerAngles = Vector3.zero;
+                    canvas.transform.eulerAngles = Vector3.right * 90;
                     break;
                 case CameraMode.Isometric:
                     canvas.transform.position = unitData.unit.data.pos + Vector3.up * 1.3f;
                     canvas.transform.eulerAngles = Vector3.right * 45;
                     break;
             }
+            canvas.SetDirection(unitData.pos, unitData.euler.y);
             var paramInfo = productData.paramDic;
             var lst = unitData.unit.productInfo.Item1 == GameManager.instance.curProgress.characterUid ? needShowParamName : needShowParamNameWithoutPlayer;
 
@@ -265,8 +266,6 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 }
 
             }
-
-
         });
 
     }

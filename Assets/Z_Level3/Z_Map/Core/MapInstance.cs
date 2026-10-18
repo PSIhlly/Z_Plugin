@@ -128,6 +128,12 @@ namespace Z_Map
             return rendererIndex <= displayLayer;
         }
 
+        protected virtual DisFadeRenderRouting.Route GetRendererMaterialRoute(
+            Renderer renderer, DisFadeRenderRouting.Route visibilityRoute)
+        {
+            return visibilityRoute;
+        }
+
         protected virtual void ApplyRendererDisplayLayerProperties(
             Renderer renderer,
             int rendererIndex,
@@ -183,12 +189,13 @@ namespace Z_Map
                 bool displayed = IsRendererVisibleInDisplayLayer(i);
                 rendererRoutes[i] = !displayed || rendererValue <= 0f ? DisFadeRenderRouting.Route.Hidden
                     : rendererValue < 1f ? DisFadeRenderRouting.Route.Transparent : DisFadeRenderRouting.Route.Opaque;
+                var materialRoute = GetRendererMaterialRoute(render, rendererRoutes[i]);
                 if (!displayed || rendererValue <= 0f)
                 {
                     render.GetPropertyBlock(visionBlock);
                     visionBlock.SetFloat("_Show", 0f);
                     visionBlock.SetFloat("_FadeCenter", 0f);
-                    DisFadeRenderRouting.Apply(render, visionBlock, rendererRoutes[i]);
+                    DisFadeRenderRouting.Apply(render, visionBlock, materialRoute);
                     continue;
                 }
                 // Texture/animation code shares this block. Read before modifying
@@ -199,7 +206,7 @@ namespace Z_Map
                 visionBlock.SetFloat("_Show", rendererValue);
                 visionBlock.SetFloat("_FadeCenter", 0f);
                 ApplyRendererDisplayLayerProperties(render, i, visionBlock);
-                DisFadeRenderRouting.Apply(render, visionBlock, rendererRoutes[i]);
+                DisFadeRenderRouting.Apply(render, visionBlock, materialRoute);
             }
             degree = value;
             vising = visible;

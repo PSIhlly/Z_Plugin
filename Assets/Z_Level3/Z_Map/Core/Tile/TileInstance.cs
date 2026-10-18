@@ -51,6 +51,14 @@ namespace Z_Map
             return GetLogicalLayer(rendererIndex) <= displayLayer;
         }
 
+        protected override DisFadeRenderRouting.Route GetRendererMaterialRoute(
+            Renderer renderer, DisFadeRenderRouting.Route visibilityRoute)
+        {
+            // Keep an empty/disabled slot on its shared Hidden material. The
+            // cached visibility route stays available when a texture enables it.
+            return renderer.enabled ? visibilityRoute : DisFadeRenderRouting.Route.Hidden;
+        }
+
         protected override void ApplyRendererDisplayLayerProperties(
             Renderer renderer,
             int rendererIndex,

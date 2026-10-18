@@ -433,6 +433,10 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             renderer.enabled = configured;
         if (!configured)
         {
+            // Empty Tile slots share one transparent binding per source instead
+            // of retaining the last ordinary/WangTile texture from pooled reuse.
+            if (ins is TileInstance)
+                DisFadeRenderRouting.SetTexture(renderer, TextureHelper.transparentTexture, Route.Hidden);
             return;
         }
 

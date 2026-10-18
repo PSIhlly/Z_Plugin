@@ -7,13 +7,14 @@ using UnityEngine;
 using Z_DataSystem.Form;
 using Z_Map;
 using Z_Map.Form;
+using Z_Texture;
 using Z_Time;
 
 // Run through the isolated project harness; never load a production scene/save.
 public static class DisFadeRoutingRegression
 {
     private static int checks;
-    private const string Forward = "Universal Forward";
+    private const string Forward = "UniversalForward";
     private const string Opaque = "DisFadeOpaque";
 
     public static void Run()
@@ -26,6 +27,8 @@ public static class DisFadeRoutingRegression
             var shader = Shader.Find("DisFadeCode");
             Check(shader != null, "production shader imported");
             source = new Material(shader) { name = "routing-source", renderQueue = 4100 };
+            Check(source.FindPass("Universal Forward") >= 0 && source.FindPass(Forward) < 0,
+                "FindPass uses the ShaderLab Name while pass switches use its LightMode");
             source.SetFloat("_Alpha", 1f);
             source.SetFloat("_Show", 1f);
             source.SetFloat("_FadeCenter", 0f);
@@ -203,6 +206,7 @@ public static class DisFadeRoutingRegression
             controller.OnEvent(evt);
             Check(!front.enabled, "removing front textures disables the old front renderer");
 
+            EmptyTileLayers(controller, tile, source);
             CharacterTemplateLifecycle(source, first, second);
 
             Debug.Log("DIS_FADE_ROUTING_REGRESSION_PASS checks=" + checks);
@@ -220,6 +224,98 @@ public static class DisFadeRoutingRegression
             if (source != null) UnityEngine.Object.DestroyImmediate(source);
             if (first != null) UnityEngine.Object.DestroyImmediate(first);
             if (second != null) UnityEngine.Object.DestroyImmediate(second);
+        }
+    }
+
+    private static void EmptyTileLayers(GameMapController controller, TileInstance tile, Material source)
+    {
+        var peerRoot = new GameObject("empty-tile-peer");
+        var timeObject = new GameObject("empty-tile-time");
+        timeObject.SetActive(false);
+        var time = timeObject.AddComponent<TimeManager>();
+        var singleton = typeof(Z_DesignStyle.Z_MonoSingleton<TimeManager>).GetField("_instance",
+            BindingFlags.Static | BindingFlags.NonPublic);
+        var previousTime = singleton.GetValue(null);
+        singleton.SetValue(null, time);
+        var empty = new List<int>();
+        try
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                var child = new GameObject("empty-layer" + i);
+                child.transform.SetParent(peerRoot.transform, false);
+                child.AddComponent<MeshRenderer>().sharedMaterial = source;
+            }
+            var peer = peerRoot.AddComponent<TileInstance>();
+            tile.displayLayer = int.MaxValue;
+            tile.ApplyVision(1f, 1f);
+            peer.ApplyVision(1f, 1f);
+            // These are the same texture submission paths used by ordinary and
+            // generated WangTile frames. Different old textures must be forgotten.
+            for (int i = 0; i < 6; i++)
+            {
+                controller.ShowFinalMat(tile, i, new List<int> { i % 2 == 0 ? 81001 : 81002 }, 0);
+                controller.ShowFinalMat(peer, i, new List<int> { i % 2 == 0 ? 81002 : 81001 }, 0);
+            }
+            var oldMaterial = tile.renderers[0].sharedMaterial;
+            var oldTexture = oldMaterial.GetTexture("_Tex");
+            var oldTimer = new Timer { bind = tile };
+            tile.animTimer[0] = oldTimer;
+            for (int i = 0; i < 6; i++)
+            {
+                controller.ShowFinalMat(tile, i, empty, 0);
+                controller.ShowFinalMat(peer, i, empty, 0);
+            }
+            Check(oldTimer.cancel && tile.animTimer[0] == null, "clearing a Tile slot cancels its prior animation");
+            var sharedEmpty = tile.renderers[0].sharedMaterial;
+            Check(sharedEmpty.GetTexture("_Tex") == TextureHelper.transparentTexture,
+                "empty Tile slots use the canonical transparent texture");
+            foreach (var instance in new[] { tile, peer })
+                foreach (var renderer in instance.renderers)
+                {
+                    Check(!renderer.enabled && renderer.sharedMaterial == sharedEmpty,
+                        "empty base/front layers and separate Tiles share one disabled default material");
+                    CheckHidden(renderer);
+                }
+            Check(oldMaterial.GetTexture("_Tex") == oldTexture, "empty binding never rewrites an existing visible material");
+            foreach (float value in new[] { 0f, .25f, .5f, 1f })
+            {
+                tile.displayLayer = value == .25f ? 0 : int.MaxValue;
+                tile.ApplyVision(value, 1f - value);
+                foreach (var renderer in tile.renderers)
+                    Check(!renderer.enabled && renderer.sharedMaterial == sharedEmpty,
+                        "visibility/display changes keep empty Tile slots on the same default material");
+            }
+            DisFadeRenderRouting.BeginSplitCamera();
+            CheckHidden(tile.renderers[0]);
+            DisFadeRenderRouting.EndSplitCamera();
+            Check(tile.renderers[0].sharedMaterial == sharedEmpty, "camera transitions retain the shared empty material");
+            tile.ApplyVision(.5f, 1f);
+            Check(tile.GetRendererRoute(0) == DisFadeRenderRouting.Route.Transparent
+                && tile.GetRendererRoute(3) == DisFadeRenderRouting.Route.Opaque,
+                "empty slots retain the visibility routes needed by later texture assignment");
+            controller.ShowFinalMat(tile, 0, new List<int> { 81001 }, 0);
+            controller.ShowFinalMat(tile, 3, new List<int> { 81002 }, 0);
+            Check(tile.renderers[0].enabled && tile.renderers[3].enabled,
+                "assigning textures to empty Tile slots enables the configured parts");
+            CheckUniformTransparency(tile.renderers[0], .5f);
+            CheckRoute(tile.renderers[3], "Opaque");
+            tile.ApplyVision(0f, 0f);
+            Check(tile.renderers[0].sharedMaterial.GetTexture("_Tex") == TexAssetForm.DataById[81001].GetTex()
+                && tile.renderers[3].sharedMaterial.GetTexture("_Tex") == TexAssetForm.DataById[81002].GetTex(),
+                "occlusion-hidden configured Tiles keep their original texture-alpha shadow silhouettes");
+            tile.PrepareForHide();
+            tile.PrepareForShow();
+            tile.ApplyVision(1f, 1f);
+            Check(tile.renderers[1].sharedMaterial == sharedEmpty && !tile.renderers[1].enabled,
+                "pool show preparation keeps empty slots on the shared default material");
+        }
+        finally
+        {
+            DisFadeRenderRouting.EndSplitCamera();
+            singleton.SetValue(null, previousTime);
+            UnityEngine.Object.DestroyImmediate(timeObject);
+            UnityEngine.Object.DestroyImmediate(peerRoot);
         }
     }
 

@@ -1,5 +1,75 @@
 [
   {
+    "id": 44,
+    "name": "小树",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 691
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "labId": 5,
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 691
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
     "id": 63,
     "name": "窗1",
     "icon": 210000,
@@ -2958,6 +3028,76 @@
             "v": 273
           }
         ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "id": 47,
+    "name": "New0",
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 690
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "labId": 5,
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 690
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
       }
     ],
     "isWangTile": false,

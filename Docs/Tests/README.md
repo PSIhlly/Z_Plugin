@@ -78,11 +78,13 @@ center press captures zero offset, edge drag maps screen XY to world XZ, Q/E bin
 their own skills, Refresh preserves an owned aim, and blocking/skill-disable/cancel
 still ends it without casting or clearing another skill's option. Original raycast
 authoring remains unchanged; these spies do not run native Unity GraphicRaycaster.
-Move/LightAttack floating-mode checks cover an idle-hidden knob with a transparent
-active hit region, off-center press origins, scaled relative drags, independent
-crossing fingers, immediate release/cancel/block hiding, and reuse in fixed mode.
+Play Move/LightAttack checks cover visible idle knobs, fixed authored centers,
+neutral center/active edge presses, independent crossing fingers, release/cancel
+recentering without hiding, preserved area Graphics, and hide/reopen ownership reset.
+Generic floating-mode checks retain idle-hidden knobs, transparent active hit regions,
+press origins, scaled relative drags, cancellation/block hiding and fixed-mode reuse.
 Android move-facing checks cover initial movement, neutral/long attack holds,
-the one-second release/cancel boundary, renewed input, Q/E priority and desktop exclusion.
+the 0.1-second release/cancel boundary, renewed input, Q/E priority and desktop exclusion.
 Mod Begin/End reset calls are checked statically; real map painting/history and
 Android touch/UI hit testing still require on-device Play/Mod smoke tests.
 
@@ -288,6 +290,10 @@ variants with opaque draw-time properties, so empty pixels prove the pass was no
 submitted rather than merely clipped. Cull must capture the disabled pass flags;
 changing flags only in AddRenderPasses is too late. Cleanup before Submit must
 still restore the next fallback camera correctly. Mixed surfaces retain both passes.
+`Material.SetShaderPassEnabled` and `GetShaderPassEnabled` address the pass's
+LightMode (`UniversalForward`); `Material.FindPass` addresses its ShaderLab Name
+(`Universal Forward`). Native GPU submission must verify suppression, because
+setting and reading the same incorrect key can agree while the pass still draws.
 Instanced draws test all three real passes with multiple transforms and independent
 Show/Alpha/FadeCenter/Cutoff/LightSensitivity values; the shader has no AlphaTex.
 Native DrawRenderers tests compare ordinary and instanced submission of shared
@@ -306,6 +312,25 @@ the Feature source is compiled against cached production URP/runtime binaries;
 no production package manifest or shader source is rewritten for the test.
 Success is `MAP_FADE_SHADER_REGRESSION_PASS`. This is not a full Play/Player test.
 
+Use `-Fixture DisFadeBatchingRegression` for the WangTile batching regression.
+It generates the real 47 variants from a uniform white sheet, proving that equal
+pixels and material display names do not imply shared Texture/Material objects.
+Native GPU instance IDs verify that 32 Tiles using one variant share one draw,
+while two depth-interleaved variants split into 32 draws with transparent sorting.
+The same two variants must use two 16-instance draws through the production
+`DisFadeOpaqueFeature` pass. The fixture executes its real queue filter, opaque
+sorting and camera cleanup, rather than only testing a separately configured SRP.
+Overlapping variant planes also check depth after swapping near/far positions
+and material groups, and after hiding the nearer Tile.
+The same fixture draws only `UniversalForward` with the shader's split discard
+disabled: Opaque must submit no pixels for split cameras and render for fallback
+cameras, while Transparent/Mixed remain visible and Hidden remains absent. A
+control disables the ShaderLab Name and still draws; disabling the LightMode
+must remove that native draw. This catches incorrect pass keys even when their
+setter/getter checks agree.
+Success is `DIS_FADE_BATCHING_REGRESSION_PASS`; the test runs in an isolated D3D11
+project and does not load the current story.
+
 The map visibility MPB protocol is uniform opacity: `_Show=degree` and
 `_FadeCenter=0`, including fixed `_Show=0.5` for half occlusion. All nonzero
 partial degrees use the cached Transparent Route and a single forward color
@@ -322,7 +347,11 @@ Use `-Fixture DisFadeRoutingRegression` for the current Renderer-based routing
 entry points. It checks cached caller-supplied Route selection (without MPB reclassification), uniform half-occlusion opacity/Transparent routing, explicit
 Hidden/Opaque/Transparent/Mixed transitions, scalar and texture
 updates with immutable material-to-texture bindings, independent Tile body/front routes, empty layers, actual Shader pass
-switches, Hidden color-pass suppression across texture/camera/show transitions,
+switches by LightMode (`UniversalForward`) and pass lookup by Name (`Universal Forward`),
+Hidden color-pass suppression across texture/camera/show transitions,
+canonical transparent material sharing for empty Tile base/front slots across
+instances, animation cancellation, stable empty bindings through visibility/display
+changes and pool preparation, and restoration of newly configured textures,
 authored shadow-pass and Renderer/shadow-mode preservation, split-camera cleanup
 and Character first Show/reuse from a disabled
 template, including part enablement and visibility during texture replacement.

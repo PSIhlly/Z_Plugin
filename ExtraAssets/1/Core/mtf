@@ -99,5 +99,41 @@
     "enableFrontPart": false,
     "frontPartTexs": [],
     "frontIsWangTile": false
+  },
+  {
+    "id": 45,
+    "name": "New0",
+    "icon": 687,
+    "animTimeInterval": 1.0,
+    "texs": [
+      {
+        "v": 687
+      }
+    ],
+    "labId": 0,
+    "events": [],
+    "isWangTile": false,
+    "passType": 0,
+    "enableFrontPart": false,
+    "frontPartTexs": [],
+    "frontIsWangTile": false
+  },
+  {
+    "id": 46,
+    "name": "New1",
+    "icon": 689,
+    "animTimeInterval": 1.0,
+    "texs": [
+      {
+        "v": 689
+      }
+    ],
+    "labId": 0,
+    "events": [],
+    "isWangTile": false,
+    "passType": 0,
+    "enableFrontPart": false,
+    "frontPartTexs": [],
+    "frontIsWangTile": false
   }
 ]

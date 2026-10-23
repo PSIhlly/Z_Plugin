@@ -17,6 +17,7 @@ using Z_Map;
 using Z_Map.Form;
 using Z_String;
 using Z_Text;
+using Z_UnitSystem;
 using Z_Ui;
 using Z_Ui.Notify;
 using static UnityEngine.Rendering.DebugUI.MessageBox;
@@ -193,7 +194,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
 
         MapObjectParamForm.AddData(new MapObjectParamForm.Data(-1, name, 0, "", "", ""));
-        foreach (var obj in MapObjectForm.DataById.Values)
+        foreach (var obj in ObjectProductForm.DataByUid.Values)
         {
             obj.paramDic[name] = new MapObjectParamForm.Data(-1, name, 0, "", "", "");
             obj.paramDic = obj.paramDic;//refresh
@@ -202,7 +203,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void DeleteSceneObjectArg(string name)
     {
         MapObjectParamForm.RemoveData(MapObjectParamForm.DataByName[name].uid);
-        foreach (var obj in MapObjectForm.DataById.Values)
+        foreach (var obj in ObjectProductForm.DataByUid.Values)
         {
             obj.paramDic.Remove(name);
             obj.paramDic = obj.paramDic;//refresh
@@ -212,9 +213,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     public void RenameSceneObjectParam(string oldName, string newName)
     {
         MapObjectParamForm.DataByName[oldName].name = newName;
-        foreach (var obj in MapObjectForm.DataById.Values)
+        foreach (var obj in ObjectProductForm.DataByUid.Values)
         {
-            obj.paramDic[newName] = obj.paramDic[oldName];
+            if (!obj.paramDic.TryGetValue(oldName, out var parameter))
+                continue;
+            obj.paramDic[newName] = parameter;
+            parameter.name = newName;
             obj.paramDic.Remove(oldName);
             obj.paramDic = obj.paramDic;//refresh
         }
@@ -418,14 +422,45 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void DeleteObject(string name)
     {
-        MapObjectForm.RemoveData(MapObjectForm.DataByName[name].id);
+        if (ObjectProductForm.DataByNameProtouid.TryGetValue((name, 0), out var product))
+            ObjectProductForm.RemoveData(product.uid);
+        RefreshObjectList();
+    }
+
+    // MapObject rows are disposable scene-tool entries, not authored object data.
+    public void RefreshObjectList()
+    {
+        var products = ObjectProductForm.DataByUid.Values
+            .Where(data => data.protoUid == 0).OrderBy(data => data.uid).ToList();
+        var productIds = new HashSet<int>(products.Select(data => data.uid));
+        var rows = new Dictionary<int, MapObjectForm.Data>();
+        foreach (var row in MapObjectForm.DataById.Values.OrderBy(data => data.id).ToList())
+        {
+            if (!productIds.Contains(row.objectUid) || rows.ContainsKey(row.objectUid))
+                MapObjectForm.RemoveData(row.id);
+            else
+                rows.Add(row.objectUid, row);
+        }
+        foreach (var product in products)
+        {
+            int labId = LabForm.GetOrCreateForBelong(product.labId, nameof(MapObjectForm));
+            if (rows.TryGetValue(product.uid, out var row))
+            {
+                row.name = product.name;
+                row.icon = product.icon;
+                row.labId = labId;
+            }
+            else
+                MapObjectForm.AddData(new MapObjectForm.Data(-1, product.name, product.icon, labId, product.uid));
+        }
     }
 
     public void CreateObject(int labId = 0, string name = null)
     {
         if (string.IsNullOrEmpty(name))
         {
-            name = StringHelper.GetUniqueName(MapObjectForm.DataByName.Keys);
+            name = StringHelper.GetUniqueName(ObjectProductForm.DataByUid.Values
+                .Where(data => data.protoUid == 0).Select(data => data.name).ToList());
         }
         var paramDic = new Dictionary<string, MapObjectParamForm.Data>();
         foreach (var prm in MapObjectParamForm.DataByName.Values)
@@ -434,15 +469,16 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         var modelData = MapModelForm.defaultData.Copy();
         modelData.subUnitTexsName = new List<List<int>>() { new List<int>() };
-        var objectData = new MapObjectForm.Data(-1, name, GlobalDefaultHelper.DefaultTexId, modelData, labId, false,
+        var objectData = new ObjectProductForm.Data(-1, name, labId, 0, GlobalDefaultHelper.DefaultTexId, modelData, false,
             new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId,
             FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false, false, true);
         objectData.EnsureDirectionData();
-        MapObjectForm.AddData(objectData);
+        ObjectProductForm.AddData(objectData);
+        RefreshObjectList();
     }
     public void DeleteObjectUnitTex(string name, AnimDirecton direction, int texId)
     {
-        var data = MapObjectForm.DataByName[name];
+        var data = ObjectProductForm.DataByNameProtouid[(name, 0)];
         var clip = data.GetAnimClip(direction);
         if (texId >= 0 && texId < clip.Count)
             clip.RemoveAt(texId);
@@ -452,7 +488,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void CreateObjectUnitTex(int uid, AnimDirecton direction)
     {
-        var data = MapObjectForm.DataById[uid];
+        var data = ObjectProductForm.DataByUid[uid];
         data.GetAnimClip(direction).Add(0);
         data.SyncLegacyAnimClip(direction);
     }
@@ -462,7 +498,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (assetData) =>
             {
-                var objectData = MapObjectForm.DataById[uid];
+                var objectData = ObjectProductForm.DataByUid[uid];
                 var clip = objectData.GetAnimClip(direction);
                 if (texId >= 0 && clip.Count > texId)
                 {
@@ -504,7 +540,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         {
             onComplete = (data) =>
             {
-                MapObjectForm.DataById[uid].minimapIcon = data.id;
+                ObjectProductForm.DataByUid[uid].minimapIcon = data.id;
             }
         });
 
@@ -1140,21 +1176,22 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return true;
             }, items);
     }
-    public void ChooseSceneObject(string title, Action<MapObjectForm.Data> act)
+    public void ChooseSceneObject(string title, Action<ObjectProductForm.Data> act)
     {
         var items = new EntryItem();
         var addedIds = new HashSet<int>();
 
-        foreach (var data in MapObjectForm.DataById.Values.Where(data => data != null).OrderBy(data => data.id))
+        foreach (var data in ObjectProductForm.DataByUid.Values
+                     .Where(data => data != null && data.protoUid == 0).OrderBy(data => data.uid))
         {
-            if (data == null || !addedIds.Add(data.id))
+            if (!addedIds.Add(data.uid))
                 continue;
-            items.Add($"{data.name}", null, data.id);
+            items.Add($"{data.name}", null, data.uid);
         }
         NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
-                act?.Invoke(MapObjectForm.DataById.GetDv(item.id, null));
+                act?.Invoke(ObjectProductForm.DataByUid.GetDv(item.id, null));
                 return true;
             }, items);
     }
@@ -1220,7 +1257,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         return mapManager.AddTile(mapPos);
     }
 
-    public ObjectUnitForm.Data AddObject(MapObjectForm.Data data, Vector3 position, float angle = 0)
+    public ObjectUnitForm.Data AddObject(ObjectProductForm.Data data, Vector3 position, float angle = 0)
     {
         using (_super.sceneCtrl?.BeginOperation())
         {
@@ -1230,12 +1267,19 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
     }
 
-    private ObjectUnitForm.Data AddObjectInternal(MapObjectForm.Data data, Vector3 position, float angle)
+    public ObjectUnitForm.Data AddObject(MapObjectForm.Data row, Vector3 position, float angle = 0)
+    {
+        return row != null && ObjectProductForm.DataByUid.TryGetValue(row.objectUid, out var product)
+            ? AddObject(product, position, angle) : null;
+    }
+
+    private ObjectUnitForm.Data AddObjectInternal(ObjectProductForm.Data data, Vector3 position, float angle)
     {
         if (data == null || !TryGetPlacementTile(position, out TileUnitForm.Data tile))
             return null;
 
         var mapManager = MapManager.instance;
+        var prefabName = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(data));
         foreach (ObjectUnit current in mapManager.updateCtrl.objectTileDic.Get(tile.unit))
         {
             if (current.data.name == data.name
@@ -1245,11 +1289,17 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 return null;
             }
         }
+        // 非重叠：同 prefab 的物体视觉包围盒相交时不再生成。
+        if (_super.sceneCtrl != null && _super.sceneCtrl.nonOverlapping
+            && HasSameObjectOverlap(prefabName, position, angle))
+        {
+            return null;
+        }
 
         ObjectUnitForm.Data result = mapManager.AddObject(
             data.name,
             position,
-            GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(data.id),
+            prefabName,
             null);
         if (result == null)
             return null;
@@ -1264,6 +1314,51 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         MapManager.instance.updateCtrl.UpdateSingleOne(result.unit);
         return result;
     }
+
+    #region 非重叠
+    /// <summary>
+    /// 同一 prefab（同 prefabName）的物体，视觉世界包围盒相交时返回 true。
+    /// 尺寸和位置都用运行时 prefab 直接子节点（MapModel 的 pos/scale）换算，和 Play 里看到的实际大小一致；
+    /// 与碰撞体、物理形状无关。
+    /// </summary>
+    private bool HasSameObjectOverlap(string prefabName, Vector3 position, float angle)
+    {
+        var mapManager = MapManager.instance;
+        var utilCtrl = mapManager != null ? mapManager.utilCtrl : null;
+        if (utilCtrl == null || string.IsNullOrEmpty(prefabName))
+            return false;
+
+        var pool = InstancePoolManager.instance;
+        var prefab = pool != null ? pool.GetPrefab(prefabName) : null;
+        if (prefab == null)
+            return false;
+
+        Vector3 euler = new Vector3(0f, angle, 0f);
+        // 放置后 Unit 的 scale 就是 GetNewObject 的 Vector3.one。
+        utilCtrl.TryGetVisionBounds(prefab, position, euler, Vector3.one, out Bounds candidate);
+
+        foreach (var other in ObjectUnitForm.DataByUid.Values)
+        {
+            if (other == null || other.unit == null || other.unit.prefab == null)
+                continue;
+            if (other.prefabName != prefabName)
+                continue;
+            utilCtrl.TryGetVisionBounds(other, out Bounds otherBounds);
+            if (Overlaps(candidate, otherBounds))
+                return true;
+        }
+        return false;
+    }
+
+    private static bool Overlaps(Bounds a, Bounds b)
+    {
+        // 只是面贴面（相邻摆放）不算相交，需要实际的重叠厚度。
+        const float tolerance = 0.001f;
+        return Mathf.Min(a.max.x, b.max.x) - Mathf.Max(a.min.x, b.min.x) > tolerance
+            && Mathf.Min(a.max.y, b.max.y) - Mathf.Max(a.min.y, b.min.y) > tolerance
+            && Mathf.Min(a.max.z, b.max.z) - Mathf.Max(a.min.z, b.min.z) > tolerance;
+    }
+    #endregion
 
     public ItemUnitForm.Data AddItem(ItemProductForm.Data data, Vector3 position, float angle = 0)
     {

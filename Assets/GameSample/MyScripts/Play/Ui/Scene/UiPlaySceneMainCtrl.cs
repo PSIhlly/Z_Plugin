@@ -170,7 +170,9 @@ namespace Ui.PlaySceneMain
 
         public void OnEvent(StoryCharacterEvent evt)
         {
-            if (GameManager.instance.curProgress.teamActive.Contains(evt.data.uid))
+            if (active && (evt.type == StoryCharacterEventType.ChangeTeamer
+                || evt.type == StoryCharacterEventType.ChangeCharacter
+                || (evt.data != null && GameManager.instance.curProgress.teamActive.Contains(evt.data.uid))))
             {
                 Refresh();
             }
@@ -380,7 +382,7 @@ namespace Ui.PlaySceneMain
                    return;
                string self = unit is CharacterUnit character
                    ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, character.productInfo.Item1.ToString())
-                   : GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, unit.data.uid.ToString());
+                   : GlobalEventHelper.GetSceneObjectReference(unit);
                var heap = new Dictionary<string, BoxDataForm.Data>();
                heap["param1"] = CodeHelper.CreateBoxByStr(self);
                heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, player.uid.ToString()));
@@ -401,7 +403,7 @@ namespace Ui.PlaySceneMain
             }
             else if (model.data.unit is ObjectUnit obj)
             {
-                var pd = MapObjectForm.DataById.GetDv(obj.productInfo.Item1,null);
+                var pd = ObjectProductForm.GetProduct(obj.data);
                 view.txt_.text = pd == null ? model.data.prefabName : pd.name;
             }
             else

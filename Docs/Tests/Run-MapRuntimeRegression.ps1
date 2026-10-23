@@ -1,9 +1,11 @@
 param(
     [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path,
     [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe",
-    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression')]
+    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'ObjectProductRuntimeRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression')]
     [string]$Fixture = 'MapRuntimeRegression',
-    [switch]$CharacterPlayLifecycle
+    [switch]$CharacterPlayLifecycle,
+    [switch]$SceneCommands,
+    [switch]$SkipBuild
 )
 $ErrorActionPreference = "Stop"
 $shaderPath = Join-Path $ProjectRoot "Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeCode.shader"
@@ -22,25 +24,38 @@ if ($shadowSource.Contains("_Show") -or $shadowSource.Contains("_FadeCenter") -o
 $runtimeProjectPath = Join-Path $ProjectRoot "Assembly-CSharp.csproj"
 $bindingRelative = 'Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeMaterialBinding.cs'
 [xml]$runtimeProject = Get-Content -LiteralPath $runtimeProjectPath -Raw
-$hasBindingSource = @($runtimeProject.SelectNodes("//*[local-name()='Compile']") |
-    Where-Object { $_.Include.Replace('\', '/') -eq $bindingRelative }).Count -gt 0
+$includedSources = @($runtimeProject.SelectNodes("//*[local-name()='Compile']") |
+    ForEach-Object { $_.Include.Replace('\', '/') })
+$missingSources = @(@($bindingRelative,
+    'Assets/GameSample/Forms/ExcelCs/ObjectProductForm.cs',
+    'Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs',
+    'Assets/GameSample/MyScripts/Main/CharacterProductForm.Reference.cs',
+    'Assets/GameSample/MyScripts/Main/Event/Cmd/CharacterPartyCmd.cs',
+    'Assets/GameSample/MyScripts/Play/PlayInfoController.Party.cs',
+    'Assets/GameSample/MyScripts/Main/Event/SceneObjectReference.cs') |
+    Where-Object { $_ -notin $includedSources })
 $buildArguments = @('build', $runtimeProjectPath, '--no-restore', '--nologo', '-v:quiet', '-m:1',
     '-p:BuildInParallel=false', '-p:UseSharedCompilation=false')
-if (!$hasBindingSource) {
+if ($missingSources.Count -gt 0) {
     # Unity can briefly leave generated project files stale after new source is
     # added. Inject only that source into this validation build, never edit the
     # generated .csproj or add Assembly-CSharp source to lower project refs.
     $validationBuildRoot = Join-Path $ProjectRoot ('Temp/MapRegressionBuild-' + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $validationBuildRoot -Force | Out-Null
     $validationTargets = Join-Path $validationBuildRoot 'ValidationSources.targets'
-    $bindingAbsolute = [Security.SecurityElement]::Escape((Join-Path $ProjectRoot $bindingRelative))
-    $targetSource = '<Project><ItemGroup Condition="''$(MSBuildProjectName)'' == ''Assembly-CSharp''"><Compile Include="' +
-        $bindingAbsolute + '" /></ItemGroup></Project>'
+    $targetSource = '<Project><ItemGroup Condition="''$(MSBuildProjectName)'' == ''Assembly-CSharp''">'
+    foreach ($relative in $missingSources) {
+        $absolute = [Security.SecurityElement]::Escape((Join-Path $ProjectRoot $relative))
+        $targetSource += '<Compile Include="' + $absolute + '" />'
+    }
+    $targetSource += '</ItemGroup></Project>'
     [IO.File]::WriteAllText($validationTargets, $targetSource)
     $buildArguments += '-p:CustomAfterMicrosoftCommonTargets=' + $validationTargets
 }
-& dotnet @buildArguments
-if ($LASTEXITCODE -ne 0) { throw "Production build failed." }
+if (!$SkipBuild) {
+    & dotnet @buildArguments
+    if ($LASTEXITCODE -ne 0) { throw "Production build failed." }
+}
 if ($Fixture -eq 'CodeInterpreterRuntimeRegression') {
     & dotnet build (Join-Path $ProjectRoot 'Z_Code.Tests.Editor.csproj') --no-restore --nologo -v:quiet -m:1 -p:BuildInParallel=false -p:UseSharedCompilation=false
     if ($LASTEXITCODE -ne 0) { throw 'Interpreter test build failed.' }
@@ -81,7 +96,7 @@ if ($Fixture -eq 'MapFadeShaderRegression') {
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeRenderRouting.cs') -Destination "$testProject/Assets/DisFadeRenderRouting.cs"
     Copy-Item -LiteralPath (Join-Path $ProjectRoot $bindingRelative) -Destination "$testProject/Assets/DisFadeMaterialBinding.cs"
 }
-if ($Fixture -in @('MapFadeShaderRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression')) {
+if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression')) {
     Copy-Item -LiteralPath $shaderPath -Destination "$testProject/Assets/DisFadeCode.shader"
     # Copy only cached shader headers into isolated embedded packages. No package
     # downloads, production package edits or duplicate runtime C# assemblies.
@@ -103,7 +118,14 @@ if ($Fixture -in @('MapFadeShaderRegression', 'MapTextureRuntimeRegression', 'Ti
 
 # Also compile the new Renderer Feature against the real cached URP binaries in
 # the shader fixture. Embedded packages supply headers only, not duplicate C#.
-& {
+if ($Fixture -eq 'MapEdgeTransitionRegression') {
+    # The edge mask only reads column keys and version/cell-size metadata. Test
+    # the actual component source with a minimal map context, without importing
+    # unrelated runtime/vendor assemblies into this focused Unity project.
+    Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Assets/Z_Level3/Z_Map/Core/EdgeTransition/MapEdgeTransition.cs') -Destination "$testProject/Assets/MapEdgeTransition.cs"
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'MapEdgeTransitionTestContext.cs') -Destination "$testProject/Assets/MapEdgeTransitionTestContext.cs"
+}
+else { & {
     $visited = @{}
     function Copy-ProjectDependencies([string]$projectFile) {
         if ($visited.ContainsKey($projectFile)) { return }
@@ -133,7 +155,7 @@ if ($Fixture -in @('MapFadeShaderRegression', 'MapTextureRuntimeRegression', 'Ti
         ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination "$testProject/Assets/Plugins" -Force }
     # Unity reserves Assembly-CSharp for source scripts and cannot attach its types
     # from a precompiled plugin. Rename only the isolated binary's assembly identity.
-    if ($Fixture -ne 'MapFadeShaderRegression') {
+    if ($Fixture -notin @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression')) {
         [Reflection.Assembly]::LoadFrom((Join-Path $burstPackage.FullName "Unity.Burst.CodeGen/Unity.Burst.Cecil.dll")) | Out-Null
         $resolver = New-Object Mono.Cecil.DefaultAssemblyResolver
         $resolver.AddSearchDirectory((Join-Path (Split-Path -Parent $UnityEditor) 'Data/Managed/UnityEngine'))
@@ -152,10 +174,11 @@ if ($Fixture -in @('MapFadeShaderRegression', 'MapTextureRuntimeRegression', 'Ti
         }
         finally { $runtimeAssembly.Dispose(); $resolver.Dispose() }
     }
-}
+} }
 $logPath = Join-Path $testProject "regression.log"
-$graphicsArguments = if ($Fixture -in @('MapFadeShaderRegression', 'DisFadeBatchingRegression')) { '-force-d3d11' } else { '-nographics' }
-$entryPoint = if ($CharacterPlayLifecycle -and $Fixture -eq 'MapTextureRuntimeRegression') { 'RunCharacterPlayLifecycle' } else { 'Run' }
+$graphicsArguments = if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'DisFadeBatchingRegression')) { '-force-d3d11' } else { '-nographics' }
+$entryPoint = if ($CharacterPlayLifecycle -and $Fixture -eq 'MapTextureRuntimeRegression') { 'RunCharacterPlayLifecycle' }
+    elseif ($SceneCommands -and $Fixture -eq 'MapRuntimeRegression') { 'RunSceneCommands' } else { 'Run' }
 $argumentLine = '-batchmode ' + $graphicsArguments + ' -projectPath "' + $testProject + '" -executeMethod ' + $Fixture + '.' + $entryPoint + ' -logFile "' + $logPath + '"'
 $process = Start-Process -FilePath $UnityEditor -ArgumentList $argumentLine -WindowStyle Hidden -PassThru
 Write-Output "Regression process: $($process.Id)"
@@ -166,6 +189,12 @@ if ($process.ExitCode -ne 0) {
     throw "Unity regression process failed: $($process.ExitCode)"
 }
 $successMarker = switch ($Fixture) {
+    'CharacterReferenceRegression' { 'CHARACTER_REFERENCE_REGRESSION_PASS' }
+    'CharacterPartyRegression' { 'CHARACTER_PARTY_REGRESSION_PASS' }
+    'ObjectProductRuntimeRegression' { 'OBJECT_PRODUCT_RUNTIME_REGRESSION_PASS' }
+    'SceneObjectReferenceRegression' { 'SCENE_OBJECT_REFERENCE_REGRESSION_PASS' }
+    'SceneProductCommandRegression' { 'SCENE_PRODUCT_COMMAND_REGRESSION_PASS' }
+    'ObjectProductEditorRegression' { 'OBJECT_PRODUCT_EDITOR_REGRESSION_PASS' }
     'CodeInterpreterRuntimeRegression' { 'CODE_INTERPRETER_RUNTIME_REGRESSION_PASS' }
     'MissionRuntimeRegression' { 'MISSION_RUNTIME_REGRESSION_PASS' }
     'MinimapRuntimeRegression' { 'MINIMAP_RUNTIME_REGRESSION_PASS' }
@@ -176,12 +205,18 @@ $successMarker = switch ($Fixture) {
     'InstancePoolNameRegression' { 'INSTANCE_POOL_NAME_REGRESSION_PASS' }
     'ModSceneHistoryRuntimeRegression' { 'MOD_SCENE_HISTORY_RUNTIME_REGRESSION_PASS' }
     'MapFadeShaderRegression' { 'MAP_FADE_SHADER_REGRESSION_PASS' }
+    'MapShadowBiasRegression' { 'MAP_SHADOW_BIAS_REGRESSION_PASS' }
+    'MapShadowReceiverRegression' { 'MAP_SHADOW_RECEIVER_REGRESSION_PASS' }
+    'MapEdgeTransitionRegression' { 'MAP_EDGE_TRANSITION_REGRESSION_PASS' }
     'StoryPackageImportRegression' { 'STORY_PACKAGE_IMPORT_REGRESSION_PASS' }
     default { 'MAP_RUNTIME_REGRESSION_PASS' }
 }
 $passed = Select-String -LiteralPath $logPath -Pattern $successMarker
 if ($CharacterPlayLifecycle -and $Fixture -eq 'MapTextureRuntimeRegression') {
     $passed = Select-String -LiteralPath $logPath -Pattern 'MAP_CHARACTER_PLAY_LIFECYCLE_PASS'
+}
+if ($SceneCommands -and $Fixture -eq 'MapRuntimeRegression') {
+    $passed = Select-String -LiteralPath $logPath -Pattern 'MAP_SCENE_COMMANDS_REGRESSION_PASS'
 }
 if (!$passed) { throw "Missing regression success marker: $logPath" }
 $passed.Line

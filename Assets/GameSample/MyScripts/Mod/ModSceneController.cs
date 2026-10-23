@@ -44,6 +44,9 @@ public interface ExternalModSceneController
     public float posY { get; set; }
     public bool posing { get; set; }
 
+    /// <summary>非重叠：勾选后 Object 笔刷生成前先判断同 prefab 物体的 x/y/z 范围是否相交，相交则跳过。</summary>
+    public bool nonOverlapping { get; set; }
+
     public MapBaseForm.Data curData { get; set; }
 
     public void SetCamera(float x, float y, float z);
@@ -91,7 +94,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     #region extern Var
     private DesignType _designType;
 
-    private int _layer = GlobalSettings.TERRAIN_LAYER_MAX - 1;
+    private int _layer = 0;
     private int _cntX = 1;
     private int _cntY = 1;
     private int _angle = 0;
@@ -100,6 +103,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     private float _posY = 0;
 
     private bool _posing;
+    private bool _nonOverlapping;
     private MapBaseForm.Data _curData;
     public DesignType designType
     {
@@ -137,6 +141,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     public float posZ { get => _posZ; set => _posZ = value; }
     public float posY { get => _posY; set => _posY = value; }
     public bool posing { get => _posing; set => _posing = value; }
+    public bool nonOverlapping { get => _nonOverlapping; set => _nonOverlapping = value; }
     public MapBaseForm.Data curData
     {
         get => _curData;
@@ -153,6 +158,12 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
     #endregion
 
 
+    // Mod 相机正交尺寸（视野半高，世界单位）：原 4，现 +2 为 6。
+    private const float MapCameraOrthographicSize = 6f;
+    // 下限保持原值；上限由 6 提到 8，加宽后仍保留拉远余量。
+    private const float MapCameraOrthographicSizeMin = 4f;
+    private const float MapCameraOrthographicSizeMax = 8f;
+
     public void Begin(int id)
     {
         CommitPendingOperation();
@@ -163,10 +174,10 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         _cntY = 1;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
-        _layer = GlobalSettings.TERRAIN_LAYER_MAX - 1;
+        _layer = 0;
         _designType = DesignType.MapObject;
         eventLayerBrushTipShown = false;
-        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), 4, 6);
+        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), MapCameraOrthographicSizeMin, MapCameraOrthographicSizeMax, MapCameraOrthographicSize);
         CameraInstance.instance.tarTrs.position = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
         switch (DynamicGlobalSettings.cameraMode)
         {
@@ -183,6 +194,9 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
+
+        // 事件 Cmd(SetLightIntensity) 记录过的强度优先于相机视角默认值。
+        GameManager.ApplyProgressLightIntensity();
 
         enable = true;
         foreach (var data in ObjectUnitForm.DataByUid.Values)
@@ -494,9 +508,11 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     }
                     else if (curData is MapObjectForm.Data objectData)
                     {
+                        if (!ObjectProductForm.DataByUid.TryGetValue(objectData.objectUid, out var product))
+                            return;
                         ForeachPos(hitPos, worldPosition, (_, finalPos) =>
                         {
-                            if (_super.assetCtrl.AddObject(objectData, finalPos, angle) != null)
+                            if (_super.assetCtrl.AddObject(product, finalPos, angle) != null)
                                 brushRevision++;
                         });
 

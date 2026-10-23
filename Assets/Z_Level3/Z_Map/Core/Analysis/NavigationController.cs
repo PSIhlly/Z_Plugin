@@ -824,8 +824,13 @@ namespace Z_Map.Analysis
                     if ((navUnit.objectBlockedDirections & (1 << dir)) != 0
                         || (linkNavUnit.objectBlockedDirections & (1 << (dir ^ 1))) != 0)
                         continue;
-                    if (linkNavUnit.dirMaxY[dir ^ 1] - navUnit.dirMaxY[dir] < step)
-                        navUnit.links.Add(linkNavUnit);
+                    // 爬升超过 step 不可通过；allowDrop 关闭时，单步落差超过 step 同样不可通过。
+                    float heightDelta = linkNavUnit.dirMaxY[dir ^ 1] - navUnit.dirMaxY[dir];
+                    if (heightDelta >= step)
+                        continue;
+                    if (!DynamicGlobalSettings.allowDrop && heightDelta <= -step)
+                        continue;
+                    navUnit.links.Add(linkNavUnit);
                 }
         }
 

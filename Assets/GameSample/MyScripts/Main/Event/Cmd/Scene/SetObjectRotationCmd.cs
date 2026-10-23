@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Map;
@@ -17,9 +18,12 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var unit = SceneUnitCommand.Resolve(prm[0].str);
-            if (!SceneUnitCommand.CanMove(unit))
-                return true;
+            var units = SceneUnitCommand.ResolveAll(prm[0].str);
+            var rotations = new List<PendingRotation>();
+            foreach (var unit in units)
+                if (SceneUnitCommand.CanMove(unit))
+                    rotations.Add(new PendingRotation { unit = unit, data = unit.data, startYaw = unit.data.euler.y });
+            if (rotations.Count == 0) return true;
             float angle = prm[1].num;
             float duration = prm[2].num;
             if (float.IsNaN(angle) || float.IsInfinity(angle)
@@ -28,22 +32,26 @@ namespace Z_Code
             float targetYaw = Mathf.Repeat(angle, 360f);
             if (duration <= 0)
             {
-                SetYaw(unit, targetYaw);
+                foreach (var rotation in rotations)
+                    if (SceneUnitCommand.IsLive(rotation.unit, rotation.data))
+                        SetYaw(rotation.unit, targetYaw);
                 return true;
             }
 
-            float startYaw = unit.data.euler.y;
-            float elapsed = 0;
-            // Capture the live instance and scalar arguments, not a reusable UID/shared heap.
+            // Each target owns its original identity/start angle for the whole transition.
             GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
-                if (!SceneUnitCommand.IsLive(unit))
+                bool complete = true;
+                float delta = MapUtilController.MovementDeltaTime;
+                foreach (var rotation in rotations)
                 {
-                    asyncTask.Complete();
-                    return true;
+                    if (rotation.finished) continue;
+                    rotation.finished = !SceneUnitCommand.IsLive(rotation.unit, rotation.data)
+                        || AdvanceRotation(rotation.unit, rotation.startYaw, targetYaw, duration,
+                            ref rotation.elapsed, delta);
+                    if (!rotation.finished) complete = false;
                 }
-                if (AdvanceRotation(unit, startYaw, targetYaw, duration, ref elapsed,
-                    MapUtilController.MovementDeltaTime))
+                if (complete)
                 {
                     asyncTask.Complete();
                     return true;
@@ -52,6 +60,15 @@ namespace Z_Code
             });
 
             return false;
+        }
+
+        private sealed class PendingRotation
+        {
+            public MapUnit unit;
+            public Z_UnitSystem.Form.UnitForm.Data data;
+            public float startYaw;
+            public float elapsed;
+            public bool finished;
         }
 
         internal static bool AdvanceRotation(MapUnit unit, float startYaw, float targetYaw,

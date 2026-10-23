@@ -16,11 +16,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
     public partial class UiModStoryMapObjectObjectParameterParam
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
     }
     public partial class UiModStoryMapObjectObjectParameterModel
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
     }
     public partial class UiModStoryMapObjectObjectParameterCtrl
     {

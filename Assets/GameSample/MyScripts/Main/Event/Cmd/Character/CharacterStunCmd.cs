@@ -29,8 +29,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new CharacterStunCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var productData = CharacterProductForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), null);
-            if (productData != null)
+            foreach (var productData in CharacterProductForm.ResolveReferences(prm[0].str))
             {
                 productData.recoveryTime = Math.Max(productData.recoveryTime, GameManager.instance.curProgress.seconds + prm[1].num);
             }

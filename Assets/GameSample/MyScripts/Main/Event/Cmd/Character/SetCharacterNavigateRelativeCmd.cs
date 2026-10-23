@@ -27,10 +27,11 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetCharacterNavigateRelativeCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var productData = CharacterProductForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER)];
-            var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(productData.uid);
-            if (data != null)
+            if (!CharacterProductForm.TryGetReferenceUid(prm[0].str, out var uid))
+                return true;
+            foreach (var data in PlayManager.instance.sceneCtrl.GetCharacterUnits(uid))
             {
+                var productData = CharacterProductForm.DataByUid[data.unit.productInfo.Item1];
                 data.speed = SetCharacterNavigateCmd.GetNavigationSpeed(productData, data.speed);
                 data.pathDis = 999;
                 data.alertDis = 999;

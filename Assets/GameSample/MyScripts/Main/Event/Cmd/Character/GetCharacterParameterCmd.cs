@@ -26,10 +26,10 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetCharacterParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = CharacterProductForm.DataByUid.GetDv( GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), null);
-            if (data != null && data.paramDic.ContainsKey(prm[1].str))
+            var data = CharacterProductForm.ResolveReference(prm[0].str);
+            if (data?.paramDic != null && data.paramDic.TryGetValue(prm[1].str, out var parameter) && parameter != null)
             {
-                asyncTask.res = new BoxDataForm.Data[] {data.paramDic[prm[1].str].GetValue().DeepCopy() };
+                asyncTask.res = new BoxDataForm.Data[] { parameter.GetValue().DeepCopy() };
             }
             else
             {

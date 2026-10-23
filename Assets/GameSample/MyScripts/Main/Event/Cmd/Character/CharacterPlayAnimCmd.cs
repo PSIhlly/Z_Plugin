@@ -25,8 +25,9 @@ namespace Z_Code
         public override CmdBase GetNew() => new CharacterPlayAnimCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER));
-            if (data != null)
+            if (!CharacterProductForm.TryGetReferenceUid(prm[0].str, out var uid))
+                return true;
+            foreach (var data in PlayManager.instance.sceneCtrl.GetCharacterUnits(uid))
             {
                 GameManager.instance.characterCtrl.PlaySpecialAnim(data,prm[1].str);
             }

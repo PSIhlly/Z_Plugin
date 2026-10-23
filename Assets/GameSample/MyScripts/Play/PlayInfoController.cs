@@ -95,10 +95,15 @@ public interface ExternalPlayInfoController
     public void UseSkill(int characterUid, int skillUid, bool ignoreCd);
 
     public void ChooseCurrentCharacter(int characterUid);
+    public void AddCharacterToTeam(string reference);
+    public void RemoveCharacterFromTeam(string reference);
+    public void DeployCharacter(string reference);
+    public void UndeployCharacter(string reference);
+    public void SetCurrentCharacter(string reference);
     public void ReplaceActiveTeamer(int oldUid, int newUid, int index);
     public void ReplaceTeamer(int activeTeamerUid, int newUid);
 }
-public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>, IZ_Listener<MissionEvent>
+public partial class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoController, ExternalPlayInfoController, IZ_Listener<CollideEvent>, IZ_Listener<MissionEvent>
 {
     Dictionary<string, List<int>> bagName2UidDic;
     public PlayInfoController(PlayManager super) : base(super)
@@ -563,50 +568,20 @@ public class PlayInfoController : Z_Controller<PlayManager>, InternalPlayInfoCon
 
     public void ChooseCurrentCharacter(int characterUid)
     {
-        var ch = CharacterProductForm.DataByUid.GetDv(characterUid, null);
-        if (ch != null && GameManager.instance.curProgress.team.Contains(ch.uid))
-        {
-            GameManager.instance.curProgress.characterUid = ch.uid;
-            _super.sceneCtrl.RefreshCurrentCharacter();
-            Z_EventHelper.Invoke(new StoryCharacterEvent()
-            {
-                type = StoryCharacterEventType.ChangeCharacter,
-                data = ch
-            });
-        }
+        SetCurrentCharacter(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, characterUid.ToString()));
     }
 
     public void ReplaceActiveTeamer(int oldUid, int newUid, int index)
     {
-        var teamActive = GameManager.instance.curProgress.teamActive;
-        if (oldUid == 0)
-        {
-            teamActive.Insert(index, newUid);
-        }
-        else
-        {
-            teamActive[index] = newUid;
-        }
-        Z_EventHelper.Invoke(new StoryCharacterEvent()
-        {
-            type = StoryCharacterEventType.ChangeTeamer,
-            data = CharacterProductForm.DataByUid.GetDv(newUid, null)
-        });
+        ReplacePartySlot(oldUid, newUid, index);
     }
 
     public void ReplaceTeamer(int activeTeamerUid, int newUid)
     {
-        var teamActive = GameManager.instance.curProgress.teamActive;
-        var idx = teamActive.IndexOf(activeTeamerUid);
-        if (idx >= 0)
-        {
-            teamActive[idx] = newUid;
-        }
-        Z_EventHelper.Invoke(new StoryCharacterEvent()
-        {
-            type = StoryCharacterEventType.ChangeTeamer,
-            data = CharacterProductForm.DataByUid.GetDv(newUid, null)
-        });
+        var progress = GameManager.instance.curProgress;
+        int index = progress?.teamActive?.IndexOf(activeTeamerUid) ?? -1;
+        if (index >= 0)
+            ReplacePartySlot(activeTeamerUid, newUid, index);
     }
 
     public void ChooseTeamCharacter(string title, Action<CharacterProductForm.Data> act)

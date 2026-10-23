@@ -281,6 +281,14 @@ namespace Form
 
                 {20055,new Data(20055,"↓","↓","↓")},
 
+                {20056,new Data(20056,"antiOcclusion","Anti occlusion","防遮挡")},
+
+                {20057,new Data(20057,"allowDrop","Allow drop","允许下落")},
+
+                {20058,new Data(20058,"nonOverlapping","Non overlapping","不重叠")},
+
+                {20059,new Data(20059,"edgeTransition","Edge transition","边界过渡")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -413,6 +421,14 @@ namespace Form
                         {"m",_DataById[20054]},
     
                         {"↓",_DataById[20055]},
+    
+                        {"antiOcclusion",_DataById[20056]},
+    
+                        {"allowDrop",_DataById[20057]},
+    
+                        {"nonOverlapping",_DataById[20058]},
+    
+                        {"edgeTransition",_DataById[20059]},
     
                     
                     };

@@ -283,8 +283,65 @@ namespace Z_Map
             navigationEndpointState.Reset();
         }
 
+        /// <summary>
+        /// allowDrop 关闭时禁止跨过大于 step 的落差：在移动方向用身体前缘探测前方地面，用两块 tile
+        /// 在交界处的地面高度算落差。斜坡（含 45° 一格一层的斜面无缝拼接）在交界处高度是连续的，
+        /// 落差接近 0，照常走下去；台阶/断崖是整层落差（>= step），取消这次横向移动。
+        /// 只保留 dir 的垂直分量，所以重力下落和已经在低层时的行走都不受影响。
+        /// </summary>
+        private Vector3 ClampStepDown(Vector3 dir)
+        {
+            if (DynamicGlobalSettings.allowDrop)
+                return dir;
+
+            Vector3 horizontal = new Vector3(dir.x, 0f, dir.z);
+            float distance = horizontal.magnitude;
+            if (distance <= 0.000001f)
+                return dir;
+
+            var utilCtrl = manager.utilCtrl;
+            Vector3Int curMapPos = utilCtrl.RealPos2MapPosInt(data.pos);
+            // 站在斜面上时，角色的 y 落在斜面那一层的下面（斜面表面横跨一整层），
+            // 当前层没有 tile，取上一层最近的那块，避免整个检查被跳过。
+            TileUnit curTile = utilCtrl.GetTile(curMapPos.x, curMapPos.y, curMapPos.z)
+                ?? utilCtrl.GetTile(curMapPos.x, curMapPos.y + 1, curMapPos.z);
+            if (curTile == null)
+                return dir;
+
+            float probe = GetNavigationRadius() + 0.05f;
+            Vector3 frontPos = data.pos + horizontal / distance * probe;
+            Vector3Int frontMapPos = utilCtrl.RealPos2MapPosInt(frontPos);
+            TileUnit frontTile = utilCtrl.GetTile(frontMapPos.x, frontMapPos.y, frontMapPos.z);
+            // 前方本层有 tile，或前方地面不比脚下低：正常行走
+            if (frontTile != null && frontTile.data.mapPos.y >= curTile.data.mapPos.y)
+                return dir;
+            // 前方没有地面：悬空，禁止走下边界
+            if (frontTile == null)
+                return new Vector3(0f, dir.y, 0f);
+
+            // 前方更低：不能只看层号（斜坡的连续斜面层号本来就低一层），要在两块 tile 的交界处
+            // 比较地面高度。交界点取两格中心的中点，斜面的两个平面在这里重合。
+            Vector3 curTilePos = curTile.data.pos;
+            Vector3 frontTilePos = frontTile.data.pos;
+            float boundaryX = (curTilePos.x + frontTilePos.x) * 0.5f;
+            float boundaryZ = (curTilePos.z + frontTilePos.z) * 0.5f;
+            float curGround = curTile.GetYByPoint(new Vector2(boundaryX - curTilePos.x, boundaryZ - curTilePos.z));
+            float frontGround = frontTile.GetYByPoint(new Vector2(boundaryX - frontTilePos.x, boundaryZ - frontTilePos.z));
+            // GetYByPoint 用 -999 表示该 tile 没有可站立面（直接坠落），按断崖处理
+            if (curGround <= -900f || frontGround <= -900f)
+                return new Vector3(0f, dir.y, 0f);
+
+            // 和导航建链用同一个阈值；导航还没建好时按同样的公式兜底。
+            float stepHeight = manager.navigationCtrl != null && manager.navigationCtrl.step > 0f
+                ? manager.navigationCtrl.step
+                : manager.data.mainData.mapUnitSize.y / 3f;
+            stepHeight = Mathf.Max(stepHeight, 0.0001f);
+            return curGround - frontGround < stepHeight ? dir : new Vector3(0f, dir.y, 0f);
+        }
+
         public void Move(Vector3 dir)
         {
+            dir = ClampStepDown(dir);
             Vector3 moveStartPos = data.pos;
             /*
             var floor = manager.updateCtrl.g(this, belongTile, dir, CollideType.CollideOnly,out _);

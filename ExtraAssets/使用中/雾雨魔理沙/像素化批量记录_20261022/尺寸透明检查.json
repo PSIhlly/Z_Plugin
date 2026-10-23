@@ -1,0 +1,222 @@
+[
+  {
+    "Relative": "其他\\Codex 图像 2026年8月18日 21_16_00.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5905,
+    "Transparent": 10479,
+    "PartialAlpha": 0,
+    "Colors": 46,
+    "Bounds": "2,1,83,125",
+    "Sha256": "53CD508EE3A1A1678E18F5711F270136A5DE9A0F21090136A9810F7F6B34334B"
+  },
+  {
+    "Relative": "其他\\Codex 图像 2026年8月19日 10_09_38.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5695,
+    "Transparent": 10689,
+    "PartialAlpha": 0,
+    "Colors": 48,
+    "Bounds": "29,2,70,117",
+    "Sha256": "CC63491230B6CF6DB5FC547BE55EB9DF376A3C7FF8FF5C09C68F8995529870D3"
+  },
+  {
+    "Relative": "其他\\Codex 图像 2026年8月19日 10_12_33.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 6306,
+    "Transparent": 10078,
+    "PartialAlpha": 0,
+    "Colors": 48,
+    "Bounds": "21,4,96,117",
+    "Sha256": "E0AAB9F923C258E451B4350A2382BABBBEDE0B91A223250BF121D344D3561EB9"
+  },
+  {
+    "Relative": "其他\\Codex 图像 2026年8月19日 10_12_40.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5602,
+    "Transparent": 10782,
+    "PartialAlpha": 0,
+    "Colors": 46,
+    "Bounds": "18,2,85,116",
+    "Sha256": "F97CE7B800CC983F05031AC40C6E334E6FA391BDF3F903E159EFF4707A42B11A"
+  },
+  {
+    "Relative": "其他\\Codex 图像 2026年8月19日 10_12_49.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 6506,
+    "Transparent": 9878,
+    "PartialAlpha": 0,
+    "Colors": 46,
+    "Bounds": "21,8,95,114",
+    "Sha256": "3E0C7B416496873CBEF167EACD06BD2597F0F91562A312B0F72E3F2A374ED5C7"
+  },
+  {
+    "Relative": "其他\\Codex 图像 2026年8月19日 10_12_55.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5548,
+    "Transparent": 10836,
+    "PartialAlpha": 0,
+    "Colors": 46,
+    "Bounds": "12,8,98,113",
+    "Sha256": "24DE8556740A3424F5F31E828F6E55C5DBD3F227BDEFBA1017DA0B5984E21C1E"
+  },
+  {
+    "Relative": "其他\\exec-8395cfb2-d01f-496d-be36-d57ee134bbff.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5113,
+    "Transparent": 11271,
+    "PartialAlpha": 0,
+    "Colors": 38,
+    "Bounds": "46,10,77,116",
+    "Sha256": "0A4CFDF47074D9E4ADA2940AF842FAB08DD6D1996AC4A2EFB7ED2C5A1DC6D50E"
+  },
+  {
+    "Relative": "其他\\exec-a1ffe9ff-daa1-4075-9bc5-5abe0101dba8.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5563,
+    "Transparent": 10821,
+    "PartialAlpha": 0,
+    "Colors": 47,
+    "Bounds": "43,1,82,122",
+    "Sha256": "F6C66CDDFEE146D955E57E71915BF4FA15CAA0036B41EEB929DCEB240DAAE83A"
+  },
+  {
+    "Relative": "行走\\exec-20f3b5c0-82e1-4fed-9d13-0e85ddfc77bc.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5171,
+    "Transparent": 11213,
+    "PartialAlpha": 0,
+    "Colors": 43,
+    "Bounds": "31,2,64,122",
+    "Sha256": "98D9AE20C4366801CABF93393C8312E71BF135D92F1790C5267FE63352B5FCB3"
+  },
+  {
+    "Relative": "行走\\exec-2144a3e7-aa36-4696-96eb-bb4b8c73f080.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5409,
+    "Transparent": 10975,
+    "PartialAlpha": 0,
+    "Colors": 46,
+    "Bounds": "31,2,64,120",
+    "Sha256": "CDEFD7A2BFACFBD55F62A8FA22F28AFB0A17D723FF4EA54F5904B0F2D13E6FD6"
+  },
+  {
+    "Relative": "行走\\exec-2f41399c-9aa6-4897-a4d7-d9edc52a52ce.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5627,
+    "Transparent": 10757,
+    "PartialAlpha": 0,
+    "Colors": 48,
+    "Bounds": "28,6,70,114",
+    "Sha256": "34FB05841975C10C3E7FF0AEB17E9967239759C31919D4CFD85659E3E57A13D8"
+  },
+  {
+    "Relative": "行走\\exec-c25804a1-ec09-404b-93c9-a4ac4a2683c0.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5193,
+    "Transparent": 11191,
+    "PartialAlpha": 0,
+    "Colors": 48,
+    "Bounds": "31,8,65,115",
+    "Sha256": "1E6A2A564D3A34FD46E23CD9C7ED5AE5B0C6A115556AC104CE724F6B41FAF91B"
+  },
+  {
+    "Relative": "行走\\exec-d9ffa528-ca75-41de-b78a-fa3ed86de771.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5390,
+    "Transparent": 10994,
+    "PartialAlpha": 0,
+    "Colors": 47,
+    "Bounds": "30,4,65,119",
+    "Sha256": "60A77C5CF83588C2F0C8DED951B08F882897BA140A52AFBB4E5F533E0239D8E8"
+  },
+  {
+    "Relative": "行走\\exec-e261b32c-d196-4976-9cc6-60d6b8869812.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5576,
+    "Transparent": 10808,
+    "PartialAlpha": 0,
+    "Colors": 40,
+    "Bounds": "28,6,67,118",
+    "Sha256": "89836D49B28C1D3EC4C32BC56DA358D7E7B02CF09535FD461748F7F5707233E8"
+  },
+  {
+    "Relative": "行走\\exec-e4450e79-b2f6-4f3a-a333-4026d85f1c5f.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5633,
+    "Transparent": 10751,
+    "PartialAlpha": 0,
+    "Colors": 46,
+    "Bounds": "28,4,70,119",
+    "Sha256": "FF32684AF609A45DD94E17567CF9249D6E446C9810690B9CEFE665702DED4527"
+  },
+  {
+    "Relative": "行走\\exec-f3b5d1be-cdec-4d85-baab-aa371281d310.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5517,
+    "Transparent": 10867,
+    "PartialAlpha": 0,
+    "Colors": 41,
+    "Bounds": "28,5,68,118",
+    "Sha256": "38C2E0FB24F2DC53D5CA25C8F2B5ED63636C18FB45D4866B631A39611CD1CF96"
+  },
+  {
+    "Relative": "exec-4abab1fb-0462-4eaa-97e9-df1f9782c2ca.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5168,
+    "Transparent": 11216,
+    "PartialAlpha": 0,
+    "Colors": 43,
+    "Bounds": "31,2,65,124",
+    "Sha256": "3014CBD40220C6D3DD182CC8E7EAACE27ADB35E3D2284781AC2C2C7BC6CC4464"
+  },
+  {
+    "Relative": "exec-743dcf3f-32da-455b-bda0-9ad1df9c8205.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 4879,
+    "Transparent": 11505,
+    "PartialAlpha": 0,
+    "Colors": 47,
+    "Bounds": "30,4,65,121",
+    "Sha256": "60228098BF45974918DE116EAFB6677CF86FEFF74213FCA72B5ABA1CBBAB8A05"
+  },
+  {
+    "Relative": "exec-cacb6d35-a66e-4bc4-9349-964b9531deb2.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5616,
+    "Transparent": 10768,
+    "PartialAlpha": 0,
+    "Colors": 40,
+    "Bounds": "28,8,69,114",
+    "Sha256": "FAE7CC6DBF1213C22FEBB4B17C5BC532606D632A71A190E18BC4A1C85DAF6A0D"
+  },
+  {
+    "Relative": "exec-cb1798b6-3fe4-4b70-a089-07cd98fb78b2.png",
+    "Width": 128,
+    "Height": 128,
+    "Opaque": 5828,
+    "Transparent": 10556,
+    "PartialAlpha": 0,
+    "Colors": 47,
+    "Bounds": "28,3,70,116",
+    "Sha256": "DEBBB135C8857C26D85FC1A8068A376715F9D557CCFF21AA77BF09DBB639BBF8"
+  }
+]

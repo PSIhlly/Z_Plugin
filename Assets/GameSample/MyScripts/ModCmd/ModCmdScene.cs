@@ -117,15 +117,15 @@ public partial class ModCmd
         }
         else if (isAddObject)
         {
-            if (!MapObjectForm.DataByName.TryGetValue(name, out MapObjectForm.Data data))
+            if (!ObjectProductForm.DataByNameProtouid.TryGetValue((name, 0), out ObjectProductForm.Data data))
             {
-                result = $"MapObject '{name}' was not found.";
+                result = $"ObjectProduct '{name}' was not found.";
                 return false;
             }
 
             if (modManager.assetCtrl.AddObject(data, position, angle) == null)
             {
-                result = $"Failed to add MapObject '{name}' at the Mod scene camera target.";
+                result = $"Failed to add ObjectProduct '{name}' at the Mod scene camera target.";
                 return false;
             }
         }

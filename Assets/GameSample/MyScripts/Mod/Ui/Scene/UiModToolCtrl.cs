@@ -125,6 +125,17 @@ namespace Ui.ModSceneMain.ModTool
                 return ModManager.instance.sceneCtrl.posing;
             }
         }
+        public bool nonOverlapping
+        {
+            set
+            {
+                ModManager.instance.sceneCtrl.nonOverlapping = value;
+            }
+            get
+            {
+                return ModManager.instance.sceneCtrl.nonOverlapping;
+            }
+        }
     }
 
     public partial class UiModToolCtrl
@@ -195,6 +206,11 @@ namespace Ui.ModSceneMain.ModTool
             view.btn_rotate.onClick.AddListener(() =>
             {
                 model.angle = ((int.Parse(model.angle) + 90)).ToString();
+                Refresh();
+            });
+            view.btn_nonOverlapping.onClick.AddListener(() =>
+            {
+                model.nonOverlapping = !model.nonOverlapping;
                 Refresh();
             });
 
@@ -370,6 +386,7 @@ namespace Ui.ModSceneMain.ModTool
 
             conData.Refresh();
             view.sta_align.ChangeState(model.posing ? 1 : 0);
+            view.sta_nonOverlapping.ChangeState(model.nonOverlapping ? 1 : 0);
             view.ipt_cntSetX.Set(model.cntX);
             view.ipt_cntSetY.Set(model.cntY);
             view.ipt_posSetX.Set(model.posX);
@@ -485,7 +502,8 @@ namespace Ui.ModSceneMain.ModTool
             view.sta_exist.ChangeState(1);
 
             view.txt_.text = model.data.name;
-            if (model.data is MapObjectForm.Data objData)
+            if (model.data is MapObjectForm.Data objRow &&
+                ObjectProductForm.DataByUid.TryGetValue(objRow.objectUid, out var objData))
             {
                 var clip = objData.GetAnimClip(objData.GetDefaultAnimDirection());
                 int texId = clip.Count > 0 ? clip[0] : 0;

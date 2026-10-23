@@ -14,7 +14,7 @@ namespace Z_DataSystem.Form
 
     public static partial class ProductForm
     {
-public static readonly int autoUidCnt=100;
+public static readonly int autoUidCnt=1000000;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Register()

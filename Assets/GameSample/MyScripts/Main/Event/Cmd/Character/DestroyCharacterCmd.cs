@@ -32,15 +32,30 @@ namespace Z_Code
 
             // Interaction/BoundaryTouch pass the scene instance; other character
             // events and commands pass the owning Character Product.
-            var data = GlobalEventHelper.IsAsset(reference, GlobalEventHelper.SCENEOBJECT)
-                ? UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(reference, GlobalEventHelper.SCENEOBJECT), null)
-                    as Z_Map.Form.CharacterUnitForm.Data
-                : PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(reference, GlobalEventHelper.CHARACTER));
-            if (data?.unit is CharacterUnit character)
+            var units = new List<Z_Map.Form.CharacterUnitForm.Data>();
+            if (CharacterProductForm.TryGetReferenceUid(reference, out var productUid))
+                units = PlayManager.instance.sceneCtrl.GetCharacterUnits(productUid);
+            else
             {
+                const string mark = "$so$";
+                if (reference.Length <= mark.Length * 2
+                    || !reference.StartsWith(mark, StringComparison.Ordinal)
+                    || !reference.EndsWith(mark, StringComparison.Ordinal)
+                    || !int.TryParse(reference.Substring(mark.Length, reference.Length - mark.Length * 2),
+                        System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var unitUid)
+                    || unitUid <= 0)
+                    return true;
+                if (UnitForm.DataByUid.TryGetValue(unitUid, out var unit)
+                    && unit is Z_Map.Form.CharacterUnitForm.Data characterData)
+                    units.Add(characterData);
+            }
+            foreach (var data in units)
+            {
+                if (!(data?.unit is CharacterUnit character))
+                    continue;
                 var product = CharacterProductForm.DataByUid.GetDv(character.productInfo.Item1, null);
                 if (!PlayManager.instance.sceneCtrl.RemoveCharacter(data))
-                    return true;
+                    continue;
                 // Uniqueness protects the Product, not its instance in this scene.
                 if (product != null && !product.unique)
                     CharacterProductForm.RemoveData(product.uid);

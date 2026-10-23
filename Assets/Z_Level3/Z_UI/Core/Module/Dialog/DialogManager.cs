@@ -61,7 +61,7 @@ namespace Z_Ui.Dialog
             settings = new Settings()
             {
                 autoPlaySpeed = 0,
-                textDisplaySpeed = 20,
+                textDisplaySpeed = 20,//20 = 每字 0.05 秒（interval 0.1 × 每次 2 字）
                 historyMax = 10
             };
 

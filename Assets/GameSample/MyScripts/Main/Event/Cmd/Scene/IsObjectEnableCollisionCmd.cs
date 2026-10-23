@@ -28,10 +28,10 @@ namespace Z_Code
         public override CmdBase GetNew() => new IsObjectEnableCollisionCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-;            var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT), null);
-            if (data != null&& data is ObjectUnitForm.Data oData)
+            var unit = GlobalEventHelper.ResolveSceneObjectUnit(prm[0].str);
+            if (unit is ObjectUnit obj)
             {
-                var box = CodeHelper.CreateBoxByNum(oData.isObstacle?1:0);
+                var box = CodeHelper.CreateBoxByNum(obj.data.isObstacle?1:0);
                 asyncTask.res = new BoxDataForm.Data[] { box };
             }else
             {

@@ -1,0 +1,15 @@
+{
+  "mode": "built-in imagegen",
+  "source": "D:/Works/Unity's/Personal/Z_Plugin/Z_Plugin/ExtraAssets/元气骑士/斯大林制地砖_拆分/03_props/107_tree_snow.png",
+  "generated": "C:\\Users\\LH1\\.codex\\generated_images\\01a11a07-4b7c-7991-a4d8-b119a9a411d7\\exec-81032617-92d5-4b32-996d-8a751cf078c8.png",
+  "prompt": "Use case: style-transfer. Asset type: one coarse pixel-art cold-blue tree sprite for a 2D adventure game.\nThe attached image is the EDIT TARGET. Remaster the SAME cyan-blue tree, preserving its identity: a pointed but stout compact conifer with rounded scalloped/overlapping foliage tiers, dark teal-blue lower foliage shadows, cyan/blue-green lit upper surfaces, and a very short brown-purple trunk at bottom center. Preserve the original cold blue/cyan palette and layered rounded branch shapes.\nMatch a deliberately ROUGH, SIMPLE chunky pixel-art style. Intended final canvas 64x112, portrait aspect 4:7, genuinely transparent background. Design on a coarse logical 32x56 pixel grid shown enlarged: each smallest pixel is a 2x2 block in the final 64x112 asset. Use around 7-9 flat solid colors, 4 or 5 broad foliage tiers, just a few large irregular light/mid/dark masses per tier. Clean angular stair-step edges and simplified rounded lobes, no fine needles, no tiny leaf flecks, no grain, no dithering or intricate twig detail. Keep upper-left lighting restrained, with broad dark right-side/underside areas. Trunk only a few simple pixels.\nThis should be a companion asset to a simplified coarse-pixel green conifer, while clearly retaining this source tree's cyan-blue color and rounder fuller foliage. A single complete upright tree, centered and nearly filling the 4:7 portrait canvas, only a very thin transparent margin, with entire crown and trunk inside frame. Front-facing game map prop, not an overhead circular canopy or isometric cube.\nNo added white snow blanket or objects absent from the source, no ornaments, flowers, fruit, ground, cast shadow, grass, scenery, text, frame or watermark. No photographic leaves, painterly shading, soft gradients, blur, glossy 3D rendering or antialiasing. Redraw as visibly coarse color clusters, not a sharpened detailed tree.",
+  "logicalCanvas": [
+    32,
+    56
+  ],
+  "targetSize": [
+    64,
+    112
+  ],
+  "placement": "Uniform fit, bottom center; retain original wide rounded tree proportions."
+}

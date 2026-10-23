@@ -1,13 +1,6 @@
-using Form;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Z_Code.Form;
-using Z_Text;
-using Z_Ui.Dialog;
-using Z_Ui.Notify;
+using Z_Map;
 
 namespace Z_Code
 {
@@ -22,16 +15,18 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowEffectByCharacterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(prm[1].str, GlobalEventHelper.CHARACTER));
+            var units = SceneUnitCommand.ResolveAll(prm[1].str);
             bool ignoreRot = prm[2].num == 1;
-            var delta = ShowEffectCmd.Delta;
-            if (data != null)
+            foreach (var unit in units)
             {
+                if (!(unit is CharacterUnit) || !SceneUnitCommand.IsLive(unit)) continue;
+                var data = unit.data;
+                var delta = ShowEffectCmd.Delta;
                 PlayManager.instance.effectCtrl.CreatEffect(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.EFFECT), data.pos + delta, ignoreRot ? 0 : data.euler.y, (img) =>
                 {
-                    if(data.unit.ins!=null)
+                    if(SceneUnitCommand.IsLive(unit, data) && unit.ins != null)
                     {
-                        img.oriPos = data.unit.ins.transform.position + delta;
+                        img.oriPos = unit.ins.transform.position + delta;
                         if (!ignoreRot)
                         {
                             img.oriRot = data.euler.y;

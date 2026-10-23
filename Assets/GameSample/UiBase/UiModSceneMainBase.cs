@@ -202,6 +202,8 @@ namespace ModTool
             public ScrView scr_tool;
             public GameObject go_toolContentPos;
             public ScrView scr_toolType;
+            public Btn btn_nonOverlapping ;
+            public Sta sta_nonOverlapping ;
             public GameObject go_lab;
             public UiLabCtrl sub_lab;
             public GameObject go_toolItem;
@@ -227,22 +229,24 @@ namespace ModTool
             scr_tool = uiHolder.elementTrsLst[3].GetComponent<ScrView>();
             go_toolContentPos = uiHolder.elementTrsLst[4].gameObject;
             scr_toolType = uiHolder.elementTrsLst[5].GetComponent<ScrView>();
-            go_lab = uiHolder.elementTrsLst[6].gameObject;
-            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[7].GetComponent<UiHolder>().ctrl;
-            go_toolItem = uiHolder.elementTrsLst[8].gameObject;
-            sub_toolItem = (UiToolItemCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
-            ipt_rotateSet = uiHolder.elementTrsLst[10].GetComponent<Ipt>();
-            btn_rotate = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            ipt_posSetX = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
-            ipt_posSetZ = uiHolder.elementTrsLst[13].GetComponent<Ipt>();
-            ipt_posSetY = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
-            btn_align = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            sta_align = uiHolder.elementTrsLst[16].GetComponent<Sta>();
-            ipt_cntSetX = uiHolder.elementTrsLst[17].GetComponent<Ipt>();
-            ipt_cntSetY = uiHolder.elementTrsLst[18].GetComponent<Ipt>();
-            btn_resetCount = uiHolder.elementTrsLst[19].GetComponent<Btn>();
-            go_toolTypeItem = uiHolder.elementTrsLst[20].gameObject;
-            sub_toolTypeItem = (UiToolTypeItemCtrl) uiHolder.elementTrsLst[21].GetComponent<UiHolder>().ctrl;
+            btn_nonOverlapping  = uiHolder.elementTrsLst[6].GetComponent<Btn>();
+            sta_nonOverlapping  = uiHolder.elementTrsLst[7].GetComponent<Sta>();
+            go_lab = uiHolder.elementTrsLst[8].gameObject;
+            sub_lab = (UiLabCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
+            go_toolItem = uiHolder.elementTrsLst[10].gameObject;
+            sub_toolItem = (UiToolItemCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
+            ipt_rotateSet = uiHolder.elementTrsLst[12].GetComponent<Ipt>();
+            btn_rotate = uiHolder.elementTrsLst[13].GetComponent<Btn>();
+            ipt_posSetX = uiHolder.elementTrsLst[14].GetComponent<Ipt>();
+            ipt_posSetZ = uiHolder.elementTrsLst[15].GetComponent<Ipt>();
+            ipt_posSetY = uiHolder.elementTrsLst[16].GetComponent<Ipt>();
+            btn_align = uiHolder.elementTrsLst[17].GetComponent<Btn>();
+            sta_align = uiHolder.elementTrsLst[18].GetComponent<Sta>();
+            ipt_cntSetX = uiHolder.elementTrsLst[19].GetComponent<Ipt>();
+            ipt_cntSetY = uiHolder.elementTrsLst[20].GetComponent<Ipt>();
+            btn_resetCount = uiHolder.elementTrsLst[21].GetComponent<Btn>();
+            go_toolTypeItem = uiHolder.elementTrsLst[22].gameObject;
+            sub_toolTypeItem = (UiToolTypeItemCtrl) uiHolder.elementTrsLst[23].GetComponent<UiHolder>().ctrl;
         }
 
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Form
 {
-    public static partial class MapObjectForm
+    public static partial class ObjectProductForm
     {
         public partial class Data
         {

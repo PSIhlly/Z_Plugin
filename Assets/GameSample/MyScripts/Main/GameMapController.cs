@@ -39,10 +39,10 @@ namespace Z_Map
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
-                        if (jo != null && jo[productKey].Type != JTokenType.Null)
+                        if (jo[productKey] is JArray product && product.Count >= 2)
                         {
-                            _productInfo.Item1 = (int)jo[productKey][0];
-                            _productInfo.Item2 = (int)jo[productKey][1];
+                            _productInfo.Item1 = (int)product[0];
+                            _productInfo.Item2 = (int)product[1];
                         }
                     }
                 }
@@ -96,14 +96,21 @@ namespace Z_Map
                     }
                     else if (this is ObjectUnit obj)
                     {
-                        var objp = MapObjectForm.DataById.GetDv(obj.productInfo.Item1, null);
-                        if (objp != null)
+                        var productParameters = DynamicGlobalSettings.playing
+                            ? ObjectProductForm.GetUnitParameters(obj.data) : null;
+                        if (productParameters != null)
                         {
-                            foreach (var pair in objp.paramDic)
+                            _paramInfo = productParameters;
+                        }
+                        else
+                        {
+                            var objp = ObjectProductForm.GetProduct(obj.data);
+                            if (objp?.paramDic != null)
                             {
-                                if (!_paramInfo.ContainsKey(pair.Key))
+                                foreach (var pair in objp.paramDic)
                                 {
-                                    _paramInfo[pair.Key] = pair.Value.Copy();
+                                    if (!_paramInfo.ContainsKey(pair.Key) && pair.Value != null)
+                                        _paramInfo[pair.Key] = pair.Value.Copy();
                                 }
                             }
                         }
@@ -127,7 +134,8 @@ namespace Z_Map
             }
             set
             {
-                _paramInfo = value;
+                _paramInfo = this is ObjectUnit obj && DynamicGlobalSettings.playing
+                    ? ObjectProductForm.SetUnitParameters(obj.data, value) : value;
             }
         }
         public static string GetParamInfoString(JObject ori, Dictionary<string, GameParamForm.Data> info)
@@ -151,6 +159,30 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         ProgressForm.changeCameramodeAction += (data, old, now) =>
         {
             DynamicGlobalSettings.cameraMode = now;
+        };
+        ProgressForm.addAction += (data) =>
+        {
+            DynamicGlobalSettings.antiOcclusion = data.antiOcclusion;
+        };
+        ProgressForm.changeAntiocclusionAction += (data, old, now) =>
+        {
+            DynamicGlobalSettings.antiOcclusion = now;
+        };
+        ProgressForm.addAction += (data) =>
+        {
+            DynamicGlobalSettings.allowDrop = data.allowDrop;
+        };
+        ProgressForm.changeAllowdropAction += (data, old, now) =>
+        {
+            DynamicGlobalSettings.allowDrop = now;
+        };
+        ProgressForm.addAction += (data) =>
+        {
+            DynamicGlobalSettings.edgeTransition = data.edgeTransition;
+        };
+        ProgressForm.changeEdgetransitionAction += (data, old, now) =>
+        {
+            DynamicGlobalSettings.edgeTransition = now;
         };
         MapTextureForm.changePasstypeAction += (_, _, _) =>
         {
@@ -245,10 +277,10 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     }
     private static readonly Dictionary<(int mapTextureId, bool frontPart, int mask), List<int>>
         wangTileAnimationTextures = new Dictionary<(int, bool, int), List<int>>();
-    private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), List<int>>
+    private static readonly Dictionary<(int templateUid, AnimDirecton direction, int mask), List<int>>
         objectWangTileAnimationTextures = new Dictionary<(int, AnimDirecton, int), List<int>>();
     // Mask -1 denotes an ordinary clip; WangTile masks are 0..255.
-    private static readonly Dictionary<(int mapObjectId, AnimDirecton direction, int mask), Rect> objectWangTileCollisionBounds
+    private static readonly Dictionary<(int productUid, AnimDirecton direction, int mask), Rect> objectWangTileCollisionBounds
         = new Dictionary<(int, AnimDirecton, int), Rect>();
     private static readonly Dictionary<Texture2D, Rect> objectWangTileTextureBounds = new Dictionary<Texture2D, Rect>();
     private readonly HashSet<ObjectUnit> objectCollisionBoundsUnits = new HashSet<ObjectUnit>();
@@ -319,42 +351,50 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     }
 
     internal static void RegisterObjectWangTileAnimationTexture(
-        int mapObjectId, AnimDirecton direction, int mask, int textureId)
+        int templateUid, AnimDirecton direction, int mask, int textureId)
     {
-        var key = (mapObjectId, direction, mask);
+        var key = (templateUid, direction, mask);
         if (!objectWangTileAnimationTextures.TryGetValue(key, out List<int> textures))
         {
             textures = new List<int>();
             objectWangTileAnimationTextures.Add(key, textures);
         }
         textures.Add(textureId);
-        objectWangTileCollisionBounds.Remove(key);
+        if (objectWangTileCollisionBounds.Count > 0)
+            foreach (var boundsKey in objectWangTileCollisionBounds.Keys.Where(boundsKey => boundsKey.direction == direction
+                         && boundsKey.mask == mask && (boundsKey.productUid == templateUid
+                         || ObjectProductForm.DataByUid.TryGetValue(boundsKey.productUid, out var product)
+                         && ObjectProductForm.GetTemplateUid(product) == templateUid)).ToList())
+                objectWangTileCollisionBounds.Remove(boundsKey);
     }
 
-    internal static void ClearObjectWangTileAnimationTextures(int mapObjectId)
+    internal static void ClearObjectWangTileAnimationTextures(int templateUid)
     {
-        foreach (var key in objectWangTileCollisionBounds.Keys.Where(key => key.mapObjectId == mapObjectId).ToList())
+        foreach (var key in objectWangTileCollisionBounds.Keys.Where(key => key.productUid == templateUid
+                     || ObjectProductForm.DataByUid.TryGetValue(key.productUid, out var product)
+                     && ObjectProductForm.GetTemplateUid(product) == templateUid).ToList())
             objectWangTileCollisionBounds.Remove(key);
         // Generated textures are about to be destroyed/replaced under new IDs.
         objectWangTileTextureBounds.Clear();
         foreach (var key in objectWangTileAnimationTextures.Keys
-                     .Where(key => key.mapObjectId == mapObjectId).ToList())
+                     .Where(key => key.templateUid == templateUid).ToList())
         {
             validatedTextureFrames.Remove(objectWangTileAnimationTextures[key]);
             objectWangTileAnimationTextures.Remove(key);
         }
     }
 
-    public void RefreshObjectWangTileAppearances(int mapObjectId)
+    public void RefreshObjectWangTileAppearances(int productUid)
     {
-        var data = MapObjectForm.DataById.GetDv(mapObjectId, null);
-        if (data == null)
+        if (!ObjectProductForm.DataByUid.TryGetValue(productUid, out var prototype))
             return;
+        int templateUid = ObjectProductForm.GetTemplateUid(prototype);
 
         foreach (ObjectUnitForm.Data objectData in ObjectUnitForm.DataByUid.Values)
         {
             ObjectUnit unit = objectData.unit;
-            if (unit.productInfo.Item1 != mapObjectId)
+            var data = ObjectProductForm.GetProduct(objectData);
+            if (data == null || ObjectProductForm.GetTemplateUid(data) != templateUid)
                 continue;
 
             if (data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds))
@@ -494,12 +534,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         DisFadeRenderRouting.SetTexture(ins.renderers[rendererId], texture, ins.GetRendererRoute(rendererId));
     }
-    public void RegisterObject(ObjectUnitForm.Data newObjectData, MapObjectForm.Data objectData)
+    public void RegisterObject(ObjectUnitForm.Data newObjectData, ObjectProductForm.Data objectData)
     {
-        newObjectData.unit.productInfo = (objectData.id, -1);
-        newObjectData.unit.paramInfo = new Dictionary<string, GameParamForm.Data>();
-        foreach (var pair in objectData.paramDic)
-            newObjectData.unit.paramInfo[pair.Key] = pair.Value.Copy();
+        ObjectProductForm.AssignProduct(newObjectData, objectData);
+
+        if (DynamicGlobalSettings.playing)
+            objectData = ObjectProductForm.BindUnit(newObjectData) ?? objectData;
 
         newObjectData.isObstacle = objectData.collision;
         if (objectData.isWangTile)
@@ -559,7 +599,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             map.updateCtrl.CollectHistoryColumn(new Vector3Int(x, 0, z), candidates);
     }
 
-    private static int GetObjectWangTileMask(ObjectUnit unit, int mapObjectId, Bounds bounds)
+    private static int GetObjectWangTileMask(ObjectUnit unit, int templateUid, Bounds bounds)
     {
         objectWangTileMaskCandidates.Clear();
         CollectObjectWangTileCandidates(bounds, objectWangTileMaskCandidates);
@@ -568,7 +608,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             int mask = 0;
             foreach (MapUnit candidate in objectWangTileMaskCandidates)
             {
-                if (!(candidate is ObjectUnit other) || other == unit || other.productInfo.Item1 != mapObjectId
+                if (!(candidate is ObjectUnit other) || other == unit || !HasObjectTemplate(other, templateUid)
                     || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
                     continue;
                 mask |= GetObjectNeighbourBits(bounds, otherBounds);
@@ -581,7 +621,13 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
     }
 
-    private void UpdateObjectWangTileNeighbours(ObjectUnit unit, MapObjectForm.Data data)
+    private static bool HasObjectTemplate(ObjectUnit unit, int templateUid)
+    {
+        var product = ObjectProductForm.GetProduct(unit.data);
+        return product != null && ObjectProductForm.GetTemplateUid(product) == templateUid;
+    }
+
+    private void UpdateObjectWangTileNeighbours(ObjectUnit unit, ObjectProductForm.Data data)
     {
         if (!data.isWangTile)
             return;
@@ -602,13 +648,13 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
-                if (!(candidate is ObjectUnit other) || other == unit || other.productInfo.Item1 != data.id
+                if (!(candidate is ObjectUnit other) || other == unit || !HasObjectTemplate(other, ObjectProductForm.GetTemplateUid(data))
                     || (!other.isShowing && !data.boundsCollision)
                     || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
                     continue;
                 if ((hadOldBounds && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
                     || (hasNewBounds && GetObjectNeighbourBits(otherBounds, newBounds) != 0))
-                    RefreshObjectAppearance(other, data);
+                    RefreshObjectAppearance(other, ObjectProductForm.GetProduct(other.data));
             }
         }
         finally
@@ -618,7 +664,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     }
 
-    private void RemoveObjectWangTileNeighbours(ObjectUnit unit, MapObjectForm.Data data)
+    private void RemoveObjectWangTileNeighbours(ObjectUnit unit, ObjectProductForm.Data data)
     {
         bool hadBounds = objectWangTileBounds.TryGetValue(unit, out Bounds oldBounds)
             || TryGetObjectWangTileBounds(unit, out oldBounds);
@@ -632,11 +678,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
-                if (candidate is ObjectUnit other && other != unit && other.productInfo.Item1 == data.id
+                if (candidate is ObjectUnit other && other != unit && HasObjectTemplate(other, ObjectProductForm.GetTemplateUid(data))
                     && (other.isShowing || data.boundsCollision)
                     && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
                     && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
-                    RefreshObjectAppearance(other, data);
+                    RefreshObjectAppearance(other, ObjectProductForm.GetProduct(other.data));
             }
         }
         finally
@@ -709,13 +755,6 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         switch (evt.type)
         {
             case MapEventType.Show:
-                // Play terrain is static. The front lies on the -Z edge; an
-                // exact-layer neighbour of the same prefab makes it internal.
-                var tilePos = evt.unit.data.mapPos;
-                bool hideFront = DynamicGlobalSettings.playing
-                    && MapManager.instance.data.maps.TryGetValue(
-                        (tilePos.x, tilePos.y, tilePos.z - 1), out var rearTile)
-                    && rearTile.prefabName == evt.unit.data.prefabName;
                 int baseRendererCount = Mathf.Min(GlobalSettings.TERRAIN_LAYER_MAX, evt.unit.ins.renderers.Length);
                 for (int layer = 0; layer < baseRendererCount; layer++)
                 {
@@ -725,9 +764,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     int frontRendererId = GlobalSettings.TERRAIN_LAYER_MAX + layer;
                     if (frontRendererId < evt.unit.ins.renderers.Length)
                     {
-                        var (frontTextures, frontInterval) = hideFront
-                            ? (default(TextureFrames), 0f)
-                            : GetTileLayerTextures(evt.unit.data, layer, true);
+                        var (frontTextures, frontInterval) = GetTileLayerTextures(evt.unit.data, layer, true);
                         ShowFinalTextures(evt.unit.ins, frontRendererId, frontTextures, frontInterval);
                     }
                 }
@@ -744,7 +781,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             case MapEventType.Show:
                 {
-                    var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                    if (DynamicGlobalSettings.playing)
+                        ObjectProductForm.BindUnit(evt.unit.data);
+                    var data = ObjectProductForm.GetProduct(evt.unit.data);
                     if (data != null)
                     {
                         data.EnsureDirectionData();
@@ -759,7 +798,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             case MapEventType.BoundaryTouch:
             case MapEventType.Refresh:
                 {
-                    var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                    var data = ObjectProductForm.GetProduct(evt.unit.data);
                     if (data != null)
                     {
                         if (data.isWangTile)
@@ -770,19 +809,26 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 }
             case MapEventType.Remove:
                 {
-                    var data = MapObjectForm.DataById.GetDv(evt.unit.productInfo.Item1, null);
+                    var data = ObjectProductForm.GetProduct(evt.unit.data);
                     if (data != null)
+                    {
                         RemoveObjectWangTileNeighbours(evt.unit, data);
+                        if (data.protoUid != 0)
+                            foreach (var key in objectWangTileCollisionBounds.Keys.Where(key => key.productUid == data.uid).ToList())
+                                objectWangTileCollisionBounds.Remove(key);
+                    }
                     else
                         objectWangTileBounds.Remove(evt.unit);
                     objectCollisionBoundsUnits.Remove(evt.unit);
                     evt.unit.SetFirstPartCollisionBounds(null, 1f);
+                    if (DynamicGlobalSettings.playing)
+                        ObjectProductForm.RemoveForUnit(evt.unit.data);
                     break;
                 }
         }
     }
 
-    private static void ConfigureObjectKeepers(ObjectUnit unit, MapObjectForm.Data data)
+    private static void ConfigureObjectKeepers(ObjectUnit unit, ObjectProductForm.Data data)
     {
         if (unit.ins == null)
             return;
@@ -794,12 +840,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
     }
 
-    private void RefreshObjectAppearance(ObjectUnit unit, MapObjectForm.Data data, bool forceCollisionRefresh = false,
+    private void RefreshObjectAppearance(ObjectUnit unit, ObjectProductForm.Data data, bool forceCollisionRefresh = false,
         bool restoreCollisionBaseline = false)
     {
         var direction = data.GetAnimDirection(unit.data.euler.y);
         int mask = data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds)
-            ? GetObjectWangTileMask(unit, data.id, bounds) : 0;
+            ? GetObjectWangTileMask(unit, ObjectProductForm.GetTemplateUid(data), bounds) : 0;
         bool fit = data.boundsCollision;
         Rect? collisionBounds = fit ? GetObjectCollisionBounds(data, direction, mask) : (Rect?)null;
         if (fit)
@@ -833,7 +879,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             return;
 
         if (data.isWangTile && objectWangTileAnimationTextures.TryGetValue(
-                (data.id, direction, mask), out List<int> textures)
+                (ObjectProductForm.GetTemplateUid(data), direction, mask), out List<int> textures)
             && textures.Count > 0)
         {
             ShowFinalMat(unit.ins, 0, textures, data.model.animTimeInterval, false);
@@ -844,9 +890,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         }
     }
 
-    private static Rect GetObjectCollisionBounds(MapObjectForm.Data data, AnimDirecton direction, int mask)
+    private static Rect GetObjectCollisionBounds(ObjectProductForm.Data data, AnimDirecton direction, int mask)
     {
-        var key = (data.id, direction, data.isWangTile ? mask : -1);
+        int templateUid = ObjectProductForm.GetTemplateUid(data);
+        // Products own ordinary clip configuration. Only generated WangTile
+        // frames are shared by prototype, not per-instance collision bounds.
+        var key = (data.uid, direction, data.isWangTile ? mask : -1);
         if (objectWangTileCollisionBounds.TryGetValue(key, out var bounds))
             return bounds;
 
@@ -854,7 +903,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         // come from its assembled mask, never from the source quarter atlas.
         List<int> frames;
         if (data.isWangTile)
-            objectWangTileAnimationTextures.TryGetValue((data.id, direction, mask), out frames);
+            objectWangTileAnimationTextures.TryGetValue((templateUid, direction, mask), out frames);
         else
             frames = data.GetAnimClip(direction);
         bounds = GameUtilController.GetOpaqueTextureBounds(frames, objectWangTileTextureBounds);

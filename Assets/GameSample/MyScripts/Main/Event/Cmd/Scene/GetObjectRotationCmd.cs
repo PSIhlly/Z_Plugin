@@ -26,7 +26,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetObjectRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT), null);
+            var data = GlobalEventHelper.ResolveSceneObjectUnit(prm[0].str)?.data;
+            asyncTask.res = new[] { CodeHelper.CreateBoxByNum(0) };
             if (data != null)
             {
                 var box = CodeHelper.CreateBoxByNum(data.euler.y);

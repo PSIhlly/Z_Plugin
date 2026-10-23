@@ -197,6 +197,12 @@ public static class StoryPackageImportRegression
                 "Async import writes the allocated ID before publishing Core");
 
             var expected = SaveAndLoad.Package("7/Core/");
+            using (var output = new MemoryStream())
+            {
+                SaveAndLoad.WritePackage("7/Core/", output);
+                Check(output.CanWrite && Encoding.UTF8.GetString(output.ToArray()) == expected,
+                    "Streaming package preserves exact legacy JSON, Base64, indentation and stream ownership");
+            }
             var exported = await ctrl.PackageAsync(7);
             Check(Encoding.UTF8.GetString(TextureHelper.GetExtraInfoByPNG(exported)) == expected,
                 "Async export preserves the production filesystem payload");
@@ -211,6 +217,8 @@ public static class StoryPackageImportRegression
             using (var canceled = new CancellationTokenSource())
             {
                 canceled.Cancel();
+                try { await ctrl.PackageAsync(7, canceled.Token); Check(false, "Canceled export must stop"); }
+                catch (OperationCanceledException) { Check(true, "Canceled export does not enter the encoder"); }
                 try { await ctrl.ImportPackageAsync(selected, canceled.Token); Check(false, "Canceled import must stop"); }
                 catch (OperationCanceledException) { Check(true, "Canceled import is not published"); }
             }
@@ -283,11 +291,21 @@ public static class StoryPackageImportRegression
             var binary = Enumerable.Range(0, 256).Select(value => (byte)value).ToArray();
             var large = new byte[128 * 1024 + 7];
             new System.Random(1717).NextBytes(large);
-            foreach (var payload in new[] { new byte[0], new byte[] { 0 }, binary, large })
+            var stored = new byte[2 * 1024 * 1024 + 7];
+            new System.Random(1828).NextBytes(stored);
+            foreach (var payload in new[] { new byte[0], new byte[] { 0 }, binary, large, stored })
             {
                 var encoded = TextureHelper.GetPNGWithExtraInfo(cover, payload);
                 Check(TextureHelper.GetExtraInfoByPNG(encoded).SequenceEqual(payload),
                     "Pixel payload exact round trip: " + payload.Length + " bytes");
+                var snapshot = PngPixelPackage.CaptureCover(cover);
+                var streamed = PngPixelPackage.EncodeStreamWithCover(snapshot, output =>
+                {
+                    for (int offset = 0; offset < payload.Length; offset += 997)
+                        output.Write(payload, offset, Math.Min(997, payload.Length - offset));
+                });
+                Check(PngPixelPackage.Decode(streamed).SequenceEqual(payload),
+                    "Incremental payload checksums preserve odd offsets and final blocks: " + payload.Length);
                 Check(encoded[24] == 8 && encoded[25] == 2 && encoded[28] == 0,
                     "Export is a standard 8-bit RGB non-interlaced PNG");
                 var chunkTypes = GetChunkTypes(encoded);
@@ -323,6 +341,20 @@ public static class StoryPackageImportRegression
                         Check(image.height > cover.height + 1, "Large incompressible payload spans multiple image rows");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(image); }
+            }
+            using (var canceled = new CancellationTokenSource())
+            {
+                try
+                {
+                    PngPixelPackage.EncodeStreamWithCover(null, output =>
+                    {
+                        output.Write(large, 0, 65536);
+                        canceled.Cancel();
+                        output.Write(large, 65536, 1);
+                    }, canceled.Token);
+                    Check(false, "Cancellation during payload compression must stop");
+                }
+                catch (OperationCanceledException) { Check(true, "Streaming encoder observes cancellation between writes"); }
             }
             Check(cover.GetPixels32().SequenceEqual(new[] { new Color32(20, 30, 40, 255), new Color32(50, 60, 70, 255),
                 new Color32(80, 90, 100, 255), new Color32(110, 120, 130, 255) }), "Packaging leaves source cover pixels unchanged");

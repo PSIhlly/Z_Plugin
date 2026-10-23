@@ -19,6 +19,8 @@ namespace Z_Map
         public MapMainForm.Data mainData;
         public Dictionary<(int, int, int), TileUnitForm.Data> maps;
         public Dictionary<(int, int), SortedSet<int>> mapXZ2Y;
+        /// <summary>tile 增删版本号：边界渐变等按列范围缓存的逻辑用它判断是否需要重算。</summary>
+        public int mapVersion;
 
         public Dictionary<string,AssetForm.Data> innerPrefabDic = new Dictionary<string, AssetForm.Data>();
         public static string GetPrefabName(string name="") => "MapPrefab$" + name;
@@ -108,7 +110,7 @@ namespace Z_Map
                 mapXZ2Y[(data.mapPos.x, data.mapPos.z)] = new SortedSet<int>();
             mapXZ2Y[(data.mapPos.x, data.mapPos.z)].Add(data.mapPos.y);
 
-
+            mapVersion++;
         }
         public void UnRegisterMap(TileUnitForm.Data data)
         {
@@ -122,6 +124,7 @@ namespace Z_Map
                 if (yLevels.Count == 0)
                     mapXZ2Y.Remove(xz);
             }
+            mapVersion++;
         }
         #region unit
         public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)

@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
 using Z_DataSystem;
-using Z_Ui.Dialog;
-using Z_Ui.Notify;
+using Z_Map;
 
 namespace Z_Code
 {
@@ -20,11 +16,13 @@ namespace Z_Code
         public override CmdBase GetNew() => new CharacterChatCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            asyncTask.interpreter.data.heapTemp.Clear();
-            foreach (var p in prm)
-                asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());
-            var heapTemp = asyncTask.interpreter.data.heapTemp;
-            PlayManager.instance.effectCtrl.ChatText(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), prm[1].str,AssetManager.instance.texCtrl.GetId(prm[2].str), prm[3].num);
+            var units = SceneUnitCommand.ResolveAll(prm[0].str);
+            string text = prm[1].str;
+            int image = AssetManager.instance.texCtrl.GetId(prm[2].str);
+            float seconds = prm[3].num;
+            foreach (var unit in units)
+                if (unit is CharacterUnit character && SceneUnitCommand.IsLive(character))
+                    PlayManager.instance.effectCtrl.ChatText(character.data, text, image, seconds);
             return true;
         }
     }

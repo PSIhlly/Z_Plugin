@@ -100,6 +100,8 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
 
     public void OnEvent(StoryCharacterEvent evt)
     {
+        if (evt.data == null)
+            return;
         var heap = new Dictionary<string, BoxDataForm.Data>() { { "param1", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, evt.data.uid.ToString())) }, };
 
         switch (evt.type)

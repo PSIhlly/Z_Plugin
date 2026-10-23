@@ -160,7 +160,8 @@ Shader "DisFadeCode"
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
 
                 // 1. ��ȡ����Դ������������ɫ��
-                Light mainLight = GetMainLight(shadowCoord); // ������Ӱ����
+                // URP uses distance fade to neutralize its empty shadow map.
+                Light mainLight = GetMainLight(shadowCoord, input.positionWS, half4(1, 1, 1, 1));
                 // 2. ������Ӱǿ�ȣ�mainLight.shadowAttenuation������Ӱǿ�ȣ�0~1��
                 // 0=��ȫ��Ӱ��1=����Ӱ
                 half shadowStrength = mainLight.shadowAttenuation;
@@ -191,15 +192,22 @@ Shader "DisFadeCode"
             #pragma fragment frag
             #pragma multi_compile_instancing
             #pragma multi_compile _ _ALPHATEST_ON
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             
             #define _ALPHATEST_ON 1
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+
+            // URP supplies these with the current shadow-casting light.
+            float3 _LightDirection;
+            float3 _LightPosition;
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
+                float3 normalOS : NORMAL;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -215,7 +223,23 @@ Shader "DisFadeCode"
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
-                output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
+                float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                float3 normalWS = TransformObjectToWorldNormal(input.normalOS);
+                #if _CASTING_PUNCTUAL_LIGHT_SHADOW
+                    float3 lightDirectionWS = normalize(_LightPosition - positionWS);
+                #else
+                    float3 lightDirectionWS = _LightDirection;
+                #endif
+
+                // Match URP's ShadowCasterPass: prevent the surface from
+                // shadowing itself, including at large map coordinates.
+                output.positionHCS = TransformWorldToHClip(
+                    ApplyShadowBias(positionWS, normalWS, lightDirectionWS));
+                #if UNITY_REVERSED_Z
+                    output.positionHCS.z = min(output.positionHCS.z, UNITY_NEAR_CLIP_VALUE);
+                #else
+                    output.positionHCS.z = max(output.positionHCS.z, UNITY_NEAR_CLIP_VALUE);
+                #endif
                 output.uv = input.uv;
                 return output;
             }
@@ -297,7 +321,8 @@ Shader "DisFadeCode"
                 clip(DisFadeOpacity(input.positionWS) - 1.0);
 
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
-                Light mainLight = GetMainLight(shadowCoord);
+                // URP uses distance fade to neutralize its empty shadow map.
+                Light mainLight = GetMainLight(shadowCoord, input.positionWS, half4(1, 1, 1, 1));
                 half NdotL = saturate(dot(normalize(input.normalWS), mainLight.direction));
                 half lightAmount = pow(NdotL, 1.0 / UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _LightSensitivity));
                 half3 diffuse = mainLight.color * lightAmount * baseColor.rgb

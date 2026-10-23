@@ -16,6 +16,7 @@ using Z_DesignStyle;
 using Z_String;
 using Z_Text;
 using Z_Ui.Notify;
+using Z_Ui.Loading;
 using Ui.ModStoryEventTriggerWindow;
 
 namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
@@ -28,6 +29,7 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
     public partial class UiModStoryMapSceneUnitModel
     {
         public SceneForm.Data data;
+        public bool startingScene;
     }
     public partial class UiModStoryMapSceneUnitCtrl : IZ_Listener<AssetEvent>, IZ_Listener<EventModifyEvent>
     {
@@ -49,11 +51,31 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
                 ModManager.instance.assetCtrl.DeleteScene(model.data.uid);
                 parent.SelPage(0);
             });
-            view.btn_edit.onClick.AddListener(() =>
+            view.btn_edit.onClick.AddListener(async () =>
             {
-                GameManager.instance.saveCtrl.SaveCoreStory(GameManager.instance.curStory.id);
-                Main2StoryManager.instance.StartLoadSceneUgc(model.data.uid);
-                UiManager.instance.CloseUi<UiModStoryCtrl>();
+                if (model.startingScene)
+                    return;
+
+                model.startingScene = true;
+                int storyId = GameManager.instance.curStory.id;
+                int sceneId = model.data.uid;
+                try
+                {
+                    await LoadingManager.instance.RunAsync("modSceneEdit", async () =>
+                    {
+                        GameManager.instance.saveCtrl.SaveCoreStory(storyId);
+                        await Main2StoryManager.instance.StartLoadSceneUgc(sceneId);
+                        UiManager.instance.CloseUi<UiModStoryCtrl>();
+                    });
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+                finally
+                {
+                    model.startingScene = false;
+                }
             });
             view.btn_hideInLargeMap.onClick.AddListener(() => {
                 model.data.hideInLargeMap = !model.data.hideInLargeMap;

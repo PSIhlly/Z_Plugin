@@ -51,7 +51,7 @@ public class GameUtilController : Z_Controller<GameManager>
         }
         return res;
     }
-    public GameObject CombineNewObjectByPrefabs(string name, MapObjectForm.Data product, bool forGame,
+    public GameObject CombineNewObjectByPrefabs(string name, ObjectProductForm.Data product, bool forGame,
         AnimDirecton? previewDirection = null)
     {
         var boundsTextures = product.boundsCollision && !forGame

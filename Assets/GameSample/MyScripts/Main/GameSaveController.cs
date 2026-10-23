@@ -24,6 +24,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string mapTextureFormFileName => "mtf";
     public string mapMaskFormFileName => "mmf";
     public string mapObjectFormFileName => "mof";
+    public string objectProductFormFileName => "oprf";
     public string storyFormFileName => "sf";
     public string characterParamFormFileName => "cpaf";
     public string skillParamFormFileName => "spaf";
@@ -47,6 +48,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string passTypeFormFileName => "ptf";
 
     public string assetFolder => "ast/";
+    private JArray legacyObjectForms;
     public GameSaveController(GameManager super) : base(super)
     {
     }
@@ -77,9 +79,8 @@ public class GameSaveController : Z_Controller<GameManager>
         return Task.Run(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var payload = System.Text.Encoding.UTF8.GetBytes(SaveAndLoad.Package(core));
-            cancellationToken.ThrowIfCancellationRequested();
-            var png = PngPixelPackage.EncodeWithCover(cover, payload);
+            var png = PngPixelPackage.EncodeStreamWithCover(cover,
+                output => SaveAndLoad.WritePackage(core, output, cancellationToken), cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             return png;
         }, cancellationToken);
@@ -370,10 +371,12 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         string path = Main2StoryManager.GetStorySaveFolder(id);
 
+        ObjectProductForm.EnsurePrototypes(); // Create concrete-owned labels before saving lf.
         SaveLab(path);
         SavePassType(path);
         SaveMaterial(path);
         SaveObject(path);
+        SaveObjectProducts(path, true);
         SaveCharacter(path);
         SaveSkill(path);
         SaveItem(path);
@@ -396,10 +399,12 @@ public class GameSaveController : Z_Controller<GameManager>
 
         string path = Main2StoryManager.GetStoryCoreFolder(id);
 
+        ObjectProductForm.EnsurePrototypes();
         SaveLab(path);
         SavePassType(path);
         SaveMaterial(path);
         SaveObject(path);
+        SaveObjectProducts(path, false);
         SaveCharacter(path);
         SaveSkill(path);
         SaveItem(path);
@@ -459,14 +464,27 @@ public class GameSaveController : Z_Controller<GameManager>
     public void SaveObject(string storyCoreFolder)
     {
         SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectParamFormFileName, MapObjectParamForm.GetJaByDatas().ToString());
+    }
 
-        foreach (var data in MapObjectForm.DataById.Values)
-        {
-            data.EnsureDirectionData();
-            data.SyncLegacyAnimClip(data.GetDefaultAnimDirection());
-        }
-        SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectFormFileName, MapObjectForm.GetJaByDatas().ToString());
-
+    public void SaveObjectProducts(string folder, bool includeRuntime)
+    {
+        ObjectProductForm.EnsurePrototypes();
+        // An explicit authored save also upgrades unvisited source scenes
+        // before the obsolete MapObject table can be retired.
+        if (!includeRuntime)
+            ObjectProductForm.PrepareModStory(folder);
+        var products = new JArray();
+        foreach (var product in ObjectProductForm.DataByUid.Values)
+            if (includeRuntime || product.protoUid == 0)
+            {
+                product.EnsureDirectionData();
+                product.SyncLegacyAnimClip(product.GetDefaultAnimDirection());
+                products.Add(ObjectProductForm.GetJoByData(product));
+            }
+        SaveAndLoad.Save(folder + "/" + objectProductFormFileName, products.ToString());
+        // Delete only this obsolete table after the replacement is saved.
+        if (SaveAndLoad.Exist(folder + "/" + mapObjectFormFileName))
+            SaveAndLoad.Delete(folder + "/" + mapObjectFormFileName);
     }
 
     public void SaveCharacter(string storyCoreFolder)
@@ -698,6 +716,7 @@ public class GameSaveController : Z_Controller<GameManager>
         LoadSkill(folder);
 
         LoadItem(folder);
+        LoadObjectProducts(folder);
         LoadEffect(folder);
         LoadMission(folder);
 
@@ -706,11 +725,13 @@ public class GameSaveController : Z_Controller<GameManager>
 
         DeleteCache(id);
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
+        ObjectProductForm.PrepareModStory(Main2StoryManager.GetStoryCacheFolder(id));
         LoadAsset(assetFolder);
         RepairMissingCharacterTextureReferences();
     }
     public void ResetStory()
     {
+        LoadObjectProducts(null);
         LoadScene(null);
         LoadMaterial(null);
         LoadObject(null);
@@ -744,6 +765,7 @@ public class GameSaveController : Z_Controller<GameManager>
         LoadSkill(folder);
 
         LoadItem(folder);
+        LoadObjectProducts(folder);
         LoadEffect(folder);
         LoadMission(folder);
 
@@ -938,20 +960,28 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void LoadObject(string folder)
     {
-        var pathForm = folder + mapObjectFormFileName;
-        MapObjectForm.ClearAuto();
-        if (SaveAndLoad.Exist(pathForm))
-        {
-            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
-            MigrateFlatLabIds(forms, nameof(MapObjectForm), "label");
-            foreach (var form in MapObjectForm.GetDatasByJa(forms))
-            {
-                form.EnsureDirectionData();
-                form.SyncLegacyAnimClip(form.GetDefaultAnimDirection());
-                MapObjectForm.AddData(form);
-            }
-        }
+        MapObjectForm.Clear();
+        legacyObjectForms = null;
+        if (folder == null)
+            return;
+        var path = folder + mapObjectFormFileName;
+        if (!SaveAndLoad.Exist(path))
+            return;
+        legacyObjectForms = JArray.Parse(SaveAndLoad.Load<string>(path));
+        MigrateFlatLabIds(legacyObjectForms, nameof(ObjectProductForm), "label");
+    }
 
+    // Load last among Product-derived tables: old stories need newly allocated
+    // Object Product IDs only after Character/Skill/Item IDs have been reserved.
+    public void LoadObjectProducts(string folder)
+    {
+        ObjectProductForm.Clear();
+        ObjectProductForm.ResetReferences();
+        if (folder == null)
+            return;
+        var path = folder + objectProductFormFileName;
+        var forms = SaveAndLoad.Exist(path) ? JArray.Parse(SaveAndLoad.Load<string>(path)) : null;
+        ObjectProductForm.LoadProducts(forms, legacyObjectForms);
     }
 
     public void LoadCharacter(string folder)
@@ -1142,6 +1172,7 @@ public class GameSaveController : Z_Controller<GameManager>
             var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
             MigrateHierarchicalLabIds(forms, nameof(EventProgramDataForm), "category", "type");
             FlattenEventProgramLabs(forms);
+            MigrateObjectReferences(forms);
             var programs = EventProgramDataForm.GetDatasByJa(forms);
             foreach (var form in programs)
             {
@@ -1167,7 +1198,9 @@ public class GameSaveController : Z_Controller<GameManager>
     public MapInfo LoadSceneMap(string scenePath)
     {
         var mapData = new GameMapData();
-        mapData.Init(SaveAndLoad.Load<string>(scenePath));
+        var json = SaveAndLoad.Load<string>(scenePath);
+        // Keep migration in memory when Mod reads authored Core directly.
+        mapData.Init(ObjectProductForm.MigrateSceneJson(json, false));
         return mapData;
     }
     public void LoadProgress(string folder)
@@ -1176,11 +1209,17 @@ public class GameSaveController : Z_Controller<GameManager>
 
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in ProgressForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            MigrateObjectReferences(forms);
+            foreach (var form in ProgressForm.GetDatasByJa(forms))
             {
                 ProgressForm.AddData(form);
             }
             DynamicGlobalSettings.cameraMode = GameManager.instance.curProgress.cameraMode;
+            DynamicGlobalSettings.antiOcclusion = GameManager.instance.curProgress.antiOcclusion;
+            DynamicGlobalSettings.allowDrop = GameManager.instance.curProgress.allowDrop;
+            DynamicGlobalSettings.edgeTransition = GameManager.instance.curProgress.edgeTransition;
+            GameManager.ApplyProgressLightIntensity();
         }
     }
 
@@ -1188,6 +1227,10 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         var progress = GameManager.instance.curProgress;
         if (progress == null || CharacterProductForm.DataByUid.ContainsKey(progress.characterUid))
+            return false;
+        // Undeploying the final member deliberately leaves a reserve-only team.
+        // A missing list or an invalid nonzero current UID still uses legacy repair.
+        if (progress.characterUid == 0 && progress.teamActive?.Count == 0)
             return false;
 
         var replacementUid = 0;
@@ -1299,6 +1342,26 @@ public class GameSaveController : Z_Controller<GameManager>
                 default: return match.Value;
             }
         });
+    }
+
+    // Upgrade both source code and saved interpreter/string values. Replacing
+    // complete marker pairs leaves surrounding quotes and unrelated text intact.
+    private static void MigrateObjectReferences(JToken token)
+    {
+        var tokens = token is JContainer container ? container.DescendantsAndSelf() : new[] { token };
+        foreach (var value in tokens.OfType<JValue>())
+        {
+            if (value.Type != JTokenType.String)
+                continue;
+            value.Value = Regex.Replace((string)value, @"\$so\$t:([0-9]+)\$so\$|\$sop\$([0-9]+)\$sop\$", match =>
+            {
+                string digits = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
+                if (!int.TryParse(digits, out int mapId))
+                    return match.Value;
+                var product = ObjectProductForm.ResolveLegacyTemplate(mapId);
+                return product == null ? match.Value : "$so$p:" + product.uid + "$so$";
+            });
+        }
     }
 
 
@@ -1498,9 +1561,14 @@ public class GameSaveController : Z_Controller<GameManager>
                 InstancePoolManager.instance.AddPool(form.GetGo());
             }
         }
-        foreach (var form in MapObjectForm.DataById.Values)
+        MapObjectForm.Clear();
+        if (ObjectProductForm.DatasByProtouid.TryGetValue(0, out var prototypes))
+            foreach (var product in prototypes.OrderBy(product => product.uid))
+                MapObjectForm.AddData(new MapObjectForm.Data(-1, product.name, product.icon,
+                    LabForm.GetOrCreateForBelong(product.labId, nameof(MapObjectForm)), product.uid));
+        foreach (var form in ObjectProductForm.DataByUid.Values.Where(product => product.protoUid == 0))
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.id), form, true);
+            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.uid), form, true);
             obj.transform.parent = InstancePoolManager.instance.defaultRoot;
             InstancePoolManager.instance.AddPool(obj);
         }

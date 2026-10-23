@@ -1,0 +1,14 @@
+{
+  "mode": "built-in imagegen",
+  "source": "D:/Works/Unity's/Personal/Z_Plugin/Z_Plugin/ExtraAssets/元气骑士/斯大林制地砖_拆分/03_props/104_tree_green.png",
+  "generated": "C:\\Users\\LH1\\.codex\\generated_images\\01a11a07-4b7c-7991-a4d8-b119a9a411d7\\exec-d29ad5f0-5b51-4358-81b2-8e835f68e45a.png",
+  "prompt": "Use case: style-transfer. Edit target: the attached green conifer tree game sprite. The user says it is TOO REFINED and asks for a ROUGHER, COARSER pixel-art version.\nKeep the same single upright pointed conifer/teardrop tree silhouette, compact tapered shape, cool teal-green palette, short brown trunk at bottom center, full tree inside a transparent canvas. Keep portrait aspect 4:7 and intended final file size 64x112.\nIMPORTANT style change: REDUCE detail dramatically. Design it as a rough old-school sprite on a coarse logical 32x56 pixel grid, then present it enlarged using perfectly hard-edged square pixels. At final 64x112 every smallest pixel block should be 2x2 pixels or larger. The tree should look hand-blocked and simple rather than finely rendered.\nUse only about 7-9 solid colors total, with 5 or 6 broad stepped foliage tiers. Each tier has only a few large irregular light, middle and dark green masses. Group the foliage into chunky shapes about 3-6 logical pixels across. Use restrained upper-left highlights as several big simplified green patches, broad dark right-side areas, and simple untextured trunk pixels. Make a rough irregular stair-step silhouette. Let some angular leaves stick out in simple chunky steps.\nRemove almost all individual needles, tiny leaf flecks, grain, dithering, bark texture and intricate branch tracery. No thin bright mint streaks or tiny glints. No soft gradients, blur, painterly shading, photorealistic foliage, 3D rendering or antialiasing. Do not merely blur the detailed tree: redraw it into visibly coarse broad pixel clusters and fewer shades.\nActual transparent background; no floor, ground shadow, grass, scenery, new objects, decorations, text, watermark or frame. Preserve the tree's identity, proportions and cool emerald-green color, while making the rendering unmistakably simpler and rougher.",
+  "logicalSize": [
+    32,
+    56
+  ],
+  "targetSize": [
+    64,
+    112
+  ]
+}

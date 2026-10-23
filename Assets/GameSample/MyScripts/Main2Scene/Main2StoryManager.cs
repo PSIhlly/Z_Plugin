@@ -46,22 +46,22 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
             var player = CharacterProductForm.DataByNameProtouid[("Player", 0)];
             player.unique = true;
             ProgressForm.Clear();
-            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 500, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), 0, defaultStyle, false, false, true, true, true, true, true, GlobalDefaultHelper.DefaultTexId, 0, (sceneData.uid, Vector3.zero), false, EventState.Normal);
+            var progress = new ProgressForm.Data(1, 0, 0, new Vector3(500, 500, 500), player.uid, new List<int>() { }, new List<int>() { player.uid }, new List<int>() { player.uid }, new Dictionary<string, string>(), CameraMode.Overhead, ClipForm.defaultData.Copy(), 0, defaultStyle, false, false, true, true, true, true, true, GlobalDefaultHelper.DefaultTexId, 0, (sceneData.uid, Vector3.zero), false, EventState.Normal, false, -1f, true, true);
             ProgressForm.AddData(progress);
             var data = new GameMapData();
 
             var dic = GameManager.instance.innerAssetDic;
             data.Init((GameObjectAssetForm.Data)dic["mapground"], (GameObjectAssetForm.Data)dic["mapslope"], (GameObjectAssetForm.Data)dic["mapfloor"], (GameObjectAssetForm.Data)dic["img"], (GameObjectAssetForm.Data)dic["canvas"], (TexAssetForm.Data)dic["defaultTileTexture"]);
             var defaultTextureLabId = LabForm.GetOrCreate("default", nameof(MapTextureForm));
-            var defaultObjectLabId = LabForm.GetOrCreate("default", nameof(MapObjectForm));
+            var defaultObjectLabId = LabForm.GetOrCreate("default", nameof(ObjectProductForm));
             MapTextureForm.AddData(new MapTextureForm.Data(1, "grass", GameManager.instance.innerAssetDic["defaultTileTexture"].id, 0, new List<int>() { GameManager.instance.innerAssetDic["defaultTileTexture"].id }, defaultTextureLabId, new Dictionary<string, EventTriggerForm.Data>(), false, new Dictionary<int, int>(), 0, false, new List<int>(), false, new Dictionary<int, int>()));
-            var wall = new MapObjectForm.Data(1, "wall", GameManager.instance.innerAssetDic["defaultObjectTexture"].id,
+            var wall = new ObjectProductForm.Data(-1, "wall", defaultObjectLabId, 0, GameManager.instance.innerAssetDic["defaultObjectTexture"].id,
                 new MapModelForm.Data(1, new List<int>() { GameManager.instance.innerAssetDic["cube"].id }, new List<Vector3>() { Vector3.zero }, new List<Vector3>() { Vector3.one }, new List<List<int>>() { new List<int>() { GameManager.instance.innerAssetDic["defaultObjectTexture"].id } }, 0, true, 1),
-                defaultObjectLabId, true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
+                true, new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
                 GlobalDefaultHelper.DefaultTexId, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>(), false, false, true);
             wall.EnsureDirectionData();
             wall.SyncLegacyAnimClip(AnimDirecton.Fixed);
-            MapObjectForm.AddData(wall);
+            ObjectProductForm.AddData(wall);
 
             EventProgramDataForm.Clear();
 
@@ -143,11 +143,11 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 CreateWangTileTextureVariants(mapTexture, mapTexture.frontPartTexs, mapTexture.FrontWangTileDic, true);
         }
 
-        foreach (MapObjectForm.Data mapObject in MapObjectForm.DataById.Values)
+        foreach (ObjectProductForm.Data mapObject in ObjectProductForm.DataByUid.Values.Where(data => data.protoUid == 0))
             CreateObjectWangTileTextures(mapObject);
     }
 
-    private void CreateObjectWangTileTextures(MapObjectForm.Data mapObject)
+    private void CreateObjectWangTileTextures(ObjectProductForm.Data mapObject)
     {
         if (!mapObject.isWangTile)
             return;
@@ -165,36 +165,39 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         }
     }
 
-    public void RefreshObjectWangTileTextures(MapObjectForm.Data mapObject)
+    public void RefreshObjectWangTileTextures(ObjectProductForm.Data mapObject)
     {
         if (mapObject == null || GameManager.instance.curScene == null)
             return;
 
-        GameMapController.ClearObjectWangTileAnimationTextures(mapObject.id);
-        if (objectWangTileGameTexIds.TryGetValue(mapObject.id, out List<int> ids))
+        if (ObjectProductForm.DataByUid.TryGetValue(ObjectProductForm.GetTemplateUid(mapObject), out var prototype))
+            mapObject = prototype;
+
+        GameMapController.ClearObjectWangTileAnimationTextures(ObjectProductForm.GetTemplateUid(mapObject));
+        if (objectWangTileGameTexIds.TryGetValue(ObjectProductForm.GetTemplateUid(mapObject), out List<int> ids))
         {
             DestroyGeneratedWangTileTextures(ids);
             var obsolete = new HashSet<int>(ids);
             wangTileGameTexIds.RemoveAll(obsolete.Contains);
-            objectWangTileGameTexIds.Remove(mapObject.id);
+            objectWangTileGameTexIds.Remove(ObjectProductForm.GetTemplateUid(mapObject));
         }
 
         CreateObjectWangTileTextures(mapObject);
-        GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(mapObject.id);
+        GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(ObjectProductForm.GetTemplateUid(mapObject));
     }
 
-    private void CreateObjectWangTileTextureVariants(MapObjectForm.Data mapObject, AnimDirecton direction)
+    private void CreateObjectWangTileTextureVariants(ObjectProductForm.Data mapObject, AnimDirecton direction)
     {
-        CreateWangTileTextureVariants($"ObjectWangTile_{mapObject.id}_{direction}",
+        CreateWangTileTextureVariants($"ObjectWangTile_{ObjectProductForm.GetTemplateUid(mapObject)}_{direction}",
             mapObject.GetAnimClip(direction),
             (mask, textureId) => GameMapController.RegisterObjectWangTileAnimationTexture(
-                mapObject.id, direction, mask, textureId),
+                ObjectProductForm.GetTemplateUid(mapObject), direction, mask, textureId),
             textureId =>
             {
-                if (!objectWangTileGameTexIds.TryGetValue(mapObject.id, out List<int> ids))
+                if (!objectWangTileGameTexIds.TryGetValue(ObjectProductForm.GetTemplateUid(mapObject), out List<int> ids))
                 {
                     ids = new List<int>();
-                    objectWangTileGameTexIds.Add(mapObject.id, ids);
+                    objectWangTileGameTexIds.Add(ObjectProductForm.GetTemplateUid(mapObject), ids);
                 }
                 ids.Add(textureId);
             });
@@ -394,14 +397,14 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     #endregion
 
     #region scene
-    public async void StartLoadSceneUgc(int sceneId)
+    public async Task StartLoadSceneUgc(int sceneId)
     {
         DynamicGlobalSettings.playing = false;
         bool ok = await StartLoadScene(ModManager.instance.GetStoryCoreFolder(), sceneId);
         //ugc模式不搞碰撞缩放
-        foreach (var form in MapObjectForm.DataById.Values)
+        foreach (var form in ObjectProductForm.DataByUid.Values.Where(data => data.protoUid == 0))
         {
-            var name = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.id);
+            var name = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.uid);
             var prefab = InstancePoolManager.instance.GetPrefab(name);
             if (prefab != null)
             {
@@ -411,9 +414,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
                 }
             }
         }
-        foreach (var product in MapObjectForm.DataById.Values)
+        foreach (var product in ObjectProductForm.DataByUid.Values.Where(data => data.protoUid == 0))
             if (product.boundsCollision || !product.centerCollider)
-                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(product.id);
+                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(product.uid);
         ModManager.instance.BeginScene(sceneId);
     }
     public async void StartLoadScenePlay(int sceneId, Action onMapComplete = null)
@@ -441,37 +444,41 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
         CreateWangTileTextures();
         LoadingManager.instance.AddLoadItem("scene");
-        MapInfo data;
-
-        data = await Task.Run(() =>
+        try
         {
-            return GameManager.instance.saveCtrl.LoadSceneMap(storyFolder + "/" + GetSceneFileNameById(id));
-        });
+            LoadingManager.instance.SetProgress("scene", 0.05f);
+            MapInfo data = await Task.Run(() =>
+            {
+                return GameManager.instance.saveCtrl.LoadSceneMap(storyFolder + "/" + GetSceneFileNameById(id));
+            });
+            LoadingManager.instance.SetProgress("scene", 0.4f);
 
-        LoadingManager.instance.RemoveLoadItem("scene");
+            data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4 + 1, 5, (int)(InputManager.instance.screenWorldSize.y / 2) + 4 + 1);
 
-        /* {
-             //new
-             data = await Task.Run(() =>
-             {
-                 var data = new GameMapData();
-                 data.Init();
-                 return data;
-             });
-         }*/
-        data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4, 5, (int)(InputManager.instance.screenWorldSize.y / 2) + 4);
+            MapManager.instance.Begin(data);
+            LoadingManager.instance.SetProgress("scene", 0.6f);
+            // All visual candidate columns must exist before resolving WangTile
+            // collision masks, including off-screen Objects loaded from the save.
+            // 这一段按 Object 数量推进 0.6 -> 0.95 的进度。
+            var wangTileProducts = ObjectProductForm.DataByUid.Values
+                .Where(product => product.protoUid == 0 && (product.boundsCollision || !product.centerCollider))
+                .ToList();
+            for (int i = 0; i < wangTileProducts.Count; i++)
+            {
+                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(wangTileProducts[i].uid);
+                if ((i & 7) == 0 || i == wangTileProducts.Count - 1)
+                    LoadingManager.instance.SetProgress("scene", 0.6f + 0.35f * (i + 1) / wangTileProducts.Count);
+            }
+            LoadingManager.instance.SetProgress("scene", 0.95f);
+            onMapComplete?.Invoke();
+            LoadingManager.instance.SetProgress("scene", 1f);
 
-        MapManager.instance.Begin(data);
-        // All visual candidate columns must exist before resolving WangTile
-        // collision masks, including off-screen Objects loaded from the save.
-        foreach (var product in MapObjectForm.DataById.Values)
-            if (product.boundsCollision || !product.centerCollider)
-                GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(product.id);
-        onMapComplete?.Invoke();
-
-
-
-        return true;
+            return true;
+        }
+        finally
+        {
+            LoadingManager.instance.RemoveLoadItem("scene");
+        }
     }
     public void UnloadSceneUgc()
     {

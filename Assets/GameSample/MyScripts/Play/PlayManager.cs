@@ -41,7 +41,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 #if UNITY_EDITOR
     [UnityEngine.SerializeField]
     [UnityEngine.Tooltip("在 Play 运行时绘制当前玩家 nav 可通行的 Tile（Scene 视图需开启 Gizmos）。")]
-    private bool showWalkableNavTiles = true;
+    private bool showWalkableNavTiles = false;
 #endif
 
     #region life
@@ -171,22 +171,28 @@ public class PlayManager : Z_MonoManager<PlayManager>
         this.boxPlay = boxPlay;
 
         LoadingManager.instance.AddLoadItem("playData");
+        LoadingManager.instance.SetProgress("playData", 0.1f);
         if (!boxPlay)
         {
             if (!SaveAndLoad.Exist(GetStorySaveFolder()))
             {
                 GameManager.instance.saveCtrl.LoadCoreStory(id);
                 FirstPlayInit();
+                ObjectProductForm.PreparePlayStory(GetStoryCacheFolder());
                 GameManager.instance.saveCtrl.SaveSaveStory(id);
             }
+            LoadingManager.instance.SetProgress("playData", 0.6f);
             GameManager.instance.saveCtrl.LoadSaveStory(id);
+            ObjectProductForm.PreparePlayStory(GetStoryCacheFolder());
         }
         else
         {
             GameManager.instance.saveCtrl.LoadCoreStory(id);
             FirstPlayInit();
+            ObjectProductForm.PreparePlayStory(GetStoryCacheFolder());
         }
 
+        LoadingManager.instance.SetProgress("playData", 1f);
         LoadingManager.instance.RemoveLoadItem("playData");
 
         var firstEnter = GameManager.instance.curProgress.sceneId == 0;
@@ -218,15 +224,21 @@ public class PlayManager : Z_MonoManager<PlayManager>
     {
         scenePresentationPending = true;
         LoadingManager.instance.AddLoadItem(ScenePresentationLoadItem);
+        LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0f);
         try
         {
             _sceneCtrl.Begin(id);
+            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.3f);
             _infoCtrl.Begin();
+            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.5f);
             mapCtrl.Begin();
+            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.75f);
             effectCtrl.Begin();
+            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.9f);
             // Position and player creation must finish before lifecycle events/updates run.
             enable = true;
             NotifySceneEntered();
+            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 1f);
         }
         catch
         {
@@ -270,32 +282,41 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
         var characters = new List<int>();
         var charactersActive = new List<int>();
+        var characterUids = new Dictionary<int, int>();
 
         foreach (var ch in CharacterProductForm.DataByUid.Values)
         {
-            ch.CheckSkillProduct();
+            // Unique Products are their own runtime identity. Leave non-unique
+            // templates' skills intact so each copied character owns its skills.
+            if (ch.unique)
+                ch.CheckSkillProduct();
         }
 
 
         foreach (var uid in progress.team)
         {
-            var ch = CharacterProductForm.DataByUid[uid];
-            if (!ch.unique)
+            if (!CharacterProductForm.DataByUid.TryGetValue(uid, out var ch))
+                continue;
+            if (!characterUids.TryGetValue(uid, out var runtimeUid))
             {
-                var newCharacter = ch.Copy(false);
-                newCharacter.ToProduct(uid);
-
-                characters.Add(newCharacter.uid);
-                foreach (var uidActive in progress.teamActive)
+                runtimeUid = uid;
+                if (!ch.unique && ch.protoUid == 0)
                 {
-                    if (uidActive == uid)
-                    {
-                        charactersActive.Add(newCharacter.uid);
-                        break;
-                    }
+                    var newCharacter = ch.Copy(false);
+                    newCharacter.ToProduct(uid);
+                    runtimeUid = newCharacter.uid;
                 }
+                characterUids[uid] = runtimeUid;
             }
+            characters.Add(runtimeUid);
         }
+        foreach (var uid in progress.teamActive)
+            if (characterUids.TryGetValue(uid, out var runtimeUid))
+                charactersActive.Add(runtimeUid);
+        if (characterUids.TryGetValue(progress.characterUid, out var currentUid))
+            progress.characterUid = currentUid;
+        progress.team = characters;
+        progress.teamActive = charactersActive;
     }
     public void Exit()
     {

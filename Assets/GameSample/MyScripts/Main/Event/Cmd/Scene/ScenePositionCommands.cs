@@ -57,12 +57,21 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetPositionCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var unit = SceneUnitCommand.Resolve(prm[0].str);
-            if (!SceneUnitCommand.CanMove(unit)) return true;
+            var units = SceneUnitCommand.ResolveAll(prm[0].str);
+            if (!units.Exists(SceneUnitCommand.CanMove)) return true;
             var vector = SceneUnitCommand.ReadVector(prm[1]);
-            var position = Relative ? unit.data.pos + MapManager.instance.utilCtrl.MapPos2RealPos(vector)
+            var offsetOrPosition = Relative ? MapManager.instance.utilCtrl.MapPos2RealPos(vector)
                 : SceneUnitCommand.WorldPosition(vector);
-            MapManager.instance.updateCtrl.ApplyMove(unit, position, unit.data.euler, teleport: true);
+            var data = new Z_UnitSystem.Form.UnitForm.Data[units.Count];
+            var positions = new Vector3[units.Count];
+            for (int i = 0; i < units.Count; i++)
+            {
+                data[i] = units[i].data;
+                positions[i] = Relative ? units[i].data.pos + offsetOrPosition : offsetOrPosition;
+            }
+            for (int i = 0; i < units.Count; i++)
+                if (SceneUnitCommand.CanMove(units[i]) && SceneUnitCommand.IsLive(units[i], data[i]))
+                    MapManager.instance.updateCtrl.ApplyMove(units[i], positions[i], units[i].data.euler, teleport: true);
             return true;
         }
     }

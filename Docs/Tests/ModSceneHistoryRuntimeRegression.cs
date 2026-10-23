@@ -128,7 +128,7 @@ public static class ModSceneHistoryRuntimeRegression
         foreach (var form in new[] { typeof(MapMainForm), typeof(TileUnitForm), typeof(ObjectUnitForm),
                      typeof(CharacterUnitForm), typeof(ItemUnitForm), typeof(SceneForm), typeof(EventTriggerForm),
                      typeof(GameParamForm), typeof(CharacterProductForm), typeof(ItemProductForm),
-                     typeof(MapObjectForm), typeof(MapItemForm), typeof(MapCharacterForm),
+                     typeof(MapObjectForm), typeof(ObjectProductForm), typeof(MapItemForm), typeof(MapCharacterForm),
                      typeof(MapTextureForm), typeof(PassTypeForm), typeof(MapEraseForm),
                      typeof(ModTextForm), typeof(TexAssetForm), typeof(MapModelForm) })
             RegisterForm(form);
@@ -1297,12 +1297,14 @@ public static class ModSceneHistoryRuntimeRegression
         typeof(ModSceneController).GetField("enable", PrivateInstance).SetValue(controller, true);
         typeof(ModSceneController).GetField("history", PrivateInstance).SetValue(controller, history);
         var waitField = typeof(ModSceneController).GetField("waitForActive", PrivateInstance);
-        var product = new MapObjectForm.Data(-1, "raised placement object", 0, StaticModel(98001), 0, false,
+        var product = new ObjectProductForm.Data(-1, "raised placement object", 0, 0, 0, StaticModel(98001), false,
             new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
             0, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>>
                 { [AnimDirecton.Fixed] = new List<int> { 98001 } }, false, false, true);
-        MapObjectForm.AddData(product);
-        var prefab = Prefab<ObjectInstance>(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(product.id));
+        ObjectProductForm.AddData(product);
+        var objectRow = new MapObjectForm.Data(-1, product.name, product.icon, 0, product.uid);
+        MapObjectForm.AddData(objectRow);
+        var prefab = Prefab<ObjectInstance>(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(product.uid));
         AddBody(prefab, Vector3.up * .5f, Vector3.one);
         prefab.transform.GetChild(0).gameObject.AddComponent<MeshRenderer>();
         pool.AddPool(prefab);
@@ -1324,7 +1326,7 @@ public static class ModSceneHistoryRuntimeRegression
         Vector3 previousCellSize = map.data.mainData.mapUnitSize;
         try
         {
-            controller.curData = product;
+            controller.curData = objectRow;
             controller.cntX = controller.cntY = 1;
             controller.angle = 73;
             var tool = new Ui.ModSceneMain.ModTool.UiModToolModel();
@@ -1436,7 +1438,7 @@ public static class ModSceneHistoryRuntimeRegression
             }
             VerifyOtherPlacement(itemBrush, position => mod.assetCtrl.AddItem(itemProduct, position, 73));
             VerifyOtherPlacement(characterBrush, position => mod.assetCtrl.AddCharacter(characterProduct, position, 73));
-            controller.curData = product;
+            controller.curData = objectRow;
 
             // The camera's current layer has a hole, while ground exists below.
             // Exercise actual clicks, not just the direct AddScene/asset API.
@@ -1451,7 +1453,7 @@ public static class ModSceneHistoryRuntimeRegression
             controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screenPosition });
             Check(ObjectUnitForm.DataByUid.Count == initialCount + 1 && history.undoCount == 1,
                 "actual Object click in an empty camera layer accepts a lower Tile");
-            var clicked = ObjectUnitForm.DataByUid.Values.Single(row => row.unit.productInfo.Item1 == product.id);
+            var clicked = ObjectUnitForm.DataByUid.Values.Single(row => row.unit.productInfo.Item1 == product.uid);
             Check(Mathf.Abs(clicked.pos.y - 1) < .001f && clicked.unit.belongTile == Tile(10, 10).unit,
                 "camera-layer hole placement retains camera height rather than lower owner height");
             Check(history.TryUndo(), "camera-layer hole click is undoable");
@@ -1460,7 +1462,7 @@ public static class ModSceneHistoryRuntimeRegression
             waitField.SetValue(controller, false);
             controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screenPosition });
             controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screenPosition });
-            clicked = ObjectUnitForm.DataByUid.Values.Single(row => row.unit.productInfo.Item1 == product.id);
+            clicked = ObjectUnitForm.DataByUid.Values.Single(row => row.unit.productInfo.Item1 == product.uid);
             Check(Mathf.Abs(clicked.pos.y - 5.25f) < .001f && clicked.unit.belongTile == upper.unit,
                 "actual raised click finds the nearest lower Tile across empty layers");
             map.updateCtrl.ApplyMove(clicked.unit, new Vector3(10, .9f, 10), clicked.euler, true);
@@ -1497,7 +1499,7 @@ public static class ModSceneHistoryRuntimeRegression
             controller.Unregister<InputMouseScrollEvent>();
             controller.Unregister<TileEvent>();
             controller.Unregister<ObjectEvent>();
-            foreach (var row in ObjectUnitForm.DataByUid.Values.Where(row => row.unit.productInfo.Item1 == product.id).ToArray())
+            foreach (var row in ObjectUnitForm.DataByUid.Values.Where(row => row.unit.productInfo.Item1 == product.uid).ToArray())
                 map.RemoveObject(row);
             map.RemoveTile(upper);
             map.RemoveTile(aboveOnly);
@@ -1518,18 +1520,18 @@ public static class ModSceneHistoryRuntimeRegression
         const int connectedId = 98003;
         var disconnected = AddStaticTexture(disconnectedId);
         var connected = AddStaticTexture(connectedId);
-        var product = new MapObjectForm.Data(-1, "history Wang Object", 0, StaticModel(disconnectedId), 0, false,
+        var product = new ObjectProductForm.Data(-1, "history Wang Object", 0, 0, 0, StaticModel(disconnectedId), false,
             new Dictionary<string, EventTriggerForm.Data>(), new Dictionary<string, MapObjectParamForm.Data>(),
             0, FaceType.Fixed, new Dictionary<AnimDirecton, List<int>> { [AnimDirecton.Fixed] = new List<int> { disconnectedId } }, true, false, true);
-        MapObjectForm.AddData(product);
+        ObjectProductForm.AddData(product);
         var prefab = Prefab<ObjectInstance>("history-Wang-object");
         AddBody(prefab, Vector3.up * .5f, Vector3.one);
         prefab.transform.GetChild(0).gameObject.AddComponent<MeshRenderer>();
         pool.AddPool(prefab);
         var register = typeof(GameMapController).GetMethod("RegisterObjectWangTileAnimationTexture", PrivateStatic);
-        register.Invoke(null, new object[] { product.id, AnimDirecton.Fixed, 0, disconnectedId });
-        register.Invoke(null, new object[] { product.id, AnimDirecton.Fixed, 1 << 4, connectedId });
-        register.Invoke(null, new object[] { product.id, AnimDirecton.Fixed, 1 << 3, connectedId });
+        register.Invoke(null, new object[] { product.uid, AnimDirecton.Fixed, 0, disconnectedId });
+        register.Invoke(null, new object[] { product.uid, AnimDirecton.Fixed, 1 << 4, connectedId });
+        register.Invoke(null, new object[] { product.uid, AnimDirecton.Fixed, 1 << 3, connectedId });
         map.SetPos(new Vector3(12, 0, 12));
         map.updateCtrl.RefreshView();
         var left = map.AddObject(product.name, new Vector3(11, 0, 11), prefab.name);

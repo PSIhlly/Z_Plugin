@@ -40,9 +40,13 @@
     "curMissionId": 0,
     "targetScene": {
       "item1": 1,
-      "item2": "-38|0|27"
+      "item2": "-38|0|23"
     },
     "banSceneChange": false,
-    "eventState": 0
+    "eventState": 0,
+    "antiOcclusion": false,
+    "lightIntensity": -1.0,
+    "allowDrop": false,
+    "edgeTransition": true
   }
 ]

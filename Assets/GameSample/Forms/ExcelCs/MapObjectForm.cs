@@ -70,209 +70,29 @@ namespace Form
                 
         public static Action<Data,int,int> changeIconAction;
                 
-        public static Action<Data,MapModelForm.Data,MapModelForm.Data> changeModelAction;
-                
         public static Action<Data,int,int> changeLabidAction;
                 
-        public static Action<Data,bool,bool> changeCollisionAction;
-                
-        public static Action<Data,Dictionary<string,EventTriggerForm.Data>,Dictionary<string,EventTriggerForm.Data>> changeEventsAction;
-                
-        public static Action<Data,Dictionary<string,MapObjectParamForm.Data>,Dictionary<string,MapObjectParamForm.Data>> changeParamdicAction;
-                
-        public static Action<Data,int,int> changeMinimapiconAction;
-                
-        public static Action<Data,FaceType,FaceType> changeFacetypeAction;
-                
-        public static Action<Data,Dictionary<AnimDirecton,List<int>>,Dictionary<AnimDirecton,List<int>>> changeAnimclipAction;
-                
-        public static Action<Data,bool,bool> changeIswangtileAction;
-                
-        public static Action<Data,bool,bool> changeBoundscollisionAction;
-                
-        public static Action<Data,bool,bool> changeCentercolliderAction;
+        public static Action<Data,int,int> changeObjectuidAction;
                 
 
 
         public partial class Data : MapBaseForm.Data
         {
 
-                    private MapModelForm.Data  _model;
+                    private int  _objectUid;
                     /// <summary>
-                    ///模型
+                    ///物体Product UID
                     ///</summary>
-                    public MapModelForm.Data  model{
-                                get{return _model;}
+                    public int  objectUid{
+                                get{return _objectUid;}
  set{
 
                     if(_DataById!=null&&_DatasHashSet.Contains(this))
                     {
-                       ChangeModel(this,_model,value); 
+                       ChangeObjectuid(this,_objectUid,value); 
                     }
         
-                _model = value;
-                }
-                 
-                     }
-                    
-                    private bool  _collision;
-                    /// <summary>
-                    ///碰撞
-                    ///</summary>
-                    public bool  collision{
-                                get{return _collision;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeCollision(this,_collision,value); 
-                    }
-        
-                _collision = value;
-                }
-                 
-                     }
-                    
-                    private Dictionary<string,EventTriggerForm.Data>  _events;
-                    /// <summary>
-                    ///事件
-                    ///</summary>
-                    public Dictionary<string,EventTriggerForm.Data>  events{
-                                get{return _events;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeEvents(this,_events,value); 
-                    }
-        
-                _events = value;
-                }
-                 
-                     }
-                    
-                    private Dictionary<string,MapObjectParamForm.Data>  _paramDic;
-                    /// <summary>
-                    ///数据
-                    ///</summary>
-                    public Dictionary<string,MapObjectParamForm.Data>  paramDic{
-                                get{return _paramDic;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeParamdic(this,_paramDic,value); 
-                    }
-        
-                _paramDic = value;
-                }
-                 
-                     }
-                    
-                    private int  _minimapIcon;
-                    /// <summary>
-                    ///小地图标识
-                    ///</summary>
-                    public int  minimapIcon{
-                                get{return _minimapIcon;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeMinimapicon(this,_minimapIcon,value); 
-                    }
-        
-                _minimapIcon = value;
-                }
-                 
-                     }
-                    
-                    private FaceType  _faceType;
-                    /// <summary>
-                    ///朝向类型
-                    ///</summary>
-                    public FaceType  faceType{
-                                get{return _faceType;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeFacetype(this,_faceType,value); 
-                    }
-        
-                _faceType = value;
-                }
-                 
-                     }
-                    
-                    private Dictionary<AnimDirecton,List<int>>  _animClip;
-                    /// <summary>
-                    ///方向动画贴图
-                    ///</summary>
-                    public Dictionary<AnimDirecton,List<int>>  animClip{
-                                get{return _animClip;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeAnimclip(this,_animClip,value); 
-                    }
-        
-                _animClip = value;
-                }
-                 
-                     }
-                    
-                    private bool  _isWangTile;
-                    /// <summary>
-                    ///是WangTile
-                    ///</summary>
-                    public bool  isWangTile{
-                                get{return _isWangTile;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeIswangtile(this,_isWangTile,value); 
-                    }
-        
-                _isWangTile = value;
-                }
-                 
-                     }
-                    
-                    private bool  _boundsCollision;
-                    /// <summary>
-                    ///贴图边界碰撞
-                    ///</summary>
-                    public bool  boundsCollision{
-                                get{return _boundsCollision;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeBoundscollision(this,_boundsCollision,value); 
-                    }
-        
-                _boundsCollision = value;
-                }
-                 
-                     }
-                    
-                    private bool  _centerCollider;
-                    /// <summary>
-                    ///碰撞体居中
-                    ///</summary>
-                    public bool  centerCollider{
-                                get{return _centerCollider;}
- set{
-
-                    if(_DataById!=null&&_DatasHashSet.Contains(this))
-                    {
-                       ChangeCentercollider(this,_centerCollider,value); 
-                    }
-        
-                _centerCollider = value;
+                _objectUid = value;
                 }
                  
                      }
@@ -281,23 +101,14 @@ namespace Form
             {
             }
             
-            public Data(int id,string name,int icon,MapModelForm.Data model,int labId,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon,FaceType faceType,Dictionary<AnimDirecton,List<int>> animClip,bool isWangTile,bool boundsCollision,bool centerCollider):base(id,name,icon,labId)
+            public Data(int id,string name,int icon,int labId,int objectUid):base(id,name,icon,labId)
             {
 
              this.id = id;
              this.name = name;
              this.icon = icon;
-             this.model = model;
              this.labId = labId;
-             this.collision = collision;
-             this.events = events;
-             this.paramDic = paramDic;
-             this.minimapIcon = minimapIcon;
-             this.faceType = faceType;
-             this.animClip = animClip;
-             this.isWangTile = isWangTile;
-             this.boundsCollision = boundsCollision;
-             this.centerCollider = centerCollider;
+             this.objectUid = objectUid;
 
             }
             public void Reset(Data data)
@@ -306,22 +117,13 @@ namespace Form
              this.id = data.id;
              this.name = data.name;
              this.icon = data.icon;
-             this.model = data.model;
              this.labId = data.labId;
-             this.collision = data.collision;
-             this.events = data.events;
-             this.paramDic = data.paramDic;
-             this.minimapIcon = data.minimapIcon;
-             this.faceType = data.faceType;
-             this.animClip = data.animClip;
-             this.isWangTile = data.isWangTile;
-             this.boundsCollision = data.boundsCollision;
-             this.centerCollider = data.centerCollider;
+             this.objectUid = data.objectUid;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,model,labId,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip),isWangTile,boundsCollision,centerCollider);
+        return new Data(sameId? id:idChain.GetId(),name,icon,labId,objectUid);
                 }
             
             public override  void BeforeGet()
@@ -331,7 +133,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,MapModelForm.defaultData,0,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0,FaceType.Fixed,new Dictionary<AnimDirecton,List<int>>(){},false,false,true);
+                   private static Data _defaultData=new Data(0,"",0,0,0);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -452,27 +254,9 @@ namespace Form
 
                 jo.SelectToken("icon")==null?defaultData.icon:jo.Get<int>("icon"),
 
-                jo.SelectToken("model")==null?defaultData.model:jo.Get<MapModelForm.Data>("model"),
-
                 jo.SelectToken("labId")==null?defaultData.labId:jo.Get<int>("labId"),
 
-                jo.SelectToken("collision")==null?defaultData.collision:jo.Get<bool>("collision"),
-
-                jo.SelectToken("events")==null?defaultData.events:jo.Get<Dictionary<string,EventTriggerForm.Data>>("events"),
-
-                jo.SelectToken("paramDic")==null?defaultData.paramDic:jo.Get<Dictionary<string,MapObjectParamForm.Data>>("paramDic"),
-
-                jo.SelectToken("minimapIcon")==null?defaultData.minimapIcon:jo.Get<int>("minimapIcon"),
-
-                jo.SelectToken("faceType")==null?defaultData.faceType:jo.Get<FaceType>("faceType"),
-
-                jo.SelectToken("animClip")==null?defaultData.animClip:jo.Get<Dictionary<AnimDirecton,List<int>>>("animClip"),
-
-                jo.SelectToken("isWangTile")==null?defaultData.isWangTile:jo.Get<bool>("isWangTile"),
-
-                jo.SelectToken("boundsCollision")==null?defaultData.boundsCollision:jo.Get<bool>("boundsCollision"),
-
-                jo.SelectToken("centerCollider")==null?defaultData.centerCollider:jo.Get<bool>("centerCollider")
+                jo.SelectToken("objectUid")==null?defaultData.objectUid:jo.Get<int>("objectUid")
                     );
 
             return data;
@@ -491,27 +275,9 @@ namespace Form
 
             jo.Set<int>("icon",data.icon);
 
-            jo.Set<MapModelForm.Data>("model",data.model);
-
             jo.Set<int>("labId",data.labId);
 
-            jo.Set<bool>("collision",data.collision);
-
-            jo.Set<Dictionary<string,EventTriggerForm.Data>>("events",data.events);
-
-            jo.Set<Dictionary<string,MapObjectParamForm.Data>>("paramDic",data.paramDic);
-
-            jo.Set<int>("minimapIcon",data.minimapIcon);
-
-            jo.Set<FaceType>("faceType",data.faceType);
-
-            jo.Set<Dictionary<AnimDirecton,List<int>>>("animClip",data.animClip);
-
-            jo.Set<bool>("isWangTile",data.isWangTile);
-
-            jo.Set<bool>("boundsCollision",data.boundsCollision);
-
-            jo.Set<bool>("centerCollider",data.centerCollider);
+            jo.Set<int>("objectUid",data.objectUid);
 
             return jo;
         }
@@ -646,16 +412,6 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeModel(Data superData,MapModelForm.Data oldV,MapModelForm.Data newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeModelAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
             public static void ChangeLabid(MapBaseForm.Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
@@ -673,92 +429,12 @@ MapBaseForm.RemoveData(id);
                     
             }
             
-            public static void ChangeCollision(Data superData,bool oldV,bool newV)
+            public static void ChangeObjectuid(Data superData,int oldV,int newV)
             {
                 if(superData is Data data)
                 {
 
-                changeCollisionAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeEvents(Data superData,Dictionary<string,EventTriggerForm.Data> oldV,Dictionary<string,EventTriggerForm.Data> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeEventsAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeParamdic(Data superData,Dictionary<string,MapObjectParamForm.Data> oldV,Dictionary<string,MapObjectParamForm.Data> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeParamdicAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeMinimapicon(Data superData,int oldV,int newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeMinimapiconAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeFacetype(Data superData,FaceType oldV,FaceType newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeFacetypeAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeAnimclip(Data superData,Dictionary<AnimDirecton,List<int>> oldV,Dictionary<AnimDirecton,List<int>> newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeAnimclipAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeIswangtile(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeIswangtileAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeBoundscollision(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeBoundscollisionAction?.Invoke(data,oldV,newV);
-                }
-                    
-            }
-            
-            public static void ChangeCentercollider(Data superData,bool oldV,bool newV)
-            {
-                if(superData is Data data)
-                {
-
-                changeCentercolliderAction?.Invoke(data,oldV,newV);
+                changeObjectuidAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -27,18 +27,26 @@ namespace Z_Code
         public override CmdBase GetNew() => new GenerateObjectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = MapObjectForm.DataById.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECTPROTO), null);
+            var data = GlobalEventHelper.ResolveSceneObjectTemplate(prm[0].str);
             if (data != null)
             {
-                var key = data.id.ToString();
+                var key = data.uid.ToString();
 
-                var newObjectData = MapManager.instance.AddObject(key, MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num))), GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(data.id), null);
+                var newObjectData = MapManager.instance.AddObject(key, MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num))), GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(data)), null);
 
                 if (newObjectData != null)
                 {
+                    // Selecting an existing instance copies its Product details;
+                    // the new placement must never share mutable state with it.
+                    if (data.protoUid != 0)
+                    {
+                        var copy = data.Copy(false);
+                        copy.ToProduct(ObjectProductForm.GetTemplateUid(data));
+                        data = copy;
+                    }
                     GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);
                     MapManager.instance.updateCtrl.UpdateSingleOne(newObjectData.unit);
-                    asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, newObjectData.uid.ToString())) };
+                    asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneObjectReference(newObjectData.unit)) };
                     return true;
                 }
             }

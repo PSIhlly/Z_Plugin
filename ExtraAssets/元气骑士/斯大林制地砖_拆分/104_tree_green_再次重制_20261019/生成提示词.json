@@ -1,0 +1,14 @@
+{
+  "mode": "built-in imagegen",
+  "source": "D:/Works/Unity's/Personal/Z_Plugin/Z_Plugin/ExtraAssets/元气骑士/斯大林制地砖_拆分/03_props/104_tree_green_原图.png",
+  "generated": "C:\\Users\\LH1\\.codex\\generated_images\\01a11a07-4b7c-7991-a4d8-b119a9a411d7\\exec-72e48937-f5e2-4442-9413-ee246da8b05f.png",
+  "prompt": "Use case: style-transfer. Edit target: the attached ORIGINAL tiny green tree sprite. Create a fresh remaster directly from THIS original.\nFinal deliverable is a single game-map tree sprite on a transparent 64x112 portrait canvas (aspect 4:7). The user prefers COARSE, SIMPLE pixel art rather than fine detailed foliage. Design on a 32x56 logical pixel grid, so every smallest pixel becomes a crisp 2x2 block in the final 64x112 file.\nPreserve the original compact teardrop/conical silhouette: pointed top, smooth full rounded lower crown, slight irregular stepped foliage outline, very small brown trunk below the center. The original tree is a dense cohesive green mass. Keep its broad form faithful; avoid turning it into a thin spiky fir with long protruding branches.\nUse around 8-10 cohesive solid colors: restrained jade/teal green lit foliage, medium emerald green, dark petrol-green shadows, and a few brown trunk pixels. Keep highlights on upper-left and shadows toward lower-right. Slightly subdued brightness similar to the original, not neon or glossy.\nRedraw foliage into 4-5 broad overlapping rounded branch tiers, each indicated by just a few chunky light/mid/dark clusters. Keep the tiers subtle so the overall teardrop crown stays continuous. Readable irregular color masses of about 3-5 logical pixels across. A few coarse jagged leaf tips are enough. No individual needles, tiny leaves, isolated bright specks, dense grain, dithering, thin white/mint glints, detailed bark or fine internal tracery.\nThe whole tree should nearly fill the portrait canvas, centered with very thin transparent margin and entire tip/trunk visible, front-facing 2D map prop. Actual alpha transparency. No cast shadow, grass, ground, rocks, scenery, ornaments, fruit, text, labels, border or watermark. No blur, antialiasing, smooth gradients, painterly or photographic rendering, 3D or vector style. It should look like a deliberate rough retro game sprite, with more structure than the tiny original but much simpler than a highly detailed pine.",
+  "logicalSize": [
+    32,
+    56
+  ],
+  "targetSize": [
+    64,
+    112
+  ]
+}

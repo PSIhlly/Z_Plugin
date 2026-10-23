@@ -1,0 +1,102 @@
+[
+  {
+    "Name": "草1.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 64,
+    "Transparent": 192,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "F05B931A1E807D404051D5094485B9DBD46466338200A7E47F05579A4342ABC7"
+  },
+  {
+    "Name": "草2.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 122,
+    "Transparent": 134,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "727593E1B4B2DB7638220AD84A5D4E40EEC5240506512F2AA91039F25D1CA501"
+  },
+  {
+    "Name": "花1.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 94,
+    "Transparent": 162,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "C42EB0079FBFD6812705B77CF241E47676BF05374077CC7CF623B6006F66EE79"
+  },
+  {
+    "Name": "花2.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 96,
+    "Transparent": 160,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "2C5A9EA50D533F489F5DB48B2798F35FD08444A8F240F5AA0C1F130BEF47C75E"
+  },
+  {
+    "Name": "花3.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 76,
+    "Transparent": 180,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "536A3D13EA08F6A8B6C6380DBC74CA2698D451D07AE498A6080A82371EE5B7F7"
+  },
+  {
+    "Name": "花4.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 73,
+    "Transparent": 183,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "AEFFFD34D7B229F0E935658981BA2BCE4D2710893FC644816BB537D3A78B7BCA"
+  },
+  {
+    "Name": "蘑菇.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 108,
+    "Transparent": 148,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "114A662F09243E29587E16BA01DD9688C568D43A03BD7A85AAC794AB3DCBD879"
+  },
+  {
+    "Name": "鸟窝.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 98,
+    "Transparent": 158,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "DDF789768351B2AC82CCB112B6BE61ACFFF84AB40BA8B3FA351D44829E17CE95"
+  },
+  {
+    "Name": "石1.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 104,
+    "Transparent": 152,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "AD2E4D8AF6A73E311C67FF9C743FD9BC58FE20E4625852272FB25024CB60E75A"
+  },
+  {
+    "Name": "rm柴堆.png",
+    "Width": 16,
+    "Height": 16,
+    "Opaque": 117,
+    "Transparent": 139,
+    "PartialAlpha": 0,
+    "Colors": 12,
+    "Sha256": "5ADBF444AF861DAE4C28F5471015CED6393AEBE85560293894801D0105974768"
+  }
+]

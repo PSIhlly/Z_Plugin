@@ -16,12 +16,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject
 
     public partial class UiModStoryMapObjectObjectParam
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
         public int selPage;
     }
     public partial class UiModStoryMapObjectObjectModel
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
 
         public int selPage;
     }

@@ -100,6 +100,14 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,EventState,EventState> changeEventstateAction;
                 
+        public static Action<Data,bool,bool> changeAntiocclusionAction;
+                
+        public static Action<Data,float,float> changeLightintensityAction;
+                
+        public static Action<Data,bool,bool> changeAllowdropAction;
+                
+        public static Action<Data,bool,bool> changeEdgetransitionAction;
+                
 
 
         public partial class Data
@@ -555,7 +563,79 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,CameraMode cameraMode,ClipForm.Data dialogCache,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,int largeMap,int curMissionId,(int,Vector3) targetScene,bool banSceneChange,EventState eventState)
+                    private bool  _antiOcclusion;
+                    /// <summary>
+                    ///防遮挡：启用遮挡半透明(关闭时取消object/Tile的所有遮挡半透，高层Tile全透保留)
+                    ///</summary>
+                    public bool  antiOcclusion{
+                                get{return _antiOcclusion;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeAntiocclusion(this,_antiOcclusion,value); 
+                    }
+        
+                _antiOcclusion = value;
+                }
+                 
+                     }
+                    
+                    private float  _lightIntensity;
+                    /// <summary>
+                    ///光照强度：由事件Cmd SetLightIntensity 记录，-1表示未设置(使用相机视角默认值)
+                    ///</summary>
+                    public float  lightIntensity{
+                                get{return _lightIntensity;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeLightintensity(this,_lightIntensity,value); 
+                    }
+        
+                _lightIntensity = value;
+                }
+                 
+                     }
+                    
+                    private bool  _allowDrop;
+                    /// <summary>
+                    ///允许下落：开启时人物可以单步跨过大于step的y落差；关闭时前方本层无tile、下层有tile(落差>=1层>step)不能走下去，导航同样不生成该落差的连线
+                    ///</summary>
+                    public bool  allowDrop{
+                                get{return _allowDrop;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeAllowdrop(this,_allowDrop,value); 
+                    }
+        
+                _allowDrop = value;
+                }
+                 
+                     }
+                    
+                    private bool  _edgeTransition;
+                    /// <summary>
+                    ///边界过渡：没有tile的边界处用黑幕渐变压黑(默认开启)
+                    ///</summary>
+                    public bool  edgeTransition{
+                                get{return _edgeTransition;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeEdgetransition(this,_edgeTransition,value); 
+                    }
+        
+                _edgeTransition = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,float seconds,int sceneId,Vector3 pos,int characterUid,List<int> bag,List<int> team,List<int> teamActive,Dictionary<string,string> uiStyleImageName,CameraMode cameraMode,ClipForm.Data dialogCache,int blockProgramUid,EditorStyle editorStyle,bool enableEquip,bool enableSkill,bool enableFreeChangeActiveTeamer,bool enableFreeChangeSkill,bool enableMinimap,bool enableLargeMap,bool enableMission,int largeMap,int curMissionId,(int,Vector3) targetScene,bool banSceneChange,EventState eventState,bool antiOcclusion,float lightIntensity,bool allowDrop,bool edgeTransition)
             {
 
              this.uid = uid;
@@ -583,6 +663,10 @@ public static readonly int autoUidCnt=100;
              this.targetScene = targetScene;
              this.banSceneChange = banSceneChange;
              this.eventState = eventState;
+             this.antiOcclusion = antiOcclusion;
+             this.lightIntensity = lightIntensity;
+             this.allowDrop = allowDrop;
+             this.edgeTransition = edgeTransition;
 
             }
             public void Reset(Data data)
@@ -613,11 +697,15 @@ public static readonly int autoUidCnt=100;
              this.targetScene = data.targetScene;
              this.banSceneChange = data.banSceneChange;
              this.eventState = data.eventState;
+             this.antiOcclusion = data.antiOcclusion;
+             this.lightIntensity = data.lightIntensity;
+             this.allowDrop = data.allowDrop;
+             this.edgeTransition = data.edgeTransition;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),cameraMode,dialogCache,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill,enableMinimap,enableLargeMap,enableMission,largeMap,curMissionId,targetScene,banSceneChange,eventState);
+        return new Data(sameId? uid:uidChain.GetId(),seconds,sceneId,pos,characterUid,bag==null?new List<int>():new List<int>(bag),team==null?new List<int>():new List<int>(team),teamActive==null?new List<int>():new List<int>(teamActive),uiStyleImageName==null?new Dictionary<string,string>():new Dictionary<string,string>(uiStyleImageName),cameraMode,dialogCache,blockProgramUid,editorStyle,enableEquip,enableSkill,enableFreeChangeActiveTeamer,enableFreeChangeSkill,enableMinimap,enableLargeMap,enableMission,largeMap,curMissionId,targetScene,banSceneChange,eventState,antiOcclusion,lightIntensity,allowDrop,edgeTransition);
                 }
             
             public virtual  void BeforeGet()
@@ -627,7 +715,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},CameraMode.Overhead,ClipForm.defaultData,0,EditorStyle.Avg,false,false,false,false,false,false,false,0,0,(0,Vector3.zero),false,default);
+                   private static Data _defaultData=new Data(0,0f,0,Vector3.zero,0,null,null,null,new Dictionary<string,string>(){},CameraMode.Overhead,ClipForm.defaultData,0,EditorStyle.Avg,false,false,false,false,false,false,false,0,0,(0,Vector3.zero),false,default,false,-1f,true,true);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -749,7 +837,15 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("banSceneChange")==null?defaultData.banSceneChange:jo.Get<bool>("banSceneChange"),
 
-                jo.SelectToken("eventState")==null?defaultData.eventState:jo.Get<EventState>("eventState")
+                jo.SelectToken("eventState")==null?defaultData.eventState:jo.Get<EventState>("eventState"),
+
+                jo.SelectToken("antiOcclusion")==null?defaultData.antiOcclusion:jo.Get<bool>("antiOcclusion"),
+
+                jo.SelectToken("lightIntensity")==null?defaultData.lightIntensity:jo.Get<float>("lightIntensity"),
+
+                jo.SelectToken("allowDrop")==null?defaultData.allowDrop:jo.Get<bool>("allowDrop"),
+
+                jo.SelectToken("edgeTransition")==null?defaultData.edgeTransition:jo.Get<bool>("edgeTransition")
                     );
 
             return data;
@@ -811,6 +907,14 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<bool>("banSceneChange",data.banSceneChange);
 
             jo.Set<EventState>("eventState",data.eventState);
+
+            jo.Set<bool>("antiOcclusion",data.antiOcclusion);
+
+            jo.Set<float>("lightIntensity",data.lightIntensity);
+
+            jo.Set<bool>("allowDrop",data.allowDrop);
+
+            jo.Set<bool>("edgeTransition",data.edgeTransition);
 
             return jo;
         }
@@ -1142,6 +1246,46 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeEventstateAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAntiocclusion(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAntiocclusionAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeLightintensity(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeLightintensityAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeAllowdrop(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeAllowdropAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeEdgetransition(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeEdgetransitionAction?.Invoke(data,oldV,newV);
                 }
                     
             }

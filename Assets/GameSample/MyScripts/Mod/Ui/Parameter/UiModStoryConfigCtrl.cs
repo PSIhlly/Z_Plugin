@@ -106,6 +106,24 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
                 Refresh();
             });
 
+            view.btn_antiOcclusion.onClick.AddListener(() =>
+            {
+                GameManager.instance.curProgress.antiOcclusion = !GameManager.instance.curProgress.antiOcclusion;
+                Refresh();
+            });
+
+            view.btn_allowDrop.onClick.AddListener(() =>
+            {
+                GameManager.instance.curProgress.allowDrop = !GameManager.instance.curProgress.allowDrop;
+                Refresh();
+            });
+
+            view.btn_edgeTransition.onClick.AddListener(() =>
+            {
+                GameManager.instance.curProgress.edgeTransition = !GameManager.instance.curProgress.edgeTransition;
+                Refresh();
+            });
+
             view.btn_deleteActiveTeamer.onClick.AddListener(() =>
             {
                 if (GameManager.instance.curProgress.characterUid == model.selActiveTeamerUid)
@@ -184,6 +202,9 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryConfig
             view.sta_minimap.ChangeState(GameManager.instance.curProgress.enableMinimap ? 1 : 0);
             view.sta_largeMap.ChangeState(GameManager.instance.curProgress.enableLargeMap ? 1 : 0);
             view.sta_mission.ChangeState(GameManager.instance.curProgress.enableMission ? 1 : 0);
+            view.sta_antiOcclusion.ChangeState(GameManager.instance.curProgress.antiOcclusion ? 1 : 0);
+            view.sta_allowDrop.ChangeState(GameManager.instance.curProgress.allowDrop ? 1 : 0);
+            view.sta_edgeTransition.ChangeState(GameManager.instance.curProgress.edgeTransition ? 1 : 0);
         }
     }
 

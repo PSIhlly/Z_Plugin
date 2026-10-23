@@ -167,7 +167,12 @@ public class GameMapData : MapInfo
 
     public override List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
     {
-        return ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
+        var objects = ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
+        // Mod scene entry reads authored Core maps directly. Upgrade their old
+        // template links and prefab keys before the map creates any instances.
+        foreach (var data in objects)
+            ObjectProductForm.BindUnit(data);
+        return objects;
     }
 
     public override TileUnitForm.Data GetNewTile(Vector3Int mapPos, object[] prms = null)

@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVProVideo.Editor", "AVProV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{349D3CED-3B01-A894-1286-2212C7ED26F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerryYellow.CodeAssist.Editor", "MerryYellow.CodeAssist.Editor.csproj", "{0EE0C851-42CD-13D6-D17D-E1925BF83056}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVProVideo.Runtime", "AVProVideo.Runtime.csproj", "{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unity.webp", "unity.webp.csproj", "{88A047F6-2F57-4845-56A3-90BC56F19135}"
@@ -75,6 +77,10 @@ Global
 		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{349D3CED-3B01-A894-1286-2212C7ED26F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EE0C851-42CD-13D6-D17D-E1925BF83056}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FCF0E31-1478-0871-A3F5-B6D3C4C3FFB4}.Release|Any CPU.ActiveCfg = Release|Any CPU

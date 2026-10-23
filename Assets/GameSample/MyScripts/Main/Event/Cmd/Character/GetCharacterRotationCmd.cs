@@ -26,7 +26,9 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetCharacterRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = PlayManager.instance.sceneCtrl.GetCharacterUnit(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER));
+            var data = CharacterProductForm.TryGetReferenceUid(prm[0].str, out var uid)
+                ? PlayManager.instance.sceneCtrl.GetCharacterUnit(uid) : null;
+            asyncTask.res = new[] { CodeHelper.CreateBoxByNum(0) };
             if (data != null)
             {
                 var box = CodeHelper.CreateBoxByNum(data.euler.y);

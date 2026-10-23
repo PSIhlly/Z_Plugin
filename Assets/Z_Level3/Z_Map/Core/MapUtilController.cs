@@ -1075,19 +1075,36 @@ namespace Z_Map
             }
         }
 
+        /// <summary>
+        /// 按运行时 Object prefab 与放置参数（pos/euler/scale）直接求视觉世界包围盒，
+        /// 尺寸与位置来自 prefab 直接子节点（MapModel 的 pos/scale），与碰撞体无关。
+        /// 用于还没有生成 Unit 的放置判定（例如笔刷的非重叠检查）。
+        /// </summary>
+        public bool TryGetVisionBounds(GameObject root, Vector3 pos, Vector3 euler, Vector3 scale,
+            out Bounds visionBounds)
+        {
+            return TryGetRuntimeBounds(root, pos, euler, scale, false, out visionBounds, out _);
+        }
+
         private bool TryGetObjectBounds(
             ObjectUnitForm.Data oData, out Bounds visionBounds, bool useBodyCenter, out Vector2 projectedZ)
+        {
+            return TryGetRuntimeBounds(oData.unit.prefab, oData.pos, oData.euler, oData.scale,
+                useBodyCenter, out visionBounds, out projectedZ);
+        }
+
+        private bool TryGetRuntimeBounds(GameObject root, Vector3 pos, Vector3 euler, Vector3 scale,
+            bool useBodyCenter, out Bounds visionBounds, out Vector2 projectedZ)
         {
             visionBounds = default;
             projectedZ = default;
             bool hasBounds = false;
-            GameObject root = oData.unit.prefab;
             if (root != null)
             {
                 Matrix4x4 rootToRuntime = Matrix4x4.TRS(
-                    oData.pos,
-                    Quaternion.Euler(oData.euler),
-                    oData.scale);
+                    pos,
+                    Quaternion.Euler(euler),
+                    scale);
 
                 // GameSample 运行时 Object prefab 的直接子节点保存了 MapModel 的 pos/scale。
                 // CombineNewGoByPrefabs 会给 localPosition 额外加 0.5Y，因此先还原模型底部，
@@ -1158,17 +1175,17 @@ namespace Z_Map
                 return true;
 
             // 无可视 Renderer 时保留锚点盒，避免 Object 从空间索引中消失。
-            Vector3 scale = new Vector3(
-                Mathf.Abs(oData.scale.x),
-                Mathf.Abs(oData.scale.y),
-                Mathf.Abs(oData.scale.z));
-            Quaternion rotation = Quaternion.Euler(oData.euler);
-            Vector3 center = oData.pos + rotation * new Vector3(0f, scale.y * 0.5f, 0f);
+            Vector3 absScale = new Vector3(
+                Mathf.Abs(scale.x),
+                Mathf.Abs(scale.y),
+                Mathf.Abs(scale.z));
+            Quaternion rotation = Quaternion.Euler(euler);
+            Vector3 center = pos + rotation * new Vector3(0f, absScale.y * 0.5f, 0f);
             for (int x = 0; x < 2; x++)
             for (int y = 0; y < 2; y++)
             for (int z = 0; z < 2; z++)
             {
-                Vector3 corner = center + rotation * Vector3.Scale(scale, new Vector3(
+                Vector3 corner = center + rotation * Vector3.Scale(absScale, new Vector3(
                     x == 0 ? -.5f : .5f, y == 0 ? -.5f : .5f, z == 0 ? -.5f : .5f));
                 EncapsulateObjectCorner(corner, ref visionBounds, ref projectedZ, ref hasBounds);
             }

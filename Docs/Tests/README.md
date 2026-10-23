@@ -1,11 +1,38 @@
 # Map runtime regression
 
-`Run-MapRuntimeRegression.ps1 -Fixture TileFrontVisibilityRegression` checks Play's
-Show-time front suppression against the exact same-height -Z neighbour by prefab
-name. It uses the real DisFade shader and texture/animation entry points, covering
-offscreen neighbours, other prefab names/case, lower/forward/side neighbours, Mod,
-body/front separation, subsequent vision changes, animation cancellation and a
-new owner on the same instance hierarchy. This is an isolated Editor check;
+Product reference checks run in independent temporary Unity projects:
+
+- `Run-MapRuntimeRegression.ps1 -Fixture CharacterReferenceRegression`: exact/runtime versus prototype Character resolution, current-scene snapshots, unique singleton, invalid references, recycled Data identity, team/current remapping and independent skill copies.
+- `Run-MapRuntimeRegression.ps1 -Fixture CharacterPartyRegression`: five Character party commands, command metadata/default compilation, prototype recruitment and fan-out, unique Characters, team/active/current invariants, idempotence, current-character fallback, deliberate reserve-only save reload versus legacy invalid-UID repair, invalid/omitted references, HUD/trigger null safety and existing team-slot UI entry points. Test actual HUD refresh/player switching in Play mode too.
+- `Run-MapRuntimeRegression.ps1 -Fixture ObjectProductRuntimeRegression`: legacy `mof` and wrapper `oprf` migration, full Product-owned model/events/animation/collision/params, transient MapObject rows, all-scene copies without scene provenance, idempotence, Mod memory-only loading, unvisited Core upgrades on explicit save, replacement-table round trips and reset.
+- `Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression`: discriminated Unit/Product/template IDs, legacy `$sop$` compatibility, parameter fan-out and saved cached values, unloaded Product reads/writes, malformed refs and actual multi-instance removal.
+- `Run-MapRuntimeRegression.ps1 -Fixture SceneProductCommandRegression`: Character/Object template versus exact position/move/rotation, independent relative starts, bounded time, legacy duration aliases, original Data identity and all-target completion. It does not compile the unrelated renderer probes in the broad map fixture.
+
+These Editor checks do not replace Mod/Play scene-switch or target Player smoke tests.
+
+`Run-MapRuntimeRegression.ps1 -Fixture ObjectProductEditorRegression` checks Product-backed creation/deletion, concrete label ownership, transient MapObject list projection and stable row identity across refreshes. After one successful production build, use `-SkipBuild` for additional isolated fixtures to avoid competing writes to the same compiler output; it deliberately assumes the existing binaries match the current source.
+
+`Run-MapRuntimeRegression.ps1 -Fixture MapEdgeTransitionRegression` builds the
+production runtime, then tests the actual edge component source in an isolated
+Unity project with only a minimal column-map context. It checks the Euclidean
+transform against brute-force distances, reduced convex-corner gradient creases,
+mirrored concave/convex outlines, unchanged straight-edge profiles, black borders,
+zero/sub-cell fade widths, interior holes, mask budget and work-buffer reuse.
+The log includes a warmed rebuild duration and an `edge-corners-preview.png`
+showing unsoftened Euclidean edges (left) and default corner smoothing (right).
+The preview samples the actual Alpha8 mask with GPU-equivalent texel centers and
+the unchanged shader profile; it is not a GPU screenshot or a full-map smoke test.
+Check the real Mod/Play view after adjusting `cornerSmoothing` (default 0.5 cell,
+zero disables), including large-map adaptive mask resolution. Per-frame drawing
+still uses one texture sample and one quad; smoothing only runs during rebuilds.
+
+`Run-MapRuntimeRegression.ps1 -Fixture TileFrontVisibilityRegression` checks that
+configured Tile fronts stay visible beside same-name neighbours in Play and Mod.
+It uses the real DisFade shader and texture/animation entry points, covering
+offscreen neighbours, other prefab names/case, lower/forward/side neighbours,
+body/front separation, subsequent vision changes, continuing front animation,
+disabled/empty/restored front configuration and a new owner on the same instance
+hierarchy. This is an isolated Editor check;
 native pool callbacks and final scene rendering still need Play-mode verification.
 
 `Run-MapRuntimeRegression.ps1 -Fixture CodeInterpreterRuntimeRegression` runs the
@@ -118,6 +145,17 @@ actual package decoder and import transaction in an isolated Unity project and
 temporary persistence root: round-trip bytes/nested assets, fresh IDs, duplicate
 imports, occupied roots, rewritten persisted overview, unrelated Form identity,
 invalid/plain/truncated PNGs, bad Base64/overview, traversal paths and rollback.
+It also compares WritePackage's streamed UTF-8 bytes with the legacy Package
+JSON, checks odd-offset/incremental SHA-256 writes against the managed reference,
+cancellation during compression, and multi-megabyte stored-DEFLATE PNGs through
+both the managed decoder and Unity's native image decoder/re-encoder. Windows
+uses CNG for the same SHA-256 digest; non-Windows retains the managed fallback.
+Large exports avoid full JSON/payload copies and redundant IDAT recompression;
+the on-disk version, checksums and import compatibility are unchanged. For a
+large real-story performance check, read only its Core into an isolated test
+process, time EncodeStreamWithCover plus writing a temporary PNG, then compare
+the decoded payload byte-for-byte with the original Package output. Never
+benchmark by importing over an existing user story or writing to its Core.
 New `.png` exports store the GZip-compressed package in lossless RGB image pixels,
 with a versioned header, payload length/checksum and optional small cover; they
 write no `tEXt`/ZEXTRA metadata. Legacy ZEXTRA PNGs remain readable through a
@@ -312,6 +350,25 @@ the Feature source is compiled against cached production URP/runtime binaries;
 no production package manifest or shader source is rewritten for the test.
 Success is `MAP_FADE_SHADER_REGRESSION_PASS`. This is not a full Play/Player test.
 
+Use `-Fixture MapShadowBiasRegression` to GPU-test the production ShadowCaster's
+directional/punctual depth bias, transformed-normal bias and near-plane clamp.
+It covers origin and `(496, 500, 519)`, ordinary and actual instanced draws,
+hidden-unit silhouettes and texture-alpha holes in an isolated D3D11 Editor.
+Success is `MAP_SHADOW_BIAS_REGRESSION_PASS`; revisit the reported Scene view
+with shadows enabled to confirm the original black line is gone.
+
+Use `-Fixture MapShadowReceiverRegression` to draw the actual opaque and partial-alpha
+color passes against URP's 1x1 empty shadow texture and its `(1, 0, 1, 0)` shadow
+parameters. A retained world-to-shadow matrix produces a false strip with the
+realtime-only GetMainLight overload; the world-position overload must apply URP's
+distance fade and leave no dark strip. The 96 cases cover origin and
+`(496, 500, 519)`, three camera yaws, 1x/2x MSAA, enabled/disabled shadow keywords,
+and both color passes with real instanced Tile/front Quads. Disabling the fade
+while retaining shadow strength is a negative control: the strip must remain,
+proving ordinary shadows were not globally disabled. Success is
+`MAP_SHADOW_RECEIVER_REGRESSION_PASS`. This does not replace confirmation in the
+reported Scene view.
+
 Use `-Fixture DisFadeBatchingRegression` for the WangTile batching regression.
 It generates the real 47 variants from a uniform white sheet, proving that equal
 pixels and material display names do not imply shared Texture/Material objects.
@@ -355,6 +412,9 @@ changes and pool preparation, and restoration of newly configured textures,
 authored shadow-pass and Renderer/shadow-mode preservation, split-camera cleanup
 and Character first Show/reuse from a disabled
 template, including part enablement and visibility during texture replacement.
+Mod layer-selection checks keep all normal/front pairs displayed, cap higher
+pairs at half opacity without multiplying existing occlusion, preserve full
+hiding, and verify repeat selection plus Event/Play restoration and lower-layer lighting.
 It runs the production C# methods against the
 real shader in an isolated Unity project; GPU appearance and draw-call counts
 still require Play-mode profiling. Success is `DIS_FADE_ROUTING_REGRESSION_PASS`.

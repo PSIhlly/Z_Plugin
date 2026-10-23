@@ -26,7 +26,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetObjectRightVectorCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT), null);
+            var data = GlobalEventHelper.ResolveSceneObjectUnit(prm[0].str)?.data;
+            asyncTask.res = new[] { SceneUnitCommand.BoxVector(Vector3.zero) };
             if (data != null)
             {
                 var box = CodeHelper.CreateBox();

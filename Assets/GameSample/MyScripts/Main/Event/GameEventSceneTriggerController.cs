@@ -100,7 +100,7 @@ namespace Z_Map
                 {
                     trigger = ch.events[name];
                 }
-                else if (this is ObjectUnit oU && MapObjectForm.DataById.TryGetValue(oU.productInfo.Item1, out var ob) && ob.events.ContainsKey(name))
+                else if (this is ObjectUnit oU && ObjectProductForm.GetProduct(oU.data) is ObjectProductForm.Data ob && ob.events.ContainsKey(name))
                 {
                     trigger = ob.events[name];
                 }
@@ -166,7 +166,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 }
                 else if (evt.a is MapUnit sceneObject)
                 {
-                    heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, sceneObject.data.uid.ToString()));
+                    heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneObjectReference(sceneObject));
                 }
 
                 if (evt.b is CharacterUnit ch2)
@@ -175,7 +175,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
                 }
                 else if (evt.b is MapUnit targetSceneObject)
                 {
-                    heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, targetSceneObject.data.uid.ToString()));
+                    heap["param2"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneObjectReference(targetSceneObject));
                 }
 
                 switch (evt.type)
@@ -277,9 +277,9 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
     private static void ExecuteUnitEvent(MapUnit unit, string eventName, bool characterSelf)
     {
         var heap = new Dictionary<string, BoxDataForm.Data>();
-        heap["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(
-            characterSelf ? GlobalEventHelper.CHARACTER : GlobalEventHelper.SCENEOBJECT,
-            characterSelf ? unit.productInfo.Item1.ToString() : unit.data.uid.ToString()));
+        heap["param1"] = CodeHelper.CreateBoxByStr(characterSelf
+            ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, unit.productInfo.Item1.ToString())
+            : GlobalEventHelper.GetSceneObjectReference(unit));
         unit.ExecuteEvt(eventName, heap);
     }
 

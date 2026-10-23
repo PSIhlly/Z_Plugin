@@ -326,7 +326,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200560885376592261, guid: 76e1ed322c446a849b9c914dca7360b8, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 697.24
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6200560885376592261, guid: 76e1ed322c446a849b9c914dca7360b8, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -373,7 +373,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
-  m_VerticalFit: 0
+  m_VerticalFit: 2
 --- !u!114 &2730646957085695398
 MonoBehaviour:
   m_ObjectHideFlags: 0

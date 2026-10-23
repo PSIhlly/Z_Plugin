@@ -28,7 +28,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new IsObjectActiveCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT), null);
+            var data = GlobalEventHelper.ResolveSceneObjectUnit(prm[0].str);
 
             var box = CodeHelper.CreateBoxByNum(data != null ? 1 : 0);
             asyncTask.res = new BoxDataForm.Data[] { box };

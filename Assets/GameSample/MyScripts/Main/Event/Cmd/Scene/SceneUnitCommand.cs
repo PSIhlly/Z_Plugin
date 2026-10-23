@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Map;
@@ -10,14 +11,30 @@ namespace Z_Code
     {
         public static MapUnit Resolve(string reference)
         {
+            var units = ResolveAll(reference);
+            return units.Count == 0 ? null : units[0];
+        }
+
+        public static List<MapUnit> ResolveAll(string reference)
+        {
+            var result = new List<MapUnit>();
             if (string.IsNullOrEmpty(reference))
-                return null;
-            UnitForm.Data data = null;
-            if (TryGetId(reference, GlobalEventHelper.SCENEOBJECT, out var uid))
-                UnitForm.DataByUid.TryGetValue(uid, out data);
-            else if (TryGetId(reference, GlobalEventHelper.CHARACTER, out var productUid))
-                data = PlayManager.instance.sceneCtrl?.GetCharacterUnit(productUid);
-            return data?.unit is MapUnit unit && IsLive(unit) ? unit : null;
+                return result;
+            if (TryGetId(reference, GlobalEventHelper.CHARACTER, out var productUid))
+            {
+                var characters = PlayManager.instance.sceneCtrl?.GetCharacterUnits(productUid);
+                if (characters != null)
+                    foreach (var data in characters)
+                        if (data?.unit is MapUnit unit && IsLive(unit, data))
+                            result.Add(unit);
+            }
+            else
+            {
+                foreach (var unit in GlobalEventHelper.ResolveSceneObjectUnits(reference))
+                    if (IsLive(unit))
+                        result.Add(unit);
+            }
+            return result;
         }
 
         private static bool TryGetId(string reference, string mark, out int uid)
@@ -31,9 +48,13 @@ namespace Z_Code
         }
 
         public static bool IsLive(MapUnit unit)
+            => unit != null && IsLive(unit, unit.data);
+
+        public static bool IsLive(MapUnit unit, UnitForm.Data originalData)
         {
-            return unit != null && UnitForm.DataByUid.TryGetValue(unit.data.uid, out var registered)
-                && ReferenceEquals(registered, unit.data) && ReferenceEquals(registered.unit, unit);
+            return unit != null && originalData != null && ReferenceEquals(unit.data, originalData)
+                && UnitForm.DataByUid.TryGetValue(originalData.uid, out var registered)
+                && ReferenceEquals(registered, originalData) && ReferenceEquals(registered.unit, unit);
         }
 
         public static bool CanMove(MapUnit unit) => unit is CharacterUnit || unit is ObjectUnit;

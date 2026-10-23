@@ -27,19 +27,33 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetSceneObjectParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
-            if (data != null && ((MapUnit)(data.unit)).paramInfo.ContainsKey(prm[1].str))
+            string name = prm[1].str;
+            var unit = GlobalEventHelper.ResolveSceneObjectUnit(prm[0].str);
+            GameParamForm.Data parameter = null;
+            if (!string.IsNullOrEmpty(name))
             {
-                asyncTask.res = new BoxDataForm.Data[] { ((MapUnit)(data.unit)).paramInfo[prm[1].str].GetValue().DeepCopy() };
+                if (unit != null)
+                    unit.paramInfo.TryGetValue(name, out parameter);
+                if (parameter == null)
+                {
+                    var products = GlobalEventHelper.ResolveSceneObjectProducts(prm[0].str);
+                    if (products.Count > 0 && products[0].paramDic != null
+                        && products[0].paramDic.TryGetValue(name, out var productParameter))
+                        parameter = productParameter;
+                }
+                if (parameter == null)
+                {
+                    var template = GlobalEventHelper.ResolveSceneObjectTemplate(prm[0].str);
+                    if (template?.paramDic != null && template.paramDic.TryGetValue(name, out var templateParameter))
+                        parameter = templateParameter;
+                }
             }
-            else
+            if (parameter == null && !string.IsNullOrEmpty(name))
+                parameter = MapObjectParamForm.DataByName.GetDv(name, null);
+            asyncTask.res = new BoxDataForm.Data[]
             {
-                var prmData = MapObjectParamForm.DataByName.GetDv(prm[1].str, null);
-                if (prmData != null)
-                    asyncTask.res = new BoxDataForm.Data[] { prmData.GetValue().Copy() };
-                else
-                    asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBox()};
-            }
+                parameter == null ? CodeHelper.CreateBox() : parameter.GetValue().DeepCopy()
+            };
             return true;
         }
     }

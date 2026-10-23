@@ -18,12 +18,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
     public partial class UiModStoryMapObjectObjectConfigParam
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
     }
     public partial class UiModStoryMapObjectObjectConfigModel
     {
 
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
 
     }
     public partial class UiModStoryMapObjectObjectConfigCtrl
@@ -69,7 +69,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                 // ModStory retains scene rows after unloading the map. Update
                 // the config immediately; only refresh spatial indexes in a loaded map.
                 if (MapManager.instance.data != null)
-                    GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(model.data.id);
+                    GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(model.data.uid);
             });
             view.ipt_colliderScale.onFinishInput += s =>
             {
@@ -84,7 +84,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             });
             view.btn_minimapIcon.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportObjectMinimap(model.data.id);
+                ModManager.instance.assetCtrl.ImportObjectMinimap(model.data.uid);
                 Refresh();
             });
         }

@@ -352,12 +352,12 @@ public static class MapRuntimeRegression
 
     private static void ObjectRearAnchoredCollider()
     {
-        var product = Form.MapObjectForm.GetDataByJo(new JObject());
-        Require(product.centerCollider && Form.MapObjectForm.defaultData.centerCollider, "old saves default to centered Colliders");
+        var product = Form.ObjectProductForm.GetDataByJo(new JObject());
+        Require(product.centerCollider && Form.ObjectProductForm.defaultData.centerCollider, "old saves default to centered Colliders");
         product.centerCollider = false;
-        Require(!product.Copy().centerCollider && !Form.MapObjectForm.GetDataByJo(Form.MapObjectForm.GetJoByData(product)).centerCollider,
+        Require(!product.Copy().centerCollider && !Form.ObjectProductForm.GetDataByJo(Form.ObjectProductForm.GetJoByData(product)).centerCollider,
             "rear anchor survives copying and save/load");
-        var reset = Form.MapObjectForm.defaultData;
+        var reset = Form.ObjectProductForm.defaultData;
         reset.Reset(product);
         Require(!reset.centerCollider, "reset retains rear anchor");
         var apply = typeof(GameUtilController).GetMethod("ApplyFirstPartCollisionBounds", BindingFlags.Static | BindingFlags.NonPublic);
@@ -468,7 +468,9 @@ public static class MapRuntimeRegression
         // RuntimeInitializeOnLoadMethod registration does not run in EditMode.
         Z_DataSystem.Form.GameObjectAssetForm.InitInternal();
         Z_DataSystem.Form.TexAssetForm.InitInternal();
-        typeof(Form.MapModelForm).GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+        foreach (var form in new[] { typeof(Form.MapModelForm), typeof(Form.ObjectProductForm),
+                     typeof(Form.EventTriggerForm), typeof(Form.GameParamForm), typeof(Form.MapObjectParamForm) })
+            form.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
         const int cubeId = 99101, sphereId = 99102, textureId = 99103, otherTextureId = 99104,
             emptyTextureId = 99105, fullTextureId = 99106, animatedId = 99107, webPId = 99109;
         var cube = Go("bounds-cube-source");
@@ -599,15 +601,15 @@ public static class MapRuntimeRegression
         model.subPrefabUnitPos.RemoveAt(1);
         model.subPrefabUnitScale.RemoveAt(1);
         model.subUnitTexsName.RemoveAt(1);
-        var product = Form.MapObjectForm.GetDataByJo(new JObject());
-        Require(!product.boundsCollision && !Form.MapObjectForm.defaultData.boundsCollision, "old saves and default row keep boundsCollision off");
+        var product = Form.ObjectProductForm.GetDataByJo(new JObject());
+        Require(!product.boundsCollision && !Form.ObjectProductForm.defaultData.boundsCollision, "old saves and default row keep boundsCollision off");
         product.boundsCollision = true;
         Require(product.Copy().boundsCollision, "copy retains the saved boundsCollision option");
-        var reset = Form.MapObjectForm.defaultData;
+        var reset = Form.ObjectProductForm.defaultData;
         reset.Reset(product);
         Require(reset.boundsCollision, "reset retains the saved boundsCollision option");
-        var saved = Form.MapObjectForm.GetJoByData(product);
-        Require(saved.Value<bool>("boundsCollision") && Form.MapObjectForm.GetDataByJo(saved).boundsCollision,
+        var saved = Form.ObjectProductForm.GetJoByData(product);
+        Require(saved.Value<bool>("boundsCollision") && Form.ObjectProductForm.GetDataByJo(saved).boundsCollision,
             "boundsCollision is persisted and round-trips through generated Form JSON");
         product.model = model;
         product.faceType = FaceType.FourDirection;
@@ -702,7 +704,7 @@ public static class MapRuntimeRegression
         Z_DataSystem.Form.GameObjectAssetForm.DataById[cubeId] = new Z_DataSystem.Form.GameObjectAssetForm.Data(
             cubeId, cube.name, null, null, null, cube, 0);
         var util = new GameUtilController(null);
-        var product = Form.MapObjectForm.GetDataByJo(new JObject());
+        var product = Form.ObjectProductForm.GetDataByJo(new JObject());
         product.model = new Form.MapModelForm.Data(0, new List<int> { cubeId },
             new List<Vector3> { new Vector3(.2f, 0, -.3f) },
             new List<Vector3> { new Vector3(1.7f, 1, 2.4f) },
@@ -738,9 +740,9 @@ public static class MapRuntimeRegression
             // Old raw center offsets must still load at their exact authored position.
             product.model.subPrefabUnitScale[0] = new Vector3(1.7f, .1f, 2.4f);
             product.model.subPrefabUnitPos[0] = new Vector3(.2f, -.3f, -.3f);
-            string before = Form.MapObjectForm.GetJoByData(product).ToString();
+            string before = Form.ObjectProductForm.GetJoByData(product).ToString();
             CheckGeometry(.15f);
-            Require(Form.MapObjectForm.GetJoByData(product).ToString() == before,
+            Require(Form.ObjectProductForm.GetJoByData(product).ToString() == before,
                 "reading the bottom-relative editor height does not migrate or mutate old saves");
 
             foreach (bool fitted in new[] { false, true })
@@ -763,7 +765,7 @@ public static class MapRuntimeRegression
 
             editor.height = 2;
             editor.posHeight = 0;
-            var restored = Form.MapObjectForm.GetDataByJo(Form.MapObjectForm.GetJoByData(product));
+            var restored = Form.ObjectProductForm.GetDataByJo(Form.ObjectProductForm.GetJoByData(product));
             Require(restored.model.subPrefabUnitScale[0].y == 2 && restored.model.subPrefabUnitPos[0].y == .5f,
                 "saved center offset includes height compensation without changing the model schema");
             editor.data = product = restored;
@@ -795,7 +797,7 @@ public static class MapRuntimeRegression
     private static void WangTileBoundsCollision()
     {
         Form.MapBaseForm.InitInternal();
-        Form.MapObjectForm.InitInternal();
+        Form.ObjectProductForm.InitInternal();
         UnitForm.InitInternal();
         TileUnitForm.InitInternal();
         ObjectUnitForm.InitInternal();
@@ -830,15 +832,15 @@ public static class MapRuntimeRegression
         bodyGo.transform.SetParent(sourceCube.transform, false);
         bodyGo.AddComponent<BoxCollider>().size = new Vector3(1, 4, 1);
         Z_DataSystem.Form.GameObjectAssetForm.DataById[cubeId] = new Z_DataSystem.Form.GameObjectAssetForm.Data(cubeId, sourceCube.name, null, null, null, sourceCube, 0);
-        var product = Form.MapObjectForm.GetDataByJo(new JObject());
-        product.id = -1;
+        var product = Form.ObjectProductForm.GetDataByJo(new JObject());
+        product.uid = -1;
         product.model = new Form.MapModelForm.Data(0, new List<int> { cubeId }, new List<Vector3> { Vector3.zero },
             new List<Vector3> { Vector3.one }, new List<List<int>> { new List<int> { atlasId } }, .1f, true, .5f);
         product.faceType = FaceType.Fixed;
         product.collision = true;
         product.animClip = new Dictionary<AnimDirecton, List<int>> { [AnimDirecton.Fixed] = new List<int> { atlasId } };
         product.isWangTile = product.boundsCollision = true;
-        Form.MapObjectForm.AddData(product);
+        Form.ObjectProductForm.AddData(product);
         var sprites = Z_Map.TileHelper.GetAutoTileSprites(atlas);
         var spriteIds = new Dictionary<Sprite, int>();
         int nextId = 99300;
@@ -851,9 +853,9 @@ public static class MapRuntimeRegression
                 generatedIds.Add(id);
                 Z_DataSystem.Form.TexAssetForm.DataById[id] = new Z_DataSystem.Form.TexAssetForm.Data(id, "assembled-bounds", null, null, null, pair.Value.texture, 0);
             }
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Fixed, pair.Key, id });
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Fixed, pair.Key, id });
         }
-        var prefab = util.CombineNewObjectByPrefabs("wang-bounds-runtime", product, true);
+        var prefab = util.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(product.uid), product, true);
         objects.Add(prefab);
         pool.AddPool(prefab);
         var baseline = prefab.GetComponentsInChildren<BoxCollider>(true).Single(c => !c.isTrigger);
@@ -885,6 +887,25 @@ public static class MapRuntimeRegression
         var first = Add(99210, owner.data.pos);
         ObjectUnitForm.Data second = null;
         Texture2D cornerAtlas = null;
+        void RefreshProductConfiguration()
+        {
+            // This geometry fixture edits source configuration between cases.
+            // Explicitly publish it to test Products: gameplay copies own their
+            // config and must not silently follow subsequent prototype edits.
+            foreach (var data in ObjectUnitForm.DataByUid.Values)
+            {
+                var target = Form.ObjectProductForm.GetProduct(data);
+                if (target == null || Form.ObjectProductForm.GetTemplateUid(target) != product.uid || target == product)
+                    continue;
+                int uid = target.uid, protoUid = target.protoUid;
+                var updated = Form.ObjectProductForm.GetDataByJo(Form.ObjectProductForm.GetJoByData(product));
+                updated.uid = uid;
+                updated.name = target.name;
+                updated.protoUid = protoUid;
+                target.Reset(updated);
+            }
+            controller.RefreshObjectWangTileAppearances(product.uid);
+        }
         try
         {
             Require(first.unit.ins == null && (PhysicalSize(first.unit) - new Vector3(.2f, .8f, .2f)).sqrMagnitude < .000001f,
@@ -931,14 +952,14 @@ public static class MapRuntimeRegression
             var connectedCenter = first.unit.GetMeshes(CollideType.CollideOnly)[0].center;
             DynamicGlobalSettings.playing = false;
             foreach (var collider in prefab.GetComponentsInChildren<BoxCollider>(true)) collider.transform.localScale = Vector3.one;
-            controller.RefreshObjectWangTileAppearances(product.id);
+            RefreshProductConfiguration();
             Require((PhysicalSize(first.unit) - new Vector3(.8f, 2.4f, 1.2f)).sqrMagnitude < .000001f
                 && (first.unit.GetMeshes(CollideType.CollideOnly)[0].center - connectedCenter).sqrMagnitude < .000001f
                 && live.transform.localScale == Vector3.one && Mathf.Abs(live.center.x - .1f) < .00001f,
                 "Mod collider-scale reset rebuilds geometry and live Colliders without moving the artwork bounds center");
             DynamicGlobalSettings.playing = true;
             foreach (var collider in prefab.GetComponentsInChildren<BoxCollider>(true)) collider.transform.localScale = new Vector3(.5f, 1, .5f);
-            controller.RefreshObjectWangTileAppearances(product.id);
+            RefreshProductConfiguration();
             first.unit.Hide();
             second.unit.Move(Vector3.right * 2);
             Require((PhysicalSize(first.unit) - new Vector3(.2f, .8f, .2f)).sqrMagnitude < .000001f,
@@ -962,18 +983,18 @@ public static class MapRuntimeRegression
             int wideId = nextId++;
             generatedIds.Add(wideId);
             BoundsTexture(wideId, 2, 3, 8, 9);
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Fixed, 0, wideId });
-            controller.RefreshObjectWangTileAppearances(product.id);
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Fixed, 0, wideId });
+            RefreshProductConfiguration();
             Require((PhysicalSize(first.unit) - new Vector3(.6f, 2.4f, .6f)).sqrMagnitude < .000001f,
                 "all frames of an assembled mask are unioned; new registration invalidates its cached bounds");
             product.faceType = FaceType.FourDirection;
             int cornerId = nextId++;
             generatedIds.Add(cornerId);
             BoundsTexture(cornerId, 0, 0, 1, 1);
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Up, 0, spriteIds[sprites[0]] });
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Down, 0, wideId });
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Right, 0, cornerId });
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Left, 0, wideId });
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Up, 0, spriteIds[sprites[0]] });
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Down, 0, wideId });
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Right, 0, cornerId });
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Left, 0, wideId });
             // A second source atlas renders only the bottom-left corner of the
             // isolated tile, matching Right's registered assembled variant.
             int cornerAtlasId = nextId++;
@@ -993,7 +1014,7 @@ public static class MapRuntimeRegression
             Require((upPreview.GetComponentsInChildren<BoxCollider>(true).Single(c => !c.isTrigger).size - new Vector3(.2f, .8f, .2f)).sqrMagnitude < .000001f &&
                 (rightPreview.GetComponentsInChildren<BoxCollider>(true).Single(c => !c.isTrigger).size - new Vector3(.1f, .4f, .1f)).sqrMagnitude < .000001f,
                 "WangTile appearance preview assembles only its selected facing's source atlas");
-            controller.RefreshObjectWangTileAppearances(product.id);
+            RefreshProductConfiguration();
             Require((PhysicalSize(first.unit) - new Vector3(.2f, .8f, .2f)).sqrMagnitude < .000001f &&
                 (live.size - new Vector3(.2f, .8f, .2f)).sqrMagnitude < .000001f,
                 "WangTile uses only the current Up facing of the assembled mask");
@@ -1031,12 +1052,12 @@ public static class MapRuntimeRegression
             map.RemoveObject(second);
             second = null;
             product.faceType = FaceType.Fixed;
-            clear.Invoke(null, new object[] { product.id });
+            clear.Invoke(null, new object[] { product.uid });
             int emptyId = nextId++;
             generatedIds.Add(emptyId);
             BoundsTexture(emptyId, 0, 0, 0, 0);
-            register.Invoke(null, new object[] { product.id, AnimDirecton.Fixed, 0, emptyId });
-            controller.RefreshObjectWangTileAppearances(product.id);
+            register.Invoke(null, new object[] { product.uid, AnimDirecton.Fixed, 0, emptyId });
+            RefreshProductConfiguration();
             Require(PhysicalSize(first.unit).x == 0 && PhysicalSize(first.unit).z == 0
                 && !map.utilCtrl.IsTileCenterCoveredByObject(owner, first)
                 && !map.navigationCtrl.navUnits[(6, 0, 6)].objectBlocked,
@@ -1053,8 +1074,8 @@ public static class MapRuntimeRegression
                 [AnimDirecton.Right] = new List<int> { cornerId },
                 [AnimDirecton.Down] = new List<int> { wideId, cornerId },
                 [AnimDirecton.Left] = new List<int> { emptyId } };
-            clear.Invoke(null, new object[] { product.id });
-            controller.RefreshObjectWangTileAppearances(product.id);
+            clear.Invoke(null, new object[] { product.uid });
+            RefreshProductConfiguration();
             Require((PhysicalSize(first.unit) - new Vector3(.2f, .8f, .2f)).sqrMagnitude < .000001f,
                 "ordinary Up bounds are distinct from the previous transparent WangTile variant");
             Turn(first.unit, 44.9f);
@@ -1066,8 +1087,8 @@ public static class MapRuntimeRegression
                 !map.utilCtrl.IsTileCenterCoveredByObject(owner, first),
                 "ordinary direction threshold immediately selects Right for live/Trigger/pass geometry");
             product.animClip[AnimDirecton.Right] = new List<int> { wideId };
-            clear.Invoke(null, new object[] { product.id });
-            controller.RefreshObjectWangTileAppearances(product.id);
+            clear.Invoke(null, new object[] { product.uid });
+            RefreshProductConfiguration();
             Require((live.size - new Vector3(.6f, 2.4f, .6f)).sqrMagnitude < .000001f,
                 "ordinary clip regeneration invalidates cached facing bounds");
             Turn(first.unit, 180);
@@ -1090,7 +1111,7 @@ public static class MapRuntimeRegression
                 "scene reset releases ordinary directional per-unit bounds overrides as well as WangTile ones");
             controller.OnEvent(new ObjectEvent { unit = first.unit, type = MapEventType.Refresh });
             product.boundsCollision = false;
-            controller.RefreshObjectWangTileAppearances(product.id);
+            RefreshProductConfiguration();
             Require(PhysicalSize(first.unit) == new Vector3(1, 4, 1) && live.size == new Vector3(1, 4, 1),
                 "turning fitting off restores baseline geometry");
         }
@@ -1099,10 +1120,10 @@ public static class MapRuntimeRegression
             DynamicGlobalSettings.playing = true;
             if (second != null) map.RemoveObject(second);
             map.RemoveObject(first);
-            clear.Invoke(null, new object[] { product.id });
+            clear.Invoke(null, new object[] { product.uid });
             controller.ResetSceneUnitCaches();
             controller.Unregister<TileEvent>(); controller.Unregister<ObjectEvent>(); controller.Unregister<ItemEvent>();
-            Form.MapObjectForm.RemoveData(product.id);
+            Form.ObjectProductForm.RemoveData(product.uid);
             foreach (int id in generatedIds) Z_DataSystem.Form.TexAssetForm.DataById.Remove(id);
             Z_DataSystem.Form.TexAssetForm.DataById.Remove(atlasId);
             Z_DataSystem.Form.GameObjectAssetForm.DataById.Remove(cubeId);
@@ -1404,7 +1425,7 @@ public static class MapRuntimeRegression
             else continue;
             field.SetValue(view, value);
         }
-        var product = Form.MapObjectForm.GetDataByJo(new JObject());
+        var product = Form.ObjectProductForm.GetDataByJo(new JObject());
         product.centerCollider = true;
         var ctrl = new ObjectConfig.UiModStoryMapObjectObjectConfigCtrl
         {
@@ -1866,6 +1887,7 @@ public static class MapRuntimeRegression
         var product = (Form.CharacterProductForm.Data)System.Runtime.Serialization.FormatterServices
             .GetUninitializedObject(typeof(Form.CharacterProductForm.Data));
         product.uid = 98904;
+        character.productInfo = (product.uid, -1);
         Form.CharacterProductForm.InitInternal();
         var products = Form.CharacterProductForm.DataByUid;
         products.TryGetValue(product.uid, out var oldProduct);
@@ -1961,6 +1983,118 @@ public static class MapRuntimeRegression
                 }
             }
             finally { map.data.mainData.mapUnitSize = navigationSize; }
+
+            // A story template addresses all current copies, while a runtime Product remains exact.
+            var copiedProducts = new List<Form.CharacterProductForm.Data>();
+            var copiedCharacters = new List<CharacterUnit>();
+            var templateReference = Z_Code.CodeHelper.CreateBoxByStr(
+                GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, product.uid.ToString()));
+            try
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    var copy = (Form.CharacterProductForm.Data)System.Runtime.Serialization.FormatterServices
+                        .GetUninitializedObject(typeof(Form.CharacterProductForm.Data));
+                    copy.uid = 98905 + i;
+                    copy.protoUid = product.uid;
+                    products[copy.uid] = copy;
+                    copiedProducts.Add(copy);
+                    var actor = new CharacterUnitForm.Data(98907 + i, false, Vector3.zero, 1, 1, 1, false, "",
+                        prefab.name, start + Vector3.right * (i + 1), Vector3.zero, Vector3.one,
+                        UpdateType.ShowOnly, new List<int>(), "", false, 0, new List<int>()).unit;
+                    actor.productInfo = (copy.uid, -1);
+                    CharacterUnitForm.AddData(actor.data);
+                    UnitForm.DataByUid[actor.data.uid] = actor.data;
+                    map.updateCtrl.characterTileDic.Add(actor, owner);
+                    copiedCharacters.Add(actor);
+                }
+                character.data.pos = start;
+                Invoke(new Z_Code.SetPositionRelativeCmd(), templateReference, VectorBox(Vector3.forward));
+                Require(character.data.pos == start + Vector3.forward
+                    && copiedCharacters[0].data.pos == start + Vector3.right + Vector3.forward
+                    && copiedCharacters[1].data.pos == start + Vector3.right * 2 + Vector3.forward,
+                    "template-relative Set changes every matching unit from its own initial position");
+                Require(Read(Invoke(new Z_Code.GetPositionCmd(), templateReference).res[0])
+                    == GameManager.MapPosToPlayerPos(map.utilCtrl.RealPos2MapPos(character.data.pos)),
+                    "template getters keep the deterministic first scalar/vector result");
+                var exactReference = Z_Code.CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(
+                    GlobalEventHelper.CHARACTER, copiedProducts[0].uid.ToString()));
+                Invoke(new Z_Code.SetPositionRelativeCmd(), exactReference, VectorBox(Vector3.right));
+                Require(copiedCharacters[0].data.pos == start + Vector3.right * 2 + Vector3.forward
+                    && copiedCharacters[1].data.pos == start + Vector3.right * 2 + Vector3.forward
+                    && character.data.pos == start + Vector3.forward,
+                    "an exact runtime Product does not expand to its template's sibling copies");
+                character.data.euler = new Vector3(1, 350, 2);
+                copiedCharacters[0].data.euler = new Vector3(3, 10, 4);
+                copiedCharacters[1].data.euler = new Vector3(5, 180, 6);
+                Invoke(new Z_Code.SetRotationCmd(), templateReference, Z_Code.CodeHelper.CreateBoxByNum(90),
+                    Z_Code.CodeHelper.CreateBoxByNum(0));
+                Require(character.data.euler == new Vector3(1, 90, 2)
+                    && copiedCharacters[0].data.euler == new Vector3(3, 90, 4)
+                    && copiedCharacters[1].data.euler == new Vector3(5, 90, 6),
+                    "template rotation updates all targets while preserving their own X/Z components");
+
+                clearTasks.Invoke(events, null);
+                var origins = new[] { character.data.pos, copiedCharacters[0].data.pos, copiedCharacters[1].data.pos };
+                var movingCopies = Invoke(new Z_Code.MoveRelativeCmd(), templateReference, VectorBox(Vector3.forward),
+                    Z_Code.CodeHelper.CreateBoxByNum(1));
+                float frameDelta = MapUtilController.MovementDeltaTime;
+                Require(!movingCopies.IsComplete() && character.data.pos == origins[0] + Vector3.forward * frameDelta
+                    && copiedCharacters[0].data.pos == origins[1] + Vector3.forward * frameDelta
+                    && copiedCharacters[1].data.pos == origins[2] + Vector3.forward * frameDelta,
+                    "template Move schedules all copies with independent starts and one bounded step");
+                var pending = ((System.Collections.IEnumerable)taskField.GetValue(events)).Cast<object>().Last();
+                UnitForm.DataByUid.Remove(copiedCharacters[0].data.uid);
+                var removedPosition = copiedCharacters[0].data.pos;
+                pending.GetType().GetMethod("Update").Invoke(pending, null);
+                Require(!movingCopies.IsComplete() && copiedCharacters[0].data.pos == removedPosition,
+                    "removing one captured copy stops only that copy and does not finish surviving targets");
+                UnitForm.DataByUid.Remove(character.data.uid);
+                UnitForm.DataByUid.Remove(copiedCharacters[1].data.uid);
+                pending.GetType().GetMethod("Update").Invoke(pending, null);
+                Require(movingCopies.IsComplete(), "group movement completes once every captured target ends");
+                UnitForm.DataByUid[character.data.uid] = character.data;
+                foreach (var actor in copiedCharacters) UnitForm.DataByUid[actor.data.uid] = actor.data;
+
+                clearTasks.Invoke(events, null);
+                character.data.euler = Vector3.zero;
+                copiedCharacters[0].data.euler = new Vector3(0, 270, 0);
+                copiedCharacters[1].data.euler = new Vector3(0, 90, 0);
+                var rotatingCopies = Invoke(new Z_Code.SetRotationCmd(), templateReference,
+                    Z_Code.CodeHelper.CreateBoxByNum(180), Z_Code.CodeHelper.CreateBoxByNum(1));
+                Require(!rotatingCopies.IsComplete()
+                    && Mathf.Abs(Mathf.DeltaAngle(character.data.euler.y,
+                        Mathf.LerpAngle(0, 180, frameDelta))) < .0001f
+                    && Mathf.Abs(Mathf.DeltaAngle(copiedCharacters[0].data.euler.y,
+                        Mathf.LerpAngle(270, 180, frameDelta))) < .0001f
+                    && Mathf.Abs(Mathf.DeltaAngle(copiedCharacters[1].data.euler.y,
+                        Mathf.LerpAngle(90, 180, frameDelta))) < .0001f,
+                    "template rotation waits and interpolates independently from each captured start angle");
+                pending = ((System.Collections.IEnumerable)taskField.GetValue(events)).Cast<object>().Last();
+                UnitForm.DataByUid.Remove(copiedCharacters[0].data.uid);
+                var removedEuler = copiedCharacters[0].data.euler;
+                pending.GetType().GetMethod("Update").Invoke(pending, null);
+                Require(!rotatingCopies.IsComplete() && copiedCharacters[0].data.euler == removedEuler,
+                    "group rotation retains original identities without ending surviving rotations");
+                UnitForm.DataByUid.Remove(character.data.uid);
+                UnitForm.DataByUid.Remove(copiedCharacters[1].data.uid);
+                pending.GetType().GetMethod("Update").Invoke(pending, null);
+                Require(rotatingCopies.IsComplete(), "group rotation completes after all original targets end");
+            }
+            finally
+            {
+                clearTasks.Invoke(events, null);
+                UnitForm.DataByUid[character.data.uid] = character.data;
+                foreach (var actor in copiedCharacters)
+                {
+                    map.updateCtrl.characterTileDic.Del(actor);
+                    map.updateCtrl.characterOverlapTileDic.Del(actor);
+                    CharacterUnitForm.RemoveData(actor.data.uid);
+                    UnitForm.RemoveData(actor.data.uid);
+                }
+                foreach (var copy in copiedProducts) products.Remove(copy.uid);
+                character.data.pos = start;
+            }
 
             character.Move(Vector3.right * .001f);
             Require(Vector3.Distance(character.data.pos, start + Vector3.right * .001f) < .00001f,
@@ -5103,7 +5237,8 @@ public static class MapRuntimeRegression
         GlobalDefaultHelper.DefaultTexId = defaultTextureId;
         GlobalDefaultHelper.ExternDefaultTexId = textureId;
         var texture = TexAssetForm.DataById[textureId];
-        var product = Form.MapObjectForm.defaultData;
+        var product = Form.ObjectProductForm.defaultData;
+        product.uid = 99804;
         product.name = "empty-thumbnail-object";
         product.icon = textureId;
         product.faceType = FaceType.FourDirection;
@@ -5112,6 +5247,8 @@ public static class MapRuntimeRegression
             .ToDictionary(direction => direction, direction => new List<int>());
         var clip = product.GetAnimClip(AnimDirecton.Up);
         clip.Add(textureId);
+        Form.ObjectProductForm.AddData(product);
+        var mapRow = new Form.MapObjectForm.Data(-1, product.name, product.icon, product.labId, product.uid);
 
         (Z_Ui.Base.UiHolder holder, Z_Ui.Base.Img image, Z_Ui.Base.Txt text,
             Z_Ui.Base.Sta exist, Z_Ui.Base.Sta selected) Row(string name)
@@ -5152,7 +5289,7 @@ public static class MapRuntimeRegression
         var listRow = Row("object-list-empty-texture");
         var list = new ObjectList.UiBigItemCtrl {
             view = new ObjectList.UiBigItemView(listRow.holder) { img_ = listRow.image, txt_ = listRow.text, sta_exist = listRow.exist },
-            model = new ObjectList.UiBigItemModel { data = product } };
+            model = new ObjectList.UiBigItemModel { data = mapRow } };
         list.Refresh();
         Visible(listRow.image, "Object list first binding");
         listRow.image.overrideSprite = texture.GetSprite();
@@ -5175,7 +5312,7 @@ public static class MapRuntimeRegression
             list.model.data = null;
             list.Refresh();
             Empty(listRow.image, "Animated pooled thumbnail becomes New/empty");
-            list.model.data = product;
+            list.model.data = mapRow;
         }
         clip[0] = textureId;
         list.Refresh();
@@ -5213,7 +5350,7 @@ public static class MapRuntimeRegression
             uiHolder = toolRow.holder,
             view = new ModTool.UiToolItemView(toolRow.holder) {
                 img_ = toolRow.image, txt_ = toolRow.text, sta_exist = toolRow.exist, sta_ = toolRow.selected },
-            model = new ModTool.UiToolItemModel(), param = new ModTool.UiToolItemParam { data = product } };
+            model = new ModTool.UiToolItemModel(), param = new ModTool.UiToolItemParam { data = mapRow } };
         var modManager = ModManager.instance;
         var originalSceneCtrl = modManager.sceneCtrl;
         var sceneCtrl = new ModSceneController(modManager);
@@ -5247,17 +5384,17 @@ public static class MapRuntimeRegression
         var assets = new ModAssetCtrl(null);
         const string name = "regression-new-empty-object";
         assets.CreateObject(name: name);
-        var created = Form.MapObjectForm.DataByName[name];
+        var created = Form.ObjectProductForm.DataByNameProtouid[(name, 0)];
         try
         {
             Require(created.animClip.Values.All(frames => frames.Count == 0) && created.model.subUnitTexsName[0].Count == 0,
                 "New Object starts with no texture in any facing or legacy clip");
-            assets.CreateObjectUnitTex(created.id, AnimDirecton.Fixed);
+            assets.CreateObjectUnitTex(created.uid, AnimDirecton.Fixed);
             Require(created.GetAnimClip(AnimDirecton.Fixed).SequenceEqual(new[] { 0 })
                 && created.model.subUnitTexsName[0].SequenceEqual(new[] { 0 }),
                 "New Object frame is stored as unassigned ID 0, including the legacy mirror");
         }
-        finally { Form.MapObjectForm.RemoveData(created.id); }
+        finally { Form.ObjectProductForm.RemoveData(created.uid); Form.ObjectProductForm.RemoveData(product.uid); }
     }
 
     private static void EventOperatorRendering()

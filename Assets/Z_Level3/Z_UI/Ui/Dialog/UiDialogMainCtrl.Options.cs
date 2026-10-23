@@ -80,7 +80,7 @@ namespace Ui.DialogMain
                 {
                     view.sta_autoPlay.ChangeState();
                     autoPlaySpeed = view.sta_autoPlay.state;
-                    textDisplaySpeed = 5;
+                    textDisplaySpeed = 20;
                     autoPlayDelay = 5f;
                     Z_EventHelper.Invoke(new ClipPlayEvent()
                     {
@@ -107,7 +107,7 @@ namespace Ui.DialogMain
                     DialogManager.instance.settings.skipping = false;
                     view.sta_skip.ChangeState(0);
                     autoPlaySpeed = view.sta_autoPlay.state;
-                    textDisplaySpeed = 5;
+                    textDisplaySpeed = 20;
                     autoPlayDelay = 5f;
                     Z_EventHelper.Invoke(new ClipPlayEvent()
                     {
@@ -142,7 +142,7 @@ namespace Ui.DialogMain
                             DialogManager.instance.settings.skipping = false;
                             view.sta_skip.ChangeState(0);
                             autoPlaySpeed = 0;
-                            textDisplaySpeed = 5;
+                            textDisplaySpeed = 20;
                             autoPlayDelay = 5f;
                         }
                     }

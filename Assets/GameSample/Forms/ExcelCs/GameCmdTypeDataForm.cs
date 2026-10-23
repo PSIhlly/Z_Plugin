@@ -161,8 +161,6 @@ namespace Form
 
                 {10010,new Data(10010,"skill")},
 
-                {10011,new Data(10011,"sceneObjectProto")},
-
                 {10012,new Data(10012,"mission")},
 
                 };
@@ -189,8 +187,6 @@ namespace Form
                         {"vector",_DataByUid[10009]},
     
                         {"skill",_DataByUid[10010]},
-    
-                        {"sceneObjectProto",_DataByUid[10011]},
     
                         {"mission",_DataByUid[10012]},
     

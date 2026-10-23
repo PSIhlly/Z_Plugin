@@ -297,11 +297,15 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     {
         var productData = CharacterProductForm.DataByUid.GetDv(characterUid, null);
         var unit = _super.sceneCtrl.GetCharacterUnit(characterUid);
-        if (productData == null || unit == null || !canvasDic.ContainsKey(unit.uid))
-        {
+        if (productData != null)
+            ChatText(unit, txt, img, time);
+    }
+
+    public void ChatText(CharacterUnitForm.Data unit, string txt, int img, float time)
+    {
+        if (unit?.unit == null || !Z_Code.SceneUnitCommand.IsLive(unit.unit, unit)
+            || !canvasDic.TryGetValue(unit.uid, out var canvas))
             return;
-        }
-        var canvas = canvasDic[unit.uid];
         if (canvas != null)
             canvas.Chat(txt, img, time);
     }
@@ -323,6 +327,15 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     }
     public void OnEvent(CharacterEvent evt)
     {
+        if (evt.type == MapEventType.Remove)
+        {
+            if (canvasDic.TryGetValue(evt.unit.data.uid, out var canvas))
+            {
+                canvasDic.Remove(evt.unit.data.uid);
+                ReleaseCanvas(canvas);
+            }
+            return;
+        }
         if (!_super.enable || !active)
         {
             return;

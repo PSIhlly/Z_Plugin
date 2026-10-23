@@ -52,6 +52,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
         }
         public void Update()
         {
+            if (param.type == 3)
+                ModManager.instance.assetCtrl.RefreshObjectList();
             model.datas.Clear();
             switch (param.type)
             {
@@ -106,7 +108,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                     }
                     model.createAct = (labId) =>
                     {
-                        ModManager.instance.assetCtrl.CreateObject(labId);
+                        ModManager.instance.assetCtrl.CreateObject(
+                            LabForm.GetOrCreateForBelong(labId, nameof(ObjectProductForm)));
                     };
                     break;
 
@@ -254,11 +257,15 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                     }
                     break;
                 case 3:
-                    foreach (var data in MapObjectForm.DataById.Values.ToList())
+                    var oldProductLabId = LabForm.GetOrCreateForBelong(oldLabId, nameof(ObjectProductForm));
+                    var newProductLabId = LabForm.GetOrCreateForBelong(newLabId, nameof(ObjectProductForm));
+                    foreach (var data in ObjectProductForm.DataByUid.Values.ToList())
                     {
-                        if (data.labId == oldLabId)
-                            data.labId = newLabId;
+                        if (data.labId == oldProductLabId)
+                            data.labId = newProductLabId;
                     }
+                    if (oldProductLabId != LabForm.NoneId && oldProductLabId != newProductLabId)
+                        LabForm.RemoveData(oldProductLabId);
                     break;
             }
         }
@@ -379,7 +386,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectList
                 return texData.texs[0];
             if (data is MapMaskForm.Data maskData && maskData.texsName != null && maskData.texsName.Count > 0)
                 return maskData.texsName[0];
-            if (data is MapObjectForm.Data objData)
+            if (data is MapObjectForm.Data objRow &&
+                ObjectProductForm.DataByUid.TryGetValue(objRow.objectUid, out var objData))
             {
                 var clip = objData.GetAnimClip(objData.GetDefaultAnimDirection());
                 if (clip.Count > 0 && clip[0] != GlobalDefaultHelper.DefaultTexId)

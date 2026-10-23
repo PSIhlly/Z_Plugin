@@ -59,10 +59,14 @@ namespace Ui.ModStory
                     {
                         try
                         {
+                            LoadingManager.instance.SetProgress(TestLoadingItem, 0.1f);
                             GameManager.instance.saveCtrl.SaveCoreStory(curId);
+                            LoadingManager.instance.SetProgress(TestLoadingItem, 0.4f);
                             Close();
                             Main2StoryManager.instance.UnloadStoryUgc();
+                            LoadingManager.instance.SetProgress(TestLoadingItem, 0.6f);
                             Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
+                            LoadingManager.instance.SetProgress(TestLoadingItem, 1f);
                         }
                         finally
                         {

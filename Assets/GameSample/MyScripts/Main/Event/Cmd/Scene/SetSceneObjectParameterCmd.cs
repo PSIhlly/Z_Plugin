@@ -26,15 +26,34 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetSceneObjectParameterCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var data = UnitForm.DataByUid[GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.SCENEOBJECT)];
-          
-            if (data != null)
+            string name = prm[1].str;
+            if (string.IsNullOrEmpty(name))
+                return true;
+            var products = GlobalEventHelper.ResolveSceneObjectProducts(prm[0].str);
+            foreach (var product in products)
             {
-                var dic = ((MapUnit)(data.unit)).paramInfo;
-                if(!dic.ContainsKey(prm[1].str))
-                    dic[prm[1].str] = new MapObjectParamForm.Data(-1, prm[1].str, 0, "", "", "");
-                dic[prm[1].str].SetValue(prm[2]);
-                ((MapUnit)(data.unit)).paramInfo = dic;
+                if (product.paramDic == null)
+                    product.paramDic = new Dictionary<string, MapObjectParamForm.Data>();
+                if (!product.paramDic.TryGetValue(name, out var parameter) || parameter == null)
+                    product.paramDic[name] = parameter = new MapObjectParamForm.Data(-1, name, 0, "", "", "");
+                parameter.SetValue(prm[2]);
+            }
+            foreach (var unit in GlobalEventHelper.ResolveSceneObjectUnits(prm[0].str))
+            {
+                if (!SceneUnitCommand.IsLive(unit))
+                    continue;
+                if (unit is ObjectUnit obj && ObjectProductForm.GetProduct(obj.data) != null)
+                {
+                    ObjectProductForm.RefreshUnitParameters(obj.data);
+                    continue;
+                }
+                // Bare legacy $so$ references also address Items, Tiles and
+                // Characters. Preserve their existing scene-local parameters.
+                var dic = unit.paramInfo;
+                if (!dic.TryGetValue(name, out var parameter) || parameter == null)
+                    dic[name] = parameter = new MapObjectParamForm.Data(-1, name, 0, "", "", "");
+                parameter.SetValue(prm[2]);
+                unit.paramInfo = dic;
             }
           
             return true;

@@ -168,6 +168,23 @@ public class GameManager : Z_MonoManager<GameManager>
     public SceneForm.Data curScene;
     public ProgressForm.Data curProgress => ProgressForm.DataByUid.ContainsKey(1) ? ProgressForm.DataByUid[1] : null;
     public Dictionary<string, AssetForm.Data> innerAssetDic; 
+
+    /// <summary>
+    /// 把 ProgressForm 记录的全局灯光强度应用到 CameraInstance.globalLight。
+    /// lightIntensity 小于 0 表示事件从未设置过，保留相机视角写入的默认强度。
+    /// </summary>
+    public static void ApplyProgressLightIntensity()
+    {
+        var progress = instance == null ? null : instance.curProgress;
+        if (progress == null || progress.lightIntensity < 0f)
+            return;
+        var cameraInstance = CameraInstance.instance;
+        if (cameraInstance == null || cameraInstance.globalLight == null)
+            return;
+        cameraInstance.globalLight.intensity = progress.lightIntensity;
+    }
+
+
     public override void Init()
     {
         innerAssetDic = new Dictionary<string, AssetForm.Data>();

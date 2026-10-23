@@ -265,7 +265,7 @@ namespace Form
 
                 {100006,new Data(100006,"Audio",null,null,null,new List<string>(){"audio",},"","\"$a$$a$\"",10001,EditorStyle.AvgAdvanced,"")},
 
-                {100007,new Data(100007,"SceneObjectProto",null,null,null,new List<string>(){"sceneObjectProto",},"","\"$sop$$sop$\"",10001,EditorStyle.AvgAdvanced,"")},
+                {100007,new Data(100007,"SceneObject",null,null,null,new List<string>(){"sceneObject",},"","\"$so$p:0$so$\"",10001,EditorStyle.AvgAdvanced,"")},
 
                 {100008,new Data(100008,"Item",null,null,null,new List<string>(){"item",},"","\"$it$$it$\"",10001,EditorStyle.AvgAdvanced,"")},
 
@@ -325,7 +325,7 @@ namespace Form
 
                 {100036,new Data(100036,"DestroyObject",new List<string>(){"object",},new List<string>(){"sceneObject",},null,new List<string>(){"void",},"object {0}: Destroy","DestroyObject(param1);",10016,EditorStyle.Rpg,"")},
 
-                {100037,new Data(100037,"GenerateObject",new List<string>(){"sceneObject","pos",},new List<string>(){"sceneObjectProto","vector",},new List<string>(){"new Object",},new List<string>(){"sceneObject",},"object {0}: Generate at coordinates({1}):","GenerateObject(\"empty\",NewVector(0,0,0))",10016,EditorStyle.Rpg,"newObject = ")},
+                {100037,new Data(100037,"GenerateObject",new List<string>(){"sceneObject","pos",},new List<string>(){"sceneObject","vector",},new List<string>(){"new Object",},new List<string>(){"sceneObject",},"object {0}: Generate at coordinates({1}):","GenerateObject(\"empty\",NewVector(0,0,0))",10016,EditorStyle.Rpg,"newObject = ")},
 
                 {100038,new Data(100038,"MoveRelative",new List<string>(){"unit","pos","speed",},new List<string>(){"var","vector","num",},null,new List<string>(){"void",},"scene unit {0}: Move to relative coordinates ({1}) at {2} tiles/second","MoveRelative(param1,NewVector(1,1,0),1);",10026,EditorStyle.Rpg,"")},
 
@@ -463,6 +463,18 @@ namespace Form
 
                 {100110,new Data(100110,"GetPositionRelative",new List<string>(){"target","origin",},new List<string>(){"var","var",},new List<string>(){"pos",},new List<string>(){"vector",},"scene unit {0} position relative to {1}","GetPositionRelative(param1,param2)",10026,EditorStyle.Rpg,"")},
 
+                {100111,new Data(100111,"SetLightIntensity",new List<string>(){"intensity",},new List<string>(){"num",},null,new List<string>(){"void",},"Set global light intensity to {0}","SetLightIntensity(1);",10026,EditorStyle.Avg,"")},
+
+                {100112,new Data(100112,"AddCharacterToTeam",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Add Character {0} to team","AddCharacterToTeam(param1);",10007,EditorStyle.Rpg,"")},
+
+                {100113,new Data(100113,"RemoveCharacterFromTeam",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Remove Character {0} from team","RemoveCharacterFromTeam(param1);",10007,EditorStyle.Rpg,"")},
+
+                {100114,new Data(100114,"DeployCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Deploy Character {0}","DeployCharacter(param1);",10007,EditorStyle.Rpg,"")},
+
+                {100115,new Data(100115,"UndeployCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Undeploy Character {0}","UndeployCharacter(param1);",10007,EditorStyle.Rpg,"")},
+
+                {100116,new Data(100116,"SetCurrentCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Set Character {0} as current character","SetCurrentCharacter(param1);",10007,EditorStyle.Rpg,"")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -480,7 +492,7 @@ namespace Form
     
                         {"Audio",_DataByUid[100006]},
     
-                        {"SceneObjectProto",_DataByUid[100007]},
+                        {"SceneObject",_DataByUid[100007]},
     
                         {"Item",_DataByUid[100008]},
     
@@ -677,6 +689,18 @@ namespace Form
                         {"SceneShake",_DataByUid[100109]},
     
                         {"GetPositionRelative",_DataByUid[100110]},
+    
+                        {"SetLightIntensity",_DataByUid[100111]},
+    
+                        {"AddCharacterToTeam",_DataByUid[100112]},
+    
+                        {"RemoveCharacterFromTeam",_DataByUid[100113]},
+    
+                        {"DeployCharacter",_DataByUid[100114]},
+    
+                        {"UndeployCharacter",_DataByUid[100115]},
+    
+                        {"SetCurrentCharacter",_DataByUid[100116]},
     
                     
                     };
@@ -916,6 +940,18 @@ namespace Form
                     _DatasByLabid[10013].Add(_DataByUid[100109]);
 
                     _DatasByLabid[10026].Add(_DataByUid[100110]);
+
+                    _DatasByLabid[10026].Add(_DataByUid[100111]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100112]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100113]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100114]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100115]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100116]);
 
 
             childInitAction?.Invoke();

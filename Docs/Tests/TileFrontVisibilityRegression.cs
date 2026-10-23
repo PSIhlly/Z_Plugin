@@ -59,23 +59,23 @@ public static class TileFrontVisibilityRegression
             CheckLayers(instance, true, "open edge");
 
             var rear = NewTile(89105, tile.mapPos + Vector3Int.back, product.id);
-            rear.texDic.Clear(); // Classification uses prefab names, not appearance or a live instance.
+            rear.texDic.Clear(); // Neighbour appearance and instance state must not suppress configured fronts.
             var rearKey = (rear.mapPos.x, rear.mapPos.y, rear.mapPos.z);
             map.data.maps[rearKey] = rear;
             Check(rear.unit.ins == null, "rear tile need not be shown");
             controller.OnEvent(show);
-            CheckLayers(instance, false, "same prefab directly behind");
+            CheckLayers(instance, true, "same prefab directly behind keeps configured fronts");
             instance.ApplyVision(.5f, 1f);
             instance.VisOff();
             instance.VisOn();
-            CheckLayers(instance, false, "vision updates retain front suppression");
+            CheckLayers(instance, true, "vision updates retain configured fronts beside the same prefab");
 
             rear.prefabName = PrefabName + "-other";
             controller.OnEvent(show);
             CheckLayers(instance, true, "different prefab");
             rear.prefabName = PrefabName.ToUpperInvariant();
             controller.OnEvent(show);
-            CheckLayers(instance, true, "prefab names match ordinally");
+            CheckLayers(instance, true, "prefab name case does not affect configured fronts");
             rear.prefabName = PrefabName;
             map.data.maps.Remove(rearKey);
             map.data.maps[(rear.mapPos.x, rear.mapPos.y - 1, rear.mapPos.z)] = rear;
@@ -102,9 +102,26 @@ public static class TileFrontVisibilityRegression
                 Check(previousTimers[i] != null && !previousTimers[i].cancel, "open front animation starts " + i);
             map.data.maps[rearKey] = rear;
             controller.OnEvent(show);
-            CheckLayers(instance, false, "covered animated fronts");
+            CheckLayers(instance, true, "same-prefab neighbour keeps animated fronts");
             for (int i = 3; i < 6; i++)
-                Check(previousTimers[i].cancel && instance.animTimer[i] == null, "hidden front animation is canceled " + i);
+                Check(previousTimers[i].cancel && instance.animTimer[i] != null && !instance.animTimer[i].cancel,
+                    "Show refresh replaces the timer and keeps front animation running " + i);
+
+            previousTimers = (Timer[])instance.animTimer.Clone();
+            product.enableFrontPart = false;
+            controller.OnEvent(show);
+            CheckLayers(instance, false, "disabled front configuration is respected");
+            for (int i = 3; i < 6; i++)
+                Check(previousTimers[i].cancel && instance.animTimer[i] == null,
+                    "disabled front configuration cancels its animation " + i);
+            product.enableFrontPart = true;
+            product.frontPartTexs.Clear();
+            controller.OnEvent(show);
+            CheckLayers(instance, false, "empty front texture configuration is respected");
+            product.frontPartTexs.Add(89101);
+            product.frontPartTexs.Add(89102);
+            controller.OnEvent(show);
+            CheckLayers(instance, true, "restored front configuration shows beside the same prefab");
 
             // A pool handoff changes owners on the same renderer hierarchy.
             instance.PrepareForHide();

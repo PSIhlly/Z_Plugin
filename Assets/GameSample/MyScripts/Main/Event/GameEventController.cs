@@ -177,7 +177,7 @@ public static partial class GlobalEventHelper
             res = "character";
         else if (IsAsset(desc.code, ITEM))
             res = "item";
-        else if (IsAsset(desc.code, SCENEOBJECT))
+        else if (IsAsset(desc.code, SCENEOBJECT) || IsAsset(desc.code, SCENEOBJECTPROTO))
             res = "sceneObject";
         else if (IsAsset(desc.code, EFFECT))
             res = "effect";

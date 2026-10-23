@@ -10,6 +10,7 @@ namespace Z_Map
     {
         private const int LayerRendererCount = 3;
         private const float LowerLayerLightSensitivityScale = 0.5f;
+        private const float HigherLayerPreviewOpacity = 0.5f;
         private static readonly int LightSensitivityProperty = Shader.PropertyToID("_LightSensitivity");
         private float[] _initialLightSensitivities;
         private bool[] _lightSensitivityCaptured;
@@ -35,20 +36,21 @@ namespace Z_Map
             float primaryValue,
             float secondaryValue)
         {
-            return rendererIndex >= LayerRendererCount && rendererIndex < LayerRendererCount * 2
+            float value = rendererIndex >= LayerRendererCount && rendererIndex < LayerRendererCount * 2
                 ? secondaryValue
                 : primaryValue;
+            // Preview upper texture layers without overriding stronger occlusion
+            // or multiplying an already-half-transparent Tile a second time.
+            return GetLogicalLayer(rendererIndex) > displayLayer
+                ? Mathf.Min(value, HigherLayerPreviewOpacity)
+                : value;
         }
 
         protected override bool IsRendererVisibleInDisplayLayer(int rendererIndex)
         {
-            if (displayLayer == int.MaxValue)
-                return true;
-
-            // Tile renderers 0/1/2 are the normal parts and 3/4/5 are their
-            // matching front parts. ModSceneMain's three display states are
-            // therefore logical layers 0+3, 1+4 and 2+5.
-            return GetLogicalLayer(rendererIndex) <= displayLayer;
+            // Unlike the generic Renderer ceiling, Mod's texture-layer selector
+            // keeps all normal/front pairs visible; upper pairs use half opacity.
+            return true;
         }
 
         protected override DisFadeRenderRouting.Route GetRendererMaterialRoute(

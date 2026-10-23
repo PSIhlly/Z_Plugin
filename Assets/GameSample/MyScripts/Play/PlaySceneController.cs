@@ -46,6 +46,7 @@ public interface ExternalPlaySceneController
     public void SetCurOptSkill(SkillType? type);
 
     public CharacterUnitForm.Data GetCharacterUnit(int productUid);
+    public List<CharacterUnitForm.Data> GetCharacterUnits(int productUid);
     public bool RemoveCharacter(CharacterUnitForm.Data data);
 }
 public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputKeyUpEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
@@ -57,6 +58,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     bool enable = false;
     bool waitForActive = false;
+
+    // Play 相机正交尺寸（视野半高，世界单位）：原 4，现 +1 为 5
+    private const float PlayCameraOrthographicSize = 5f;
+    // Play 相机正交尺寸下限/上限，下限保持原值，仅初始尺寸变大
+    private const float PlayCameraOrthographicSizeMin = 4f;
+    private const float PlayCameraOrthographicSizeMax = 15f;
 
     Vector3 lastPlayerPos;
     Vector3 setPlayerMove;
@@ -90,7 +97,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         downPos = Vector2.zero;
 
         this._fileName = Main2StoryManager.GetSceneFileNameById(id);
-        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), 4, 15);
+        CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(MapManager.instance.sizeLimit, MapManager.instance.data.mainData.mapUnitSize), PlayCameraOrthographicSizeMin, PlayCameraOrthographicSizeMax, PlayCameraOrthographicSize);
         //CameraInstance.instance.tarTrs.position = Z_Math.Graph.ElementwiseMultiply(new Vector3(500, 500, 500), MapManager.instance.data.mainData.mapUnitSize);
         switch (DynamicGlobalSettings.cameraMode)
         {
@@ -107,6 +114,9 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
                 CameraInstance.instance.globalLight.intensity = 1.3f;
                 break;
         }
+
+        // 事件 Cmd(SetLightIntensity) 记录过的强度优先于相机视角默认值。
+        GameManager.ApplyProgressLightIntensity();
 
         setPlayerMove = Vector3.zero;
         enable = true;
@@ -158,7 +168,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         //object correct
         foreach (var data in ObjectUnitForm.DataByUid.Values)
         {
-            var cur = MapObjectForm.DataById.GetDv(data.unit.productInfo.Item1, null);
+            var cur = ObjectProductForm.BindUnit(data);
             if (cur != null)
             {
                 data.isObstacle = cur.collision;
@@ -195,11 +205,24 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void RefreshCurrentCharacter()
     {
+        var progress = GameManager.instance.curProgress;
+        if (!enable || _characterDic == null || progress == null)
+            return;
+        var next = CharacterProductForm.DataByUid.GetDv(progress.characterUid, null);
+        if (next != null && ReferenceEquals(_playerG, next) && _playerM != null
+            && CharacterUnitForm.DataByUid.TryGetValue(_playerM.uid, out var registered)
+            && ReferenceEquals(registered, _playerM) && _playerM.unit != null
+            && _playerM.unit.productInfo.Item1 == next.uid)
+            return;
+        setPlayerMove = Vector3.zero;
+        setPlayerRot = null;
+        curOptSkill = null;
         if (_playerM != null)
         {
-            MapManager.instance.RemoveCharacter(_playerM);
+            progress.pos = _playerM.pos;
+            RemoveCharacter(_playerM);
         }
-        _playerG = CharacterProductForm.DataByUid.GetDv(GameManager.instance.curProgress.characterUid, null);
+        _playerG = next;
         if (_playerG == null)
         {
             _playerM = null;
@@ -355,16 +378,27 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public CharacterUnitForm.Data GetCharacterUnit(int productUid)
     {
-        var data = CharacterProductForm.DataByUid.GetDv(productUid, null);
-        if (data == null || _characterDic == null || !_characterDic.TryGetValue(data, out var unitData))
-            return null;
-        if (!CharacterUnitForm.DataByUid.TryGetValue(unitData.uid, out var registered)
-            || !ReferenceEquals(registered, unitData))
+        var units = GetCharacterUnits(productUid);
+        return units.Count == 0 ? null : units[0];
+    }
+
+    public List<CharacterUnitForm.Data> GetCharacterUnits(int productUid)
+    {
+        var result = new List<CharacterUnitForm.Data>();
+        if (productUid <= 0 || !CharacterProductForm.DataByUid.TryGetValue(productUid, out var source))
+            return result;
+        foreach (var unitData in CharacterUnitForm.DataByUid.Values)
         {
-            _characterDic.Remove(data);
-            return null;
+            if (unitData?.unit == null
+                || !Z_UnitSystem.Form.UnitForm.DataByUid.TryGetValue(unitData.uid, out var registered)
+                || !ReferenceEquals(registered, unitData) || !ReferenceEquals(unitData.unit.data, unitData)
+                || !CharacterProductForm.DataByUid.TryGetValue(unitData.unit.productInfo.Item1, out var product))
+                continue;
+            if (product.uid == productUid || (source.protoUid == 0 && product.protoUid == productUid))
+                result.Add(unitData);
         }
-        return unitData;
+        result.Sort((left, right) => left.uid.CompareTo(right.uid));
+        return result;
     }
 
     public bool RemoveCharacter(CharacterUnitForm.Data data)

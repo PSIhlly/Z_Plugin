@@ -148,9 +148,9 @@ public class CheckController : Z_Controller<ModManager>
         list.Add(new ForeignKeyMapping { SourceFormName = "SkillProductForm", FieldName = "characterUid", TargetFormName = "CharacterProductForm", TargetIndexName = "DataByUid", FieldType = typeof(int), SourceDisplayName = "技能", FieldDisplayName = "装备角色", TargetDisplayName = "角色", SourceDisplayFieldName = "name" });
         list.Add(new ForeignKeyMapping { SourceFormName = "SkillProductForm", FieldName = "triggerConditionUid", TargetFormName = "EventTriggerForm", TargetIndexName = "DataByUid", FieldType = typeof(int), SourceDisplayName = "技能", FieldDisplayName = "触发条件ID", TargetDisplayName = "事件触发器表", SourceDisplayFieldName = "name" });
 
-        // ========== MapObjectForm ==========
-        list.Add(new ForeignKeyMapping { SourceFormName = "MapObjectForm", FieldName = "icon", TargetFormName = "TexAssetForm", TargetIndexName = "DataById", FieldType = typeof(int), SourceDisplayName = "地图景物", FieldDisplayName = "图标", TargetDisplayName = "图片", SourceDisplayFieldName = "name" });
-        list.Add(new ForeignKeyMapping { SourceFormName = "MapObjectForm", FieldName = "minimapIcon", TargetFormName = "TexAssetForm", TargetIndexName = "DataById", FieldType = typeof(int), SourceDisplayName = "地图景物", FieldDisplayName = "小地图图标", TargetDisplayName = "图片", SourceDisplayFieldName = "name" });
+        // ========== ObjectProductForm ==========
+        list.Add(new ForeignKeyMapping { SourceFormName = "ObjectProductForm", FieldName = "icon", TargetFormName = "TexAssetForm", TargetIndexName = "DataById", FieldType = typeof(int), SourceDisplayName = "地图景物", FieldDisplayName = "图标", TargetDisplayName = "图片", SourceDisplayFieldName = "name" });
+        list.Add(new ForeignKeyMapping { SourceFormName = "ObjectProductForm", FieldName = "minimapIcon", TargetFormName = "TexAssetForm", TargetIndexName = "DataById", FieldType = typeof(int), SourceDisplayName = "地图景物", FieldDisplayName = "小地图图标", TargetDisplayName = "图片", SourceDisplayFieldName = "name" });
 
         // ========== MapTextureForm ==========
         list.Add(new ForeignKeyMapping { SourceFormName = "MapTextureForm", FieldName = "icon", TargetFormName = "TexAssetForm", TargetIndexName = "DataById", FieldType = typeof(int), SourceDisplayName = "地图图片", FieldDisplayName = "图标", TargetDisplayName = "图片", SourceDisplayFieldName = "name" });
@@ -190,6 +190,7 @@ public class CheckController : Z_Controller<ModManager>
         "GameTexAssetForm",
         "ProductForm",
         "CharacterProductForm",
+        "ObjectProductForm",
         "ItemProductForm",
         "SkillProductForm",
         "MapBaseForm",

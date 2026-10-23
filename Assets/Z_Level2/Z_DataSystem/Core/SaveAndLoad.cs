@@ -1,8 +1,11 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Threading;
 using UnityEngine;
 using Z_DataSystem;
 
@@ -40,6 +43,41 @@ namespace Z_UnitSystem
                 }
             }
             return root.ToString();
+        }
+
+        // Preserve Package's filesystem JSON, but never retain all asset bytes,
+        // a full UTF-16 JSON string and its UTF-8 copy at the same time.
+        public static void WritePackage(string rootPath, Stream output, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            rootPath = GetRealPath(rootPath);
+            using (var text = new StreamWriter(output, new UTF8Encoding(false), 65536, true))
+            using (var json = new JsonTextWriter(text) { Formatting = Formatting.Indented, CloseOutput = false })
+            {
+                var paths = new Queue<string>();
+                paths.Enqueue(rootPath);
+                json.WriteStartObject();
+                while (paths.Count > 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var path = paths.Dequeue();
+                    foreach (var file in Directory.EnumerateFiles(path))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        json.WritePropertyName(file.Replace(rootPath, ""));
+                        json.WriteValue(File.ReadAllBytes(file));
+                    }
+                    foreach (var directory in Directory.EnumerateDirectories(path))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        paths.Enqueue(directory);
+                        json.WritePropertyName(directory.Replace(rootPath, "/"));
+                        json.WriteStartObject();
+                        json.WriteEndObject();
+                    }
+                }
+                json.WriteEndObject();
+            }
         }
         public static void Unpackage(string content, string rootPath)
         {

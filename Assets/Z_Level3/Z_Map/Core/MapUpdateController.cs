@@ -536,6 +536,7 @@ namespace Z_Map
         private readonly Dictionary<ObjectUnit, bool> objectHalfOcclusionEligibility = new Dictionary<ObjectUnit, bool>();
         private readonly Dictionary<(int, int), bool> projectedUpperTileChecks = new Dictionary<(int, int), bool>();
         private readonly HashSet<TileUnit> characterOverlapBuffer = new HashSet<TileUnit>();
+        private readonly List<MapUnit> halfOcclusionUnits = new List<MapUnit>();
 
         private static bool IsWithinHalfOcclusionRange(int x, int z, Vector3Int center)
         {
@@ -949,6 +950,9 @@ namespace Z_Map
             bool isSideView = DynamicGlobalSettings.cameraMode == CameraMode.Isometric;
             bool modHighLayerHalfTransparent = GlobalSettings.MOD_HIGH_LAYER_HALF_TRANSPARENT
                 && !DynamicGlobalSettings.playing;
+            // 防遮挡关闭时取消 Play 中 Object/Tile 的所有半透明遮挡；高层 Tile 全透保留。
+            // Mod 编辑时高层统一半透明是编辑辅助，不受该开关影响。
+            bool applyHalfOcclusion = !DynamicGlobalSettings.playing || DynamicGlobalSettings.antiOcclusion;
 
             foreach (var curMap in curTileLst)
             {
@@ -1000,6 +1004,23 @@ namespace Z_Map
             if (!modHighLayerHalfTransparent)
                 CollectElevatedObjectVision(realViewCenter);
             CollectAttachedVision(realViewCenter.y, isSideView, modHighLayerHalfTransparent);
+            if (!applyHalfOcclusion)
+                ClearHalfOcclusion();
+        }
+
+        /// <summary>
+        /// 防遮挡关闭：把所有半透明遮挡还原为不透明，只保留高层 Tile 的全透(0)。
+        /// </summary>
+        private void ClearHalfOcclusion()
+        {
+            halfOcclusionUnits.Clear();
+            foreach (var vision in nextVision)
+            {
+                if (vision.Value > FullHighLayerOcclusionDegree && vision.Value < 1f)
+                    halfOcclusionUnits.Add(vision.Key);
+            }
+            foreach (var unit in halfOcclusionUnits)
+                nextVision[unit] = 1f;
         }
 
         private void CollectAttachedVision(int currentLayer, bool isSideView, bool modHighLayerHalfTransparent)

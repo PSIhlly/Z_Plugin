@@ -240,7 +240,7 @@ public partial class ModCmd
                 forms.Add(commandName, api);
         }
 
-        RegisterAlias("SceneObject", typeof(MapObjectForm));
+        RegisterAlias("SceneObject", typeof(ObjectProductForm));
         RegisterAlias("Effect", typeof(EffectForm));
         RegisterAlias("Event", typeof(EventProgramDataForm));
         RegisterAlias("Mission", typeof(MissionForm));

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Map;
@@ -25,32 +26,49 @@ namespace Z_Code
         public override CmdBase GetNew() => new MoveCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var unit = SceneUnitCommand.Resolve(prm[0].str);
-            if (!SceneUnitCommand.CanMove(unit)) return true;
+            var units = SceneUnitCommand.ResolveAll(prm[0].str);
+            if (!units.Exists(SceneUnitCommand.CanMove)) return true;
             var vector = SceneUnitCommand.ReadVector(prm[1]);
-            var target = Relative ? unit.data.pos + MapManager.instance.utilCtrl.MapPos2RealPos(vector)
-                : SceneUnitCommand.WorldPosition(vector);
-            float distance = MapManager.instance.utilCtrl.RealPos2MapPos(target - unit.data.pos).magnitude;
             float argument = prm[2].num;
-            if (float.IsNaN(argument) || float.IsInfinity(argument) || distance <= .00001f)
+            if (float.IsNaN(argument) || float.IsInfinity(argument) || (!UsesDuration && argument <= 0))
                 return true;
+            var offsetOrPosition = Relative ? MapManager.instance.utilCtrl.MapPos2RealPos(vector)
+                : SceneUnitCommand.WorldPosition(vector);
+            var moves = new List<PendingMove>();
+            foreach (var unit in units)
+            {
+                if (!SceneUnitCommand.CanMove(unit)) continue;
+                var target = Relative ? unit.data.pos + offsetOrPosition : offsetOrPosition;
+                float distance = MapManager.instance.utilCtrl.RealPos2MapPos(target - unit.data.pos).magnitude;
+                if (distance <= .00001f) continue;
+                moves.Add(new PendingMove
+                {
+                    unit = unit, data = unit.data, target = target,
+                    speed = UsesDuration && argument > 0 ? distance / argument : argument,
+                    remainingTime = UsesDuration ? argument : distance / argument
+                });
+            }
+            if (moves.Count == 0) return true;
             if (UsesDuration && argument <= 0)
             {
-                SceneUnitCommand.Move(unit, target - unit.data.pos);
+                foreach (var move in moves)
+                    if (SceneUnitCommand.IsLive(move.unit, move.data))
+                        SceneUnitCommand.Move(move.unit, move.target - move.unit.data.pos);
                 return true;
             }
-            if (argument <= 0) return true;
-            float speed = UsesDuration ? distance / argument : argument;
-            float remainingTime = UsesDuration ? argument : distance / speed;
-            // Capture this instance, not a reusable UID or the interpreter's shared heapTemp.
+            // Capture all original identities/targets before the first movement callback runs.
             GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {
-                if (!SceneUnitCommand.IsLive(unit))
+                bool complete = true;
+                float delta = MapUtilController.MovementDeltaTime;
+                foreach (var move in moves)
                 {
-                    asyncTask.Complete();
-                    return true;
+                    if (move.finished) continue;
+                    move.finished = !SceneUnitCommand.IsLive(move.unit, move.data)
+                        || AdvanceMove(move.unit, move.target, move.speed, ref move.remainingTime, delta);
+                    if (!move.finished) complete = false;
                 }
-                if (AdvanceMove(unit, target, speed, ref remainingTime, MapUtilController.MovementDeltaTime))
+                if (complete)
                 {
                     // A blocked move ends after its allotted travel time, as before.
                     asyncTask.Complete();
@@ -59,6 +77,16 @@ namespace Z_Code
                 return false;
             });
             return false;
+        }
+
+        private sealed class PendingMove
+        {
+            public MapUnit unit;
+            public Z_UnitSystem.Form.UnitForm.Data data;
+            public Vector3 target;
+            public float speed;
+            public float remainingTime;
+            public bool finished;
         }
 
         internal static bool AdvanceMove(MapUnit unit, Vector3 target, float speed, ref float remainingTime, float deltaTime)

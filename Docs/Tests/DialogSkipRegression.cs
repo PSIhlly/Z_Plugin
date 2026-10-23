@@ -132,7 +132,7 @@ public class DialogSkipRegression : IZ_Listener<ClipPlayEvent>
         var oldWord = main.model.wordTimer;
         Check(main.view.txt_.text == "" && main.model.isDisplaying, "normal show still starts the typewriter");
         clock.Fire(oldWord);
-        Check(main.model.nowWord == 2, "normal text speed is unchanged");
+        Check(main.model.nowWord == 2 && Math.Abs(main.model.wordTimer.interval - 0.1f) < 0.000001f, "normal text speed is two characters per 0.1 s (0.05 s per character)");
         int writes = main.view.txt_.writes;
         options.view.btn_skip.onClickDown();
         Check(settings.skipping && options.view.sta_skip.state == 1, "press enters explicit skip state");
@@ -159,7 +159,7 @@ public class DialogSkipRegression : IZ_Listener<ClipPlayEvent>
 
         Show(main, options, "普通句子");
         oldWord = main.model.wordTimer;
-        Check(main.view.txt_.text == "" && Math.Abs(oldWord.interval - 0.2f) < 0.000001f, "next sentence returns to ordinary typewriter timing");
+        Check(main.view.txt_.text == "" && Math.Abs(oldWord.interval - 0.1f) < 0.000001f, "next sentence returns to ordinary typewriter timing (0.05 s per character)");
         for (int i = 0; i <= "普通句子".Length; i++) clock.Fire(oldWord);
         Check(main.view.txt_.text == "普通句子" && !main.model.isDisplaying && oldWord.completed && !oldWord.cancel, "ordinary completed timer matches production completion semantics");
         options.view.btn_autoPlay.onClick.Invoke();

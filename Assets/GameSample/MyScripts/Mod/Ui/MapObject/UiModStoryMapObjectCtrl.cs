@@ -67,7 +67,9 @@ namespace Ui.ModStory.ModStoryMapObject
             });
             view.page_ModStoryMapObjectObject.SetShow(model.data is MapObjectForm.Data, new UiModStoryMapObjectObjectParam()
             {
-                data = model.data is MapObjectForm.Data?(MapObjectForm.Data)model.data:null,
+                data = model.data is MapObjectForm.Data objectRow &&
+                       ObjectProductForm.DataByUid.TryGetValue(objectRow.objectUid, out var objectProduct)
+                    ? objectProduct : null,
             });
         }
     }

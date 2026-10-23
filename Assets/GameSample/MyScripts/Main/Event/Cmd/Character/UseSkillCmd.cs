@@ -26,8 +26,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new UseSkillCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var ch = CharacterProductForm.DataByUid.GetDv(GlobalEventHelper.GetId(prm[0].str, GlobalEventHelper.CHARACTER), null);
-            if (ch != null)
+            foreach (var ch in CharacterProductForm.ResolveReferences(prm[0].str))
             {
                 var data = SkillProductForm.GetByEvtName(prm[1].str, ch.uid);
                 if (data != null)

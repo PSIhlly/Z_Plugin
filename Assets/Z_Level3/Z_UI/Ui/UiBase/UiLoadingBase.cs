@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Z_Ui.Base;
 using Z_Ui;
-using Z_Texture;
- 
-using UnityEngine.Video;
+using Z_Texture;using RenderHeads.Media.AVProVideo;
 namespace Ui.Loading
 
 {
@@ -22,10 +20,12 @@ namespace Ui.Loading
     {
 
             public Txt txt_title;
+            public Txt txt_progress;
         public UiLoadingView(UiHolder uiHolder):base(uiHolder)
         {
 
             txt_title = uiHolder.elementTrsLst[0].GetComponent<Txt>();
+            txt_progress = uiHolder.elementTrsLst[1].GetComponent<Txt>();
         }
 
     }

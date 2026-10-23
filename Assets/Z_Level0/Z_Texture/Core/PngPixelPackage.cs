@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Threading;
 using UnityEngine;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 
@@ -82,11 +84,33 @@ namespace Z_Texture
             if (payload == null) throw new ArgumentNullException(nameof(payload));
             if (payload.Length > MaxPayloadBytes)
                 throw Invalid("Package payload exceeds the 512 MiB safety limit.");
+            return EncodeStreamWithCover(cover, output => output.Write(payload, 0, payload.Length));
+        }
 
+        /// <summary>
+        /// Streams UTF-8 package data directly through its checksum and GZip,
+        /// avoiding a second full-size JSON/payload allocation. The writer must
+        /// finish synchronously and leave its output stream open.
+        /// </summary>
+        public static byte[] EncodeStreamWithCover(CoverSnapshot cover, Action<Stream> writePayload,
+            CancellationToken cancellationToken = default)
+        {
+            if (writePayload == null) throw new ArgumentNullException(nameof(writePayload));
+            cancellationToken.ThrowIfCancellationRequested();
             using (var packed = new MemoryStream())
             {
+                long rawLength;
+                byte[] digest;
+                using (var sha = CreatePayloadHash())
                 using (var gzip = new GZipStream(packed, CompressionLevel.Optimal, true))
-                    gzip.Write(payload, 0, payload.Length);
+                {
+                    var raw = new PayloadWriter(gzip, sha, cancellationToken);
+                    writePayload(raw);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    rawLength = raw.Length;
+                    sha.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+                    digest = sha.Hash;
+                }
                 // Some runtimes do not initialize GZip on a zero-byte Write.
                 if (packed.Length == 0)
                 {
@@ -114,15 +138,21 @@ namespace Z_Texture
                 Buffer.BlockCopy(Magic, 0, header, 0, Magic.Length);
                 WriteUInt32(header, 8, 1); // Protocol version.
                 WriteUInt32(header, 12, 1); // GZip payload.
-                WriteUInt32(header, 16, (uint)payload.Length);
+                WriteUInt32(header, 16, (uint)rawLength);
                 WriteUInt32(header, 20, (uint)packedLength);
                 WriteUInt32(header, 24, (uint)coverRows);
-                using (var sha = SHA256.Create())
-                    Buffer.BlockCopy(sha.ComputeHash(payload), 0, header, 32, 32);
+                Buffer.BlockCopy(digest, 0, header, 32, 32);
 
-                // Reserve PNG/deflate overhead up front: going only a few KiB
-                // past packedLength must not double a 100+ MiB output buffer.
-                int outputCapacity = checked(packedLength + (cover?.RgbLength ?? 0) + packedLength / 1024 + 65536);
+                // Large RGB payloads are already GZipped: recompressing them
+                // costs seconds without reducing their size. Stored DEFLATE
+                // blocks are standard PNG and have a predictable allocation.
+                // Keep compression for small images with mostly blank rows.
+                bool storeRows = packedLength >= 1024 * 1024;
+                long scanlineBytes = (long)(rowBytes + 1) * height;
+                long zlibBytes = scanlineBytes + (scanlineBytes / 65535 + 1) * 5 + 6;
+                int outputCapacity = storeRows
+                    ? checked((int)(57 + zlibBytes + ((zlibBytes + IdatChunkBytes - 1) / IdatChunkBytes) * 12))
+                    : checked(packedLength + (cover?.RgbLength ?? 0) + packedLength / 1024 + 65536);
                 using (var png = new MemoryStream(outputCapacity))
                 {
                     png.Write(Signature, 0, Signature.Length);
@@ -139,14 +169,13 @@ namespace Z_Texture
                     {
                         chunks.WriteByte(0x78);
                         chunks.WriteByte(0x01); // zlib, deflate, no preset dictionary.
-                        // Optimal can emit stored blocks for already-compressed
-                        // bytes. Fastest on some runtimes adds ~5% unnecessary
-                        // Huffman overhead to random GZip data.
-                        using (var deflate = new DeflateStream(chunks, CompressionLevel.Optimal, true))
+                        using (Stream deflate = storeRows ? (Stream)new StoredDeflateWriter(chunks)
+                            : new DeflateStream(chunks, CompressionLevel.Optimal, true))
                         {
                             int dataOffset = 0;
                             for (int y = 0; y < height; y++)
                             {
+                                cancellationToken.ThrowIfCancellationRequested();
                                 Array.Clear(row, 0, row.Length);
                                 if (y == 0)
                                     Buffer.BlockCopy(header, 0, row, 1, header.Length);
@@ -168,6 +197,7 @@ namespace Z_Texture
                         chunks.Write(checksum, 0, checksum.Length);
                     }
                     WriteChunk(png, Iend, Array.Empty<byte>(), 0, 0);
+                    cancellationToken.ThrowIfCancellationRequested();
                     return png.ToArray();
                 }
             }
@@ -246,7 +276,7 @@ namespace Z_Texture
                     // a small buffer first; malformed tiny images cannot force
                     // a 512 MiB allocation on Android.
                     byte[] actualHash;
-                    using (var sha = SHA256.Create())
+                    using (var sha = CreatePayloadHash())
                     using (var bytes = new MemoryStream(packed, false))
                     using (var gzip = new GZipStream(bytes, CompressionMode.Decompress))
                     {
@@ -550,6 +580,163 @@ namespace Z_Texture
             uint typeCrc = Crc(type, 0, 4);
             WriteUInt32(length, 0, Crc(bytes, offset, count, typeCrc ^ 0xffffffffu));
             png.Write(length, 0, 4);
+        }
+
+        private static HashAlgorithm CreatePayloadHash()
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            // Unity's Mono SHA256Managed takes ~10 s for a 160 MiB package.
+            // CNG computes the identical standard digest using Windows' provider.
+            try { return new WindowsSha256(); }
+            catch (DllNotFoundException) { }
+            catch (EntryPointNotFoundException) { }
+            catch (CryptographicException) { }
+#endif
+            return SHA256.Create();
+        }
+
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+        private sealed class WindowsSha256 : HashAlgorithm
+        {
+            private IntPtr algorithm, hash;
+            public WindowsSha256()
+            {
+                HashSizeValue = 256;
+                try
+                {
+                    Check(BCryptOpenAlgorithmProvider(out algorithm, "SHA256", null, 0));
+                    Initialize();
+                }
+                catch { Dispose(); throw; }
+            }
+            ~WindowsSha256() { Dispose(false); }
+            public override void Initialize()
+            {
+                if (hash != IntPtr.Zero) { BCryptDestroyHash(hash); hash = IntPtr.Zero; }
+                Check(BCryptCreateHash(algorithm, out hash, IntPtr.Zero, 0, IntPtr.Zero, 0, 0));
+            }
+            protected override void HashCore(byte[] bytes, int offset, int count)
+            {
+                if (count == 0) return;
+                var pinned = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                try { Check(BCryptHashData(hash, Marshal.UnsafeAddrOfPinnedArrayElement(bytes, offset), count, 0)); }
+                finally { pinned.Free(); }
+            }
+            protected override byte[] HashFinal()
+            {
+                var digest = new byte[32];
+                Check(BCryptFinishHash(hash, digest, digest.Length, 0));
+                return digest;
+            }
+            protected override void Dispose(bool disposing)
+            {
+                if (hash != IntPtr.Zero) { BCryptDestroyHash(hash); hash = IntPtr.Zero; }
+                if (algorithm != IntPtr.Zero) { BCryptCloseAlgorithmProvider(algorithm, 0); algorithm = IntPtr.Zero; }
+                if (disposing) GC.SuppressFinalize(this);
+                base.Dispose(disposing);
+            }
+            private static void Check(int status)
+            {
+                if (status != 0) throw new CryptographicException("Windows SHA-256 failed (0x" + status.ToString("X8") + ").");
+            }
+            [DllImport("bcrypt.dll", CharSet = CharSet.Unicode)]
+            private static extern int BCryptOpenAlgorithmProvider(out IntPtr algorithm, string id, string implementation, int flags);
+            [DllImport("bcrypt.dll")]
+            private static extern int BCryptCreateHash(IntPtr algorithm, out IntPtr hash, IntPtr buffer, int length, IntPtr secret, int secretLength, int flags);
+            [DllImport("bcrypt.dll")]
+            private static extern int BCryptHashData(IntPtr hash, IntPtr bytes, int count, int flags);
+            [DllImport("bcrypt.dll")]
+            private static extern int BCryptFinishHash(IntPtr hash, [Out] byte[] digest, int length, int flags);
+            [DllImport("bcrypt.dll")]
+            private static extern int BCryptDestroyHash(IntPtr hash);
+            [DllImport("bcrypt.dll")]
+            private static extern int BCryptCloseAlgorithmProvider(IntPtr algorithm, int flags);
+        }
+#endif
+
+        private sealed class PayloadWriter : Stream
+        {
+            private readonly Stream output;
+            private readonly HashAlgorithm sha;
+            private readonly CancellationToken cancellation;
+            private long length;
+            public PayloadWriter(Stream output, HashAlgorithm sha, CancellationToken cancellation)
+            { this.output = output; this.sha = sha; this.cancellation = cancellation; }
+            public override bool CanRead => false;
+            public override bool CanSeek => false;
+            public override bool CanWrite => true;
+            public override long Length => length;
+            public override long Position { get => length; set => throw new NotSupportedException(); }
+            public override void Write(byte[] bytes, int offset, int count)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                if (count < 0 || offset < 0 || bytes == null || offset > bytes.Length - count)
+                    throw new ArgumentOutOfRangeException();
+                if (length + count > MaxPayloadBytes)
+                    throw Invalid("Package payload exceeds the 512 MiB safety limit.");
+                while (count > 0)
+                {
+                    cancellation.ThrowIfCancellationRequested();
+                    int copy = Math.Min(65536, count);
+                    sha.TransformBlock(bytes, offset, copy, bytes, offset);
+                    output.Write(bytes, offset, copy);
+                    length += copy;
+                    offset += copy;
+                    count -= copy;
+                }
+            }
+            public override void Flush() { cancellation.ThrowIfCancellationRequested(); output.Flush(); }
+            public override int Read(byte[] bytes, int offset, int count) => throw new NotSupportedException();
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+            public override void SetLength(long value) => throw new NotSupportedException();
+        }
+
+        // RFC 1951 stored blocks, used only after the package was GZipped.
+        // Leave IDAT open so the caller can append the zlib Adler-32 checksum.
+        private sealed class StoredDeflateWriter : Stream
+        {
+            private readonly Stream output;
+            private readonly byte[] buffer = new byte[65535], header = new byte[5];
+            private int used;
+            private bool finished;
+            public StoredDeflateWriter(Stream output) { this.output = output; }
+            public override bool CanRead => false;
+            public override bool CanSeek => false;
+            public override bool CanWrite => !finished;
+            public override long Length => throw new NotSupportedException();
+            public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+            public override void Write(byte[] bytes, int offset, int count)
+            {
+                while (count > 0)
+                {
+                    int copy = Math.Min(buffer.Length - used, count);
+                    Buffer.BlockCopy(bytes, offset, buffer, used, copy);
+                    used += copy;
+                    offset += copy;
+                    count -= copy;
+                    if (used == buffer.Length) WriteBlock(false);
+                }
+            }
+            private void WriteBlock(bool final)
+            {
+                header[0] = (byte)(final ? 1 : 0);
+                header[1] = (byte)used;
+                header[2] = (byte)(used >> 8);
+                header[3] = (byte)~used;
+                header[4] = (byte)(~used >> 8);
+                output.Write(header, 0, header.Length);
+                output.Write(buffer, 0, used);
+                used = 0;
+            }
+            public override void Flush() { if (used > 0) WriteBlock(false); }
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing && !finished) { WriteBlock(true); finished = true; }
+                base.Dispose(disposing);
+            }
+            public override int Read(byte[] bytes, int offset, int count) => throw new NotSupportedException();
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+            public override void SetLength(long value) => throw new NotSupportedException();
         }
 
         private sealed class Adler32

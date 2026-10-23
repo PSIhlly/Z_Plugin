@@ -32,6 +32,7 @@ public static class DisFadeRoutingRegression
             source.SetFloat("_Alpha", 1f);
             source.SetFloat("_Show", 1f);
             source.SetFloat("_FadeCenter", 0f);
+            source.SetFloat("_LightSensitivity", 1f);
             first = new Texture2D(2, 2);
             second = new Texture2D(2, 2);
             source.SetTexture("_Tex", first);
@@ -162,14 +163,40 @@ public static class DisFadeRoutingRegression
             Check(body.sharedMaterial == firstHidden && front.sharedMaterial == secondHidden,
                 "repeated hiding reuses cached hidden materials");
             tile.ApplyVision(1f, 1f);
+            foreach (int display in new[] { 0, 1, 2, 0, 2, int.MaxValue })
+            {
+                tile.displayLayer = display;
+                tile.ApplyVision(1f, 1f);
+                for (int i = 0; i < 6; i++)
+                {
+                    bool higher = i % 3 > display;
+                    var renderer = tile.renderers[i];
+                    renderer.GetPropertyBlock(block);
+                    Check(block.GetFloat("_Show") == (higher ? .5f : 1f)
+                        && block.GetFloat("_FadeCenter") == 0f && renderer.enabled,
+                        "selected layer keeps lower pairs and previews upper normal/front pairs at half opacity");
+                    Check(tile.GetRendererRoute(i) == (higher ? DisFadeRenderRouting.Route.Transparent
+                        : DisFadeRenderRouting.Route.Opaque), "upper layer preview is cached as a transparent route");
+                    CheckRoute(renderer, higher ? "Transparent" : "Opaque");
+                    float light = display != int.MaxValue && i % 3 < display ? .5f : 1f;
+                    Check(block.GetFloat("_LightSensitivity") == light,
+                        "layer changes retain original lighting above/current and non-cumulative half lighting below");
+                }
+            }
             tile.displayLayer = 0;
-            tile.ApplyVision(1f, 1f);
-            tile.renderers[1].GetPropertyBlock(block);
-            Check(block.GetFloat("_Show") == 0f, "display ceiling hides upper layers");
-            Check(tile.GetRendererRoute(1) == DisFadeRenderRouting.Route.Hidden
-                && tile.GetRendererRoute(4) == DisFadeRenderRouting.Route.Hidden,
-                "display ceiling is included in cached routes");
-            CheckHidden(tile.renderers[1]);
+            tile.ApplyVision(.25f, .75f);
+            for (int i = 0; i < 6; i++)
+                CheckUniformTransparency(tile.renderers[i], i < 3 ? .25f : i == 3 ? .75f : .5f);
+            tile.ApplyVision(.5f, .5f);
+            foreach (var renderer in tile.renderers)
+                CheckUniformTransparency(renderer, .5f);
+            tile.ApplyVision(0f, 0f);
+            foreach (var renderer in tile.renderers)
+            {
+                renderer.GetPropertyBlock(block);
+                Check(block.GetFloat("_Show") == 0f, "upper layer preview cannot reveal fully hidden Tile parts");
+                CheckHidden(renderer);
+            }
             HiddenAuthoredPasses(source, first);
 
             // Exercise production Tile Show selection, not only the routing helper.

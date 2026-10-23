@@ -24,11 +24,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
 
     public partial class UiModStoryMapObjectObjectAppearanceParam
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
     }
     public partial class UiModStoryMapObjectObjectAppearanceModel
     {
-        public MapObjectForm.Data data;
+        public ObjectProductForm.Data data;
         public AnimDirecton dir;
         public int id;
 
@@ -104,7 +104,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             };
             view.btn_label.onClick.AddListener(() =>
             {
-                UiLabRenderHelper.Choose(nameof(MapObjectForm), labId =>
+                UiLabRenderHelper.Choose(nameof(ObjectProductForm), labId =>
                 {
                     model.data.labId = labId;
                     Refresh();
@@ -132,7 +132,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             };
             view.btn_image.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.id, model.dir, model.id);
+                ModManager.instance.assetCtrl.ImportObjectUnitTex(model.data.uid, model.dir, model.id);
                 Refresh();
             });
             view.ipt_interval.onFinishInput += (s) =>
@@ -300,7 +300,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         {
             view.btn_new.onClick.AddListener(() =>
             {
-                ModManager.instance.assetCtrl.CreateObjectUnitTex(parent.model.data.id, parent.model.dir);
+                ModManager.instance.assetCtrl.CreateObjectUnitTex(parent.model.data.uid, parent.model.dir);
                 parent.Refresh();
             });
             view.btn_.onClick.AddListener(() =>

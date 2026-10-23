@@ -37,7 +37,7 @@ namespace Z_Map
         }
         public const int TEX_ANIM_MAX = 10;
         public const int ITEM_UNIT_MAX = 10;
-        public const bool NAV_DEBUG = true;
+        public static bool NAV_DEBUG = false;
         public const bool MAP_SHOW_DEBUG = false;
         public const bool OVERLAY_HIDE = false;
         public const bool MOD_HIGH_LAYER_HALF_TRANSPARENT = true;
@@ -53,6 +53,19 @@ namespace Z_Map
         public static CameraMode cameraMode;
         public static bool playing;
         public static bool pauseNav;
+        /// <summary>
+        /// 防遮挡：关闭时 Play 中取消 Object/Tile 的所有半透明遮挡，高层 Tile 全透保留。
+        /// </summary>
+        public static bool antiOcclusion;
+        /// <summary>
+        /// 允许下落：开启(默认)时人物可以单步跨过大于 step 的 y 落差；
+        /// 关闭时前方本层没有 tile、只有下层有 tile(落差 >= 1 层 > step)的移动被禁止，导航也不再连出该落差的线。
+        /// </summary>
+        public static bool allowDrop = true;
+        /// <summary>
+        /// 边界过渡：开启(默认)时没有 tile 的地图边界处用黑幕渐变压黑，关闭时完全不绘制。
+        /// </summary>
+        public static bool edgeTransition = true;
     }
 
 
@@ -102,6 +115,7 @@ public class MapManager : Z_MonoManager<MapManager>
     public Vector3 sizeLimit = new Vector3(1000, 1000, 1000);
     public MapInfo data;
     public GameObject mainGo;
+    public MapEdgeTransition edgeTransition;
 
 
     public NavigationController navigationCtrl;
@@ -135,6 +149,9 @@ public class MapManager : Z_MonoManager<MapManager>
 
         navigationCtrl.Build();
         mainGo.SetActive(true);
+
+        // 没有 tile 的边界渐变过渡（矩形解析，固定 1 次全屏绘制）。
+        edgeTransition = MapEdgeTransition.Create(this);
 
         //try invoke create
         foreach (var tData in TileUnitForm.DataByUid.Values)
@@ -282,6 +299,11 @@ public class MapManager : Z_MonoManager<MapManager>
     {
         updateCtrl.End();
 
+        if (edgeTransition != null)
+        {
+            Destroy(edgeTransition.gameObject);
+            edgeTransition = null;
+        }
         enable = false;
         mainGo.SetActive(false);
         if (data != null)

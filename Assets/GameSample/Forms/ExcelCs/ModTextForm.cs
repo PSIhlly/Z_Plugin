@@ -883,6 +883,16 @@ namespace Form
 
                 {1000376,new Data(1000376,"MoveRelative","Move relatively","相对移动")},
 
+                {1000377,new Data(1000377,"AddCharacterToTeam","Add character to team","加入队伍")},
+
+                {1000378,new Data(1000378,"RemoveCharacterFromTeam","Remove character from team","移出队伍")},
+
+                {1000379,new Data(1000379,"DeployCharacter","Deploy character","角色出战")},
+
+                {1000380,new Data(1000380,"UndeployCharacter","Undeploy character","角色不出战")},
+
+                {1000381,new Data(1000381,"SetCurrentCharacter","Set current character","切换为当前角色")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -1617,6 +1627,16 @@ namespace Form
                         {"Move",_DataById[1000375]},
     
                         {"MoveRelative",_DataById[1000376]},
+    
+                        {"AddCharacterToTeam",_DataById[1000377]},
+    
+                        {"RemoveCharacterFromTeam",_DataById[1000378]},
+    
+                        {"DeployCharacter",_DataById[1000379]},
+    
+                        {"UndeployCharacter",_DataById[1000380]},
+    
+                        {"SetCurrentCharacter",_DataById[1000381]},
     
                     
                     };

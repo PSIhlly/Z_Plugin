@@ -1,7 +1,7 @@
 [
   {
-    "uid": 2,
-    "name": "2",
+    "uid": 3,
+    "name": "3",
     "miniMap": 210000,
     "pos": "0|0",
     "unlock": false,
@@ -49,6 +49,45 @@
           "evt": [
             {
               "v": 11
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggeringOnceDuringEvts": [],
+    "triggeredOnceEvts": [],
+    "notFirstTime": false
+  },
+  {
+    "uid": 2,
+    "name": "2",
+    "miniMap": 210000,
+    "pos": "0|0",
+    "unlock": false,
+    "hideInLargeMap": false,
+    "events": [
+      {
+        "k": "onCharacterParamChangeEvent$$Hp",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterParamChangeEvent$$Hp",
+          "evt": [
+            {
+              "v": 11
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onEnterEvent",
+        "v": {
+          "uid": -1,
+          "name": "onEnterEvent",
+          "evt": [
+            {
+              "v": 30
             }
           ],
           "type": 0
